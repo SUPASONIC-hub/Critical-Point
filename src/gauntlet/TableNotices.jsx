@@ -120,7 +120,7 @@ export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onC
     <>
       {/* The table's one voice (tableVoice.js): the push, the stance, the settlement, the act and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
-      <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
+      <span className="sr-only" role="status" data-testid="table-voice">{said.text && <span key={said.n}>{said.text}</span>}</span>
       <EdgeNotice voice={voice} caseId={caseId} />
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">

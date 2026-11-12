@@ -358,7 +358,8 @@ const fileBudgets = {
   // (en-hand5-linux, pc-type-scale).
   // 3141 / 61293 -> 3151 / 61522 on 2026-11-10, C-15 over main cb8346da (#499 #500), measured: the badge fold and the plain 소모 없음.
   // 3151 / 61522 (C-15) and 3143 / 61347 (phone-390-staked, #503) -> 3153 / 61576 on 2026-11-11, C-15 after merging main 568572d3, measured: both.
-  "play.css": { lines: 3153, bytes: 61576 },
+  // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
+  "play.css": { lines: 3160, bytes: 61634 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

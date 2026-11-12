@@ -83,6 +83,8 @@ const tableCopy = {
     holdToCommit: "꾹 눌러 확정",
     holdHint: "길게 눌러야 확정",
     holdHelp: "길게 눌러 확정",
+    // The heart's button (I): drawn as the icon alone, named for the one line it asks the voice for.
+    listen: "지금 상황 듣기",
   },
   // The key line over the hand: each word after its key.
   keys: {
@@ -236,6 +238,8 @@ const tableCopy = {
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",
+    // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
+    status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },
   // tableAfterword.js: what a closed window still says about itself, and the
   // recap over the next scene's reaction.

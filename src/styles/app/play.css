@@ -1025,6 +1025,18 @@
   transform: scale(calc(1 + var(--gx-beat, 0) * 0.35));
 }
 
+/* 지금 상황 듣기 (E3): the heart itself is the button, drawn as the icon
+   alone and no larger, so the row it sits in keeps its width and height. */
+.gx-listen {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  line-height: 0;
+}
+
 /* The scene: who is asking and the one question. */
 .gx-scene {
   position: relative;
@@ -2380,6 +2392,15 @@
     content: "";
     position: absolute;
     inset: calc(50% - 22px) 0;
+  }
+
+  /* The heart's 14px button is pressed over 44 the same way, reaching right
+     over its own 심박 N (no control) and only into the 4px gap on its left. */
+  .gx-listen::before {
+    content: "";
+    position: absolute;
+    inset: calc(50% - 22px) auto calc(50% - 22px) -4px;
+    width: 44px;
   }
 
   .gx-focus-modes span {
