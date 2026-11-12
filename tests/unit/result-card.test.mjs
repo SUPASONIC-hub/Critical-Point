@@ -376,6 +376,8 @@ test("every character the card can draw or copy has a glyph in the game's font",
     "0123456789",
     // The card with nothing to show, for the words it falls back to.
     ...draw(buildResultCardModel()).texts.map((entry) => entry.text),
+    // C3-3's line, drawn only on a held season.
+    buildResultCardModel({ held: "x" }).heldLine,
   ]);
   // And every card as it is drawn and copied, so a string put together at
   // draw time (the score with its unit) is read too.
@@ -460,7 +462,8 @@ test("the report screen hands the card four things and the season's two strings,
     literal.split(", ").map((field) => field.split(":")[0]),
     // 사건당 금고 (C-1 (3), 2026-10-22) comes worded, a string and no record;
     // E-5: the season's number and the shared line's tail (secondSeason.getSeasonCard), which say nothing of who played.
-    ["fingerprint", "endingVariant", "endingName", "caseResults", "vaultLine", "season", "share"],
+    // C3-3: the report's held sentence, of which the card reads only whether it is set.
+    ["fingerprint", "endingVariant", "endingName", "caseResults", "vaultLine", "season", "share", "held"],
   );
   assert.doesNotMatch(literal, pattern);
   assert.doesNotMatch(literal, /\.\.\./, "nothing is spread into it");
@@ -584,6 +587,35 @@ test("the longest ending line is set on at most three lines, and the longest 판
   const plain = draw(modelOf({ ending, fingerprint }));
   assert.equal(plain.texts.find((entry) => longestMode.startsWith(entry.text)).size, 76);
   assert.equal(plain.texts.find((entry) => longestTitle.startsWith(entry.text)).size, 40);
+});
+
+test("C3-3: a held season's card says under the ending that people were kept, short of the 논리 유지력 line", () => {
+  const caseResults = { case01: { burstScore: 100, rank: "S", logicRecord: logicRecord({ windows: 9, best: 9 }) }, final: { burstScore: 100, rank: "S" } };
+  const longestMode = longestOf(FINGERPRINTS.map((fingerprint) => fingerprint.modeTitle));
+  const fingerprint = FINGERPRINTS.find((candidate) => candidate.modeTitle === longestMode);
+  for (const options of [{}, { hangul: 1.1 }]) {
+    for (const ending of ENDINGS.filter((candidate) => candidate.id !== "collapse")) {
+      const plain = buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, caseResults, logicHold: 100 });
+      const held = buildResultCardModel({ fingerprint, endingVariant: ending, endingName: ending.name, caseResults, logicHold: 100, held: "현금은 평균 40까지 내려갔지만 …" });
+      assert.equal(plain.heldLine, "");
+      assert.equal(held.heldLine, "현금은 잃었어도 사람 피해는 붕괴선 아래");
+      const ctx = draw(held, options);
+      assertInsideCard(ctx, `${ending.id} held`);
+      const line = ctx.texts.find((entry) => entry.text === held.heldLine);
+      assert.ok(line, `${ending.id}: the held line is drawn`);
+      assert.deepEqual([line.x, line.size, line.color], [RESULT_CARD_MARGIN, 26, "accent"]);
+      const logic = ctx.texts.find((entry) => entry.text === RESULT_CARD_LABELS.logic);
+      assert.ok(line.y + descent(line) < logic.y - logic.size, `${ending.id}: the held line ends above the 논리 유지력 line (${line.y})`);
+      // Everything above the ending's title is where it was.
+      const unheld = draw(plain, options);
+      const titleTop = unheld.texts.find((entry) => entry.text === ending.label)?.y ?? Infinity;
+      assert.deepEqual(ctx.texts.filter((entry) => entry.y <= titleTop), unheld.texts.filter((entry) => entry.y <= titleTop), ending.id);
+    }
+  }
+  // No held sentence, no line; and the line is not copied with the card.
+  assert.equal(buildResultCardModel({ held: null }).heldLine, "");
+  assert.equal(buildResultCardModel({ held: "" }).heldLine, "");
+  assert.doesNotMatch(buildShareText(buildResultCardModel({ held: "x" })), /붕괴선/);
 });
 
 test("the collapse is drawn in the wall's colour and every other ending in the accent", () => {
