@@ -75,6 +75,8 @@ SUPASONIC and ALICE made the game together, from the first plan to the finished 
 
 ## 라이선스
 
+**© 2026 STUDIO 찹쌀떡 (Mochi Verse · もちぷよ). All rights reserved.**
+
 이 저장소에는 오픈소스 라이선스가 없습니다. 코드와 글, 그림의 권리는 우리에게 있습니다. 쓰고 싶은 곳이
 있으면 위 메일로 물어 주세요. 초상 사진의 출처와 라이선스는
 [`docs/portrait-credits.md`](docs/portrait-credits.md)에 있습니다.
