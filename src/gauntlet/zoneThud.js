@@ -10,23 +10,31 @@
  * A step down says nothing. The same step does not sound twice while the line
  * stands on it; a line that cools off a step and climbs back sounds again.
  *
- * For earphones: a sine at one pitch, set once and never moved, and a gain
- * that starts at 0.0001 and only ramps -- in over `THUD_ATTACK` (no click),
- * out well inside 0.3 s. It goes to the context's destination, never into the
- * score's drive, like every table cue (gauntletAudio.js).
+ * The sound (picked on earphones 2026-11-12 over a 110 Hz blip heard as
+ * "light, small, no effect"): a sine body that glides 120 -> 42 Hz over
+ * 0.22 s with a 1.1 s tail, plus its octave so earbuds that cannot play 42 Hz
+ * still carry the drop. For earphones: pitch only glides (exponential, never
+ * a step), every gain starts at 0.0001 and only ramps, and it goes to the
+ * context's destination, never into the score's drive, like every table cue
+ * (gauntletAudio.js).
  */
 
 /** The line's steps, low to high. */
 export const ZONE_RANK = Object.freeze({ distance: 0, inReach: 1, inBand: 2 });
 
-/** A2 -- the drone's 55Hz an octave up: low, and in tune with the room tone under it. */
-export const THUD_HZ = 110;
-export const THUD_ATTACK = 0.025;
-export const THUD_RELEASE = 0.22;
-/** When the oscillator stops: the release is done by then, and it is under 0.3 s. */
-export const THUD_LENGTH = 0.28;
-/** At the default preset about the heartbeat's resting beat: heard, not a jolt. */
-export const THUD_LEVEL = 0.2;
+/** The body: where the glide starts and lands, and how long it takes. */
+export const THUD_FROM_HZ = 120;
+export const THUD_TO_HZ = 42;
+export const THUD_GLIDE = 0.22;
+/** In fast enough to land as a hit, slow enough not to click. */
+export const THUD_ATTACK = 0.012;
+/** Where the body has settled to 45% before the tail. */
+export const THUD_SETTLE = 0.18;
+export const THUD_TAIL = 1.1;
+export const THUD_LEVEL = 0.55;
+/** The octave above, for earbuds; shorter, so the low body is what lingers. */
+export const THUD_OCTAVE_LEVEL = 0.22;
+export const THUD_OCTAVE_TAIL = 0.45;
 
 const rank = (zone) => ZONE_RANK[zone] ?? -1;
 
@@ -42,18 +50,29 @@ export function zoneThudDue(before, after, quiet = false) {
   return from >= 0 && rank(after) > from;
 }
 
-/** Schedules the thud on a runtime `{ context, destination, multiplier }` (gauntletAudio.js). */
-export function scheduleZoneThud({ context, destination, multiplier = 1 }) {
-  const now = context.currentTime;
+function voice(context, destination, at, { from, to, level, tail }) {
   const oscillator = context.createOscillator();
   const gain = context.createGain();
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(THUD_HZ, now);
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, THUD_LEVEL * multiplier), now + THUD_ATTACK);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + THUD_ATTACK + THUD_RELEASE);
+  oscillator.frequency.setValueAtTime(from, at);
+  oscillator.frequency.exponentialRampToValueAtTime(to, at + THUD_GLIDE);
+  // A muted preset still ramps to a positive floor: an exponential ramp to 0 throws.
+  const peak = Math.max(0.0002, level);
+  gain.gain.setValueAtTime(0.0001, at);
+  gain.gain.exponentialRampToValueAtTime(peak, at + THUD_ATTACK);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.00015, peak * 0.45), at + THUD_SETTLE);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + tail);
   oscillator.connect(gain).connect(destination);
-  oscillator.start(now);
-  oscillator.stop(now + THUD_LENGTH);
+  oscillator.start(at);
+  oscillator.stop(at + tail + 0.05);
   return { oscillator, gain };
+}
+
+/** Schedules the thud on a runtime `{ context, destination, multiplier }` (gauntletAudio.js). */
+export function scheduleZoneThud({ context, destination, multiplier = 1 }) {
+  const now = context.currentTime;
+  return [
+    voice(context, destination, now, { from: THUD_FROM_HZ, to: THUD_TO_HZ, level: THUD_LEVEL * multiplier, tail: THUD_TAIL }),
+    voice(context, destination, now, { from: THUD_FROM_HZ * 2, to: THUD_TO_HZ * 2, level: THUD_OCTAVE_LEVEL * multiplier, tail: THUD_OCTAVE_TAIL }),
+  ];
 }

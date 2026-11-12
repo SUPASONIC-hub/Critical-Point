@@ -2,7 +2,19 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { scheduleZoneThud, THUD_ATTACK, THUD_HZ, THUD_LENGTH, THUD_LEVEL, THUD_RELEASE, ZONE_RANK, zoneThudDue } from "../../src/gauntlet/zoneThud.js";
+import {
+  scheduleZoneThud,
+  THUD_ATTACK,
+  THUD_FROM_HZ,
+  THUD_GLIDE,
+  THUD_LEVEL,
+  THUD_OCTAVE_LEVEL,
+  THUD_OCTAVE_TAIL,
+  THUD_TAIL,
+  THUD_TO_HZ,
+  ZONE_RANK,
+  zoneThudDue,
+} from "../../src/gauntlet/zoneThud.js";
 
 /** A context that records every AudioParam call and every connection (the style of mood-music.test.mjs). */
 function fakeContext(now = 3) {
@@ -54,35 +66,50 @@ function fakeContext(now = 3) {
   };
 }
 
-test("the thud is one low sine at one pitch, set once and never moved", () => {
+test("the thud is a low sine body gliding down, with its octave for earbuds; pitch only glides", () => {
   const context = fakeContext();
   scheduleZoneThud({ context, destination: context.destination, multiplier: 0.82 });
   const oscillators = context.nodes.filter((n) => n.kind === "oscillator");
-  assert.equal(oscillators.length, 1);
-  assert.equal(oscillators[0].type, "sine");
-  const pitch = context.log.filter((e) => e.name === "frequency" || e.name === "detune");
-  assert.equal(pitch.length, 1, "the frequency is set once");
-  assert.deepEqual(pitch[0], { owner: oscillators[0], name: "frequency", call: "setValueAtTime", args: [THUD_HZ, 3] });
-  assert.ok(THUD_HZ >= 70 && THUD_HZ <= 150, `${THUD_HZ} Hz is low`);
+  assert.equal(oscillators.length, 2);
+  assert.ok(oscillators.every((o) => o.type === "sine"));
+  for (const [index, oscillator] of oscillators.entries()) {
+    const octave = index + 1;
+    const pitch = context.log.filter((e) => e.owner === oscillator && (e.name === "frequency" || e.name === "detune"));
+    assert.deepEqual(
+      pitch.map((e) => [e.call, ...e.args]),
+      [
+        ["setValueAtTime", THUD_FROM_HZ * octave, 3],
+        ["exponentialRampToValueAtTime", THUD_TO_HZ * octave, 3 + THUD_GLIDE],
+      ],
+      "set once, then one smooth glide down: never a step",
+    );
+  }
+  assert.ok(THUD_TO_HZ < THUD_FROM_HZ && THUD_FROM_HZ <= 150 && THUD_TO_HZ >= 30, "low, and falling");
 });
 
-test("the gain starts at 0.0001 and only ramps: in over 20 ms or more, gone inside 0.3 s", () => {
+test("every gain starts at 0.0001 and only ramps; the body lingers longer than its octave", () => {
   const context = fakeContext();
   scheduleZoneThud({ context, destination: context.destination, multiplier: 0.82 });
-  const gain = context.log.filter((e) => e.name === "gain");
-  assert.deepEqual(
-    gain.map((e) => e.call),
-    ["setValueAtTime", "exponentialRampToValueAtTime", "exponentialRampToValueAtTime"],
-    "no instant jump: one start, then ramps",
-  );
-  assert.deepEqual(gain[0].args, [0.0001, 3]);
-  assert.ok(THUD_ATTACK >= 0.02, "the attack is 20 ms or more");
-  assert.deepEqual(gain[1].args, [THUD_LEVEL * 0.82, 3 + THUD_ATTACK]);
-  assert.deepEqual(gain[2].args, [0.0001, 3 + THUD_ATTACK + THUD_RELEASE]);
-  assert.ok(THUD_ATTACK + THUD_RELEASE <= THUD_LENGTH && THUD_LENGTH <= 0.3, "the release ends before the oscillator stops, inside 0.3 s");
-  const [oscillator] = context.nodes.filter((n) => n.kind === "oscillator");
-  assert.equal(oscillator.started, 3);
-  assert.equal(oscillator.stoppedAt, 3 + THUD_LENGTH);
+  const [body, octave] = context.nodes.filter((n) => n.kind === "gain");
+  for (const [gain, level, tail] of [
+    [body, THUD_LEVEL, THUD_TAIL],
+    [octave, THUD_OCTAVE_LEVEL, THUD_OCTAVE_TAIL],
+  ]) {
+    const calls = context.log.filter((e) => e.owner === gain && e.name === "gain");
+    assert.deepEqual(
+      calls.map((e) => e.call),
+      ["setValueAtTime", "exponentialRampToValueAtTime", "exponentialRampToValueAtTime", "exponentialRampToValueAtTime"],
+      "no instant jump: one start, then ramps",
+    );
+    assert.deepEqual(calls[0].args, [0.0001, 3]);
+    assert.deepEqual(calls[1].args, [level * 0.82, 3 + THUD_ATTACK]);
+    assert.deepEqual(calls[3].args, [0.0001, 3 + tail]);
+  }
+  assert.ok(THUD_ATTACK >= 0.01, "the attack is 10 ms or more: no click");
+  assert.ok(THUD_OCTAVE_TAIL < THUD_TAIL);
+  const [first, second] = context.nodes.filter((n) => n.kind === "oscillator");
+  assert.equal(first.started, 3);
+  assert.ok(first.stoppedAt > 3 + THUD_TAIL && second.stoppedAt > 3 + THUD_OCTAVE_TAIL, "each stops after its release ends");
   // A muted preset still ramps to a positive floor: an exponential ramp to 0 throws.
   const silent = fakeContext();
   scheduleZoneThud({ context: silent, destination: silent.destination, multiplier: 0 });
@@ -93,10 +120,12 @@ test("the thud goes straight to the destination it is handed, never through the 
   const context = fakeContext();
   const destination = { kind: "destination" };
   scheduleZoneThud({ context, destination });
-  const [oscillator] = context.nodes.filter((n) => n.kind === "oscillator");
-  const [gain] = context.nodes.filter((n) => n.kind === "gain");
-  assert.deepEqual(oscillator.targets, [gain]);
-  assert.deepEqual(gain.targets, [destination]);
+  const oscillators = context.nodes.filter((n) => n.kind === "oscillator");
+  const gains = context.nodes.filter((n) => n.kind === "gain");
+  for (const [index, oscillator] of oscillators.entries()) {
+    assert.deepEqual(oscillator.targets, [gains[index]]);
+    assert.deepEqual(gains[index].targets, [destination]);
+  }
   // gauntletAudio hands every cue the context's destination, not the music bus.
   const audio = readFileSync("src/gauntlet/gauntletAudio.js", "utf8");
   assert.match(audio, /destination: runtime\.context\.destination/);
