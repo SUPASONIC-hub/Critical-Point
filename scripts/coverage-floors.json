@@ -54,6 +54,7 @@
     "src/gauntlet/useTableKeys.js": 93,
     "src/gauntlet/weeklyCalendar.js": 100,
     "src/gauntlet/weeklyRuleLine.js": 100,
+    "src/gauntlet/heartbeat.js": 100,
     "src/gauntlet/weeklyRules.js": 100,
     "src/gauntlet/windowReplay.js": 100,
     "src/gauntlet/windowTrail.js": 100,

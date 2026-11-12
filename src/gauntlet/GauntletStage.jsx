@@ -480,6 +480,7 @@ export function GauntletStage({
         stageRef={stageRef}
         caseId={scene.node.caseId}
         zone={dangerZoneOf(dangerLine)}
+        hold={cashHold.phase}
       />
 
       <div className="gx-table">

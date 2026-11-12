@@ -108,7 +108,7 @@ test("nothing on the table marks a beat to press on, and the pulse is still writ
   }
   // The heart still sounds on its own tempo, and the vignette still takes the beat.
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
-  assert.match(frame, /playHeartbeat\(heat, tier\);\s+nextBeat = time \+ 60000 \/ bpm;/);
+  assert.match(frame, /playHeartbeat\(heat, tier, hesitationSwell\(held, now\)\);\s+nextBeat = time \+ 60000 \/ bpm;/);
   assert.match(frame, /if \(now - pulsedAt >= PULSE_MIN_MS\)/, "under three screen-wide pulses a second, as before");
   assert.match(FX_READERS["--gx-beat"], /\.gx-fx-vignette/);
   const css = ["play", "responsive", "comfort", "plate", "relics", "briefing", "result", "base-intro-ranking", "recovery"].map((name) => readFileSync(`src/styles/app/${name}.css`, "utf8")).join(" ");
@@ -311,7 +311,7 @@ test("the cases where the season rests play a quiet table, and the table is the 
   // The frame loop plays it as the comfort setting, and keeps the heartbeat and the drone out of the ear.
   const fx = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   assert.match(fx, /const calm = quiet \|\| getAccessibility\(\)\.calmEffects;/);
-  assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier\);/);
+  assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier, hesitationSwell\(held, now\)\);/);
   assert.match(fx, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated, win\.status === "bust"\);/);
   assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /<GauntletFx[^>]*caseId=\{scene\.node\.caseId\}/s);
 

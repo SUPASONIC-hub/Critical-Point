@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { getCloseness, getHeartbeatBpm, getRemainingSeconds, getWindowSeconds } from "./gauntletEngine.js";
 import { playClockTick, playHeartbeat, playZoneThud, startTensionDrone } from "./gauntletAudio.js";
 import { zoneThudDue } from "./zoneThud.js";
+import { HESITATION_IDLE, hesitationKey, hesitationSwell, stepHesitation } from "./heartbeat.js";
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import { setMusicStake } from "../components/AdaptiveMusic.jsx";
@@ -67,6 +68,12 @@ import { setMusicStake } from "../components/AdaptiveMusic.jsx";
  * thud, once. It reads the line, not `fxTier`, so neither setting reaches it;
  * a quiet table keeps it out of the ear as it keeps the heartbeat out.
  *
+ * The hesitation swell (heartbeat.js, A1-2, 2026-11-12): a card staked and
+ * nothing else pressed for over 3 s, and the heartbeat grows in volume only,
+ * over 8 s, to +20%. `hold` is the held 확정's phase, so a press on 확정 that
+ * has not finished is a press too. The beat's count, its tempo and every
+ * number drawn stay as they were.
+ *
  * The score hears the table too (`setMusicStake`, 2026-11-02): as the gauge
  * the table shows climbs, AdaptiveMusic brings in up to three layers over
  * the mode's own lead (musicScore.js, `STAKE_LAYER_GAUGES`), and lets them go
@@ -83,16 +90,16 @@ const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const PULSE_MIN_MS = 345;
 /** How often the loop looks for readers that mounted since it last looked. */
 const READERS_REFRESH_MS = 400;
-export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef, caseId, zone = "" }) {
-  const stateRef = useRef({ window: liveWindow, paused, quiet: isQuietTable(caseId), zone });
+export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef, caseId, zone = "", hold = "" }) {
+  const stateRef = useRef({ window: liveWindow, paused, quiet: isQuietTable(caseId), zone, hold });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
   const flashedAt = useRef(0);
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId), zone };
-  }, [liveWindow, paused, caseId, zone]);
+    stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId), zone, hold };
+  }, [liveWindow, paused, caseId, zone, hold]);
 
   useEffect(() => {
     if (!impact) return;
@@ -151,10 +158,12 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
     let droneAt = 0;
     // The 현재 위험 step the last live frame stood on; "" until the first one.
     let zoneSeen = "";
+    // How long the staked card has been held with nothing else pressed.
+    let held = HESITATION_IDLE;
     let readersAt = 0;
 
     const loop = (time) => {
-      const { window: win, paused: isPaused, quiet, zone } = stateRef.current;
+      const { window: win, paused: isPaused, quiet, zone, hold } = stateRef.current;
       const delta = last ? Math.min(64, time - last) : 16;
       last = time;
       if (time >= readersAt) {
@@ -179,9 +188,10 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       // not: the tick light shows it, and is on screen for as long as it is.
       const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / getWindowSeconds(win));
       rate = fxRateStep(rate, fxRateTarget(bpm, win.status), delta, win.status);
+      held = stepHesitation(held, hesitationKey(win, hold), live, now);
       if (live) {
         if (time >= nextBeat) {
-          if (!quiet) playHeartbeat(heat, tier);
+          if (!quiet) playHeartbeat(heat, tier, hesitationSwell(held, now));
           nextBeat = time + 60000 / bpm;
           if (now - pulsedAt >= PULSE_MIN_MS) {
             pulsedAt = now;

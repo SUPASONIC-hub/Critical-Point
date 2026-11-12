@@ -7,7 +7,8 @@ import { createRoot } from "react-dom/client";
 import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
 import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
-import { playZoneThud, startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { playHeartbeat, playZoneThud, startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { HESITATE_MAX } from "../gauntlet/heartbeat.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
 import { THUD_ATTACK, THUD_HZ, THUD_RELEASE } from "../gauntlet/zoneThud.js";
 
@@ -180,6 +181,16 @@ function MusicLab() {
           <span style={styles.muted}>
             {THUD_HZ}Hz 사인 고정 · {Math.round(THUD_ATTACK * 1000)}ms에 걸쳐 커지고 {Math.round((THUD_ATTACK + THUD_RELEASE) * 1000)}ms에 사라짐 · drive 밖(곡을 켠 뒤 누르세요)
           </span>
+        </div>
+        {/* A1-2 (11-12): the hesitation swell -- the same beat at its plain level and at the most it grows. */}
+        <div style={styles.row}>
+          <button type="button" onClick={() => playHeartbeat(0.4, 0, 1)} disabled={!current}>
+            심박 — 보통
+          </button>
+          <button type="button" onClick={() => playHeartbeat(0.4, 0, HESITATE_MAX)} disabled={!current}>
+            심박 — 망설임 최대(+{Math.round((HESITATE_MAX - 1) * 100)}%)
+          </button>
+          <span style={styles.muted}>카드를 고르고 3초 넘게 아무것도 안 누르면 8초에 걸쳐 이만큼까지 · 음량만, 빠르기·음높이 그대로</span>
         </div>
         <label style={styles.row}>
           <input type="checkbox" checked={crackleFix} onChange={(event) => toggleCrackleFix(event.target.checked)} />

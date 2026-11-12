@@ -1,5 +1,6 @@
 import { acquireCueRuntime, getMusicMood, getSoundLevel, isSoundMuted } from "../components/AdaptiveMusic.jsx";
 import { createTensionDrone } from "./tensionDrone.js";
+import { scheduleHeartbeat } from "./heartbeat.js";
 import { scheduleZoneThud } from "./zoneThud.js";
 
 /**
@@ -64,38 +65,12 @@ function getNoise(context) {
 }
 
 /**
- * Lub-dub. Louder and brighter as the wall closes in.
- *
- * `tier` is the step the table shows (`fxTier`: 0, 1 hot, 2 critical, and 0
- * under either comfort setting). Each step lifts the beat 6% -- 110 to 123Hz
- * at the top of the thump, still under the lowpass, nothing bright -- and
- * brings the second beat 10ms sooner. The tempo stays the engine's.
+ * Lub-dub, louder and brighter as the wall closes in (heartbeat.js). `swell`
+ * is the hesitation swell (A1-2): volume only, at most +20%; the tempo stays
+ * the engine's.
  */
-export function playHeartbeat(closeness = 0, tier = 0) {
-  withRuntime(({ context, destination, multiplier }) => {
-    const now = context.currentTime;
-    // 0.19 at rest is 0.156 on the default preset: audible under the score.
-    const level = (0.19 + closeness * 0.13) * multiplier;
-    for (const [offset, share, pitch] of [
-      [0, 1, 1],
-      [0.17 - closeness * 0.05 - tier * 0.01, 0.7, 0.86],
-    ]) {
-      const start = now + offset;
-      const lift = pitch * (1 + tier * 0.06);
-      const oscillator = context.createOscillator();
-      const body = context.createBiquadFilter();
-      const gain = context.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(110 * lift, start);
-      oscillator.frequency.exponentialRampToValueAtTime(34 * lift, start + 0.11);
-      body.type = "lowpass";
-      body.frequency.setValueAtTime(180 + closeness * 260, start);
-      envelope(gain, start, level * share, 0.008, 0.2);
-      oscillator.connect(body).connect(gain).connect(destination);
-      oscillator.start(start);
-      oscillator.stop(start + 0.24);
-    }
-  });
+export function playHeartbeat(closeness = 0, tier = 0, swell = 1) {
+  withRuntime((runtime) => scheduleHeartbeat(runtime, closeness, tier, swell));
 }
 
 /**
