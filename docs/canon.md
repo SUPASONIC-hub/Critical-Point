@@ -416,8 +416,8 @@ The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
 open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
-`check:canon` holds their dated weekdays like any other (12월 20일 (토) and
-11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
+`check:canon` holds their dated weekdays like any other (12월 20일 (토),
+11월 8일 (토) and 12월 11일 (목) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -461,6 +461,20 @@ season case has to keep. What each one states for the first time is below.
 | The sheet | goes to head office by itself at 06:00. Each stopped minute takes an idle reason from four: 휴식, 교육, 설비 대기, 기타. The night manager: "비고는 어차피 아무도 안 읽어요" |
 | 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
 | The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
+
+### 번외 4, 연말 정산 (side04)
+
+| Fact | Value |
+|---|---|
+| When | 2025-12-11 (목) 22:10 to 12-12 (금) 09:00: eight days after 사건 16's 리스 승인위원회 (12월 3일), four before 사건 17 opens (12월 15일) |
+| Where | KD은행 고객센터, the night shift's 상담석. 한기호 (야간조 팀장) asks 트리거랩 for someone who reads numbers |
+| The list | 312 small-business loans ending on 12월 31일, refused a 만기 연장; every borrower to be told by phone before the 09:00 report to head office. The screen's one reason: 「내부 종합 평가 미달」 |
+| The script | ends "고객님의 소중한 사업을 KD은행이 늘 응원합니다"; a call past 2분 40초 turns red; each 「죄송합니다」 counts as one 공감 표현 |
+| 오민정 | 상담원 7년 차, employed by an outsourcing company on one-year contracts reviewed each January by average call time and 공감 표현 |
+| 문정택 (56) | a 분식집 in 김포 across the road from 플로우온's 김포 센터, 12 years on its night shift's dawn 떡볶이. Card sales: 9월 1,140만 / 10월 980만 / 11월 610만 원, average 910만 against the re-review bar of 80% of 1,000만 (800만) |
+| The re-review rule | on the printout's last page: three months' sales above 80% of the standard let the team leader request a re-review under his own name; 한기호's one request, 4 years before, was answered three months later, after the shop had closed |
+| The detail line | 「상권 위험 가중: 인근 대형 거래처 플로우온 김포 센터, 관련 대출 2023-0412 관리 대상」. It names the loan and nothing that happens to it |
+| The endings | what is left at 09:00 (a re-review request under 한기호's 사번, 311 + 1 pending / the detail line in the report's 비고 / three plain lines in 오민정's call notes). None says whether the extension was granted |
 
 ## Known and left alone
 

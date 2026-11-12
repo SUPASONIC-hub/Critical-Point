@@ -1,13 +1,13 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
 2026년 10월 22일, 한 사건에만 나오는 인물 여덟의 이름을 핵심 인물과 닮지 않게 바꾸면서(B-8) 그 초상 파일 이름도 새 이름으로 바꿨습니다. 사진과 출처는 그대로입니다:
 서하윤 → 황혜원, 마서윤 → 홍예담, 민도현 → 안기범, 연태준 → 공병만, 주하온 → 엄동균, 신이안 → 봉영훈, 이서준 → 이찬빈, 염태호 → 편종구.
 
-## 사진에서 만든 예순여덟 장
+## 사진에서 만든 일흔 장
 
 사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
@@ -91,6 +91,8 @@
 | 은재하 | `portrait-eun-jaeha.webp` | https://www.pexels.com/photo/professional-chef-posing-in-restaurant-interior-39576883/ | Grecia Carbajal (https://www.pexels.com/@grecia-carbajal-2155465721/) | [Pexels License](https://www.pexels.com/license/) |
 | 이하경 | `portrait-lee-hagyeong.webp` | https://www.pexels.com/photo/confident-senior-woman-smiling-in-studio-portrait-30603537/ | Stephanie Gray (https://www.pexels.com/@bestinshowmedia/) | [Pexels License](https://www.pexels.com/license/) |
 | 권태호 | `portrait-kwon-taeho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-man-in-casual-attire-outdoors-36976717/ | Jayford Batobato (https://www.pexels.com/@jayford-batobato-309499020/) | [Pexels License](https://www.pexels.com/license/) |
+| 오민정 | `portrait-oh-minjeong.webp` | https://www.pexels.com/photo/a-close-up-shot-of-a-woman-wearing-a-headset-7709199/ | MART PRODUCTION (https://www.pexels.com/@mart-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 문정택 | `portrait-moon-jeongtaek.webp` | https://unsplash.com/photos/man-sitting-on-chair-d77tidmCJqI | Raychan (https://unsplash.com/@wx1993) | [Unsplash License](https://unsplash.com/license) |
 
 같은 사진가의 사진이 여러 장 있지만(Vitaly Gariev, Mikhail Nilov, cottonbro studio 세 장씩) 모델은 서로 다른 사람입니다.
 10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
@@ -116,7 +118,12 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 송하율은 턱에 댄 손끝이 아래 가장자리에 조금 남고, 이하경은 턱을 괸 손이 아래에 남습니다(본문의 은테 안경은 없음).
 Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 장째이고, 모델은 모두 다른 사람입니다.
 
-## 실존하지 않는 사람의 생성 사진 열네 장
+오민정과 문정택은 2026년 11월 12일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 둘 다 번외 4(src/nodes/side04.js)의
+악역이 아닌 사람(고객센터 야간 상담원, 거절 통보를 받은 분식집 사장)이라 실제 사람의 사진을 썼습니다. MART PRODUCTION은 오민정으로
+세 장째(차지원, 배성준과 다른 모델)입니다. 문정택은 옆을 보는 사진이라 얼굴을 가운데 두고 잘랐습니다. 먼저 본 Vitaly Gariev의 체크 셔츠
+사진은 나준혁과, Ketut Subiyanto의 사진은 지강현과, Wasin Pirom의 사진은 채이안과 같은 모델이라 쓰지 않았습니다.
+
+## 실존하지 않는 사람의 생성 사진 열다섯 장
 
 백아린과 윤상혁은 비리·악역을 맡고, 문하준은 미성년입니다. 실제 사람의 얼굴을 이런 역에 빌려 오지 않으려고,
 이 세 장은 AI가 만든 실존하지 않는 사람의 사진을 썼습니다(2026년 10월 20일 내려받음). 보정은 위 사진들과 같습니다.
@@ -147,6 +154,7 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 | 진세라 | `portrait-jin-sera.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8054606/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 규정 뒤에 숨어 책임을 피하는 부행장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 편종구 | `portrait-pyeon-jonggu.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 도건우 | `portrait-do-geonu.webp` | https://pixabay.com/illustrations/handsome-happy-smile-white-shirt-8988318/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 기록을 지워 주는 값으로 증언을 가져가는 위기대응 TF 팀장이라 실제 사람의 얼굴을 쓰지 않음 |
+| 한기호 | `portrait-han-giho.webp` | https://pixabay.com/illustrations/ai-generated-man-face-thoughtful-8560815/ (KeilaMariaDesigns, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 4에서 위에서 받은 「예외 없음」을 아래로 전하는 야간조 팀장(우리 계획의 악역 쪽)이라 실제 사람의 얼굴을 쓰지 않음. 10월 21일 목록에서 연태준(지금의 공병만) 몫으로 골라 두었다가 쓰지 않은 사진이고, 2026년 11월 12일에 내려받음. TheDigitalArtist의 남은 사진은 편종구와 얼굴이 같아 보여 쓰지 않음 |
 
 ## 직접 그린 한 장
 
@@ -156,5 +164,5 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 아흔 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 70 + 생성 15 + 그린 1; 번외 4의 세 명은 11월 12일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).

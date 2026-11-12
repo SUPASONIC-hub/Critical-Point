@@ -672,6 +672,27 @@ export default {
       "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
+    },
+    "오민정": {
+      "appearance": "Hair flattened by a headset, a thermos of barley tea, the empathy count in the corner of her monitor.",
+      "thought": "I say sorry in my own voice, and I don’t know what I’m sorry for either.",
+      "gesture": "Before she says something that matters, Oh Minjeong covers the headset mic with her palm.",
+      "voice": "Under a kind counsellor’s manner lies a thin layer of 7 years’ tiredness.",
+      "line": "If you ask me why, that’s what I most want to know too."
+    },
+    "문정택": {
+      "appearance": "An apron with tteokbokki stains, a wad of card-terminal receipts in his pocket, thick knuckles.",
+      "thought": "Going under doesn’t scare me. Going under without knowing why does.",
+      "gesture": "Every time he says a number, Moon Jeongtaek wipes his hand once on his apron.",
+      "voice": "The rounded way of a man who runs a shop: an apology first, then the point.",
+      "line": "What do I hand in? I’ll hand in whatever you ask."
+    },
+    "한기호": {
+      "appearance": "Shirt sleeves folded twice, the foil from a convenience-store gimbap, sticky notes all round his monitor’s frame.",
+      "thought": "File a request and a red dot goes by my name. Don’t, and it goes nowhere.",
+      "gesture": "Before saying something awkward, Han Giho gives an embarrassed laugh, and stops before the laugh is over.",
+      "voice": "Soft and apologetic, but the end of every sentence comes back to the rules.",
+      "line": "I didn’t write this. I was handed it."
     }
   },
 };
