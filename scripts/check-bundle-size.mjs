@@ -173,7 +173,8 @@ const budgets = [
   // 153,705 / 56,489 -> 153,883 / 56,590 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 153879 / 56586 (over budget only) in the e2e build, the plus 4.
   // 153,883 / 56,590 -> 153,883 / 56,597 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 56593 (over budget only) in the e2e build, the plus 4.
   // 153,883 / 56,597 -> 157,229 / 58,019 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 157225 / 58015 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_229, maxGzip: 58_019 },
+  // 157,229 / 58,019 -> 157,367 / 58,055 a2a3-ending over main 7ec2304e. Measured 157363 / 58051 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_367, maxGzip: 58_055 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -890,7 +891,8 @@ const budgets = [
   // -> 51,360 / 16,908 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 51,356 / 16,904 in the e2e build, the plus 4.
   // 51,360 / 16,908 -> 51,558 / 16,956 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 51554 / 16952 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,956 -> 51,558 / 16,961 c2c3-result over main fbf1000c (held read outside the view groups). Measured - / 16957 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 51_558, maxGzip: 16_961 },
+  // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_421, maxGzip: 17_333 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -907,7 +909,8 @@ const budgets = [
   // -> 51,360 / 16,908 on 2026-11-11, bundle 1111 (#350 #301 #501) over main 568572d3: the three together. Measured 51,356 / 16,904 in the e2e build, the plus 4.
   // 51,360 / 16,908 -> 51,558 / 16,956 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 51554 / 16952 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,956 -> 51,558 / 16,961 c2c3-result over main fbf1000c (held read outside the view groups). Measured - / 16957 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 51_558, maxGzip: 16_961 },
+  // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_421, maxGzip: 17_333 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1114,7 +1117,8 @@ const budgets = [
   // 213,999 / 41,403 -> 214,201 / 41,455 on 2026-11-11, C-15 after merging main c61d6618. Measured 214197 / 41451 (over budget only) in the e2e build, the plus 4.
   // 213,999 / 41,403 -> 214,218 / 41,444 on 2026-11-12, e3-status (the heart's .gx-listen button) over main fbf1000c. Measured 214,214 / 41,440 in the e2e build, the plus 4.
   // 214,218 / 41,444 -> 214,420 / 41,493 bundle 1112c (#520 #521) over main 4f927085. Measured 214416 / 41489 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 214_420, maxGzip: 41_493 },
+  // 214,420 / 41,493 -> 214,508 / 41,536 a2a3-ending over main 7ec2304e. Measured 214504 / 41532 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 214_508, maxGzip: 41_536 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2269,7 +2273,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,645 / 432,958 / 440,676 bundle 1112c (#520 #521) over main 4f927085. Measured first paint, the plus 4.
 // -> 373,611 / 432,578 / 440,275 on 2026-11-12, bundle 1112b (#516 #517) over main 4f927085, CI measured (373,607 / 432,574 / 440,271), the plus 4.
 // -> 373,634 / 432,946 / 440,665 bundle 1112c (#520 #521 390) over main e3687e46. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_634, en: 432_946, ja: 440_665 };
+// -> 373,683 / 432,970 / 440,695 a2a3-ending over main 7ec2304e. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_683, en: 432_970, ja: 440_695 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
