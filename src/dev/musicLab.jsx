@@ -10,7 +10,7 @@ import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_
 import { playHeartbeat, playZoneThud, startTensionDrone } from "../gauntlet/gauntletAudio.js";
 import { HESITATE_MAX } from "../gauntlet/heartbeat.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
-import { THUD_ATTACK, THUD_HZ, THUD_RELEASE } from "../gauntlet/zoneThud.js";
+import { THUD_FROM_HZ, THUD_TAIL, THUD_TO_HZ } from "../gauntlet/zoneThud.js";
 
 const MOOD_NAMES = { neutral: "중립", bright: "밝음", tense: "긴장", dread: "공포", sorrow: "슬픔" };
 
@@ -179,7 +179,7 @@ function MusicLab() {
             쿵 — 위험 단계 오름 표지
           </button>
           <span style={styles.muted}>
-            {THUD_HZ}Hz 사인 고정 · {Math.round(THUD_ATTACK * 1000)}ms에 걸쳐 커지고 {Math.round((THUD_ATTACK + THUD_RELEASE) * 1000)}ms에 사라짐 · drive 밖(곡을 켠 뒤 누르세요)
+            깊은 쿵(11-12 고름): {THUD_FROM_HZ}→{THUD_TO_HZ}Hz로 미끄러지는 몸통 + 한 옥타브 위 · {THUD_TAIL}초 꼬리 · drive 밖(곡을 켠 뒤 누르세요)
           </span>
         </div>
         {/* A1-2 (11-12): the hesitation swell -- the same beat at its plain level and at the most it grows. */}
