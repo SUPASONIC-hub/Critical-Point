@@ -1,5 +1,6 @@
 import { acquireCueRuntime, getMusicMood, getSoundLevel, isSoundMuted } from "../components/AdaptiveMusic.jsx";
 import { createTensionDrone } from "./tensionDrone.js";
+import { scheduleZoneThud } from "./zoneThud.js";
 
 /**
  * The gauntlet's sound. Every cue goes through `acquireCueRuntime`, so a muted
@@ -95,6 +96,14 @@ export function playHeartbeat(closeness = 0, tier = 0) {
       oscillator.stop(start + 0.24);
     }
   });
+}
+
+/**
+ * The step marker (zoneThud.js): one low thud as the 현재 위험 line steps up.
+ * The frame loop decides when (`zoneThudDue`); this only plays it.
+ */
+export function playZoneThud() {
+  withRuntime(scheduleZoneThud);
 }
 
 /**

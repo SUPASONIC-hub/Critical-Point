@@ -7,8 +7,9 @@ import { createRoot } from "react-dom/client";
 import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
 import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
-import { startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { playZoneThud, startTensionDrone } from "../gauntlet/gauntletAudio.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
+import { THUD_ATTACK, THUD_HZ, THUD_RELEASE } from "../gauntlet/zoneThud.js";
 
 const MOOD_NAMES = { neutral: "중립", bright: "밝음", tense: "긴장", dread: "공포", sorrow: "슬픔" };
 
@@ -170,6 +171,15 @@ function MusicLab() {
             <input type="checkbox" checked={droneOn} disabled={!current} onChange={(event) => setDroneOn(event.target.checked)} />
             판 드론 듣기 (슬라이더 값이 가까움)
           </label>
+        </div>
+        {/* A1-1 · E3 (11-12): the step marker the table plays as the 현재 위험 line steps up. Needs a track playing (the cue runtime). */}
+        <div style={styles.row}>
+          <button type="button" onClick={() => playZoneThud()} disabled={!current}>
+            쿵 — 위험 단계 오름 표지
+          </button>
+          <span style={styles.muted}>
+            {THUD_HZ}Hz 사인 고정 · {Math.round(THUD_ATTACK * 1000)}ms에 걸쳐 커지고 {Math.round((THUD_ATTACK + THUD_RELEASE) * 1000)}ms에 사라짐 · drive 밖(곡을 켠 뒤 누르세요)
+          </span>
         </div>
         <label style={styles.row}>
           <input type="checkbox" checked={crackleFix} onChange={(event) => toggleCrackleFix(event.target.checked)} />
