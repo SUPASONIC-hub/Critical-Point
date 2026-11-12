@@ -174,7 +174,8 @@ const budgets = [
   // 153,883 / 56,590 -> 153,883 / 56,597 on 2026-11-11, prose-trim-29-38 over main accd990b. Measured - / 56593 (over budget only) in the e2e build, the plus 4.
   // 153,883 / 56,597 -> 157,229 / 58,019 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 157225 / 58015 (over budget only) in the e2e build, the plus 4.
   // 153,883 / 56,597 -> 153,995 / 56,630 f1-stage2 over f8dd481d. Measured 153991 / 56626 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 153_995, maxGzip: 56_630 },
+  // 153,995 / 56,630 -> 157,344 / 58,077 f1-evening (#466 4a28054e + f1-stage2 + f1-checker) 837ec8de. Measured 157340 / 58073 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_344, maxGzip: 58_077 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -291,7 +292,8 @@ const budgets = [
   // 34,241 / 14,597 -> 34,363 / 14,631 on 2026-11-12, e3-status (지금 상황 듣기: tableVoice's status line, a keyed node per line) over main fbf1000c. Measured 34,359 / 14,627 in the e2e build, the plus 4.
   // 34,363 / 14,631 -> 34,528 / 14,703 bundle 1112c (#520 #521) over main 4f927085. Measured 34524 / 14699 (over budget only) in the e2e build, the plus 4.
   // 34,241 / 14,597 -> 34,317 / 14,618 f1-stage2 over f8dd481d. Measured 34313 / 14614 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_317, maxGzip: 14_618 },
+  // 34,317 / 14,618 -> 34,603 / 14,728 f1-evening (#466 4a28054e + f1-stage2 + f1-checker) 837ec8de. Measured 34599 / 14724 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_603, maxGzip: 14_728 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -2274,7 +2276,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,611 / 432,578 / 440,275 on 2026-11-12, bundle 1112b (#516 #517) over main 4f927085, CI measured (373,607 / 432,574 / 440,271), the plus 4.
 // -> 373,634 / 432,946 / 440,665 bundle 1112c (#520 #521 390) over main e3687e46. Measured first paint, the plus 4.
 // -> 373,709 / 432,675 / 440,372 f1-stage2 over f8dd481d. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_709, en: 432_675, ja: 440_372 };
+// -> 373,787 / 433,090 / 440,819 f1-evening (#466 4a28054e + f1-stage2 + f1-checker) 837ec8de. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_787, en: 433_090, ja: 440_819 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
