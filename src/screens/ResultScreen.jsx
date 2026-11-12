@@ -22,8 +22,9 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       counterfactualReport, routeTimeline,
     },
     actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
-    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog }, seasonStanding, seasonStanding: { held },
+    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog }, seasonStanding,
   } = view;
+  const { held } = seasonStanding; // C3-3: the card reads only whether the report's held sentence is set.
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel } = renderers;
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
   // whether the page may name them: not when the player turned them off.
@@ -97,8 +98,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
         {currentCase === "final" && (
           <EndingSequence
             endingStep={endingStep}
-            endingTwistIndex={endingTwistIndex}
-            endingTwistCount={endingTwistCount}
+            endingTwistIndex={endingTwistIndex} endingTwistCount={endingTwistCount}
             currentEndingTwist={currentEndingTwist}
             finalChoiceText={finalChoiceText}
             isFinalEndingTwist={isFinalEndingTwist}

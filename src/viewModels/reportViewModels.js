@@ -38,6 +38,12 @@ export function readHeldLine({ level, closing } = {}) {
 }
 
 /**
+ * What src/nearestEnding.js answers, written out here so the type check does
+ * not follow that module into the ruling's.
+ * @typedef {{ id?: string, label?: string, gaps?: Array<{ key: string, value: number }>, burn?: boolean } | null} NearestEnding
+ */
+
+/**
  * The line every case's report prints about SYSTEM COLLAPSE, and on a collapse
  * the cases worth playing again. All of it is `getSeasonStanding`, so the line
  * cannot say what the ending does not.
@@ -57,7 +63,7 @@ export function readHeldLine({ level, closing } = {}) {
  * @param {Record<string, any> | null} [input.closing] The mean resources the season's cases closed on, for `held`.
  * @param {string} [input.endingId] The ending the season reached, for `endingHeld` (the finale only).
  * @param {string | null} [input.finale] The finale's last answer (`getFinaleOutcome`), for `endingWitness`.
- * @param {ReturnType<typeof import("../nearestEnding.js").nearestEnding>} [input.nearest] For `endingNearest`.
+ * @param {NearestEnding} [input.nearest] What `nearestEnding` (src/nearestEnding.js) returned, for `endingNearest`.
  *
  * `held` (C3) is the sentence after the line when the season lost money and
  * kept people (`readHeldLine`), else null; `endingHeld` is that season's
@@ -103,7 +109,7 @@ export function createSeasonStandingReadout({ caseResults, resources, cases = []
  * line that 봉인 closed the record endings. Null when there is nothing to say.
  * The gaps are set apart by a middle dot, as the standing line's parts are.
  *
- * @param {ReturnType<typeof import("../nearestEnding.js").nearestEnding>} [nearest]
+ * @param {NearestEnding} [nearest]
  */
 export function describeNearestEnding(nearest) {
   if (!nearest) return null;

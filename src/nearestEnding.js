@@ -37,8 +37,7 @@ function share(count, cases, rate) {
 }
 
 /**
- * @param {object} [input] What `getEndingVariant` is handed, plus the id of the ending it returned.
- * @param {string} [input.endingId]
+ * @param {Record<string, any>} [input] What `getEndingVariant` is handed, plus `endingId`, the id of the ending it returned.
  * @returns {{ id: string, label: string, gaps: Array<{ key: string, value: number }> } | { burn: true } | null}
  */
 export function nearestEnding(input = {}) {
