@@ -2585,8 +2585,11 @@
     font-size: 1.75rem;
   }
 
+  /* 6 -> 3px on 2026-11-12: with the block on every phone to 860 tall, two
+     English hands at 390x844 (c38_witness, c45_stories, a card staked) still
+     ended 1px under the action bar (Linux, run 43141115676). */
   .gauntlet-shell .game-header {
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
 
   .gx-read,
