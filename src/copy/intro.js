@@ -52,6 +52,8 @@ const introCopy = {
   round: " · {round}회차",
   stats: { cases: "사건", oneCase: "한 사건", minutes: "분 안팎", answers: "정답" },
   previousMessage: "이전 참가자가 남긴 말: “{message}”",
+  // N10: from 11-16 to the end of 11-30 (rankingResetNoticeAt).
+  rankingReset: "랭킹 안내: 11월 30일(월) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남습니다.",
   setup: {
     label: "게임 시작 준비",
     title: "기록 진입 설정",

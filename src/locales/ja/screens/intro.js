@@ -33,6 +33,7 @@ export default {
   round: " · {round}周目",
   stats: { cases: "事件", oneCase: "1事件", minutes: "分前後", answers: "正解" },
   previousMessage: "前の参加者が残した言葉:「{message}」",
+  rankingReset: "ランキングのお知らせ: 11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。殿堂の表はそのまま残ります。",
   setup: {
     label: "ゲーム開始の準備",
     title: "記録への入室設定",

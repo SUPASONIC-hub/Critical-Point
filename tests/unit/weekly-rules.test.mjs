@@ -44,7 +44,7 @@ const {
 const { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY } = await import("../../src/appConfig.js");
 const { getBriefingIntro, getBriefingWeekRuleId } = await import("../../src/gauntlet/tableStaging.js");
 const { localRowRule } = await import("../../src/state/useLeaderboard.js");
-const { weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
+const { rankingResetNoticeAt, weekHasNews } = await import("../../src/gauntlet/weeklyCalendar.js");
 const { weeklyRuleLine } = await import("../../src/gauntlet/weeklyRuleLine.js");
 const { CASE_START_NODES } = await import("../../src/gameCases.js");
 const { E2E_WEEKLY_RULE_CLOCK, pinnedWeeklyClock, weeklyRuleNow } = await import("../../src/state/weeklyClock.js");
@@ -232,7 +232,7 @@ test("SHORT CLOCK moves the board's own clock and chips, on top of what relics a
   assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
 });
 
-test("the calendar books W48 to 2027-W03 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
+test("the calendar books W48 to 2027-W15 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
   const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48");
   assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
     ["2026-W48", "heavy-fracture"],
@@ -240,6 +240,12 @@ test("the calendar books W48 to 2027-W03 one week in two, the three event rules 
     ["2026-W52", "near-wall"],
     ["2027-W01", "heavy-fracture"],
     ["2027-W03", "short-clock"],
+    ["2027-W05", "near-wall"],
+    ["2027-W07", "heavy-fracture"],
+    ["2027-W09", "short-clock"],
+    ["2027-W11", "near-wall"],
+    ["2027-W13", "heavy-fracture"],
+    ["2027-W15", "short-clock"],
   ]);
   // One week in two: two weeks from one start to the next, across 2026's W53.
   for (let i = 1; i < booked.length; i += 1) assert.equal(weekStartMs(booked[i].week) - weekStartMs(booked[i - 1].week), 14 * DAY, booked[i].week);
@@ -398,7 +404,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql", "20261112010000_weekly_rule_calendar_w05_w15.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
@@ -532,4 +538,13 @@ test("the ranking keeps last week's board for the week after it: W47 on 11-23, b
   assert.equal(weekHasNews(Date.parse(E2E_WEEKLY_RULE_CLOCK), undefined, -7), false);
   assert.deepEqual(weekBoardsAt(kst("2026-10-28T12:00:00")), []);
   assert.deepEqual(weekBoardsAt(Number.NaN), []);
+});
+
+test("the start screen tells of the 11-30 ranking wipe from 11-16 to the end of 11-30 (N10)", () => {
+  assert.equal(rankingResetNoticeAt(kst("2026-11-15T23:59:59")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-16T00:00:00")), true);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-30T23:59:59")), true);
+  assert.equal(rankingResetNoticeAt(kst("2026-12-01T00:00:00")), false);
+  assert.equal(rankingResetNoticeAt(Date.parse(E2E_WEEKLY_RULE_CLOCK)), false, "a test build never shows it");
+  assert.equal(rankingResetNoticeAt(Number.NaN), false);
 });

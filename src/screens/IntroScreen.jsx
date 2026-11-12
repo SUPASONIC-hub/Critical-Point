@@ -9,6 +9,8 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
+import { rankingResetNoticeAt } from "../gauntlet/weeklyCalendar.js";
+import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
@@ -430,6 +432,9 @@ export function IntroScreen({ view, renderers = {} }) {
           </div>
           {nextParticipantMessage && (
             <p className="previous-participant-message">{fill(introCopy.previousMessage, { message: nextParticipantMessage })}</p>
+          )}
+          {rankingResetNoticeAt(weeklyRuleNow()) && (
+            <p className="previous-participant-message" data-testid="ranking-reset-notice">{introCopy.rankingReset}</p>
           )}
           <WeeklyRuleNotice />
           <section id="case-access-setup" className="start-priority" aria-label={introCopy.setup.label} tabIndex={-1}>
