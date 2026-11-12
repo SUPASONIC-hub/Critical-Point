@@ -36,8 +36,10 @@ test("an honest season chains with no mark, and says what it did not check", () 
     assert.deepEqual(report.marks, []);
     assert.equal(report.cases.length, CASE_SEQUENCE.length);
     assert.equal(report.unchecked.links, 0);
-    // What waits for S2, and what the opening snapshot cannot answer, is counted on every case, never passed.
-    for (const field of [...UNCHECKED.inside, ...UNCHECKED.between]) assert.equal(report.unchecked.fields[field], CASE_SEQUENCE.length, field);
+    // What waits for S2 is counted on every case, never passed; the route with no `opening` checker handed in too.
+    for (const field of [...UNCHECKED.inside, "openingRoute"]) assert.equal(report.unchecked.fields[field], CASE_SEQUENCE.length, field);
+    // LOCK's carry (F1 step 2) is read on every link: the rows carry it.
+    assert.equal(report.unchecked.fields.focusCarry, undefined);
     // Every row carries its opening snapshot, so none of the opening is left unchecked.
     for (const field of [...UNCHECKED.open, "reopened", "practice", "links", "relics"]) assert.equal(report.unchecked.fields[field], undefined, field);
     assert.ok(rows.every((row) => row.dynamics.open?.caseId === row.case_id));
