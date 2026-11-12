@@ -31,10 +31,53 @@ export const DRIVE_CEILING = 0.15;
 export const BUS_LOWPASS_HZ = 7000;
 
 /**
+ * The crackle in 불안 and 위기 (music-lab, 2026-11-10, earphones; a master
+ * limiter did not touch it, so it was made inside the bus, not at the end).
+ * Rendered offline in Chromium, two things in the drive made it:
+ *
+ * - The shaper's 2x oversampling runs 128 samples (2.7 ms) late, and the
+ *   dry path did not, so wherever both were in -- unstable sits near half
+ *   and half -- the bus was a comb: notches at 187, 562, 937 Hz, right on
+ *   the leads and pads, with every attack struck twice 2.7 ms apart. The dry
+ *   path now goes through an identity shaper with the same oversampling, so
+ *   it arrives with the wet (AdaptiveMusic.jsx, `connectMusicBus`).
+ * - The bass ran into the shaper with the kick. 46-87 Hz held the curve in
+ *   its knee, and every note over it was buzzed at the bass's rate: the
+ *   distortion between voices was 8.6 dB under the whole mix in critical
+ *   and 14 dB in unstable (controlled: 27.5). These two tiers' bass now
+ *   enters past the drive (`bassPastDrive`), trimmed (`bassLevel`) to where
+ *   the drive used to squash it, and their drive is a little lower.
+ *
+ * The kick still goes through the drive, so the tiers keep their grit; the
+ * lead waves are the cases' as before. `setCrackleFix(false)` plays the
+ * score as it was, for the music lab's A/B only; the game never calls it.
+ */
+export const CRACKLE_FIX_BEFORE = {
+  unstable: { drive: 0.08, bassPastDrive: false, bassLevel: 1 },
+  critical: { drive: 0.15, bassPastDrive: false, bassLevel: 1 },
+};
+const crackleFix = { on: true };
+
+export function setCrackleFix(on) {
+  crackleFix.on = Boolean(on);
+}
+
+export function isCrackleFixOn() {
+  return crackleFix.on;
+}
+
+/** A mode's base data with the crackle fix off: the values it had before 11-10. */
+function withoutCrackleFix(baseKey, base) {
+  const before = CRACKLE_FIX_BEFORE[baseKey];
+  return before && !crackleFix.on ? { ...base, ...before } : base;
+}
+
+/**
  * The scene's mood (design-mood, 2026-11-05): one of five, `neutral` when a
  * scene names none or names one the score does not know. A mood picks which
  * of the mode's leads take the bar (`moodLeads`) and how the table's drone is
- * voiced (gauntlet/tensionDrone.js); the key, the tempo, the drums and the
+ * voiced (gauntlet/tensionDrone.js), and since 2026-11-06 how loud each part
+ * plays and where the lead sits (`MOOD_TEXTURES`); the key, the tempo and the
  * drive are the scene's as before. `tense` is the score exactly as it was.
  */
 export const MUSIC_MOODS = ["neutral", "bright", "tense", "dread", "sorrow"];
@@ -72,6 +115,61 @@ export function getMusicMood() {
 export function moodCrossfade(now) {
   const blend = Math.min(1, Math.max(0, (now - moodRuntime.changedAt) / MOOD_FADE_SECONDS));
   return { to: moodRuntime.mood, from: blend < 1 ? moodRuntime.previous : null, blend };
+}
+
+/**
+ * What a mood does to the whole bar, not only to which lead plays (mood-boost,
+ * 2026-11-06: the leads alone could not be heard as a change). Each part's
+ * share of its own gain, never above 1, so a mood only ever takes away from
+ * what reaches the bus and its drive (#388); `octave` is the lead's register
+ * (each note is struck there, nothing sounding is retuned) and `every` plays
+ * one lead step in that many.
+ *
+ * - tense: the score as it was.
+ * - neutral: sparse and low -- no snare, hats and kick down, the lead an
+ *   octave under on every other step.
+ * - bright: light on its feet -- hats whole, snare and kick soft, the lead an
+ *   octave up (only where it stays under LEAD_OCTAVE_CEILING_HZ).
+ * - sorrow: no drums but a breath of hat; the slow minor lead over the pad.
+ * - dread: the kick and the noise sweep whole, the hats nearly gone, the lead
+ *   an octave down.
+ */
+export const MOOD_TEXTURES = {
+  tense: { kick: 1, snare: 1, hat: 1, bass: 1, lead: 1, pad: 1, noise: 1, octave: 1, every: 1 },
+  neutral: { kick: 0.5, snare: 0, hat: 0.35, bass: 0.8, lead: 0.8, pad: 1, noise: 0, octave: 0.5, every: 2 },
+  bright: { kick: 0.55, snare: 0.35, hat: 1, bass: 0.75, lead: 0.9, pad: 0.8, noise: 0.3, octave: 2, every: 1 },
+  sorrow: { kick: 0, snare: 0, hat: 0.2, bass: 0.7, lead: 1, pad: 1, noise: 0, octave: 1, every: 1 },
+  dread: { kick: 1, snare: 0.2, hat: 0.15, bass: 1, lead: 0.8, pad: 0.6, noise: 1, octave: 0.5, every: 1 },
+};
+/** A lead note doubled for bright stays at or under this, so the octave up never turns shrill in earphones. */
+export const LEAD_OCTAVE_CEILING_HZ = 1400;
+
+export function moodTexture(mood) {
+  return MOOD_TEXTURES[normalizeMood(mood)];
+}
+
+/**
+ * The drums', bass's, pad's and noise's shares at a point in a crossfade: the
+ * two moods' textures weighed by `blend`, so a change walks each share over
+ * `MOOD_FADE_SECONDS` instead of stepping it.
+ */
+export function blendedTexture({ to, from, blend }) {
+  const next = moodTexture(to);
+  if (!from || blend >= 1) return next;
+  const prev = moodTexture(from);
+  const mixed = {};
+  for (const key of ["kick", "snare", "hat", "bass", "pad", "noise"]) mixed[key] = prev[key] + (next[key] - prev[key]) * blend;
+  return mixed;
+}
+
+/** The lead note a mood strikes on a step: null on a step it rests, else the note in its register. */
+export function moodLeadNote(line, step, mood) {
+  const note = line[step];
+  if (!note) return null;
+  const { octave, every } = moodTexture(mood);
+  if (every > 1 && step % every !== 0) return null;
+  if (octave > 1 && note * octave > LEAD_OCTAVE_CEILING_HZ) return note;
+  return note * octave;
 }
 
 /**
@@ -142,6 +240,8 @@ function revealMode(track, mixVolume) {
     volume: Math.min(0.14, track.volume * mixVolume),
     wave: track.wave,
     drive: Math.min(DRIVE_CEILING, track.drive),
+    bassPastDrive: false,
+    bassLevel: 1,
     kick: track.kick,
     snare: track.snare,
     hat: track.hat,
@@ -303,7 +403,7 @@ export function createSceneMode(modeKey, mixVolume = 1) {
   if (parts[0] === "reveal") return revealMode(revealTracks[parts[1]] ?? revealTracks.even, mixVolume);
   const isFinal = parts.includes("final");
   const baseKey = isFinal && parts[0] === "result" ? "final" : parts[0];
-  const base = musicModes[baseKey] ?? musicModes.intro;
+  const base = withoutCrackleFix(baseKey, musicModes[baseKey] ?? musicModes.intro);
   const hash = Math.abs(hashMusicKey(modeKey));
   const tempoMultipliers = [1, 0.94, 1.06, 0.88, 1.12, 0.82];
   const semitoneShifts = [-5, -2, 0, 3, 5, 7, -7];
@@ -326,6 +426,8 @@ export function createSceneMode(modeKey, mixVolume = 1) {
     volume: Math.min(0.14, base.volume * mixVolume * (0.82 + intensity * 0.16 + scenePulse * 0.012)),
     wave: speakerMotif.wave ?? base.wave,
     drive: Math.min(DRIVE_CEILING, base.drive * intensity),
+    bassPastDrive: Boolean(base.bassPastDrive),
+    bassLevel: base.bassLevel ?? 1,
     kick: rotate(base.kick, groove.kickShift),
     snare: base.snare,
     hat: thinOut(base.hat, groove.hatDrop),

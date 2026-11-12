@@ -18,11 +18,6 @@ export default {
     nextCase: "次の事件「{title}」まで続けて見たい理由ができましたか？",
     finale: "最後の選択は、トリガーラボの実験の構造と自然につながりましたか？",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] シーズン崩壊",
-    season: "[{ending}] シーズン判定",
-    case: "[事件終了] {tag}",
-  },
   rationaleClues: "手がかり {count}",
   standing: {
     clear: "崩壊線の下",
@@ -31,6 +26,31 @@ export default {
     harm: "シーズン平均 {harmLabel} {perCase} / {gate} · 弾けた勝負 {bustPercent}%",
     overreach: "シーズン平均 {harmLabel} {perCase} / {gate} · 弾けた勝負 {bustPercent}% / {bustGate}%",
     harmCase: "{caseLabel} 再挑戦 · {harmLabel} {harm}",
+    held: "{capitalLabel}は平均{capital}まで下がりましたが、{harmLabel}は崩壊線の下にとどまっています。",
+  },
+  heldEndings: {
+    "open-oversight": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、基準を残したシーズンです。",
+    "evidence-reform": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、公開と保護のルールを残したシーズンです。",
+    "human-record": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、名前を残したシーズンです。",
+    "cold-justice": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、手続きを守ったシーズンです。",
+    "field-pact": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、人々の約束を残したシーズンです。",
+    "quiet-cover": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、静かに閉じたシーズンです。",
+    "open-question": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、問いを引き継いだシーズンです。",
+  },
+  witnessHeld: "最後にあなたは告発を選びました。現金は減り、スコアにも残りませんが、人的被害を線の下に抑えたまま、隠された記録を外に出しました。このシーズンが勝ち取ったものは、数字の外にあります。",
+  nearest: {
+    line: "最も近かった別の結末：{ending}まで{gaps}",
+    gaps: {
+      trust: "{label}が{value}不足",
+      legitimacy: "{label}が{value}不足",
+      capital: "{label}が{value}不足",
+      trustOver: "{label}が{value}超過",
+      clues: "手がかりが{value}件不足",
+      reframes: "卓の組み替えが{value}回不足",
+      coldGap: "{legitimacy}が{trust}をあと{value}上回る必要",
+      pactGap: "{trust}が{legitimacy}をあと{value}上回る必要",
+    },
+    burn: "最後に封印を選んだため、記録が残ってこそ開く結末（OPEN OVERSIGHT・EVIDENCE REFORM・HUMAN RECORD）は今シーズン閉じていました。",
   },
   score: {
     points: "{score}点",

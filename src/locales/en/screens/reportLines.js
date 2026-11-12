@@ -18,11 +18,6 @@ export default {
     nextCase: "Did you find a reason to keep going to the next case, “{title}”?",
     finale: "Did the final choice tie in naturally with the Trigger Lab’s experiment?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] Season collapse",
-    season: "[{ending}] Season verdict",
-    case: "[Case closed] {tag}",
-  },
   rationaleClues: "Clues {count}",
   standing: {
     clear: "Below the collapse line",
@@ -31,6 +26,31 @@ export default {
     harm: "Season average {harmLabel} {perCase} / {gate} · busted hands {bustPercent}%",
     overreach: "Season average {harmLabel} {perCase} / {gate} · busted hands {bustPercent}% / {bustGate}%",
     harmCase: "Retry {caseLabel} · {harmLabel} {harm}",
+    held: "{capitalLabel} fell to an average of {capital}, but {harmLabel} stayed below the collapse line.",
+  },
+  heldEndings: {
+    "open-oversight": "Cash fell, but the season was not lost: it kept human cost below the line and left a standard.",
+    "evidence-reform": "Cash fell, but the season was not lost: it kept human cost below the line and left rules for disclosure and protection.",
+    "human-record": "Cash fell, but the season was not lost: it kept human cost below the line and left the names.",
+    "cold-justice": "Cash fell, but the season was not lost: it kept human cost below the line and held to the procedure.",
+    "field-pact": "Cash fell, but the season was not lost: it kept human cost below the line and left people’s promises.",
+    "quiet-cover": "Cash fell, but the season was not lost: it kept human cost below the line and closed quietly.",
+    "open-question": "Cash fell, but the season was not lost: it kept human cost below the line and passed the question on.",
+  },
+  witnessHeld: "At the end you chose to blow the whistle. Cash fell and the score will not show it, but you brought the hidden record out while keeping human cost below the line. What this season won lies outside the numbers.",
+  nearest: {
+    line: "Closest other ending: {ending}. Short of it: {gaps}",
+    gaps: {
+      trust: "{label} by {value}",
+      legitimacy: "{label} by {value}",
+      capital: "{label} by {value}",
+      trustOver: "{label} {value} too high",
+      clues: "{value} more clue(s)",
+      reframes: "{value} more reframe(s)",
+      coldGap: "{legitimacy} {value} further ahead of {trust}",
+      pactGap: "{trust} {value} further ahead of {legitimacy}",
+    },
+    burn: "You sealed it all at the end, so the endings that need the records (OPEN OVERSIGHT · EVIDENCE REFORM · HUMAN RECORD) were closed this season.",
   },
   score: {
     points: "{score} pts",

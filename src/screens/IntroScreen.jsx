@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleAlert, Trophy } from "lucide-react";
+import { ChevronRight, Info, LockKeyhole, MessagesSquare, Sparkles, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { playOpeningAccent } from "../components/AdaptiveMusic.jsx";
 import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
@@ -12,7 +12,10 @@ import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
+import { getSideSlot } from "../sideCases.js";
+import { LazyScreen } from "../components/LazyScreen.jsx";
 import { loadedChunk } from "../state/chunkReload.js";
+import { retryableLazy } from "../state/retryableLazy.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
 import { DEFAULT_PLAYER_NAME, getDeletionRequestText } from "../appConfig.js";
@@ -21,6 +24,10 @@ import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
 import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
+import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
+
+// E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
+const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
 
 const PROTOCOL_LINE = "NO CORRECT ANSWER / 45 SEC WINDOW / NEXT CASE CONTAMINATED";
 // One loop of the marquee. Three copies is what makes the run wider than a
@@ -118,6 +125,8 @@ function DeletionRequest() {
 export function IntroScreen({ view, renderers = {} }) {
   // The case the burst is opening, or null when there is none.
   const [openingBurst, setOpeningBurst] = useState(null);
+  // E-11: the side case open in this screen's place, or null.
+  const [sideCaseId, setSideCaseId] = useState(null);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");  const {
@@ -161,6 +170,8 @@ export function IntroScreen({ view, renderers = {} }) {
   const gameTitle = GAME_TITLE;
   const consent = useConsentToggle({ pendingTelemetry, persist, setDataConsent, setPendingTelemetry, setTelemetryStatus });
   useEffect(() => () => window.clearTimeout(openingTimerRef.current), []);
+  // The cold opening's page, once its chunk has arrived (null: not playing).
+  const [ColdOpeningPage, setColdOpeningPage] = useState(null);
   // Before paint, so the handed-over press never flashes this screen first.
   useLayoutEffect(() => {
     const action = takeRuntimeStartAction();
@@ -189,7 +200,21 @@ export function IntroScreen({ view, renderers = {} }) {
   // With no run to lose nothing is awaited: the first press on the page still
   // opens the burst, and starts its sound, inside the press itself.
   const startNewRun = async () => {
-    if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) beginOpeningBurst(startGame);
+    if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) {
+      // B-3(1) 냉정한 오프닝 (state/coldOpening.js). `__CP_COLD_OPENING__` is
+      // the switch, written by vite.config.js: off, this branch is not in the
+      // build. On, a first season plays the page first, and the page's last
+      // press opens the burst exactly as this press would have.
+      if ((__CP_COLD_OPENING__ || (__CP_DEBUG_BUILD__ && coldOpeningForced())) && playsColdOpening({ enabled: true, hasResumableSave })) {
+        import("../components/ColdOpening.jsx").then(
+          (module) => setColdOpeningPage(() => module.default),
+          // A page that cannot arrive is not a reason to hold the season back.
+          () => beginOpeningBurst(startGame),
+        );
+        return;
+      }
+      beginOpeningBurst(startGame);
+    }
   };
   const startNewGamePlusRun = async () => {
     if (!hasResumableSave || (await confirmAction(CONFIRM.newGamePlus))) beginOpeningBurst(startNewGamePlus);
@@ -234,7 +259,9 @@ export function IntroScreen({ view, renderers = {} }) {
       <a href={`#${DATA_DRAWER_ID}`} onClick={openDataDrawer}>{introCopy.consentLine.link}</a>{introCopy.consentLine.after}
     </small>
   );
-  const analystTitle = getAnalystTitle({ currentCase, caseResults });
+  // The record title (C1, 2026-11-05): the case in play, the cases closed and
+  // whether this device has finished a season (NEW GAME+ open) -- nothing new.
+  const analystTitle = getAnalystTitle({ currentCase, caseResults, finishedSeason: newGamePlusUnlocked });
   const resumePanel = (
     <div className="resume-panel">
       <div>
@@ -275,6 +302,17 @@ export function IntroScreen({ view, renderers = {} }) {
       </button>
     </div>
   );
+  // E-11 번외 사건: hidden until a finale is closed on this device and a side
+  // case is written (sideCases.getSideSlot). Read on each draw, so a case
+  // closed in the side screen is counted when the start screen comes back.
+  const sideSlot = getSideSlot({ newGamePlusUnlocked, caseResults });
+  if (sideCaseId) {
+    return (
+      <LazyScreen>
+        <SideCaseScreen caseId={sideCaseId} Music={Music} onClose={() => setSideCaseId(null)} />
+      </LazyScreen>
+    );
+  }
   return (
       <main className="shell intro-shell" aria-busy={Boolean(openingBurst)}>
         <Music modeKey={musicModeKey} />
@@ -330,7 +368,7 @@ export function IntroScreen({ view, renderers = {} }) {
                       aria-controls={showErrorLog ? "error-log-panel" : undefined}
                       onClick={() => setShowErrorLog(true)}
                     >
-                      <TriangleAlert size={15} />
+                      <TriangleExclamationPoint size={15} />
                       에러 로그
                     </button>
                   )}
@@ -427,11 +465,40 @@ export function IntroScreen({ view, renderers = {} }) {
               />
               {hasResumableSave && startFirstCaseButton}
             </div>
+            {/* 기록 칭호 under the name: the same title the resume card reads
+                (src/analystTitle.js), on the input note's own rule, so no
+                style is added. A fresh device reads 수습 분석관. */}
+            {analystTitle && (
+              <p className="input-note" data-testid="rank-title">
+                <small>{fill(introCopy.setup.rankTitle, { title: analystTitle })}</small>
+              </p>
+            )}
             {newGamePlusUnlocked && (
               <button type="button" className="new-game-plus-button" onClick={startNewGamePlusRun} disabled={Boolean(openingBurst)}>
                 <Sparkles size={16} />
                 <span>{newGamePlusLabel()[0]}<span lang="en">NEW GAME+</span>{newGamePlusLabel()[1]}</span>
               </button>
+            )}
+            {sideSlot && (
+              <div className="resume-panel" data-testid="side-case-slot" role="group" aria-label={introCopy.sideSlot.label}>
+                <div>
+                  <span>{fill(introCopy.sideSlot.heading, { book: sideSlot.book })}</span>
+                  <small>{introCopy.sideSlot.text}</small>
+                </div>
+                {sideSlot.cases.map((sideCase) => (
+                  <button
+                    key={sideCase.id}
+                    type="button"
+                    data-testid={`side-case-open-${sideCase.id}`}
+                    onClick={() => setSideCaseId(sideCase.id)}
+                    disabled={Boolean(openingBurst)}
+                  >
+                    <ChevronRight size={18} />
+                    {sideCase.label} {sideCase.title}
+                    {sideCase.resumable ? introCopy.sideSlot.resumable : sideCase.closed ? introCopy.sideSlot.closed : ""}
+                  </button>
+                ))}
+              </div>
             )}
             {__CP_DEBUG_BUILD__ && debugToolsEnabled && (
               <button type="button" data-testid="unlock-all-cases" className="test-unlock" onClick={unlockAllCasesForTest}>
@@ -851,6 +918,16 @@ export function IntroScreen({ view, renderers = {} }) {
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {openingCase ? fill(introCopy.opening.entering, { case: openingIsFirst ? introCopy.opening.firstCase : openingCase.label }) : ""}
         </p>
+        {/* Behind the same constants as the press, so a build with the switch off carries none of it. */}
+        {(__CP_COLD_OPENING__ || __CP_DEBUG_BUILD__) && ColdOpeningPage && (
+          <ColdOpeningPage
+            startLabel={introCopy.startButton}
+            onDone={() => {
+              setColdOpeningPage(null);
+              beginOpeningBurst(startGame);
+            }}
+          />
+        )}
         {openingCase && (
           <div className="opening-burst" data-testid="opening-burst" aria-hidden="true">
             <div className="opening-burst-grid" />

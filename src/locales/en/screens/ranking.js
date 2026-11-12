@@ -29,6 +29,7 @@ export default {
   pastBest: "Your best on the previous ranking (v{version}): {score} points · {rank}",
   footnote: "Other participants are told apart by judgment type and run number, not by name. Your name appears only in this browser’s records, and without a remote connection only local records are counted.",
   hallFootnote: "Checked seasons that place 1st to 3rd on each board stay in the Hall of Fame by their run number.",
+  checkScope: "The nightly check confirms a record could have come out of the rules. It cannot tell a person from a bot.",
   hallBadge: "Hall of Fame · {board} #{place}",
   hallMainBoard: "main ranking",
   hallProvisional: " (provisional)",

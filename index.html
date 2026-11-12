@@ -45,6 +45,8 @@
     />
     <meta name="twitter:image" content="/triggerlab-key-visual.jpg" />
     <meta name="twitter:image:alt" content="해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습" />
+    <!-- JSON-LD, written by startStructuredData (scripts/site-pages.mjs) -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"임계점: CRITICAL POINT","url":"/","inLanguage":"ko"},{"@type":"VideoGame","name":"임계점: CRITICAL POINT","url":"/","inLanguage":"ko","description":"「임계점: CRITICAL POINT」는 판돈을 올릴수록 벽이 가까워지는 기업·금융 미스터리 게임입니다. 웹 브라우저에서 바로 실행되며 회원가입이나 설치 없이 무료로 플레이할 수 있습니다.","image":"/triggerlab-key-visual.jpg","genre":["기업·금융 미스터리","푸시 유어 럭"],"gamePlatform":"Web browser","applicationCategory":"Game","author":{"@type":"Organization","name":"찹쌀떡","member":[{"@type":"Person","name":"SUPASONIC"},{"@type":"Person","name":"ALICE"}]},"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}]}</script>
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -72,8 +74,10 @@
       media="not all and (max-width: 700px)"
       fetchpriority="high"
     />
-    <!-- The one font file (src/styles/tokens.css). Preloaded so the intro's text
-         is not held until the stylesheet that names it has been parsed. -->
+    <!-- The first of the two font files (src/styles/tokens.css): the start
+         screen's characters. Preloaded so the intro's text is not held until the
+         stylesheet that names it has been parsed. The second file is not
+         preloaded; the service worker keeps it at install. -->
     <link
       rel="preload"
       as="font"
@@ -98,7 +102,7 @@
         <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">임계점: CRITICAL POINT</h1>
         <p style="margin: 0 0 24px">「임계점: CRITICAL POINT」는 기업·금융 미스터리이자 푸시 유어 럭(push your luck) 게임입니다. 판돈을 올릴수록 보이지 않는 벽이 가까워지고, 한 번의 판단은 다음 판의 규칙을 바꿉니다.</p>
         <p style="margin: 0 0 12px; font-weight: 700">
-          사건 파일이 열리지 않았습니다. 분석 시스템이 이 브라우저에서 실행 승인을 받지 못했습니다.
+          사건 파일이 열리지 않았습니다. 이 브라우저에서는 분석관 단말이 실행 승인을 받지 못했습니다.
         </p>
         <p style="margin: 0 0 24px">
           임계점은 자바스크립트로 그려지는 게임입니다. 브라우저 설정에서 자바스크립트를 켠 뒤 다시 열어 주세요.
@@ -108,7 +112,7 @@
           <li><a href="https://support.google.com/chrome/answer/114662?hl=ko" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Chrome</a></li>
           <li><a href="https://support.apple.com/ko-kr/102456" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Safari (iPhone)</a></li>
           <li><a href="https://www.samsung.com/us/support/troubleshoot/TSG10007306/" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">삼성 인터넷</a></li>
-          <li><a href="https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Firefox</a></li>
+          <li><a href="https://support.mozilla.org/ko/kb/javascript-settings-for-interactive-web-pages" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Firefox</a></li>
           <li><a href="https://support.microsoft.com/ko-kr/office/enable-javascript-7bb9ee74-6a9e-4dd1-babf-b0a1bb136361" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">Edge</a></li>
         </ul>
         <ul style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none; margin-top: 24px">
@@ -117,6 +121,10 @@
           <li><a href="/contact.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">문의</a></li>
           <li><a href="/privacy.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">개인정보처리방침</a></li>
           <li><a href="/terms.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">이용약관</a></li>
+          <li><a href="/guide.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">게임 방법</a></li>
+          <li><a href="/cases/index.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">사건 파일</a></li>
+          <li><a href="/characters.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">인물</a></li>
+          <li><a href="/making.html" style="display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline">만든 이야기</a></li>
         </ul>
       </div>
     </noscript>

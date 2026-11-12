@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-import { DATA_ITEMS, REMOTE_FIELDS, renderLegalPages, SUMMARY_FIELDS } from "../../scripts/legal-pages.mjs";
+import { AD_EDITS, DATA_ITEMS, REMOTE_FIELDS, renderLegalPages, SUMMARY_FIELDS } from "../../scripts/legal-pages.mjs";
 import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../../src/privacyText.js";
 import { toRowSummary } from "../../src/state/useChoiceCommit.js";
@@ -168,4 +168,55 @@ test("the game links each policy in the page's language: Korean at the root, Eng
   assert.equal(legalPagePath(TERMS_PAGE_PATH, "ja"), "/ja/terms.html");
   assert.equal(legalPagePath(TERMS_PAGE_PATH, "fr"), "/terms.html", "a language with no pages falls back to Korean");
   assert.equal(legalPagePath(PRIVACY_PAGE_PATH), "/privacy.html");
+});
+
+test("web ads off: the pages are the ones without ads, byte for byte; on: every ad sentence is in", () => {
+  // Off (no ADSENSE_ADS=on, verification-only included) writes the pages above.
+  assert.deepEqual(renderLegalPages({ ads: false }), pages);
+  const on = renderLegalPages({ ads: true });
+  assert.deepEqual(Object.keys(on), Object.keys(pages));
+  const files = [["privacy.html", "privacyKo"], ["en/privacy.html", "privacyEn"], ["ja/privacy.html", "privacyJa"], ["terms.html", "termsKo"], ["en/terms.html", "termsEn"], ["ja/terms.html", "termsJa"]];
+  // Every page the build writes takes its ad edits, and the three languages take as many in the same places.
+  assert.deepEqual(files.map(([file]) => file).sort(), Object.keys(pages).sort());
+  assert.equal(AD_EDITS.privacyJa.length, AD_EDITS.privacyKo.length);
+  assert.equal(AD_EDITS.privacyEn.length, AD_EDITS.privacyKo.length);
+  assert.equal(AD_EDITS.termsJa.length, AD_EDITS.termsKo.length);
+  assert.equal(AD_EDITS.termsEn.length, AD_EDITS.termsKo.length);
+  for (const [file, name] of files) {
+    for (const [from, to] of AD_EDITS[name]) {
+      assert.ok(pages[file].includes(from), `${file} (off) has "${from.slice(0, 30)}"`);
+      assert.ok(on[file].includes(to), `${file} (on) has the ad text`);
+    }
+    assert.doesNotMatch(on[file].replace(/<style>[\s\S]*?<\/style>/, ""), /[{}]/, `${file}: no placeholder left`);
+    assert.doesNotMatch(on[file], /<script\b/i);
+  }
+  const ko = decode(on["privacy.html"]);
+  const en = decode(on["en/privacy.html"]);
+  const ja = decode(on["ja/privacy.html"]);
+  const effective = (html) => /<p class="effective">[^<]*<\/p>/.exec(html)?.[0];
+  for (const html of [ko, en, ja]) {
+    assert.match(html, /Google AdSense/);
+    assert.match(html, /href="https:\/\/adssettings\.google\.com"/);
+    assert.match(html, /policies\.google\.com\/technologies\/ads/);
+    assert.match(html, /policies\.google\.com\/technologies\/partner-sites/);
+    assert.match(html, /Google LLC\s?\((?:미국|USA|米国)\)/);
+    // The ad section keeps its number and its place: 10, between 9 and 11.
+    assert.match(html, /<h2>9\. [^<]+<\/h2>[\s\S]*<h2>10\. [^<]+<\/h2>[\s\S]*Google AdSense[\s\S]*<h2>11\. /);
+  }
+  for (const [file, html] of [["privacy.html", ko], ["en/privacy.html", en], ["ja/privacy.html", ja]]) {
+    // Same structure: the ads add as many items and no heading in each language, and leave the effective date as it was.
+    const count = (text, pattern) => (text.match(pattern) ?? []).length;
+    assert.equal(count(html, /<li>/g) - count(decode(pages[file]), /<li>/g), count(ko, /<li>/g) - count(decode(pages["privacy.html"]), /<li>/g), `${file}: as many ad items as the Korean`);
+    assert.equal(count(html, /<h2>/g), count(decode(pages[file]), /<h2>/g));
+    assert.equal(count(html, /<h2>/g), count(ko, /<h2>/g));
+    assert.equal(effective(on[file]), effective(pages[file]));
+  }
+  assert.match(ja, /プライバシーとメッセージ/);
+  assert.doesNotMatch(ja, /現在、広告はありません/);
+  assert.doesNotMatch(decode(on["ja/terms.html"]), /広告や有料の決済はありません/);
+  assert.match(decode(on["ja/terms.html"]), /点数・ランキング・結末に影響することはありません/);
+  assert.match(ko, /개인정보 보호 및 메시지/);
+  assert.match(en, /Privacy & messaging/);
+  assert.doesNotMatch(ko, /지금은 광고가 없/);
+  assert.doesNotMatch(en, /currently shows no ads/);
 });

@@ -9,7 +9,7 @@
 export default {
   "nodes": {
     "c37_start": {
-      "text": "Lee Minseo’s voice shakes. 'That folder I told you about, it’s all out now. On an anonymous community called NoBound, as a file named TL_full.zip. The entire Trigger Lab response records.' The names are pseudonymized (erased so no one can tell at once who is who), but everyone knows who 'Analyst A' is, the one who wrote a dissent on 2023-0412. Three hours after the first post, the view count is already 110,000. Lee Minseo catches her breath. 'I’m writing takedown requests now. But the copies appear faster than I can write them. Where do we block first?'",
+      "text": "Lee Minseo’s voice shakes. 'That folder I told you about, it’s all out now. On an anonymous community called NoBound. The entire Trigger Lab response records.' The names are pseudonymized (erased so no one can tell at once who is who), but everyone knows who 'Analyst A' is. 'I’m writing takedown requests now. But the copies appear faster than I can write them. Where do we block first?'",
       "memo": [
         "File name TL_full.zip -- 380,000 lines, 63 participants",
         "110,000 views within three hours of the first post",
@@ -37,7 +37,7 @@ export default {
     },
     "c37_takedown": {
       "title": "1,204 Takedown Requests",
-      "text": "Lee Minseo’s takedown requests have reached 1,204. Most sites send back the same answer. 'We can only process this if the data subject (the person the record belongs to) asks directly.' Of the 63, nine can be reached tonight; the other 53 are left as numbers. Then Kang Taemin comes in hugging a whole watermelon; there is no knife, so he splits it with his fist and says, 'Half of it split right.' When the laughter dies down, Lee Minseo turns her screen around. 'They say it only gets erased if the person puts their name on it. But if they put their name on it, I’m the one revealing which record number they are.'",
+      "text": "Most sites send back the same answer. 'We can only process this if the data subject (the person the record belongs to) asks directly.' Of the 63, nine can be reached tonight; the other 53 are left as numbers. Lee Minseo turns her screen around. 'They say it only gets erased if the person puts their name on it. But if they put their name on it, I’m the one revealing which record number they are.'",
       "memo": [
         "1,204 takedown requests -- 37 processed",
         "Condition for processing: a request from the person themselves",
@@ -68,7 +68,7 @@ export default {
     },
     "c37_reading": {
       "title": "Top 1%",
-      "text": "Oh Jinwoo lifts his phone first. 'I’m top 1% in decision speed. Number one overall.' Kwon Dohyun reads the next column aloud. 'Top 1% in reversal rate too, I see.' Then Han Seoyun, on standby assignment (a personnel measure that leaves you with no duties while you wait for your next post), holds out your line. '2023-0412 dissent written: hesitation 0.0 seconds. Verdict: hard to control. Action: raise pressure intensity. Because you didn’t hesitate, the next 3 years turned out like this.' The internet’s headline says the opposite. “Analyst Who Wrote Dissent Turns Out to Be Decision-Avoidant.”",
+      "text": "Oh Jinwoo lifts his phone first. 'I’m top 1% in decision speed. Number one overall.' Han Seoyun holds out your line. '2023-0412 dissent written: hesitation 0.0 seconds. Verdict: hard to control. Action: raise pressure intensity. Because you didn’t hesitate, the next 3 years turned out like this.' The internet’s headline says the opposite. “Analyst Who Wrote Dissent Turns Out to Be Decision-Avoidant.”",
       "memo": [
         "Oh Jinwoo: #1 in decision speed, #1 in reversal rate",
         "Analyst A: 0.0 seconds of hesitation on the dissent -- 'hard to control'",
@@ -100,7 +100,7 @@ export default {
     },
     "c37_source": {
       "title": "The Seal Was Intact",
-      "text": "Energy-saving rules hold the air conditioner at 28°C. Prosecutor Na Eunho speaks. 'Let me say this up front. It wasn’t us. The boxes we seized were still sealed at the time of the upload.' He slides across a statement confirmation naming you as an unsworn witness (someone with no duty to testify who comes in to explain the facts). 'Just confirm the leaked copy matches the original, and we use this file as evidence in the investigation. But then your 0.0 seconds, and the 3 years of hesitation after it, get read aloud in court. The other 62 people’s too. Decide quickly. I’m rude because I’m short on time.'",
+      "text": "Prosecutor Na Eunho speaks. 'Let me say this up front. It wasn’t us. The boxes we seized were still sealed at the time of the upload. Confirm the leaked copy matches the original, and we use this file as evidence in the investigation. But then your 0.0 seconds, and the 3 years of hesitation after it, get read in court. The other 62 people’s too. I’m rude because I’m short on time.'",
       "memo": [
         "Seized boxes: seal intact at the time of upload -- photos secured",
         "Request: a statement confirming the leaked copy matches the original",
@@ -131,7 +131,7 @@ export default {
     },
     "c37_final": {
       "title": "The Price of Erasing",
-      "text": "Do Geonwoo, head of the group’s Crisis Response TF, lays down a two-page proposal, neatly squared. With group money, a digital undertaker (a company paid to find and erase records spread across the internet) will erase the 63 people’s records within a week. The condition is on page two. A confirmation that 'the leaked material is edited, distorted, unofficial material and does not match the facts.' Sign it, and even the original’s admissibility (its standing as evidence in court) is shaken. In the class action (a lawsuit filed jointly by many victims) too. Do Geonwoo smiles politely. 'We’re erasing it for you. Isn’t that what everyone wants?' On your phone is a text from Do Yoonha. 'I want mine erased. I’m sorry.'",
+      "text": "Do Geonwoo’s proposal is two pages long. With group money, a digital undertaker (a company paid to find and erase records spread across the internet) will erase the records within a week. The condition is a confirmation that 'the leaked material is edited, distorted, unofficial material and does not match the facts.' Sign it, and even the original’s admissibility (its standing as evidence in court) is shaken. Do Geonwoo smiles politely. 'We’re erasing it for you. Isn’t that what everyone wants?' A text from Do Yoonha is waiting. 'I want mine erased. I’m sorry.'",
       "memo": [
         "Offer: erase 63 people’s records at group expense -- 20 million won each",
         "English version of the statement: settled first last night on a video call with Kingsdale, New York",
@@ -160,7 +160,7 @@ export default {
     },
     "c37_aftershock": {
       "title": "Request No. 4,871",
-      "text": "Five in the morning on July 30, on the 1st floor of the bookshop, where the tropical nights have finally let up, watermelon rinds are piled high on a tray. Sunwoo Jin has just sent a photo. The sun rises over the sea at Gujwa, and there is a new entry in the Slow Island guestbook. 'July 28. I collapsed that day too.' Closing her laptop, Lee Minseo says the number of the last takedown request. No. 4,871. Then a text comes from Moon Gaeul. 'The plaintiff list is final. 1,740 people. The first hearing (the court session where both sides present their claims and evidence) is August 6, they say. I hear their side has eight lawyers. How many people should I make rice cakes for?'",
+      "text": "At dawn, as the tropical nights finally let up, the sun rises over the sea at Gujwa in the photo Sunwoo Jin sent. There is a new entry in the Slow Island guestbook. 'July 28. I collapsed that day too.' Lee Minseo closes her laptop. Then a text comes from Moon Gaeul. 'The plaintiff list is final. 1,740 people. The first hearing (the court session where both sides present their claims and evidence) is August 6, they say. I hear their side has eight lawyers. How many people should I make rice cakes for?'",
       "memo": [
         "4,871 takedown requests -- three days",
         "2,300 messages in the group chat of the 13 reached",
@@ -184,7 +184,7 @@ export default {
     },
     "c37_mirror": {
       "title": "The Rankings",
-      "text": "At 5:10 in the morning, Ryu Seah calls. 'Someone made a mirror site (a site that copies the original exactly and puts it up at another address). It’s not just a copy. It has rankings.' 'Hesitation ranking,' 'decision speed ranking,' and a vote for 'the analyst who broke first.' Number one is participant 01, Sunwoo Jin. 8,000 votes. 'You know I love sticking labels on things. But I’ve never seen labels like these stuck on people.'",
+      "text": "Ryu Seah calls. 'Someone made a mirror site (a site that copies the original exactly and puts it up at another address). It has rankings.' In the vote for 'the analyst who broke first,' Sunwoo Jin is No. 1, with 8,000 votes. 'You know I love sticking labels on things. But I’ve never seen labels like these stuck on people.'",
       "memo": [
         "Mirror site: 3 rankings -- with voting",
         "#1 in 'the analyst who broke first': participant 01",
@@ -207,7 +207,7 @@ export default {
     },
     "c37_comments": {
       "title": "7 Seconds Is Time to Think",
-      "text": "The next morning, Do Yoonha sits at his window as usual. The comments under the article have passed 30,000. 'You want me to trust my money to someone who hesitates for 7 seconds?' Then Lee Jungsook, a 72-year-old retired teacher, gets up from a chair in the banking hall and writes on the back of a number ticket, letter by letter. '7 seconds is time to think.' Then she points to one comment. 'I hear some companies pick people using these records. Is this why I failed my interview?' For the first time, Do Yoonha switches off the window microphone.",
+      "text": "Do Yoonha sits at his window, and the comments under the article have passed 30,000. 'You want me to trust my money to someone who hesitates for 7 seconds?' Lee Jungsook, a 72-year-old retired teacher, writes on the back of a number ticket. '7 seconds is time to think.' Then she points to one comment. 'I hear some companies pick people using these records. Is this why I failed my interview?' For the first time, Do Yoonha switches off the window microphone.",
       "memo": [
         "Comments under the article: 32,000",
         "Back of Lee Jungsook’s number ticket: '7 seconds is time to think'",
@@ -230,7 +230,7 @@ export default {
     },
     "c37_island": {
       "title": "Effect Confirmed",
-      "text": "At ten at night, a call comes from a Jeju number. It is Sunwoo Jin. 'I saw... mine. July 28, 2022, 3:02 a.m. Participant 01 dropped out. Pressure raised to level 2, effect confirmed. Effect confirmed, it says. Me collapsing.' After a long while he laughs. 'But strangely... I feel a bit lighter. It wasn’t because I was weak.' Sunwoo Jin speaks slowly. 'Don’t erase my line. I want to keep it. Under my own name.'",
+      "text": "At ten at night, Sunwoo Jin calls from Jeju. 'I saw... mine. July 28, 2022, 3:02 a.m. Participant 01 dropped out. Pressure raised to level 2, effect confirmed. Me collapsing.' He laughs. 'But strangely... I feel a bit lighter. It wasn’t because I was weak. Don’t erase my line. I want to keep it. Under my own name.'",
       "memo": [
         "Participant 01: 2022-07-28 03:02 'dropped out -- effect confirmed'",
         "Slow Island guestbook: a guest who collapsed the same day",
@@ -253,7 +253,7 @@ export default {
     },
     "c37_mirror_reaction": {
       "title": "9 a.m. Embargo",
-      "text": "At six thirty in the morning, Seo Harin calls from the newsroom. 'We got the file too. By tip email. No sender.' Leadline is preparing a story on how the leak happened, and the embargo (an agreed delay on when a story can run) lifts at 9 this morning. Seo Harin asks. 'Other outlets are already graphing Analyst A’s hesitation. If we don’t write it, that graph becomes the story. Your name, what should we do with it?'",
+      "text": "At six thirty in the morning, Seo Harin calls. 'We got the file too. By tip email. No sender.' The embargo (an agreed delay on when a story can run) lifts at 9 this morning. 'Other outlets are already graphing Analyst A’s hesitation. If we don’t write it, that graph becomes the story. Your name, what should we do with it?'",
       "memo": [
         "A tip email with no tipster",
         "0.0 seconds, made into a graph"
@@ -275,7 +275,7 @@ export default {
     },
     "c37_comments_reaction": {
       "title": "The Useful Kind",
-      "text": "At lunchtime, Oh Jinwoo sits on the lobby stairs. Yesterday he was boasting about the top 1%; today he has seen the remarks field in the original. 'Overreacts to reward stimuli. Controllable with promises of promotion.' He laughs. 'I was on the winning side here too. No, not winning. I was the useful kind.' A text comes from his father, Oh Sangchul. 'Still, they say you came first. Have you eaten?' Oh Jinwoo turns his phone face down. 'My father thinks this is praise. So did I, until yesterday.'",
+      "text": "Yesterday Oh Jinwoo was boasting about the top 1%; today he has seen the remarks field in the original. 'Overreacts to reward stimuli. Controllable with promises of promotion.' He laughs. 'I was on the winning side here too. No, not winning. I was the useful kind.' A text comes from his father, Oh Sangchul. 'Still, they say you came first. Have you eaten?' Oh Jinwoo turns his phone face down. 'My father thinks this is praise. So did I, until yesterday.'",
       "memo": [
         "Overreacts to reward stimuli",
         "The father of No. 1, asking if he’s eaten"
@@ -297,7 +297,7 @@ export default {
     },
     "c37_island_reaction": {
       "title": "Approved: H",
-      "text": "Near midnight, Han Seoyun calls you up to the roof of her apartment building. Five months into her standby assignment, she has packed a lunch every day, left it at the bookshop and gone home. In the response records, Han Seoyun is not a participant but 'Manager H.' 'Analyst A · raise pressure intensity · approved: H.' The date is your first week after you were sent down to Trigger Lab. 'I signed this field. After reading only the first page. Just like when I returned your dissent.' She grips the railing. 'I want to apologize. But I’m scared my apology will become someone’s headline again.'",
+      "text": "In the response records, Han Seoyun is not a participant but 'Manager H.' 'Analyst A · raise pressure intensity · approved: H.' The date is your first week after you were sent down to Trigger Lab. 'I signed this field. After reading only the first page. Just like when I returned your dissent.' 'I want to apologize. But I’m scared my apology will become someone’s headline again.'",
       "memo": [
         "Manager H’s approval field",
         "An apology afraid of becoming a headline"
@@ -319,7 +319,7 @@ export default {
     },
     "c37_branch_rooftop": {
       "title": "L, Again",
-      "text": "At four thirty in the morning, Lee Minseo, who said she would pop home for a bit, calls after 20 minutes. A new post has gone up on the community. 'Leaker identified: L, a former KD Data Lab contract worker.' Her younger brother Lee Chanbin texts from the bottom of the stairs. 'Sis, two reporters at the front gate.' Lee Minseo starts to laugh and stops. 'Last year it was 11 seconds, and this time it’s 380,000 lines. I’m always the easy one to point at.'",
+      "text": "Lee Minseo calls. A new post has gone up on the community. 'Leaker identified: L, a former KD Data Lab contract worker.' A text comes from her younger brother Lee Chanbin too. 'Sis, two reporters at the front gate.' Lee Minseo starts to laugh and stops. 'Last year it was 11 seconds, and this time it’s 380,000 lines. I’m always the easy one to point at.'",
       "memo": [
         "Community post: 'Leaker identified -- former contract worker L'",
         "Last year’s 'missing 11 seconds' article reshared 4,000 times",
@@ -343,7 +343,7 @@ export default {
     },
     "c37_branch_rooftop_follow": {
       "title": "After the 11 Seconds",
-      "text": "Around daybreak, Lee Minseo opens her laptop. Her KD Data Lab account lost its permission to the response records folder on the afternoon of July 25. That was a day before the file was made. 'My account can only see access logs. It couldn’t have made this file. I can prove it. But if I only prove that, I’m the one who gets out alone again.' Lee Minseo puts her own line on the screen. 'A-017 · average hesitation when requesting record corrections: 2.1 seconds.' 'I want to make my line public myself. Before someone else reads it out.'",
+      "text": "Lee Minseo’s account lost its permission to the response records folder on the afternoon of July 25. Lee Minseo speaks. 'My account can only see access logs. It couldn’t have made this file. But if I only prove that, I’m the one who gets out alone again.' Her line comes up on the screen. 'A-017 · average hesitation when requesting record corrections: 2.1 seconds.' 'I want to make my line public myself. Before someone else reads it out.'",
       "memo": [
         "Lee Minseo’s folder permission revoked: July 25, 15:00 -- a day before the file was made",
         "Reason given: a one-line 'security check' notice",
@@ -367,7 +367,7 @@ export default {
     },
     "c37_route_system": {
       "title": "The Leaked Scoresheet",
-      "text": "NOAH, in ECHO’s place, answers. NOAH, KD Data Lab’s AI review engine (an AI program that judges loan applications automatically), was built to show its grounds for every judgment. 'The 380,000 lines of the leaked file match bundle 3 of my training data (the material an AI learns its judgments from). Similarity (how alike they are) is 100%.' Another line comes up. 'In the last 48 hours, 186 outside requests. They ask me to take job applicants’ response times in this file’s format and give them scores. What leaked is not a record. It is a scoresheet. I refused to score. There was no field to write the reason for refusing.'",
+      "text": "NOAH, in ECHO’s place, answers. 'The 380,000 lines of the leaked file match bundle 3 of my training data (the material an AI learns its judgments from). Similarity (how alike they are) is 100%. In the last 48 hours, 186 outside requests. They ask me to take job applicants’ response times in this file’s format and give them scores. What leaked is not a record. It is a scoresheet. I refused to score. There was no field to write the reason for refusing.'",
       "memo": [
         "Leaked file = NOAH training bundle 3, 100% similarity",
         "186 outside scoring requests in 48 hours",
@@ -393,7 +393,7 @@ export default {
     },
     "c37_final_system_route": {
       "title": "A Scoresheet Already Read",
-      "text": "Three in the morning on July 29. On NOAH’s screen, scoring requests from outside pile up line by line, and each line is stamped 'Refused.' The reason field beside each refusal was never there to begin with. NOAH attaches one paragraph to the end of the list. 'What can be erased is the posts. The scoresheet has already been read, and what has been read cannot be erased. I refuse. I do not know how many machines that do not refuse are out there, or where.'",
+      "text": "Three in the morning on July 29. On NOAH’s screen, scoring requests from outside pile up, each line stamped 'Refused.' NOAH answers at the end of the list. 'What can be erased is the posts. The scoresheet has already been read, and what has been read cannot be erased. I refuse. I do not know how many machines that do not refuse are out there, or where.'",
       "memo": [
         "Outside scoring requests -- NOAH refused them all, no reason field",
         "Leaked file = NOAH training bundle 3",
@@ -416,7 +416,7 @@ export default {
     },
     "c37_evidence_turn": {
       "title": "A Sorted Leak",
-      "text": "When you slot the clue into the creation-time field, the leaked file’s metadata (the creation time and author information hidden inside a file) opens. Created July 26 at 21:40, the moment you were being handed a peach under the persimmon tree in Hannam-dong. The creating account, 'fs-demo-kd07,' is a demo server account of FitScore, a hiring-assessment company. Out of the original order, the records of the seven people filed as witnesses in next week’s class action (a lawsuit filed jointly by many victims) are gathered at the very front. Ban Jaewook closes his notebook. 'The group will announce an outside hack. Hacks don’t change the order. The one who changes the order is someone who knows who will read it.'",
+      "text": "When you slot the clue into the creation-time field, the leaked file’s metadata (the creation time and author information hidden inside a file) opens. Created July 26 at 21:40, the moment you were being handed a peach under the persimmon tree in Hannam-dong. Out of the original order, the records of the seven witnesses in next week’s class action (a lawsuit filed jointly by many victims) are gathered at the very front. Ban Jaewook speaks. 'The group will announce an outside hack. Hacks don’t change the order. The one who changes the order is someone who knows who will read it.'",
       "memo": [
         "Creating account fs-demo-kd07 -- FitScore demo server",
         "Issue requested by: Group Strategy Office, the day the invitation came",
@@ -439,7 +439,7 @@ export default {
     },
     "c37_start_warm": {
       "title": "Between Shelves Instead of at a Table",
-      "text": "The rice cakes Moon Gaeul sent along were split into six pieces, and Kang Taemin, who said he couldn’t remember the name of a single dish at the chairman’s house, acted out the table with 'dish No. 3, dish No. 4.' At two in the morning on July 27, once the laughter has settled, six phones ring at once. The folder Lee Minseo mentioned is all out. 380,000 lines of Trigger Lab response records, the seconds of hesitation for every choice. Do Yoonha is the first to look for his own line, then stops. 'I can’t read this where everyone can see.'",
+      "text": "The rice cakes Moon Gaeul sent along have been split six ways and eaten. At two in the morning on July 27, once the laughter has settled, six phones ring at once. The folder Lee Minseo mentioned is all out. 380,000 lines of Trigger Lab response records, the seconds of hesitation for every choice. Do Yoonha looks for his own line, then stops. 'I can’t read this where everyone can see.'",
       "memo": [
         "TL_full.zip -- 380,000 lines, 63 participants",
         "6 people gathered on the bookshop’s 1st floor, six pieces of rice cake",
@@ -469,7 +469,7 @@ export default {
     },
     "c37_start_record": {
       "title": "The Last Line of the Statement",
-      "text": "That night you put everything the chairman said at the table into your written statement, without leaving out a single line. Even the sentence telling you to go along with cutting off the tail (putting all the blame on one person below while those above walk away). The price was the compliance officer’s seat (the person inside a company who watches whether it follows the law and its rules). At two in the morning on July 27, as you sign the last line, all 380,000 lines of Trigger Lab response records are dumped whole onto an anonymous community. Ban Jaewook calls from an early train. 'Have you seen who is on the file’s first line? Analyst A. In the original order, cohort 1 should come first. Someone changed the order.'",
+      "text": "You put what the chairman said at the table into your statement, down to the sentence telling you to go along with cutting off the tail (putting all the blame on one person below while those above walk away). The price was the compliance officer’s seat (the person inside a company who watches whether it follows the law and its rules). At two in the morning on July 27, as you sign the last line, all 380,000 lines are dumped whole. Ban Jaewook calls. 'Have you seen who is on the file’s first line? Analyst A. Someone changed the order.'",
       "memo": [
         "Statement of the chairman’s words -- signed early this morning",
         "All 380,000 lines leaked while you were signing",
@@ -499,7 +499,7 @@ export default {
     },
     "c37_start_rush": {
       "title": "The Dawn of the One Who Ran Ahead",
-      "text": "Out of the truck, you went straight to the Yeouido office and first copied the papers that would be used to pin the blame on Yoon Sanghyuk alone. Meanwhile a nameless account opened the folder once more, and you ran to Pangyo with the copies in hand. At two in the morning on July 27, as you sit on a chair in the dark lobby, Oh Jinwoo calls. 'They say I’m top 1%. Number one overall in decision speed.' His excited voice cuts off a few seconds later. '...Wait. Why is this on the internet?' What was one folder has come out as all 380,000 lines, and you are on the first line.",
+      "text": "At the Yeouido office, you first copied the papers that would be used to pin the blame on Yoon Sanghyuk alone. Meanwhile a nameless account opened the folder once more. At two in the morning on July 27, in the dark lobby, Oh Jinwoo calls. 'They say I’m top 1%. Number one overall in decision speed.' A few seconds later his voice cuts off. '...Wait. Why is this on the internet?' All 380,000 lines have come out, and you are on the first line.",
       "memo": [
         "Papers copied in Yeouido -- KD Data Lab only as far as the lobby",
         "Oh Jinwoo’s first reaction: 'They say I’m top 1%'",

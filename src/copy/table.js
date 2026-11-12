@@ -9,12 +9,6 @@ import { localizeTables } from "../locale.js";
  * particle its word takes, which another language leaves out.
  */
 const tableCopy = {
-  // The browser tab while the table is hot (GauntletStage's TAB_TITLES).
-  tab: {
-    hot: "▲ 밀면 벽 사정권",
-    critical: "▲ 열기 {gauge} · 벽 구간 안",
-    bust: "[BUST] 판이 벽에 닿았다",
-  },
   // The 현재 위험 cell's line (tableMeters.js describeDanger).
   danger: {
     inBand: "벽 구간 안",
@@ -87,7 +81,10 @@ const tableCopy = {
     commit: "확정",
     oneMore: "한 번 더",
     holdToCommit: "꾹 눌러 확정",
-    holdHelp: "길게 눌러 확정. 길게 누르기 어려우면 3초 안에 한 번 더 누른다",
+    holdHint: "길게 눌러야 확정",
+    holdHelp: "길게 눌러 확정",
+    // The heart's button (I): drawn as the icon alone, named for the one line it asks the voice for.
+    listen: "지금 상황 듣기",
   },
   // The key line over the hand: each word after its key.
   keys: {
@@ -110,6 +107,7 @@ const tableCopy = {
     slamAbandon: "테이블을 떠났다",
     slamWall: "벽은 {wall}에 있었다",
     slamPot: "판돈",
+    slamStill: "심장이 멈춘 자리에서 벽이 드러났다.",
     slamCombo: " · 논리 콤보 {streak}",
     equipped: "장착",
     dropped: "· {name} 내려놓음",
@@ -232,11 +230,16 @@ const tableCopy = {
   // tableVoice.js: what the table says aloud in its one polite region.
   voice: {
     holdArmed: "한 번 더 누르면 확정된다",
+    holdHint: "길게 눌러야 확정된다",
     push: "열기 {gauge} · {danger}",
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
     scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
-    bank: "판돈 {pot} · 금고 {vault}",
+    // {hand} is the last hand's ±N, signed by the code (formatChange).
+    bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
+    act: "{act}막 시작 · 사건 {case}",
+    // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
+    status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },
   // tableAfterword.js: what a closed window still says about itself, and the
   // recap over the next scene's reaction.

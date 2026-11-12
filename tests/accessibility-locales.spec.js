@@ -1,8 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 import { NEW_GAME_PLUS_KEY, NEW_GAME_PLUS_MEMORY_KEY, SEASON_RECORD_KEY } from "../src/appConfig.js";
+import { CASE_START_NODES } from "../src/gameCases.js";
 import { weekStartMs, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
-import { cashStakedCard, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
+import { cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
+import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
 
 /**
@@ -10,7 +12,9 @@ import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
  * at the smallest phone the layout is held to, and on the screens it did not
  * reach: the comfort settings opened over the table, the table with a card
  * staged, the start screen's 결말 도감, and the ranking of an event week with
- * its 이번 주의 규칙 board (the 2026-11-03 audit, items 3 to 5).
+ * its 이번 주의 규칙 board (the 2026-11-03 audit, items 3 to 5). Since E3's
+ * 상황 듣기 (2026-11-12) also the open table with a push made, an act's title
+ * card, the finale's ending report and a 번외 사건 (E-11) on its table.
  *
  * Every test sets its own viewport, so the phone project would run the same
  * page again with touch on: they are @once, and run in `chromium` only. The
@@ -31,6 +35,20 @@ async function expectNoA11yViolations(page, label) {
     results.violations.map((violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(" ")).join(", ")}`),
     label,
   ).toEqual([]);
+}
+
+/** A side case (E-11) on a device that closed a finale: the season paused at 사건 12. */
+async function seedSideCaseDevice(page) {
+  await page.addInitScript(
+    ({ saveKey, save, newGamePlusKey }) => {
+      if (sessionStorage.getItem("a11y-side-seeded")) return;
+      sessionStorage.setItem("a11y-side-seeded", "1");
+      localStorage.clear();
+      localStorage.setItem(saveKey, JSON.stringify(save));
+      localStorage.setItem(newGamePlusKey, "true");
+    },
+    { saveKey: TEST_STORAGE_KEYS.save, save: savedRunAt("case12", "c12_start"), newGamePlusKey: NEW_GAME_PLUS_KEY },
+  );
 }
 
 /** Tuesday of the first event week, the way weekly-rule.spec.js moves the rule's clock. */
@@ -149,6 +167,52 @@ for (const lang of LANGS) {
         await expect(page.getByTestId("decision-next")).toBeVisible();
         await waitForEntrance(page.locator(".decision-reveal-backdrop"));
         await expectNoA11yViolations(page, "decision reveal");
+      });
+
+      test(`the open table after a push, with its 지금 상황 듣기 button, and an act's title card have no structural accessibility violations (${lang}, ${size.name})`, { tag: "@once" }, async ({ page }) => {
+        test.setTimeout(120_000);
+        await page.goto(withLang("/?debug=1", lang));
+        // 사건 01's first table has the whole table on it: the stances, SCOUT and the heart's button.
+        await startDebugNode(page, "case01", "start", { navigate: false });
+        await expect(page.locator("html")).toHaveAttribute("lang", lang);
+        const stage = page.getByTestId("gauntlet-stage");
+        await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+        await page.getByTestId("commit-push").click();
+        await expect(stage).toHaveAttribute("data-status", "live");
+        await expect(page.getByTestId("table-listen")).toBeVisible();
+        await waitForEntrance(stage);
+        await expectNoA11yViolations(page, "the open table, a push made");
+
+        // B-11(1): a run that reached 사건 08's first page opens on 2막's title card.
+        await seedSave(page, savedRunAt("case08", CASE_START_NODES.case08, { dynamics: { windowIndex: 40 } }));
+        await page.goto(withLang("/", lang));
+        await page.getByTestId("resume-save").click();
+        const card = page.getByTestId("act-card");
+        await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+        await expect(page.locator("html")).toHaveAttribute("lang", lang);
+        await expectNoA11yViolations(page, "the act's title card");
+      });
+
+      test(`the finale's ending report and a side case's table have no structural accessibility violations (${lang}, ${size.name})`, { tag: "@once" }, async ({ page }) => {
+        test.setTimeout(180_000);
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await page.goto(withLang("/?debug=1", lang));
+        await startDebugNode(page, "final", "f_start", { navigate: false });
+        await completeCurrentCase(page);
+        await expect(page.locator(".ending-sequence")).toBeVisible();
+        await expect(page.locator("html")).toHaveAttribute("lang", lang);
+        await expectNoA11yViolations(page, "the finale's ending report");
+
+        // E-11: the release's 번외 1 on its first table, the season left where it was.
+        await seedSideCaseDevice(page);
+        await page.goto(withLang("/", lang));
+        await clickElement(page.getByTestId("side-case-open-side01"), "open side01");
+        const screen = page.getByTestId("side-case-screen");
+        await expect(screen).toHaveAttribute("data-side-node", "s1_start", { timeout: TRANSITION_TIMEOUT_MS });
+        await dismissProtocolBreach(page);
+        await expect(page.getByTestId("gauntlet-stage")).toHaveAttribute("data-status", "live");
+        await waitForEntrance(screen);
+        await expectNoA11yViolations(page, "a side case's table");
       });
     });
   }

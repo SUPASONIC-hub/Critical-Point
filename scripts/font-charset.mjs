@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 /**
@@ -21,6 +21,58 @@ import path from "node:path";
 export const FONT_SOURCE = "node_modules/pretendard/dist/public/variable/PretendardVariable.ttf";
 export const FONT_OUTPUT = "src/assets/fonts/pretendard-cp.woff2";
 export const CHARSET_OUTPUT = "src/assets/fonts/pretendard-cp.charset.txt";
+/**
+ * The second file: every character of the list the first file does not carry.
+ * The first file (`FONT_OUTPUT`, preloaded) holds what the start screen draws in
+ * any of the three languages -- the always-carried ranges and the Korean of the
+ * files in `FIRST_PAINT_SOURCES` -- and the rest wait in this one, named by
+ * code point in the `unicode-range` of a second @font-face of the same family
+ * (src/styles/tokens.css, between the FONT_REST_RANGE markers). A browser fetches
+ * it only when a page puts one of those characters on screen. English is
+ * printable ASCII and Japanese is the system face, so both are whole in the
+ * first file. `CHARSET_OUTPUT` stays the list of both together.
+ */
+export const REST_FONT_OUTPUT = "src/assets/fonts/pretendard-cp-rest.woff2";
+export const FIRST_CHARSET_OUTPUT = "src/assets/fonts/pretendard-cp.first.txt";
+export const FONT_CSS = "src/styles/tokens.css";
+/**
+ * What the start screen prints, in source. Comments are dropped before the
+ * read (a Korean comment is not drawn); a character missed here is not lost,
+ * only drawn once the second file arrives.
+ */
+export const FIRST_PAINT_SOURCES = [
+  "index.html",
+  "src/screens/IntroScreen.jsx",
+  "src/copy/intro.js",
+  "src/copy/introPanels.js",
+  "src/copy/comfort.js",
+  "src/copy/cloudSave.js",
+  "src/copy/loading.js",
+  "src/components/GameWordmark.jsx",
+  "src/components/LanguagePicker.jsx",
+  "src/components/StudioCredit.jsx",
+  "src/credits.js",
+  "src/components/WeeklyRuleNotice.jsx",
+  "src/components/AccessibilityPanel.jsx",
+  "src/components/CloudSavePanel.jsx",
+  "src/components/GuardedButton.jsx",
+  "src/components/LazyScreen.jsx",
+  "src/locale.js",
+  "src/analystTitle.js",
+  "src/appConfig.js",
+  "src/advancedSystems.js",
+  // The intro's field bag (createIntroViewModel) and the data it carries: every
+  // case card's title, trigger and summary, the play styles, the operator
+  // origins, the trigger labels and the privacy lines. Measured on Linux
+  // 2026-11-04, these drew 217 syllables from the second file on the Korean
+  // start screen; tests/unit/first-paint-charset.test.mjs holds the bag to the list.
+  "src/viewModels/introViewModel.js",
+  "src/viewModels/seasonViewModels.js",
+  "src/gameCases.js",
+  "src/appCopy.js",
+  "src/gameConstants.js",
+  "src/privacyText.js",
+];
 
 const SOURCE_ROOTS = ["src"];
 const SOURCE_FILES = ["index.html"];
@@ -41,8 +93,15 @@ const SKIPPED_DIRECTORIES = new Set([path.join("src", "locales", "ja"), path.joi
  * Source files whose strings are never drawn. src/boardBlockedTerms.js is the
  * board's blocked words, folded (hiragana, kanji, old jamo): the board refuses
  * a post that holds one with a sentence of its own and never prints the word.
+ * src/copy/tabTitles.js and its English layer are the browser tab's titles,
+ * which the browser's own interface draws, never the page's font (the ⚠ of
+ * 「⚠ 벽까지 3」 would otherwise cost a glyph nothing on the page uses).
  */
-const SKIPPED_FILES = new Set([path.join("src", "boardBlockedTerms.js")]);
+const SKIPPED_FILES = new Set([
+  path.join("src", "boardBlockedTerms.js"),
+  path.join("src", "copy", "tabTitles.js"),
+  path.join("src", "locales", "en", "screens", "tabTitles.js"),
+]);
 
 function range(from, to) {
   let text = "";
@@ -104,10 +163,15 @@ function decodeCssEscapes(text) {
 export function collectSourceCharacters(root = process.cwd()) {
   const files = SOURCE_FILES.map((file) => path.join(root, file));
   for (const directory of SOURCE_ROOTS) visit(path.join(root, directory), files, root);
+  return charactersOf(files, (file) => readFileSync(file, "utf8"));
+}
 
+const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^\s*\/\/.*$/gm, "");
+
+function charactersOf(files, read) {
   const characters = new Set();
   for (const file of files) {
-    const text = readFileSync(file, "utf8");
+    const text = read(file);
     const decoded = text + decodeEscapes(text) + (file.endsWith(".css") ? decodeCssEscapes(text) : "");
     for (const character of decoded) {
       const code = character.codePointAt(0);
@@ -144,6 +208,32 @@ export async function collectComputedCharacters() {
   return { characters, labels };
 }
 
+/**
+ * The first file's characters: the always-carried ranges and what the
+ * start-screen sources print, kept to what the whole list carries.
+ */
+export async function collectFirstPaintCharset(root = process.cwd()) {
+  const all = new Set(await collectCharset(root));
+  const files = FIRST_PAINT_SOURCES.map((file) => path.join(root, file)).filter((file) => existsSync(file));
+  const printed = charactersOf(files, (file) => withoutComments(readFileSync(file, "utf8")));
+  const characters = [...new Set([...BASELINE_CHARACTERS, ...printed])].filter((character) => all.has(character));
+  return characters.sort((a, b) => a.codePointAt(0) - b.codePointAt(0)).join("");
+}
+
+/** `U+AC00-AC01,U+B000`: code points as the shortest unicode-range list. */
+export function unicodeRange(characters) {
+  const codes = [...new Set([...characters].map((c) => c.codePointAt(0)))].sort((a, b) => a - b);
+  const parts = [];
+  const hex = (code) => code.toString(16).toUpperCase();
+  for (let i = 0; i < codes.length; ) {
+    let j = i;
+    while (j + 1 < codes.length && codes[j + 1] === codes[j] + 1) j += 1;
+    parts.push(j > i ? `U+${hex(codes[i])}-${hex(codes[j])}` : `U+${hex(codes[i])}`);
+    i = j + 1;
+  }
+  return parts.join(",");
+}
+
 /** A sorted string of every code point the font should carry. */
 export async function collectCharset(root = process.cwd()) {
   const { characters: computed } = await collectComputedCharacters();
@@ -157,9 +247,9 @@ export async function collectCharset(root = process.cwd()) {
  * the source against it and `check-doc-numbers.mjs` counts it, so the line
  * format is read in one place.
  */
-export function readCharsetList(root = process.cwd()) {
+export function readCharsetList(root = process.cwd(), list = CHARSET_OUTPUT) {
   return new Set(
-    readFileSync(path.join(root, CHARSET_OUTPUT), "utf8")
+    readFileSync(path.join(root, list), "utf8")
       .split("\n")
       .filter(Boolean)
       .map((line) => String.fromCodePoint(parseInt(line.slice(0, line.indexOf(" ")), 16))),

@@ -3,7 +3,7 @@ import { ENDING_GATES } from "./gameConstants.js";
 import { isPeopleFirstEffect } from "./gameLogic.js";
 import { easyResourceLabels, objectParticle, subjectParticle } from "./playerLanguage.js";
 import { getOperatorProfile } from "./advancedSystems.js";
-import { getSeasonStanding } from "./seasonStanding.js";
+import { cutPerCase, getSeasonStanding } from "./seasonStanding.js";
 import epilogueCopy from "./copy/epilogue.js";
 import { fill } from "./locale.js";
 
@@ -105,11 +105,22 @@ export const COLLAPSED_SEASON_MARK = W.collapsedMark;
  */
 export function getCollapseToll({ caseResults = {}, resources = {}, cases = [] } = {}) {
   const harm = easyResourceLabels.humanCost;
-  const [worst] = getSeasonStanding({ caseResults, resources }).harmCases;
+  const standing = getSeasonStanding({ caseResults, resources });
+  const [worst] = standing.harmCases;
   const named = worst && cases.find((caseItem) => caseItem.id === worst.caseId);
+  // 개선 포인트 C4 (2026-11-05 draft): the favours taken back, on the harm the
+  // gate read (its total and its mean a case, cut as the standing line cuts
+  // it). The engine counts no one laid off, so no such number is printed.
+  const favours = fill(W.toll.favours, {
+    harm,
+    particle: subjectParticle(harm),
+    total: standing.harm.total,
+    perCase: cutPerCase(standing.harm.total, standing.casesCounted),
+  });
   return [
     fill(W.toll.over, { harm, particle: subjectParticle(harm) }),
     named && fill(W.toll.worst, { label: named.label, title: named.title, harm, value: worst.harm, particle: objectParticle(String(worst.harm)) }),
+    favours,
     W.toll.paid,
   ].filter(Boolean).join(" ");
 }

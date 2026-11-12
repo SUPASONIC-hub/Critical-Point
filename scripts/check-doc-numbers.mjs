@@ -122,8 +122,8 @@ const DOC_NUMBERS = [
   { file: "README.md", what: "font file, KB", pattern: said("약 #KB, 글꼴 이름"), compute: () => game.fontKilobytes },
   {
     file: "README.md",
-    what: "font file (bytes, characters in its list, Hangul syllables among them)",
-    pattern: said("지금 파일은 #바이트\\s+\\(#자, 한글 #자\\)"),
+    what: "first font file (bytes; characters in the whole list, Hangul syllables among them)",
+    pattern: said("지금 첫 파일은 #바이트\\s+\\(목록 전체 #자, 한글 #자"),
     compute: () => [game.fontBytes, game.fontCharacters, game.fontHangul],
   },
   {

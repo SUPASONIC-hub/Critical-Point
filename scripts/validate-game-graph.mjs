@@ -23,6 +23,8 @@ import { applyEffect, getAuthorityLevel, getCaseOutcome, getContinuityChallenge,
 import { pressureBeats } from "../src/nodes/sceneBuild.js";
 import { sceneContext } from "../src/nodes/sceneContext.js";
 import { CASE_PACKS as AUTHORED_CASE_PACKS } from "../src/nodes/casePacks.js";
+import { getSpeakerPortrait } from "../src/speakerPortraits.js";
+import { checkSidePack } from "../src/state/sidePackCheck.js";
 
 const resultNodeIds = new Set(Object.values(CASE_RESULT_NODES));
 const orderedNodeIds = new Set(Object.values(nodeOrders).flat());
@@ -793,10 +795,35 @@ for (const [nodeId, node] of Object.entries(nodes)) {
 }
 if (speakersChecked.size === 0) failures.push("no speaker was checked against a profile");
 
+/**
+ * E-11 번외 사건: every side case file (`src/nodes/sideNN.js`), the framework's
+ * placeholder side00 among them. Outside the season graph above, so walked on
+ * its own (`checkSidePack`): its ids, its scenes reached from the start, its
+ * three endings, no scene the season has. Its speakers are the season's
+ * people, with their cards and their portraits (never a silhouette).
+ */
+const sideFiles = fs.readdirSync("src/nodes").filter((name) => /^side\d{2}\.js$/.test(name)).sort();
+let sideScenes = 0;
+for (const file of sideFiles) {
+  const module = await import(`../src/nodes/${file}`);
+  const pack = module[file.replace(".js", "")];
+  if (!pack) {
+    failures.push(`src/nodes/${file} exports no ${file.replace(".js", "")}`);
+    continue;
+  }
+  failures.push(...checkSidePack(pack, { seasonNodeIds: Object.keys(nodes) }).map((problem) => `src/nodes/${file}: ${problem}`));
+  for (const [nodeId, scene] of Object.entries(pack.nodes ?? {})) {
+    sideScenes += 1;
+    if (!getCharacterProfile(scene.speaker, null)) failures.push(`${nodeId} is spoken by ${scene.speaker}, who has no character profile`);
+    if (!getSpeakerPortrait(scene.speaker)) failures.push(`${nodeId} is spoken by ${scene.speaker}, who has no portrait`);
+  }
+}
+
 assert.deepEqual(failures, [], failures.join("\n"));
 console.log(
   `Game graph checks passed (${Object.keys(nodes).length} scenes, ${AUTHORED_CASE_PACKS.length} packs, ${speakersChecked.size} speakers, ` +
     `${memoryCards.length} memory cards, ${challengesChecked} continuity challenges).`,
 );
+console.log(`Side cases: ${sideFiles.length} files, ${sideScenes} scenes (outside the season graph).`);
 console.log(`Continuity challenges no card can meet: ${[...unmeetableFound].join(", ") || "none"}.`);
 console.log(`Generated copy still in play: ${fallbackReport}.`);

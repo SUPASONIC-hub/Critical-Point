@@ -83,7 +83,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { CHAIN_MARK, recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { CHAIN_MARK, recheckChain, SETTLED_INSIDE, UNCHECKED } from "../src/chainRecheck.js";
 import { isoWeekKey } from "../src/gauntlet/weeklyCalendar.js";
 import { RULES_MARK } from "../src/gauntlet/gauntletEngine.js";
 import {
@@ -99,6 +99,7 @@ import {
   readHallOfFameCounts,
 } from "../src/hallOfFame.js";
 import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingRecheck.js";
+import { recheckCaseSettlement } from "../src/settlementRecheck.js";
 
 /**
  * The marks ranking_set_recheck_marks takes (20261023000000, then 20261103020000).
@@ -256,7 +257,8 @@ export function verifyRows(rows) {
     const ranking = runRows.find((row) => row.case_id === "season-final");
     if (!ranking) continue;
     const recheck = recheckRun(runRows);
-    const chain = recheck.status === "unverified" ? null : recheckChain(runRows);
+    // F1 step 1: the settlement inside each case played again (the next scene, `resourcesAfter`).
+    const chain = recheck.status === "unverified" ? null : recheckChain(runRows, { settle: recheckCaseSettlement });
     const marks = [...recheck.marks, ...(chain?.marks ?? [])];
     results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, chain });
   }
@@ -346,8 +348,11 @@ export function formatChain(chain) {
   const notChecked = [];
   if (unchecked.cases) notChecked.push(`${unchecked.cases} cases with no readable log`);
   if (unchecked.links) notChecked.push(`${unchecked.links} links (a gap in the rows, or the counters missing)`);
+  // The board, the audit and the link (UNCHECKED.inside less what settlementRecheck.js plays again).
   const settled = unchecked.fields[UNCHECKED.inside[0]] ?? 0;
-  if (settled) notChecked.push(`the settlement of ${settled} cases`);
+  if (settled) notChecked.push(`the board, audit and link of ${settled} cases`);
+  const routed = SETTLED_INSIDE.map((field) => `${field} ${unchecked.fields[field] ?? 0}`).filter((text) => !text.endsWith(" 0"));
+  if (routed.length) notChecked.push(`entries not read again (cases): ${routed.join(", ")}`);
   // A row from a build before the snapshot (UNCHECKED.open); the board and the
   // route a case opened on wait for the settlement (UNCHECKED.between, S2).
   const opened = unchecked.fields[UNCHECKED.open[0]] ?? 0;

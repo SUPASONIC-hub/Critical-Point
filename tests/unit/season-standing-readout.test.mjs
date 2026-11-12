@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { CASE_SEQUENCE, seasonCasesBase } from "../../src/gameCases.js";
-import { ENDING_GATES } from "../../src/gameConstants.js";
+import { ENDING_GATES, initialResources } from "../../src/gameConstants.js";
+import { ENDING_IDS } from "../../src/gameLogic.js";
+import reportLinesCopy from "../../src/copy/reportLines.js";
+import enScreens from "../../src/locales/en/screens/index.js";
+import jaScreens from "../../src/locales/ja/screens/index.js";
 import { getSeasonStanding } from "../../src/seasonStanding.js";
-import { createSeasonStandingReadout } from "../../src/viewModels/reportViewModels.js";
+import { HELD_LINE_CAPITAL_SHARE, createSeasonStandingReadout, readHeldLine } from "../../src/viewModels/reportViewModels.js";
 
 /**
  * The line each case's report prints about SYSTEM COLLAPSE, and the cases a
@@ -113,4 +117,63 @@ test("on seasons of every shape the line's level is the standing's, and it lists
     seen[line.route] += 1;
   }
   assert.ok(seen.harm > 100 && seen.overreach > 20, `the sweep read both routes (${JSON.stringify(seen)})`);
+});
+
+/**
+ * 개선 포인트 C3 (2026-11-05 draft): a season that lost money and kept people
+ * says so after the line (`held`), and after the ending's own line on the
+ * finale (`endingHeld`), from the mean cash its cases closed on against
+ * `HELD_LINE_CAPITAL_SHARE` of the start. Neither says anything for a
+ * season near or over the line, one that kept its cash, or one with no
+ * closed case to read a mean from.
+ */
+test("the held line prints when harm is clear and the season's mean cash closed under the share of the start", () => {
+  const lost = initialResources.capital * HELD_LINE_CAPITAL_SHARE - 1;
+  const line = readout(season(140), { closing: { capital: lost }, endingId: "quiet-cover" });
+  assert.equal(line.held, `현금은 평균 ${lost}까지 내려갔지만 사람 피해는 붕괴선 아래입니다.`);
+  assert.equal(line.endingHeld, "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.");
+  assert.deepEqual(readHeldLine({ level: "clear", closing: { capital: lost } }), { capital: lost });
+});
+
+test("the held line stays out when the season kept its cash, is near or over the line, or has no closed mean", () => {
+  const lost = { capital: 40 };
+  const kept = { capital: initialResources.capital * HELD_LINE_CAPITAL_SHARE };
+  assert.equal(readout(season(140), { closing: kept, endingId: "quiet-cover" }).held, null, "at the share is not under it");
+  assert.equal(readout(season(140), { closing: { capital: 100 } }).held, null);
+  assert.equal(readout(season(160), { closing: lost, endingId: "quiet-cover" }).held, null, "near");
+  assert.equal(readout(season(200), { closing: lost, endingId: "quiet-cover" }).held, null, "over");
+  assert.equal(readout(season(120, 18), { closing: lost }).held, null, "near by its busts");
+  assert.equal(readout(season(140), { closing: null }).held, null, "no closed case");
+  assert.equal(readout(season(140), { closing: { capital: "x" } }).held, null);
+  assert.equal(readout(season(140)).held, null);
+  for (const line of [readout(season(160), { closing: lost, endingId: "quiet-cover" }), readout(season(140), { closing: kept, endingId: "quiet-cover" })]) {
+    assert.equal(line.endingHeld, null);
+  }
+});
+
+test("every ending that can be reached on lost cash has its sentence, and the collapse and PROFITABLE SILENCE have none", () => {
+  const lost = { capital: 40 };
+  const withOne = ENDING_IDS.filter((id) => id !== "collapse" && id !== "profitable-silence");
+  for (const id of [...withOne, "open-question"]) {
+    const line = readout(season(140), { closing: lost, endingId: id });
+    assert.equal(typeof line.endingHeld, "string", id);
+    assert.match(line.endingHeld, /^현금을 잃었지만 진 것이 아니라, /, id);
+  }
+  for (const id of ["collapse", "profitable-silence", "", "toString", undefined]) {
+    assert.equal(readout(season(140), { closing: lost, endingId: id }).endingHeld, null, String(id));
+  }
+  // The table holds exactly those endings, in the three languages.
+  const expected = [...withOne, "open-question"].sort();
+  for (const [lang, table] of Object.entries({ ko: reportLinesCopy.heldEndings, en: enScreens.reportLines.heldEndings, ja: jaScreens.reportLines.heldEndings })) {
+    assert.deepEqual(Object.keys(table).sort(), expected, lang);
+    for (const [id, sentence] of Object.entries(table)) assert.ok(typeof sentence === "string" && sentence.length > 0, `${lang} ${id}`);
+  }
+  // 감수 질문 1·9 (C3-1): Korean reads 「진 것이 아니라」, English has no "lost … did not lose" pun.
+  for (const sentence of Object.values(reportLinesCopy.heldEndings)) assert.doesNotMatch(sentence, /진 것은 아니라/);
+  for (const sentence of Object.values(enScreens.reportLines.heldEndings)) {
+    assert.match(sentence, /^Cash fell, but the season was not lost: it kept /);
+    assert.doesNotMatch(sentence, /did not lose/);
+  }
+  assert.equal(typeof enScreens.reportLines.standing.held, "string");
+  assert.equal(typeof jaScreens.reportLines.standing.held, "string");
 });

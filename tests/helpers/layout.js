@@ -3,12 +3,16 @@ import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./storage.
 
 /**
  * The screens the table promises to fit one decision on: a common phone, a
- * small Android phone and a laptop. The Playwright projects add their own
- * desktop and Pixel 7 sizes on top of these.
+ * small Android phone, a wide Android phone and a laptop. The Playwright
+ * projects add their own desktop and Pixel 7 sizes on top of these.
+ * "wide phone" (411x846, the Galaxy and Pixel width under the short-phone
+ * height of 860) joined on 2026-11-11: the 391-480px rules (#493 #500) had no
+ * sweep of their own, so a 411px regression showed only in a hand-run probe.
  */
 export const LAYOUT_VIEWPORTS = Object.freeze({
   phone: { width: 390, height: 844 },
   "small phone": { width: 360, height: 740 },
+  "wide phone": { width: 411, height: 846 },
   laptop: { width: 1366, height: 768 },
 });
 
@@ -94,13 +98,14 @@ export async function measureStakedTable(page) {
  * given. The save is written from a static page on the same origin: leaving the
  * table persists its live state on the way out, which would overwrite a save
  * written while it was still open. The briefing page is closed so the table
- * is read, not the page.
+ * is read, not the page. `run` writes more of the run's numbers (the vault,
+ * busts, best multiplier) the same way, for a bank row as late in a season.
  */
-export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0 } = {}) {
+export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0, run = {} } = {}) {
   await startDebugNode(page, caseId, nodeId);
   const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   await page.goto("/profile.jpg");
-  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, openSeed: null };
+  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, ...run, openSeed: null };
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/");
   await page.locator(".choices .choice").first().waitFor();

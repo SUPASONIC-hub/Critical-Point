@@ -41,6 +41,7 @@ export default {
     identity: "Analyst call sign",
     nameLabel: "Analyst name",
     namePlaceholder: "Enter your name",
+    rankTitle: "Record title: {title}",
     newGamePlus: "Start {game}",
   },
   pastRunLabel: "NEW GAME+ past record",
@@ -134,5 +135,13 @@ export default {
     entering: "Entering {case}",
     first: "Syncing first judgment conditions",
     syncing: "Syncing {case} judgment conditions",
+  },
+  sideSlot: {
+    label: "Side cases",
+    heading: "Side cases · off the rankings · {book}",
+    text: "Short cases played apart from the season. Your season save and the rankings stay as they are.",
+    book: "Side {closed}/{total}",
+    resumable: " · Continue",
+    closed: " · Done",
   },
 };

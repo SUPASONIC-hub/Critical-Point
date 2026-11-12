@@ -17,6 +17,9 @@ import { normalizeMood } from "../components/musicScore.js";
 export const DRONE_FADE_SECONDS = 5;
 /** The crossfade's time constant: half-way in a second, 97% over in `DRONE_FADE_SECONDS`. */
 export const DRONE_FADE_TAU = DRONE_FADE_SECONDS / 3.5;
+/** How fast the drone follows its level: live, and once the table has bust (A2: the slower let-down, no jump a listener on earphones can hear). */
+export const DRONE_FADE_S = 0.25;
+export const DRONE_STILL_FADE_S = 0.6;
 
 /**
  * voices: the sawtooths' Hz (the last one takes the closeness detune);
@@ -76,7 +79,10 @@ export function createTensionDrone({ context, destination, multiplier }, readers
   let mutedAt = -Infinity;
 
   return {
-    set(closeness = 0, sedated = false) {
+    // `still` is a table that has just bust (A2, 2026-11-05): the same
+    // level, let down over DRONE_STILL_FADE_S instead of DRONE_FADE_S -- a
+    // slower gain curve, no new voice, the pitch and the filter as before.
+    set(closeness = 0, sedated = false, still = false) {
       if (stopped) return;
       const now = context.currentTime;
       const read = sedated ? 0.35 : closeness;
@@ -102,7 +108,7 @@ export function createTensionDrone({ context, destination, multiplier }, readers
         if (live[index].until <= now) live.splice(index, 1);
       }
       const level = muted ? 0.0001 : (0.012 + read * read * 0.07) * multiplier;
-      master.gain.setTargetAtTime(level, now, 0.25);
+      master.gain.setTargetAtTime(level, now, still ? DRONE_STILL_FADE_S : DRONE_FADE_S);
       for (const entry of live) entry.filter.frequency.setTargetAtTime(entry.voicing.floor + read * 1400, now, 0.3);
       current.voices.at(-1).detune.setTargetAtTime(read * 60, now, 0.4);
     },

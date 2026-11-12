@@ -2,16 +2,46 @@
  * Derived report state: the ending framing, the score rows, the badges and the
  * storage banner. All of it is a pure read of a finished run.
  */
-import { easyResourceLabels } from "../playerLanguage.js";
-import { getSeasonStanding } from "../seasonStanding.js";
+import { easyResourceLabels, subjectParticle, topicParticle } from "../playerLanguage.js";
+import { initialResources } from "../gameConstants.js";
+import { cutPerCase, getSeasonStanding } from "../seasonStanding.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
 
-const { standing: STANDING, score: SCORE, badges: BADGE, pace: PACE } = reportLinesCopy;
+const { standing: STANDING, heldEndings: HELD_ENDINGS, witnessHeld: WITNESS_HELD, nearest: NEAREST, score: SCORE, badges: BADGE, pace: PACE } = reportLinesCopy;
 
 // A shape and a word for each level, so the level is read without its colour
 // (the word is STANDING's, by the level).
 const STANDING_MARKS = { clear: "○", near: "▲", over: "■" };
+
+/**
+ * How far under the start the season's mean cash must have closed for the
+ * season to have lost money (개선 포인트 C3, 2026-11-05 draft): under this
+ * share of `initialResources.capital`, so under 80 of the 100 a season
+ * starts with. The one number the held line hangs on; where it sits is the
+ * owner's (감수자's) call.
+ */
+export const HELD_LINE_CAPITAL_SHARE = 0.8;
+
+/**
+ * Whether the season lost money and kept people: its standing is clear of
+ * both collapse routes and the cash its cases closed on, on average, is
+ * under `HELD_LINE_CAPITAL_SHARE` of the start. `closing` is the mean
+ * closing resources (`getSeasonStrain().seasonResources`), or null before a
+ * case has closed -- and then nothing is held.
+ *
+ * @param {{ level?: string, closing?: Record<string, any> | null }} [input]
+ */
+export function readHeldLine({ level, closing } = {}) {
+  const capital = Number(closing?.capital);
+  return level === "clear" && Number.isFinite(capital) && capital < initialResources.capital * HELD_LINE_CAPITAL_SHARE ? { capital } : null;
+}
+
+/**
+ * What src/nearestEnding.js answers, written out here so the type check does
+ * not follow that module into the ruling's.
+ * @typedef {{ id?: string, label?: string, gaps?: Array<{ key: string, value: number }>, burn?: boolean } | null} NearestEnding
+ */
 
 /**
  * The line every case's report prints about SYSTEM COLLAPSE, and on a collapse
@@ -30,14 +60,29 @@ const STANDING_MARKS = { clear: "○", near: "▲", over: "■" };
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
  * @param {Record<string, any>} [input.resources] The resources on the table now.
  * @param {Array<{ id: string, label: string }>} [input.cases] The cases the season can open.
+ * @param {Record<string, any> | null} [input.closing] The mean resources the season's cases closed on, for `held`.
+ * @param {string} [input.endingId] The ending the season reached, for `endingHeld` (the finale only).
+ * @param {string | null} [input.finale] The finale's last answer (`getFinaleOutcome`), for `endingWitness`.
+ * @param {NearestEnding} [input.nearest] What `nearestEnding` (src/nearestEnding.js) returned, for `endingNearest`.
+ *
+ * `held` (C3) is the sentence after the line when the season lost money and
+ * kept people (`readHeldLine`), else null; `endingHeld` is that season's
+ * sentence after the ending's own line, by the ending, and null for an
+ * ending that has none (the collapse, PROFITABLE SILENCE) or a season that
+ * did not hold. `endingWitness` (C3-4) is the paragraph after it when the
+ * finale's answer was 폭로 on a held season, and `endingNearest` (C2-1) the
+ * finale's line on the ending it came closest to (`describeNearestEnding`).
+ * Both are words only: the ending is the one the season reached.
  */
-export function createSeasonStandingReadout({ caseResults, resources, cases = [] } = {}) {
+export function createSeasonStandingReadout({ caseResults, resources, cases = [], closing = null, endingId = "", finale = null, nearest = null } = {}) {
   const { level, harm, overreach, casesCounted, harmCases } = getSeasonStanding({ caseResults, resources });
   const route = level === harm.level ? "harm" : "overreach";
-  const perCase = Math.floor((harm.total * 10) / casesCounted) / 10;
+  const perCase = cutPerCase(harm.total, casesCounted);
   const bustPercent = overreach.windows > 0 ? Math.floor((overreach.busts * 100) / overreach.windows) : 0;
   const harmLabel = easyResourceLabels.humanCost;
+  const capitalLabel = easyResourceLabels.capital;
   const labels = new Map(cases.map((caseItem) => [caseItem.id, caseItem.label]));
+  const heldLine = readHeldLine({ level, closing });
   return {
     level,
     route,
@@ -46,10 +91,38 @@ export function createSeasonStandingReadout({ caseResults, resources, cases = []
     text: route === "harm"
       ? fill(STANDING.harm, { harmLabel, perCase, gate: harm.gate, bustPercent })
       : fill(STANDING.overreach, { harmLabel, perCase, gate: overreach.harmGate, bustPercent, bustGate: Math.round(overreach.bustGate * 100) }),
+    held: heldLine
+      ? fill(STANDING.held, { capitalLabel, capitalParticle: topicParticle(capitalLabel), capital: heldLine.capital, harmLabel, harmParticle: topicParticle(harmLabel) })
+      : null,
+    endingHeld: heldLine && Object.hasOwn(HELD_ENDINGS, endingId) ? HELD_ENDINGS[endingId] : null,
+    endingWitness: heldLine && finale === "witness" && endingId && endingId !== "collapse" ? WITNESS_HELD : null,
+    endingNearest: describeNearestEnding(nearest),
     harmCases: harmCases
       .filter((entry) => labels.has(entry.caseId))
       .map((entry) => ({ ...entry, text: fill(STANDING.harmCase, { caseLabel: labels.get(entry.caseId), harmLabel, harm: entry.harm }) })),
   };
+}
+
+/**
+ * The finale's 「가장 가까웠던 다른 결말」 line (C2-1) for what `nearestEnding`
+ * returned: the ending and what it lacked, each gap in its own words, or the
+ * line that 봉인 closed the record endings. Null when there is nothing to say.
+ * The gaps are set apart by a middle dot, as the standing line's parts are.
+ *
+ * @param {NearestEnding} [nearest]
+ */
+export function describeNearestEnding(nearest) {
+  if (!nearest) return null;
+  if (nearest.burn) return NEAREST.burn;
+  const { trust, legitimacy } = easyResourceLabels;
+  const gaps = nearest.gaps.map(({ key, value }) => fill(NEAREST.gaps[key], {
+    value,
+    label: easyResourceLabels[key === "trustOver" ? "trust" : key] ?? "",
+    trust,
+    legitimacy,
+    particle: subjectParticle(key === "pactGap" ? trust : legitimacy),
+  }));
+  return fill(NEAREST.line, { ending: nearest.label, gaps: gaps.join(" · ") });
 }
 
 export function createEndingProfile({ finalEndingEntry }) {

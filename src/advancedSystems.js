@@ -9,7 +9,7 @@ import { caseDisplayCode } from "./gameCases.js";
 import { ENDING_GATES } from "./gameConstants.js";
 import { easyResourceLabels, objectParticle } from "./playerLanguage.js";
 import { getSeasonRound } from "./appConfig.js";
-import { fill } from "./locale.js";
+import { appliedLocale, fill } from "./locale.js";
 import W from "./copy/introPanels.js";
 
 const percent = (share) => Math.round(share * 100);
@@ -95,13 +95,42 @@ export function getSeasonGoals() {
 
 
 /**
+ * How the start screen's NEW GAME+ panel names a finished season
+ * (NEWGAMEPLUS 문구 질문 10, all (1)). The verdict is named only for the
+ * three the result screen names (봉인·개혁·폭로); a collapse is its ending's
+ * own name, and an open verdict the ending alone, with no promise of a line,
+ * since that season opens on the plain one. The second sentence is
+ * conditional because the plain start, on the same screen, carries nothing.
+ * NEW GAME+ is held together (a no-break space): with `keep-all` the phone
+ * broke the line between NEW and GAME+.
+ *
+ * The record keeps the sentence as it was written (`last.line`), in the
+ * language the season was finished in; the panel draws it again from the
+ * record's ending and verdict, so a season finished in Korean reads in the
+ * page's language (#496 질문 1). The ending's label (OPEN OVERSIGHT) is the
+ * same in every language.
+ */
+export function getMemoryLine({ endingLabel, verdict }) {
+  const named = Object.hasOwn(W.verdicts, verdict ?? "") ? `${W.verdicts[verdict]} · ` : "";
+  return fill(W.memory.line, { named, ending: endingLabel, carry: named || verdict === "collapse" ? W.memory.carry : "" });
+}
+
+/**
+ * The record's last season as the panel says it: drawn again in the page's
+ * language from its ending and verdict, or the stored line of a record that
+ * has no ending to draw it from.
+ */
+function memoryLineOf(last) {
+  if (typeof last?.endingId === "string" && last.endingId && typeof last.endingLabel === "string" && last.endingLabel) return getMemoryLine(last);
+  return typeof last?.line === "string" ? last.line : null;
+}
+
+/**
  * The start screen's NEW GAME+ panel (NEWGAMEPLUS 문구 질문 9-10, all (1)):
  * the season number from the second season on, and how the last finished
- * season ended. The sentence is written when the season is counted
- * (newGamePlusCarry.getMemoryLine) and kept in the record's `last.line`, so
- * the entry chunk, which had no room, carries neither the sentence's rules nor
- * the record's reader: it reads the stored line and the season number
- * (`getSeasonRound`, appConfig.js). `round` is the saved run's season number,
+ * season ended (`getMemoryLine`). The entry chunk, which had no room, does not
+ * carry the record's reader: it reads the record as stored and the season
+ * number (`getSeasonRound`, appConfig.js). `round` is the saved run's season number,
  * which the continue card prints too; the intro view has no room for a field
  * of its own; the panel's head is written in IntroScreen, with its English
  * name marked as English. A device with only the NEW GAME+ memory keeps the
@@ -114,7 +143,7 @@ export function getSeasonGoals() {
  */
 export function getPastRunMemory(memory = {}, record = null, runId = null) {
   const entries = Object.entries(memory ?? {}).filter(([, value]) => value?.outcomeChoiceId);
-  const line = typeof record?.last?.line === "string" ? record.last.line : null;
+  const line = memoryLineOf(record?.last);
   if (entries.length === 0 && !line) return null;
   const round = getSeasonRound(record, runId, memory);
   const [caseId] = entries.at(-1) ?? [];
@@ -129,6 +158,20 @@ export function getPastRunMemory(memory = {}, record = null, runId = null) {
     // windows beside 10.1%. The preview on RULES_MARK 3 had 22.8% / 22.0%.
     text: `${line ?? fill(W.pastCase, { code: caseDisplayCode(caseId) })} ${W.veteranTable}`,
   };
+}
+
+/**
+ * Whether the record's 결말 도감 lines (state/endingBook.js) are in another
+ * language than the page's: the shell then has the runtime write them again
+ * (AppContent), as the runtime does on its own mount. A book written before
+ * its `lang` was kept is Korean when it holds Hangul, and another language's
+ * otherwise. The book itself is too long for the entry chunk to draw.
+ */
+export function isStaleBook(record, lang = appliedLocale()) {
+  const book = record?.endingBook;
+  if (typeof book?.head !== "string") return false;
+  if (typeof book.lang === "string") return book.lang !== lang;
+  return /[가-힣]/.test(book.head) !== (lang === "ko");
 }
 
 /** What each memory opens with on the start screen (named by src/copy/intro.js, like OPERATOR_PROFILES). */

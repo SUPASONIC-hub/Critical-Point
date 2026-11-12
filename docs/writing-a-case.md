@@ -459,6 +459,25 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 만들고, 그 결과를 `virtual:season`(공통 색인)과 `virtual:season-case/<사건 id>`(사건 하나씩) 모듈로
 나눠 줍니다. 개발 서버에서 사건 파일을 고치면 데이터를 다시 만들고 페이지를 새로 엽니다.
 
+### 6-1. 번외 사건은 시즌에 올리지 않습니다 (E-11)
+
+번외 사건은 시즌 밖의 짧은 사건(장면 8~12개, 판 한 번, 결말 셋)입니다. 위 1~7을 하나도 하지 않습니다.
+`CASE_SEQUENCE`·사건 목록·서버의 사건 목록이 그대로라 점수 상한, 목표, 칭호, 랭킹이 바뀌지 않습니다.
+
+1. **파일**: `src/nodes/sideNN.js`(예: `side01.js`)에 `export const side01 = { ... }`. 모양은 견본
+   `src/nodes/side00.js`(틀 확인용, 출시 빌드에 없음)를 따릅니다. id는 `sideNN`이고 `caseNN`은 쓰지 않습니다
+   (서버는 `^case[0-9]{2}$`만 시즌 사건으로 받습니다). 장면은 `s1_`로 시작하고, 마지막 장면 `s1_aftershock`의
+   카드 셋이 `s1_result`로 가며, 그 카드 id마다 `outcomes`에 결말 하나(`title`, `text`)를 씁니다. 시작 자원은
+   `startState.resources`에 직접 씁니다(시즌 자원을 읽지 않습니다).
+2. **목록**: `src/nodes/sidePacks.js`의 `SIDE_CASES`에 `{ id, label: "번외 1", title, load }` 한 줄. 목록이 비어
+   있으면 시작 화면의 칸이 보이지 않습니다.
+3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
+   `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
+4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,
+   시즌 저장, NEW GAME+에는 아무것도 가지 않습니다(`tests/unit/side-cases.test.mjs`). 온라인 저장은 끝낸
+   표시(`closedAt`, `outcomeChoiceId`)만 시즌의 기기 기록 옆 `save.deviceRecords.sideCases`에 싣고, 진행 중인
+   판은 싣지 않습니다. 다른 기기에서 불러오면 끝낸 사건은 끝낸 채로 합쳐집니다(둘 다 끝냈으면 늦게 끝낸 쪽의 결말).
+
 ---
 
 ## 7. 검사가 지키는 규칙
@@ -740,7 +759,7 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 | 장면 그림(장소에서 계산) | `src/scenePlate.js` (`getPlateMotif`, `PLATE_MOTIFS`) |
 | 래스터 그림 목록·축소본·잠금·예산 | `src/responsiveArt.js`, `scripts/build-art-variants.mjs` (`build:art`), `scripts/art-variants.lock.json`, `scripts/check-art-budget.mjs` (`check:art`) |
 | 사건 조각 나누기, 조각 예산 | `scripts/vite-season-data.mjs`, `scripts/season-split.mjs`, `scripts/check-bundle-size.mjs` (`check:bundle`) |
-| 장면 분위기 태그(준비 중, 15장) | `src/sceneMoods.js`, `scripts/tag-mood.mjs`, `check:mood` -- 아직 main에 없음 |
+| 장면 분위기 태그(15장) | `src/sceneMoods.js`, `scripts/tag-mood.mjs`, `check:mood` |
 
 ---
 
@@ -825,18 +844,19 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 
 ---
 
-## 15. 장면 분위기 태그 (준비 중)
+## 15. 장면 분위기 태그
 
-장면마다 분위기 하나(`neutral`·`bright`·`tense`·`dread`·`sorrow`)를 붙여 바탕색과 음악이 따라가게 하는 일이
-2026-11-05에 결정됐고, `mood-tags` 갈래에서 만들고 있습니다. **아직 main에는 없습니다.** 들어오면 이렇게 됩니다.
+장면마다 분위기 하나(`neutral`·`bright`·`tense`·`dread`·`sorrow`)를 붙여 바탕색과 음악이 따라가게 합니다(#458, #465).
 
 - `src/sceneMoods.js`는 **생성 파일**입니다(장면 id → 분위기, `neutral`은 생략). 손으로 고치지 않고
-  `scripts/tag-mood.mjs`가 장면 글·의성어·`cognition`·위험도 규칙으로 초안을 매긴 뒤, 검토표를 거쳐 다시 씁니다.
-- `check:mood`가 없는 장면 id와 모르는 값을 막습니다. 새 사건을 올리면 이 스크립트를 한 번 돌려 사건 50의
-  장면 20개가 표에 들어가게 합니다.
-- 사건 파일 자체에는 분위기 칸이 **없습니다**. 2장의 장면 칸은 그대로입니다.
-
-병합되면 이 장의 「준비 중」을 지우고 8장의 순서에 `check:mood`를 넣습니다.
+  `scripts/tag-mood.mjs`가 장면 글·의성어·국면 칩·위험도 규칙으로 초안을 매긴 뒤, 사건별 검토표
+  (`cp-archive/메모-20261105/mood-review/<사건>.md`)의 검토 칸을 `--from-review`로 읽어 다시 씁니다.
+  2026-11-06에 프롤로그부터 마지막 사건까지 1,129개 가운데 508개가 검토로 정해졌습니다.
+- `check:mood`가 없는 장면 id, 모르는 값, 한 사건의 70%를 넘는 한 가지 분위기를 막습니다. 한 사건이 정말
+  처음부터 끝까지 한 색이면 `tag-mood.mjs`의 `CASE_CAP_OVERRIDES`에 그 사건의 몫과 까닭을 적습니다
+  (지금은 사건 32 압수수색 0.75 하나).
+- 새 사건을 올리면 이 스크립트를 한 번 돌려 장면들이 표에 들어가게 하고, 검토 칸을 채웁니다.
+- 사건 파일 자체에는 분위기 칸이 **없습니다**. 2장의 장면 칸은 그대로입니다(빌드가 `src/sceneMoods.js`를 읽어 조각에 적습니다).
 
 ---
 

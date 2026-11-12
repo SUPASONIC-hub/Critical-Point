@@ -1,10 +1,11 @@
-import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleAlert, Trophy } from "lucide-react";
+import { ChevronRight, Download, FileText, Link2, RefreshCcw, TriangleExclamationPoint, Trophy } from "lucide-react";
 import { EndingSequence } from "../components/EndingSequence.jsx";
 import { ReportArchive } from "./ReportArchive.jsx";
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import * as endingCopy from "../endingCopy.js";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
+import { SIDE_CASES } from "../sideCases.js";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -21,8 +22,9 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
       counterfactualReport, routeTimeline,
     },
     actions: { startCase, setStarted, setShowRanking, showSeasonMap, exportPlaytestLog, copyReplayLink, reset, nextCaseSignal, resultBridge },
-    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog },
+    debug: { debugToolsEnabled, showErrorLog, setShowErrorLog }, seasonStanding,
   } = view;
+  const { held } = seasonStanding; // C3-3: the card reads only whether the report's held sentence is set.
   const { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel } = renderers;
   // R and N are the runtime's keys (useRuntimeChoiceShortcuts), and it says
   // whether the page may name them: not when the player turned them off.
@@ -91,13 +93,12 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
         {renderRecoveryNotice()}
         {renderErrorLogPanel()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
-          {screenReaderStatus}
+          {screenReaderStatus} {view.seasonStanding.label} · {view.seasonStanding.text}{/* E3 2단계 (b): the rank is in the line already (GameRuntime); the standing is the harm level, as the season-standing line below shows it. */}
         </p>
         {currentCase === "final" && (
           <EndingSequence
             endingStep={endingStep}
-            endingTwistIndex={endingTwistIndex}
-            endingTwistCount={endingTwistCount}
+            endingTwistIndex={endingTwistIndex} endingTwistCount={endingTwistCount}
             currentEndingTwist={currentEndingTwist}
             finalChoiceText={finalChoiceText}
             isFinalEndingTwist={isFinalEndingTwist}
@@ -111,15 +112,13 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             setNextParticipantMessage={setNextParticipantMessage}
             saveNextParticipantMessage={saveNextParticipantMessage}
             endingAfterglow={endingAfterglow}
-            unopenedRecordCount={unopenedRecordCount}
-            unopenedClueCount={unopenedClueCount}
+            unopenedRecordCount={unopenedRecordCount} unopenedClueCount={unopenedClueCount}
             unopenedBranchCount={unopenedBranchCount}
-            endingAtmosphere={view.endingAtmosphere}
-            endingVisualClass={view.endingVisualClass}
+            endingAtmosphere={view.endingAtmosphere} endingVisualClass={view.endingVisualClass}
             endingImage={endingSceneProfile.image}
             reportTitleRef={titleRef} seasonRecord={{ caseResults: view.score.caseResults, log: view.score.log }}
             // The four things a card is made from, and nothing that says who played.
-            card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share }}
+            card={{ fingerprint, endingVariant: view.endingCause?.cardEnding ?? endingVariant, endingName: view.endingPreview?.label, caseResults: view.score.caseResults, vaultLine: view.score.vaultLine, season: view.seasonCard.season, share: view.seasonCard.share, held }}
           />
         )}
         <section className={`result-page ${currentCase === "final" && endingStep < 3 ? "final-report-locked" : ""}`}>
@@ -151,7 +150,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                   aria-controls={showErrorLog ? "error-log-panel" : undefined}
                   onClick={() => setShowErrorLog(true)}
                 >
-                  <TriangleAlert size={16} />
+                  <TriangleExclamationPoint size={16} />
                   에러 로그
                 </button>
               )}
@@ -191,7 +190,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <div>
               <h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2>
               <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}
-              <p className={`season-standing ${view.seasonStanding.level}`} data-testid="season-standing"><b>{view.seasonStanding.mark} {view.seasonStanding.label}</b> {view.seasonStanding.text}</p>
+              <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
             </div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
@@ -230,8 +229,10 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label={resultCopy.endingVariantLabel}>
               <span>{endingVariant.label}</span>
               <h2>{endingVariant.title}</h2>
-              <p>{endingVariant.text}</p>
+              <p>{endingVariant.text}{seasonStanding.endingHeld && <> <span data-testid="ending-held">{seasonStanding.endingHeld}</span></>}</p>
+              {seasonStanding.endingWitness && <p data-testid="ending-witness">{seasonStanding.endingWitness}</p>}
               <small>{endingVariant.failure ? view.endingCause.toll : resultCopy.endingVariantNote}</small>{view.seasonCard.comparison && <small data-testid="season-comparison">{view.seasonCard.comparison}</small>}
+              {seasonStanding.endingNearest && <small data-testid="ending-nearest">{seasonStanding.endingNearest}</small>}
             </section>
           )}
           {currentCase === "final" && (
@@ -245,6 +246,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
+          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.failureRecovery && (
             <section className="failure-recovery-panel" aria-label={resultCopy.failureRecoveryLabel}>
               <strong>{view.failureRecovery.title}</strong>
@@ -333,7 +335,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
           </section>
           {/* Act three. Everything the report used to open with. */}
           <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
-        </section>
+          {/* ad-slot: placement="report" hidden={currentCase.startsWith("prologue") || (currentCase === "final" && endingStep < 3)} */}</section>
       </main>
 );
 }

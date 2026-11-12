@@ -74,6 +74,8 @@ const reportCopy = {
     retry: "원격 저장 재시도",
     waiting: "연결 대기 중",
     copyCode: "코드 복사",
+    // A queued error row (state/errorRecovery.js), named by its scene in the page's language.
+    errorRow: "{scene} 에러 로그",
   },
   badges: {
     title: "획득 배지",

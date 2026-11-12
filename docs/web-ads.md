@@ -1,64 +1,161 @@
-# 웹 광고(Google AdSense) — 출시 로드맵 2단계
+# 웹 광고(Google AdSense) 켜는 순서 — 출시 로드맵 2단계
 
-지금(1단계)은 광고가 없습니다. 2단계에서 AdSense를 붙이기 전에, 1단계 동안 **사이트 승인만 먼저** 받아 둘 수
-있게 사이트 확인 스위치를 넣었습니다. 광고 자리·광고 스크립트·방침 광고 절·CSP 변경은 draft #341에 있고
-이 저장소에는 아직 없습니다.
+지금(1단계)은 광고가 없습니다. 이 문서는 2단계에서 웹에 AdSense를 붙일 때의 순서입니다. 코드는 미리
+들어가 있고 **기본은 꺼짐**입니다. 스위치는 Render 환경 변수 네 개이며, 빌드할 때만 읽습니다
+(`scripts/adsense-config.mjs`, `vite.config.js`의 `adsenseVerification()`·`adSlots()`·`staticPages()`).
 
-## 사이트 확인 (`ADSENSE_CLIENT`)
-
-| 환경 변수 | 값 | 들어가는 것 | 번들 JS |
+| 환경 변수 | 값 | 켜지는 것 | 번들 JS |
 | --- | --- | --- | --- |
 | (없음) | — | 아무것도 없음. 지금 운영과 같은 빌드 | 변화 0 |
-| `ADSENSE_CLIENT` | `ca-pub-` + 16자리 | `index.html` `<head>`의 `<meta name="google-adsense-account">`, 빌드 산출물 `/ads.txt` | 변화 0 (`sw.js`의 파일 목록만 바뀜) |
+| `ADSENSE_CLIENT` | `ca-pub-` + 16자리 | **사이트 확인용**: `index.html`의 `<meta name="google-adsense-account">`, 빌드 산출물 `/ads.txt` | 변화 0 (`sw.js`의 파일 목록만 바뀜) |
+| `ADSENSE_ADS` | `notice` | **7일 전 예고만**: 개인정보처리방침·이용약관 맨 위(시행일 줄 아래)의 「변경 예고」 한 문단(`adsNotice`, 세 언어). 광고·스크립트·자주 묻는 질문 문장은 그대로 | 변화 0 |
+| `ADSENSE_ADS` | `on` | 광고 자리(`src/ads/AdSlot.jsx`)와 AdSense 스크립트, 개인정보처리방침·이용약관의 광고 문장(예고는 빠지고, 두 쪽의 시행일이 `ADSENSE_DATE`) | 광고 자리가 있는 화면 청크만 늘어남 |
+| `ADSENSE_DATE` | `2026-12-01` | 광고 방침의 시행일. `notice`·`on` 둘 다 필요(없거나 없는 날이면 빌드 실패). 예고가 배포된 날로부터 7일 이상 뒤 | — |
+| `ADSENSE_SLOTS` | `report:<광고 단위 번호>` (쉼표로 여럿, `ranking:<번호>`) | `ADSENSE_ADS=on`일 때 그 자리만 그림 | — |
 
-- 광고 스크립트(`adsbygoogle.js`)는 넣지 않습니다. 플레이어 브라우저가 Google에 아무것도 요청하지 않고 쿠키도
-  생기지 않으므로 개인정보처리방침은 그대로입니다(광고를 켤 때 광고 절을 더함, #341).
-- 게시자 ID는 저장소에 쓰지 않고 Render 환경 변수로만 둡니다. 다만 이 값은 원래 비밀이 아니라 `ads.txt`와
-  광고가 나오는 페이지에 누구나 볼 수 있게 공개되는 값입니다.
-- 이름에 `VITE_`를 붙이지 않는 것은 일부러입니다. Vite는 `VITE_` 변수를 전부 `import.meta.env`에 넣고, 그
-  객체를 통째로 읽는 코드가 있어서 `VITE_`로 두면 진입·런타임 청크에 ID가 들어갔습니다(2026-10-26 측정).
-- `check:bundle`은 `ADSENSE_ADS=on`(광고 켜기, #341)이 아닌 빌드의 스크립트에 광고 코드가 있으면 실패합니다.
+지금(2026-11-10): 운영에는 `ADSENSE_CLIENT`만 들어 있습니다(meta·`ads.txt` 확인됨). 「가치가 낮은 콘텐츠」 거절 뒤
+글 페이지를 더하고 11-10에 검토를 다시 요청했습니다. 나머지 세 변수는 비어 있고, 비어 있는 동안 빌드는 이 문서의
+코드가 없는 `main`과 바이트까지 같습니다.
 
-### Render 환경 변수 (대시보드 → 서비스 → Environment)
+게시자 ID(`ca-pub-…`)는 저장소에 쓰지 않고 Render 환경 변수로만 둡니다. 다만 이 값은 원래 비밀이 아니라
+광고가 나오는 페이지와 `ads.txt`에 누구나 볼 수 있게 공개되는 값입니다.
+이름에 `VITE_`를 붙이지 않는 것은 일부러입니다. Vite는 `VITE_` 변수를 전부 `import.meta.env`에 넣고, 그 객체를
+통째로 읽는 코드가 있어서 `VITE_`로 두면 사이트 확인만 켠 빌드에도 진입 청크·런타임 청크에 ID가 들어갔습니다(측정).
 
-| Key | Value |
-| --- | --- |
-| `ADSENSE_CLIENT` | `ca-pub-0000000000000000` (AdSense 콘솔 → 계정 → 계정 정보의 게시자 ID, 앞에 `ca-`) |
+## 순서
 
-환경 변수는 빌드할 때 읽으므로 넣은 뒤 다시 빌드해야 반영됩니다(「Save, rebuild, and deploy」 또는 다음 배포).
+| # | 할 일 | 누가 | 확인 |
+| --- | --- | --- | --- |
+| 1 | 도메인: 지금 주소 `critical-point-wn6p.onrender.com`으로 신청해도 됩니다(아래 「도메인」). 자기 도메인으로 옮길 생각이면 **신청 전에** 옮깁니다 — 승인은 사이트 주소마다 받습니다 | 사용자 | 새 주소에서 게임이 열림 |
+| 2 | Render 환경 변수 `ADSENSE_CLIENT` 하나만 넣고 배포(사이트 확인용, 광고 없음) | 사용자(값) / 배포는 자동 | 아래 「확인 명령」 |
+| 3 | AdSense 콘솔 → 사이트 → 사이트 추가 → 확인 방법 「메타 태그」 또는 「ads.txt」 → 검토 요청 | 사용자 | 콘솔에 「준비 중」 |
+| 4 | 승인(보통 며칠~몇 주, Google이 기간을 약속하지 않음). 거절되면 사유를 보고 고친 뒤 다시 요청 | Google | 콘솔에 「준비됨」 |
+| 5 | AdSense 콘솔에서 광고 단위 만들기: 디스플레이 광고, **고정 크기 300×250**(자리 높이를 고정하므로 반응형 말고). 받은 번호가 `ADSENSE_SLOTS`의 값 | 사용자 | 광고 단위 번호 |
+| 6 | 「개인정보 보호 및 메시지」에서 유럽 규정(EEA·영국·스위스) 메시지 만들기 — Google 인증 동의 창. 문구는 Google 기본 문안 | 사용자 | 콘솔에 메시지 게시됨 |
+| 7 | 방침 공지(시행 7일 이상 전): Render 환경 변수 `ADSENSE_ADS=notice`, `ADSENSE_DATE=<시행일>`을 넣고 배포. 방침·약관 맨 위에 세 언어로 「변경 예고: <시행일>부터 …」가 나옴(방침 12번). PR은 필요 없음 | 사용자(값) / 확인은 Claude | 아래 「확인 명령」의 예고 curl, `tests/unit/ads-notice.test.mjs` |
+| 8 | Render 대시보드 헤더: CSP를 아래 「CSP」의 값으로(PR 필요 없음) | 사용자 | `npm run check:deploy` |
+| 9 | 시행일에: Render 환경 변수 `ADSENSE_ADS=notice` → `on`으로 바꾸고 `ADSENSE_SLOTS=report:<번호>`를 넣고 배포(`ADSENSE_DATE`는 그대로) | 사용자 | 리포트 맨 아래 「광고」 칸, 방침 10번·6번 끝 줄, 예고가 빠지고 시행일이 `ADSENSE_DATE` |
+| 10 | `ads.txt` 상태: AdSense 콘솔 → 사이트 → ads.txt 「승인됨」 | 사용자 | 아래 curl |
 
-### 확인 명령
+시험 주(W47 같은)나 문제가 생기면 `ADSENSE_ADS`를 지우고 다시 배포하면 광고 코드가 없는 빌드로
+돌아갑니다(사이트 확인용 meta·ads.txt는 남음).
+
+## Render 환경 변수 (대시보드 → 서비스 → Environment)
+
+| Key | Value | 언제 |
+| --- | --- | --- |
+| `ADSENSE_CLIENT` | `ca-pub-0000000000000000`(AdSense 콘솔 → 계정 → 계정 정보의 게시자 ID 앞에 `ca-`) | 2번 |
+| `ADSENSE_ADS` | `notice` → 시행일에 `on` | 7번 → 9번 |
+| `ADSENSE_DATE` | `2026-12-01`(예고 배포일 + 7일 이상) | 7번 |
+| `ADSENSE_SLOTS` | `report:1234567890` | 9번 |
+
+환경 변수를 바꾼 뒤에는 새로 빌드해야 반영됩니다(Render의 「Save, rebuild, and deploy」 또는 `main` 다음 배포).
+
+## 확인 명령
 
 ```sh
+# 2번 뒤: meta 태그와 ads.txt (값이 콘솔의 게시자 ID와 같아야 함)
 curl -s https://critical-point-wn6p.onrender.com/ | grep -o '<meta name="google-adsense-account"[^>]*>'
 curl -s https://critical-point-wn6p.onrender.com/ads.txt
 # → google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
-curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'   # 아무것도 안 나오면 정상
+
+# 2번 뒤에도 광고 스크립트는 없어야 함 (아무것도 안 나오면 정상)
+curl -s https://critical-point-wn6p.onrender.com/ | grep -o 'adsbygoogle'
+
+# 7번 뒤: 방침·약관 여섯 쪽 맨 위의 「변경 예고」 문단(광고 예고에 ADSENSE_DATE의 날짜가 보여야 함)
+for p in privacy.html en/privacy.html ja/privacy.html terms.html en/terms.html ja/terms.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -o '<p><strong>[^<]*</strong>[^<]*'; done
+
+# 9번 뒤: 방침에 광고 절, 예고는 빠지고 시행일이 ADSENSE_DATE
+for p in privacy.html en/privacy.html ja/privacy.html; do curl -s https://critical-point-wn6p.onrender.com/$p | grep -oE 'Google AdSense|<p class="effective">[^<]*' | sort -u; done
 ```
 
-### 순서
+방침·약관의 광고 문장(`AD_EDITS`)은 한국어·영어·일본어 세 언어에 같은 자리(요약·3번 쿠키·6번 Google·10번 광고 절·약관 3항),
+같은 시행일(`ADSENSE_DATE`)로 들어갑니다. 6번 「국외 이전을 원하지 않으면」 문단 끝에는 광고 전송을 줄이는 법(10번의 맞춤형 광고 끄기·제3자
+쿠키 차단) 한 줄이 붙습니다. `tests/unit/legal-pages.test.mjs`가 여섯 페이지 모두와 세 언어의 수를, `tests/unit/ads-notice.test.mjs`가
+꺼짐·예고·켬 세 단계를 세 언어 × 애널리틱스 끔·켬으로 확인합니다(예고 빌드는 예고 문단을 뺀 나머지가 꺼진 빌드와 바이트까지 같음).
 
-| # | 할 일 | 누가 |
+Google 애널리틱스(`GA_MEASUREMENT_ID`, [analytics.md](analytics.md), 11-12부터 켬)도 요약·3번 쿠키·6번과 자주 묻는 질문의
+쿠키 문장을 바꾸므로, 두 스위치가 함께 켜진 빌드(광고를 켤 때의 실제 조합)는 애널리틱스 문장 위에 따로 맞춘 표를 씁니다
+(`ANALYTICS_AD_EDITS`, `ANALYTICS_SITE_AD_EDITS`): 요약은 「광고와 방문 통계에 Google, 그 밖의 추적 도구 없음」, 3번 쿠키와
+FAQ는 두 쿠키를 다 적고, 6번 Google은 한 문단입니다. 광고를 끈 빌드는 애널리틱스를 켜든 끄든 main과 바이트까지 같고,
+`tests/unit/ads-with-analytics.test.mjs`가 네 조합을 봅니다.
+
+## 광고 자리
+
+| 자리 | 마커 | 언제 숨김 |
 | --- | --- | --- |
-| 1 | Render 환경 변수 `ADSENSE_CLIENT`를 넣고 다시 배포 | 사용자 |
-| 2 | 위 확인 명령으로 meta·`ads.txt` 확인 | 사용자 또는 Claude |
-| 3 | AdSense 콘솔 → 사이트 → 사이트 추가(`critical-point-wn6p.onrender.com`) → 확인 방법 「메타 태그」 또는 「ads.txt」 → 검토 요청 | 사용자 |
-| 4 | 승인(기간은 Google이 약속하지 않음). 거절되면 사유를 보고 고친 뒤 다시 요청 | Google |
+| `report` — 사건 리포트 맨 아래(접힌 기록 보관함 아래) | `src/screens/ResultScreen.jsx` | 프롤로그 01~05의 리포트, 결말을 다 읽기 전(`endingStep < 3`) |
+| `ranking` — 랭킹 화면 맨 아래(설명 문단 아래) | `src/screens/RankingScreen.jsx` | 없음 |
+
+판(테이블)·결정·브리핑·첫 화면·게시판에는 마커가 없고, 유닛 테스트(`tests/unit/adsense.test.mjs`)가
+그것을 지킵니다. 자리는 300×250 광고 + 한 줄 라벨로 **높이 276px 고정**이라 광고가 차든, 실패하든,
+막히든 아래가 밀리지 않습니다. 300px는 폰 360px에서 양쪽 16px 여백 안에 들어갑니다. 움직임이 없고
+(동작 줄이기와 무관), 낭독기는 「광고」 구역과 라벨 한 줄을 먼저 읽습니다. 두 문구는 세 언어 모두 `src/ads/adSlotWords.js`에
+있습니다(언어 사전에 넣으면 광고를 끈 빌드의 영어·일본어 사전 청크까지 바뀌므로 따로 둠).
+
+마커는 JSX 주석 `{/* ad-slot: placement="report" … */}`이라 꺼진 빌드에서는 컴파일되면 없어집니다.
+켠 빌드에서만 `<AdSlot … />`과 import로 바뀝니다.
 
 ## 검토가 읽는 글과 Search Console
 
 검토는 사이트에 읽을 글, 개인정보처리방침·문의 페이지, 깨진 링크가 없는지를 봅니다. 빌드가 쓰는 정적 페이지
 열다섯(게임 소개·자주 묻는 질문·문의·개인정보처리방침·이용약관 × 한국어·영어·일본어)과 `robots.txt`·`sitemap.xml`,
 그리고 Search Console 확인 스위치 `GOOGLE_SITE_VERIFICATION`은 [search-console.md](search-console.md)에 있습니다.
+자주 묻는 질문의 「비용」·「서버로 가는 데이터」 답 두 문장은 방침과 같은 스위치(`ADSENSE_ADS=on`)를 따라
+「광고가 나옴, 유료 결제 없음」·「Google이 광고 쿠키를 씀」으로 바뀝니다(`SITE_AD_EDITS`, `scripts/site-pages.mjs`).
 
-## 도메인은 필요 없음
+## CSP (9번 전에 대시보드에)
 
-AdSense가 받는 사이트는 「도메인」, 「Public Suffix List에 있는 플랫폼의 하위 도메인(예: site.appspot.com)」,
-「AdSense 플랫폼 파트너가 관리하는 사이트」입니다([사이트 관리](https://support.google.com/adsense/answer/12170421)).
-`onrender.com`은 Public Suffix List에 있습니다(Render 등록,
-[PSL](https://publicsuffix.org/list/public_suffix_list.dat)). 그래서 지금 주소로 신청할 수 있습니다. 승인은
-주소마다 받으므로 자기 도메인으로 옮길 생각이면 신청 전에 옮기는 편이 낫습니다.
+Google은 AdSense 코드에 nonce를 쓰는 strict CSP만 지원한다고 합니다 — 광고 코드가 쓰는 도메인이 바뀌기
+때문입니다([AdSense 도움말](https://support.google.com/adsense/answer/16283098)). Render 정적 호스팅은
+응답마다 nonce를 만들 수 없으므로, 도메인을 나열하는 대신 script/frame/connect/img를 `https:`로 열고
+`script-src`에 `'unsafe-eval'`을 더합니다(Google이 AdSense용으로 내는 CSP와 같음). 나머지(`default-src`,
+`frame-ancestors 'none'`, `object-src 'none'` 등)와 지금 값이 이름으로 적은 호스트(Supabase, Google
+애널리틱스)는 그대로입니다. 값은 `render.yaml`의 CSP에 `scripts/adsense-config.mjs`의 `adCsp()`를 씌운 것이고,
+아래 명령이 그 값을 찍습니다(2026-11-10 `render.yaml` 기준 값은 표).
 
-## 광고 켜기 (draft #341)
+```sh
+node --input-type=module -e "import { readFileSync } from 'node:fs'; import { adCsp } from './scripts/adsense-config.mjs'; import { readRenderYamlCsp } from './scripts/deploy-policy.mjs'; console.log(adCsp(readRenderYamlCsp(readFileSync('render.yaml', 'utf8'))))"
+```
 
-광고 자리(리포트 맨 아래), 광고 스크립트, 방침·약관 광고 문장, CSP(`https:`로 열기)는 #341에 있습니다.
+| Path | Name | Value |
+| --- | --- | --- |
+| `/*` | `Content-Security-Policy` | `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https:; media-src 'self' blob:; connect-src 'self' https://kiazzdbpkazwqhhimdib.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://region1.analytics.google.com https:; script-src 'self' https://www.googletagmanager.com 'unsafe-eval' https:; frame-src https:; fenced-frame-src https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'` |
+
+바뀌는 지시어만 보면: `img-src`·`connect-src`에 `https:`, `script-src`에 `'unsafe-eval' https:`, 새로
+`frame-src https:`·`fenced-frame-src https:`. 다른 헤더(`Cross-Origin-Opener-Policy: same-origin`,
+`Permissions-Policy`의 `browsing-topics=()`)는 그대로 둡니다. `browsing-topics=()`는 Topics API를 끄므로
+맞춤 광고 단가가 조금 낮을 수 있습니다[확인].
+
+**PR은 필요 없습니다.** 배포 뒤 검사(`check:deploy`, Deploy 워크플로)는 운영 CSP가 `render.yaml`의 값이거나,
+그 값에 `adCsp()`를 씌운 값과 지시어마다 정확히 같을 때만 통과시킵니다(`isAdCsp`, `scripts/deploy-policy.mjs`).
+그보다 하나라도 더 넓으면(예: `object-src *`, `'unsafe-inline'`) 지금처럼 실패합니다. `render.yaml`의 CSP를 바꾸는
+PR이 들어가면 대시보드 값도 위 명령으로 다시 뽑아 맞춥니다. 광고를 끄면 대시보드 CSP를 `render.yaml` 값으로
+되돌립니다(되돌리지 않아도 검사는 통과하지만 넓은 정책을 남길 이유가 없음).
+
+## 도메인과 승인 조건 (2026-10-26 조사)
+
+- **`*.onrender.com`으로 신청 가능**: AdSense가 받는 사이트는 「도메인」, 「Public Suffix List에 있는
+  플랫폼의 하위 도메인(예: site.appspot.com)」, 「AdSense 플랫폼 파트너가 관리하는 사이트」입니다
+  ([사이트 관리](https://support.google.com/adsense/answer/12170421)). `onrender.com`은 Public Suffix
+  List에 있습니다(Render 등록, [PSL](https://publicsuffix.org/list/public_suffix_list.dat)). 그러니 자기
+  도메인은 **필수가 아닙니다**. 다만 승인은 주소마다라 나중에 도메인을 옮기면 다시 받아야 하므로, 옮길
+  생각이면 신청 전에 옮기는 편이 낫습니다. 랜덤 꼬리(`-wn6p`)가 붙은 플랫폼 주소가 심사에 불리한지는
+  공식 문서에 없습니다[확인].
+- **신청 자격**: 만 18세 이상, 사이트 HTML을 고칠 수 있을 것, 「고품질·독창적이며 방문자를 모으는
+  콘텐츠」, 프로그램 정책 준수([자격 요건](https://support.google.com/adsense/answer/9724)). **최소
+  트래픽·사이트 나이 기준은 공식 문서에 없습니다**(블로그들의 「6개월」, 「글 몇 개」는 비공식).
+- **게임 사이트 정책**: 게임 화면(game interfaces)에는 콘텐츠 광고를 두지 말라고 합니다
+  ([정책 입문](https://support.google.com/adsense/answer/23921)). 알림·이동·행동용 화면, 내용 없는 화면에도
+  광고 금지([Inventory value](https://support.google.com/publisherpolicies/answer/11112688)). 그래서
+  판·결정·브리핑을 빼고 글이 많은 리포트·랭킹 아래만 자리로 둡니다. 게임 속 칩·판돈 같은 표현이 「도박
+  관련」 제한 광고 게재로 분류될 수 있는지는 [확인]. 대부분의 내용이 스크립트로 그려지는 단일 페이지라
+  「가치가 낮은 콘텐츠」로 거절될 가능성도 [확인] — 거절되면 방침·약관 같은 글 페이지를 늘리는 쪽.
+- **EU·영국·스위스**: 이 지역에 맞춤 광고를 내려면 Google 인증 동의 관리 플랫폼(TCF)이 필요합니다
+  (EEA·영국 2024-01-16, 스위스 2024-07-31부터; [동의 관리 요건](https://support.google.com/adsense/answer/13554116)).
+  AdSense 「개인정보 보호 및 메시지」의 유럽 규정 메시지가 그것입니다. 없으면 그 지역은 비맞춤·제한 광고만.
+- **한국 개인·세금**: AdSense는 개인 계정으로 가입할 수 있고, 지급 전에 미국 세금 정보(개인은 W-8BEN)를
+  내야 합니다. 안 내면 Google이 최고 세율로 원천징수할 수 있습니다
+  ([미국 외 세금 정보](https://support.google.com/adsense/answer/14131950),
+  [FAQ](https://support.google.com/adsense/answer/10735961)). 한미 조세조약으로 줄어드는 세율, 한국의
+  사업자 등록·종합소득세 신고가 필요한지는 세무 확인[확인].

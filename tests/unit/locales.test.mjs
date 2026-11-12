@@ -22,7 +22,8 @@ const others = codes.filter((code) => code !== SOURCE_LOCALE);
 
 async function languageFiles(lang) {
   const dir = new URL(`${lang}/nodes/`, localesDir);
-  const files = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".js")) : [];
+  // A side case's file (sideNN.js, E-11) answers its authored pack, not the season: tests/unit/side-locales.test.mjs.
+  const files = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".js") && !/^side\d{2}\.js$/.test(file)) : [];
   const cases = Object.fromEntries(await Promise.all(files.map(async (file) => [file.replace(/\.js$/, ""), (await import(new URL(file, dir).href)).default])));
   const dictionary = await import(new URL(`${lang}/index.js`, localesDir).href);
   return { cases, dictionary };

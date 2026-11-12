@@ -291,6 +291,8 @@ const fileBudgets = {
   // -> 2925 / 55865 on 2026-10-23, 묶음 C (A + B + #261 + #272) 합친 상태 실측.
   // -> 2931 / 56015 on 2026-10-24, measured: a sealed card's badges on a plain
   // ground over its stripes.
+  // -> 56244 on 2026-10-25, measured (C-15 draft, for after W47): a board
+  // rule's badge folded until its card is staked, and 소모 없음 without red.
   // -> 56132 bytes on 2026-10-30, measured: a 360px phone's Japanese card
   // labels a size down, so five-card hands keep two lines in a CJK face.
   // -> 56181 bytes on 2026-10-25, measured: #224's link mark as a tag on the
@@ -338,7 +340,28 @@ const fileBudgets = {
   // 3029 / 58883 -> 3025 / 58815 on 2026-11-05, measured (bundle-rules2: kd-spend-engine, kd-spend-ui, phone-en-stake-11px,
   // scout-narrow, stake-clock over rules-1105 dd2cd419): the 360px English 10px label rule out (phone-en-stake-11px) beside
   // the stake clock's HUD lines; the ratchet goes down with it, never up again after rules-1105's one raise.
-  "play.css": { lines: 3025, bytes: 58815 },
+  // 3025 / 58815 -> 3035 / 59047 on 2026-11-06, mood-boost after merging main e1f5e515 (#463), measured: the mood's edge tint (.game-shell::after).
+  // 3035 / 59047 -> 3035 / 59146 on 2026-11-09, hand-fit-2px (#476), measured: Japanese HUD and scene lines at 1.2 on a 360px phone (Noto CJK's normal line put nine overclocked five-card hands 6px under the bar).
+  // 3035 / 59146 -> 3095 / 60291 on 2026-11-09, phone-390-fit, measured: a 361-390px block giving English and Japanese the 360px fits (overclocked five-card hands up to 58px under the bar on a 390x844 phone, Linux fonts) and the English streak's ellipsis at 360px.
+  // 3095 / 60291 -> 3097 / 60365 on 2026-11-09, a32-411-fit, measured: the 360px HUD air (2px rows and paddings, a 30px clock, 18px pills) moved out of the 360px block into one block shared with phones up to 480 wide and 800 tall (a Galaxy A32, 411x780: nineteen five-card hands 9px under the bar at a pot of 99,999).
+  // 3095 / 60291 -> 3109 / 60592 on 2026-11-09, phone-heavy-bank, measured: the relics beside the run's line at 360px (an overclocked board with a max bank, Korean 18px under the bar) and the English signals' 360px columns at 361-390px.
+  // 3097 / 60365 (a32-411-fit, #493) and 3109 / 60592 (phone-heavy-bank) -> 3111 / 60666 on 2026-11-10, phone-heavy-bank after merging a32-follow (#493), measured: both, the English signals' columns now in the 361-480px block.
+  // 3111 / 60666 -> 3133 / 61044 on 2026-11-10, en-signals-row, measured: the English signals row at 361-480px as one flex line, the streak's direction line cut with an ellipsis (Linux, 390x844 and 411x780: 2 to 13px into itself with a late season's bank).
+  // 3111 / 60666 -> 3116 / 60792 on 2026-11-10, phone-390-bank, measured: the relics beside the run's line at 361-480px in Korean and Japanese (390x844 with a max bank: 22px under the bar in Korean, 20 in Japanese).
+  // 3116 / 60792 -> 3119 / 60915 on 2026-11-10, phone-846-staked, measured: the short phone's air (not its hidden portrait or cut question) also at 391-480px wide and up to 860px tall (411x846 Korean overclocked, a card staked: 25px under the bar; Pixel 7 412x839), as its own block beside the short phone's.
+  // 3133 / 61044 (en-signals-row) and 3116 / 60792 (#497) -> 3138 / 61170 on 2026-11-10, en-signals-row after merging main 261accef (#497), measured: both.
+  // 3119 / 60915 (phone-846-staked) and 3138 / 61170 (#499) -> 3141 / 61293 on 2026-11-10, phone-846-staked after merging main 3a507805 (#499), measured: both.
+  // 3141 / 61293 -> 3143 / 61347 on 2026-11-10, phone-390-staked, measured: the staked card's one-line detail out of the 391-480px air block into a block of its own for every phone up to 480 wide and 860 tall (390x844 Korean overclocked, a card staked in case 01: 9px under the bar).
+  // 3143 / 61347 -> 3140 / 61224 on 2026-11-11, phone-390-staked-all, measured: the short phone's air on every phone up to 480 wide and 860 tall (390x844 overclocked, a card staked: up to 20px under the bar), one block with the staked card's one-line detail.
+  // -> 56734 bytes on 2026-11-02, measured: C-15's badge fold over the
+  // Japanese 360px card labels and the 360px HUD air.
+  // -> 2941 lines / 57182 bytes on 2026-11-03, measured: C-15's badge fold over main 465ccb93
+  // (en-hand5-linux, pc-type-scale).
+  // 3141 / 61293 -> 3151 / 61522 on 2026-11-10, C-15 over main cb8346da (#499 #500), measured: the badge fold and the plain 소모 없음.
+  // 3151 / 61522 (C-15) and 3143 / 61347 (phone-390-staked, #503) -> 3153 / 61576 on 2026-11-11, C-15 after merging main 568572d3, measured: both.
+  // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
+  // 3160 / 61634 (E3) and 3153 / 61576 (main 4f927085, C-15) -> 3170 / 61863 on 2026-11-12, bundle 1112c (#520 #521) over main 4f927085, measured: both.
+  "play.css": { lines: 3170, bytes: 61863 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -413,7 +436,8 @@ const fileBudgets = {
   // 849 / 16478 -> 849 / 16498 on 2026-11-03, measured (plate-sound-clip): the
   // word is centred in its transform, which the build keeps, not by the
   // separate translate property the build dropped.
-  "briefing.css": { lines: 849, bytes: 16498 },
+  // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
+  "briefing.css": { lines: 854, bytes: 16681 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

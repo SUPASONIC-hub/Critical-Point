@@ -30,11 +30,6 @@ const reportLinesCopy = {
     nextCase: "다음 사건 「{title}」까지 이어서 보고 싶은 이유가 생겼나요?",
     finale: "최종 선택이 트리거랩의 실험 구조와 자연스럽게 연결됐나요?",
   },
-  tabTitle: {
-    collapse: "[SYSTEM COLLAPSE] 시즌 붕괴",
-    season: "[{ending}] 시즌 판정",
-    case: "[사건 종료] {tag}",
-  },
   rationaleClues: "단서 {count}",
   standing: {
     clear: "붕괴선 아래",
@@ -43,6 +38,44 @@ const reportLinesCopy = {
     harm: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}%",
     overreach: "시즌 평균 {harmLabel} {perCase} / {gate} · 터진 판 {bustPercent}% / {bustGate}%",
     harmCase: "{caseLabel} 다시 도전 · {harmLabel} {harm}",
+    // 개선 포인트 C3 (2026-11-05 초안): the sentence after the line when the
+    // season's cases closed on a mean cash under the start and harm under the
+    // line (createSeasonStandingReadout `held`). A season that lost money but
+    // kept people reads as that, not as a loss.
+    held: "{capitalLabel}{capitalParticle} 평균 {capital}까지 내려갔지만 {harmLabel}{harmParticle} 붕괴선 아래입니다.",
+  },
+  // C3: the sentence after an ending's own line on the finale, by the ending,
+  // printed only on that same season (`endingHeld`). SYSTEM COLLAPSE is over
+  // the line and PROFITABLE SILENCE kept its cash, so neither has one.
+  heldEndings: {
+    "open-oversight": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 기준을 남긴 시즌입니다.",
+    "evidence-reform": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 공개와 보호의 규칙을 남긴 시즌입니다.",
+    "human-record": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 이름들을 남긴 시즌입니다.",
+    "cold-justice": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 절차를 지킨 시즌입니다.",
+    "field-pact": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 사람들의 약속을 남긴 시즌입니다.",
+    "quiet-cover": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.",
+    "open-question": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 질문을 넘긴 시즌입니다.",
+  },
+  // C3-4 (1), 2026-11-11: the paragraph after the ending's own on the finale
+  // when its last answer was 폭로 (f_after_witness) on a held season
+  // (`endingWitness`). The ending is the same one; only its words grow.
+  witnessHeld: "마지막에 당신은 폭로를 골랐습니다. 현금은 줄었고 점수에도 남지 않지만, 사람 피해를 선 아래에 둔 채 숨긴 기록을 밖으로 꺼냈습니다. 이 시즌이 이긴 자리는 숫자 밖에 있습니다.",
+  // C2-1 (1), 2026-11-11: the finale's line on the ending the season came
+  // closest to and did not reach (src/nearestEnding.js), by what it lacked.
+  // {label} in a gap is the resource's own word (easyResourceLabels).
+  nearest: {
+    line: "가장 가까웠던 다른 결말: {ending}까지 {gaps}",
+    gaps: {
+      trust: "{label} {value} 모자람",
+      legitimacy: "{label} {value} 모자람",
+      capital: "{label} {value} 모자람",
+      trustOver: "{label} {value} 넘침",
+      clues: "단서 {value}개 모자람",
+      reframes: "판 다시 짜기 {value}번 모자람",
+      coldGap: "{legitimacy}{particle} {trust}보다 {value} 더 높아야 함",
+      pactGap: "{trust}{particle} {legitimacy}보다 {value} 더 높아야 함",
+    },
+    burn: "마지막에 봉인을 골라, 기록이 남아야 열리는 결말(OPEN OVERSIGHT · EVIDENCE REFORM · HUMAN RECORD)은 이번 시즌 닫혀 있었습니다.",
   },
   score: {
     points: "{score}점",

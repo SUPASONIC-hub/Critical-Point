@@ -84,9 +84,12 @@ export function collectLines(tables) {
     for (const [path, text] of strings(value)) lines.push([path ? `${where}.${path}` : where, text]);
   };
 
-  // The swept copy modules, whole.
-  for (const name of ["habits", "judgment", "logicReport", "sceneRates", "seasonLines", "playReads", "introPanels", "music", "runLines", "farCallbacks"]) add(`copy/${name}`, tables[name]);
-  add("copy/reportLines.endingProfiles", tables.reportLines.endingProfiles);
+  // Every screen-copy module (src/copy/*.js), whole: the 10-30 sweep named ten
+  // of them, and E4 (11-10) widened it to all, the recovery center's and the
+  // report's words among them. A `sourceLabel` is the Korean label the overlay
+  // keeps for the observer (src/locales/overlay.js), never printed.
+  for (const name of Object.keys(tables).sort()) add(`copy/${name}`, tables[name]);
+  for (let at = lines.length - 1; at >= 0; at -= 1) if (lines[at][0].endsWith(".sourceLabel")) lines.splice(at, 1);
 
   // The 판단 습관, as the card and the report read them.
   for (const habit of JUDGEMENT_HABITS) add(`habit.${habit.id}`, { title: habit.title, line: habit.line });
@@ -164,7 +167,8 @@ export function collectLines(tables) {
   add("seasonGoals", getSeasonGoals());
   add("pastRunMemory", getPastRunMemory({ case03: { outcomeChoiceId: "x" } }));
   add("integrity", [getRankingIntegrity({ runId: "r", completedAt: 1, summary: { rank: "A" } }), getRankingIntegrity({})]);
-  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.from}`, getAnalystTitle({ currentCase: step.from }));
+  for (const step of ANALYST_TITLE_STEPS) add(`analystTitle.${step.id}`, step.title);
+  add("analystTitle.finished", getAnalystTitle({ finishedSeason: true }));
   return lines;
 }
 

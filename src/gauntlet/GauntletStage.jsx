@@ -20,13 +20,13 @@ import {
   getTableSchema,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
-import { isClosingScene } from "./holdConfirm.js";
+import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
-import { describeEffect, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
-import { readTableMeters } from "./tableMeters.js";
+import { describeStakedDetail, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { dangerZoneOf, readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
-import { useTabTitle } from "../state/tabTitle.js";
+import { useTableTabTitle } from "./tableTabTitle.js";
 import { listOfferedDirections } from "./logicStreak.js";
 import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
@@ -59,11 +59,10 @@ import { fill } from "../locale.js";
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
 const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
-// The table's words (src/copy/table.js). Tab drafts (개선 포인트 A3): a cold table leaves the tab as index.html has it.
-const { stage: say, keys: keyWords, tab: tabWords } = tableCopy;
+// The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
+const { stage: say, keys: keyWords } = tableCopy;
 /** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
 const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
-const TAB_TITLES = { hot: () => tabWords.hot, critical: (gauge) => fill(tabWords.critical, { gauge }) };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -196,9 +195,7 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
-  const selectedEffects = selectedCard ? describeEffect(selectedCard.effect, resourceMeta) : [];
-  const visibleEffects = selectedEffects.slice(0, 4);
-  const hiddenEffectCount = Math.max(0, selectedEffects.length - visibleEffects.length);
+  const { visibleEffects, hiddenEffectCount } = describeStakedDetail(selectedCard, schema, resourceMeta);
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -439,17 +436,20 @@ export function GauntletStage({
     dispatch({ type: "CASH", locked: sealedLock });
   }
 
-  // The scene that closes the case is confirmed by a hold or a second press,
-  // not a click (holdConfirm.js); every other table cashes as it always did.
-  const holdsCash = isClosingScene(scene.node);
-  const cashHold = useHoldConfirm({ enabled: holdsCash && canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  // The case's last choice and a table in the danger zone confirm by a 0.6s hold (holdConfirm.js); every other table cashes on a click.
+  const cashHold = useHoldConfirm({ node: scene.node, gauge: win.gauge, wallMin: band.wallMin, canCash, resetKey: selectedCard?.id, onConfirm: cash });
+  const holdsCash = cashHold.holds;
   // Short enough for the dock's 108px on a 360px phone; the full sentence is the button's description.
-  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : !holdsCash ? say.commit : cashHold.phase === "armed" ? say.oneMore : say.holdToCommit;
+  const holdLabel = { hinted: say.holdHint, armed: say.oneMore }[cashHold.phase] ?? say.holdToCommit;
+  const cashLabel = win.status === "bust" ? "BUST" : sealedLock ? say.sealed : !selectedCard ? say.pickCard : holdsCash ? holdLabel : say.commit;
 
+  // 지금 상황 듣기 (E3): each ask, by I or the heart's button, is one line from the table's voice.
+  const [asked, setAsked] = useState(0);
+  const askStatus = () => setAsked((count) => count + 1);
   // The hook that owns the keys also says which of them a control may name.
   const { letterKeys, keys, drawn } = useTableKeys({
     select, focus: lockOn ? focus : null, push, safe: pushToSafe, cash, cashHold: holdsCash && canCash ? cashHold : null,
-    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null,
+    cycleFocusMode: stanceOn ? cycleFocusMode : null, scout: scoutOn ? scout : null, status: live ? askStatus : null,
     cards, reframeChoice, draftOpen, relicOffer, pickRelic, swapFor, relics, cancelSwap: () => setSwapFor(null), spendAtDraft: onSpendAtDraft,
     briefingOpen, tableOpen, openTable,
   });
@@ -459,11 +459,8 @@ export function GauntletStage({
   const bandWidth = ((band.wallMax - band.wallMin + 1) / GAUGE_MAX) * 100;
   const verdictClass = win.status === "bust" ? " is-bust" : win.status === "cashed" ? " is-cashed" : "";
   const heatTier = win.status === "bust" ? "bust" : win.gauge >= band.wallMin ? "critical" : win.gauge >= band.wallMin - schema.stepMax ? "hot" : "cold";
-  // The tab says what the table shows (tabTitle.js): never the hidden wall. A
-  // bust stays on it until the next table opens; the briefing leaves it be.
-  const busted = win.status === "bust" && win.cause !== "abandon";
-  const tabTitle = busted ? tabWords.bust : !tableOpen ? undefined : !live ? null : TAB_TITLES[heatTier]?.(Math.round(win.gauge)) ?? null;
-  useTabTitle("table", tabTitle, { rank: 1, keep: busted });
+  // The tab counts to the band, and holds a bust until the next table opens (tableTabTitle.js).
+  useTableTabTitle({ win, band, schema, tableOpen, live });
   // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
 
@@ -483,6 +480,8 @@ export function GauntletStage({
         flash={flash}
         stageRef={stageRef}
         caseId={scene.node.caseId}
+        zone={dangerZoneOf(dangerLine)}
+        hold={cashHold.phase}
       />
 
       <div className="gx-table">
@@ -631,7 +630,9 @@ export function GauntletStage({
               </span>
             )}
             <span className="gx-bpm" data-testid="gauntlet-bpm">
-              <HeartPulse size={14} aria-hidden="true" />
+              {/* The heart is the button that asks the voice for the table (key I): an icon already in the row, so no row grows. */}
+              <button type="button" className="gx-listen" data-testid="table-listen" onClick={live ? askStatus : undefined} aria-disabled={!live}
+                aria-label={say.listen} title={say.listen} aria-keyshortcuts={keys("I")}><HeartPulse size={14} aria-hidden="true" /></button>
               {say.bpm} <b>{schema.sedated ? say.sedated : bpm}</b>
             </span>
           </div>
@@ -802,9 +803,9 @@ export function GauntletStage({
         >
           <span>{cashLabel}</span>
           <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
+          {holdsCash && <HoldGauge phase={cashHold.phase} />}
         </button>
-        {/* Outside the button, so neither is read into its name. The second is
-            what a press that did not hold says: one more confirms. */}
+        {/* Outside the button, so neither is read into its name. */}
         {holdsCash && <span id="gx-cash-hold" className="sr-only">{say.holdHelp}</span>}
         {audit && <span id="gx-audit-detail" className="sr-only">{audit.spoken}</span>}
       </div>
@@ -845,8 +846,9 @@ export function GauntletStage({
         equipped={equipped}
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
-        // What the table says aloud, in one polite region (tableVoice.js), the armed 확정 included.
-        voice={{ win, live, speaking: live && !paused, dangerLine, cashMutations, run, band, audit, links, armed: holdsCash && cashHold.phase === "armed", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
+        // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
+        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, audit, links,
+          hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}

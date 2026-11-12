@@ -37,7 +37,7 @@ import { useBoard } from "./state/useBoard.js";
 import { useOverlayScreens } from "./state/useOverlayScreens.js";
 import { createStartSave } from "./state/shellStartSave.js";
 import { getReplaySeedFromLocation } from "./state/trace.js";
-import { getOperatorProfiles } from "./advancedSystems.js";
+import { getOperatorProfiles, isStaleBook } from "./advancedSystems.js";
 import { GAME_TITLE } from "./appCopy.js";
 import shellNotices from "./shellNotices.js";
 import { getSessionCode, getSessionId } from "./telemetry.js";
@@ -167,7 +167,7 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   const [initialStartState, setInitialStartState] = useState(null);
   const { showRanking, showBoard, setShowRanking, setShowBoard } = useOverlayScreens();
   const newGamePlusMemory = useMemo(() => readNewGamePlusMemory(), []);
-  const newGamePlusRecord = useMemo(() => readStoredSeasonRecord(), []);
+  const [newGamePlusRecord, setNewGamePlusRecord] = useState(readStoredSeasonRecord);
   const [playerName, setPlayerName] = useState(() => normalizePlayerName(saved?.playerName));
   const [playStyle, setPlayStyle] = useState(saved?.playStyle ?? "instinct");
   // The box starts ticked on a device with no save. Where there is a save,
@@ -214,16 +214,22 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
   // without waiting for a dictionary and so reached this effect soonest,
   // painted at 11.5s instead of 8s, with 3.5s of blocking (perf-first-visit,
   // 2026-11-03). Pointing at or focusing 시작 still fetches it at once
-  // (IntroScreen).
+  // (IntroScreen). A 결말 도감 written in another language than the page's
+  // (a season finished in Korean, read in English) is written again by the
+  // runtime once it is in (isStaleBook), and the panel redrawn with it.
   useEffect(() => {
     if (runtimeActive) return undefined;
     let cancel = () => {};
+    const fetchRuntime = () => {
+      if (!isStaleBook(readStoredSeasonRecord())) return prefetchGameRuntime();
+      loadGameRuntime().then((runtime) => setNewGamePlusRecord(runtime.refreshSeasonRecord()), () => {});
+    };
     const whenIdle = () => {
       if (typeof globalThis.requestIdleCallback === "function") {
-        const handle = globalThis.requestIdleCallback(prefetchGameRuntime, { timeout: RUNTIME_PREFETCH_TIMEOUT_MS });
+        const handle = globalThis.requestIdleCallback(fetchRuntime, { timeout: RUNTIME_PREFETCH_TIMEOUT_MS });
         cancel = () => globalThis.cancelIdleCallback?.(handle);
       } else {
-        const handle = globalThis.setTimeout(prefetchGameRuntime, RUNTIME_PREFETCH_TIMEOUT_MS / 2);
+        const handle = globalThis.setTimeout(fetchRuntime, RUNTIME_PREFETCH_TIMEOUT_MS / 2);
         cancel = () => globalThis.clearTimeout(handle);
       }
     };

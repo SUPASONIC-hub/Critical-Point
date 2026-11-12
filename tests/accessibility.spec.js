@@ -2,7 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, startDebugNode, waitForEntrance } from "./helpers/gameFlow.js";
-import { TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { createWindow, normalizeSchema } from "../src/gauntlet/gauntletEngine.js";
 
 async function expectNoA11yViolations(page) {
   const results = await new AxeBuilder({ page }).analyze();
@@ -694,7 +695,7 @@ test("a push is said in the table's one polite region, with the shown band and n
   await expect(page.getByTestId("gauntlet-stage").locator("[role='status'], [aria-live='polite'], [aria-live='assertive']")).toHaveCount(1);
 });
 
-test("the verdict is the slam's alone, and the next table says what the cash banked", async ({ page }) => {
+test("the verdict is the slam's alone, and the next table says what the cash settled", async ({ page }) => {
   await startDebugNode(page, "case01", "start");
   const voice = page.getByTestId("table-voice");
   await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
@@ -704,5 +705,48 @@ test("the verdict is the slam's alone, and the next table says what the cash ban
   await page.getByTestId("decision-next").click();
   await dismissProtocolBreach(page);
   const runPot = await page.getByTestId("gauntlet-run-pot").textContent();
-  await expect(voice).toHaveText(new RegExp(`^판돈 ${runPot} · 금고 [\\d,]+$`));
+  // E3 2단계 (a): the settlement's one line -- the hand's +N, the case pot, the vault -- once, as the next table opens.
+  await expect(voice).toHaveText(new RegExp(`^이번 판 \\+${runPot} · 판돈 ${runPot} · 금고 [\\d,]+$`));
+});
+
+/**
+ * 지금 상황 듣기 (E3, 2026-11-12): the heart in the gauge's row is a button,
+ * reached by Tab and named for what it asks, and it and the key I each put one
+ * line at the front of the voice -- the heat, the danger line, the case pot,
+ * the seconds and the heartbeat the screen shows. The wall is never in it.
+ */
+const STATUS_CALL = /^열기 \d+ · (벽까지 최소 \d+|밀면 벽 사정권|벽 구간 안) · 판돈 [\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
+
+test("지금 상황 듣기: the heart's button and I each say the table in one line, its shown numbers and never the wall", async ({ page }) => {
+  await startDebugNode(page, "case01", "start");
+  const voice = page.getByTestId("table-voice");
+  const listen = page.getByTestId("table-listen");
+  await expect(listen).toHaveAccessibleName("지금 상황 듣기");
+  await expect(listen).not.toHaveAttribute("tabindex", "-1");
+  await expect(voice).toHaveText("");
+  // Every line the region says, in order: two asks are two lines even where the numbers repeat.
+  await voice.evaluate((region) => {
+    globalThis.__said = [];
+    new MutationObserver(() => globalThis.__said.push(region.textContent)).observe(region, { childList: true, characterData: true, subtree: true });
+  });
+  const said = () => page.evaluate(() => globalThis.__said.filter(Boolean));
+
+  await listen.click();
+  await expect.poll(async () => (await said()).length).toBe(1);
+  const [byButton] = await said();
+  expect(byButton).toMatch(STATUS_CALL);
+  const runPot = await page.getByTestId("gauntlet-run-pot").textContent();
+  expect(byButton).toContain(`판돈 ${runPot}`);
+
+  await page.keyboard.press("i");
+  await expect.poll(async () => (await said()).length, { timeout: 5_000 }).toBe(2);
+  const byKey = (await said())[1];
+  expect(byKey).toMatch(STATUS_CALL);
+  // The wall this window was dealt, from the engine (the save holds the seed, never the wall):
+  // the line's only numbers are the five slots above, and the danger slot is a distance or a word.
+  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const dealt = createWindow({ schema: normalizeSchema(saved.dynamics.schema), seed: String(saved.dynamics.openSeed).split("#")[0] });
+  for (const line of [byButton, byKey]) expect(line.split(" · ")[1]).not.toBe(`벽까지 최소 ${Math.round(dealt.wall)}`);
+  // Still the table's one region.
+  await expect(page.getByTestId("gauntlet-stage").locator("[role='status'], [aria-live='polite'], [aria-live='assertive']")).toHaveCount(1);
 });

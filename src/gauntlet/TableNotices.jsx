@@ -95,6 +95,9 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
                 : fill(say.slamWall, { wall: win.wall })}{" "}
             · {say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}
           </span>
+          {/* The moment, in one line under the verdict (A2, 2026-11-05): the same
+              sentence whatever the cause, read last by the alert. */}
+          <small>{say.slamStill}</small>
         </>
       ) : (
         <>
@@ -111,12 +114,13 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
 /** Everything that lands over the table: what it says aloud, the relic just taken, a table lost to or held by another tab, the verdict. */
 export function TableNotices({ equipped, tab, caseId, voice, slam, onReload, onClaim, onLeave }) {
   const { lost, held } = getTabNotices(tab);
-  const said = useTableVoice(voice);
+  // The case is the voice's too (E3 2단계): the first table of a case that opens an act says so.
+  const said = useTableVoice({ ...voice, caseId });
   return (
     <>
-      {/* The table's one voice (tableVoice.js): the push, the stance, the bank and the clock.
+      {/* The table's one voice (tableVoice.js): the push, the stance, the settlement, the act and the clock.
           Silent to the eye, and on the page before it has anything to say. */}
-      <span className="sr-only" role="status" data-testid="table-voice">{said}</span>
+      <span className="sr-only" role="status" data-testid="table-voice">{said.text && <span key={said.n}>{said.text}</span>}</span>
       <EdgeNotice voice={voice} caseId={caseId} />
       {equipped && (
         <div key={`equip-${equipped.n}`} className={`gx-equip-toast relic-${equipped.id}`} role="status" data-testid="relic-equipped">

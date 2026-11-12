@@ -1,15 +1,10 @@
 /** src/copy/seasonLines.js in Japanese: what NEW GAME+ says of the season before, and the ending book's lines. */
 export default {
-  verdicts: { ending_seal: "封印", ending_reform: "改革", ending_expose: "暴露" },
   openingEchoes: {
     ending_seal: "前のシーズンの記録は封印されましたが、実験は別の名前で戻ってきました。今回は、何を閉じるのかを先に見ます。",
     ending_reform: "前のシーズンの記録は、使用ルールの基準表になりました。今回は、その監視がどこまで持ちこたえるかを見ます。",
     ending_expose: "前のシーズンの記録は、すでに外に出ています。今回は、何を先に守るのかを見ます。",
     collapse: "前のシーズンは、人が払った代償を背負いきれずに止まりました。保存されたその記録が、今回の最初の問いの横に置かれています。",
-  },
-  memory: {
-    line: "前のシーズン:{named}{ending}。{carry}",
-    carry: "NEW GAME+で始めると、最初のシーンにこの記録が戻ってきます。",
   },
   comparison: {
     same: "前のシーズンと同じ結末、{ending}にふたたびたどり着きました。",

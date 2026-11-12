@@ -1,15 +1,10 @@
 /** What NEW GAME+ says of the season before, and the ending book’s lines, in English (src/copy/seasonLines.js). */
 export default {
-  verdicts: { ending_seal: "Seal", ending_reform: "Reform", ending_expose: "Expose" },
   openingEchoes: {
     ending_seal: "Last season’s record was sealed, but the experiment came back under another name. This time, we’ll first see what you choose to close.",
     ending_reform: "Last season’s record became the benchmark for the rules of use. This time, we’ll see how long that oversight holds.",
     ending_expose: "Last season’s record is already out in the world. This time, we’ll see what you protect first.",
     collapse: "Last season stopped, unable to bear what people paid. That preserved record now sits beside this season’s first question.",
-  },
-  memory: {
-    line: "Last season: {named}{ending}.{carry}",
-    carry: " Start NEW GAME+ and this record returns in the first scene.",
   },
   comparison: {
     same: "You reached the same ending as last season again: {ending}.",

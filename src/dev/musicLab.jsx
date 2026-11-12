@@ -6,9 +6,11 @@ import { StrictMode, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AdaptiveMusic, MUSIC_MOODS, setMusicMood, setMusicStake } from "../components/AdaptiveMusic.jsx";
 import { chapterMotifs, speakerMotifs } from "../components/musicData.js";
-import { createSceneMode, moodLeads, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
-import { startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { createSceneMode, isCrackleFixOn, moodLeads, setCrackleFix, STAKE_LAYER_GAUGES } from "../components/musicScore.js";
+import { playHeartbeat, playZoneThud, startTensionDrone } from "../gauntlet/gauntletAudio.js";
+import { HESITATE_MAX } from "../gauntlet/heartbeat.js";
 import { DRONE_VOICINGS } from "../gauntlet/tensionDrone.js";
+import { THUD_FROM_HZ, THUD_TAIL, THUD_TO_HZ } from "../gauntlet/zoneThud.js";
 
 const MOOD_NAMES = { neutral: "중립", bright: "밝음", tense: "긴장", dread: "공포", sorrow: "슬픔" };
 
@@ -65,13 +67,13 @@ function writeNotes(notes) {
   }
 }
 
-function describe(key, mood) {
+function describe(key, mood, crackleFix) {
   const mode = createSceneMode(key);
   const bpm = Math.round(60000 / (mode.interval * 4));
   const leads = moodLeads(mode, mood);
   const picks = mood === "sorrow" ? "슬픔 리드(많이 치름 선율을 단조로)" : `리드 ${leads.map((lead) => mode.leads.indexOf(lead) + 1).join("·")}번`;
   const drone = DRONE_VOICINGS[mood];
-  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)} · ${picks} · 드론 ${drone.voices.length}성 ×${drone.level}`;
+  return `${mode.label} · ${bpm} BPM · ${mode.wave} · drive ${mode.drive.toFixed(2)}${mode.bassPastDrive ? " · 베이스는 드라이브 밖" : ""}${crackleFix ? "" : " · 고치기 전"} · ${picks} · 드론 ${drone.voices.length}성 ×${drone.level}`;
 }
 
 function MusicLab() {
@@ -81,6 +83,8 @@ function MusicLab() {
   const [copied, setCopied] = useState(false);
   const [mood, setMood] = useState("neutral");
   const [droneOn, setDroneOn] = useState(false);
+  // 11-10: A/B the crackle fix on one passage. Toggling restarts the track from its first bar.
+  const [crackleFix, setCrackleFixState] = useState(isCrackleFixOn);
   const gaugeRef = useRef(gauge);
 
   useEffect(() => {
@@ -101,6 +105,11 @@ function MusicLab() {
     };
   }, [droneOn]);
   useEffect(() => writeNotes(notes), [notes]);
+
+  function toggleCrackleFix(on) {
+    setCrackleFix(on);
+    setCrackleFixState(on);
+  }
 
   const index = ALL.findIndex((track) => track.key === current);
   const step = (offset) => setCurrent(ALL[(index + offset + ALL.length) % ALL.length].key);
@@ -133,7 +142,7 @@ function MusicLab() {
       <section style={styles.bar}>
         <div>
           <strong>{current ? ALL[index].name : "곡을 고르세요"}</strong>
-          {current && <div style={styles.muted}>{describe(current, mood)}</div>}
+          {current && <div style={styles.muted}>{describe(current, mood, crackleFix)}</div>}
         </div>
         <div style={styles.row}>
           <button type="button" onClick={() => step(-1)} disabled={!current}>
@@ -164,13 +173,36 @@ function MusicLab() {
             판 드론 듣기 (슬라이더 값이 가까움)
           </label>
         </div>
+        {/* A1-1 · E3 (11-12): the step marker the table plays as the 현재 위험 line steps up. Needs a track playing (the cue runtime). */}
+        <div style={styles.row}>
+          <button type="button" onClick={() => playZoneThud()} disabled={!current}>
+            쿵 — 위험 단계 오름 표지
+          </button>
+          <span style={styles.muted}>
+            깊은 쿵(11-12 고름): {THUD_FROM_HZ}→{THUD_TO_HZ}Hz로 미끄러지는 몸통 + 한 옥타브 위 · {THUD_TAIL}초 꼬리 · drive 밖(곡을 켠 뒤 누르세요)
+          </span>
+        </div>
+        {/* A1-2 (11-12): the hesitation swell -- the same beat at its plain level and at the most it grows. */}
+        <div style={styles.row}>
+          <button type="button" onClick={() => playHeartbeat(0.4, 0, 1)} disabled={!current}>
+            심박 — 보통
+          </button>
+          <button type="button" onClick={() => playHeartbeat(0.4, 0, HESITATE_MAX)} disabled={!current}>
+            심박 — 망설임 최대(+{Math.round((HESITATE_MAX - 1) * 100)}%)
+          </button>
+          <span style={styles.muted}>카드를 고르고 3초 넘게 아무것도 안 누르면 8초에 걸쳐 이만큼까지 · 음량만, 빠르기·음높이 그대로</span>
+        </div>
+        <label style={styles.row}>
+          <input type="checkbox" checked={crackleFix} onChange={(event) => toggleCrackleFix(event.target.checked)} />
+          지직거림 고침 (11-10) — 끄면 고치기 전 소리. 바꾸면 같은 곡이 첫 마디부터 다시 시작합니다
+        </label>
         <div style={styles.row}>
           <button type="button" onClick={copyNotes} disabled={!rated.length}>
             평가 {rated.length}개 복사
           </button>
           {copied && <span>복사됨 — 대화창에 붙여넣어 주세요</span>}
         </div>
-        {current && <AdaptiveMusic modeKey={current} />}
+        {current && <AdaptiveMusic key={crackleFix ? "fix" : "before"} modeKey={current} />}
       </section>
 
       {GROUPS.map((group) => (
