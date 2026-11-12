@@ -23,7 +23,7 @@ import { useGauntletWindow } from "./useGauntletWindow.js";
 import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeStakedDetail, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
-import { readTableMeters } from "./tableMeters.js";
+import { dangerZoneOf, readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTableTabTitle } from "./tableTabTitle.js";
@@ -480,6 +480,8 @@ export function GauntletStage({
         flash={flash}
         stageRef={stageRef}
         caseId={scene.node.caseId}
+        zone={dangerZoneOf(dangerLine)}
+        hold={cashHold.phase}
       />
 
       <div className="gx-table">

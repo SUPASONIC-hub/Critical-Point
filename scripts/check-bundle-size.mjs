@@ -2266,7 +2266,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,585 / 432,524 / 440,230 on 2026-11-12, e3-status (지금 상황 듣기) over main fbf1000c, critical CSS regenerated. Measured first paint, the plus 4.
 // -> 373,551 / 432,788 / 440,476 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured first paint, the plus 4.
 // -> 373,645 / 432,958 / 440,676 bundle 1112c (#520 #521) over main 4f927085. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_645, en: 432_958, ja: 440_676 };
+// -> 373,611 / 432,578 / 440,275 on 2026-11-12, bundle 1112b (#516 #517) over main 4f927085, CI measured (373,607 / 432,574 / 440,271), the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_611, en: 432_578, ja: 440_275 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
