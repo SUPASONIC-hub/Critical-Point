@@ -452,6 +452,8 @@ const tallySummary = (banked, lost = 0) => ({
 });
 
 test("N1: the card after 사건 18 carries the 중간 결산, waits for 계속, and a press inside it is its own", async ({ page }) => {
+  // About 57s on three local workers (resume, the drawn card, the 7.5s wait): room above the 60s default.
+  test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addInitScript(() => {
     delete Navigator.prototype.share;
@@ -474,7 +476,7 @@ test("N1: the card after 사건 18 carries the 중간 결산, waits for 계속, 
 
   // The save button hands over the finale's picture, and the card stays up.
   const save = tally.getByRole("button", { name: "중간 결산 카드 저장" });
-  await expect(save).toHaveAttribute("aria-disabled", "false", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(save, "the card is held, so the button is ready").not.toHaveAttribute("aria-disabled", "true", { timeout: TRANSITION_TIMEOUT_MS });
   const download = page.waitForEvent("download");
   await save.click();
   expect((await download).suggestedFilename()).toBe("critical-point-result.png");

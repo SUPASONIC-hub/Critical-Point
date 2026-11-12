@@ -176,7 +176,8 @@ const budgets = [
   // 157,229 / 58,019 -> 157,412 / 58,135 c4c5-copy over main 7ec2304e. Measured 157408 / 58131 (over budget only) in the e2e build, the plus 4.
   // 157,229 / 58,019 -> 157,367 / 58,055 a2a3-ending over main 7ec2304e. Measured 157363 / 58051 (over budget only) in the e2e build, the plus 4.
   // 157,367 / 58,055 -> 157,552 / 58,149 bundle 1112f (#530 #531) over main fbc8adc6. Measured 157548 / 58145 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_552, maxGzip: 58_149 },
+  // 157,552 / 58,149 -> 157,584 / 58,157 n1-act-card over main 53845978. Measured 157580 / 58153 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_584, maxGzip: 58_157 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1127,7 +1128,8 @@ const budgets = [
   // 213,999 / 41,403 -> 214,218 / 41,444 on 2026-11-12, e3-status (the heart's .gx-listen button) over main fbf1000c. Measured 214,214 / 41,440 in the e2e build, the plus 4.
   // 214,218 / 41,444 -> 214,420 / 41,493 bundle 1112c (#520 #521) over main 4f927085. Measured 214416 / 41489 (over budget only) in the e2e build, the plus 4.
   // 214,420 / 41,493 -> 214,508 / 41,536 a2a3-ending over main 7ec2304e. Measured 214504 / 41532 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 214_508, maxGzip: 41_536 },
+  // 214,508 / 41,536 -> 215,366 / 41,680 n1-act-card over main 53845978. Measured 215362 / 41676 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 215_366, maxGzip: 41_680 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1395,7 +1397,8 @@ const budgets = [
   // 8,432 / 4,054 -> 8,659 / 4,168 on 2026-10-26, 영어판 3단계: the card's words and the copied line read by key (src/copy/resultCard.js, resultCardDraw.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 8,659 / 4,168 -> 8,787 / 4,224 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's sentence drawn on the label's line and copied after the shared line, as two fields (habitLine, dnaTitle) handed in worded (resultCardModel.js, resultCard.js). Measured 8,783 / 4,220 in the e2e build, the plus 4.
   // 8,787 / 4,224 -> 8,959 / 4,325 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 8955 / 4321 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_959, maxGzip: 4_325 },
+  // 8,959 / 4,325 -> 9,276 / 4,430 n1-act-card over main 53845978. Measured 9272 / 4426 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_276, maxGzip: 4_430 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -1412,7 +1415,8 @@ const budgets = [
   // 3,989 -> 4,000 gzip on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 8,487 / 3,996, the gzip plus 4.
   // 8,487 / 3,989 -> 8,487 / 4,002 on 2026-11-02, #308 d2-hall-of-fame merged with #224 c29c2efd (main 9be94346). Measured raw under / 3,998 in the e2e build, the gzip plus 4.
   // 3,989 -> 3,998 gzip on 2026-11-05, tab-title-situation over main 24af89d7: the raw bytes are the same (8,487); the chunk names it imports. Measured 3,994 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_487, maxGzip: 4_002 },
+  // 8,487 / 4,002 -> 8,498 / 4,002 n1-act-card over main 53845978. Measured 8494 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_498, maxGzip: 4_002 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
   // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
@@ -1601,7 +1605,8 @@ const budgets = [
   // season's end and the dialog, fetched by the PlayScreen chunk's fold only
   // on an act's first case. Measured 2,698 / 1,538 on main da6292be, the gzip plus 4.
   // 2,698 / 1,542 -> 2,952 / 1,675 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^ActCard-.*\.js$/, maxBytes: 2_952, maxGzip: 1_675 },
+  // 2,952 / 1,675 -> 4,089 / 2,280 n1-act-card over main 53845978. Measured 4085 / 2276 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ActCard-.*\.js$/, maxBytes: 4_089, maxGzip: 2_280 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1831,7 +1836,8 @@ const budgets = [
   // 188,317 / 62,664 -> 189,273 / 62,982 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 189269 / 62978 (over budget only) in the e2e build, the plus 4.
   // 189,273 / 62,982 -> 189,552 / 63,089 bundle 1112c (#520 #521) over main 4f927085. Measured 189548 / 63085 (over budget only) in the e2e build, the plus 4.
   // 189,552 / 63,089 -> 189,888 / 63,261 c4c5-copy over main 7ec2304e. Measured 189884 / 63257 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 189_888, maxGzip: 63_261 },
+  // 189,888 / 63,261 -> 191,288 / 63,716 n1-act-card over main 53845978. Measured 191284 / 63712 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 191_288, maxGzip: 63_716 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1893,7 +1899,8 @@ const budgets = [
   // 156,978 / 55,879 -> 157,794 / 56,201 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 157790 / 56197 (over budget only) in the e2e build, the plus 4.
   // 157,794 / 56,201 -> 158,035 / 56,278 bundle 1112c (#520 #521) over main 4f927085. Measured 158031 / 56274 (over budget only) in the e2e build, the plus 4.
   // 158,035 / 56,278 -> 158,306 / 56,407 c4c5-copy over main 7ec2304e. Measured 158302 / 56403 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 158_306, maxGzip: 56_407 },
+  // 158,306 / 56,407 -> 159,400 / 56,809 n1-act-card over main 53845978. Measured 159396 / 56805 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 159_400, maxGzip: 56_809 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2289,7 +2296,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,687 / 433,129 / 440,892 c4c5-copy over main 7ec2304e. Measured first paint, the plus 4.
 // -> 373,683 / 432,970 / 440,695 a2a3-ending over main 7ec2304e. Measured first paint, the plus 4.
 // -> 373,726 / 433,153 / 440,911 bundle 1112f (#530 #531) over main fbc8adc6. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_726, en: 433_153, ja: 440_911 };
+// -> 373,874 / 433,718 / 441,533 n1-act-card over main 53845978. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_874, en: 433_718, ja: 441_533 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2479,7 +2487,8 @@ function checkBudget(file, budget) {
 // -> 10,798 / 3,875 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477), the plus 4.
 // -> 10,827 / 3,884 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317), the plus 4.
 // -> 10,856 / 3,897 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321), the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_856, maxGzip: 3_897 };
+// -> 10,887 / 3,905 n1-act-card over main 53845978, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_887, maxGzip: 3_905 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
