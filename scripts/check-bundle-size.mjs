@@ -175,7 +175,8 @@ const budgets = [
   // 153,883 / 56,597 -> 157,229 / 58,019 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 157225 / 58015 (over budget only) in the e2e build, the plus 4.
   // 157,229 / 58,019 -> 157,412 / 58,135 c4c5-copy over main 7ec2304e. Measured 157408 / 58131 (over budget only) in the e2e build, the plus 4.
   // 157,229 / 58,019 -> 157,367 / 58,055 a2a3-ending over main 7ec2304e. Measured 157363 / 58051 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_367, maxGzip: 58_055 },
+  // 157,367 / 58,055 -> 157,552 / 58,149 bundle 1112f (#530 #531) over main fbc8adc6. Measured 157548 / 58145 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_552, maxGzip: 58_149 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -897,7 +898,8 @@ const budgets = [
   // 51,558 / 16,956 -> 51,558 / 16,961 c2c3-result over main fbf1000c (held read outside the view groups). Measured - / 16957 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,961 -> 51,704 / 17,011 c4c5-copy over main 7ec2304e. Measured 51700 / 17007 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_421, maxGzip: 17_333 },
+  // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_378 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -916,7 +918,8 @@ const budgets = [
   // 51,558 / 16,956 -> 51,558 / 16,961 c2c3-result over main fbf1000c (held read outside the view groups). Measured - / 16957 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,961 -> 51,704 / 17,011 c4c5-copy over main 7ec2304e. Measured 51700 / 17007 (over budget only) in the e2e build, the plus 4.
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_421, maxGzip: 17_333 },
+  // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_378 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -2285,7 +2288,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,634 / 432,946 / 440,665 bundle 1112c (#520 #521 390) over main e3687e46. Measured first paint, the plus 4.
 // -> 373,687 / 433,129 / 440,892 c4c5-copy over main 7ec2304e. Measured first paint, the plus 4.
 // -> 373,683 / 432,970 / 440,695 a2a3-ending over main 7ec2304e. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_683, en: 432_970, ja: 440_695 };
+// -> 373,726 / 433,153 / 440,911 bundle 1112f (#530 #531) over main fbc8adc6. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_726, en: 433_153, ja: 440_911 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
