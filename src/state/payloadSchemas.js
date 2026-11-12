@@ -112,6 +112,22 @@ export function fitCaseDynamics(dynamics) {
   return rest;
 }
 
+/**
+ * A season-final row's `seasonStanding` (decision T3, seasonStanding.js's
+ * `readSeasonStandingMark`): one of SEASON_STANDING_MARKS there, written out
+ * here so the first paint does not load the collapse gate's module; a test
+ * keeps the two lists one. The server takes the summary as any object of at
+ * most 4,096 bytes without reading its keys, so a row without it, or from
+ * before it, is a row as before.
+ */
+const SEASON_STANDING_VALUES = new Set(["held", "clear", "near", "over"]);
+
+/** What is wrong with a case row's `summary.seasonStanding`; none for a row without it. */
+export function validateSeasonStanding(summary) {
+  const value = summary?.seasonStanding;
+  return value === undefined || SEASON_STANDING_VALUES.has(value) ? [] : ["invalid summary.seasonStanding"];
+}
+
 export function validateTelemetryItem(item) {
   const errors = [];
   if (!TELEMETRY_TYPES.has(item?.type)) errors.push(`invalid type ${item?.type}`);
@@ -122,7 +138,7 @@ export function validateTelemetryItem(item) {
   if (containsPrivateTelemetryValue(item?.payload, ALLOWED_PRIVATE_KEYS[item?.type] ?? NO_ALLOWED_KEYS)) {
     errors.push("payload contains private fields");
   }
-  if (item?.type === "case") errors.push(...validateCaseDynamics(item?.payload?.dynamics));
+  if (item?.type === "case") errors.push(...validateCaseDynamics(item?.payload?.dynamics), ...validateSeasonStanding(item?.payload?.summary));
   return errors;
 }
 

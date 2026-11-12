@@ -113,3 +113,27 @@ test("(d) a number no row carries reads 「기록 없음」, not zero", () => {
   assert.match(describeGaps(null).join("\n"), /빈칸 행이 없습니다/);
   assert.match(describeJudgment(readJudgment(FIXTURE.seasons, null, "2026-W47"), { week: "2026-W47", board: "all" }, readGaps(GAP_ROWS)), /## \(d\) 결정 T/);
 });
+
+test("(d) T3 held is read off the season row's own standing where it has one, and approximated for older rows", () => {
+  assert.match(gapsQuery("2026-W47", "all"), /f\.summary->>'seasonStanding' as standing/);
+  assert.match(gapsQuery("2026-W47", "all"), /group by s\.run_id, s\.ending, s\.standing/);
+  // No row carries it: the approximation alone, said to be one.
+  const before = readGaps(GAP_ROWS);
+  assert.deepEqual([before.held.held, before.held.heldRecorded, before.held.heldApprox, before.held.recorded], [1, 0, 1, 0]);
+  assert.match(describeGaps(before).join("\n"), /T3 held: standing을 실은 행이 아직 없음 — 위 「붕괴 결말 아님」 근사 1/);
+  // The quiet-cover season ended under the line without collapse, but its row says near: it did not hold.
+  // A field-pact season over 80 that the row calls held counts, as the report printed it.
+  const rows = [
+    { ...GAP_ROWS[0], standing: "held" },
+    { ...GAP_ROWS[1], standing: "near" },
+    { ...GAP_ROWS[2], standing: "over" },
+    { ...GAP_ROWS[1], standing: null },
+  ];
+  const g = readGaps(rows);
+  assert.deepEqual([g.held.held, g.held.heldRecorded, g.held.heldApprox, g.held.recorded, g.held.unrecorded], [2, 1, 1, 3, 1]);
+  assert.deepEqual(g.held.standings, { held: 1, clear: 0, near: 1, over: 1 });
+  const text = describeGaps(g).join("\n");
+  assert.match(text, /T3 held\(돈 잃고 사람 지킴\): 2\/4 \(50\.0%\) = 행 기록 1\/3 \+ 기록 전 행 근사 1\/1; 기록된 standing held 1 · clear 0 · near 1 · over 1/);
+  // Every row recorded: no approximation in the line.
+  assert.doesNotMatch(describeGaps(readGaps(rows.slice(0, 3))).join("\n"), /기록 전 행 근사/);
+});
