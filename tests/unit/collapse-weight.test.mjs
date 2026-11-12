@@ -27,7 +27,7 @@ test("a collapse names the case that closed on the most harm, with that harm", (
   // C4 (2026-11-05 draft): the favours taken back, on the season's own harm --
   // 65 over three closed cases, cut to a tenth -- and no number of people laid
   // off, which the engine does not count.
-  assert.match(toll, /수당과 지원이 그 값 앞에서 가장 먼저 거둬집니다\. 당신이 밀어붙여 쌓인 사람 피해가 모두 65, 사건마다 평균 21\.6입니다\./);
+  assert.match(toll, /휴가비와 학자금이 그 값 앞에서 가장 먼저 거둬집니다\. 당신이 밀어붙여 쌓인 사람 피해가 모두 65, 사건마다 평균 21\.6입니다\./);
   assert.doesNotMatch(toll, /실직|명/);
 });
 
