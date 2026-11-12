@@ -496,7 +496,10 @@ const fileBudgets = {
   // 2509 -> 2512 lines on 2026-10-25, C-1(1) (the 판 읽기 axis), measured: the
   // score breakdown's seventh card leaves the penalty card alone in its row,
   // and one rule gives it the row. The bytes still fit.
-  "result.css": { lines: 2512, bytes: 57089 },
+  // 2512 -> 2523 lines on 2026-11-12, A2-1(1) 언어의 엔트로피: the collapse
+  // ending's headline letters and their one keyframe, measured 2523 / 56485.
+  // The bytes still fit.
+  "result.css": { lines: 2523, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
