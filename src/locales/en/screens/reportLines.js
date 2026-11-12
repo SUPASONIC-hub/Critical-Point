@@ -37,6 +37,21 @@ export default {
     "quiet-cover": "You lost cash, but you did not lose: this season kept human cost below the line and closed quietly.",
     "open-question": "You lost cash, but you did not lose: this season kept human cost below the line and passed the question on.",
   },
+  witnessHeld: "At the end you chose to blow the whistle. Cash fell and the score will not show it, but you brought the hidden record out while keeping human cost below the line. What this season won lies outside the numbers.",
+  nearest: {
+    line: "Closest other ending: {ending}. Short of it: {gaps}",
+    gaps: {
+      trust: "{label} by {value}",
+      legitimacy: "{label} by {value}",
+      capital: "{label} by {value}",
+      trustOver: "{label} {value} too high",
+      clues: "{value} more clue(s)",
+      reframes: "{value} more reframe(s)",
+      coldGap: "{legitimacy} {value} further ahead of {trust}",
+      pactGap: "{trust} {value} further ahead of {legitimacy}",
+    },
+    burn: "You sealed it all at the end, so the endings that need the records (OPEN OVERSIGHT · EVIDENCE REFORM · HUMAN RECORD) were closed this season.",
+  },
   score: {
     points: "{score} pts",
     penalty: "-{score} pts",

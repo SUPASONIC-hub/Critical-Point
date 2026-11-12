@@ -549,6 +549,13 @@ export { VAULT_SLACK_PER_CASE };
 // random hand never passes 8, one that plays for it reaches 40 one season in
 // two).
 export const LOGIC_SLACK_STREAK = 24;
+// The gates above as numbers, read by nearestEnding.js for the finale's 「가장 가까웠던 다른 결말」 line (C2, display only).
+export const ENDING_THRESHOLDS = Object.freeze({
+  clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY,
+  reformLegitimacy: REFORM_LEGITIMACY, recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, recordClueRate: HUMAN_RECORD_CLUE_RATE,
+  silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, pactGap: PACT_GAP,
+  heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK,
+});
 
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
 
@@ -618,7 +625,7 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
 }
 
 /** The finale's own answer, read off its log: "witness", "control", "burn", or null before it. */
-function getFinaleOutcome(log = []) {
+export function getFinaleOutcome(log = []) {
   const entry = [...(log ?? [])].reverse().find((item) => /^f_after_(witness|control|burn)$/.test(item?.choiceId ?? ""));
   return entry ? entry.choiceId.slice("f_after_".length) : null;
 }

@@ -16,7 +16,8 @@ import {
 } from "../runtimeSystems.js";
 import { COLLAPSED_SEASON_MARK, getCollapseToll, getFailureRecovery } from "../featurePack.js";
 import { caseAftermathNodeId, nodes, seasonCasesBase, triggerLabels } from "../gameData.js";
-import { createCaseSummary, getCaseOutcome, getEndingVariant, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
+import { createCaseSummary, getCaseOutcome, getEndingVariant, getFinaleOutcome, getOutcomeCarryover, getOutcomeChoiceId, getSeasonStrain } from "../gameLogic.js";
+import { nearestEnding } from "../nearestEnding.js";
 import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logicReport.js";
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout, describeDecisionPace, getDecisionPace } from "../viewModels/reportViewModels.js";
@@ -151,11 +152,13 @@ export function useResultReport({
   const standing = seasonStrain.seasonResources ?? resources;
   // The same season against the collapse gate, for the line each report prints
   // and the cases a collapse offers to play again (reportViewModels.js). It is
-  // handed the mean closing standing and the ending, for the held line (C3).
-  const seasonStanding = useMemo(
-    () => createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id }),
-    [caseResults, resources, seasonStrain, endingVariant.id],
-  );
+  // handed the mean closing standing and the ending, for the held line (C3),
+  // and on the finale its last answer and the nearest other ending (C3-4, C2-1).
+  const seasonStanding = useMemo(() => {
+    const finale = currentCase === "final" ? getFinaleOutcome(log) : null;
+    const nearest = currentCase === "final" ? nearestEnding({ resources, discoveredClues, log, ...seasonStrain, endingId: endingVariant.id }) : null;
+    return createSeasonStandingReadout({ caseResults, resources, cases: seasonCasesBase, closing: seasonStrain.seasonResources, endingId: endingVariant.id, finale, nearest });
+  }, [caseResults, currentCase, discoveredClues, log, resources, seasonStrain, endingVariant.id]);
   const rankingComparison = useMemo(() => getRankingComparison(result), [result]);
   // The season's logic panel, from the stored summaries: `result` above is made
   // without `replayOf`, so it is not what a replayed case keeps (logicReport.js).
