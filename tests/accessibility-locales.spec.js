@@ -190,6 +190,8 @@ for (const lang of LANGS) {
         const card = page.getByTestId("act-card");
         await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
         await expect(page.locator("html")).toHaveAttribute("lang", lang);
+        // The card fades its button in: axe read .gx-act-go's contrast mid-fade once (#529, ko 1280x720).
+        await waitForEntrance(card);
         await expectNoA11yViolations(page, "the act's title card");
       });
 
