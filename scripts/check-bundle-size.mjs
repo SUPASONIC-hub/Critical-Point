@@ -288,7 +288,8 @@ const budgets = [
   // -> 34,241 / 14,597 on 2026-11-11, bundle 1111 after build:fonts (냄, 짧) and the critical CSS regenerated. Measured 34,237 / 14,593 in the e2e build, the plus 4.
   // 34,241 / 14,597 -> 34,404 / 14,666 on 2026-11-11, C-15 after merging main c61d6618. Measured 34400 / 14662 (over budget only) in the e2e build, the plus 4.
   // 34,241 / 14,597 -> 34,363 / 14,631 on 2026-11-12, e3-status (지금 상황 듣기: tableVoice's status line, a keyed node per line) over main fbf1000c. Measured 34,359 / 14,627 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_363, maxGzip: 14_631 },
+  // 34,363 / 14,631 -> 34,528 / 14,703 bundle 1112c (#520 #521) over main 4f927085. Measured 34524 / 14699 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_528, maxGzip: 14_703 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1110,7 +1111,8 @@ const budgets = [
   // 213,985 / 41,396 -> 213,999 / 41,403 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496 (#504). Measured 213995 / 41399 (over budget only) in the e2e build, the plus 4.
   // 213,999 / 41,403 -> 214,201 / 41,455 on 2026-11-11, C-15 after merging main c61d6618. Measured 214197 / 41451 (over budget only) in the e2e build, the plus 4.
   // 213,999 / 41,403 -> 214,218 / 41,444 on 2026-11-12, e3-status (the heart's .gx-listen button) over main fbf1000c. Measured 214,214 / 41,440 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 214_218, maxGzip: 41_444 },
+  // 214,218 / 41,444 -> 214,420 / 41,493 bundle 1112c (#520 #521) over main 4f927085. Measured 214416 / 41489 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 214_420, maxGzip: 41_493 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1809,7 +1811,8 @@ const budgets = [
   // 188,317 / 62,664 -> 188,472 / 62,723 on 2026-11-11, recheck-in-case over main 52027156. Measured 188468 / 62719 (over budget only) in the e2e build, the plus 4.
   // 188,317 / 62,664 -> 188,441 / 62,704 on 2026-11-12, e3-status (지금 상황 듣기 words) over main fbf1000c. Measured 188,437 / 62,700 in the e2e build, the plus 4.
   // 188,317 / 62,664 -> 189,273 / 62,982 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 189269 / 62978 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 189_273, maxGzip: 62_982 },
+  // 189,273 / 62,982 -> 189,552 / 63,089 bundle 1112c (#520 #521) over main 4f927085. Measured 189548 / 63085 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 189_552, maxGzip: 63_089 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1869,7 +1872,8 @@ const budgets = [
   // 156,978 / 55,879 -> 157,097 / 55,933 on 2026-11-11, recheck-in-case over main 52027156. Measured 157093 / 55929 (over budget only) in the e2e build, the plus 4.
   // 156,978 / 55,879 -> 157,100 / 55,906 on 2026-11-12, e3-status (지금 상황 듣기 words) over main fbf1000c. Measured 157,096 / 55,902 in the e2e build, the plus 4.
   // 156,978 / 55,879 -> 157,794 / 56,201 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 157790 / 56197 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 157_794, maxGzip: 56_201 },
+  // 157,794 / 56,201 -> 158,035 / 56,278 bundle 1112c (#520 #521) over main 4f927085. Measured 158031 / 56274 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 158_035, maxGzip: 56_278 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2258,7 +2262,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,605 / 432,565 / 440,262 bundle 1112a (#514 #322) over main fbf1000c. Measured first paint, the plus 4.
 // -> 373,585 / 432,524 / 440,230 on 2026-11-12, e3-status (지금 상황 듣기) over main fbf1000c, critical CSS regenerated. Measured first paint, the plus 4.
 // -> 373,551 / 432,788 / 440,476 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_551, en: 432_788, ja: 440_476 };
+// -> 373,645 / 432,958 / 440,676 bundle 1112c (#520 #521) over main 4f927085. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_645, en: 432_958, ja: 440_676 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
