@@ -468,7 +468,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // rules, and on the window that closes it the next case's.
       const rules = playedRules(getTableRules(caseId, run, staged));
       const nextCaseRules = playedRules(getTableRules(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1], run, staged));
-      run = openCaseRun(run, { rules, caseId, resources });
+      run = openCaseRun(run, { rules, caseId, resources, route: opening.route });
       // The draft the case before closed on, answered at this case's first
       // table, after it opened -- where the page holds it (GauntletStage).
       if (run.relicOffer.length) run = takeDraft(run, tools);

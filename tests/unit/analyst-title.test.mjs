@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 const { CASE_SEQUENCE } = await import("../../src/gameCases.js");
-const { ANALYST_TITLE_STEPS, getAnalystTitle, readFurthestCase } = await import("../../src/analystTitle.js");
+const { ANALYST_TITLE_STEPS, getAnalystTitle, getAnalystTitleRise, getAnalystTitleStep, readFurthestCase } = await import("../../src/analystTitle.js");
 
 const closedThrough = (caseId) => Object.fromEntries(CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(caseId) + 1).map((id) => [id, {}]));
 
@@ -67,4 +67,46 @@ test("a run that has reached nothing the season knows has no title", () => {
   assert.equal(getAnalystTitle({ currentCase: null, caseResults: null }), "");
   assert.equal(getAnalystTitle({ currentCase: "case99", caseResults: { nope: {} } }), "");
   assert.equal(readFurthestCase(), -1);
+});
+
+/**
+ * C1-1 (2026-11-12): the result of a case that raised the record title says so
+ * in one line. useResultReport holds the step as it stood while the case was
+ * played and compares it with the step once the case has closed; these are the
+ * two reads it makes, for every case of a season played in order and for the
+ * runs that must announce nothing.
+ */
+const closeCase = (caseId, { before = {}, finishedBefore = false, finishedAfter = finishedBefore } = {}) => {
+  const played = getAnalystTitleStep({ currentCase: caseId, caseResults: before, finishedSeason: finishedBefore });
+  const closed = getAnalystTitleStep({ currentCase: caseId, caseResults: { ...before, [caseId]: {} }, finishedSeason: finishedAfter });
+  return getAnalystTitleRise(played, closed);
+};
+const closedBefore = (caseId) => Object.fromEntries(CASE_SEQUENCE.slice(0, CASE_SEQUENCE.indexOf(caseId)).map((id) => [id, {}]));
+
+test("a season played in order announces each of the four rises once, at the case that reaches it", () => {
+  const rises = CASE_SEQUENCE.map((caseId) => [caseId, closeCase(caseId, { before: closedBefore(caseId) })]).filter(([, title]) => title);
+  assert.deepEqual(rises, [
+    ["prologue01", "분석관"],
+    ["prologue05", "선임 분석관"],
+    ["case24", "책임 분석관"],
+    ["final", "수석 분석관"],
+  ]);
+  // The first finale also opens NEW GAME+, which the result may read already.
+  assert.equal(closeCase("final", { before: closedBefore("final"), finishedAfter: true }), "수석 분석관");
+});
+
+test("a case played again, a finished season and a record with no step announce nothing", () => {
+  // 사건 24 played again from the roadmap: it was closed, so the step it reached is already held.
+  assert.equal(closeCase("case24", { before: closedThrough("case24") }), "");
+  assert.equal(closeCase("prologue01", { before: closedThrough("case03") }), "");
+  // A device that finished a season holds 수석 from the first page of the next.
+  assert.equal(closeCase("prologue01", { finishedBefore: true }), "");
+  assert.equal(closeCase("final", { before: closedBefore("final"), finishedBefore: true }), "");
+  assert.equal(getAnalystTitleRise(-1, 0), "");
+  assert.equal(getAnalystTitleRise(undefined, 2), "");
+  assert.equal(getAnalystTitleRise(2, 2), "");
+  assert.equal(getAnalystTitleRise(3, 2), "");
+  assert.equal(getAnalystTitleRise(1, 9), "");
+  assert.equal(getAnalystTitleStep(), -1);
+  assert.equal(getAnalystTitleStep({ finishedSeason: true }), ANALYST_TITLE_STEPS.length - 1);
 });
