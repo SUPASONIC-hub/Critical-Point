@@ -141,13 +141,19 @@ export function drawResultCard(ctx, model, theme) {
     y += 50;
     write(model.endingLabel, LEFT, y, { weight: HEAVY, size: 28, color: accent });
   }
+  // A held season (C3-3) gives the title two lines and the third to its line,
+  // so the longest ending still stops at 902, short of the 논리 유지력 line.
   if (model.endingTitle) {
-    const line = fitLines(ctx, theme, model.endingTitle, { weight: REGULAR, size: 40, minSize: 28, maxWidth: CONTENT_WIDTH, maxLines: 3 });
+    const line = fitLines(ctx, theme, model.endingTitle, { weight: REGULAR, size: 40, minSize: 28, maxWidth: CONTENT_WIDTH, maxLines: model.heldLine ? 2 : 3 });
     y += 16;
     for (const text of line.lines) {
       y += 56;
       write(text, LEFT, y, { size: line.size });
     }
+  }
+  if (model.heldLine) {
+    y += 46;
+    write(model.heldLine, LEFT, y, { weight: HEAVY, size: 26, color: accent });
   }
 
   // 4. 논리 유지력, on one line over the cells, for a season that has one.

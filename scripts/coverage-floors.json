@@ -64,6 +64,7 @@
     "src/locales/overlay.js": 89,
     "src/logicReport.js": 100,
     "src/mood.js": 100,
+    "src/nearestEnding.js": 100,
     "src/personalBests.js": 97,
     "src/plateStory.js": 100,
     "src/playerLanguage.js": 100,
