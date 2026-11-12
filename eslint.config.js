@@ -57,6 +57,7 @@ export default [
       "scripts/build-art-variants.mjs",
       "scripts/build-portrait.mjs",
       "scripts/build-critical-css.mjs",
+      "scripts/capture-readme-shots.mjs",
       "tests/**/*.{js,mjs}",
     ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
