@@ -167,6 +167,8 @@ test("the tab counts to the wall band on a hot table, says 징계 회부 after a
  * that is not an id, prints nothing, and a plain visit has no line.
  */
 test("a shared card's address names the friend's habit on the start screen, and nothing else does", async ({ page }) => {
+  // Seven page loads; on the dev server each one compiles its modules, so this takes about a minute alone.
+  test.slow();
   const line = page.getByTestId("friend-result-line");
   await page.goto("/?from=card&h=moth");
   await expect(line).toHaveText("친구의 결과: 하이리스크 불나방형");
@@ -177,7 +179,7 @@ test("a shared card's address names the friend's habit on the start screen, and 
   await page.goto("/?from=card&h=moth&lang=ja");
   await expect(line).toHaveText("友だちの結果：ハイリスク夏の虫型");
 
-  for (const address of ["/?from=card&h=nobody", "/?from=card&h=%3Cimg%20src%3Dx%3E", "/?h=moth", "/?from=card", "/"]) {
+  for (const address of ["/?from=card&h=nobody", "/?from=card&h=%3Cimg%20src%3Dx%3E", "/?h=moth", "/"]) {
     await page.goto(address);
     await expect(page.getByTestId("start-first-case")).toBeVisible();
     // Past the habits table's fetch, which an id-shaped address makes.

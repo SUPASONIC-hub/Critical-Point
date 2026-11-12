@@ -375,8 +375,7 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
-    // N2: the season's first table, counted once per page (gameEvents.js).
-    noteTableOpened(scene.node.caseId);
+    noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });
