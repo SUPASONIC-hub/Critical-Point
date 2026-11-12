@@ -17,6 +17,9 @@
  *   node scripts/report-judgment.mjs --from <file.json>    the report; the file is
  *        { "seasons": [rows of --sql], "funnel": [rows of --sql-funnel] } or the seasons rows alone
  *   node scripts/report-judgment.mjs --from <seasons.json> --funnel <funnel.json>
+ *   node scripts/report-judgment.mjs --sql-gaps            the decision-T SELECT (d): one row per season
+ *        with its case rows' mean closing cash/harm, looks (B1) and draft spend (C9); the file's `gaps`
+ *        or --gaps <file.json>
  *
  * --week <YYYY-Www> (or TEST_WEEK, default 2026-W47) and --board <rule|all>
  * (or TEST_WEEK_RULE, default audit-cascade: the seasons that took the week's
@@ -27,7 +30,9 @@ import { pathToFileURL } from "node:url";
 
 import { COLD_OPENING_ENABLED } from "../src/coldOpeningSwitch.js";
 import { getWeekRule } from "../src/gauntlet/weeklyRules.js";
+import { initialResources } from "../src/gameConstants.js";
 import { scoreMarks } from "../src/seasonScore.js";
+import { HELD_LINE_CAPITAL_SHARE } from "../src/viewModels/reportViewModels.js";
 import { funnelQuery, quantile, readFunnel, readRun, STOPS } from "./report-funnel.mjs";
 import { SIMULATION_LINES } from "./report-test-week.mjs";
 
@@ -79,6 +84,98 @@ export function judgmentQuery(week, board) {
    and not exists (select 1 from public.playtest_sessions st where st.run_id = f.run_id and st.decision_log @> '[{"assistStory": true}]'::jsonb)${rule}`;
 }
 
+/**
+ * (d) The three 11-23 numbers decision T's draft (2026-11-12) found no report
+ * for, from what the case rows already carry: T3 the season's mean closing
+ * cash and harm (`resources.capital` / `resources.humanCost` of its case rows,
+ * the held line's own reading, HELD_LINE_CAPITAL_SHARE), T6 the looks spent
+ * (`decision_log[].threshold.scouted`, B1) per window, T11 the KD account money
+ * paid at drafts (`decision_log[].relicDraft.cost`, as chainRecheck.js's
+ * draftSpend sums it, with its reroll / extra). One row per season of
+ * judgmentQuery, no run id. `*_recorded` counts entries that carry the key, so
+ * older rows without it read 「기록 없음」, not zero.
+ */
+export function gapsQuery(week, board) {
+  const seasons = judgmentQuery(week, board).replace(/^select [\s\S]*?\n {2}from public\.playtest_sessions f/, "select f.run_id, coalesce(f.summary->'endingVariant'->>'id', f.summary->>'endingVariant') as ending\n  from public.playtest_sessions f");
+  return `with seasons as (
+${seasons}
+)
+select s.ending,
+       count(c.*) as cases,
+       avg((c.resources->>'capital')::numeric) as mean_capital,
+       avg((c.resources->>'humanCost')::numeric) as mean_human_cost,
+       coalesce(sum(x.windows), 0) as windows,
+       coalesce(sum(x.scout_recorded), 0) as scout_recorded,
+       coalesce(sum(x.scouts), 0) as scouts,
+       coalesce(sum(x.drafts), 0) as drafts,
+       coalesce(sum(x.spent), 0) as spent,
+       coalesce(sum(x.rerolls), 0) as rerolls,
+       coalesce(sum(x.extras), 0) as extras
+  from seasons s
+  join public.playtest_sessions c on c.run_id = s.run_id and c.case_id <> 'season-final'
+  cross join lateral (
+    select count(*) filter (where e ? 'threshold') as windows,
+           count(*) filter (where e->'threshold' ? 'scouted') as scout_recorded,
+           count(*) filter (where e->'threshold'->>'scouted' = 'true') as scouts,
+           count(*) filter (where jsonb_typeof(e->'relicDraft') = 'object') as drafts,
+           coalesce(sum(greatest(0, coalesce((e->'relicDraft'->>'cost')::numeric, 0))), 0) as spent,
+           count(*) filter (where jsonb_typeof(e->'relicDraft'->'reroll') = 'object') as rerolls,
+           count(*) filter (where e->'relicDraft'->>'extra' = 'true') as extras
+      from jsonb_array_elements(case when jsonb_typeof(c.decision_log) = 'array' then c.decision_log else '[]'::jsonb end) e
+  ) x
+ group by s.run_id, s.ending`;
+}
+
+const num = (value) => (value === null || value === undefined || value === "" ? NaN : Number(value));
+
+/** (d)'s numbers from gapsQuery's rows. A count is null (「기록 없음」) when no row carried its key. */
+export function readGaps(rows) {
+  const line = initialResources.capital * HELD_LINE_CAPITAL_SHARE;
+  const withCash = rows.filter((row) => Number.isFinite(num(row.mean_capital)));
+  const capitals = withCash.map((row) => num(row.mean_capital));
+  const harms = rows.map((row) => num(row.mean_human_cost)).filter(Number.isFinite);
+  const under = withCash.filter((row) => num(row.mean_capital) < line);
+  const sum = (key) => rows.reduce((total, row) => total + (num(row[key]) || 0), 0);
+  const scoutRecorded = sum("scout_recorded") > 0;
+  const draftRecorded = sum("drafts") > 0;
+  const quartiles = (values) => (values.length ? { p10: quantile(values, 0.1), p50: quantile(values, 0.5), p90: quantile(values, 0.9) } : null);
+  return {
+    seasons: rows.length,
+    line,
+    cash: withCash.length ? { n: withCash.length, ...quartiles(capitals), under: under.length, underNotCollapse: under.filter((row) => row.ending !== "collapse").length } : null,
+    harm: harms.length ? { n: harms.length, ...quartiles(harms) } : null,
+    scout: scoutRecorded
+      ? { windows: sum("windows"), scouts: sum("scouts"), seasonsUsing: rows.filter((row) => num(row.scouts) > 0).length, perSeason: quartiles(rows.map((row) => num(row.scouts) || 0)) }
+      : null,
+    spend: draftRecorded
+      ? { drafts: sum("drafts"), spent: sum("spent"), rerolls: sum("rerolls"), extras: sum("extras"), seasonsSpending: rows.filter((row) => num(row.spent) > 0).length }
+      : null,
+  };
+}
+
+const NONE = "기록 없음";
+
+export function describeGaps(g) {
+  if (!g) return ["## (d) 결정 T 보고서 빈칸 (T3 · T6 · T11)", "", "빈칸 행이 없습니다(--gaps 또는 파일의 `gaps`, `--sql-gaps`)."];
+  const fmt = (q) => [q.p10, q.p50, q.p90].map((v) => (v === null ? "—" : Number(v).toFixed(1))).join(" / ");
+  return [
+    "## (d) 결정 T 보고서 빈칸 (T3 · T6 · T11)",
+    "",
+    `시즌 ${g.seasons}개. 사건 행의 마감 자원과 decision_log에서 셉니다.`,
+    "",
+    g.cash
+      ? `- T3 「돈을 잃음」 선 ${g.line}: 시즌 평균 마감 돈 p10 / p50 / p90 = ${fmt(g.cash)}; ${g.line} 밑 ${g.cash.under}/${g.cash.n} (${pct(g.cash.under, g.cash.n)}), 그중 붕괴 결말 아님 ${g.cash.underNotCollapse}`
+      : `- T3 「돈을 잃음」 선 ${g.line}: ${NONE}`,
+    g.harm ? `- T3 사람 피해(humanCost) 시즌 평균 p10 / p50 / p90 = ${fmt(g.harm)}` : `- T3 사람 피해: ${NONE}`,
+    g.scout
+      ? `- T6 조회(믿음) 사용: 판 ${g.scout.windows}개 중 ${g.scout.scouts} (${pct(g.scout.scouts, g.scout.windows)}); 한 번이라도 쓴 시즌 ${g.scout.seasonsUsing}/${g.seasons} (${pct(g.scout.seasonsUsing, g.seasons)}); 시즌당 p10 / p50 / p90 = ${fmt(g.scout.perSeason)}`
+      : `- T6 조회(믿음) 사용: ${NONE}`,
+    g.spend
+      ? `- T11 KD 계좌 돈 쓰기: 쓴 시즌 ${g.spend.seasonsSpending}/${g.seasons} (${pct(g.spend.seasonsSpending, g.seasons)}); 합계 ${g.spend.spent}; 드래프트 ${g.spend.drafts}개 중 다시 뽑기 ${g.spend.rerolls} · 하나 더 ${g.spend.extras}`
+      : `- T11 KD 계좌 돈 쓰기: ${NONE}`,
+  ];
+}
+
 const pct = (part, whole) => (whole > 0 ? `${((part / whole) * 100).toFixed(1)}%` : "—");
 const yes = (value) => value === true || value === "true" || value === "t";
 const proposedRank = (s) => (s >= PROPOSED_BANDS.S ? "S" : s >= PROPOSED_BANDS.A ? "A" : s >= PROPOSED_BANDS.B ? "B" : "C");
@@ -120,7 +217,7 @@ export function readJudgment(seasons, funnelRows, week) {
   };
 }
 
-export function describeJudgment(j, { week, board }) {
+export function describeJudgment(j, { week, board }, gaps) {
   const ids = [...new Set([...Object.keys(BOT_ENDINGS), ...Object.keys(j.endings)])];
   const lines = [
     `# ${week} 판정 보고 (보드: ${board})`,
@@ -167,6 +264,7 @@ export function describeJudgment(j, { week, board }) {
       ...STOPS.slice(0, 6).map(([name], index) => `| ${name} | ${f.stops[index].all} | ${pct(f.stops[index].all, f.runs)} |`),
     );
   }
+  if (gaps !== undefined) lines.push("", ...describeGaps(gaps));
   return lines.join("\n");
 }
 
@@ -179,9 +277,11 @@ function main(argv) {
   const board = opt("--board") || process.env.TEST_WEEK_RULE || "audit-cascade";
   checkArgs(week, board);
   if (argv.includes("--sql")) return void process.stdout.write(`${judgmentQuery(week, board)}\n`);
+  if (argv.includes("--sql-gaps")) return void process.stdout.write(`${gapsQuery(week, board)}
+`);
   if (argv.includes("--sql-funnel")) return void process.stdout.write(`${funnelQuery(weekMonday(week))}\n`);
   const file = opt("--from");
-  if (!file) throw new Error("usage: report-judgment.mjs --sql | --sql-funnel | --from <file.json> [--funnel <file.json>] [--week W] [--board B]");
+  if (!file) throw new Error("usage: report-judgment.mjs --sql | --sql-funnel | --sql-gaps | --from <file.json> [--funnel <file.json>] [--gaps <file.json>] [--week W] [--board B]");
   const rowsOf = (value) => (Array.isArray(value) ? value : Array.isArray(value?.rows) ? value.rows : null);
   const parsed = JSON.parse(readFileSync(file, "utf8"));
   const seasons = rowsOf(parsed) ?? rowsOf(parsed?.seasons);

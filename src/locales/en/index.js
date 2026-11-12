@@ -292,7 +292,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Leaving on Day One",
           "title": "The River from the 4th-Floor Window",
-          "text": "Everyone calls it the basement, but the room has a window, and through it you can see the river. Byun Yujin says in passing, 'Everyone calls it the basement, but this is actually the 4th floor. New people always check that first.' You stand at the window for a long time, then turn off the light. For 3 years after that, you stand there almost every day."
+          "text": "Everyone calls it the basement, but the room has a window, and through it you can see the river. Byun Yujin says in passing, 'Everyone calls it the basement, but this is actually the 4th floor. New people always check that first.' The first line of the welfare notice on your desk reads 'Tuition support for staff children, paid in full.' You stand at the window for a long time, then turn off the light. For 3 years after that, you stand there almost every day."
         }
       },
       "case01": {
@@ -440,7 +440,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Rota, Week 3",
           "title": "Na Junhyuk Sends Squid Sundae",
-          "text": "3 weeks after the rota starts going around, an ice box arrives at the office. The sender is Na Junhyuk, and inside are six servings of squid sundae and a handwritten note. 'Six slots, so six servings. I put in double for Kang Taemin. The night shift needs to eat a lot.' That day Lee Minseo leaves on time for the first time, and Oh Jinwoo puts his share in the fridge and eats it two days later."
+          "text": "3 weeks after the rota starts going around, an ice box arrives at the office. The sender is Na Junhyuk, and inside are six servings of squid sundae and a handwritten note. 'Six slots, so six servings. I put in double for Kang Taemin. The night shift needs to eat a lot.' That day Lee Minseo leaves on time for the first time, and Oh Jinwoo puts his share in the fridge and eats it two days later. That same week, a notice goes up on the company board: 'This year’s vacation allowance will be paid in full, not a won cut.'"
         }
       }
     },
