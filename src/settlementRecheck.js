@@ -30,6 +30,13 @@
  * break of the chain (`chain-off-log`), a mark someone reads, never a refusal
  * (decision 2 (1)).
  *
+ * Between cases, `recheckOpeningRoute` (F1 step 2) plays the opening again:
+ * the route a case opened on (`dynamics.open.openingRoute`) is the one
+ * describeCaseOpening picks from the case before's outcome and rank -- its
+ * scene, the first decision's scene -- and the hand it opened with
+ * (`dynamics.open.resources`) is the one that result deals. The checker hands
+ * it to recheckChain as `opening`.
+ *
  * Kept out of chainRecheck.js on purpose: that file is read by the hall of
  * fame's badges on the page, and this one imports the scenes (gameData.js).
  * The checker (scripts/verify-ranking-rows.mjs) hands it to recheckChain.
@@ -38,6 +45,7 @@ import { CASE_SEQUENCE } from "./gameCases.js";
 import { nodes } from "./gameData.js";
 import { applyEffect, REFRAME_EFFECT } from "./gameLogic.js";
 import { applyGauntletEffect, BUST_EFFECT, normalizeSchema } from "./gauntlet/gauntletEngine.js";
+import { describeCaseOpening } from "./state/caseRoutes.js";
 import { routeChoice } from "./state/settleChoice.js";
 import { WINDOW_RECORD_KEY } from "./rankingRecheck.js";
 
@@ -155,4 +163,52 @@ export function recheckCaseSettlement(row, before = null) {
     if (entry.reframeOpenedRoute === true) reframeCount += 1;
   });
   return { breaks, unchecked: [...unchecked] };
+}
+
+/**
+ * F1 step 2: the route a case opened on, played again from the case before.
+ * `row` is the case's row, `before` the row of the case before it in the
+ * season when it is the row before here (recheckChain hands it so). The
+ * snapshot's `openingRoute` must name the case before's outcome and rank, and
+ * the scene describeCaseOpening opens on for them; that scene is where the
+ * first decision was made, and the snapshot's hand (`resources`) is the hand
+ * that result deals. The season's first case has no case before: its route
+ * names none, and its scene is the first decision's (the hand there is the
+ * analyst's origin, which the row does not say).
+ *
+ * Not checked, and counted as `openingRoute`: a route that is null (a build
+ * before it), a replay's opening, a case whose case before is not the row
+ * before here or names no outcome (a gap, a row past retention), a case
+ * before sent from a replay (its result may be the replay's, after this case
+ * opened), and a route that names no case before on a case that has one (a
+ * table stamped from a save without one, runState's `seasonRoute`).
+ */
+export function recheckOpeningRoute(row, before = null) {
+  const open = row?.dynamics?.open;
+  const route = open?.openingRoute;
+  if (!isObject(open) || !isObject(route) || typeof route.nodeId !== "string" || open.practice === true) return { breaks: [], unchecked: ["openingRoute"] };
+  const caseId = row.case_id;
+  const breaks = [];
+  const log = Array.isArray(row.decision_log) ? row.decision_log : [];
+  const firstScene = typeof log[0]?.nodeId === "string" ? log[0].nodeId : null;
+  const found = { after: route.after ?? null, rank: route.rank ?? null, nodeId: route.nodeId };
+  if (firstScene && firstScene !== route.nodeId) breaks.push({ field: "open.openingRoute", expected: { nodeId: firstScene }, found });
+  const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
+  if (!previousCaseId) {
+    if (found.after !== null || found.rank !== null) breaks.push({ field: "open.openingRoute", expected: { after: null, rank: null }, found });
+    return { breaks, unchecked: [] };
+  }
+  const result = before?.summary;
+  const readable = before?.case_id === previousCaseId && typeof result?.outcomeChoiceId === "string" && before?.dynamics?.open?.practice !== true;
+  if (!readable || found.after === null) return { breaks, unchecked: ["openingRoute"] };
+  const rank = typeof result.rank === "string" ? result.rank : null;
+  const expected = describeCaseOpening(caseId, { caseResults: { [previousCaseId]: { outcomeChoiceId: result.outcomeChoiceId, rank } }, operatorOrigin: null });
+  if (found.after !== expected.route.after || found.rank !== expected.route.rank || found.nodeId !== expected.route.nodeId) {
+    breaks.push({ field: "open.openingRoute", expected: expected.route, found });
+  }
+  const hand = open.resources;
+  if (isObject(hand) && !RESOURCE_KEYS.every((key) => hand[key] === expected.resources[key])) {
+    breaks.push({ field: "open.resources", expected: Object.fromEntries(RESOURCE_KEYS.map((key) => [key, expected.resources[key]])), found: hand });
+  }
+  return { breaks, unchecked: [] };
 }

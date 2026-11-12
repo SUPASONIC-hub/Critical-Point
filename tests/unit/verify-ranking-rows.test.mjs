@@ -398,7 +398,7 @@ test("the report says where the chain broke and what it did not check", () => {
   // Not replayed: the scores' line shows the scores' marks, the chain's line the chain's.
   assert.match(report, /\n {2}scores: {2}no marks\n/);
   assert.match(report, new RegExp(`chain break: ${rows[19].case_id} -> ${rows[20].case_id} vault \\(expected "\\+0 or more", found -1\\)`));
-  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the board, audit and link of 54 cases; entries not read again \(cases\): scene \d+; the opening state of 53 cases \(no opening snapshot\); the board and route 53 cases opened on$/m);
+  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the board, audit and link of 54 cases; entries not read again \(cases\): scene \d+; the opening state of 53 cases \(no opening snapshot\); LOCK's carry 53 cases opened on; the route 53 cases opened on$/m);
   assert.deepEqual(formatChain({ status: "unchecked", marks: [], breaks: [], cases: [], unchecked: { cases: 0, links: 0, fields: {} } }), ["  chain: not checked (no case row to chain)"]);
   const many = formatChain({ status: "broken", marks: [CHAIN_MARK], breaks: Array.from({ length: 12 }, () => ({ case: "case01", field: "case", found: "twice" })), cases: [], unchecked: { cases: 1, links: 0, fields: {} } });
   assert.equal(many[1], '  chain break: case01 case ("twice")');
