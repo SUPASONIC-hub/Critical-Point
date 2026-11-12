@@ -225,7 +225,8 @@ const budgets = [
   // 37,703 / 14,682 -> 37,703 / 14,690 on 2026-11-10, memory-line-i18n (draft) over main cb8346da: only the chunk names it imports. Measured 37,699 / 14,686 in the e2e build, the gzip plus 4.
   // 37,703 / 14,690 -> 38,027 / 14,776 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 38023 / 14772 (over budget only) in the e2e build, the plus 4.
   // 38,027 / 14,776 -> 38,027 / 14,783 c4c5-copy over main 7ec2304e. Measured - / 14779 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_027, maxGzip: 14_783 },
+  // 38,027 / 14,776 -> 38,372 / 14,883 held-standing over f1-evening. Measured 38368 / 14879 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_372, maxGzip: 14_883 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -641,7 +642,8 @@ const budgets = [
   // 200,735 / 72,784 -> 200,908 / 72,845 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 200904 / 72841 (over budget only) in the e2e build, the plus 4.
   // 200,908 / 72,845 -> 201,362 / 72,997 f1-stage2 over f8dd481d. Measured 201358 / 72993 (over budget only) in the e2e build, the plus 4.
   // 200,908 / 72,845 -> 201,033 / 72,895 c4c5-copy over main 7ec2304e. Measured 201029 / 72891 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 201_033, maxGzip: 72_895 },
+  // 201,362 / 72,997 -> 201,544 / 73,049 held-standing over f1-evening. Measured 201540 / 73045 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 201_544, maxGzip: 73_049 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2297,7 +2299,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,687 / 433,129 / 440,892 c4c5-copy over main 7ec2304e. Measured first paint, the plus 4.
 // -> 373,683 / 432,970 / 440,695 a2a3-ending over main 7ec2304e. Measured first paint, the plus 4.
 // -> 373,726 / 433,153 / 440,911 bundle 1112f (#530 #531) over main fbc8adc6. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_726, en: 433_153, ja: 440_911 };
+// -> 373,837 / 433,139 / 440,868 held-standing over f1-evening. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 373_837, en: 433_139, ja: 440_868 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
