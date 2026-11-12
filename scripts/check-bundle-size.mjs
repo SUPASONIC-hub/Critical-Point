@@ -1239,7 +1239,8 @@ const budgets = [
   // 11,785 / 4,779 -> 12,368 / 4,988 on 2026-11-03, E-11 번외 사건 온라인 저장 (draft) over e11-side01 dca98f20 (main 425eb4da). Measured 12,364 / 4,984 in the e2e build, the plus 4.
   // 11,785 / 4,773 -> 11,901 / 4,809 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 11897 / 4805 (over budget only) in the e2e build, the plus 4.
   // 11,901 / 4,809 -> 11,901 / 4,816 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured - / 4812 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_816 },
+  // 11,901 / 4,816 -> 11,901 / 4,821 bundle 1112d (#523) over main 68c7071e. Measured - / 4817 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_821 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.

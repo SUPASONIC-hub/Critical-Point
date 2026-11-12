@@ -48,13 +48,13 @@ const reportLinesCopy = {
   // printed only on that same season (`endingHeld`). SYSTEM COLLAPSE is over
   // the line and PROFITABLE SILENCE kept its cash, so neither has one.
   heldEndings: {
-    "open-oversight": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 기준을 남긴 시즌입니다.",
-    "evidence-reform": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 공개와 보호의 규칙을 남긴 시즌입니다.",
-    "human-record": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 이름들을 남긴 시즌입니다.",
-    "cold-justice": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 절차를 지킨 시즌입니다.",
-    "field-pact": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 사람들의 약속을 남긴 시즌입니다.",
-    "quiet-cover": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.",
-    "open-question": "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 질문을 넘긴 시즌입니다.",
+    "open-oversight": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 기준을 남긴 시즌입니다.",
+    "evidence-reform": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 공개와 보호의 규칙을 남긴 시즌입니다.",
+    "human-record": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 이름들을 남긴 시즌입니다.",
+    "cold-justice": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 절차를 지킨 시즌입니다.",
+    "field-pact": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 사람들의 약속을 남긴 시즌입니다.",
+    "quiet-cover": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.",
+    "open-question": "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 질문을 넘긴 시즌입니다.",
   },
   // C3-4 (1), 2026-11-11: the paragraph after the ending's own on the finale
   // when its last answer was 폭로 (f_after_witness) on a held season
