@@ -15,8 +15,10 @@
  *
  *   inside a case   each entry's `caseId` is its row's case, and its
  *                   `resourcesBefore` is the entry before's `resourcesAfter`.
- *                   The board, the next scene, `resourcesAfter` itself, the
- *                   audit and the CASCADE need the settlement run again (S2).
+ *                   The next scene and `resourcesAfter` itself are played
+ *                   again by settlementRecheck.js when the checker hands it
+ *                   in (`settle`, F1 step 1); the board, the audit and the
+ *                   CASCADE need run state the snapshot does not carry yet.
  *   between cases   the run counters in `dynamics` (createRunSummary) only
  *                   move forward and by no more than the windows between:
  *                   `windowIndex` by at least the next case's decisions (more
@@ -84,19 +86,23 @@ const COUNTERS = ["windowIndex", "busts", "cashes", "vault", "handVault"];
  * per case (inside) or per link (between) in `unchecked`.
  */
 export const UNCHECKED = Object.freeze({
-  // TODO(S2): with settleChoice(state, input) out of useChoiceCommit, play the
-  // settlement entry by entry and compare: the board each window was dealt
-  // (buildNextSchema, with isLinkDue/carryLinksOut for CASCADE), the next
-  // scene (card `next`, reframeTarget, the detour, BLACKOUT's skip),
-  // `resourcesAfter` (card effect + applyGauntletEffect), and the audit
-  // (countAudit/settleAudit) on the vault. Import the engine's functions, never
-  // copies, so the 11-02 verdict's rules follow (question 6 (1)).
+  // The settlement inside a case. With a `settle` checker handed to
+  // recheckChain (settlementRecheck.js, F1 step 1: the checker passes it),
+  // the next scene and `resourcesAfter` are played again and only what it
+  // could not read is counted; the board each window was dealt
+  // (buildNextSchema, with LOCK's carry), the audit on the vault and the
+  // CASCADE link need run state the opening snapshot does not carry (F1
+  // step 2) and are counted on every case. `board` stays first: the report
+  // counts the cases by it.
   inside: Object.freeze(["board", "scene", "resourcesAfter", "audit", "cascade"]),
   // What the opening snapshot (S3) still cannot answer, on every link.
   between: Object.freeze(["focusCarry", "openingRoute"]),
   // What a row without the snapshot (a build before S3) leaves unchecked.
   open: Object.freeze(["open", "relics", "stanceMastery", "links", "logic", "openingResources", "newGamePlusStart"]),
 });
+
+/** What a `settle` checker (settlementRecheck.js) answers of UNCHECKED.inside: counted only where it could not read. */
+export const SETTLED_INSIDE = Object.freeze(["scene", "resourcesAfter"]);
 
 const isObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 const numberOf = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
@@ -110,11 +116,11 @@ function sameResources(left, right) {
  * One case's decisions, chained. A row with no readable log is not checked;
  * a log entry without both resource sets leaves its link not checked.
  */
-export function recheckCaseLinks(row) {
+export function recheckCaseLinks(row, { settled = false } = {}) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : null;
   if (!log) return { status: "unchecked", breaks: [], unchecked: ["log"] };
   const breaks = [];
-  const unchecked = [...UNCHECKED.inside];
+  const unchecked = settled ? UNCHECKED.inside.filter((field) => !SETTLED_INSIDE.includes(field)) : [...UNCHECKED.inside];
   // The case opened on the hand its first decision started from (S3).
   const opening = row?.dynamics?.open?.resources;
   if (isObject(opening) && isObject(log[0]?.resourcesBefore) && !sameResources(opening, log[0].resourcesBefore)) {
@@ -261,8 +267,13 @@ export function recheckCaseGap(before, after) {
  * are left out. A case delivered twice is a break (the server keeps one row per
  * close). Returns the mark, the breaks with where they are, and how many
  * links and fields were not checked.
+ *
+ * `settle` (F1 step 1) is the settlement checker, settlementRecheck.js's
+ * `recheckCaseSettlement(row, before)`, handed in by the checker so this file
+ * stays light for the page: its breaks are the chain's ("inside"), and of
+ * UNCHECKED.inside only what it did not answer is counted.
  */
-export function recheckChain(rows = []) {
+export function recheckChain(rows = [], { settle = null } = {}) {
   const byCase = new Map();
   const breaks = [];
   for (const row of Array.isArray(rows) ? rows : []) {
@@ -284,7 +295,14 @@ export function recheckChain(rows = []) {
       if (before || cases.length) gap = true;
       continue;
     }
-    const inside = recheckCaseLinks(row);
+    const inside = recheckCaseLinks(row, { settled: Boolean(settle) });
+    if (settle && inside.status !== "unchecked") {
+      // The case before in the season, only when it is the row before here.
+      const settlement = settle(row, before && !gap ? before : null);
+      inside.breaks.push(...settlement.breaks);
+      inside.unchecked.push(...settlement.unchecked);
+      if (settlement.breaks.length) inside.status = "broken";
+    }
     // The run's start is read only when prologue01 is the first row; after a
     // gap the link is not checked.
     const link = gap || (!before && caseId !== CASE_SEQUENCE[0]) ? { status: "unchecked", breaks: [], unchecked: ["gap"] } : recheckCaseGap(before, row);
@@ -298,8 +316,5 @@ export function recheckChain(rows = []) {
     before = row;
     gap = false;
   }
-  // TODO(S2): once settleChoice is out, the inside check plays each case again
-  // here (with the rules getRowRules reads off the row, as rankingRecheck.js
-  // does) and adds its breaks; until then UNCHECKED.inside is counted.
   return { status: cases.length ? (breaks.length ? "broken" : "linked") : "unchecked", marks: breaks.length ? [CHAIN_MARK] : [], breaks, cases, unchecked };
 }
