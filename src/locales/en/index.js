@@ -110,6 +110,8 @@ export const speakers = {
   "연시우": "Yeon Siwoo",
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
+  "그레이스 웡": "Grace Wong",
+  "모지현": "Mo Jihyun",
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -140,7 +142,9 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
+  "홍콩 수취 은행 송금 조사 담당 · 29세": "Payments investigator at the receiving bank in Hong Kong · age 29",
+  "전 KD캐피탈 자금부 해외 송금 담당 · 9년 · 37세": "Former overseas-payments officer, KD Capital Treasury · 9 years · age 37"
 };
 
 
@@ -742,6 +746,10 @@ export const copy = {
       "side03": {
         "label": "Side case 3",
         "title": "An Ordinary Night"
+      },
+      "side07": {
+        "label": "Side case 7",
+        "title": "Friday, 17:58"
       }
     }
   }

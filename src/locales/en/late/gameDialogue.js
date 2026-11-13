@@ -672,6 +672,20 @@ export default {
       "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
+    },
+    "그레이스 웡": {
+      "appearance": "Thin gold-rimmed glasses, a striped vest over a white shirt, two desk clocks set to closing times.",
+      "thought": "A payment with nobody to make the confirmation call to is a payment nobody was ever responsible for.",
+      "gesture": "Before she says something that matters, Grace Wong takes her hands off the keyboard.",
+      "voice": "She states the rules word by word, then asks the person just one sentence at the end.",
+      "line": "Analyst, who am I supposed to call?"
+    },
+    "모지현": {
+      "appearance": "A shopping bag hung on the stroller handle, hair falling past her shoulders, a phone showing the email from her last day.",
+      "thought": "For 9 years my name meant approval. Now it means suspicion.",
+      "gesture": "When she says a number, Mo Jihyun grips the stroller handle tight.",
+      "voice": "She starts calmly, and her sentences grow short whenever her own name comes up.",
+      "line": "I asked you to delete it."
     }
   },
 };

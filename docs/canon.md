@@ -417,7 +417,7 @@ open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토) and
-11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
+11월 8일 (토) fit 2025, 1월 9일 (금) and 6월 12일 (금) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -461,6 +461,20 @@ season case has to keep. What each one states for the first time is below.
 | The sheet | goes to head office by itself at 06:00. Each stopped minute takes an idle reason from four: 휴식, 교육, 설비 대기, 기타. The night manager: "비고는 어차피 아무도 안 읽어요" |
 | 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
 | The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
+
+### 번외 7, 금요일 17시 58분 (side07)
+
+| Fact | Value |
+|---|---|
+| When | 2026-06-12 (금) 17:58 to 06-15 (월) 09:00: the last day of 사건 31's five-day inspection (6월 8일 opening) to the morning before 사건 32's search (6월 16일) |
+| Where | KD캐피탈 자금부; a café in 상암동 on the Saturday; the corridor outside the 대표이사실 on the Sunday |
+| The payments | four overseas transfers approved at 17:58: 홍콩 ① 31억, 홍콩 ② 9억 (another bank), 런던 18억, 뉴욕 26억 -- 84억 원. Supplier names as usual, receiving accounts new. Closing times in Seoul time: 홍콩 19:00, 런던 01:00, 뉴욕 토 06:00 |
+| The approvers | 모지현 (해외 송금 승인 9년, 퇴사 3월 31일; her last-day mail asking to delete her rights was answered 「확인했습니다」 and nothing was done; the HR list and the payment-permission list do not know each other) and 「자금-공용02」, shared by six. How anyone got in is never said |
+| 그레이스 웡 (29) | payments investigator at the receiving bank in Hong Kong, on the phone in English; her bank froze 홍콩 ①'s receiving account with about 11억 left |
+| 한지우 | on the inspection's last day: 「금융사고는 알게 된 즉시 보고가 원칙」; she takes Monday's report |
+| 석재우 | Sunday's draft statement: 「외부 세력의 정교한 공격 ... 고객 피해는 없습니다」 |
+| The ransom | Monday 08:40, a notice on every 자금부 screen; the first folder locked is 「해외송금_2026_06」. 이민서's Friday-night copy on the KD데이터랩 side is untouched |
+| The endings | the first line of the 09:00 report (the money chased: 11억 2천만 back three weeks later, 72억 8천만 never answered / the cause: no money back, eleven leavers' permissions struck, the shared account left as it is -- as 사건 44 still finds it / the statement's line copied, 사건 37's echo). None names the trial, the raid or 윤상혁 |
 
 ## Known and left alone
 

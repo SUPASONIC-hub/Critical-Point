@@ -1,13 +1,13 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 13일에 번외 7을 위해 더한 두 장(그레이스 웡, 모지현)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
 2026년 10월 22일, 한 사건에만 나오는 인물 여덟의 이름을 핵심 인물과 닮지 않게 바꾸면서(B-8) 그 초상 파일 이름도 새 이름으로 바꿨습니다. 사진과 출처는 그대로입니다:
 서하윤 → 황혜원, 마서윤 → 홍예담, 민도현 → 안기범, 연태준 → 공병만, 주하온 → 엄동균, 신이안 → 봉영훈, 이서준 → 이찬빈, 염태호 → 편종구.
 
-## 사진에서 만든 예순여덟 장
+## 사진에서 만든 일흔 장
 
 사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
@@ -91,6 +91,8 @@
 | 은재하 | `portrait-eun-jaeha.webp` | https://www.pexels.com/photo/professional-chef-posing-in-restaurant-interior-39576883/ | Grecia Carbajal (https://www.pexels.com/@grecia-carbajal-2155465721/) | [Pexels License](https://www.pexels.com/license/) |
 | 이하경 | `portrait-lee-hagyeong.webp` | https://www.pexels.com/photo/confident-senior-woman-smiling-in-studio-portrait-30603537/ | Stephanie Gray (https://www.pexels.com/@bestinshowmedia/) | [Pexels License](https://www.pexels.com/license/) |
 | 권태호 | `portrait-kwon-taeho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-man-in-casual-attire-outdoors-36976717/ | Jayford Batobato (https://www.pexels.com/@jayford-batobato-309499020/) | [Pexels License](https://www.pexels.com/license/) |
+| 그레이스 웡 | `portrait-grace-wong.webp` | https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-wearing-eyeglasses-sitting-on-gray-chair-8278977/ | ANTONI SHKRABA production (https://www.pexels.com/@anthonyshkraba-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 모지현 | `portrait-mo-jihyun.webp` | https://www.pexels.com/photo/young-brunette-portrait-14255519/ | Oktavianus Mulyadi (https://www.pexels.com/@zacks1981/) | [Pexels License](https://www.pexels.com/license/) |
 
 같은 사진가의 사진이 여러 장 있지만(Vitaly Gariev, Mikhail Nilov, cottonbro studio 세 장씩) 모델은 서로 다른 사람입니다.
 10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
@@ -115,6 +117,11 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 하은경과 은시온, 은재하는 처음 고른 사진에서 손이 얼굴에 닿거나, 같은 사진가의 다른 모델과 얼굴이 닮거나, 나이가 맞지 않아 다른 사진으로 바꿨습니다.
 송하율은 턱에 댄 손끝이 아래 가장자리에 조금 남고, 이하경은 턱을 괸 손이 아래에 남습니다(본문의 은테 안경은 없음).
 Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 장째이고, 모델은 모두 다른 사람입니다.
+
+그레이스 웡과 모지현은 2026년 11월 13일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 둘 다 번외 7(src/nodes/side07.js)의
+악역이 아닌 사람(홍콩 수취 은행의 송금 조사 담당 29세, 이름이 도용된 퇴사자 37세)이라 실제 사람의 사진을 썼고, 설정 나이에 맞는 얼굴로 골랐습니다.
+ANTONI SHKRABA production은 최서진(Antoni Shkraba)과 같은 작업실이지만 모델이 다릅니다. 먼저 본 cottonbro studio의 사진은 사진가 한 사람에
+세 장까지라는 기준에 걸리고, Ramon Karolan의 사진은 이미 주은채에 써서 쓰지 않았습니다.
 
 ## 실존하지 않는 사람의 생성 사진 열네 장
 
@@ -156,5 +163,5 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 여든아홉 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 70 + 생성 14 + 그린 1; 번외 7의 두 명은 11월 13일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).
