@@ -208,11 +208,15 @@
 .gx-fx-edge {
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 0 3px var(--c-amber), inset 0 0 12px var(--c-amber);
+  box-shadow:
+    inset 0 0 0 3px var(--c-amber),
+    inset 0 0 12px var(--c-amber);
   opacity: 0.8;
 }
 .gx-fx-edge[data-level="inBand"] {
-  box-shadow: inset 0 0 0 4px var(--c-gx-heat), inset 0 0 14px var(--c-gx-heat-a55);
+  box-shadow:
+    inset 0 0 0 4px var(--c-gx-heat),
+    inset 0 0 14px var(--c-gx-heat-a55);
 }
 .gx-fx-edge.is-pulsing {
   animation: gx-edge-breathe 1.6s ease-in-out infinite;
