@@ -44,10 +44,11 @@ export const WEEK_RULE_ID_MAX = 32;
  * (B3 decision 8, widened by B2 decision 11) until RULES_MARK 3 made them
  * rules of the table (tableUnlocks.js); the list was kept, empty, for the next
  * device a week tries out first (the rule switch's question 2, user
- * 2026-10-20). B4's idle money is that device (`erosion`, IDLE MONEY below).
+ * 2026-10-20). B4's idle money (`erosion`, IDLE MONEY below) and the
+ * market shock (`shock`, MARKET SHOCK below) are those devices.
  * A device a rule names outside it is not on.
  */
-export const WEEK_RULE_DEVICES = Object.freeze(["erosion"]);
+export const WEEK_RULE_DEVICES = Object.freeze(["erosion", "shock"]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
@@ -87,6 +88,22 @@ export const CRISIS_CHIPS = 1.2;
 export const IDLE_EROSION_PERCENT = 2;
 
 /**
+ * MARKET SHOCK (금융 소재 기획 2026-11-13 (c) c2, 「충격 카드」): once a case, in
+ * the middle of it, the market moves. The window that settles the case's
+ * `MARKET_SHOCK_BOARD - 1`th board (0 = the board a case opens on) deals the
+ * next one SHOCK: its wall band `MARKET_SHOCK_WALL` closer, told before it
+ * opens like every next-board rule, and the pot the case has stacked so far
+ * moves by up to `MARKET_SHOCK_WOBBLE` hundredths, up or down, drawn from the
+ * window's seed (gauntletEngine.js `drawShockSwing`). A device (`shock`), not
+ * a number of every board. In the catalogue only, booked in no week; draft
+ * numbers until the user picks one of the measured candidates (check:pressure
+ * and check:endings with WEEK_RULE=market-shock).
+ */
+export const MARKET_SHOCK_BOARD = 3;
+export const MARKET_SHOCK_WALL = 4;
+export const MARKET_SHOCK_WOBBLE = 20;
+
+/**
  * The audit's numbers 2026-W47's line was written with (B3's set B, 40 / 4 /
  * one in four). The table's own are auditRisk.js's since RULES_MARK 3; these
  * stay the ones that week showed, so the week's line does not move with a
@@ -104,7 +121,7 @@ function ruleWords(id) {
   const { auditLine, cascadeLine, rules } = weekRulesCopy;
   const { title, text, world } = rules[id];
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, audit, cascade: cascadeLine };
+  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine };
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -150,6 +167,13 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "IDLE MONEY",
     ...ruleWords("idle-erosion"),
     rules: Object.freeze(["erosion"]),
+  }),
+  // c2: the market shock, once a case. In the catalogue before any week names
+  // it, so it has no migration yet (booking it adds one, as crisis-week's did).
+  "market-shock": Object.freeze({
+    label: "MARKET SHOCK",
+    ...ruleWords("market-shock"),
+    rules: Object.freeze(["shock"]),
   }),
   // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
   // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules

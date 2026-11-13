@@ -28,6 +28,11 @@ export default {
       text: "This week, each time a case closes, {erosion}% of what sat in the Vault through it is gone. Money spent at the tool draft doesn’t shrink.",
       world: "This week prices rose, and money left sitting is worth less.",
     },
+    "market-shock": {
+      title: "Market shock",
+      text: "This week, once in every case, the market shakes on hand {shockBoard}. That hand’s Wall band stands {shockWall} Heat earlier, and the stake stacked so far moves up or down by as much as {shockSwing}%.",
+      world: "This week the market lurched, and the numbers in the books shook with it.",
+    },
     "audit-cascade": {
       title: "Audit and Cascade",
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",

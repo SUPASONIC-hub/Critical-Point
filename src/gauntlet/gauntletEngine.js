@@ -42,7 +42,7 @@ import {
   WINDOW_SECONDS,
 } from "./tableRules.js";
 import { decisionWindowSeconds } from "./stakeClock.js";
-import { IDLE_EROSION_PERCENT, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
+import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
@@ -1115,6 +1115,9 @@ export const MUTATIONS = Object.freeze({
   // B2, on a table that counts links only (cascadeRisk.js).
   cascade: CASCADE_MUTATION,
   exposeMastery: mutation("exposeMastery", { label: "EXPOSE MASTERY" }),
+  // MARKET SHOCK, a week's device (weeklyRules.js): once a case, mid-case. Not a
+  // penalty: no decision of the player's broke this board, the week did.
+  shock: mutation("shock", { label: "MARKET SHOCK" }, { wall: MARKET_SHOCK_WALL, swing: MARKET_SHOCK_WOBBLE }),
 });
 
 /**
@@ -1395,6 +1398,36 @@ export function getIdleErosion(weekRule, vault) {
   return Math.floor((Math.max(0, Math.round(Number(vault) || 0)) * IDLE_EROSION_PERCENT) / 100);
 }
 
+/**
+ * MARKET SHOCK (금융 소재 기획 c2, a week's device, weeklyRules.js): whether
+ * the window settling now deals the case's shock board, board
+ * `MARKET_SHOCK_BOARD` (0 = the board a case opens on). `settled` is how many
+ * windows the case settled before this one: what its decision log holds
+ * (`countCaseBoards`), as CASCADE reads the log (cascadeRisk.js, decision 9);
+ * no run state of its own. Once a case, never on the board a
+ * case's close deals, never in story mode or a replay. The caller passes the
+ * answer to `resolveWindow` as `shock`.
+ */
+export function isShockDue(run, settled, caseClosed = false) {
+  return !caseClosed && Boolean(run) && run.story !== true && !run.practice && weekRuleHasDevice(run.weekRule, "shock") && Number(settled) + 1 === MARKET_SHOCK_BOARD;
+}
+
+/** The windows a case's decision log has settled: each entry with a window is one board. */
+export function countCaseBoards(log = []) {
+  return (Array.isArray(log) ? log : []).filter((entry) => entry?.threshold).length;
+}
+
+/**
+ * How far the shock moves the pot: a whole share of it from -MARKET_SHOCK_WOBBLE
+ * to +MARKET_SHOCK_WOBBLE hundredths, drawn from the window's seed alone (the
+ * wall and the steps are drawn from it under other names), so a window played
+ * again moves it the same. Signed, in pot units.
+ */
+export function drawShockSwing(seed, pot) {
+  const share = Math.round((seededUnit(`shock:${seed}`) * 2 - 1) * MARKET_SHOCK_WOBBLE);
+  return Math.round((Math.max(0, Number(pot) || 0) * share) / 100) || 0;
+}
+
 /** The run with `cost` paid out of the vault: the bank rail's 방금 and the season's spent column say so. */
 function payFromVault(run, cost, draft) {
   const vault = run.vault - cost;
@@ -1631,7 +1664,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false }) {
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false }) {
   if (caseClosed) return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics), rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -1675,6 +1708,13 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.wallMin -= LINK_WALL;
     schema.wallMax -= LINK_WALL;
     schema.mutations.push("cascade");
+  }
+  // MARKET SHOCK (a week's device): the market moves this board's wall, on
+  // top of whatever else moved it. Once a case; the caller decides which.
+  if (shock) {
+    schema.wallMin -= MARKET_SHOCK_WALL;
+    schema.wallMax -= MARKET_SHOCK_WALL;
+    schema.mutations.push("shock");
   }
   if (burnAxis && rules.has("fracture")) {
     schema.fracturedAxis = burnAxis;
@@ -1735,8 +1775,12 @@ function readWindowUnder(window, rules) {
  * `cascade` says a link is due on the board this window deals (cascadeRisk.js,
  * `isLinkDue` over the case's log, false on a table without links). It is
  * dealt unless the case closes here or the board is a BLACKOUT one.
+ *
+ * `shock` says the board this window deals is the case's MARKET SHOCK board
+ * (`isShockDue` over the case's log, false under any week without it): the
+ * pot stacked so far swings, and the board's wall comes closer.
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false, shock = false }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1804,7 +1848,12 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // slack reads the vault without it, and neither is reading the table.
   const runHandAfter = outcome === "cash" ? current.runHand + logicPot + focusPot : keptShare ? Math.floor(current.runHand / keptShare) : 0;
   const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= HOT_CASH_MULTIPLIER ? current.streak + 1 : 0;
-  const runPotAfter = outcome === "cash" ? current.runPot + pot : insuredPot;
+  const stackedPot = outcome === "cash" ? current.runPot + pot : insuredPot;
+  // MARKET SHOCK: on the window that deals the case's shock board, the pot
+  // stacked so far moves (up or down) before anything else reads it.
+  const shocked = shock === true && !caseClosed && current.story !== true && !current.practice;
+  const shockSwing = shocked ? drawShockSwing(window?.seed ?? current.windowIndex, stackedPot) : 0;
+  const runPotAfter = stackedPot + shockSwing;
   // A practice run closes a case the table has already been paid for: nothing
   // moves to the vault, and the next case is dealt what the season held before.
   const practice = caseClosed ? current.practice : null;
@@ -1821,8 +1870,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // The hand's money for the bank rail: the cash's pot less what a closing
   // audit took, or what the wall and the audit took. A replay's hand is still
   // shown; the season's totals are the real cases'.
-  const won = outcome === "cash" ? pot : 0;
-  const taken = lostPot + (audited?.lost ?? 0) + eroded;
+  const won = (outcome === "cash" ? pot : 0) + Math.max(0, shockSwing);
+  const taken = lostPot + (audited?.lost ?? 0) + eroded + Math.max(0, -shockSwing);
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
   const nextSchema = buildNextSchema({
@@ -1841,6 +1890,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     windowIndex: getEscalationWindow(current) + (current.practice ? 0 : 1),
     rules: caseClosed ? nextRules : rules,
     cascade,
+    shock: shocked,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -1877,6 +1927,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     secured,
     // B4, under the week that has it: what the close took from the vault held through the case.
     ...(eroded ? { eroded } : {}),
+    // MARKET SHOCK, on the window that dealt it: the wall it moved and what it did to the pot.
+    ...(shocked ? { shock: { wall: MARKET_SHOCK_WALL, pot: shockSwing } } : {}),
     // Only on a table that counts it: the audit after this window, and on the
     // close whether it took its part and how much (`secured` is after it).
     ...(audited ? { audit: { count: audited.count, caught: audited.caught, lost: audited.lost } } : {}),

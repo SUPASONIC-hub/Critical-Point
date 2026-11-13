@@ -47,6 +47,7 @@ import {
   buyExtraRelic,
   createCaseClose,
   createRunSummary,
+  countCaseBoards,
   createWindow,
   equipRelic,
   FOCUS_MAX,
@@ -57,6 +58,7 @@ import {
   getTableSchema,
   getWindowBand,
   HAND_CAP,
+  isShockDue,
   openCaseRun,
   reduceWindow,
   rerollRelicOffer,
@@ -562,7 +564,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         if (skip) skipped += 1;
         const nextNode = skip?.nodeId ?? plannedNode;
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules) });
+        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, countCaseBoards(log), caseClosed) });
         audit = verdict.audit?.count ?? 0;
         eroded += verdict.eroded ?? 0;
         if (verdict.audit?.caught) {
@@ -863,7 +865,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (lock?.cashAs && win.status === "live") win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
       if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules) });
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, played - 1, caseClosed) });
       audit = verdict.audit?.count ?? 0;
       see(seen, verdict);
       if (run.schema.mutations.includes("cascade")) {
