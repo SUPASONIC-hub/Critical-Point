@@ -12,4 +12,5 @@ export default {
   lightning: { title: "速戦即決型", line: "読んだらすぐ選び、選んだらすぐ押します。" },
   steady: { title: "無難なバランス型", line: "目立たず、それでも最後まで勝負を閉じました。" },
   cardLine: "あなたの審査タイプは、{habit}です。",
+  friendLine: "友だちの結果：{habit}",
 };

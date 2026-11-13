@@ -1,0 +1,32 @@
+/** src/copy/actTally.js in Japanese: the mid-season tally on the act card. */
+export default {
+  heading: "中間決算 · {end}",
+  ends: {
+    case01: "プロローグの終わり",
+    case19: "第3幕の終わり · 事件18",
+    case37: "第6幕の終わり · 事件36",
+  },
+  habit: "ここまでの判断タイプ",
+  habitPending: "まだ名前のない判断",
+  stake: "いちばん大きな賭け金",
+  stakeKept: "{pot} · {where}で金庫へ",
+  stakeLost: "{pot} · {where}で壁に失った",
+  stakeNone: "まだ金庫に入れた賭け金はありません",
+  stakeShort: "最大の賭け金 {pot}",
+  caseNo: "事件{code}",
+  prologueNo: "プロローグ{n}",
+  ending: "近い結末",
+  nearLine: "一歩となり：{ending}まで{gaps}",
+  note: "幕が変わるところで、私たちがここまでを一枚にまとめました。スコアと結末はまだ決まっていません。",
+  shareLine: "トリガーラボのシーズンを{end}まで進めました。判断タイプは'{habit}'、近い結末は'{ending}'。",
+  buttons: {
+    shareLabel: "中間決算カードを共有",
+    saveLabel: "中間決算カードを保存",
+    making: "カードを作っています。",
+    saved: "中間決算カードを保存し、紹介文をコピーしました。",
+    savedUncopied: "中間決算カードを保存しました。紹介文はコピーできませんでした。",
+    shared: "中間決算カードを共有しました。",
+    failed: "カードを作れませんでした。もう一度押してください。",
+    note: "カードに名前は入りません。",
+  },
+};

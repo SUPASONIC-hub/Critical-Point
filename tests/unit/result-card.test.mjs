@@ -296,7 +296,7 @@ test("the copied line has one shape for every ending and every 판단 DNA", () =
       const text = buildShareText(model, ORIGIN);
       assert.equal(
         text,
-        `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '${ending.name}'. 최고 버스트 87점, A 랭크. ${ORIGIN}/`,
+        `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '${ending.name}'. 최고 버스트 87점, A 랭크. ${ORIGIN}/?from=card`,
       );
       assert.doesNotMatch(text, /undefined|NaN|null/);
       count += 1;
@@ -304,7 +304,7 @@ test("the copied line has one shape for every ending and every 판단 DNA", () =
   }
   assert.equal(count, 33);
   // An address that already ends in a slash is not given two.
-  assert.ok(buildShareText(modelOf(), `${ORIGIN}/`).endsWith(` ${ORIGIN}/`));
+  assert.ok(buildShareText(modelOf(), `${ORIGIN}/`).endsWith(` ${ORIGIN}/?from=card`));
   // Without an address the line ends at the rank.
   assert.ok(buildShareText(modelOf()).endsWith("B 랭크."));
 });

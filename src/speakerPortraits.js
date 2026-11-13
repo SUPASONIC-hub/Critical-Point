@@ -111,6 +111,24 @@ const SPEAKER_PORTRAITS = {
   "뤼카 베르나르": "/portrait-lucas-bernard.webp",
   "이하경": "/portrait-lee-hagyeong.webp",
   "권태호": "/portrait-kwon-taeho.webp",
+  // 번외 4 (2026-11-12): the side case's three new speakers. 한기호 is the
+  // 「예외 없음」 side, so his is a generated face of someone who does not
+  // exist, and an ordinary one.
+  "오민정": "/portrait-oh-minjeong.webp",
+  "한기호": "/portrait-han-giho.webp",
+  "문정택": "/portrait-moon-jeongtaek.webp",
+  // 번외 7 (2026-11-13): the side case's two new speakers, neither on its
+  // wrong side, so both are photographs of real models (docs/portrait-credits.md).
+  "그레이스 웡": "/portrait-grace-wong.webp",
+  "모지현": "/portrait-mo-jihyun.webp",
+  // 번외 6 (2026-11-13): the side case's one new speaker, a generated face
+  // of someone who does not exist.
+  "쩐 티 란": "/portrait-tran-thi-lan.webp",
+  // 번외 5 (2026-11-13): the side case's three new speakers, each a generated
+  // face of someone who does not exist, and an ordinary one.
+  "육성빈": "/portrait-yuk-seongbin.webp",
+  "추영복": "/portrait-chu-yeongbok.webp",
+  "마리사 탄": "/portrait-marisa-tan.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */

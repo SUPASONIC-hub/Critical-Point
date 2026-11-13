@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
-import { ACT_CARD_MS, ACT_CARDS, casesLeft } from "./actCardCopy.js";
+import { useEffect, useRef, useState } from "react";
+import { ACT_CARD_MS, ACT_CARDS, ACT_TALLY_CASES, casesLeft } from "./actCardCopy.js";
+import { quietImport } from "../state/chunkReload.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import actCardCopy from "../copy/actCard.js";
 import { fill } from "../locale.js";
@@ -13,9 +14,14 @@ export function ActCard({ caseId, onDone }) {
   const dialogRef = useRef(null);
   const goRef = useRef(null);
   const trapTab = useDialogFocus(dialogRef, goRef);
+  // N1: the three cards after 프롤로그, 사건 18 and 사건 36 carry the 중간 결산,
+  // a chunk of its own. A chunk that does not come leaves the plain card.
+  const tallied = Boolean(card) && ACT_TALLY_CASES.includes(caseId);
+  const [Tally, setTally] = useState(null);
   useEffect(() => {
-    // A case with no card goes straight on.
-    const timer = globalThis.setTimeout(onDone, card ? ACT_CARD_MS : 0);
+    if (tallied) quietImport(() => import("./ActTally.jsx")).then((module) => setTally(() => module.default), () => {});
+    // A case with no card goes straight on; a tallied one waits for 계속.
+    const timer = tallied ? null : globalThis.setTimeout(onDone, card ? ACT_CARD_MS : 0);
     return () => globalThis.clearTimeout(timer);
     // One card, one clock: the card is mounted once per act.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -29,7 +35,7 @@ export function ActCard({ caseId, onDone }) {
     onDone();
   };
   return (
-    <div className="gx-act" data-testid="act-card" data-case={caseId} onClick={onDone}>
+    <div className={tallied ? "gx-act gx-act-tallied" : "gx-act"} data-testid="act-card" data-case={caseId} onClick={onDone}>
       <div
         ref={dialogRef}
         className="gx-act-page"
@@ -50,7 +56,8 @@ export function ActCard({ caseId, onDone }) {
           {card.line}
           <span className="gx-act-left">{fill(actCardCopy.left, { count: casesLeft(caseId) })}</span>
         </p>
-        <button ref={goRef} type="button" className="gx-act-go" data-testid="act-card-continue" style={{ "--act-wait": `${ACT_CARD_MS}ms` }}>
+        {Tally && <Tally caseId={caseId} />}
+        <button ref={goRef} type="button" className="gx-act-go" data-testid="act-card-continue" style={tallied ? undefined : { "--act-wait": `${ACT_CARD_MS}ms` }}>
           {actCardCopy.go}
         </button>
       </div>

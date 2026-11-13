@@ -1,6 +1,6 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호), 11월 13일에 번외 5를 위해 더한 세 장(육성빈, 추영복, 마리사 탄), 11월 13일에 번외 6을 위해 더한 한 장(쩐 티 란), 11월 13일에 번외 7을 위해 더한 두 장(그레이스 웡, 모지현)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
@@ -18,7 +18,7 @@
 은재하 → 뤼카 베르나르(리옹 출신 셰프)는 Kampus Production의 사진으로, 이 사진가는 연하진과 두 장째이고 모델은 다른 사람입니다.
 배수경은 이름은 그대로 두고 베트남 출신 결혼이민자(귀화 16년)라는 배경을 더하면서, 40대 여성의 사진(yun zhu)으로 초상만 바꿨습니다. 옛 사진(Esma Yıkılmaz İpek)은 더 쓰지 않습니다.
 
-## 사진에서 만든 예순여덟 장
+## 사진에서 만든 일흔두 장
 
 사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
@@ -102,6 +102,10 @@
 | 뤼카 베르나르 | `portrait-lucas-bernard.webp` | https://www.pexels.com/photo/a-man-wearing-a-black-and-white-striped-apron-and-a-black-hat-6605421/ | Kampus Production (https://www.pexels.com/@kampus/) | [Pexels License](https://www.pexels.com/license/) |
 | 이하경 | `portrait-lee-hagyeong.webp` | https://www.pexels.com/photo/confident-senior-woman-smiling-in-studio-portrait-30603537/ | Stephanie Gray (https://www.pexels.com/@bestinshowmedia/) | [Pexels License](https://www.pexels.com/license/) |
 | 권태호 | `portrait-kwon-taeho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-man-in-casual-attire-outdoors-36976717/ | Jayford Batobato (https://www.pexels.com/@jayford-batobato-309499020/) | [Pexels License](https://www.pexels.com/license/) |
+| 오민정 | `portrait-oh-minjeong.webp` | https://www.pexels.com/photo/a-close-up-shot-of-a-woman-wearing-a-headset-7709199/ | MART PRODUCTION (https://www.pexels.com/@mart-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 문정택 | `portrait-moon-jeongtaek.webp` | https://unsplash.com/photos/man-sitting-on-chair-d77tidmCJqI | Raychan (https://unsplash.com/@wx1993) | [Unsplash License](https://unsplash.com/license) |
+| 그레이스 웡 | `portrait-grace-wong.webp` | https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-wearing-eyeglasses-sitting-on-gray-chair-8278977/ | ANTONI SHKRABA production (https://www.pexels.com/@anthonyshkraba-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 모지현 | `portrait-mo-jihyun.webp` | https://www.pexels.com/photo/young-brunette-portrait-14255519/ | Oktavianus Mulyadi (https://www.pexels.com/@zacks1981/) | [Pexels License](https://www.pexels.com/license/) |
 
 같은 사진가의 사진이 여러 장 있지만(cottonbro studio 세 장, Vitaly Gariev·Mikhail Nilov·Kindel Media 두 장씩, 11-13 기준) 모델은 서로 다른 사람입니다.
 10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
@@ -127,7 +131,19 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 송하율은 턱에 댄 손끝이 아래 가장자리에 조금 남고, 이하경은 턱을 괸 손이 아래에 남습니다(본문의 은테 안경은 없음).
 Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 장째이고, 모델은 모두 다른 사람입니다.
 
-## 실존하지 않는 사람의 생성 사진 열네 장
+오민정과 문정택은 2026년 11월 12일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 둘 다 번외 4(src/nodes/side04.js)의
+악역이 아닌 사람(고객센터 야간 상담원, 거절 통보를 받은 분식집 사장)이라 실제 사람의 사진을 썼습니다. MART PRODUCTION은 오민정으로
+세 장째(차지원, 배성준과 다른 모델)입니다. 문정택은 옆을 보는 사진이라 얼굴을 가운데 두고 잘랐습니다. 먼저 본 Vitaly Gariev의 체크 셔츠
+사진은 나준혁과, Ketut Subiyanto의 사진은 지강현과, Wasin Pirom의 사진은 채이안과 같은 모델이라 쓰지 않았습니다.
+
+그레이스 웡과 모지현은 2026년 11월 13일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 둘 다 번외 7(src/nodes/side07.js)의
+악역이 아닌 사람(홍콩 수취 은행의 송금 조사 담당 29세, 이름이 도용된 퇴사자 37세)이라 실제 사람의 사진을 썼고, 설정 나이에 맞는 얼굴로 골랐습니다.
+ANTONI SHKRABA production은 최서진(Antoni Shkraba)과 같은 작업실이지만 모델이 다릅니다. 먼저 본 cottonbro studio의 사진은 사진가 한 사람에
+세 장까지라는 기준에 걸리고, Ramon Karolan의 사진은 이미 주은채에 써서 쓰지 않았습니다.
+
+
+
+## 실존하지 않는 사람의 생성 사진 열아홉 장
 
 백아린과 윤상혁은 비리·악역을 맡고, 문하준은 미성년입니다. 실제 사람의 얼굴을 이런 역에 빌려 오지 않으려고,
 이 세 장은 AI가 만든 실존하지 않는 사람의 사진을 썼습니다(2026년 10월 20일 내려받음). 보정은 위 사진들과 같습니다.
@@ -158,6 +174,16 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 | 진세라 | `portrait-jin-sera.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8054606/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 규정 뒤에 숨어 책임을 피하는 부행장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 편종구 | `portrait-pyeon-jonggu.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 대니얼 강 | `portrait-daniel-kang.webp` | https://pixabay.com/illustrations/handsome-happy-smile-white-shirt-8988318/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 기록을 지워 주는 값으로 증언을 가져가는 위기대응 TF 팀장이라 실제 사람의 얼굴을 쓰지 않음 |
+| 한기호 | `portrait-han-giho.webp` | https://pixabay.com/illustrations/asian-business-businessman-chinese-8434765/ (AMRULQAYS, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 4에서 위에서 받은 「예외 없음」을 아래로 전하는 야간조 팀장(우리 계획의 악역 쪽)이라 실제 사람의 얼굴을 쓰지 않음. 10월 21일 목록에서 조현석 몫의 후보였다가 쓰지 않은 사진이고, 2026년 11월 12일에 내려받음. 처음 고른 KeilaMariaDesigns 8560815는 어두운 조명에 옆에서 빛이 비쳐 험악해 보일 수 있어 밝은 사무실의 평범한 표정으로 바꿈(우리, 11월 12일). 설정(40~50대)보다 젊어 보이는 얼굴임 |
+| 쩐 티 란 | `portrait-tran-thi-lan.webp` | https://pixabay.com/illustrations/ai-generated-woman-portrait-9220639/ (ArtfulColorWorks, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 6의 세입자(베트남 출신, 서울 9년째 공대 연구원)라 악역은 아니지만, 다국적 인물의 얼굴을 실제 사람에게서 빌려 와 국적을 붙이지 않으려고 생성 사진을 씀(번외 6 지시, 우리). 2026년 11월 13일에 내려받음. 아래에서 올려다본 구도라 얼굴을 가운데 두고 정사각형으로 잘랐고, 고층 빌딩 배경은 보정으로 회청색에 묻힘. ArtfulColorWorks는 은시온에 이어 두 장째(모델은 다른 사람). 처음 본 geralt 8714004는 이미 백아린이라 쓰지 않음 |
+| 육성빈 | `portrait-yuk-seongbin.webp` | https://pixabay.com/illustrations/japanese-asian-traditional-costume-8743623/ (Arl_Dlt, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5에서 제휴 수수료를 지키려 배너 확인 칸에 이름을 넣은 제휴팀 과장(우리 계획의 악역 쪽)이라 실제 사람의 얼굴을 쓰지 않음. 정장과 넥타이 차림의 평범한 정면 얼굴. 설정(30대 후반)보다 젊어 보임 |
+| 추영복 | `portrait-chu-yeongbok.webp` | https://pixabay.com/illustrations/chinese-asian-traditional-costume-8743313/ (jsha_art, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5에서 은행 이름을 믿고 돈을 넣은 사람. 피해자 쪽이지만 금융 사기 이야기에 실제 사람의 얼굴을 빌려 오지 않으려고 생성 사진을 씀. 전통 의상의 깃은 보정과 자르기로 거의 보이지 않음 |
+| 마리사 탄 | `portrait-marisa-tan.webp` | https://pixabay.com/illustrations/ai-generated-beautiful-woman-8737181/ (popmelon, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5의 싱가포르 컴플라이언스 책임자. 가상 거래소 이야기에 실제 사람의 얼굴을 빌려 오지 않으려고 생성 사진을 씀. 웃는 얼굴의 평범한 정면 사진 |
+
+육성빈, 추영복, 마리사 탄은 2026년 11월 13일에 Pixabay에서 내려받아 같은 보정을 했습니다. 셋 다 페이지에 "AI generated" 표시가 있습니다.
+번외 5(src/nodes/side05.js)는 가상자산 거래소와 예치 상품을 다루는 이야기라, 악역 쪽이 아닌 사람도 실제 사람의 얼굴을 쓰지 않았습니다.
+40~60대 동아시아 사람의 사무실 생성 사진은 드물어, 육성빈은 설정보다 젊어 보이고 추영복은 전통 의상 사진에서 얼굴만 잘랐습니다.
+후보와 보정 전 원본은 cp-archive/메모-20261113/side05-portraits/에 있습니다.
 
 ## 직접 그린 한 장
 
@@ -167,5 +193,6 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 아흔여섯 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 72 + 생성 19 + 그린 1; 번외 4의 세 명은 11월 12일, 번외 5의 세 명·번외 6의 한 명·번외 7의 두 명은 11월 13일).
+번외 6의 관리 대리인 기성철은 장면의 화자가 아니라 서술 속에서만 말하므로 초상이 없습니다. 평범한 얼굴의 동아시아 남성 생성 사진을 업로더 상한(한 사람에 세 장) 안에서 찾지 못해(kalsstockmedia 8644546은 연서준과 같은 모델로 보이고, Joshgmit의 태권도복 시리즈는 표정이 험악함) 화자로 두지 않았습니다(우리, 11월 13일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).

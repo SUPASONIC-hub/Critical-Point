@@ -38,7 +38,7 @@ export default {
     },
     "c27_queue": {
       "title": "Stamped Number Tickets",
-      "text": "The moment the doors open at 9 a.m., the number-ticket machine jams at No. 187. Executive Director Namgoong Sol calls the people in line by name. 'Auntie Hyesook, how are your knees? Uncle Jungho, your boat didn’t go out today, I see.' Na Junhyuk stamps three seals on the backs of deposit slips and hands them out as tickets. Cash on hand is 1.4 billion won, and the line has passed 300.",
+      "text": "The moment the doors open at 9 a.m., the number-ticket machine jams at No. 187. Executive Director Namgoong Sol calls the people in line by name. 'Auntie Hyesook, how are your knees? Uncle Jungho, your boat didn’t go out today, I see.' An old man at the end of the line says he stood in a line like this in 1998 too. Na Junhyuk stamps three seals on the backs of deposit slips and hands them out as tickets. Cash on hand is 1.4 billion won, and the line has passed 300.",
       "memo": [
         "Number-ticket machine jammed at No. 187 -- handwritten tickets after that",
         "312 waiting by morning, average withdrawal request 19 million won",

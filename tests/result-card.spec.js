@@ -212,7 +212,7 @@ async function expectedShareLine(page) {
   const modeTitle = habit ? "[^']+" : await page.locator(".result-why-grid article").nth(1).locator("strong").innerText();
   const tail = habit ? ` ${habitCardLine(habit).replace(/[.「」]/g, "\\$&")}` : "";
   const origin = new URL(page.url()).origin;
-  const pattern = new RegExp(`^트리거랩에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/$`);
+  const pattern = new RegExp(`^트리거랩에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/\\?from=card${habit ? `&h=${habit.id}` : ""}$`);
   return { pattern, bestBurst, bestRank, logicHold };
 }
 

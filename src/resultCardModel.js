@@ -1,6 +1,7 @@
 import { buildLeaderboard } from "./ranking.js";
 import drawCopy from "./copy/resultCardDraw.js";
 import { fill } from "./locale.js";
+import { shareAddress } from "./shareLink.js";
 
 /**
  * The result card as data: every string and number the season's card shows,
@@ -64,7 +65,7 @@ function readSeasonLeague(finalSummary) {
 
 /**
  * @param {object} [input]
- * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string }, habit?: { title?: string, card?: string } | null }} [input.fingerprint] The 판단 DNA, with the season's 판단 습관 when it has one, and the one sentence that says it (D1).
+ * @param {{ mode?: string, modeTitle?: string, motive?: { label?: string }, habit?: { id?: string, title?: string, card?: string } | null }} [input.fingerprint] The 판단 DNA, with the season's 판단 습관 when it has one, and the one sentence that says it (D1).
  * @param {{ label?: string, title?: string, failure?: boolean }} [input.endingVariant] The ending the season reached.
  * @param {string} [input.endingName] The ending as a sentence calls it, in Korean.
  * @param {Record<string, any>} [input.caseResults] The season's case summaries, by case id.
@@ -90,6 +91,8 @@ export function buildResultCardModel(input = {}) {
     // (judgementHabit.habitCardLine): drawn over the large line and copied
     // after the shared line. With it the copied line's 판단 DNA is the DNA's own title.
     habitLine: toText(fingerprint?.habit?.card),
+    // N3: the habit's id, for the shared address (shareLink.js); never printed.
+    habitId: toText(fingerprint?.habit?.id),
     dnaTitle,
     mode: toText(fingerprint?.mode),
     motiveLabel: toText(fingerprint?.motive?.label),
@@ -118,14 +121,15 @@ export function buildResultCardModel(input = {}) {
 }
 
 /**
- * The line copied with the card. `origin` is the site's address; without one
- * the line ends at the rank.
+ * The line copied with the card. `origin` is the site's address, which the
+ * line ends on marked as a shared card's (`/?from=card&h=<habit id>`,
+ * shareLink.js); without one the line ends at the rank.
  */
 export function buildShareText(model, origin = "") {
   const card = model ?? buildResultCardModel();
-  const address = toText(origin).replace(/\/+$/, "");
+  const address = shareAddress(toText(origin), card.habitId);
   const line = fill(drawCopy.shareLine, { mode: card.habitLine ? card.dnaTitle : card.modeTitle, ending: card.endingName, burst: card.bestBurst, points: RESULT_CARD_LABELS.points, rank: card.bestRank, share: card.share });
-  return [line, card.habitLine, address && `${address}/`].filter(Boolean).join(" ");
+  return [line, card.habitLine, address].filter(Boolean).join(" ");
 }
 
 /**

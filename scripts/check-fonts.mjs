@@ -55,7 +55,8 @@ const MAX_FONT_BYTES = 131_832;
 // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (냄 and 짧 left this file). Measured 82,424 plus 4.
 // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
 // 82,688 -> 86,328 on 2026-11-13, 다국적 인물 (cast-global): the new names' syllables (뤼, 옌, 응, 즈 ...). Measured 86,324 plus 4.
-const MAX_REST_FONT_BYTES = 86_328;
+// 86,328 -> 87,100 on 2026-11-13, 다국적 인물 over main e43f7bf6: the new names' syllables plus 번외 4~7's. Measured 87,096 plus 4.
+const MAX_REST_FONT_BYTES = 87_100;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones

@@ -318,7 +318,7 @@ export default {
     },
     "c19_branch_bookshop": {
       "title": "The Economic History Shelf, 1st Floor",
-      "text": "At the hospital, Lim Kyungsoo added: '1st floor, economic history shelf.' The old woman is tying up books to sell as wastepaper at 110 won per kg. When Lim Soyul pulls out “50 Years of Korean Finance,” a 1997 review report falls out. The next book too. The old woman speaks. 'So he wasn’t coming to buy books. For 19 years he came every week and slipped one in.'",
+      "text": "At the hospital, Lim Kyungsoo added: '1st floor, economic history shelf.' The old woman is tying up books to sell as wastepaper at 110 won per kg. When Lim Soyul pulls out “50 Years of Korean Finance,” a 1997 review report falls out. The date on its cover is December 1997, the winter the banks began to fall one by one. The next book too. The old woman speaks. 'So he wasn’t coming to buy books. For 19 years he came every week and slipped one in.'",
       "memo": [
         "1st-floor stock: 12,000 volumes -- out as wastepaper tomorrow at 07:00",
         "Economic history shelf: about 1,400 volumes",

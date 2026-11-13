@@ -178,7 +178,7 @@ test("I asks the table's voice for where the hand stands: one line, on any layou
   await dismissProtocolBreach(page);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 
-  const line = /^열기 \d+ · .+ · 판돈 [\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
+  const line = /^열기 \d+ · .+ · 판돈 \$[\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
   await page.keyboard.press("i");
   await expect(voice).toHaveText(line);
   const first = await voice.textContent();

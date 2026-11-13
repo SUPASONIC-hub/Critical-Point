@@ -181,7 +181,13 @@ const budgets = [
   // 157,552 / 58,149 -> 157,634 / 58,164 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 157630 / 58160 (over budget only) in the e2e build, the plus 4.
   // 157,634 / 58,164 -> 157,634 / 58,174 #535 달력·예고 묶음 실측. Measured - / 58170 (over budget only) in the e2e build, the plus 4.
   // 157,634 / 58,174 -> 157,898 / 58,318 다국적 인물. Measured 157894 / 58314 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_898, maxGzip: 58_318 },
+  // 157,634 / 58,164 -> 157,751 / 58,210 side04 over main 7c80ccfe. Measured 157747 / 58206 (over budget only) in the e2e build, the plus 4.
+  // 157,634 / 58,174 -> 157,656 / 58,186 금액 $ 표시. Measured 157652 / 58182 (over budget only) in the e2e build, the plus 4.
+  // 157,634 / 58,174 -> 157,718 / 58,203 번외 7. Measured 157714 / 58199 (over budget only) in the e2e build, the plus 4.
+  // 157,634 / 58,174 -> 157,678 / 58,200 번외 6. Measured 157674 / 58196 (over budget only) in the e2e build, the plus 4.
+  // 157,634 / 58,164 -> 157,666 / 58,190 N1 결산 카드. Measured 157662 / 58186 (over budget only) in the e2e build, the plus 4.
+  // 157,634 / 58,164 -> 157,758 / 58,225 번외 5. Measured 157754 / 58221 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_758, maxGzip: 58_225 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -230,7 +236,8 @@ const budgets = [
   // 38,027 / 14,776 -> 38,027 / 14,783 c4c5-copy over main 7ec2304e. Measured - / 14779 (over budget only) in the e2e build, the plus 4.
   // 38,027 / 14,776 -> 38,372 / 14,883 held-standing over f1-evening. Measured 38368 / 14879 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,883 -> 38,372 / 14,890 f1-evening (#518 #525 #532) over #466 1331e71d. Measured - / 14886 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_372, maxGzip: 14_890 },
+  // 38,372 / 14,890 -> 38,372 / 14,895 묶음 1113. Measured - / 14891 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_372, maxGzip: 14_895 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -341,7 +348,13 @@ const budgets = [
   // 294,110 / 87,736 -> 294,110 / 87,741 on 2026-11-03, E-11 번외 사건 틀 (draft) over main 465ccb93. Measured 294,106 / 87,737 in the e2e build, the plus 4.
   // 294,110 / 87,741 -> 294,110 / 87,746 on 2026-11-03, E-11 번외 2 (draft) over e11-side-cloud c2954023 (main 465ccb93). Measured 294,106 / 87,742 in the e2e build, the plus 4.
   // 294,162 / 87,785 -> 294,303 / 87,867 다국적 인물. Measured 294299 / 87863 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 294_303, maxGzip: 87_867 },
+  // 294,162 / 87,785 -> 295,867 / 88,244 side04 over main 1ae72e0b. Measured 295863 / 88240 (over budget only) in the e2e build, the plus 4.
+  // 294,162 / 87,785 -> 295,201 / 88,021 번외 7. Measured 295197 / 88017 (over budget only) in the e2e build, the plus 4.
+  // 294,162 / 87,785 -> 294,635 / 87,905 번외 6. Measured 294631 / 87901 (over budget only) in the e2e build, the plus 4.
+  // 294,162 / 87,785 -> 296,033 / 88,293 번외 5. Measured 296029 / 88289 (over budget only) in the e2e build, the plus 4.
+  // 296,033 / 88,293 -> 300,207 / 89,546 묶음 1113. Measured 300203 / 89542 (over budget only) in the e2e build, the plus 4.
+  // 300,207 / 89,546 -> 300,667 / 89,754 다국적 인물 over main e43f7bf6. Measured 300663 / 89750 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 300_667, maxGzip: 89_754 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -653,12 +666,30 @@ const budgets = [
   // 201,544 / 73,049 -> 201,645 / 73,087 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 201641 / 73083 (over budget only) in the e2e build, the plus 4.
   // 201,645 / 73,087 -> 202,471 / 73,277 #535 달력·예고 묶음 실측. Measured 202467 / 73273 (over budget only) in the e2e build, the plus 4.
   // 202,471 / 73,277 -> 204,681 / 74,446 다국적 인물. Measured 204677 / 74442 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 204_681, maxGzip: 74_446 },
+  // 201,645 / 73,087 -> 201,818 / 73,144 side04 over main 7c80ccfe. Measured 201814 / 73140 (over budget only) in the e2e build, the plus 4.
+  // 201,033 / 72,895 -> 203,058 / 73,777 n2n3 over main 1ae72e0b. Measured 203054 / 73773 (over budget only) in the e2e build, the plus 4.
+  // 201,645 / 73,087 -> 203,679 / 73,972 N2N3 첫 시간 over main 7c80ccfe. Measured 203675 / 73968 (over budget only) in the e2e build, the plus 4.
+  // 202,471 / 73,277 -> 204,500 / 74,146 N2N3 첫 시간 over main dcbbe5e0. Measured 204496 / 74142 (over budget only) in the e2e build, the plus 4.
+  // 202,471 / 73,277 -> 202,527 / 73,309 금액 $ 표시. Measured 202523 / 73305 (over budget only) in the e2e build, the plus 4.
+  // 202,471 / 73,277 -> 202,652 / 73,329 번외 7. Measured 202648 / 73325 (over budget only) in the e2e build, the plus 4.
+  // 202,471 / 73,277 -> 202,640 / 73,324 번외 6. Measured 202636 / 73320 (over budget only) in the e2e build, the plus 4.
+  // 201,645 / 73,087 -> 201,818 / 73,147 번외 5. Measured 201814 / 73143 (over budget only) in the e2e build, the plus 4.
+  // 201,818 / 73,147 -> 205,322 / 74,409 묶음 1113. Measured 205318 / 74405 (over budget only) in the e2e build, the plus 4.
+  // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 207_552, maxGzip: 75_601 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
   // 559 / 323 -> 564 / 323 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 560 / - (over budget only) in the e2e build, the plus 4.
   { pattern: /^InstallHint-.*\.js$/, maxBytes: 564, maxGzip: 323 },
+  // N3 (2026-11-12): the habits table (src/copy/habits.js), fetched by the start
+  // page only for a visit from a shared card (`/?from=card&h=<id>`, shareLink.js)
+  // to print 「친구의 결과: …」. Measured 1,468 / 906 in the e2e build, the plus 4.
+  { pattern: /^habits-.*\.js$/, maxBytes: 1_472, maxGzip: 910 },
+  // N12 (2026-11-12): the speed watcher (src/webVitals.js), fetched after `load`
+  // by one page in twenty with Google's tag (gameEvents.startVitalsSample).
+  // Measured 1,186 / 707 in the e2e build, the plus 4.
+  { pattern: /^webVitals-.*\.js$/, maxBytes: 1_190, maxGzip: 711 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -917,7 +948,11 @@ const budgets = [
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
   // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 다국적 인물. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_383 },
+  // 52,577 / 17,378 -> 52,577 / 17,385 n2n3 over main 1ae72e0b. Measured - / 17381 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -938,7 +973,11 @@ const budgets = [
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
   // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 다국적 인물. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_383 },
+  // 52,577 / 17,378 -> 52,577 / 17,385 n2n3 over main 1ae72e0b. Measured - / 17381 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
+  // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1147,7 +1186,9 @@ const budgets = [
   // 214,218 / 41,444 -> 214,420 / 41,493 bundle 1112c (#520 #521) over main 4f927085. Measured 214416 / 41489 (over budget only) in the e2e build, the plus 4.
   // 214,420 / 41,493 -> 214,508 / 41,536 a2a3-ending over main 7ec2304e. Measured 214504 / 41532 (over budget only) in the e2e build, the plus 4.
   // 214,508 / 41,536 -> 214,722 / 41,632 다국적 인물. Measured 214718 / 41628 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 214_722, maxGzip: 41_632 },
+  // 214,508 / 41,536 -> 215,366 / 41,680 n1-act-card over main 53845978. Measured 215362 / 41676 (over budget only) in the e2e build, the plus 4.
+  // 215,366 / 41,680 -> 215,606 / 41,786 다국적 인물 over main e43f7bf6. Measured 215602 / 41782 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 215_606, maxGzip: 41_786 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1169,7 +1210,8 @@ const budgets = [
   // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (#350 #301 #501) after merging main d4048d83: build:fonts for the two start-screen characters #301 adds (냄, 짧) (they left this file). Measured 82,424, the plus 4.
   // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: build:fonts for 갭 and 뿌. Measured 82,684, the plus 4.
   // 82,688 -> 86,328 on 2026-11-13, 다국적 인물 (cast-global): build:fonts for the new names' syllables (뤼, 옌, 응, 즈 ...). Measured 86,324, the plus 4.
-  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 86_328, compressed: true },
+  // 86,328 -> 87,100 on 2026-11-13, 다국적 인물 over main e43f7bf6: build:fonts for the new names' syllables plus 번외 4~7's. Measured 87,096, the plus 4.
+  { pattern: /^pretendard-cp-rest-.*\.woff2$/, maxBytes: 87_100, compressed: true },
   // The chunks below had no budget until 2026-09-28: the list named six files
   // and the build emits eleven, so a new 400KB lazy screen would have passed a
   // check described as a ratchet on every chunk. Measured that day, plus 5%.
@@ -1285,7 +1327,8 @@ const budgets = [
   // (draft) restacked on e11-side01 76c5b028: the side records' merge on a
   // restore. Measured 2,097 / 1,000, the gzip plus 4.
   // 1,004 -> 1,011 gzip on 2026-11-13, 다국적 인물 (cast-global): the chunk names it imports changed hash (savedState reads castAliases.js); measured 1,007 in check:changed's build, the plus 4.
-  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_011 },
+  // 2,097 / 1,004 -> 2,097 / 1,010 금액 $ 표시. Measured - / 1006 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_010 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
@@ -1420,7 +1463,10 @@ const budgets = [
   // 8,432 / 4,054 -> 8,659 / 4,168 on 2026-10-26, 영어판 3단계: the card's words and the copied line read by key (src/copy/resultCard.js, resultCardDraw.js). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 8,659 / 4,168 -> 8,787 / 4,224 on 2026-11-05, result-card-habit over main 3ca15f8d: D1, the habit's sentence drawn on the label's line and copied after the shared line, as two fields (habitLine, dnaTitle) handed in worded (resultCardModel.js, resultCard.js). Measured 8,783 / 4,220 in the e2e build, the plus 4.
   // 8,787 / 4,224 -> 8,959 / 4,325 on 2026-11-12, c2c3-result over main fbf1000c (C2-1 nearest ending, C3-3 card line, C3-4 witness paragraph). Measured 8955 / 4321 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 8_959, maxGzip: 4_325 },
+  // 8,959 / 4,325 -> 8,977 / 4,325 n2n3 over main 1ae72e0b. Measured 8973 / - (over budget only) in the e2e build, the plus 4.
+  // 8,959 / 4,325 -> 9,276 / 4,430 n1-act-card over main 53845978. Measured 9272 / 4426 (over budget only) in the e2e build, the plus 4.
+  // 9,276 / 4,430 -> 9,294 / 4,430 묶음 1113. Measured 9290 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_294, maxGzip: 4_430 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -1437,7 +1483,8 @@ const budgets = [
   // 3,989 -> 4,000 gzip on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 8,487 / 3,996, the gzip plus 4.
   // 8,487 / 3,989 -> 8,487 / 4,002 on 2026-11-02, #308 d2-hall-of-fame merged with #224 c29c2efd (main 9be94346). Measured raw under / 3,998 in the e2e build, the gzip plus 4.
   // 3,989 -> 3,998 gzip on 2026-11-05, tab-title-situation over main 24af89d7: the raw bytes are the same (8,487); the chunk names it imports. Measured 3,994 gzip in the e2e build, the gzip plus 4.
-  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_487, maxGzip: 4_002 },
+  // 8,487 / 4,002 -> 8,498 / 4,002 n1-act-card over main 53845978. Measured 8494 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^runtimeSystems-.*\.js$/, maxBytes: 8_498, maxGzip: 4_002 },
   // The season's copy between and around cases (src/caseCopy.js): the
   // next-case teasers and interludes, chapter rules, rank legacy lines and
   // 에코's opening lines. It was in the runtime's chunk, which had 255 gzip
@@ -1551,7 +1598,8 @@ const budgets = [
   // 2,636 -> 2,637 raw on 2026-10-26, pwa-install-hint: only by the chunk names it imports. Measured 2,637 / 1,398.
   // 2,637 / 1,403 -> 3,215 / 1,600 on 2026-10-26, 영어판 3단계 (N1): the catalogue's words read by key (src/copy/weekRules.js, in this chunk), their numbers filled in from the constants when a rule is read. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 3,215 / 1,600 -> 3,360 / 1,671 on 2026-11-03, week-board-after over main 36104abd: weekBoardsAt, this week's board and last week's for the seven days after it (W47 점검 P9). Measured 3,356 / 1,667 in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_360, maxGzip: 1_671 },
+  // 3,360 / 1,671 -> 3,414 / 1,707 위기 줄기·주간. Measured 3410 / 1703 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_414, maxGzip: 1_707 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1627,7 +1675,12 @@ const budgets = [
   // season's end and the dialog, fetched by the PlayScreen chunk's fold only
   // on an act's first case. Measured 2,698 / 1,538 on main da6292be, the gzip plus 4.
   // 2,698 / 1,542 -> 2,952 / 1,675 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^ActCard-.*\.js$/, maxBytes: 2_952, maxGzip: 1_675 },
+  // 2,952 / 1,675 -> 4,089 / 2,280 n1-act-card over main 53845978. Measured 4085 / 2276 (over budget only) in the e2e build, the plus 4.
+  // 4,089 / 2,280 -> 4,120 / 2,299 묶음 1113. Measured 4116 / 2295 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ActCard-.*\.js$/, maxBytes: 4_120, maxGzip: 2_299 },
+  // N1 막 끝 결산 카드 (src/gauntlet/ActTally.jsx, src/actTally.js), 2026-11-13: fetched by ActCard
+  // only when an act ends with a tally, so nothing at first paint carries it. Measured 5,041 / 2,493 in the e2e build, the plus 4.
+  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_045, maxGzip: 2_497 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1859,7 +1912,17 @@ const budgets = [
   // 189,552 / 63,089 -> 189,888 / 63,261 c4c5-copy over main 7ec2304e. Measured 189884 / 63257 (over budget only) in the e2e build, the plus 4.
   // 189,888 / 63,261 -> 190,074 / 63,309 n-plan over main 1ae72e0b. Measured 190070 / 63305 (over budget only) in the e2e build, the plus 4.
   // 190,074 / 63,309 -> 190,356 / 63,456 다국적 인물. Measured 190352 / 63452 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 190_356, maxGzip: 63_456 },
+  // 189,888 / 63,261 -> 190,339 / 63,427 side04 over main 1ae72e0b. Measured 190335 / 63423 (over budget only) in the e2e build, the plus 4.
+  // 189,888 / 63,261 -> 189,921 / 63,268 n2n3 over main 1ae72e0b. Measured 189917 / 63264 (over budget only) in the e2e build, the plus 4.
+  // 190,074 / 63,309 -> 190,116 / 63,334 N2N3 첫 시간 over main dcbbe5e0. Measured 190112 / 63330 (over budget only) in the e2e build, the plus 4.
+  // 190,074 / 63,309 -> 190,331 / 63,380 위기 줄기·주간. Measured 190327 / 63376 (over budget only) in the e2e build, the plus 4.
+  // 190,074 / 63,309 -> 190,443 / 63,498 번외 7. Measured 190439 / 63494 (over budget only) in the e2e build, the plus 4.
+  // 190,074 / 63,309 -> 190,317 / 63,431 번외 6. Measured 190313 / 63427 (over budget only) in the e2e build, the plus 4.
+  // 189,888 / 63,261 -> 191,288 / 63,716 n1-act-card over main 53845978. Measured 191284 / 63712 (over budget only) in the e2e build, the plus 4.
+  // 189,888 / 63,261 -> 190,369 / 63,482 번외 5. Measured 190365 / 63478 (over budget only) in the e2e build, the plus 4.
+  // 190,369 / 63,482 -> 193,344 / 64,621 묶음 1113. Measured 193340 / 64617 (over budget only) in the e2e build, the plus 4.
+  // 193,344 / 64,621 -> 193,626 / 64,762 다국적 인물 over main e43f7bf6. Measured 193622 / 64758 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 193_626, maxGzip: 64_762 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1923,7 +1986,17 @@ const budgets = [
   // 158,035 / 56,278 -> 158,306 / 56,407 c4c5-copy over main 7ec2304e. Measured 158302 / 56403 (over budget only) in the e2e build, the plus 4.
   // 158,306 / 56,407 -> 158,442 / 56,447 n-plan over main 1ae72e0b. Measured 158438 / 56443 (over budget only) in the e2e build, the plus 4.
   // 158,442 / 56,447 -> 158,647 / 56,600 다국적 인물. Measured 158643 / 56596 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 158_647, maxGzip: 56_600 },
+  // 158,306 / 56,407 -> 158,739 / 56,587 side04 over main 1ae72e0b. Measured 158735 / 56583 (over budget only) in the e2e build, the plus 4.
+  // 158,306 / 56,407 -> 158,341 / 56,407 n2n3 over main 1ae72e0b. Measured 158337 / - (over budget only) in the e2e build, the plus 4.
+  // 158,442 / 56,447 -> 158,485 / 56,459 N2N3 첫 시간 over main dcbbe5e0. Measured 158481 / 56455 (over budget only) in the e2e build, the plus 4.
+  // 158,442 / 56,447 -> 158,689 / 56,496 위기 줄기·주간. Measured 158685 / 56492 (over budget only) in the e2e build, the plus 4.
+  // 158,442 / 56,447 -> 158,812 / 56,632 번외 7. Measured 158808 / 56628 (over budget only) in the e2e build, the plus 4.
+  // 158,442 / 56,447 -> 158,671 / 56,571 번외 6. Measured 158667 / 56567 (over budget only) in the e2e build, the plus 4.
+  // 158,306 / 56,407 -> 159,400 / 56,809 n1-act-card over main 53845978. Measured 159396 / 56805 (over budget only) in the e2e build, the plus 4.
+  // 158,306 / 56,407 -> 158,737 / 56,644 번외 5. Measured 158733 / 56640 (over budget only) in the e2e build, the plus 4.
+  // 158,737 / 56,644 -> 161,313 / 57,695 묶음 1113. Measured 161309 / 57691 (over budget only) in the e2e build, the plus 4.
+  // 161,313 / 57,695 -> 161,518 / 57,831 다국적 인물 over main e43f7bf6. Measured 161514 / 57827 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 161_518, maxGzip: 57_831 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -1950,7 +2023,13 @@ const budgets = [
   // that language and the dictionary above does not carry it. Japanese the larger, 59,419 / 20,428 (English 52,337 /
   // 19,332), in the e2e build, the plus 4.
   // 59,423 / 20,432 -> 59,535 / 20,560 on 2026-11-13, 다국적 인물 (cast-global): the renamed profiles' names in katakana and kanji. Measured 59,531 / 20,556, the plus 4.
-  { pattern: /^locale-(en|ja)-late-gameDialogue-.*\.js$/, maxBytes: 59_535, maxGzip: 20_560 },
+  // 59,423 / 20,432 -> 61,091 / 20,936 side04 over main 1ae72e0b: 번외 4의 새 화자 셋(오민정, 문정택, 한기호) 프로필. Measured ja 61087 / 20932 in the e2e build, the plus 4.
+  // 59,423 / 20,432 -> 60,464 / 20,755 side07 over main dcbbe5e0: 번외 7의 새 화자 둘(그레이스 웡, 모지현) 프로필. Measured ja 60460 / 20751 in the e2e build, the plus 4.
+  // 59,423 / 20,432 -> 60,090 / 20,647 side06 over main dcbbe5e0: 번외 6의 새 화자 쩐 티 란 프로필. Measured ja 60086 / 20643 in the e2e build, the plus 4.
+  // 59,423 / 20,432 -> 61,186 / 21,029 side05 over main 7c80ccfe: 번외 5의 새 화자 셋(육성빈, 추영복, 마리사 탄) 프로필. Measured ja 61182 / 21025 in the e2e build, the plus 4.
+  // 61,186 / 21,029 -> 64,562 / 22,016 묶음 1113 (번외 4·5·6·7의 새 화자 아홉 프로필 함께) over main dcbbe5e0. Measured ja 64558 / 22012 in the e2e build, the plus 4.
+  // 64,562 / 22,016 -> 64,674 / 22,137 다국적 인물 over main e43f7bf6: the renamed profiles' names in katakana and kanji on top of 번외 4~7's. Measured ja 64670 / 22133 in the e2e build, the plus 4.
+  { pattern: /^locale-(en|ja)-late-gameDialogue-.*\.js$/, maxBytes: 64_674, maxGzip: 22_137 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   // 8,013 / 2,344 -> 8,731 / 2,640 on 2026-10-26, en-between-11-20: the between/ files in its import map, fetched once
@@ -1979,7 +2058,12 @@ const budgets = [
   // 13,713 / 3,737 -> 13,713 / 3,748 on 2026-11-11, prose-trim-19-28 after merging main accd990b (#321). Measured - / 3744 (over budget only) in the e2e build, the plus 4.
   // 13,713 / 3,748 -> 13,869 / 3,774 on 2026-11-11, bundle 1111b (#505 #506 #507 #508) over main 72d10e69. Measured 13865 / 3770 (over budget only) in the e2e build, the plus 4.
   // 13,869 / 3,767 -> 13,869 / 3,779 on 2026-11-11, prose-trim-39-final over main 72d10e69. Measured - / 3775 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 13_869, maxGzip: 3_779 },
+  // 13,869 / 3,779 -> 14,025 / 3,809 side04 over main 1ae72e0b. Measured 14021 / 3805 (over budget only) in the e2e build, the plus 4.
+  // 13,869 / 3,779 -> 14,025 / 3,809 번외 7. Measured 14021 / 3805 (over budget only) in the e2e build, the plus 4.
+  // 13,869 / 3,779 -> 14,025 / 3,809 번외 6. Measured 14021 / 3805 (over budget only) in the e2e build, the plus 4.
+  // 13,869 / 3,779 -> 14,025 / 3,807 번외 5. Measured 14021 / 3803 (over budget only) in the e2e build, the plus 4.
+  // 14,025 / 3,807 -> 14,493 / 3,905 묶음 1113. Measured 14489 / 3901 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 14_493, maxGzip: 3_905 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2328,7 +2412,19 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,926 / 433,352 / 441,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured first paint, the plus 4.
 // -> 374,122 / 433,603 / 441,373 #535 달력·예고 묶음 실측. Measured first paint, the plus 4.
 // -> 375,846 / 435,465 / 443,230 다국적 인물. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 375_846, en: 435_465, ja: 443_230 };
+// -> 373,985 / 433,641 / 441,389 side04 over main 7c80ccfe. Measured first paint, the plus 4.
+// -> 374,619 / 434,057 / 441,824 n2n3 over main 1ae72e0b. Measured first paint, the plus 4.
+// -> 374,814 / 434,252 / 442,020 N2N3 첫 시간 over main 7c80ccfe. Measured first paint, the plus 4.
+// -> 374,990 / 434,481 / 442,264 N2N3 첫 시간 over main dcbbe5e0. Measured first paint, the plus 4.
+// -> 374,154 / 433,628 / 441,399 금액 $ 표시. Measured first paint, the plus 4.
+// -> 374,122 / 433,655 / 441,449 위기 줄기·주간. Measured first paint, the plus 4.
+// -> 374,160 / 433,862 / 441,634 번외 7. Measured first paint, the plus 4.
+// -> 374,155 / 433,797 / 441,564 번외 6. Measured first paint, the plus 4.
+// -> 374,077 / 433,920 / 441,735 N1 결산 카드. Measured first paint, the plus 4.
+// -> 373,991 / 433,702 / 441,448 번외 5. Measured first paint, the plus 4.
+// -> 375,396 / 436,255 / 444,088 묶음 1113. Measured first paint, the plus 4.
+// -> 377,166 / 438,137 / 445,978 다국적 인물 over main e43f7bf6. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_166, en: 438_137, ja: 445_978 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2518,7 +2614,15 @@ function checkBudget(file, budget) {
 // -> 10,798 / 3,875 on 2026-11-11, E-11 번외 1 (#314) after merging main 808834eb (#477), the plus 4.
 // -> 10,827 / 3,884 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317), the plus 4.
 // -> 10,856 / 3,897 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321), the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_856, maxGzip: 3_897 };
+// -> 10,885 / 3,903 side04 over main 1ae72e0b, the plus 4.
+// -> 10,917 / 3,919 n2n3 over main 1ae72e0b, the plus 4.
+// -> 10,885 / 3,902 번외 7, the plus 4.
+// -> 10,885 / 3,907 번외 6, the plus 4.
+// -> 10,887 / 3,905 n1-act-card over main 53845978, the plus 4.
+// -> 10,887 / 3,912 N1 결산 카드, the plus 4.
+// -> 10,885 / 3,904 번외 5, the plus 4.
+// -> 11,064 / 3,974 묶음 1113, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_064, maxGzip: 3_974 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

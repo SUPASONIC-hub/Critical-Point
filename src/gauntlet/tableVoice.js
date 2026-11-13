@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { formatNumber } from "../gameConstants.js";
+import { formatMoney } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
 import { dangerZoneOf } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
@@ -99,10 +99,10 @@ export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min
  * shows: the wall this window drew is not handed in and cannot be said.
  */
 export const describeStatus = ({ gauge, dangerLine, runPot = 0, remaining = 0, pulse = "" }) =>
-  fill(voice().status, { gauge: Math.round(gauge), danger: dangerLine, pot: formatNumber(runPot), seconds: Math.max(0, Math.ceil(remaining)), bpm: pulse });
+  fill(voice().status, { gauge: Math.round(gauge), danger: dangerLine, pot: formatMoney(runPot), seconds: Math.max(0, Math.ceil(remaining)), bpm: pulse });
 
 /** The last hand's settlement: what it did to the money (signed, formatChange), the case pot and the vault it left. */
-export const describeBank = ({ hand = 0, runPot, vault }) => fill(voice().bank, { hand: formatChange(hand), pot: formatNumber(runPot), vault: formatNumber(vault) });
+export const describeBank = ({ hand = 0, runPot, vault }) => fill(voice().bank, { hand: formatChange(hand), pot: formatMoney(runPot), vault: formatMoney(vault) });
 
 /** An act beginning, by the case that opens it (actCardGate's ACT_START_CASES, in order): 「2막 시작 · 사건 08」. */
 export const describeAct = ({ act, caseId }) => fill(voice().act, { act, case: String(caseId).replace(/^case/, "") });

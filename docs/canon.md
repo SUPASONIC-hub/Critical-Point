@@ -126,6 +126,28 @@ inside quotes. en writes these names in ASCII. The old names live only in
 written before the change; `check:canon` (cast-old-names) keeps them out of
 every other season file.
 
+## The crisis years (C11)
+
+Roughly once a decade the market breaks, and each time the request that comes
+down is the same: make the numbers come out. The season does not explain the
+economy; it threads seeds it already had. 금융 소재 기획 2026-11-13 (b),
+결정 Q3 (1).
+
+| Years | What it was, in general words | What the season has of it |
+|---|---|---|
+| 1997-98 | The currency crisis: banks fell one by one, and the country's dollars ran out | 임경수's 1997 심사 보고서, dated December 1997 (사건 19). Spring 1998: 경동은행 sold to 킹스데일 and its small loans cleared (번외 2), where 임경수 says the request comes down every time a crisis comes. An old man in 군산's line queued in 1998 too (사건 27) |
+| 2008 | The world financial crisis: markets fell that autumn | KD금융그룹 launched in 2008; the branch talked 41 영동 elders into shares instead of savings that autumn (사건 23) |
+| 2018-23 | Cheap money ended; rates jumped and project-finance lending froze | 제7조 (2022-11) and the 2023-0412 loan, the analyst's dissent among them: the numbers made to come out once more |
+| 2026 | The next crack, small so far | 평택 PF extended (사건 26), 군산's bank run (사건 27), bad loans sold abroad (사건 29) |
+
+- No real event is named and no real company stands in: 「외환위기」, 「세계 금융위기」
+  and the like are general words, never an organisation, a law or a ticker.
+- The word 위기 is said only by people (임경수, 번외 2); narration gives the
+  year and what could be seen. Nothing predicts the next one or reads as
+  investment advice.
+- `check:canon` holds two years: KD금융그룹 launched in 2008, and 경동은행 was
+  being sold in 1998.
+
 ## The era: 2023 and 2026 in a Korean bank
 
 The 프롤로그 is 2022-23 and the main season 2025-26, so the bank works the way
@@ -448,8 +470,9 @@ The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
 open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
-`check:canon` holds their dated weekdays like any other (12월 20일 (토) and
-11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
+`check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토)
+and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금) and 6월 12일 (금) fit
+2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -494,6 +517,61 @@ season case has to keep. What each one states for the first time is below.
 | 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
 | The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
 
+### 번외 4, 연말 정산 (side04)
+
+| Fact | Value |
+|---|---|
+| When | 2025-12-11 (목) 22:10 to 12-12 (금) 09:00: eight days after 사건 16's 리스 승인위원회 (12월 3일), four before 사건 17 opens (12월 15일) |
+| Where | KD은행 고객센터, the night shift's 상담석. 한기호 (야간조 팀장) asks 트리거랩 for someone who reads numbers |
+| The list | 312 small-business loans ending on 12월 31일, refused a 만기 연장; every borrower to be told by phone before the 09:00 report to head office. The screen's one reason: 「내부 종합 평가 미달」 |
+| The script | ends "고객님의 소중한 사업을 KD은행이 늘 응원합니다"; a call past 2분 40초 turns red; each 「죄송합니다」 counts as one 공감 표현 |
+| 오민정 | 상담원 7년 차, employed by an outsourcing company on one-year contracts reviewed each January by average call time and 공감 표현 |
+| 문정택 (56) | a 분식집 in 김포 across the road from 플로우온's 김포 센터, 12 years on its night shift's dawn 떡볶이. Card sales: 9월 1,140만 / 10월 980만 / 11월 610만 원, average 910만 against the re-review bar of 80% of 1,000만 (800만) |
+| The re-review rule | on the printout's last page: three months' sales above 80% of the standard let the team leader request a re-review under his own name; 한기호's one request, 4 years before, was answered three months later, after the shop had closed |
+| The detail line | 「상권 위험 가중: 인근 대형 거래처 플로우온 김포 센터, 관련 대출 2023-0412 관리 대상」. It names the loan and nothing that happens to it |
+| The endings | what is left at 09:00 (a re-review request under 한기호's 사번, 311 + 1 pending / the detail line in the report's 비고 / three plain lines in 오민정's call notes). None says whether the extension was granted |
+
+### 번외 5, 상장 전야 (side05)
+
+| Fact | Value |
+|---|---|
+| When | 2026-02-12 (목) 21:40 to 02-13 (금) 09:00: three days after 사건 21, eleven before 사건 22 opens (2월 23일), four before 설 (2월 16일). 문하준's internship is still ahead ("다음다음 주") |
+| Where | 트리거랩 분석관실. 이민서 brings the analyst in; the bank's 자금세탁방지팀 has two people on duty and asks for a count before its 09:00 meeting |
+| The partnership | KD은행 gives the virtual-asset exchange 카노바 its 실명확인 계좌; 디지털자산제휴팀 earns a fee on it, 40% of that team's year target. 카노바 and its new coin 미레온 are invented (searched 2026-11-13, no ticker printed) |
+| The night | deposits to 카노바 at nine times the usual; 1,900 이상거래 경보; 미레온 lists 10:00 Friday |
+| The banner | 「연 12% 예치 이자, KD은행 제휴」 in 카노바's app; the terms' last line, 「이 상품은 예금자 보호 대상이 아닙니다」. The wording's approval record names 디지털자산제휴팀 in the 확인자 box, and 육성빈 put his own name there after the exchange refused to drop 「제휴」 |
+| 육성빈 | 디지털자산제휴팀 과장, on duty alone; three of his team's seven are on contracts, renewed in March |
+| 추영복 (64) | a 공덕동 철물점, 32 years a KD은행 customer; sent 3,800만 원 at 22:58 to earn one month's 38만 원 before his granddaughter's March tuition, "KD은행이 같이 한다길래" |
+| 마리사 탄 | Singaporean, regional compliance head of the group that owns 카노바; advised putting off the listing the week before and the Seoul business side did not take it. Speaks English, calls 이민서 「민서 씨」 |
+| The three rows | 312 accounts opened that day sending similar amounts / some 1,400 old accounts sending one large sum / the rest, unknown |
+| The line (Q5 (1)) | only the people who put money in and the analysts are seen; no price, no profit, no buy-or-sell sentence, no method |
+| The endings | what goes to the 09:00 meeting (312 reports filed at 9:40 / 「KD은행 제휴」 taken off the banner at 9:50, the 12% stays / nothing, a folder named by date). The listing goes ahead at 10:00 in all three; none says what it did or whether anyone's money came back |
+
+### 번외 6, 보증금 (side06)
+
+| Fact | Value |
+|---|---|
+| When | 2026-05-08 (금), 어버이날, 17:50 to 23:30: four days after 사건 27 opens (5월 4일) and the last working day before 도윤하's ten days at KD생명 (사건 28, 「다음 주부터」 in c27) |
+| 송하율 | 사건 26's buyer, 10월 출산 예정; her 전세 (in 은행나무빌, 강서구) ends in December, its 전세자금대출 from KD은행 강서지점 with a 전세보증. She calls the analyst on the card from 평택 |
+| 쩐 티 란 | 베트남 출신, 서울 9년째, a university engineering lab; answers in Korean. One floor below 송하율; her lease ended 4월 30일 and her 보증금 of 1억 9천만 원 (savings, no loan, no 전세보증) has not come back. She copied the 37 flats' 등기부 into one table: all bought in 2024 |
+| The landlord | 모아든 주식회사: 37 flats in four buildings on one lane. Its 관리 대리인 기성철 says the money is 「묶여 있는」 because 「대표님이 평택 쪽에 좀 물려서」, and that it comes back when the next tenants move in |
+| The row | 23 전세자금대출 on that lane, all from 강서지점, 21 from 5번 창구 (April's 우수 창구, 「전세자금대출 1위」; 기성철 as 소개인 21 times). Every row: 감정가 = 매매가 = 전세가 = 2억 1천만 원. How such a row is made is never said |
+| Monday | three more loans for the company's flats, 실행 예정 5월 11일 (월) 09:30. Any staff member may file a 실행 보류 요청 under their own 사번; the 지점장 decides, and answered 「월요일에 얘기합시다」 |
+| The endings | what 도윤하 files under his own name that night (a hold request, 「검토 중」 on Monday / a plain notice in the tenants' group chat, 2 to 19 people / a one-page table in the 지점장's inbox, unread). None says whether a deposit came back or a loan was held |
+
+### 번외 7, 금요일 17시 58분 (side07)
+
+| Fact | Value |
+|---|---|
+| When | 2026-06-12 (금) 17:58 to 06-15 (월) 09:00: the last day of 사건 31's five-day inspection (6월 8일 opening) to the morning before 사건 32's search (6월 16일) |
+| Where | KD캐피탈 자금부; a café in 상암동 on the Saturday; the corridor outside the 대표이사실 on the Sunday |
+| The payments | four overseas transfers approved at 17:58: 홍콩 31억, 홍콩 9억 (another bank), 런던 18억, 뉴욕 26억 -- 84억 원. Supplier names as usual, receiving accounts new. Closing times in Seoul time: 홍콩 19:00, 런던 01:00, 뉴욕 토 06:00 |
+| The approvers | 모지현 (해외 송금 승인 9년, 퇴사 3월 31일; her last-day mail asking to delete her rights was answered 「확인했습니다」 and nothing was done; the HR list and the payment-permission list do not know each other) and 「자금-공용02」, shared by six. How anyone got in is never said |
+| 그레이스 웡 (29) | payments investigator at the receiving bank in Hong Kong, on the phone in English; her bank froze the 31억 transfer's receiving account with about 11억 left |
+| 한지우 | on the inspection's last day: 「금융사고는 알게 된 즉시 보고가 원칙」; she takes Monday's report |
+| 석재우 | Sunday's draft statement: 「외부 세력의 정교한 공격 ... 고객 피해는 없습니다」 |
+| The ransom | Monday 08:40, a notice on every 자금부 screen; the first folder locked is 「해외송금_2026_06」. 이민서's Friday-night copy on the KD데이터랩 side is untouched |
+| The endings | the first line of the 09:00 report (the money chased: 11억 2천만 back three weeks later, 72억 8천만 never answered / the cause: no money back, eleven leavers' permissions struck, the shared account left as it is -- as 사건 44 still finds it / the statement's line copied, 사건 37's echo). None names the trial, the raid or 윤상혁 |
 ## Known and left alone
 
 - **"3년".** The 프롤로그 is dated 2022-23 and 사건 01 is some months before

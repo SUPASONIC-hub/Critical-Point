@@ -18,6 +18,11 @@ export default {
       text: "今週は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。",
       world: "今週、取締役会は報告の時間を削り、報告書の値を上げた。",
     },
+    "crisis-week": {
+      title: "危機の週",
+      text: "今週は壁の帯が熱{crisisShift}だけ手前に立ち、すべてのカードのチップが{crisisChips}倍だ。",
+      world: "今週、市場が揺れると、本社はまず数字を合わせろと言った。",
+    },
     "audit-cascade": {
       title: "監査と連鎖",
       text: "今週は監査と連鎖が同時に立つ。{audit} {cascade} CASCADE勝負の確定は監査に数えない。",
