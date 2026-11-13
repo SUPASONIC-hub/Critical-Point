@@ -179,7 +179,8 @@ const budgets = [
   // 157,229 / 58,019 -> 157,367 / 58,055 a2a3-ending over main 7ec2304e. Measured 157363 / 58051 (over budget only) in the e2e build, the plus 4.
   // 157,367 / 58,055 -> 157,552 / 58,149 bundle 1112f (#530 #531) over main fbc8adc6. Measured 157548 / 58145 (over budget only) in the e2e build, the plus 4.
   // 157,552 / 58,149 -> 157,634 / 58,164 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 157630 / 58160 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_634, maxGzip: 58_164 },
+  // 157,634 / 58,164 -> 157,634 / 58,174 #535 달력·예고 묶음 실측. Measured - / 58170 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_634, maxGzip: 58_174 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -648,7 +649,8 @@ const budgets = [
   // 201,033 / 72,895 -> 201,857 / 73,075 n-plan over main 1ae72e0b. Measured 201853 / 73071 (over budget only) in the e2e build, the plus 4.
   // 201,362 / 72,997 -> 201,544 / 73,049 held-standing over f1-evening. Measured 201540 / 73045 (over budget only) in the e2e build, the plus 4.
   // 201,544 / 73,049 -> 201,645 / 73,087 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 201641 / 73083 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 201_645, maxGzip: 73_087 },
+  // 201,645 / 73,087 -> 202,471 / 73,277 #535 달력·예고 묶음 실측. Measured 202467 / 73273 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 202_471, maxGzip: 73_277 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2310,7 +2312,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,919 / 433,399 / 441,171 n-plan over main 1ae72e0b. Measured first paint, the plus 4.
 // -> 373,837 / 433,139 / 440,868 held-standing over f1-evening. Measured first paint, the plus 4.
 // -> 373,926 / 433,352 / 441,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_926, en: 433_352, ja: 441_111 };
+// -> 374,122 / 433,603 / 441,373 #535 달력·예고 묶음 실측. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 374_122, en: 433_603, ja: 441_373 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
