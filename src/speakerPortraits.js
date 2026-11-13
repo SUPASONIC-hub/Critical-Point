@@ -111,6 +111,11 @@ const SPEAKER_PORTRAITS = {
   "은재하": "/portrait-eun-jaeha.webp",
   "이하경": "/portrait-lee-hagyeong.webp",
   "권태호": "/portrait-kwon-taeho.webp",
+  // 번외 6 (2026-11-13): the side case's two new speakers, both generated
+  // faces of people who do not exist. 기성철 is the 「다음 세입자」 side, so
+  // his is an ordinary one.
+  "쩐 티 란": "/portrait-tran-thi-lan.webp",
+  "기성철": "/portrait-gi-seongcheol.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */
