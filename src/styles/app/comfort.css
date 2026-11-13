@@ -198,3 +198,39 @@
 [data-story-scale] .interlude-panel p {
   font-size: calc(0.875rem * var(--story));
 }
+
+/* 위기 가장자리 알림 (A5, gauntlet/edgeAlert.js): with its switch on, a frame
+   at the screen's very edge as the 현재 위험 line nears the wall -- amber in
+   reach, red in the band. A shadow on the fixed overlay, so nothing moves and
+   nothing over a card or a line is drawn. One breath is the period in
+   EDGE_ALERT_PERIOD_MS (under three a second), opacity between two levels,
+   never on and off; reduced motion holds it at its level. */
+.gx-fx-edge {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--c-amber),
+    inset 0 0 12px var(--c-amber);
+  opacity: 0.8;
+}
+.gx-fx-edge[data-level="inBand"] {
+  box-shadow:
+    inset 0 0 0 4px var(--c-gx-heat),
+    inset 0 0 14px var(--c-gx-heat-a55);
+}
+.gx-fx-edge.is-pulsing {
+  animation: gx-edge-breathe 1.6s ease-in-out infinite;
+}
+.gx-fx-edge.is-pulsing[data-level="inBand"] {
+  animation-duration: 0.9s;
+}
+@keyframes gx-edge-breathe {
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx-fx-edge.is-pulsing {
+    animation: none;
+  }
+}

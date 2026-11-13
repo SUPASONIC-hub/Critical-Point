@@ -34,6 +34,10 @@ const comfortCopy = {
       label: "가장자리 알림 띄우기",
       text: "밀어붙일수록 화면 위 가장자리에 메신저·메일이 잠깐 뜹니다.",
     },
+    crisisEdge: {
+      label: "위기 가장자리 알림",
+      text: "판이 벽에 가까워지면 화면 가장자리가 은은하게 밝아집니다. 카드와 글은 가리지 않습니다.",
+    },
     letterKeys: {
       label: "한 글자 단축키 쓰기",
       text: "1-9, W, E, Q, P, R, N. 끄면 Space, Enter, Esc만 남습니다.",

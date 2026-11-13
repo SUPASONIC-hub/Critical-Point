@@ -28,6 +28,10 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *   edgeNotices      the office's noise at the table's edge (EdgeNotice.jsx,
  *                    개선 포인트 A5): a message and a mail as a hand is pushed
  *                    on. On unless turned off; it never covers a number.
+ *   crisisEdge       위기 가장자리 알림 (A5, 2026-11-13): the screen's edges
+ *                    breathe amber, then red, as the 현재 위험 line steps
+ *                    toward the wall (gauntlet/edgeAlert.js). Off unless
+ *                    turned on; still under reduced motion.
  *   foldReadScenes   읽은 장면 접기 (on unless turned off): on a NEW GAME+
  *                    season, a scene a season before read opens with its body
  *                    folded under 「지난 시즌에 읽은 장면 · 펼치기」
@@ -75,6 +79,7 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   storyScale: 1,
   textScale: 1,
   edgeNotices: true,
+  crisisEdge: false,
   foldReadScenes: true,
 });
 
@@ -84,7 +89,7 @@ export function normalizeAccessibility(value) {
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
   if (STORY_SCALES.includes(source.storyScale)) settings.storyScale = source.storyScale;
   if (TEXT_SCALES.includes(source.textScale)) settings.textScale = source.textScale;
-  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices", "foldReadScenes"]) {
+  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices", "crisisEdge", "foldReadScenes"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);
