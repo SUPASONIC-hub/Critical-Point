@@ -254,10 +254,10 @@ const BUDGETS = {
   // 860 -> 863 lines on 2026-11-04, measured (kd-bank-account): the purse
   // leaves the rail and is drawn after the briefing and the draft as the
   // KD은행 계좌, with a line saying why it sits there.
-  // 863 -> 864 lines on 2026-11-12, measured (n2n3-firsthour): the import that
-  // counts 프롤로그 01's first table opened for Google Analytics (N2, gameEvents.js).
+  // 863 -> 865 lines on 2026-11-13, measured (n2n3-firsthour): the import and the call that
+  // count 프롤로그 01's first table opened for Google Analytics (N2, gameEvents.js).
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 864,
+    lines: 865,
     longestLine: 250,
     importedNames: 73,
     hooks: {},

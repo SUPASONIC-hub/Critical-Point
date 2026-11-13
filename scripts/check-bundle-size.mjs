@@ -648,7 +648,8 @@ const budgets = [
   // 201,362 / 72,997 -> 201,544 / 73,049 held-standing over f1-evening. Measured 201540 / 73045 (over budget only) in the e2e build, the plus 4.
   // 201,544 / 73,049 -> 201,645 / 73,087 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 201641 / 73083 (over budget only) in the e2e build, the plus 4.
   // 201,033 / 72,895 -> 203,058 / 73,777 n2n3 over main 1ae72e0b. Measured 203054 / 73773 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 201_645, maxGzip: 73_087 },
+  // 201,645 / 73,087 -> 203,679 / 73,972 N2N3 첫 시간 over main 7c80ccfe. Measured 203675 / 73968 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 203_679, maxGzip: 73_972 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2321,7 +2322,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,837 / 433,139 / 440,868 held-standing over f1-evening. Measured first paint, the plus 4.
 // -> 373,926 / 433,352 / 441,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured first paint, the plus 4.
 // -> 374,619 / 434,057 / 441,824 n2n3 over main 1ae72e0b. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_926, en: 433_352, ja: 441_111 };
+// -> 374,814 / 434,252 / 442,020 N2N3 첫 시간 over main 7c80ccfe. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 374_814, en: 434_252, ja: 442_020 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
