@@ -111,6 +111,12 @@ const SPEAKER_PORTRAITS = {
   "은재하": "/portrait-eun-jaeha.webp",
   "이하경": "/portrait-lee-hagyeong.webp",
   "권태호": "/portrait-kwon-taeho.webp",
+  // 번외 4 (2026-11-12): the side case's three new speakers. 한기호 is the
+  // 「예외 없음」 side, so his is a generated face of someone who does not
+  // exist, and an ordinary one.
+  "오민정": "/portrait-oh-minjeong.webp",
+  "한기호": "/portrait-han-giho.webp",
+  "문정택": "/portrait-moon-jeongtaek.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */

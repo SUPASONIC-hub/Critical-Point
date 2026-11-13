@@ -74,6 +74,7 @@ const { side00 } = await import("../../src/nodes/side00.js");
 const { side01 } = await import("../../src/nodes/side01.js");
 const { side02 } = await import("../../src/nodes/side02.js");
 const { side03 } = await import("../../src/nodes/side03.js");
+const { side04 } = await import("../../src/nodes/side04.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
 const sideMarks = await import("../../src/state/sideMarks.js");
@@ -146,7 +147,7 @@ test("3: the slot opens on a closed finale (NEW GAME+ or caseResults.final) and 
   assert.equal(closed.cases[0].closed, true);
 });
 
-test("the registry lists 번외 1, 2 and 3 in a release; the placeholder stays behind the debug build", async () => {
+test("the registry lists 번외 1, 2, 3 and 4 in a release; the placeholder stays behind the debug build", async () => {
   // Node has no __CP_DEBUG_BUILD__, as a release has it false.
   assert.deepEqual(
     SIDE_CASES.map(({ id, label, title }) => ({ id, label, title })),
@@ -154,11 +155,12 @@ test("the registry lists 번외 1, 2 and 3 in a release; the placeholder stays b
       { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명" },
       { id: "side02", label: "번외 2", title: "돌려줄 것" },
       { id: "side03", label: "번외 3", title: "보통의 밤" },
+      { id: "side04", label: "번외 4", title: "연말 정산" },
     ],
   );
   assert.equal(side00.fixture, true);
   // Each entry loads the case file it names, and says what the file says.
-  for (const [entry, pack] of [[SIDE_CASES[0], side01], [SIDE_CASES[1], side02], [SIDE_CASES[2], side03]]) {
+  for (const [entry, pack] of [[SIDE_CASES[0], side01], [SIDE_CASES[1], side02], [SIDE_CASES[2], side03], [SIDE_CASES[3], side04]]) {
     const loaded = await entry.load();
     assert.equal(loaded, pack);
     assert.equal(loaded.label, entry.label);
@@ -367,6 +369,77 @@ test("번외 3 plays to each of its three endings, on every route through its br
   assert.deepEqual([...endings].sort(), ["s3_after_board", "s3_after_memo", "s3_after_note"]);
   const visited = new Set([...routes].flatMap((route) => route.split(">")));
   assert.deepEqual([...visited].sort(), Object.keys(side03.nodes).sort());
+  assert.ok(playThrough(pack, { pick: 2, window: (index) => (index % 2 ? BUST : CASHED) }).outcomeChoiceId);
+  assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
+});
+
+test("번외 4 is a sound side pack: 8 to 12 scenes, no season scene, every speaker profiled and painted", async () => {
+  assert.deepEqual(checkSidePack(side04, { seasonNodeIds: Object.keys(nodes) }), []);
+  const sceneIds = Object.keys(side04.nodes);
+  assert.ok(sceneIds.length >= 8 && sceneIds.length <= 12, `${sceneIds.length} scenes`);
+  assert.deepEqual(Object.keys(side04.outcomes).sort(), side04.nodes.s4_aftershock.choices.map(({ id }) => id).sort());
+  const { getCharacterProfile } = await import("../../src/gameDialogue.js");
+  const { getSpeakerPortrait } = await import("../../src/speakerPortraits.js");
+  for (const [nodeId, scene] of Object.entries(side04.nodes)) {
+    assert.ok(getCharacterProfile(scene.speaker, null), `${nodeId}: ${scene.speaker} has no profile`);
+    assert.ok(getSpeakerPortrait(scene.speaker), `${nodeId}: ${scene.speaker} has no portrait (never a silhouette)`);
+  }
+  // No scene id or card id of 번외 1, 2 or 3 is reused.
+  const earlier = new Set([side01, side02, side03].flatMap((pack) => [...Object.keys(pack.nodes), ...Object.values(pack.nodes).flatMap((scene) => scene.choices.map(({ id }) => id))]));
+  for (const id of [...sceneIds, ...Object.values(side04.nodes).flatMap((scene) => scene.choices.map((choice) => choice.id))]) assert.equal(earlier.has(id), false, id);
+});
+
+test("번외 4's copy keeps the season's lengths: labels 30, scenes 420, a cognition on every card", () => {
+  for (const [nodeId, scene] of Object.entries(side04.nodes)) {
+    assert.ok([...scene.text].length <= 420, `${nodeId}: ${[...scene.text].length} characters`);
+    assert.ok(Array.isArray(scene.memo) && scene.memo.length > 0, `${nodeId}: no memo`);
+    assert.ok(scene.place && scene.clock, `${nodeId}: no place or clock`);
+    for (const choice of scene.choices) {
+      assert.ok([...choice.label].length <= 30, `${choice.id}: ${[...choice.label].length} characters`);
+      assert.ok(Object.keys(choice.cognition ?? {}).length > 0, `${choice.id}: no cognition`);
+    }
+  }
+  for (const [id, { text }] of Object.entries(side04.outcomes)) assert.ok([...text].length <= 420, `${id}: ${[...text].length} characters`);
+});
+
+test("번외 4 is the Thursday between 사건 16's committee and 사건 17, and says nothing either of them tells", () => {
+  // 2025-12-11 is a Thursday: eight days after 사건 16's 리스 승인위원회 (12월 3일)
+  // and four before 사건 17 opens (12월 15일, docs/canon.md).
+  assert.equal(new Date(Date.UTC(2025, 11, 11)).getUTCDay(), 4);
+  assert.match(side04.nodes.s4_start.clock, /^12월 11일 \(목\)/);
+  assert.match(side04.nodes.s4_callback.clock, /^12월 12일 \(금\)/);
+  const copy = JSON.stringify(side04);
+  for (const later of ["로봇", "다람이", "리스", "KD캐피탈", "인사위원회", "송년회", "계약 종료", "강태민", "배수경", "유하온"]) assert.equal(copy.includes(later), false, later);
+  // The detail line names the loan and nothing that happens to it.
+  assert.match(side04.nodes.s4_bottom.text, /관련 대출 2023-0412 관리 대상/);
+  assert.match(side04.nodes.s4_bottom.text, /열한 쪽짜리 반대 의견/);
+  // The sales pass the re-review bar: (1,140 + 980 + 610) / 3 = 910 against 80% of 1,000.
+  assert.equal((1140 + 980 + 610) / 3, 910);
+  assert.match(side04.nodes.s4_receipt.text, /한 달 910만 원/);
+  // The endings never say whether the extension was granted.
+  for (const effect of ["연장됐", "연장되었", "승인됐", "승인되었", "통과됐", "받아들여"]) assert.equal(copy.includes(effect), false, effect);
+});
+
+test("번외 4 plays to each of its three endings, on every route through its branches, without touching the engine", () => {
+  const pack = sideRun.prepareSidePack(side04);
+  const endings = new Set();
+  const routes = new Set();
+  // The shortest asks nine decisions (it skips the queue), the longest ten.
+  const walk = (state, path) => {
+    if (state.outcomeChoiceId) {
+      endings.add(state.outcomeChoiceId);
+      routes.add(path.join(">"));
+      assert.ok(state.log.length >= 9 && state.log.length <= 10, `${path.join(">")}: ${state.log.length} decisions`);
+      for (const value of Object.values(state.resources)) assert.ok(Number.isFinite(value));
+      return;
+    }
+    const scene = pack.nodes[state.nodeId];
+    for (const choice of scene.choices) walk(sideRun.advanceSideRun(pack, state, { choice, window: CASHED }), [...path, state.nodeId]);
+  };
+  walk(sideRun.createSideRun(pack, { runId: "side04-walk" }), []);
+  assert.deepEqual([...endings].sort(), ["s4_after_code", "s4_after_request", "s4_after_script"]);
+  const visited = new Set([...routes].flatMap((route) => route.split(">")));
+  assert.deepEqual([...visited].sort(), Object.keys(side04.nodes).sort());
   assert.ok(playThrough(pack, { pick: 2, window: (index) => (index % 2 ? BUST : CASHED) }).outcomeChoiceId);
   assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
 });
@@ -598,6 +671,7 @@ test("6: the goals, the titles and the season's length read the same after side 
   playThrough(sideRun.prepareSidePack(side01));
   playThrough(sideRun.prepareSidePack(side02));
   playThrough(sideRun.prepareSidePack(side03));
+  playThrough(sideRun.prepareSidePack(side04));
   assert.deepEqual(getAchievementProgress({}).map(({ id, goal }) => [id, goal]), seasonNumbersBefore.goals);
   assert.deepEqual(seasonNumbersBefore.goals.find(([id]) => id === "full-audit"), ["full-audit", 55]);
   assert.equal(JSON.stringify(ANALYST_TITLE_STEPS), seasonNumbersBefore.titles);

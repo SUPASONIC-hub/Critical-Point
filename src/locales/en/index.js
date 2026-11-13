@@ -110,6 +110,9 @@ export const speakers = {
   "연시우": "Yeon Siwoo",
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
+  "오민정": "Oh Minjeong",
+  "문정택": "Moon Jeongtaek",
+  "한기호": "Han Giho"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -140,7 +143,10 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
+  "KD은행 고객센터 야간 상담원 · 7년 차": "Night counsellor, KD Bank Customer Center · 7 years in",
+  "김포 분식집 사장 · 12년째 · 56세": "Owner of a snack bar in Gimpo · 12 years running · age 56",
+  "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center"
 };
 
 
@@ -742,6 +748,10 @@ export const copy = {
       "side03": {
         "label": "Side case 3",
         "title": "An Ordinary Night"
+      },
+      "side04": {
+        "label": "Side case 4",
+        "title": "Year-End Settlement"
       }
     }
   }
