@@ -883,6 +883,14 @@ Still open, on purpose:
   `window-no-replay` in the `suspicion` column through the service-role-only
   `ranking_set_recheck_marks` (migration 20261023000000); rows with other
   table rules are "not checked". Phase 3 (S1-S7) stays in drafts.
+- F1's hide switch (2026-11-13, `20261117000000_ranking_hide_switch.sql`):
+  `ranking_hide_marked` = 1 now hides only a row with one of `HIDE_MARKS`
+  (`scripts/verify-ranking-rows.mjs`: every checker mark, and the trigger's
+  marks for values no table deals), never `time-over-gap` or `unchecked`. It
+  stays off; the owner turns it on with one SQL line (in the migration's
+  header) once the nightly report's "hide switch: hidden once on" lines have
+  named no honest season for 14 days. `check:grants` holds the policy's list
+  to `HIDE_MARKS`.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
