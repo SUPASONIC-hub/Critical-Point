@@ -1426,7 +1426,8 @@ const budgets = [
   // 49,605 / 18,891 -> 50,344 / 19,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 50340 / 19107 (over budget only) in the e2e build, the plus 4.
   // 50,344 / 19,111 -> 50,576 / 19,198 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 50572 / 19194 (over budget only) in the e2e build, the plus 4.
   // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_160, maxGzip: 19_410 },
+  // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_385, maxGzip: 19_490 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1606,7 +1607,8 @@ const budgets = [
   // 3,360 / 1,671 -> 3,414 / 1,707 위기 줄기·주간. Measured 3410 / 1703 (over budget only) in the e2e build, the plus 4.
   // 3,414 / 1,707 -> 3,884 / 1,881 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 3880 / 1877 (over budget only) in the e2e build, the plus 4.
   // 3,414 / 1,707 -> 3,994 / 1,924 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 3990 / 1920 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_994, maxGzip: 1_924 },
+  // 3,994 / 1,924 -> 4,391 / 2,073 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 4387 / 2069 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 4_391, maxGzip: 2_073 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1931,7 +1933,8 @@ const budgets = [
   // 193,344 / 64,621 -> 193,626 / 64,762 다국적 인물 over main e43f7bf6. Measured 193622 / 64758 (over budget only) in the e2e build, the plus 4.
   // 193,626 / 64,762 -> 193,913 / 64,859 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 193909 / 64855 (over budget only) in the e2e build, the plus 4.
   // 193,626 / 64,762 -> 194,146 / 64,949 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 194142 / 64945 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_146, maxGzip: 64_949 },
+  // 194,146 / 64,949 -> 194,430 / 65,049 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 194426 / 65045 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_430, maxGzip: 65_049 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2007,7 +2010,8 @@ const budgets = [
   // 161,313 / 57,695 -> 161,518 / 57,831 다국적 인물 over main e43f7bf6. Measured 161514 / 57827 (over budget only) in the e2e build, the plus 4.
   // 161,518 / 57,831 -> 161,778 / 57,920 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 161774 / 57916 (over budget only) in the e2e build, the plus 4.
   // 161,518 / 57,831 -> 162,006 / 57,995 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 162002 / 57991 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_006, maxGzip: 57_995 },
+  // 162,006 / 57,995 -> 162,267 / 58,084 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 162263 / 58080 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_267, maxGzip: 58_084 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2437,7 +2441,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,166 / 438,137 / 445,978 다국적 인물 over main e43f7bf6. Measured first paint, the plus 4.
 // -> 377,172 / 438,144 / 445,987 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured first paint, the plus 4.
 // -> 377,166 / 438,300 / 446,167 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_172, en: 438_300, ja: 446_167 };
+// -> 377,172 / 438,397 / 446,272 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_172, en: 438_397, ja: 446_272 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
