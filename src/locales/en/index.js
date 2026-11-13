@@ -110,6 +110,9 @@ export const speakers = {
   "연시우": "Yeon Siwoo",
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
+  "마리사 탄": "Marisa Tan",
+  "육성빈": "Yuk Seongbin",
+  "추영복": "Chu Yeongbok"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -140,7 +143,10 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
+  "KD은행 디지털자산제휴팀 과장": "Manager, Digital Asset Partnerships, KD Bank",
+  "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
+  "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore"
 };
 
 
@@ -742,6 +748,10 @@ export const copy = {
       "side03": {
         "label": "Side case 3",
         "title": "An Ordinary Night"
+      },
+      "side05": {
+        "label": "Side case 5",
+        "title": "Listing Eve"
       }
     }
   }
