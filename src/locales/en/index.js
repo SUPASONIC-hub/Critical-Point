@@ -115,7 +115,7 @@ export const speakers = {
   "한기호": "Han Giho",
   "그레이스 웡": "Grace Wong",
   "모지현": "Mo Jihyun",
-  "쩐 티 란": "Tran Thi Lan",
+  "레 티 호아": "Le Thi Hoa",
   "마리사 탄": "Marisa Tan",
   "육성빈": "Yuk Seongbin",
   "추영복": "Chu Yeongbok"

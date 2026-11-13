@@ -123,7 +123,7 @@ const SPEAKER_PORTRAITS = {
   "모지현": "/portrait-mo-jihyun.webp",
   // 번외 6 (2026-11-13): the side case's one new speaker, a generated face
   // of someone who does not exist.
-  "쩐 티 란": "/portrait-tran-thi-lan.webp",
+  "레 티 호아": "/portrait-le-thi-hoa.webp",
   // 번외 5 (2026-11-13): the side case's three new speakers, each a generated
   // face of someone who does not exist, and an ordinary one.
   "육성빈": "/portrait-yuk-seongbin.webp",

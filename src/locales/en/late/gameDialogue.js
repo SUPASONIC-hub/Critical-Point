@@ -708,10 +708,10 @@ export default {
       "voice": "She starts calmly, and her sentences grow short whenever her own name comes up.",
       "line": "I asked you to delete it."
     },
-    "쩐 티 란": {
+    "레 티 호아": {
       "appearance": "A rice cooker on top of the moving boxes, a lanyard with her lab pass, a laptop holding thirty-seven property registers.",
       "thought": "9 years of savings have become one row of a table. A row, at least, can be counted.",
-      "gesture": "When Tran Thi Lan says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
+      "gesture": "When Le Thi Hoa says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
       "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
       "line": "Whether that’s strange, I don’t know."
     },

@@ -564,7 +564,7 @@ test("번외 6 is the Friday between 사건 27 and 28, shows the row and never h
   // The row is shown, not explained (금융 소재 기획 3절 6).
   assert.match(side06.nodes.s6_row.text, /2억 1천만 원, 2억 1천만 원, 2억 1천만 원/);
   for (const how of ["수법", "동시 진행", "동시진행", "깡통", "리베이트", "바지 사장"]) assert.equal(copy.includes(how), false, how);
-  // 쩐 티 란's speech is Korean: no Latin word in any scene but KD.
+  // 레 티 호아's speech is Korean: no Latin word in any scene but KD.
   for (const scene of Object.values(side06.nodes)) assert.equal(/[A-Za-z]{2,}/.test(scene.text.replace(/KD/g, "")), false, scene.title);
   // The endings never say a deposit came back or a loan was stopped.
   for (const effect of ["돌려받았", "보류됐", "보류되었", "받아들여졌", "승인됐", "막았"]) assert.equal(copy.includes(effect), false, effect);
