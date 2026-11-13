@@ -714,6 +714,27 @@ export default {
       "gesture": "When Tran Thi Lan says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
       "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
       "line": "Whether that’s strange, I don’t know."
+    },
+    "육성빈": {
+      "appearance": "A convenience-store bag, a loosened tie, the team’s target table on his phone.",
+      "thought": "If I hadn’t checked it, someone else would have. And they’d have been on a contract too.",
+      "gesture": "Before saying something awkward, Yuk Seongbin puts down whatever he is holding, and leaves it half unwrapped.",
+      "voice": "Friendly and apologetic, but the end of every sentence comes back to the team’s numbers.",
+      "line": "We only checked it. Though the checked-by box does have my name in it."
+    },
+    "추영복": {
+      "appearance": "A bunch of shutter keys, a counter by the heater, a tuition bill with his granddaughter’s name on it.",
+      "thought": "If the bank’s name is on it, the bank is watching it. That’s how it has been for 32 years.",
+      "gesture": "Every time he says a big number, Chu Yeongbok gives a small laugh and slows down a little on the next words.",
+      "voice": "A neighbourhood shopkeeper’s way of talking: it starts gruff and ends in an apology.",
+      "line": "If the bank tells me, I’ll do just that."
+    },
+    "마리사 탄": {
+      "appearance": "Singapore’s night skyline past the video-call window, a half-drunk cup of tea, an approval record on screen share.",
+      "thought": "My advice is on the record. Being on the record and being taken up are different things.",
+      "gesture": "Marisa Tan says the other person’s name, then the point, and when she is done she puts a document on the screen.",
+      "voice": "In English, short and straight. Given names before titles.",
+      "line": "All we can see is the inside of the exchange. Where the money came from, the bank sees."
     }
   },
 };

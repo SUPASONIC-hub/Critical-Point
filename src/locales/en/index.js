@@ -116,6 +116,9 @@ export const speakers = {
   "그레이스 웡": "Grace Wong",
   "모지현": "Mo Jihyun",
   "쩐 티 란": "Tran Thi Lan",
+  "마리사 탄": "Marisa Tan",
+  "육성빈": "Yuk Seongbin",
+  "추영복": "Chu Yeongbok"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -152,7 +155,10 @@ export const roles = {
   "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center",
   "홍콩 수취 은행 송금 조사 담당 · 29세": "Payments investigator at the receiving bank in Hong Kong · age 29",
   "전 KD캐피탈 자금부 해외 송금 담당 · 9년 · 37세": "Former overseas-payments officer, KD Capital Treasury · 9 years · age 37",
-  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul"
+  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul",
+  "KD은행 디지털자산제휴팀 과장": "Manager, Digital Asset Partnerships, KD Bank",
+  "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
+  "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore"
 };
 
 
@@ -766,6 +772,10 @@ export const copy = {
       "side06": {
         "label": "Side case 6",
         "title": "The Deposit"
+      },
+      "side05": {
+        "label": "Side case 5",
+        "title": "Listing Eve"
       }
     }
   }

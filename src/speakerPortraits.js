@@ -124,6 +124,11 @@ const SPEAKER_PORTRAITS = {
   // 번외 6 (2026-11-13): the side case's one new speaker, a generated face
   // of someone who does not exist.
   "쩐 티 란": "/portrait-tran-thi-lan.webp",
+  // 번외 5 (2026-11-13): the side case's three new speakers, each a generated
+  // face of someone who does not exist, and an ordinary one.
+  "육성빈": "/portrait-yuk-seongbin.webp",
+  "추영복": "/portrait-chu-yeongbok.webp",
+  "마리사 탄": "/portrait-marisa-tan.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */
