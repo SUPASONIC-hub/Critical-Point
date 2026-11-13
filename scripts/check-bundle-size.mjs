@@ -652,7 +652,8 @@ const budgets = [
   // 201,645 / 73,087 -> 202,471 / 73,277 #535 달력·예고 묶음 실측. Measured 202467 / 73273 (over budget only) in the e2e build, the plus 4.
   // 201,033 / 72,895 -> 203,058 / 73,777 n2n3 over main 1ae72e0b. Measured 203054 / 73773 (over budget only) in the e2e build, the plus 4.
   // 201,645 / 73,087 -> 203,679 / 73,972 N2N3 첫 시간 over main 7c80ccfe. Measured 203675 / 73968 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 202_471, maxGzip: 73_277 },
+  // 202,471 / 73,277 -> 204,500 / 74,146 N2N3 첫 시간 over main dcbbe5e0. Measured 204496 / 74142 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 204_500, maxGzip: 74_146 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1862,7 +1863,8 @@ const budgets = [
   // 189,552 / 63,089 -> 189,888 / 63,261 c4c5-copy over main 7ec2304e. Measured 189884 / 63257 (over budget only) in the e2e build, the plus 4.
   // 189,888 / 63,261 -> 190,074 / 63,309 n-plan over main 1ae72e0b. Measured 190070 / 63305 (over budget only) in the e2e build, the plus 4.
   // 189,888 / 63,261 -> 189,921 / 63,268 n2n3 over main 1ae72e0b. Measured 189917 / 63264 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 190_074, maxGzip: 63_309 },
+  // 190,074 / 63,309 -> 190,116 / 63,334 N2N3 첫 시간 over main dcbbe5e0. Measured 190112 / 63330 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 190_116, maxGzip: 63_334 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1926,7 +1928,8 @@ const budgets = [
   // 158,035 / 56,278 -> 158,306 / 56,407 c4c5-copy over main 7ec2304e. Measured 158302 / 56403 (over budget only) in the e2e build, the plus 4.
   // 158,306 / 56,407 -> 158,442 / 56,447 n-plan over main 1ae72e0b. Measured 158438 / 56443 (over budget only) in the e2e build, the plus 4.
   // 158,306 / 56,407 -> 158,341 / 56,407 n2n3 over main 1ae72e0b. Measured 158337 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 158_442, maxGzip: 56_447 },
+  // 158,442 / 56,447 -> 158,485 / 56,459 N2N3 첫 시간 over main dcbbe5e0. Measured 158481 / 56455 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 158_485, maxGzip: 56_459 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2330,7 +2333,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 374,122 / 433,603 / 441,373 #535 달력·예고 묶음 실측. Measured first paint, the plus 4.
 // -> 374,619 / 434,057 / 441,824 n2n3 over main 1ae72e0b. Measured first paint, the plus 4.
 // -> 374,814 / 434,252 / 442,020 N2N3 첫 시간 over main 7c80ccfe. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 374_122, en: 433_603, ja: 441_373 };
+// -> 374,990 / 434,481 / 442,264 N2N3 첫 시간 over main dcbbe5e0. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 374_990, en: 434_481, ja: 442_264 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
