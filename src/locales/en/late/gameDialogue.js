@@ -337,10 +337,10 @@ export default {
       "voice": "He asks straight out, and when adults dodge the answer, he asks the same question once more.",
       "line": "You teach how to sell. Don’t you teach how not to sell?"
     },
-    "표세린": {
+    "미즈노 사키": {
       "appearance": "A white shirt with the cuffs turned once, a desk without a single plant, an Excel sheet balanced to the third decimal place.",
       "thought": "A recommendation written as a favor is one nobody trusts the next year. What I sell isn’t a yes or a no; it’s being trustworthy.",
-      "gesture": "Before answering, Pyo Serin turns her laptop screen toward the other person. She shows her numbers first, then speaks.",
+      "gesture": "Before answering, Mizuno Saki turns her laptop screen toward the other person. She shows her numbers first, then speaks.",
       "voice": "She doesn’t write down words carried by feeling. When those words come with grounds, she doesn’t drop a single letter.",
       "line": "I don’t take requests for a vote-against recommendation. Give me grounds. I write the recommendation."
     },
@@ -400,10 +400,10 @@ export default {
       "voice": "He uses Korean proverbs backwards and doesn’t correct them even when he knows they’re wrong. His accent disappears only when he says numbers.",
       "line": "There’s a Korean proverb: the more urgent it is, the more you go around. So let’s sign quickly."
     },
-    "백다온": {
+    "마커스 림": {
       "appearance": "He keeps his ID badge tucked inside his shirt. The corner of his laptop shows a half-peeled Korean university sticker.",
       "thought": "Four people can open the file. One in four is as good as a name.",
-      "gesture": "Baek Daon holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
+      "gesture": "Marcus Lim holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
       "voice": "His polite speech is fast and quiet. He always ends a sentence by saying he’s the one with the least power.",
       "line": "That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel."
     },
@@ -666,10 +666,10 @@ export default {
       "voice": "She talks fast and bright, and slows by half a beat the moment numbers turn into people’s names.",
       "line": "We won’t go under. That’s what we built this company for."
     },
-    "우지환": {
+    "토머스 리드": {
       "appearance": "A tablet with a marathon-finish photo as wallpaper, a neat knit sweater instead of a tie, watch alarms set to the minute.",
       "thought": "This is an age where dissents stay on the record. So even with a dissent, the loan can go out.",
-      "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
+      "gesture": "When Thomas Reed gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
     }

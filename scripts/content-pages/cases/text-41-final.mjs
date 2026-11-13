@@ -369,7 +369,7 @@ export default {
       setting: "2026년 추석 연휴 · KD캐피탈 위험관리부 → 성수동 루프나우 다크스토어 → KD캐피탈 심사위원회 회의실",
       premise: [
         "추석 밤, KD캐피탈 위험관리부 부장 채이안이 파일 한 부를 내밉니다. 내일 오전 9시, 연휴 중에 임시 심사위원회가 열립니다. 안건은 도심 15분 배송 회사 루프나우의 운영자금 대출 290억 원. 라운드힐 캐피탈이 480억을 투자하기로 했는데, 그 계약에 선행 조건(이게 먼저 이뤄져야 계약이 효력을 갖는 조건)이 붙었습니다. KD캐피탈의 대출 확약(돈을 빌려주겠다는 공식 약속), 마감은 내일 오전 10시입니다.",
-        "위원은 다섯 명이고 모두 실명으로 서명합니다. 그 다섯 줄 가운데 마지막 줄에 처음으로 당신 이름이 인쇄돼 있습니다. 채이안은 14쪽 제7조를 읽어 보라고, 아는 문장일 거라고 말합니다. 부채비율(회사 빚이 자기 돈의 몇 배인지 보는 숫자)이 180%를 넘으면 만기 전이라도 즉시 회수한다. 쉼표 자리까지 2023-0412 계약서와 똑같습니다. 3년 전 플로우온 대출 앞에서 당신이 반대 의견을 썼던 바로 그 문장입니다. 안건을 올린 사람은 기업금융본부장 우지환, 노아의 사전 점수는 A등급입니다.",
+        "위원은 다섯 명이고 모두 실명으로 서명합니다. 그 다섯 줄 가운데 마지막 줄에 처음으로 당신 이름이 인쇄돼 있습니다. 채이안은 14쪽 제7조를 읽어 보라고, 아는 문장일 거라고 말합니다. 부채비율(회사 빚이 자기 돈의 몇 배인지 보는 숫자)이 180%를 넘으면 만기 전이라도 즉시 회수한다. 쉼표 자리까지 2023-0412 계약서와 똑같습니다. 3년 전 플로우온 대출 앞에서 당신이 반대 의견을 썼던 바로 그 문장입니다. 안건을 올린 사람은 기업금융본부장 토머스 리드, 노아의 사전 점수는 A등급입니다.",
         "성수동의 루프나우 1호 다크스토어(손님은 들어올 수 없는 배송 전용 소형 창고)에서는 전기자전거 40대가 충전기에 꽂혀 있습니다. 강태민이 문을 열자 대표 민하랑이 먼저 알아봅니다. 플로우온 야간조 반장님! 민하랑은 플로우온의 야간 배차 매니저였고, 지금은 다크스토어 18곳, 직원 214명, 계약 라이더 1,380명을 이끄는 서른한 살 대표입니다.",
         "민하랑이 사업계획서를 펼칩니다. 플로우온의 마지막 72시간 동안 자기 손으로 배차표에서 이름 58개를 지웠다고, 그래서 만든 회사라고, 우리는 안 망한다고. 그런데 계획서 마지막 장, 상환(빌린 돈을 갚는 일)에 쓸 돈의 출처 칸에 적힌 것은 매출이 아니라 「다음 투자 유치」입니다."
       ],
@@ -377,7 +377,7 @@ export default {
         { name: "채이안", note: "KD캐피탈 위험관리부 부장, 17년 차. 추석 밤에 제7조가 든 파일을 당신에게 건넵니다." },
         { name: "민하랑", note: "루프나우 대표, 31세. 플로우온 야간 배차 매니저였고, 다시는 망하지 않겠다며 회사를 세웠습니다." },
         { name: "강태민", note: "플로우온 야간조 반장 출신. 다크스토어 문을 열자마자 옛 동료에게 알아봐집니다." },
-        { name: "우지환", note: "KD캐피탈 기업금융본부장. 루프나우 대출 안건을 올린 사람입니다." }
+        { name: "토머스 리드", note: "KD캐피탈 기업금융본부장. 루프나우 대출 안건을 올린 사람입니다." }
       ],
       question: "똑같은 모양의 대출 앞에서, 이번에는 당신 이름으로 반대 의견을 쓸 수 있을까요? 그 서명은 누구를 지키고, 누구에게 청구서를 보내게 될까요?",
     },
@@ -385,7 +385,7 @@ export default {
       setting: "Chuseok holiday 2026 · KD Capital Risk Management Department → LoopNow dark store, Seongsu-dong → KD Capital credit committee meeting room",
       premise: [
         "On Chuseok night, Chae Ian, head of KD Capital’s Risk Management Department, hands you a file. Tomorrow at 9 a.m., in the middle of the holiday, an emergency credit committee will meet. The agenda: a 29-billion-won working-capital loan to LoopNow, a 15-minute urban delivery company. Roundhill Capital has agreed to invest 48 billion won, but on one precondition: a loan commitment from KD Capital, due by 10 a.m. tomorrow.",
-        "Five committee members will sign under their real names, and for the first time, the last of those five lines carries your name in print. Chae Ian tells you to read Article 7 on page 14; you’ll recognize the sentence. If the debt ratio exceeds 180 percent, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas, the FlowOn loan you dissented on three years ago. The item was proposed by Woo Jihwan, Head of Corporate Finance, and NOAH has pre-scored it Grade A.",
+        "Five committee members will sign under their real names, and for the first time, the last of those five lines carries your name in print. Chae Ian tells you to read Article 7 on page 14; you’ll recognize the sentence. If the debt ratio exceeds 180 percent, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas, the FlowOn loan you dissented on three years ago. The item was proposed by Thomas Reed, Head of Corporate Finance, and NOAH has pre-scored it Grade A.",
         "At LoopNow’s Dark Store No. 1 in Seongsu-dong, a small delivery-only warehouse customers never enter, forty e-bikes sit plugged into chargers. When Kang Taemin opens the door, the CEO, Min Harang, recognizes him first: the FlowOn night-shift foreman! Min Harang was FlowOn’s night dispatch manager. Now, at 31, she runs 18 dark stores, 214 employees and 1,380 contract riders.",
         "She opens the business plan. In FlowOn’s last 72 hours, she says, she erased 58 names from the dispatch sheet with her own hands. That is why she built this company. We won’t go under. But on the plan’s last page, in the box for where the repayment money will come from, it doesn’t say revenue. It says “next funding round.”"
       ],
@@ -393,7 +393,7 @@ export default {
         { name: "Chae Ian", note: "Head of KD Capital’s Risk Management Department, seventeen years in, who hands you the file with Article 7 on Chuseok night." },
         { name: "Min Harang", note: "CEO of LoopNow, 31, formerly FlowOn’s night dispatch manager, who built her company so it would never go under." },
         { name: "Kang Taemin", note: "Former FlowOn night-shift foreman, recognized the moment he opens the dark store door." },
-        { name: "Woo Jihwan", note: "Head of Corporate Finance at KD Capital, the man who put the LoopNow loan on the agenda." }
+        { name: "Thomas Reed", note: "Head of Corporate Finance at KD Capital, the man who put the LoopNow loan on the agenda." }
       ],
       question: "Facing a loan of exactly the same shape, can you write the dissent under your own name this time? Whom would that signature protect, and to whom would it send the bill?",
     },
@@ -401,7 +401,7 @@ export default {
       setting: "2026年の秋夕連休 · KDキャピタル リスク管理部 → ソンス洞のループナウのダークストア → KDキャピタル審査委員会の会議室",
       premise: [
         "秋夕の夜、KDキャピタル リスク管理部の部長チェ・イアンがファイルを一部差し出します。明日の午前9時、連休中に臨時審査委員会が開かれます。議案は、都心15分配送の会社ループナウへの運転資金融資290億ウォン。ラウンドヒル・キャピタルが480億ウォンを投資することになっていますが、その契約には先行条件(それが先に満たされないと契約が効力を持たない条件)が付いています。KDキャピタルの融資確約(お金を貸すという正式な約束)、締め切りは明日の午前10時です。",
-        "委員は五人で、全員が実名で署名します。その五行の最後の一行に、初めてあなたの名前が印刷されています。14ページの第7条を読んでみて、知っている文のはずだ、とチェ・イアンは言います。負債比率(会社の借金が自己資金の何倍かを見る数字)が180%を超えたら、満期前でも即時回収する。カンマの位置まで2023-0412の契約書と同じです。3年前、フロウオンへの融資を前にあなたが反対意見を書いた、まさにあの文です。議案を出したのは企業金融本部長ウ・ジファン、NOAHの事前スコアはA等級です。",
+        "委員は五人で、全員が実名で署名します。その五行の最後の一行に、初めてあなたの名前が印刷されています。14ページの第7条を読んでみて、知っている文のはずだ、とチェ・イアンは言います。負債比率(会社の借金が自己資金の何倍かを見る数字)が180%を超えたら、満期前でも即時回収する。カンマの位置まで2023-0412の契約書と同じです。3年前、フロウオンへの融資を前にあなたが反対意見を書いた、まさにあの文です。議案を出したのは企業金融本部長トーマス・リード、NOAHの事前スコアはA等級です。",
         "ソンス洞のループナウ1号ダークストア(客は入れない配送専用の小さな倉庫)では、電動自転車40台が充電器につながれています。カン・テミンがドアを開けると、代表のミン・ハランが先に気づきます。フロウオン夜勤班の班長さん!ミン・ハランはフロウオンの夜間配車マネージャーで、いまはダークストア18か所、社員214人、契約ライダー1,380人を率いる31歳の代表です。",
         "ミン・ハランが事業計画書を広げます。フロウオンの最後の72時間、自分の手で配車表から58人の名前を消した、だから作った会社だ、うちは潰れない、と。けれど計画書の最後のページ、返済(借りたお金を返すこと)に充てるお金の出どころの欄に書かれているのは、売上ではなく「次の投資の誘致」です。"
       ],
@@ -409,7 +409,7 @@ export default {
         { name: "チェ・イアン", note: "KDキャピタル リスク管理部の部長、17年目。秋夕の夜、第7条の入ったファイルをあなたに渡します。" },
         { name: "ミン・ハラン", note: "ループナウ代表、31歳。フロウオンの夜間配車マネージャーだった人で、二度と潰れない会社をと起業しました。" },
         { name: "カン・テミン", note: "フロウオン夜勤班の班長だった人。ダークストアのドアを開けた瞬間、昔の仲間に気づかれます。" },
-        { name: "ウ・ジファン", note: "KDキャピタル企業金融本部長。ループナウ融資の議案を出した人です。" }
+        { name: "トーマス・リード", note: "KDキャピタル企業金融本部長。ループナウ融資の議案を出した人です。" }
       ],
       question: "まったく同じ形の融資を前に、今度こそあなたの名前で反対意見を書けるでしょうか。その署名は誰を守り、誰に請求書を送ることになるのでしょうか。",
     },

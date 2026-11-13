@@ -69,7 +69,7 @@ export default {
     },
     "c23_advisor": {
       "title": "To the Third Decimal Place",
-      "text": "Pyo Serin of ClearVote, a proxy advisor (a firm that tells big investors how to vote on each item), brings up the group’s 48-page 'Candidate Yoon Sanghyuk’s Innovation Achievements.' 'I don’t take requests to recommend a no vote. I write the recommendations. Articles aren’t grounds. A rating drop is. Give me a document showing this drop came from one candidate’s decision.' Kwon Dohyun says, 'You’re precise to two decimal places.' Pyo Serin answers. 'To three.'",
+      "text": "Mizuno Saki of ClearVote, a proxy advisor (a firm that tells big investors how to vote on each item), brings up the group’s 48-page 'Candidate Yoon Sanghyuk’s Innovation Achievements.' She has covered Korean companies from ClearVote’s Tokyo office for 7 years and speaks the careful Korean of a year at a Seoul language school. 'I don’t take requests to recommend a no vote. I write the recommendations. Articles aren’t grounds. A rating drop is. Give me a document showing this drop came from one candidate’s decision.' Kwon Dohyun says, 'You’re precise to two decimal places.' Mizuno Saki answers. 'To three.'",
       "memo": [
         "ClearVote recommendation deadline: tomorrow 09:00",
         "Group materials, 48 pages -- 2023 mentioned 0 times",
@@ -95,7 +95,7 @@ export default {
       },
       "place": "ClearVote, Yeouido · Meeting Room",
       "clock": "March 16 · Day Before the Report Deadline",
-      "question": "Pyo Serin wants grounds linking the rating drop to the candidate’s decision. What do you hand over by tomorrow morning?",
+      "question": "Mizuno Saki wants grounds linking the rating drop to the candidate’s decision. What do you hand over by tomorrow morning?",
       "lead": "With the bundles of proxy forms from Yeongdong and Mangwon in your bag, you knock on the door of a small office in a Yeouido back alley."
     },
     "c23_backstage": {
@@ -158,7 +158,7 @@ export default {
       "lead": "Agenda Item No. 3 came up only after 11. Meanwhile, the line in the lobby filed in one by one through the auditorium’s back doors."
     },
     "c23_aftershock": {
-      "text": "50.6% in favor, passed. Pyo Serin of ClearVote speaks. 'Last year’s approval rate was 97.1%. It dropped 46.5 points. Our recommendation was against.' The 49.4% against is 22.7% from foreign institutions that followed ClearVote, the National Pension Service’s 8%, and 18.7% from other institutions. 'Institutions cast the votes. The reason they gave was the reputational damage after the Gaeul Rice Cake Shop series, and the footnotes to that reason are the people who stood in the back.' A message comes from Han Seoyun. 'An all-staff notice is scheduled for Monday at 8. The title is Reorganization, and the first line is Trigger Lab.'",
+      "text": "50.6% in favor, passed. Mizuno Saki of ClearVote speaks. 'Last year’s approval rate was 97.1%. It dropped 46.5 points. Our recommendation was against.' The 49.4% against is 22.7% from foreign institutions that followed ClearVote, the National Pension Service’s 8%, and 18.7% from other institutions. 'Institutions cast the votes. The reason they gave was the reputational damage after the Gaeul Rice Cake Shop series, and the footnotes to that reason are the people who stood in the back.' A message comes from Han Seoyun. 'An all-staff notice is scheduled for Monday at 8. The title is Reorganization, and the first line is Trigger Lab.'",
       "memo": [
         "Agenda Item No. 3: 50.6% in favor -- passed · last year 97.1%",
         "49.4% against: foreign institutions 22.7% · National Pension 8% · other institutions 18.7%",
@@ -532,9 +532,9 @@ export default {
     "c23_proxy_visit": "Going round forty-one homes takes two days. Every house serves instant coffee, and Grandma Seo Jungran wraps up dried persimmons along with her ID copy.",
     "c23_proxy_explain": "After the explanation, nine of them take back their proxy forms. One even decides to vote in favor after learning who Yoon Sanghyuk is.",
     "c23_proxy_fast": "All 41 are filled in an hour. Also left on record: customers’ IDs went through the branch copier and into the group’s bag.",
-    "c23_advisor_voices": "174 statements come in overnight. Pyo Serin puts only the 38 with dates and documents in the footnotes and writes 'Against' in the conclusion field. The reasons run two lines. 'Appointing the candidate raises reputational risk to shareholder assets. The possible lawsuit by 1,740 victims is a debt not yet on the books.'",
-    "c23_advisor_docs": "Documents are strong. Pyo Serin writes 'Against' in the conclusion field and ties the reasons to the originals. 'The rating drop stems from the candidate’s decision to discard the dissent.' The record of Han Seoyun pressing the return button goes into the appendix too.",
-    "c23_advisor_gap": "One missing year isn’t grounds. Pyo Serin writes 'Against' on the rating drop alone, and beside the candidate’s 2023 adds one line: 'Further verification needed.'",
+    "c23_advisor_voices": "174 statements come in overnight. Mizuno Saki puts only the 38 with dates and documents in the footnotes and writes 'Against' in the conclusion field. The reasons run two lines. 'Appointing the candidate raises reputational risk to shareholder assets. The possible lawsuit by 1,740 victims is a debt not yet on the books.'",
+    "c23_advisor_docs": "Documents are strong. Mizuno Saki writes 'Against' in the conclusion field and ties the reasons to the originals. 'The rating drop stems from the candidate’s decision to discard the dissent.' The record of Han Seoyun pressing the return button goes into the appendix too.",
+    "c23_advisor_gap": "One missing year isn’t grounds. Mizuno Saki writes 'Against' on the rating drop alone, and beside the candidate’s 2023 adds one line: 'Further verification needed.'",
     "c23_backstage_stay": "Baek Arin looks at the run sheet for a long time. She doesn’t tear out page 14; she draws a line through it with a ballpoint. Whether the chair will skip that line, no one knows.",
     "c23_backstage_script": "The original becomes evidence. So does the name in the author field. Baek Arin hands it over knowing that.",
     "c23_backstage_go": "As the door closes, Baek Arin folds the draft resignation again. The fold, three months creased, wears a little thinner.",
@@ -568,7 +568,7 @@ export default {
     "c23_branch_newsroom_follow_a": "Erasing the IDs takes a day. The story runs the night before the meeting, and the source is safe.",
     "c23_branch_newsroom_follow_b": "The FSS gives a filing number. The meeting opens before anything comes of that number.",
     "c23_branch_newsroom_follow_c": "The story spreads fast. HR matches the employee IDs faster.",
-    "c23_route_system_send": "The statistics become an appendix to Pyo Serin’s report. One in three institutions reads as far as the appendix.",
+    "c23_route_system_send": "The statistics become an appendix to Mizuno Saki’s report. One in three institutions reads as far as the appendix.",
     "c23_route_system_minutes": "Once the letter is received, the secretariat sets out one more recorder. The speaking time stays the same.",
     "c23_route_system_drop": "A few more votes come in. The words kept as one line for 10 years get ready to be kept as one line again this year.",
     "c23_final_system_route_a": "With the rule in place, candidates from next year on must list how they handled dissent against themselves. This year’s candidate falls outside the rule.",

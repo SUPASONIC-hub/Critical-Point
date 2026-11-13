@@ -10,8 +10,11 @@ import { getSpeakerPortrait } from "../../src/speakerPortraits.js";
  * one, with the Korean particle after it following the new name's last sound.
  */
 
+// Named in a profile and the narration only, never a scene's speaker (사건 48).
+const PROFILE_ONLY = new Set(["토머스 리드"]);
+
 test("every new Korean name is a speaker with a portrait, and the three tables pair up", () => {
-  for (const [, to] of CAST_ALIASES.ko) assert.match(getSpeakerPortrait(to) ?? "", /^\/portrait-[a-z0-9-]+\.webp$/, to);
+  for (const [, to] of CAST_ALIASES.ko.filter(([, name]) => !PROFILE_ONLY.has(name))) assert.match(getSpeakerPortrait(to) ?? "", /^\/portrait-[a-z0-9-]+\.webp$/, to);
   assert.equal(CAST_ALIASES.en.length, CAST_ALIASES.ko.length);
   assert.equal(CAST_ALIASES.ja.length, CAST_ALIASES.ko.length);
   for (const [, to] of CAST_ALIASES.en) assert.match(to, /^[\x20-\x7e]+$/, `${to}: en names stay ASCII`);
@@ -21,6 +24,7 @@ test("the en and ja tables name the new people the way the dictionaries do", () 
   const en = readFileSync("src/locales/en/index.js", "utf8");
   const ja = readFileSync("src/locales/ja/index.js", "utf8");
   CAST_ALIASES.ko.forEach(([, to], index) => {
+    if (PROFILE_ONLY.has(to)) return;
     assert.ok(en.includes(`"${to}": "${CAST_ALIASES.en[index][1]}"`), `en speakers: ${to}`);
     assert.ok(ja.includes(`"${to}": "${CAST_ALIASES.ja[index][1]}"`), `ja speakers: ${to}`);
   });

@@ -327,6 +327,6 @@ export const caseRoles = {
   },
   "case48": {
     "루프나우 대표 · 전 플로우온 야간 배차 매니저 · 31세": "CEO of LoopNow · former night dispatch manager at FlowOn · age 31",
-    "KD캐피탈 기업금융본부장 · 루프나우 안건 발의자": "Head of Corporate Finance, KD Capital · proposer of the LoopNow agenda item"
+    "KD캐피탈 기업금융본부장 · 루프나우 안건 발의자 · 뉴욕 지역은행 출신 외부 영입": "Head of Corporate Finance, KD Capital · proposer of the LoopNow agenda item · hired from a New York regional bank"
   }
 };

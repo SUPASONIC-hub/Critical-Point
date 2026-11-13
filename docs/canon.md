@@ -109,6 +109,10 @@ A nationality is never the reason someone does right or wrong.
 | 응우옌 반 남 / Nguyen Van Nam / グエン・ヴァン・ナム | 연시우 | Vietnamese, Hanoi engineering school; sixth year at the 판교 data center; on duty over 추석 (사건 46) | 「남 씨」 |
 | 대니얼 강 / Daniel Kang / ダニエル・カン | 도건우 | Korean American (1.5 generation), New York lawyer; keeps the name from his law-firm years | 위기대응TF 팀장 |
 | 채이안 (unchanged) | -- | 재일교포 3세; joined KD은행 도쿄지점 in 2009, 17th year (사건 25); ja gives his 通名 千伊安 once | 부장 |
+| 미즈노 사키 / Mizuno Saki / 水野咲 | 표세린 | Japanese; ClearVote's Tokyo office, covering Korean companies for 7 years; a year at a Seoul language school | 「미즈노 씨」; 합니다체 and her distance to the end, 「죄송하지만」 before an objection; one personal sentence only in 사건 49 |
+| 마커스 림 / Marcus Lim / マーカス・リム | 백다온 | Singaporean, Korean mother; third-year analyst at Roundhill's Singapore head office | calls 조현석 「에단」 as the firm does; polite Korean to the analyst |
+| 조현석 (unchanged) | -- | Korean American 1.5 generation (went to New York at twelve), 12 years in Singapore; 「에단」 inside the firm, 조현석 in the narration | -- |
+| 토머스 리드 / Thomas Reed / トーマス・リード | 우지환 (profile only) | American; KD캐피탈 hired him itself from a New York regional bank after the 사건 43 dismissal (not Kingsdale's) | speaks English, an interpreter follows a beat behind (사건 48, first and only scene); his 「다만」 is the however he says in English |
 
 Rules: what a foreign speaker says inside quotes is natural Korean (no English
 or Japanese mixed in, no broken Korean); whether they speak Korean or go

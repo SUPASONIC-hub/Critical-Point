@@ -69,12 +69,12 @@ export default {
     },
     "c43_advisor": {
       "title": "What the Tail Is Worth",
-      "text": "If the dismissal motion passes, an extraordinary shareholders’ meeting follows a month later. Pyo Serin says, 'Recommending a yes on dismissal is easy. Then this company’s governance score goes up.' 'The director who received the dissent report back then is chairing this vote. This isn’t reform. It’s putting the blame on one subordinate while the people above walk away. Give me the grounds, and I’ll write a conditional one: dismissal alone isn’t enough. Just know, when you hand them over, that the recommendation could sink the dismissal.'",
+      "text": "If the dismissal motion passes, an extraordinary shareholders’ meeting follows a month later. Mizuno Saki says, 'Recommending a yes on dismissal is easy. Then this company’s governance score goes up.' 'The director who received the dissent report back then is chairing this vote. I’m sorry, but this isn’t reform. It’s putting the blame on one subordinate while the people above walk away. Give me the grounds, and I’ll write a conditional one: dismissal alone isn’t enough. Just know, when you hand them over, that the recommendation could sink the dismissal.'",
       "memo": [
         "ClearVote draft recommendation -- conclusion box empty",
         "Extraordinary shareholders’ meeting: a month after the board passes it",
         "Director who received the 2023 dissent report = current board chair",
-        "Pyo Serin: 'This isn’t reform. It’s cutting off the tail.'"
+        "Mizuno Saki: 'This isn’t reform. It’s cutting off the tail.'"
       ],
       "choices": {
         "c43_advisor_amend": {
@@ -95,7 +95,7 @@ export default {
       },
       "place": "ClearVote, Yeouido · Meeting Room",
       "clock": "September 4 · Board meeting in D-3",
-      "question": "Pyo Serin calls dismissal alone cutting off the tail and offers a conditional recommendation. What do you hand her for it?",
+      "question": "Mizuno Saki calls dismissal alone cutting off the tail and offers a conditional recommendation. What do you hand her for it?",
       "lead": "The small office of ClearVote, the proxy adviser. Six months on, you knock on the same door."
     },
     "c43_corridor": {
@@ -159,7 +159,7 @@ export default {
     },
     "c43_aftershock": {
       "title": "5 to 3",
-      "text": "The dismissal motion passes, 5 yes, 3 no. The last line saying the inquiry is over will be publicly disclosed tonight. When the doors open, 20 representatives of the one-share group are standing in the hallway. Yoon Sanghyuk hands his employee ID to his secretary and turns around. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Pyo Serin of ClearVote. 'Filled in the conclusion box. Conditional yes, 11 footnotes.'",
+      "text": "The dismissal motion passes, 5 yes, 3 no. The last line saying the inquiry is over will be publicly disclosed tonight. When the doors open, 20 representatives of the one-share group are standing in the hallway. Yoon Sanghyuk hands his employee ID to his secretary and turns around. 'The first-instance sentencing is coming up. That day, I’m the one in the defendant’s seat.' A text arrives from Mizuno Saki of ClearVote. 'I have filled in the conclusion box. Conditional yes, with 11 footnotes.'",
       "memo": [
         "Dismissal motion passed -- yes 5 · no 3",
         "Last line of the resolution: to be disclosed tonight",
@@ -377,7 +377,7 @@ export default {
           "label": "Pull out the resolution’s last line and challenge it publicly"
         },
         "c43_route_system_publish": {
-          "label": "Send the 10-year minutes data to Eun Chaewon and Pyo Serin"
+          "label": "Send the 10-year minutes data to Eun Chaewon and Mizuno Saki"
         },
         "c43_route_system_drop": {
           "label": "Set the statistics aside and focus on the vote count"
@@ -534,9 +534,9 @@ export default {
     "c43_ledger_visit": "Eun Chaewon’s reply is short. Thursday, four in the afternoon, her office. A text from Baek Arin asking to meet outside the court that same morning has already arrived. You now have one more story to bring.",
     "c43_ledger_conflict": "You raise it, and one of the two outside directors offers to recuse from the vote, then takes it back the next day. The other calls a lawyer.",
     "c43_ledger_target": "The two agree to meet you. The probability table was right that far, and in that table no one was ever called by name.",
-    "c43_advisor_voices": "Overnight, 140 demands come in. Pyo Serin footnotes only the 11 that come with dates and documents.",
+    "c43_advisor_voices": "Overnight, 140 demands come in. Mizuno Saki footnotes only the 11 that come with dates and documents.",
     "c43_advisor_amend": "The amendment lands in seven inboxes. Four open it, and only Eun Chaewon replies.",
-    "c43_advisor_simple": "Pyo Serin closes her laptop. 'I told you I don’t take requests.' The recommendation goes out conditional, as it was. Only your request stays on the record.",
+    "c43_advisor_simple": "Mizuno Saki closes her laptop. 'As I said, I do not take requests.' The recommendation goes out conditional, as it was. Only your request stays on the record.",
     "c43_corridor_speak": "Yoon Sanghyuk laughs for a long time. 'So the day comes when you tell me to go in.' He stands, but whether he says that name, he decides inside the door.",
     "c43_corridor_statement": "At the mention of a statement, Yoon Sanghyuk takes out a pen. The pen stops at the signature field, and he hands over the sheet with that field left empty.",
     "c43_corridor_ignore": "Your script does not waver. You never learn what else the man at the end of the bench meant to say.",
@@ -570,7 +570,7 @@ export default {
     "c43_branch_witness_follow_a": "Three lawyers join for free. One of them has handled the lawsuit of Moon Gaeul’s group. The claim still doubles.",
     "c43_branch_witness_follow_b": "The report gets a filing number. The settlement deadline comes sooner than that number does.",
     "c43_branch_witness_follow_c": "Told it is all right, Baek Arin laughs for a long while. Then she puts the settlement in her bag. Even after 13:00 on Monday, the signature field on that sheet is still empty.",
-    "c43_route_system_publish": "The statistics go into the margins of Eun Chaewon’s brief and into Pyo Serin’s footnotes. The names of the three who voted no go in with them.",
+    "c43_route_system_publish": "The statistics go into the margins of Eun Chaewon’s brief and into Mizuno Saki’s footnotes. The names of the three who voted no go in with them.",
     "c43_route_system_line": "Once the question is public, the secretariat calls the line 'customary wording.' For the first time, the word customary becomes a headline.",
     "c43_route_system_drop": "The votes get counted a little more precisely. That last line gets ready to sit in the same place again this year.",
     "c43_final_system_route_a": "With the rule in place, from the next dismissal on, a resolution cannot say it is over. This resolution falls outside that rule.",
@@ -641,7 +641,7 @@ export default {
     "c43_branch_witness_follow_a": "So she does not walk the road to the end alone, you build a legal team from the one-share group to protect Baek Arin’s testimony instead of the settlement.",
     "c43_branch_witness_follow_b": "Saying a deadline one hour before the board means to shut her up, you report the offer itself to regulators as retaliation against a whistleblower.",
     "c43_branch_witness_follow_c": "Saying you have no right to tell her to go to the end, you tell her signing is Baek Arin’s choice and that it is all right.",
-    "c43_route_system_publish": "So those who decide the votes decide knowing this pattern, you send the 10 years of minutes statistics to Eun Chaewon and Pyo Serin at once.",
+    "c43_route_system_publish": "So those who decide the votes decide knowing this pattern, you send the 10 years of minutes statistics to Eun Chaewon and Mizuno Saki at once.",
     "c43_route_system_line": "Before a third resolution closes with the same line, you pull out only the resolution’s last line and challenge it publicly.",
     "c43_route_system_drop": "Saying the past 10 years will not make five votes, you set the statistics aside and focus on the vote count.",
     "c43_final_system_route_a": "So that one ballot cannot do two things, you propose a board rule barring closing language in dismissal resolutions.",

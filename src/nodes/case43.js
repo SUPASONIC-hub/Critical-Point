@@ -8,7 +8,7 @@
  * meeting. Eight people vote: 회장 서도경 and seven outside directors. The
  * analyst has spent five months as 윤상혁's own subordinate at KD캐피탈, and now
  * walks into the board as a witness. 권도현 turns the seven outside directors
- * into seven one-page profit-and-loss sheets; 표세린 refuses to call the removal
+ * into seven one-page profit-and-loss sheets; 미즈노 사키 refuses to call the removal
  * reform unless the 2023 board that received the dissent is on the record too;
  * 백아린, sued by her former employer since her whistleblowing report, holds
  * the page that shows the current board chair 연태경 initialled "dissent: handled"
@@ -124,14 +124,14 @@ const case43Nodes = {
   c43_advisor: {
     phase: "THE ADVISER",
     title: "꼬리의 값",
-    speaker: "표세린",
+    speaker: "미즈노 사키",
     text:
-      "해임안이 통과되면 한 달 뒤 임시 주주총회(회사의 주인인 주주들이 모여 중요한 일을 표로 정하는 회의)가 열립니다. 표세린이 말합니다. '해임 찬성 권고는 쉬워요. 그러면 이 회사 지배구조(회사가 누구의 결정으로 움직이고 누가 감시하는지의 짜임) 점수가 올라가요.' '그때 반대 의견 보고를 받은 이사가 이번 표결의 의장이에요. 이건 개혁이 아니라 아랫사람 하나에게 책임을 지우고 윗선은 빠지는 거예요. 근거를 주시면 해임만으로는 부족하다고 조건부로 씁니다. 그 권고가 해임을 떨어뜨릴 수도 있다는 것까지 알고 주세요.'",
+      "해임안이 통과되면 한 달 뒤 임시 주주총회(회사의 주인인 주주들이 모여 중요한 일을 표로 정하는 회의)가 열립니다. 미즈노 사키가 말합니다. '해임 찬성 권고는 쉽습니다. 그러면 이 회사 지배구조(회사가 누구의 결정으로 움직이고 누가 감시하는지의 짜임) 점수가 올라갑니다.' '그때 반대 의견 보고를 받은 이사가 이번 표결의 의장입니다. 죄송하지만, 이건 개혁이 아니라 아랫사람 하나에게 책임을 지우고 윗선은 빠지는 것입니다. 근거를 주시면 해임만으로는 부족하다고 조건부로 씁니다. 그 권고가 해임을 떨어뜨릴 수도 있다는 것까지 알고 주십시오.'",
     memo: [
       "클리어보트 권고 초안 -- 결론 칸 비어 있음",
       "임시 주주총회: 이사회 가결 시 한 달 뒤",
       "2023년 반대 의견 보고 수신 이사 = 현 이사회 의장",
-      "표세린: '이건 개혁이 아니라 꼬리 자르기예요'",
+      "미즈노 사키: '이건 개혁이 아니라 꼬리 자르기입니다'",
     ],
     triggers: ["order", "system", "choice"],
     choices: [
@@ -140,7 +140,7 @@ const case43Nodes = {
         label: "1주 모임의 요구를 모아 조건부 권고의 근거로 싣는다",
         effect: { trust: 11, legitimacy: 4, humanCost: -4, time: -5, capital: -3, fatigue: 6 },
         voice: "부족하다는 말은 당사자들에게서 나와야 한다며, 1주 모임의 요구를 모아 조건부 권고의 근거로 싣는다.",
-        echo: "밤새 요구 140개가 모입니다. 표세린은 날짜와 문서가 붙은 11개만 각주로 씁니다.",
+        echo: "밤새 요구 140개가 모입니다. 미즈노 사키는 날짜와 문서가 붙은 11개만 각주로 씁니다.",
         cognition: { persistence: 2 },
       },
       {
@@ -156,7 +156,7 @@ const case43Nodes = {
         label: "개혁 조건은 다음으로 미루고 해임 찬성 권고만 부탁한다",
         effect: { capital: 5, legitimacy: -6, trust: 3, humanCost: 4, fatigue: -3 },
         voice: "조건이 해임을 떨어뜨릴 수도 있다는 말에, 개혁 조건은 다음으로 미루고 해임 찬성 권고만 부탁한다.",
-        echo: "표세린이 노트북을 닫습니다. '부탁은 안 받는다고 했죠.' 권고는 그대로 조건부로 나갑니다. 당신의 부탁만 기록에 남습니다.",
+        echo: "미즈노 사키가 노트북을 닫습니다. '부탁은 받지 않는다고 말씀드렸습니다.' 권고는 그대로 조건부로 나갑니다. 당신의 부탁만 기록에 남습니다.",
         cognition: { risk: 2 },
       },
       {
@@ -274,8 +274,8 @@ export const case43 = {
     c43_aftershock: {
       phase: "AFTERMATH",
       title: "5대 3",
-      speaker: "표세린",
-      text: "해임안(이사를 자리에서 물러나게 하는 안건) 가결, 찬성 5 반대 3. 책임 규명이 끝났다는 마지막 줄은 오늘 밤 공시(회사가 중요한 일을 모두에게 알리는 것)됩니다. 문이 열리자 복도에 1주 모임 대표 20명이 서 있습니다. 윤상혁이 사원증을 비서에게 건네고 돌아봅니다. '1심 선고가 곧일세. 그날은 내가 피고인석에 앉지.' 클리어보트의 표세린에게서 문자가 옵니다. '결론 칸 채웠어요. 조건부 찬성, 각주 11개.'",
+      speaker: "미즈노 사키",
+      text: "해임안(이사를 자리에서 물러나게 하는 안건) 가결, 찬성 5 반대 3. 책임 규명이 끝났다는 마지막 줄은 오늘 밤 공시(회사가 중요한 일을 모두에게 알리는 것)됩니다. 문이 열리자 복도에 1주 모임 대표 20명이 서 있습니다. 윤상혁이 사원증을 비서에게 건네고 돌아봅니다. '1심 선고가 곧일세. 그날은 내가 피고인석에 앉지.' 클리어보트의 미즈노 사키에게서 문자가 옵니다. '결론 칸을 채웠습니다. 조건부 찬성, 각주 11개입니다.'",
       memo: ["해임안 가결 -- 찬성 5 · 반대 3", "결의문 마지막 줄: 오늘 밤 공시 예정", "1주 모임 대표 20명, 33층 복도까지 입장", "1심 선고 임박 · 클리어보트 조건부 찬성 권고"],
       triggers: ["trust", "helplessness", "choice"],
       choices: [
@@ -590,10 +590,10 @@ export const case43 = {
       routeChoices: [
         {
           id: "c43_route_system_publish",
-          label: "10년 치 의사록 통계를 은채원과 표세린에게 보낸다",
+          label: "10년 치 의사록 통계를 은채원과 미즈노 사키에게 보낸다",
           effect: { legitimacy: 10, trust: 6, capital: -5, time: -6, fatigue: 5 },
-          voice: "표를 정할 사람들이 이 모양을 알고 정하게, 10년 치 의사록 통계를 은채원과 표세린에게 동시에 보낸다.",
-          echo: "통계는 은채원의 설명서 여백과 표세린의 각주로 들어갑니다. 반대표를 던진 세 사람의 이름도 함께 들어갑니다.",
+          voice: "표를 정할 사람들이 이 모양을 알고 정하게, 10년 치 의사록 통계를 은채원과 미즈노 사키에게 동시에 보낸다.",
+          echo: "통계는 은채원의 설명서 여백과 미즈노 사키의 각주로 들어갑니다. 반대표를 던진 세 사람의 이름도 함께 들어갑니다.",
           cognition: { inference: 2, persistence: 1 },
         },
         {
@@ -800,7 +800,7 @@ export const case43 = {
     c43_advisor: {
       place: "여의도 클리어보트 · 회의실",
       clock: "9월 4일 · 이사회까지 D-3",
-      question: "표세린은 해임만으로는 꼬리 자르기라며 조건부 권고를 말합니다. 그 권고에 무엇을 건네겠습니까?",
+      question: "미즈노 사키는 해임만으로는 꼬리 자르기라며 조건부 권고를 말합니다. 그 권고에 무엇을 건네겠습니까?",
       lead: "의결권 자문사(큰 투자 기관들에게 안건마다 찬성·반대를 권고하는 회사) 클리어보트의 작은 사무실, 여섯 달 만에 같은 문을 두드립니다.",
     },
     c43_call: {

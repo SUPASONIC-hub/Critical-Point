@@ -13,6 +13,8 @@
 옛 사진 세 장(Vitaly Gariev, Ramon Karolan, Mikhail Nilov)은 더 쓰지 않습니다. Kindel Media는 두 장이고 모델은 서로 다른 사람입니다.
 도건우 → 대니얼 강(재미교포 변호사)은 가해 쪽 역이라 생성 사진이어야 하는데, 이번에 Pixabay에서 새 생성 사진을 찾지 못해
 같은 생성 사진(동아시아 남성, 평범한 표정)을 그대로 두고 파일 이름만 바꿨습니다.
+같은 날 표세린 → 미즈노 사키(일본, 클리어보트 도쿄 사무소), 백다온 → 마커스 림(싱가포르)도 바꿨습니다. 미즈노 사키의 첫 후보는 cottonbro studio의 사진이라
+(네 장째가 되어) RDNE Stock project의 사진으로 바꿨고, 사진 아래 가장자리에 분홍 파일철 끝이 조금 남습니다. 마커스 림은 Ramon Karolan의 사진으로, 옛 주은채 사진이 빠져 이 사진가는 다시 한 장입니다.
 
 ## 사진에서 만든 예순여덟 장
 
@@ -50,7 +52,7 @@
 | 남궁솔 | `portrait-namgung-sol.webp` | https://www.pexels.com/photo/close-up-photo-of-woman-smiling-11563145/ | yi lu (https://www.pexels.com/@luyi/) | [Pexels License](https://www.pexels.com/license/) |
 | 최서진 | `portrait-choi-seojin.webp` | https://www.pexels.com/photo/portrait-of-a-woman-wearing-an-office-smart-casual-attire-7163348/ | Antoni Shkraba (https://www.pexels.com/@shkrabaanthony/) | [Pexels License](https://www.pexels.com/license/) |
 | 채윤슬 | `portrait-chae-yunseul.webp` | https://www.pexels.com/photo/a-happy-woman-sitting-at-her-work-desk-8546757/ | Karola G (https://www.pexels.com/@karola-g/) | [Pexels License](https://www.pexels.com/license/) |
-| 표세린 | `portrait-pyo-serin.webp` | https://www.pexels.com/photo/portrait-of-social-worker-in-white-shirt-9870145/ | Ron Lach (https://www.pexels.com/@ron-lach/) | [Pexels License](https://www.pexels.com/license/) |
+| 미즈노 사키 | `portrait-mizuno-saki.webp` | https://www.pexels.com/photo/a-woman-wearing-a-blazer-holding-a-binder-7845388/ | RDNE Stock project (https://www.pexels.com/@rdne/) | [Pexels License](https://www.pexels.com/license/) |
 | 지강현 | `portrait-ji-ganghyeon.webp` | https://www.pexels.com/photo/man-in-yellow-crew-neck-t-shirt-pointing-a-finger-4584538/ | Ketut Subiyanto (https://www.pexels.com/@ketut-subiyanto/) | [Pexels License](https://www.pexels.com/license/) |
 | 안기범 | `portrait-an-gibeom.webp` | https://www.pexels.com/photo/a-man-in-a-gray-sweatshirt-taking-a-selfie-7972551/ | George Pak (https://www.pexels.com/@george-pak/) | [Pexels License](https://www.pexels.com/license/) |
 | 민하랑 | `portrait-min-harang.webp` | https://unsplash.com/photos/pIgl1dni3dQ | Vitaly Gariev (https://unsplash.com/@silverkblack) | [Unsplash License](https://unsplash.com/license) |
@@ -77,7 +79,7 @@
 | 응우옌 반 남 | `portrait-nguyen-van-nam.webp` | https://www.pexels.com/photo/portrait-of-a-man-in-vintage-styled-cafe-34501834/ | Thái Trường Giang (https://www.pexels.com/@tieugiang007/) | [Pexels License](https://www.pexels.com/license/) |
 | 변유진 | `portrait-byeon-yujin.webp` | https://www.pexels.com/photo/8761675/ | Pavel Danilyuk (https://www.pexels.com/@pavel-danilyuk/) | [Pexels License](https://www.pexels.com/license/) |
 | 곽민재 | `portrait-kwak-minjae.webp` | https://www.pexels.com/photo/smiling-man-in-springtime-seoul-temple-setting-31752178/ | Theodore Nguyen (https://www.pexels.com/@thejourneyofframes/) | [Pexels License](https://www.pexels.com/license/) |
-| 백다온 | `portrait-baek-daon.webp` | https://unsplash.com/photos/OFSQ6bHjFjs | Hà Nguyễn (https://unsplash.com/@lavinhha) | [Unsplash License](https://unsplash.com/license) |
+| 마커스 림 | `portrait-marcus-lim.webp` | https://www.pexels.com/photo/portrait-of-young-asian-man-18285588/ | Ramon Karolan (https://www.pexels.com/@ramonkaphotography/) | [Pexels License](https://www.pexels.com/license/) |
 | 진서우 | `portrait-jin-seou.webp` | https://www.pexels.com/photo/a-smiling-woman-siting-behind-a-desk-7845155/ | RDNE Stock project (https://www.pexels.com/@rdne/) | [Pexels License](https://www.pexels.com/license/) |
 | 하도율 | `portrait-ha-doyul.webp` | https://www.pexels.com/photo/portrait-of-man-standing-in-black-suit-26524772/ | Pro5 vn (https://www.pexels.com/@pro5-vn-1368185933/) | [Pexels License](https://www.pexels.com/license/) |
 | 연지안 | `portrait-yeon-jian.webp` | https://www.pexels.com/photo/a-nurse-in-a-white-apron-15641096/ | Tran Nhu Tuan (https://www.pexels.com/@kooldark/) | [Pexels License](https://www.pexels.com/license/) |

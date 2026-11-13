@@ -20,18 +20,27 @@ export const CAST_ALIASES = {
     ["주은채", "레이철 탄"],
     ["연시우", "응우옌 반 남"],
     ["도건우", "대니얼 강"],
+    ["표세린", "미즈노 사키"],
+    ["백다온", "마커스 림"],
+    ["우지환", "토머스 리드"],
   ],
   en: [
     ["Ryu Seah", "Priya Nair"],
     ["Joo Eunchae", "Rachel Tan"],
     ["Yeon Siwoo", "Nguyen Van Nam"],
     ["Do Geonwoo", "Daniel Kang"],
+    ["Pyo Serin", "Mizuno Saki"],
+    ["Baek Daon", "Marcus Lim"],
+    ["Woo Jihwan", "Thomas Reed"],
   ],
   ja: [
     ["リュ・セア", "プリヤ・ナイル"],
     ["チュ・ウンチェ", "レイチェル・タン"],
     ["ヨン・シウ", "グエン・ヴァン・ナム"],
     ["ト・ゴヌ", "ダニエル・カン"],
+    ["ピョ・セリン", "水野咲"],
+    ["ペク・ダオン", "マーカス・リム"],
+    ["ウ・ジファン", "トーマス・リード"],
   ],
 };
 

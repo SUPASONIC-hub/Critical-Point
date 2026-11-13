@@ -15,7 +15,7 @@ export default {
         "Extraordinary review committee: tomorrow 09:00, called during the holiday, 5 members sign by name",
         "LoopNow working-capital loan 29 billion won -- the condition for Roundhill’s 48 billion won investment",
         "Contract Article 7: debt ratio over 180% means immediate call",
-        "Proposed by: Woo Jihwan, Head of Corporate Finance · NOAH pre-score Grade A"
+        "Proposed by: Thomas Reed, Head of Corporate Finance · NOAH pre-score Grade A"
       ],
       "choices": {
         "c48_start_visit": {
@@ -132,7 +132,7 @@ export default {
     },
     "c48_final": {
       "title": "The Fifth Field",
-      "text": "At the top of the electronic decision sheet is NOAH’s field. 'Approval recommended · Grade A · 0.6 seconds.' Woo Jihwan, Head of Corporate Finance, e-signs 'Approve' first, and the outside member follows. The compliance officer picks approval with conditions. The two fields left belong to the chair, Chae Ian, and to you. Woo Jihwan speaks gently. 'You may oppose. Dissents can’t be erased anymore. But if even one is attached, it goes up to the board, gets decided again in 2 weeks, and the 10:00 investment deadline passes.' Chae Ian lays the pencil down flat. 'For 17 years I only abstained. Today I’ll write after you.'",
+      "text": "At the top of the electronic decision sheet is NOAH’s field. 'Approval recommended · Grade A · 0.6 seconds.' Thomas Reed, the Head of Corporate Finance KD Capital hired itself from a New York regional bank after the dismissal, e-signs 'Approve' first, and the outside member follows. The compliance officer picks approval with conditions. The two fields left belong to the chair, Chae Ian, and to you. Thomas Reed speaks gently in English, and an interpreter follows a beat behind. 'You may oppose. Dissents can’t be erased anymore. But if even one is attached, it goes up to the board, gets decided again in 2 weeks, and the 10:00 investment deadline passes.' Chae Ian lays the pencil down flat. 'For 17 years I only abstained. Today I’ll write after you.'",
       "memo": [
         "Signatures so far: approve 2, conditional approval 1, fields left 2",
         "1 or more dissents means board re-review -- 2 weeks",
@@ -573,13 +573,13 @@ export default {
     "c48_branch_riders_follow_a": "Seated together, Yoo Haon speaks before the CEO does. 'Just one condition. Let us see the deposit account number too.'",
     "c48_branch_riders_follow_b": "With the statement attached, the word rider enters the committee file for the first time. It grows by 11 pages.",
     "c48_branch_riders_follow_c": "Put off, the cup noodles taste good. There is no set place to hear this story after the committee ends.",
-    "c48_route_system_publish": "Of the members who get the statistics, two start rereading their decision sheets. Woo Jihwan asks first where the numbers came from.",
+    "c48_route_system_publish": "Of the members who get the statistics, two start rereading their decision sheets. Thomas Reed asks first where the numbers came from.",
     "c48_route_system_rule": "The amendment goes to next month’s board. Tomorrow morning’s decision sheet still has a delegation field.",
     "c48_route_system_drop": "Shelved, the 406 empty fields stay at 406. Tomorrow morning there may be a 407th.",
     "c48_final_system_route_a": "A rule that halts automatically gets rid of empty fields. In exchange, one person’s absence stops even an urgent loan.",
     "c48_final_system_route_b": "When only signers are accountable, not signing becomes the safest thing. The next year, empty fields double.",
     "c48_final_system_route_c": "With the protection clause, the HR records of the six of nine dissenters who were moved are reviewed again. Chae Ian, who only ever abstained, reads those six names aloud.",
-    "c48_evidence_turn_attach": "When you demand the attachment, Woo Jihwan for the first time does not check his watch. His face says he did not know the two pages existed either.",
+    "c48_evidence_turn_attach": "When you demand the attachment, Thomas Reed for the first time does not check his watch. His face says he did not know the two pages existed either.",
     "c48_evidence_turn_hold": "Holding it back makes a big impact at the moment of the vote. Meanwhile LoopNow’s CEO Min Harang, unaware the two pages exist, texts Roundhill’s Cho Hyunseok a thank-you.",
     "c48_evidence_turn_founder": "Shown the pages, Min Harang reads them three times, then asks. 'If it’s 41%, what percent do our riders get back on their deposits?'",
     "c48_hub_evidence_turn": "Count the pages and you find why Article 7 was copied as it was. The name of the one waiting for the clause to blow is on that page too.",
