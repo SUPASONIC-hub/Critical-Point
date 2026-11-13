@@ -100,8 +100,8 @@ test("a real case left with a pot counts it lost as the next one opens; a replay
 test("a change is printed with its sign; a minus is the minus sign", () => {
   assert.equal(formatChange(12400), "+12,400");
   assert.equal(formatChange(-12400), "−12,400");
-  assert.equal(formatChange(0), "0");
-  assert.equal(formatChange(undefined), "0");
+  assert.equal(formatChange(0), "$0");
+  assert.equal(formatChange(undefined), "$0");
 });
 
 test("the purse: what the run holds, the last hand's change, and the season's columns", () => {
@@ -156,7 +156,7 @@ test("the purse is plain text, and the verdict is still said once, by the slam",
   assert.match(purse, /<span aria-hidden="true">\{purse\.change\.arrow\} \{purse\.change\.text\}<\/span>\s*<span className="sr-only">\{purse\.change\.spoken\}<\/span>/);
   // The bust's −N is out of the alert, whose sentence says the pot; the cash's +N is in it, where the pill was.
   assert.match(notices, /<strong lang="en">BUST<\/strong>\s*<MoneyBurst burst=\{burst\} target=\{target\} spoken=\{false\} \/>/);
-  assert.match(notices, /\{burst \? <MoneyBurst burst=\{burst\} target=\{target\} \/> : <span>\+\{formatNumber\(livePot\)\}<\/span>\}/);
+  assert.match(notices, /\{burst \? <MoneyBurst burst=\{burst\} target=\{target\} \/> : <span>\+\{formatMoney\(livePot\)\}<\/span>\}/);
   assert.doesNotMatch(burst, /aria-live|role=/);
   assert.match(notices, /const burst = target \? readBurst\(/, "the amount flies only where there is a purse");
 });

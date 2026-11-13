@@ -7,6 +7,7 @@ import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
 import { reloadLeaderboard } from "../state/useLeaderboard.js";
 import words from "../copy/ranking.js";
 import { fill, LANG, SOURCE_LOCALE } from "../locale.js";
+import { formatMoney } from "../gameConstants.js";
 
 // Dates as the page's language writes them; a Korean page as it always has.
 const DATE_LOCALE = LANG === SOURCE_LOCALE ? "ko-KR" : LANG;
@@ -146,7 +147,7 @@ export function RankingScreen({
                       <span>{entry.completedAt ? new Date(entry.completedAt).toLocaleDateString(DATE_LOCALE) : words.noTime}</span>
                       <span>{fill(words.average, { seconds: entry.averageResponseTime })}</span>
                       <span>{fill(words.reframes, { count: entry.reframeCount })}</span>
-                      {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">{fill(words.vault, { value: vaultPerCase.toLocaleString("en-US") })}</span>}
+                      {Number.isFinite(vaultPerCase) && <span data-testid="ranking-vault">{fill(words.vault, { value: formatMoney(vaultPerCase) })}</span>}
                       {entry.assistTime > 1 && <span className="ranking-assist">{fill(words.tableTime, { value: entry.assistTime })}</span>}
                       {entry.assistStory && <span className="ranking-assist">{words.story}</span>}
                       {entry.newGamePlus && <span className="ranking-assist" lang="en">NEW GAME+</span>}

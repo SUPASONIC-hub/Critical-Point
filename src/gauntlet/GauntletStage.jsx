@@ -22,7 +22,7 @@ import {
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
-import { describeStakedDetail, formatMultiplier, formatNumber, joinRules, useTableForecast } from "./tableReadout.js";
+import { describeStakedDetail, formatMultiplier, formatMoney, joinRules, useTableForecast } from "./tableReadout.js";
 import { dangerZoneOf, readTableMeters } from "./tableMeters.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
@@ -496,7 +496,7 @@ export function GauntletStage({
               {BOARD_MARK_LABELS[boardMark] ?? say.pot}
             </span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
-              {win.status === "bust" ? 0 : formatNumber(livePot)}
+              {win.status === "bust" ? 0 : formatMoney(livePot)}
             </strong>
             <span className="gx-pot-math">
               <b className="gx-chips">{selectedChips || "—"}</b>
@@ -514,12 +514,12 @@ export function GauntletStage({
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
-              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatNumber(bustKeeps) : formatNumber(run.runPot)}</b>
+              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatMoney(bustKeeps) : formatMoney(run.runPot)}</b>
             </span>
             <span className="gx-stat">
               <Vault size={13} aria-hidden="true" />
               <small>{say.vault}</small>
-              <b>{formatNumber(run.vault)}</b>
+              <b>{formatMoney(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
@@ -670,7 +670,7 @@ export function GauntletStage({
               <CaseFileStory node={scene.node} nodeId={scene.nodeId} open={briefOpen} standing={[resources, resourceMeta, clueCount]} caseCast={scene.caseCast} />
               <ul>
                 {scene.challenge && <li data-testid="brief-challenge">{fill(say.briefChallenge, { challenge: scene.challenge })}</li>}
-                <li>{fill(say.briefPot, { pot: formatNumber(run.runPot) })}</li>
+                <li>{fill(say.briefPot, { pot: formatMoney(run.runPot) })}</li>
                 <li>{fill(say.briefRules, { rules: currentRules })}</li>
                 <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
@@ -689,14 +689,14 @@ export function GauntletStage({
           </article>
           <article className="gx-situation-card">
             <span>{say.ifCommit}</span>
-            <b>{selectedCard ? `+${formatNumber(livePot)}` : say.pickFirst}</b>
+            <b>{selectedCard ? `+${formatMoney(livePot)}` : say.pickFirst}</b>
             <small>{fill(say.nextRules, { rules: joinRules(cashMutations) })}</small>
           </article>
           <article className="gx-situation-card">
             <span>{say.ifPush}</span>
-            <b>{selectedCard ? `${formatNumber(nextPotLow)}–${formatNumber(nextPotHigh)}` : say.multiplierOnly}</b>
+            <b>{selectedCard ? `${formatMoney(nextPotLow)}–${formatMoney(nextPotHigh)}` : say.multiplierOnly}</b>
             <small>
-              {say.fail} {formatNumber(run.runPot)}→{formatNumber(bustKeeps)} · {joinRules(bustMutations)}
+              {say.fail} {formatMoney(run.runPot)}→{formatMoney(bustKeeps)} · {joinRules(bustMutations)}
             </small>
           </article>
         </section>
@@ -802,7 +802,7 @@ export function GauntletStage({
           aria-describedby={[holdsCash && "gx-cash-hold", logic && "gx-logic-detail", audit && "gx-audit-detail"].filter(Boolean).join(" ") || undefined}
         >
           <span>{cashLabel}</span>
-          <b>{live && selectedCard && !sealedLock ? formatNumber(livePot) : ""}</b>
+          <b>{live && selectedCard && !sealedLock ? formatMoney(livePot) : ""}</b>
           {holdsCash && <HoldGauge phase={cashHold.phase} />}
         </button>
         {/* Outside the button, so neither is read into its name. */}

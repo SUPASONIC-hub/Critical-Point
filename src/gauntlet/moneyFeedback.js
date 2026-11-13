@@ -1,4 +1,4 @@
-import { formatNumber } from "../gameConstants.js";
+import { formatMoney } from "../gameConstants.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -27,12 +27,12 @@ import { fill } from "../locale.js";
 // U+2212, the minus sign: a hyphen is narrower than the digits beside it.
 const MINUS = "−";
 
-/** A signed amount: "+12,400", "−12,400", or "0". */
+/** A signed amount: "+$12,400", "−$12,400", or "$0". */
 export function formatChange(amount) {
   const value = Math.round(Number(amount) || 0);
-  if (value > 0) return `+${formatNumber(value)}`;
-  if (value < 0) return `${MINUS}${formatNumber(-value)}`;
-  return "0";
+  if (value > 0) return `+${formatMoney(value)}`;
+  if (value < 0) return `${MINUS}${formatMoney(-value)}`;
+  return formatMoney(0);
 }
 
 /** The arrow and the class for a change: up for a gain, down for a loss, none for nothing. */
@@ -68,7 +68,7 @@ export function readPurse({ run, win, settling = false, livePot = 0, bustKeeps =
   const arrow = direction(change);
   return {
     total,
-    totalText: formatNumber(total),
+    totalText: formatMoney(total),
     change: arrow ? { amount: change, text: formatChange(change), ...arrow, spoken: fill(say.purseChange, { change: formatChange(change) }) } : null,
     season: { gained, lost, text: fill(say.purseSeason, { gained: formatChange(gained), lost: formatChange(-lost) }) },
     // The slam's amount lands here: the purse pops as it arrives.
