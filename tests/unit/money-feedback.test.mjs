@@ -98,8 +98,8 @@ test("a real case left with a pot counts it lost as the next one opens; a replay
 });
 
 test("a change is printed with its sign; a minus is the minus sign", () => {
-  assert.equal(formatChange(12400), "+12,400");
-  assert.equal(formatChange(-12400), "−12,400");
+  assert.equal(formatChange(12400), "+$12,400");
+  assert.equal(formatChange(-12400), "−$12,400");
   assert.equal(formatChange(0), "$0");
   assert.equal(formatChange(undefined), "$0");
 });
@@ -108,22 +108,22 @@ test("the purse: what the run holds, the last hand's change, and the season's co
   const run = normalizeRunState({ runPot: 2400, vault: 10000, seasonGained: 15000, seasonLost: 2600, lastChange: -800 });
   const live = readPurse({ run, win: { status: "live" } });
   assert.equal(live.total, 12400);
-  assert.equal(live.totalText, "12,400");
-  assert.deepEqual([live.change.amount, live.change.dir, live.change.arrow, live.change.text], [-800, "down", "▼", "−800"]);
-  assert.equal(live.change.spoken, "방금 판 −800", "the sign is read; the arrow is not");
-  assert.equal(live.season.text, "시즌 누적 획득 +15,000 · 손실 −2,600");
+  assert.equal(live.totalText, "$12,400");
+  assert.deepEqual([live.change.amount, live.change.dir, live.change.arrow, live.change.text], [-800, "down", "▼", "−$800"]);
+  assert.equal(live.change.spoken, "방금 판 −$800", "the sign is read; the arrow is not");
+  assert.equal(live.season.text, "시즌 누적 획득 +$15,000 · 손실 −$2,600");
   assert.equal(live.landing, null, "a live window lands nothing");
   assert.equal(readPurse({ run: normalizeRunState({}), win: { status: "live" } }).change, null, "no hand yet, no change");
-  assert.equal(readPurse({ run: normalizeRunState({}), win: { status: "live" } }).season.text, "시즌 누적 획득 0 · 손실 0");
+  assert.equal(readPurse({ run: normalizeRunState({}), win: { status: "live" } }).season.text, "시즌 누적 획득 $0 · 손실 $0");
 });
 
 test("a closed window's purse is the run as the settle will leave it, counted once", () => {
   const run = normalizeRunState({ runPot: 2400, vault: 10000, seasonGained: 15000, seasonLost: 2600, lastChange: -800 });
   const cashed = readPurse({ run, win: { status: "cashed" }, settling: true, livePot: 3100, bustKeeps: 0 });
-  assert.deepEqual([cashed.total, cashed.change.text, cashed.change.dir, cashed.landing], [15500, "+3,100", "up", "up"]);
+  assert.deepEqual([cashed.total, cashed.change.text, cashed.change.dir, cashed.landing], [15500, "+$3,100", "up", "up"]);
   assert.deepEqual([cashed.season.gained, cashed.season.lost], [18100, 2600]);
   const busted = readPurse({ run, win: { status: "bust" }, settling: true, livePot: 0, bustKeeps: 800 });
-  assert.deepEqual([busted.total, busted.change.text, busted.landing], [10800, "−1,600", "down"], "INSURANCE's third stays");
+  assert.deepEqual([busted.total, busted.change.text, busted.landing], [10800, "−$1,600", "down"], "INSURANCE's third stays");
   assert.deepEqual([busted.season.gained, busted.season.lost], [15000, 4200]);
   // A window another tab settles, or a run the settle has already written, is not counted again.
   const notMine = readPurse({ run, win: { status: "cashed" }, settling: false, livePot: 3100 });
@@ -137,8 +137,8 @@ test("a closed window's purse is the run as the settle will leave it, counted on
 });
 
 test("the slam's amount: the cash's +N, the bust's −N, nothing for a hand that moved nothing", () => {
-  assert.deepEqual(readBurst({ win: { status: "cashed" }, livePot: 12400 }), { amount: 12400, text: "+12,400", dir: "up" });
-  assert.deepEqual(readBurst({ win: { status: "bust" }, runPot: 12400, bustKeeps: 0 }), { amount: -12400, text: "−12,400", dir: "down" });
+  assert.deepEqual(readBurst({ win: { status: "cashed" }, livePot: 12400 }), { amount: 12400, text: "+$12,400", dir: "up" });
+  assert.deepEqual(readBurst({ win: { status: "bust" }, runPot: 12400, bustKeeps: 0 }), { amount: -12400, text: "−$12,400", dir: "down" });
   assert.equal(readBurst({ win: { status: "bust" }, runPot: 0, bustKeeps: 0 }), null);
   assert.equal(readBurst({ win: { status: "live" }, livePot: 500 }), null);
   assert.equal(readSettledChange({ win: { status: "bust" }, settling: true, runPot: 900, bustKeeps: 300 }), -600);
