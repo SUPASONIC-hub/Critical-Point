@@ -706,7 +706,8 @@ test("the verdict is the slam's alone, and the next table says what the cash set
   await dismissProtocolBreach(page);
   const runPot = await page.getByTestId("gauntlet-run-pot").textContent();
   // E3 2단계 (a): the settlement's one line -- the hand's +N, the case pot, the vault -- once, as the next table opens.
-  await expect(voice).toHaveText(new RegExp(`^이번 판 \\+${runPot} · 판돈 ${runPot} · 금고 [\\d,]+$`));
+  const pot = runPot.replace("$", "\\$");
+  await expect(voice).toHaveText(new RegExp(`^이번 판 \\+${pot} · 판돈 ${pot} · 금고 \\$[\\d,]+$`));
 });
 
 /**

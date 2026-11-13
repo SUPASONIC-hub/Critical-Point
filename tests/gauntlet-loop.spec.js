@@ -270,7 +270,7 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     expect(rerolled.dynamics.vault).toBe(26000);
     expect(rerolled.dynamics.relicDraft.reroll.offer).toEqual(rerolled.dynamics.relicOffer);
     expect(rerolled.dynamics.relicOffer).not.toEqual(first);
-    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −4,000");
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −$4,000");
 
     await page.keyboard.press("b");
     await expect(draft.getByTestId("relic-spend")).toBeVisible();
@@ -569,7 +569,7 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   await expect(page.locator(".gx-slam-bust")).toContainText("BUST");
-  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText("0");
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText("$0");
 
   const reveal = page.locator(".decision-reveal");
   await expect(reveal.locator("h2")).toHaveText("BUST");
@@ -601,9 +601,9 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
 test("a cash and a bust throw their amount, signed, and the purse holds it", async ({ page }) => {
   await openTable(page, "case01", "start");
   const purse = page.getByTestId("gauntlet-purse");
-  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("$0");
   await expect(page.getByTestId("gauntlet-purse-change")).toHaveCount(0);
-  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 $0 · 손실 $0");
   await expect(purse.locator("[aria-live], [role]")).toHaveCount(0);
 
   await page.locator(".choices .choice").first().click();
@@ -616,16 +616,16 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   const won = await readNumber(burst);
   expect(won).toBeGreaterThan(0);
   await expect(purse).toHaveClass(/is-landing is-up/);
-  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(won.toLocaleString("en-US"));
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(`$${won.toLocaleString("en-US")}`);
 
   await page.getByTestId("decision-next").click();
   await dismissProtocolBreach(page);
-  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(won.toLocaleString("en-US"));
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(`$${won.toLocaleString("en-US")}`);
   const change = page.getByTestId("gauntlet-purse-change");
   await expect(change).toHaveClass(/is-up/);
-  await expect(change.locator('[aria-hidden="true"]')).toHaveText(`▲ +${won.toLocaleString("en-US")}`);
-  await expect(change.locator(".sr-only")).toHaveText(`방금 판 +${won.toLocaleString("en-US")}`);
-  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText(`시즌 누적 획득 +${won.toLocaleString("en-US")} · 손실 0`);
+  await expect(change.locator('[aria-hidden="true"]')).toHaveText(`▲ +$${won.toLocaleString("en-US")}`);
+  await expect(change.locator(".sr-only")).toHaveText(`방금 판 +$${won.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("gauntlet-purse-season")).toHaveText(`시즌 누적 획득 +$${won.toLocaleString("en-US")} · 손실 $0`);
   const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect([banked.dynamics.lastChange, banked.dynamics.seasonGained, banked.dynamics.seasonLost]).toEqual([won, won, 0]);
 
@@ -639,8 +639,8 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await expect(lost).toHaveCSS("animation-name", "none");
   await expect(lost).toHaveCSS("opacity", "1");
   await expect(page.getByTestId("gauntlet-purse-change")).toHaveClass(/is-down/);
-  await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(/^▼ −[\d,]+$/);
-  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+  await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(/^▼ −\$[\d,]+$/);
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("$0");
 
   // And a cash's verdict under reduced motion (2026-11-03): the big ×N and the
   // +N under it are printed where they land and do not move -- no pop, no
@@ -714,7 +714,7 @@ async function expectAccountPinned(page, viewport) {
 async function expectAccountHolds(page) {
   const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   const held = saved.dynamics.runPot + saved.dynamics.vault;
-  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(held.toLocaleString("en-US"));
+  await expect(page.getByTestId("gauntlet-purse-total")).toHaveText(`$${held.toLocaleString("en-US")}`);
   return held;
 }
 
@@ -725,7 +725,7 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 
     const account = page.getByTestId("gauntlet-purse");
     const head = account.getByRole("button");
     await expect(head).toHaveAccessibleName(/^KD은행 계좌 0/);
-    await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("0");
+    await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("$0");
     await expectAccountPinned(page, viewport);
 
     // The season's columns are a tap away.
@@ -733,7 +733,7 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 
     await head.click();
     await expect(head).toHaveAttribute("aria-expanded", "true");
     await expect(page.getByTestId("gauntlet-purse-season")).toBeVisible();
-    await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 0 · 손실 0");
+    await expect(page.getByTestId("gauntlet-purse-season")).toHaveText("시즌 누적 획득 $0 · 손실 $0");
     await head.click();
     await expect(page.getByTestId("gauntlet-purse-season")).toBeHidden();
 
@@ -749,7 +749,7 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 
     await expect(page.getByTestId("scene-briefing")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     const held = await expectAccountHolds(page);
     expect(held).toBeGreaterThan(0);
-    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(`▲ +${held.toLocaleString("en-US")}`);
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText(`▲ +$${held.toLocaleString("en-US")}`);
     await expect(account.locator(".kd-account-just")).toHaveText("방금");
     await expectAccountPinned(page, viewport);
 

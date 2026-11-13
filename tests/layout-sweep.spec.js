@@ -95,7 +95,7 @@ async function loadBank(page, nodeId) {
   await page.goto("/?debug=1");
   await page.locator(".choices .choice").first().waitFor();
   await dismissProtocolBreach(page);
-  await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId}: the bank is the one written`).toHaveText(BANK.runPot.toLocaleString("en-US"));
+  await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId}: the bank is the one written`).toHaveText(`$${BANK.runPot.toLocaleString("en-US")}`);
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
 }
 
@@ -337,7 +337,7 @@ for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
         await openBrokenBoard(page, caseId, nodeId, HEAVY_BANK_BOARD);
         await expectLayoutLang(page, `${nodeId} @ ${name}, max bank`);
         await page.addStyleTag({ content: ".debug-overlay { display: none !important; } .gx-table { transform: none !important; }" });
-        await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId} @ ${name}: the bank is the one written`).toHaveText(BANK_TABLES.max.runPot.toLocaleString("en-US"));
+        await expect(page.getByTestId("gauntlet-run-pot"), `${nodeId} @ ${name}: the bank is the one written`).toHaveText(`$${BANK_TABLES.max.runPot.toLocaleString("en-US")}`);
         const banked = { caseId, nodeId, name, board: "overclocked, five relics, max bank", ...(await measureTable(page)), ...(await measureBank(page)), signals: await measureSignals(page) };
         rows.push(banked);
         checkHeavyRow(banked, failures);
