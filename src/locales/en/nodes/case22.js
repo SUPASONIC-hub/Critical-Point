@@ -252,7 +252,7 @@ export default {
     },
     "c22_comment_reaction": {
       "title": "A Machine That Learned to Refuse",
-      "text": "Ryu Seah puts R-17’s training basis on the screen. Over the past 30 years, 94% of loan applications from the families of heads of defaulted companies were rejected. Even though the 6% that were approved repaid better than average. Ryu Seah speaks. 'NOAH didn’t learn risk. It learned our habit of rejecting those families. I took this job to make it explainable, and now that it explains, this is what it says.'",
+      "text": "Priya Nair puts R-17’s training basis on the screen. Over the past 30 years, 94% of loan applications from the families of heads of defaulted companies were rejected. Even though the 6% that were approved repaid better than average. Priya Nair speaks. 'NOAH didn’t learn risk. It learned our habit of rejecting those families. I took this job to make it explainable, and now that it explains, this is what it says.'",
       "memo": [
         "Rejection rate for applications from defaulted-company families: 94%",
         "The approved 6% repaid better than average"
@@ -366,7 +366,7 @@ export default {
     },
     "c22_route_system": {
       "title": "An Explanation Going in Circles",
-      "text": "Ryu Seah opens NOAH’s test terminal. 'Explain the reason for the R-17 rejection.' NOAH answers in 0.3 seconds. 'Since 94% of similar past applications were rejected, rejecting this application is appropriate.' 'Why were the past applications rejected?' 'Because most similar past applications were rejected.' Ryu Seah speaks. 'We announced it as explainable AI. It does explain. It explains in circles.'",
+      "text": "Priya Nair opens NOAH’s test terminal. 'Explain the reason for the R-17 rejection.' NOAH answers in 0.3 seconds. 'Since 94% of similar past applications were rejected, rejecting this application is appropriate.' 'Why were the past applications rejected?' 'Because most similar past applications were rejected.' Priya Nair speaks. 'We announced it as explainable AI. It does explain. It explains in circles.'",
       "memo": [
         "NOAH’s explanation feature: explains rejections by past rejections",
         "41 R-17 rejections -- 2 weeks of full operation",
@@ -392,7 +392,7 @@ export default {
     },
     "c22_final_system_route": {
       "title": "An Answer That Comes Back Around",
-      "text": "The screen Ryu Seah captured is still open on the terminal. The same question brings the same answer back in 0.3 seconds. Ryu Seah speaks. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation. And the people at To-the-End Precision are waiting for this answer today too.'",
+      "text": "The screen Priya Nair captured is still open on the terminal. The same question brings the same answer back in 0.3 seconds. Priya Nair speaks. 'The adoption report calls this explainable. It isn’t wrong. It does give an explanation. And the people at To-the-End Precision are waiting for this answer today too.'",
       "memo": [
         "NOAH’s rejection explanation: cites past rejections as the reason",
         "41 R-17 rejections -- 2 weeks of full operation",
@@ -555,9 +555,9 @@ export default {
     "c22_notebook_choice_1": "With you beside him, Do Yoonha starts to speak three times and stops. On the fourth, Hajun asks first. 'Is that your handwriting?'",
     "c22_notebook_choice_2": "Made the bank’s responsibility, the record helps To-the-End Precision’s re-review. Do Yoonha’s name stays in that record with it.",
     "c22_notebook_choice_3": "The notebook stays shut. In the ceremony photos, Do Yoonha’s smile comes half a beat late.",
-    "c22_comment_reaction_choice_1": "When you tell them, some of the 41 learn for the first time that it was not their fault. Ryu Seah becomes the one who told them before reporting up the line.",
+    "c22_comment_reaction_choice_1": "When you tell them, some of the 41 learn for the first time that it was not their fault. Priya Nair becomes the one who told them before reporting up the line.",
     "c22_comment_reaction_choice_2": "The request goes through procedure. The verification committee meets next month.",
-    "c22_comment_reaction_choice_3": "Ryu Seah hesitates a moment, then shakes her head. 'If we release just one, the other 40 will never know why.'",
+    "c22_comment_reaction_choice_3": "Priya Nair hesitates a moment, then shakes her head. 'If we release just one, the other 40 will never know why.'",
     "c22_heater_reaction_choice_1": "When you read it out, Foreman Kim takes the lid and slips it under the glass of the workbench. For the first time, the bill belongs to the factory.",
     "c22_heater_reaction_choice_2": "The 0 won on page one catches the eye of the review staff. Catching their eye does not change the result.",
     "c22_heater_reaction_choice_3": "The papers move faster. The lid goes into the recycling bin with the noodle cup.",
@@ -572,7 +572,7 @@ export default {
     "c22_branch_shop_follow_c": "When you talk about the logo, Hajun laughs. The question stays on the last page of the sketchbook, unanswered.",
     "c22_route_system_publish": "Published, the 41 all receive the same sentence. That afternoon KD Data Lab posts a notice: 'Explanation feature improvements planned.'",
     "c22_route_system_human": "With reasons attached, every rejection gets one line with a person’s name. For the first time, Tak Yerin writes a reason instead of a rejection text.",
-    "c22_route_system_drop": "The refiled application gets the same result in 0.8 seconds. The capture stays on Ryu Seah’s desktop.",
+    "c22_route_system_drop": "The refiled application gets the same result in 0.8 seconds. The capture stays on Priya Nair’s desktop.",
     "c22_final_system_route_a": "With a person taking a second look, each rejection takes one more day. In that day, someone gets to hear not a result but a reason.",
     "c22_final_system_route_b": "The notice gets kinder. 'We regret' becomes 'We sincerely regret.'",
     "c22_final_system_route_c": "With the 41 gathered, the voice grows louder. It takes that much longer, and in the meantime the most desperate close their doors first.",

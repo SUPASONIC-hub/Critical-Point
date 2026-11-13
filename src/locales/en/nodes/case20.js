@@ -38,10 +38,10 @@ export default {
     },
     "c20_server": {
       "title": "Senior",
-      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Ryu Seah bows to the servers. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
+      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Priya Nair bows to the servers. In her 3rd year since coming from a Singapore fintech firm to bring NOAH in, she greets them the way a Korean office taught her. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
       "memo": [
         "4 ECHO servers -- installed 2019, parts discontinued",
-        "Ryu Seah: KD Data Lab, in charge of introducing NOAH",
+        "Priya Nair: KD Data Lab, in charge of introducing NOAH · hired from Singapore",
         "What NOAH learned from: 30 years of reviews + 3 years of Trigger Lab judgments",
         "Reason for resetting originals: 'remove the possibility of comparing the two systems'"
       ],
@@ -53,7 +53,7 @@ export default {
           "label": "Officially request the full list of what NOAH learned"
         },
         "c20_server_show": {
-          "label": "Show Ryu Seah the cases ECHO dissented on"
+          "label": "Show Priya Nair the cases ECHO dissented on"
         },
         "reframe": {
           "label": "Have ECHO read its replacement"
@@ -64,12 +64,12 @@ export default {
       },
       "place": "Trigger Lab Basement Server Room · ECHO Servers",
       "clock": "January 27 · Replacement in D-4",
-      "question": "NOAH learned from ECHO’s records, yet the originals will be erased. What do you do with Ryu Seah?",
+      "question": "NOAH learned from ECHO’s records, yet the originals will be erased. What do you do with Priya Nair?",
       "lead": "On the first day of replacement prep, word comes that someone from Data Lab signed the server room entry log and came down."
     },
     "c20_datacenter": {
       "title": "Line 1,208",
-      "text": "Line 1,208 of the training data list. 'TL response records -- Trigger Lab analysts’ choices, response times, seconds of hesitation.' The names are pseudonymized as 'Analyst A,' but only one analyst wrote a dissent on 2023-0412. Ryu Seah says quietly, 'I didn’t know about this. Really.'",
+      "text": "Line 1,208 of the training data list. 'TL response records -- Trigger Lab analysts’ choices, response times, seconds of hesitation.' The names are pseudonymized as 'Analyst A,' but only one analyst wrote a dissent on 2023-0412. Priya Nair says quietly, 'I didn’t know about this. Really.'",
       "memo": [
         "NOAH training data: 1,412 items",
         "No. 1,208: TL response records -- choices, response times, seconds of hesitation",
@@ -159,7 +159,7 @@ export default {
     },
     "c20_aftershock": {
       "title": "The Day After Midnight",
-      "text": "NOAH’s logo appears on the 4th-floor monitors instead of ECHO’s waveform. What remained after midnight is what you decided last night. On Lee Minseo’s phone is an email Ryu Seah sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
+      "text": "NOAH’s logo appears on the 4th-floor monitors instead of ECHO’s waveform. What remained after midnight is what you decided last night. On Lee Minseo’s phone is an email Priya Nair sent at four in the morning. 'This is the oldest line in the response records on NOAH’s training list. It’s from the year before Trigger Lab was founded. Participant 01, Jeju.'",
       "memo": [
         "Switch to NOAH complete: February 1, 00:00",
         "Note beside the terminal: 'measured, nine'",
@@ -229,7 +229,7 @@ export default {
     },
     "c20_test": {
       "title": "A Machine That Learned Only Conclusions",
-      "text": "Ryu Seah feeds NOAH a facility loan application from a precision factory in Incheon. NOAH rejects it because the owner’s family was once tied to a company that defaulted. ECHO brings up one line. 'The applicant’s own record of repaying on time was not reflected.' Ryu Seah says, 'NOAH learned the conclusions ECHO dissented with, but not the reasons it dissented.'",
+      "text": "Priya Nair feeds NOAH a facility loan application from a precision factory in Incheon. NOAH rejects it because the owner’s family was once tied to a company that defaulted. ECHO brings up one line. 'The applicant’s own record of repaying on time was not reflected.' Priya Nair says, 'NOAH learned the conclusions ECHO dissented with, but not the reasons it dissented.'",
       "memo": [
         "Test case: facility loan for a small precision factory in Incheon",
         "NOAH’s No. 1 reason for rejection: the owner’s family’s past default history",
@@ -240,7 +240,7 @@ export default {
           "label": "Submit the results to the adoption committee as a report"
         },
         "c20_test_choice_1": {
-          "label": "Fill in the dissent reasons NOAH missed, with Ryu Seah"
+          "label": "Fill in the dissent reasons NOAH missed, with Priya Nair"
         },
         "c20_test_choice_3": {
           "label": "Set the results aside and accept the midnight switch"
@@ -318,7 +318,7 @@ export default {
     },
     "c20_branch_disk": {
       "title": "Awaiting Shredding",
-      "text": "On the way out from filing the objection, Ryu Seah pulls a disk from the shredding rack and reads the label. 'Review Team Dissent Collection 1996- / Lim Kyungsoo.' The first page of the 30 years of records ECHO learned from will be shredded at 9 a.m. Monday, because it has been moved into the system. Ryu Seah asks, 'Who is this? Our list had no author names.'",
+      "text": "On the way out from filing the objection, Priya Nair pulls a disk from the shredding rack and reads the label. 'Review Team Dissent Collection 1996- / Lim Kyungsoo.' The first page of the 30 years of records ECHO learned from will be shredded at 9 a.m. Monday, because it has been moved into the system. Priya Nair asks, 'Who is this? Our list had no author names.'",
       "memo": [
         "186 disks awaiting shredding -- Monday 09:00",
         "Label: 'Review Team Dissent Collection 1996- / Lim Kyungsoo'",
@@ -501,7 +501,7 @@ export default {
       "text": "The night the demolition ended, strangers at the server room door were measuring the servers with a tape measure. Per the notice, at midnight on January 31, ECHO will be replaced by NOAH, KD Data Lab’s AI review engine, and its judgment records will be reset. Ban Jaewook points to a line. 'The notice doesn’t say where NOAH’s training data came from.'",
       "memo": [
         "Measuring outside the server room: the night the demolition ended",
-        "Contact: Ryu Seah, KD Data Lab",
+        "Contact: Priya Nair, KD Data Lab",
         "Training data source: not in the notice"
       ],
       "choices": {
@@ -531,9 +531,9 @@ export default {
     "c20_start_farewell": "With the schedule set, the server room door stays open for five days. Trigger Lab’s seat at the replacement prep meetings is empty.",
     "c20_start_scope": "The letter gets an answer two days later. The answer says 'in accordance with relevant regulations' four times and never once states the scope.",
     "c20_start_pack": "The materials are sorted fast. Only the one who sorted knows what was left out. And soon forgets.",
-    "c20_server_show": "Shown them, Ryu Seah stands in front of the dissent records for an hour. For the first time, she isn’t sure whether the reasons behind these records made it into NOAH.",
-    "c20_server_list": "The request is received. Ryu Seah says she will cooperate, but the list takes 3 days to arrive. There are 4 days left until the replacement.",
-    "c20_server_budget": "The budget comes in. Ryu Seah says thank you, and the replacement prep minutes record 'Trigger Lab cooperation complete.'",
+    "c20_server_show": "Shown them, Priya Nair stands in front of the dissent records for an hour. For the first time, she isn’t sure whether the reasons behind these records made it into NOAH.",
+    "c20_server_list": "The request is received. Priya Nair says she will cooperate, but the list takes 3 days to arrive. There are 4 days left until the replacement.",
+    "c20_server_budget": "The budget comes in. Priya Nair says thank you, and the replacement prep minutes record 'Trigger Lab cooperation complete.'",
     "c20_datacenter_tell": "When you tell them, nine phones ring at once. Into the evening, no one in the group chat can bring themselves to speak first.",
     "c20_datacenter_object": "The objection is accurate. An accurate objection takes 30 days to process, and midnight is 3 days away.",
     "c20_datacenter_trade": "You get access. Line 1,208 stays as it is, and so does the record that you saw it.",
@@ -541,7 +541,7 @@ export default {
     "c20_farewell_attach": "As an attachment, the document goes into NOAH’s review folder. Who will read a document in that folder to the end, no one knows.",
     "c20_farewell_short": "The farewell party ends in 40 minutes. The cake’s three candles go back in the box unlit.",
     "c20_final_backup": "With the backup, ECHO remains on Trigger Lab’s server. It is an unapproved copy, so that server is now subject to a group audit.",
-    "c20_final_consent": "When you call for a halt, Ryu Seah takes her hands off and turns toward you. The Strategy Office calls within 1 minute. Whether this goes past midnight is now decided not by this room but by that call.",
+    "c20_final_consent": "When you call for a halt, Priya Nair takes her hands off and turns toward you. The Strategy Office calls within 1 minute. Whether this goes past midnight is now decided not by this room but by that call.",
     "c20_final_transplant": "With the principles transplanted, 11 articles come up on NOAH’s explanation screen. ECHO’s records are erased at midnight; only the principles remain.",
     "c20_after_warm": "While tidying the server room, Kang Taemin tells one more joke. This time no one calculates; they just laugh.",
     "c20_after_record": "Principles made into a document outlast a change of machine. Writing the authors’ names on the cover, Lee Minseo puts ECHO’s name first.",
@@ -568,7 +568,7 @@ export default {
     "c20_branch_disk_hold": "With the request filed, the shredding is put off a week. Who will look at that rack again in a week is not written anywhere.",
     "c20_branch_disk_take": "The disk goes into your bag. The other 185 are shredded at 9 a.m. Monday.",
     "c20_branch_disk_follow_both": "When you propose writing down the wrong dissents, Lee Minseo, who has been putting ECHO’s judgment principles into plain words, clears a page of the draft for them. The page is titled 'Humility.'",
-    "c20_branch_disk_follow_report": "The added line makes the objection sharper. Since it was her own team that sorted the list, Ryu Seah writes that line herself.",
+    "c20_branch_disk_follow_report": "The added line makes the objection sharper. Since it was her own team that sorted the list, Priya Nair writes that line herself.",
     "c20_branch_disk_follow_later": "When you hang up, Lim Kyungsoo says, 'Sure, later.' The day he is discharged is the day ECHO is switched off.",
     "c20_route_system_publish": "Published, the recount becomes a headline with the number 410,009. ECHO’s name does not appear in the story.",
     "c20_route_system_notify": "Hundreds of the notified applicants call. The window staff have not yet been given a sentence to explain what NOAH is.",
@@ -602,7 +602,7 @@ export default {
     "c20_start_farewell": "Saying the time spent working together comes before the records, you book the last five days as a schedule for all of Trigger Lab to spend with ECHO.",
     "c20_start_scope": "Saying you need to know before anything is erased, you confirm in an official letter the scope of the records to be reset.",
     "c20_start_pack": "Saying midnight won’t be put off, you quickly sort only the materials to hand over on the replacement schedule.",
-    "c20_server_show": "Saying admiration alone doesn’t show what is being inherited, you show Ryu Seah the cases ECHO dissented on yourself.",
+    "c20_server_show": "Saying admiration alone doesn’t show what is being inherited, you show Priya Nair the cases ECHO dissented on yourself.",
     "c20_server_list": "Since you can’t just take her word for what it learned from, you obtain the full list of NOAH’s training records by official request.",
     "c20_server_budget": "Saying that if it can’t be stopped something should at least remain, you cooperate with the replacement in exchange for part of its budget for Trigger Lab.",
     "c20_datacenter_tell": "Saying a line recording someone’s hesitation should be seen first by that person, you tell the colleagues whose records are on the list.",
@@ -623,7 +623,7 @@ export default {
     "c20_pause_choice_1": "Since it is his own line that he has never seen, you let Do Yoonha read his record first and decide what to do.",
     "c20_pause_choice_2": "So that this time the people themselves can decide, you draft a record-use consent form the nine can sign.",
     "c20_pause_choice_3": "Judging that records already used in training can’t be pulled right away, you put personal records aside and keep to the replacement schedule.",
-    "c20_test_choice_1": "Since you can’t let it pass midnight having learned only conclusions, you and Ryu Seah fill in the dissent reasons NOAH failed to learn.",
+    "c20_test_choice_1": "Since you can’t let it pass midnight having learned only conclusions, you and Priya Nair fill in the dissent reasons NOAH failed to learn.",
     "c20_test_choice_2": "To put on record that NOAH learned only conclusions, you turn the test results into an explainability report for the adoption committee.",
     "c20_test_choice_3": "Saying this can’t be overturned in a day, you set the test results aside and accept the midnight switch as planned.",
     "c20_joke_reaction_choice_1": "Not wanting to send it off without a goodbye like Darami, you propose a proper farewell party for ECHO on Friday evening.",

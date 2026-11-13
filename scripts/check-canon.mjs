@@ -580,6 +580,13 @@ export const CANON = [
     allow: [],
   },
   {
+    id: "cast-old-names",
+    fact: "the renamed people (11-13) go by their new names; the old ones live only in castAliases.js",
+    files: /src\/(?!locales\/|castAliases\.js$)/,
+    find: /(류세아|주은채|연시우|도건우|표세린|백다온|우지환|은재하)/g,
+    allow: [],
+  },
+  {
     id: "kd-owner-name",
     fact: "KD금융그룹's largest shareholder is 킹스데일 파트너스 (Kingsdale Partners), New York",
     files: SEASON,

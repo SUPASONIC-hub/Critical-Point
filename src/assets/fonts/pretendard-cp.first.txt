@@ -700,6 +700,7 @@ ba58 멘
 ba70 며
 ba74 면
 ba85 명
+ba87 몇
 baa8 모
 baa9 목
 baab 몫

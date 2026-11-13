@@ -376,31 +376,31 @@ export const CHARACTER_GROUPS = [
         },
       },
       {
-        key: "류세아",
-        portrait: "/portrait-ryu-sea.webp",
+        key: "프리야 나이르",
+        portrait: "/portrait-priya-nair.webp",
         ko: {
-          name: "류세아",
-          role: "KD데이터랩 노아 도입 책임자",
+          name: "프리야 나이르",
+          role: "KD데이터랩 노아 도입 책임자 · 싱가포르에서 영입",
           text: [
-            "그룹의 데이터 조직인 KD데이터랩에서 새 AI 심사 엔진 노아의 도입을 맡은 책임자입니다. 목에 라벨 프린터 끈을 걸고, 스티커가 빼곡한 노트북과 은색 보온병을 어디든 들고 다닙니다. 이름 없는 것을 그냥 두지 못해서, 대답하기 전에 라벨부터 한 장 뽑아 붙일 곳을 찾는 사람입니다.",
+            "그룹의 데이터 조직인 KD데이터랩에서 새 AI 심사 엔진 노아의 도입을 맡은 책임자입니다. 싱가포르의 금융 기술 회사에서 영입되어 서울에서 3년째 일하고 있습니다. 목에 라벨 프린터 끈을 걸고, 스티커가 빼곡한 노트북과 은색 보온병을 어디든 들고 다닙니다. 이름 없는 것을 그냥 두지 못해서, 대답하기 전에 라벨부터 한 장 뽑아 붙일 곳을 찾는 사람입니다.",
             "빠르고 밝게 말하다가, 모르는 것을 인정할 때만 말끝을 낮춥니다. 자기가 다루는 모델을 진심으로 아끼지만, 설명할 수 없는 판단은 믿지 않는다는 원칙도 분명합니다. 트리거랩 사람들을 '선배님'이라고 부르며 다가오는 그는, 기술과 사람의 판단이 만나는 자리에 대한 질문을 랩 안으로 가져옵니다.",
           ],
           line: "설명 못 하는 모델은 저도 안 믿어요. 그래서 이번 건이 더 아파요.",
         },
         en: {
-          name: "Ryu Seah",
-          role: "Head of the NOAH rollout, KD Data Lab",
+          name: "Priya Nair",
+          role: "Head of the NOAH rollout, KD Data Lab · hired from Singapore",
           text: [
-            "The person in charge of bringing in NOAH, a new AI credit engine, at KD Data Lab, the group's data unit. She wears a label printer's strap around her neck and carries a sticker-covered laptop and a silver thermos everywhere. She cannot leave anything unnamed, so before she answers she prints a label and looks for somewhere to put it.",
+            "The person in charge of bringing in NOAH, a new AI credit engine, at KD Data Lab, the group's data unit. She was hired from a Singapore fintech firm and is in her third year in Seoul. She wears a label printer's strap around her neck and carries a sticker-covered laptop and a silver thermos everywhere. She cannot leave anything unnamed, so before she answers she prints a label and looks for somewhere to put it.",
             "She talks fast and brightly, lowering her voice only when she admits she does not know something. She truly cares about the model she works with, yet holds firmly to one rule: she does not trust a judgment that cannot be explained. Approaching the Trigger Lab team as her seniors, she brings into the lab a question about where technology and human judgment meet.",
           ],
           line: "I don't trust a model that can't explain itself either. That's why this one hurts more.",
         },
         ja: {
-          name: "リュ・セア",
-          role: "KDデータラボ NOAH導入責任者",
+          name: "プリヤ・ナイル",
+          role: "KDデータラボ NOAH導入責任者 · シンガポールから招聘",
           text: [
-            "グループのデータ組織であるKDデータラボで、新しいAI審査エンジンNOAHの導入を任されている責任者です。首にラベルプリンターのストラップを下げ、ステッカーだらけのノートパソコンと銀色の保温ボトルをどこへでも持ち歩きます。名前のないものを放っておけず、答える前にまずラベルを一枚印刷して、貼る場所を探す人です。",
+            "グループのデータ組織であるKDデータラボで、新しいAI審査エンジンNOAHの導入を任されている責任者です。シンガポールの金融テック企業から招かれ、ソウルで働いて三年目になります。首にラベルプリンターのストラップを下げ、ステッカーだらけのノートパソコンと銀色の保温ボトルをどこへでも持ち歩きます。名前のないものを放っておけず、答える前にまずラベルを一枚印刷して、貼る場所を探す人です。",
             "速く明るく話しますが、知らないことを認めるときだけ語尾を落とします。自分が扱うモデルを心から大切にしている一方で、説明できない判断は信じないという原則もはっきりしています。トリガーラボの人々を「先輩」と呼んで近づいてくる彼女は、技術と人の判断が出会う場所についての問いを、ラボの中へ持ち込みます。",
           ],
           line: "説明できないモデルは、私も信じません。だから今回の件は余計に痛いんです。",

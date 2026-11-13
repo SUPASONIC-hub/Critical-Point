@@ -268,12 +268,12 @@ export default {
       premise: [
         "「echo_fragment」라는 조각만으로는 에코가 한 문장도 끝까지 잇지 못합니다. 이민서가 KD데이터랩의 자산 폐기 일정표를 엽니다. 트리거랩에서 반납한 서버 12대, 9월 19일 오후 6시 디스크 파쇄. 그중 네 대에는 이민서가 예전에 붙여 둔 스티커가 그대로 남아 있습니다. 「에코 1~4호 · 발로 차지 마시오.」 폐기를 요청한 부서는 그룹전략실입니다.",
         "그 디스크 안에는 설계 로그(실험을 어떻게 짤지 바꾼 날짜와 사람을 남긴 기록)도 들어 있습니다. 임소율은 할아버지가 남긴 반대 의견서 뒷장 원본을 고해상도로 스캔해 가져왔습니다. 이민서의 말은 단순합니다. 할아버지는 종이를 남기고 가셨지만, 에코는 지금 꺼내지 않으면 내일 저녁 여섯 시에 가루가 된다고. 파쇄까지 남은 시간은 스무 시간입니다.",
-        "판교 데이터센터 지하 3층, 폐기 대기 구역에 반납 서버 12대가 비닐을 뒤집어쓰고 서 있습니다. 야간 당직을 막 끝낸 엔지니어 연시우가 출입 태블릿을 내밀며 규칙을 알려 줍니다. 여기서는 뛰면 안 되고, 서버한테 반말도 안 된다고, 얘들 귀가 밝다고. 권도현은 벌써 파쇄 비용을 셉니다. 한 대에 4만 원. 3년 치 기억을 지우는 값으로는 싸다는 게 그의 감상입니다.",
-        "폐기 승인서를 보면 확인자 칸에는 연시우와 류세아의 이름이 있지만, 승인자 칸은 비어 있습니다. 연시우가 목소리를 낮춥니다. 빈칸이어도 일정은 돌아간다고, 여기선 원래 그렇다고. 게다가 에코 디스크 네 장 가운데 한 장은 이미 초기화됐습니다. 되살아난 에코가 3,412건의 설계 로그를 다시 셀 수 있다면, 그 빈칸들 옆에 무엇이 남아 있었는지 보일지도 모릅니다."
+        "판교 데이터센터 지하 3층, 폐기 대기 구역에 반납 서버 12대가 비닐을 뒤집어쓰고 서 있습니다. 야간 당직을 막 끝낸 엔지니어 응우옌 반 남이 출입 태블릿을 내밀며 규칙을 알려 줍니다. 여기서는 뛰면 안 되고, 서버한테 반말도 안 된다고, 얘들 귀가 밝다고. 권도현은 벌써 파쇄 비용을 셉니다. 한 대에 4만 원. 3년 치 기억을 지우는 값으로는 싸다는 게 그의 감상입니다.",
+        "폐기 승인서를 보면 확인자 칸에는 응우옌 반 남과 프리야 나이르의 이름이 있지만, 승인자 칸은 비어 있습니다. 응우옌 반 남이 목소리를 낮춥니다. 빈칸이어도 일정은 돌아간다고, 여기선 원래 그렇다고. 게다가 에코 디스크 네 장 가운데 한 장은 이미 초기화됐습니다. 되살아난 에코가 3,412건의 설계 로그를 다시 셀 수 있다면, 그 빈칸들 옆에 무엇이 남아 있었는지 보일지도 모릅니다."
       ],
       cast: [
         { name: "이민서", note: "트리거랩의 데이터 기록 담당. 에코 서버에 「발로 차지 마시오」 스티커를 붙인 사람이고, 지금은 에코를 꺼내려 합니다." },
-        { name: "연시우", note: "KD데이터랩 판교 데이터센터의 인프라 엔지니어. 서버에게도 예의를 지키라고 말하는 야간 당직자입니다." },
+        { name: "응우옌 반 남", note: "KD데이터랩 판교 데이터센터의 인프라 엔지니어. 서버에게도 예의를 지키라고 말하는 야간 당직자입니다." },
         { name: "권도현", note: "파쇄 비용부터 계산하는 동료. 한 대에 4만 원이라는 숫자에 쓴웃음을 짓습니다." },
         { name: "에코", note: "대출 판단을 검증하던 시스템. 지금은 조각난 채로 한 문장도 끝까지 말하지 못합니다." }
       ],
@@ -284,12 +284,12 @@ export default {
       premise: [
         "With nothing but the piece called “echo_fragment,” ECHO cannot finish a single sentence. Lee Minseo opens KD Data Lab’s asset disposal schedule: twelve servers returned by Trigger Lab, disks to be shredded at 6 p.m. on September 19. Four of them still carry the stickers Lee Minseo once put on them: “ECHO 1-4 · Do not kick.” The department that requested the disposal is the Group Strategy Office.",
         "The design log is on those disks too, the record of who changed how the experiment was set up and when. Lim Soyul has brought a high-resolution scan of the original back page of the dissent her grandfather kept. Lee Minseo puts it simply: Grandpa left paper behind, but if they don’t get ECHO out now, it turns to dust at six tomorrow evening. Twenty hours remain.",
-        "Three floors below ground in the Pangyo data center, the twelve returned servers stand under plastic sheeting. Yeon Siwoo, an engineer just off night duty, hands over the entry tablet along with the house rules: no running, and no talking down to the servers, because they have good ears. Kwon Dohyun is already pricing the shredding at 40,000 won a unit. Cheap, he remarks, for erasing three years of memory.",
-        "On the disposal approval, Yeon Siwoo and Ryu Seah are listed as verifiers, but the approver field is empty. Yeon Siwoo lowers his voice: empty or not, the schedule runs. That’s how it always is here. One of the four ECHO disks has already been wiped. If a revived ECHO could recount all 3,412 design log entries, it might show what was left beside those empty fields."
+        "Three floors below ground in the Pangyo data center, the twelve returned servers stand under plastic sheeting. Nguyen Van Nam, an engineer just off night duty, hands over the entry tablet along with the house rules: no running, and no talking down to the servers, because they have good ears. Kwon Dohyun is already pricing the shredding at 40,000 won a unit. Cheap, he remarks, for erasing three years of memory.",
+        "On the disposal approval, Nguyen Van Nam and Priya Nair are listed as verifiers, but the approver field is empty. Nguyen Van Nam lowers his voice: empty or not, the schedule runs. That’s how it always is here. One of the four ECHO disks has already been wiped. If a revived ECHO could recount all 3,412 design log entries, it might show what was left beside those empty fields."
       ],
       cast: [
         { name: "Lee Minseo", note: "Trigger Lab’s data recorder, who once stuck “Do not kick” on ECHO’s servers and now means to get ECHO out." },
-        { name: "Yeon Siwoo", note: "Infrastructure engineer at the KD Data Lab data center in Pangyo, on night duty, who insists on good manners even toward servers." },
+        { name: "Nguyen Van Nam", note: "Infrastructure engineer at the KD Data Lab data center in Pangyo, on night duty, who insists on good manners even toward servers." },
         { name: "Kwon Dohyun", note: "A colleague who prices the shredding before anything else, and smiles wryly at 40,000 won a unit." },
         { name: "ECHO", note: "The system that once checked loan judgments, now in fragments and unable to finish a sentence." }
       ],
@@ -300,12 +300,12 @@ export default {
       premise: [
         "「echo_fragment」という断片だけでは、ECHOは一つの文も最後まで言い切れません。イ・ミンソがKDデータラボの資産廃棄スケジュールを開きます。トリガーラボから返却されたサーバー12台、9月19日午後6時にディスク破砕。そのうち四台には、イ・ミンソが以前に貼ったステッカーがそのまま残っています。「ECHO 1〜4号 · 蹴らないでください。」廃棄を依頼した部署はグループ戦略室です。",
         "そのディスクには設計ログ(実験の組み方を変えた日付と人を残した記録)も入っています。イム・ソユルは、祖父が残した反対意見書の裏面の原本を高解像度でスキャンして持ってきました。イ・ミンソの言い分は単純です。おじいちゃんは紙を残していったけれど、ECHOはいま出さなければ明日の夕方6時に粉になる。破砕まで、残りは20時間です。",
-        "パンギョのデータセンター地下3階、廃棄待機区域に、返却サーバー12台がビニールをかぶって立っています。夜間当直を終えたばかりのエンジニア、ヨン・シウが入館用タブレットを差し出し、ルールを教えてくれます。ここでは走らないこと、サーバーにタメ口もだめ、この子たちは耳がいいので。クォン・ドヒョンはもう破砕費用を数えています。一台4万ウォン。3年分の記憶を消す値段にしては安い、というのが彼の感想です。",
-        "廃棄承認書を見ると、確認者の欄にはヨン・シウとリュ・セアの名前がありますが、承認者の欄は空いています。ヨン・シウが声を落とします。空欄でもスケジュールは回る、ここではいつもそうだ、と。しかもECHOのディスク四枚のうち一枚は、すでに初期化されています。よみがえったECHOが3,412件の設計ログを数え直せたなら、あの空欄の横に何が残っていたのかが見えるかもしれません。"
+        "パンギョのデータセンター地下3階、廃棄待機区域に、返却サーバー12台がビニールをかぶって立っています。夜間当直を終えたばかりのエンジニア、グエン・ヴァン・ナムが入館用タブレットを差し出し、ルールを教えてくれます。ここでは走らないこと、サーバーにタメ口もだめ、この子たちは耳がいいので。クォン・ドヒョンはもう破砕費用を数えています。一台4万ウォン。3年分の記憶を消す値段にしては安い、というのが彼の感想です。",
+        "廃棄承認書を見ると、確認者の欄にはグエン・ヴァン・ナムとプリヤ・ナイルの名前がありますが、承認者の欄は空いています。グエン・ヴァン・ナムが声を落とします。空欄でもスケジュールは回る、ここではいつもそうだ、と。しかもECHOのディスク四枚のうち一枚は、すでに初期化されています。よみがえったECHOが3,412件の設計ログを数え直せたなら、あの空欄の横に何が残っていたのかが見えるかもしれません。"
       ],
       cast: [
         { name: "イ・ミンソ", note: "トリガーラボのデータ記録担当。ECHOのサーバーに「蹴らないでください」と貼った人で、いまECHOを連れ出そうとしています。" },
-        { name: "ヨン・シウ", note: "KDデータラボ・パンギョデータセンターのインフラエンジニア。サーバーにも礼儀を守れと言う夜間当直です。" },
+        { name: "グエン・ヴァン・ナム", note: "KDデータラボ・パンギョデータセンターのインフラエンジニア。サーバーにも礼儀を守れと言う夜間当直です。" },
         { name: "クォン・ドヒョン", note: "まず破砕費用を計算する仲間。一台4万ウォンという数字に苦笑いします。" },
         { name: "ECHO", note: "融資判断を検証していたシステム。いまは断片のまま、一つの文も最後まで話せません。" }
       ],
@@ -369,7 +369,7 @@ export default {
       setting: "2026년 추석 연휴 · KD캐피탈 위험관리부 → 성수동 루프나우 다크스토어 → KD캐피탈 심사위원회 회의실",
       premise: [
         "추석 밤, KD캐피탈 위험관리부 부장 채이안이 파일 한 부를 내밉니다. 내일 오전 9시, 연휴 중에 임시 심사위원회가 열립니다. 안건은 도심 15분 배송 회사 루프나우의 운영자금 대출 290억 원. 라운드힐 캐피탈이 480억을 투자하기로 했는데, 그 계약에 선행 조건(이게 먼저 이뤄져야 계약이 효력을 갖는 조건)이 붙었습니다. KD캐피탈의 대출 확약(돈을 빌려주겠다는 공식 약속), 마감은 내일 오전 10시입니다.",
-        "위원은 다섯 명이고 모두 실명으로 서명합니다. 그 다섯 줄 가운데 마지막 줄에 처음으로 당신 이름이 인쇄돼 있습니다. 채이안은 14쪽 제7조를 읽어 보라고, 아는 문장일 거라고 말합니다. 부채비율(회사 빚이 자기 돈의 몇 배인지 보는 숫자)이 180%를 넘으면 만기 전이라도 즉시 회수한다. 쉼표 자리까지 2023-0412 계약서와 똑같습니다. 3년 전 플로우온 대출 앞에서 당신이 반대 의견을 썼던 바로 그 문장입니다. 안건을 올린 사람은 기업금융본부장 우지환, 노아의 사전 점수는 A등급입니다.",
+        "위원은 다섯 명이고 모두 실명으로 서명합니다. 그 다섯 줄 가운데 마지막 줄에 처음으로 당신 이름이 인쇄돼 있습니다. 채이안은 14쪽 제7조를 읽어 보라고, 아는 문장일 거라고 말합니다. 부채비율(회사 빚이 자기 돈의 몇 배인지 보는 숫자)이 180%를 넘으면 만기 전이라도 즉시 회수한다. 쉼표 자리까지 2023-0412 계약서와 똑같습니다. 3년 전 플로우온 대출 앞에서 당신이 반대 의견을 썼던 바로 그 문장입니다. 안건을 올린 사람은 기업금융본부장 토머스 리드, 노아의 사전 점수는 A등급입니다.",
         "성수동의 루프나우 1호 다크스토어(손님은 들어올 수 없는 배송 전용 소형 창고)에서는 전기자전거 40대가 충전기에 꽂혀 있습니다. 강태민이 문을 열자 대표 민하랑이 먼저 알아봅니다. 플로우온 야간조 반장님! 민하랑은 플로우온의 야간 배차 매니저였고, 지금은 다크스토어 18곳, 직원 214명, 계약 라이더 1,380명을 이끄는 서른한 살 대표입니다.",
         "민하랑이 사업계획서를 펼칩니다. 플로우온의 마지막 72시간 동안 자기 손으로 배차표에서 이름 58개를 지웠다고, 그래서 만든 회사라고, 우리는 안 망한다고. 그런데 계획서 마지막 장, 상환(빌린 돈을 갚는 일)에 쓸 돈의 출처 칸에 적힌 것은 매출이 아니라 「다음 투자 유치」입니다."
       ],
@@ -377,7 +377,7 @@ export default {
         { name: "채이안", note: "KD캐피탈 위험관리부 부장, 17년 차. 추석 밤에 제7조가 든 파일을 당신에게 건넵니다." },
         { name: "민하랑", note: "루프나우 대표, 31세. 플로우온 야간 배차 매니저였고, 다시는 망하지 않겠다며 회사를 세웠습니다." },
         { name: "강태민", note: "플로우온 야간조 반장 출신. 다크스토어 문을 열자마자 옛 동료에게 알아봐집니다." },
-        { name: "우지환", note: "KD캐피탈 기업금융본부장. 루프나우 대출 안건을 올린 사람입니다." }
+        { name: "토머스 리드", note: "KD캐피탈 기업금융본부장. 루프나우 대출 안건을 올린 사람입니다." }
       ],
       question: "똑같은 모양의 대출 앞에서, 이번에는 당신 이름으로 반대 의견을 쓸 수 있을까요? 그 서명은 누구를 지키고, 누구에게 청구서를 보내게 될까요?",
     },
@@ -385,7 +385,7 @@ export default {
       setting: "Chuseok holiday 2026 · KD Capital Risk Management Department → LoopNow dark store, Seongsu-dong → KD Capital credit committee meeting room",
       premise: [
         "On Chuseok night, Chae Ian, head of KD Capital’s Risk Management Department, hands you a file. Tomorrow at 9 a.m., in the middle of the holiday, an emergency credit committee will meet. The agenda: a 29-billion-won working-capital loan to LoopNow, a 15-minute urban delivery company. Roundhill Capital has agreed to invest 48 billion won, but on one precondition: a loan commitment from KD Capital, due by 10 a.m. tomorrow.",
-        "Five committee members will sign under their real names, and for the first time, the last of those five lines carries your name in print. Chae Ian tells you to read Article 7 on page 14; you’ll recognize the sentence. If the debt ratio exceeds 180 percent, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas, the FlowOn loan you dissented on three years ago. The item was proposed by Woo Jihwan, Head of Corporate Finance, and NOAH has pre-scored it Grade A.",
+        "Five committee members will sign under their real names, and for the first time, the last of those five lines carries your name in print. Chae Ian tells you to read Article 7 on page 14; you’ll recognize the sentence. If the debt ratio exceeds 180 percent, the loan is called immediately, even before maturity. It matches the 2023-0412 contract down to the commas, the FlowOn loan you dissented on three years ago. The item was proposed by Thomas Reed, Head of Corporate Finance, and NOAH has pre-scored it Grade A.",
         "At LoopNow’s Dark Store No. 1 in Seongsu-dong, a small delivery-only warehouse customers never enter, forty e-bikes sit plugged into chargers. When Kang Taemin opens the door, the CEO, Min Harang, recognizes him first: the FlowOn night-shift foreman! Min Harang was FlowOn’s night dispatch manager. Now, at 31, she runs 18 dark stores, 214 employees and 1,380 contract riders.",
         "She opens the business plan. In FlowOn’s last 72 hours, she says, she erased 58 names from the dispatch sheet with her own hands. That is why she built this company. We won’t go under. But on the plan’s last page, in the box for where the repayment money will come from, it doesn’t say revenue. It says “next funding round.”"
       ],
@@ -393,7 +393,7 @@ export default {
         { name: "Chae Ian", note: "Head of KD Capital’s Risk Management Department, seventeen years in, who hands you the file with Article 7 on Chuseok night." },
         { name: "Min Harang", note: "CEO of LoopNow, 31, formerly FlowOn’s night dispatch manager, who built her company so it would never go under." },
         { name: "Kang Taemin", note: "Former FlowOn night-shift foreman, recognized the moment he opens the dark store door." },
-        { name: "Woo Jihwan", note: "Head of Corporate Finance at KD Capital, the man who put the LoopNow loan on the agenda." }
+        { name: "Thomas Reed", note: "Head of Corporate Finance at KD Capital, the man who put the LoopNow loan on the agenda." }
       ],
       question: "Facing a loan of exactly the same shape, can you write the dissent under your own name this time? Whom would that signature protect, and to whom would it send the bill?",
     },
@@ -401,7 +401,7 @@ export default {
       setting: "2026年の秋夕連休 · KDキャピタル リスク管理部 → ソンス洞のループナウのダークストア → KDキャピタル審査委員会の会議室",
       premise: [
         "秋夕の夜、KDキャピタル リスク管理部の部長チェ・イアンがファイルを一部差し出します。明日の午前9時、連休中に臨時審査委員会が開かれます。議案は、都心15分配送の会社ループナウへの運転資金融資290億ウォン。ラウンドヒル・キャピタルが480億ウォンを投資することになっていますが、その契約には先行条件(それが先に満たされないと契約が効力を持たない条件)が付いています。KDキャピタルの融資確約(お金を貸すという正式な約束)、締め切りは明日の午前10時です。",
-        "委員は五人で、全員が実名で署名します。その五行の最後の一行に、初めてあなたの名前が印刷されています。14ページの第7条を読んでみて、知っている文のはずだ、とチェ・イアンは言います。負債比率(会社の借金が自己資金の何倍かを見る数字)が180%を超えたら、満期前でも即時回収する。カンマの位置まで2023-0412の契約書と同じです。3年前、フロウオンへの融資を前にあなたが反対意見を書いた、まさにあの文です。議案を出したのは企業金融本部長ウ・ジファン、NOAHの事前スコアはA等級です。",
+        "委員は五人で、全員が実名で署名します。その五行の最後の一行に、初めてあなたの名前が印刷されています。14ページの第7条を読んでみて、知っている文のはずだ、とチェ・イアンは言います。負債比率(会社の借金が自己資金の何倍かを見る数字)が180%を超えたら、満期前でも即時回収する。カンマの位置まで2023-0412の契約書と同じです。3年前、フロウオンへの融資を前にあなたが反対意見を書いた、まさにあの文です。議案を出したのは企業金融本部長トーマス・リード、NOAHの事前スコアはA等級です。",
         "ソンス洞のループナウ1号ダークストア(客は入れない配送専用の小さな倉庫)では、電動自転車40台が充電器につながれています。カン・テミンがドアを開けると、代表のミン・ハランが先に気づきます。フロウオン夜勤班の班長さん!ミン・ハランはフロウオンの夜間配車マネージャーで、いまはダークストア18か所、社員214人、契約ライダー1,380人を率いる31歳の代表です。",
         "ミン・ハランが事業計画書を広げます。フロウオンの最後の72時間、自分の手で配車表から58人の名前を消した、だから作った会社だ、うちは潰れない、と。けれど計画書の最後のページ、返済(借りたお金を返すこと)に充てるお金の出どころの欄に書かれているのは、売上ではなく「次の投資の誘致」です。"
       ],
@@ -409,7 +409,7 @@ export default {
         { name: "チェ・イアン", note: "KDキャピタル リスク管理部の部長、17年目。秋夕の夜、第7条の入ったファイルをあなたに渡します。" },
         { name: "ミン・ハラン", note: "ループナウ代表、31歳。フロウオンの夜間配車マネージャーだった人で、二度と潰れない会社をと起業しました。" },
         { name: "カン・テミン", note: "フロウオン夜勤班の班長だった人。ダークストアのドアを開けた瞬間、昔の仲間に気づかれます。" },
-        { name: "ウ・ジファン", note: "KDキャピタル企業金融本部長。ループナウ融資の議案を出した人です。" }
+        { name: "トーマス・リード", note: "KDキャピタル企業金融本部長。ループナウ融資の議案を出した人です。" }
       ],
       question: "まったく同じ形の融資を前に、今度こそあなたの名前で反対意見を書けるでしょうか。その署名は誰を守り、誰に請求書を送ることになるのでしょうか。",
     },

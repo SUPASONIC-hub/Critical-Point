@@ -94,6 +94,38 @@ dividends, personnel or a sale come up; the people, endings and order of the
 cases do not change for it. 사건 43's 5 대 3 and 사건 44's sentence stand.
 `check:canon` holds the name (킹스데일 / Kingsdale) and the 30%.
 
+## The people from abroad (11-13)
+
+KD is a Korean group with a Singapore 법인 (KD자산운용), a Tokyo branch (KD은행)
+and engineers hired from abroad (KD데이터랩). The story stays in Seoul; those
+places are background. Every person below was hired by KD itself or works
+outside it -- none of them is Kingsdale's, and Kingsdale stays a company (above).
+A nationality is never the reason someone does right or wrong.
+
+| Person (ko / en / ja) | Was | Background | Address |
+|---|---|---|---|
+| 프리야 나이르 / Priya Nair / プリヤ・ナイル | 류세아 | Indian-Singaporean, 34; KD데이터랩 hired her from a Singapore fintech firm to bring in 노아; third year in Seoul | 「프리야 씨」; calls the servers 「선배님」 as a Korean office taught her |
+| 레이철 탄 / Rachel Tan / レイチェル・タン | 주은채 | Chinese-Singaporean; KD자산운용 싱가포르 법인 fund manager, seconded to Seoul for the 상생 펀드 | 「레이철」 among colleagues |
+| 응우옌 반 남 / Nguyen Van Nam / グエン・ヴァン・ナム | 연시우 | Vietnamese, Hanoi engineering school; sixth year at the 판교 data center; on duty over 추석 (사건 46) | 「남 씨」 |
+| 대니얼 강 / Daniel Kang / ダニエル・カン | 도건우 | Korean American (1.5 generation), New York lawyer; keeps the name from his law-firm years | 위기대응TF 팀장 |
+| 채이안 (unchanged) | -- | 재일교포 3세; joined KD은행 도쿄지점 in 2009, 17th year (사건 25); ja gives his 通名 千伊安 once | 부장 |
+| 미즈노 사키 / Mizuno Saki / 水野咲 | 표세린 | Japanese; ClearVote's Tokyo office, covering Korean companies for 7 years; a year at a Seoul language school | 「미즈노 씨」; 합니다체 and her distance to the end, 「죄송하지만」 before an objection; one personal sentence only in 사건 49 |
+| 마커스 림 / Marcus Lim / マーカス・リム | 백다온 | Singaporean, Korean mother; third-year analyst at Roundhill's Singapore head office | calls 조현석 「에단」 as the firm does; polite Korean to the analyst |
+| 조현석 (unchanged) | -- | Korean American 1.5 generation (went to New York at twelve), 12 years in Singapore; 「에단」 inside the firm, 조현석 in the narration | -- |
+| 토머스 리드 / Thomas Reed / トーマス・リード | 우지환 (profile only) | American; KD캐피탈 hired him itself from a New York regional bank after the 사건 43 dismissal (not Kingsdale's) | speaks English, an interpreter follows a beat behind (사건 48, first and only scene); his 「다만」 is the however he says in English |
+| 뤼카 베르나르 / Lucas Bernard / リュカ・ベルナール | 은재하 | Born and trained in Lyon to a Korean mother; came to Seoul with her 12 years ago; 서도경's home chef for 3 years. His mother's 반찬가게 in 망원시장 (사건 36) is unchanged | -- |
+| 이민서 (unchanged) | -- | 다문화 가정 2세: her mother came from Japan (Korean citizen). Only in narration -- 찬빈 mimics her in Japanese at the 수능 gate (사건 15); no Japanese words are written | -- |
+| 배수경 (unchanged) | -- | Came from Vietnam to marry 16 years ago, naturalized (born 쩐 티 투 / Tran Thi Thu / チャン・ティ・トゥ; the game keeps her Korean name); 9 years on the packing line; video calls home on holidays. Said once in 사건 16; 번외 3 and side04 are unchanged | half 반말 half 존댓말, as learned in markets and on the floor; 강태민 calls her 「수경 씨」 |
+
+Rules: what a foreign speaker says inside quotes is natural Korean (no English
+or Japanese mixed in, no broken Korean); whether they speak Korean or go
+through an interpreter is said once, in the first narration. The narration and
+the `speaker` key always use the full name; a short form (「남 씨」) is only ever
+inside quotes. en writes these names in ASCII. The old names live only in
+`src/castAliases.js`, which turns them into the new ones in saves and run logs
+written before the change; `check:canon` (cast-old-names) keeps them out of
+every other season file.
+
 ## The crisis years (C11)
 
 Roughly once a decade the market breaks, and each time the request that comes

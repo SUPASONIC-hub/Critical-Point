@@ -69,7 +69,7 @@ export default {
     },
     "c14_desk": {
       "title": "A Kind Name",
-      "text": "Joo Eunchae, highlighter in hand, is glad you came. 'I designed this fund. It buys bad loans cheap, gives the companies time to breathe, and waits 5 years to collect. Put the recovery rate at 68% and you get 4.8% a year. Kind money earning kind returns.' She switches on a second monitor, and a table you have never seen comes up. The KD Bank sales bonus table, and one line at the bottom. '1.5x when converting maturing deposits of customers aged 70 or older.' Joo Eunchae’s highlighter stops. 'This… isn’t a table I made.'",
+      "text": "Rachel Tan, highlighter in hand, is glad you came. A fund manager seconded to Seoul from KD Asset Management’s Singapore office for the Sangsaeng fund, she learned her Korean in training at the Seoul head office. 'I designed this fund. It buys bad loans cheap, gives the companies time to breathe, and waits 5 years to collect. Put the recovery rate at 68% and you get 4.8% a year. Kind money earning kind returns.' She switches on a second monitor, and a table you have never seen comes up. The KD Bank sales bonus table, and one line at the bottom. '1.5x when converting maturing deposits of customers aged 70 or older.' Rachel Tan’s highlighter stops. 'This… isn’t a table I made.'",
       "memo": [
         "Design assumptions: 5-year hold, 68% recovery, 4.8% a year",
         "Originally meant for: institutions like pension funds that can wait 5 years",
@@ -84,7 +84,7 @@ export default {
           "label": "Take only her model file; trace where the loans came from"
         },
         "c14_desk_play": {
-          "label": "Tell Joo Eunchae what the window says; ask her to stop it"
+          "label": "Tell Rachel Tan what the window says; ask her to stop it"
         },
         "reframe": {
           "label": "List what the window sold"
@@ -127,14 +127,14 @@ export default {
       "place": "Gangseo Senior Welfare Center · Finance class",
       "clock": "Round 2 sales · D-2",
       "question": "'If you don’t understand, don’t sign' is on the blackboard, and the instructor looks at you. What do you do with this class?",
-      "lead": "After you saw the number 41 in Joo Eunchae’s model, a 'Finance Class' banner went up on the welfare center’s 3rd floor."
+      "lead": "After you saw the number 41 in Rachel Tan’s model, a 'Finance Class' banner went up on the welfare center’s 3rd floor."
     },
     "c14_final": {
       "title": "Day 1 of Round 2",
-      "text": "10 minutes until the shutter goes up. Starting today, Round 2 of the Sangsaeng fund, 150 billion won, goes on sale, and page two of the new script still carries that sentence. A text comes from Joo Eunchae. 'Only my signature is left in the Round 2 approval field. Due by 9.' At the front of the line outside the glass doors stands Lee Jungsook with her notebook. 18:00 today is her cancellation deadline. Do Yoonha says, '3 years ago I sat here and said that sentence. What should I say today?'",
+      "text": "10 minutes until the shutter goes up. Starting today, Round 2 of the Sangsaeng fund, 150 billion won, goes on sale, and page two of the new script still carries that sentence. A text comes from Rachel Tan. 'Only my signature is left in the Round 2 approval field. Due by 9.' At the front of the line outside the glass doors stands Lee Jungsook with her notebook. 18:00 today is her cancellation deadline. Do Yoonha says, '3 years ago I sat here and said that sentence. What should I say today?'",
       "memo": [
         "Round 2 target 150 billion won -- starts today at 09:00",
-        "Round 2 approval field: only Joo Eunchae’s signature left",
+        "Round 2 approval field: only Rachel Tan’s signature left",
         "Lee Jungsook’s cancellation deadline today at 18:00",
         "This choice sets how the group moves its losses next"
       ],
@@ -205,9 +205,9 @@ export default {
       "question": "Lee Jungsook’s husband was Do Yoonha’s window customer 3 years ago. What do you do with this?"
     },
     "c14_recovery": {
-      "text": "In Joo Eunchae’s model, Kwon Dohyun points to one cell within 3 seconds. 'A 68% recovery rate? The FlowOn piece Bridge Bank bought last year came in at 41%. I know, because I bought it. Put in 41 and you don’t get 4.8% a year; 22% of the principal disappears. It’s a loss. For the customer.' Oh Jinwoo asks, 'And the seller?' 'The seller is in the black. I don’t want that kind of profit in my books.' Joo Eunchae types in 41, and the unit price chart bends down.",
+      "text": "In Rachel Tan’s model, Kwon Dohyun points to one cell within 3 seconds. 'A 68% recovery rate? The FlowOn piece Bridge Bank bought last year came in at 41%. I know, because I bought it. Put in 41 and you don’t get 4.8% a year; 22% of the principal disappears. It’s a loss. For the customer.' Oh Jinwoo asks, 'And the seller?' 'The seller is in the black. I don’t want that kind of profit in my books.' Rachel Tan types in 41, and the unit price chart bends down.",
       "memo": [
-        "68% recovery rate in Joo Eunchae’s model",
+        "68% recovery rate in Rachel Tan’s model",
         "Bridge Bank’s actual recovery rate on purchase: 41%",
         "At 41%: estimated 22% loss of principal"
       ],
@@ -273,7 +273,7 @@ export default {
     },
     "c14_recovery_reaction": {
       "title": "The Name I Gave It",
-      "text": "Sipping cold barley tea, Joo Eunchae speaks. 'It was meant to be sold to pension funds. Money that can wait 5 years. A month ago the group said to bring it down to the windows, and I didn’t object. It’s a kind fund, after all.' She looks at the fund’s name on the monitor. 'Sangsaeng, I named it. Thanks to that name, the word risk got smaller in the prospectus.'",
+      "text": "Sipping cold barley tea, Rachel Tan speaks. 'It was meant to be sold to pension funds. Money that can wait 5 years. A month ago the group said to bring it down to the windows, and I didn’t object. It’s a kind fund, after all.' She looks at the fund’s name on the monitor. 'Sangsaeng, I named it. Thanks to that name, the word risk got smaller in the prospectus.'",
       "memo": [
         "The month a pension-fund product came down to the windows",
         "Risk hidden by a kind name"
@@ -283,7 +283,7 @@ export default {
           "label": "Set aside her guilt; just borrow her system access"
         },
         "c14_recovery_reaction_choice_1": {
-          "label": "Ask Joo Eunchae to oppose Round 2 with you"
+          "label": "Ask Rachel Tan to oppose Round 2 with you"
         },
         "c14_recovery_reaction_choice_2": {
           "label": "Have her record who decided on window sales"
@@ -291,7 +291,7 @@ export default {
       },
       "place": "KD Asset Management trading floor, Pangyo · Night",
       "clock": "Round 2 sales D-5 · 23:00",
-      "question": "Joo Eunchae says she named it Sangsaeng herself. What do you ask of her?"
+      "question": "Rachel Tan says she named it Sangsaeng herself. What do you ask of her?"
     },
     "c14_grade_reaction": {
       "title": "The Bank Boy Fan Club",
@@ -534,9 +534,9 @@ export default {
     "c14_counter_stop": "At your request, Lee Jungsook puts down her pen. Then she writes your words in her notebook. 'Wait, stop.' That afternoon she gets a deposit maturity call, comes back alone, and signs.",
     "c14_counter_report": "The inspection sheet is accurate. The branch manager takes it and puts it in a drawer, and meanwhile the signing at the next window is done.",
     "c14_counter_record": "The recording becomes evidence. While the evidence is recorded, Lee Jungsook’s signature crosses the window’s signature pad.",
-    "c14_desk_play": "Hearing the pitch, Joo Eunchae asks twice for it again. The third time, she puts down her highlighter and stares at the screen for a while.",
+    "c14_desk_play": "Hearing the pitch, Rachel Tan asks twice for it again. The third time, she puts down her highlighter and stares at the screen for a while.",
     "c14_desk_gap": "Two columns are enough. Design document: '5-year hold'. Sales script: 'anytime'. Between them are 3,146 people.",
-    "c14_desk_model": "The model comes over. Joo Eunchae sends the file without being able to ask what her design will be used for.",
+    "c14_desk_model": "The model comes over. Rachel Tan sends the file without being able to ask what her design will be used for.",
     "c14_class_read": "Reading together, one form takes 20 minutes. Not one of the 62 leaves.",
     "c14_class_notice": "The written notice reaches everyone. The print is small, so Lee Jungsook passes her magnifier around and reads it again for them.",
     "c14_class_leave": "Lee Jungsook takes the class to the end. You see only the end and go to Pangyo to follow the money. The words on the welfare center blackboard are wiped off at cleaning time the next morning.",
@@ -549,18 +549,18 @@ export default {
     "c14_husband_choice_1": "With you beside him, Do Yoonha rewrites his first sentence three times. The fourth time, he decides to just say her name.",
     "c14_husband_choice_2": "The records show the script from 3 years ago and today’s do not differ by a single letter. Only the writer has changed.",
     "c14_husband_choice_3": "You put it off; Do Yoonha nods and folds down that page of his notebook. The folded page doesn’t last the night.",
-    "c14_recovery_choice_1": "Rewritten, '4.8% a year' becomes '5.28 million won out of 24 million won'. Joo Eunchae cannot read that number aloud.",
+    "c14_recovery_choice_1": "Rewritten, '4.8% a year' becomes '5.28 million won out of 24 million won'. Rachel Tan cannot read that number aloud.",
     "c14_recovery_choice_2": "The request is logged. The reply is due three days after Round 2 begins.",
-    "c14_recovery_choice_3": "The numbers are accurate. Even as you pack your bag, Joo Eunchae erases 41 and types it again. It isn’t easy to get up and leave her there.",
+    "c14_recovery_choice_3": "The numbers are accurate. Even as you pack your bag, Rachel Tan erases 41 and types it again. It isn’t easy to get up and leave her there.",
     "c14_grade_choice_1": "Carrying them together, the 40 notebooks don’t fit in one bag. Kang Taemin borrows two shopping bags.",
     "c14_grade_choice_2": "Bundled, the notebooks become evidence. While they do, their owners fill in 20 form boxes each.",
     "c14_grade_choice_3": "Left with her, Lee Jungsook returns the notebooks one by one. Still no one knows where to hand them in.",
     "c14_husband_reaction_choice_1": "After the explanation, Lee Jungsook writes 'non-performing loans' in her notebook with three question marks. Erasing those question marks takes an hour.",
     "c14_husband_reaction_choice_2": "When you ask, Lee Jungsook holds out her notebook. 'A teacher’s notebook is evidence by nature.' The notebook is no longer only hers.",
     "c14_husband_reaction_choice_3": "You put it off; Lee Jungsook puts her notebook in her bag and takes the bus. One day fewer to undo her purchase.",
-    "c14_recovery_reaction_choice_1": "At the idea of opposing it together, Joo Eunchae laughs for a long time. 'I’ve worked here 4 years. This is the first scary thing I’ve ever done.'",
+    "c14_recovery_reaction_choice_1": "At the idea of opposing it together, Rachel Tan laughs for a long time. 'I’ve worked here 4 years. This is the first scary thing I’ve ever done.'",
     "c14_recovery_reaction_choice_2": "On record, it turns out the decision field holds no person’s name, only two words: 'group consultation'. Those two words are the signature field.",
-    "c14_recovery_reaction_choice_3": "The access is borrowed. The next day, Joo Eunchae learns from the access log what it was used for.",
+    "c14_recovery_reaction_choice_3": "The access is borrowed. The next day, Rachel Tan learns from the access log what it was used for.",
     "c14_grade_reaction_choice_1": "Asked to go together, 37 replies of 'What time?' come in. Three say their knees won’t let them and they will send rice cakes instead.",
     "c14_grade_reaction_choice_2": "Matched up, 38 signed up on the very day their deposit matured. The dates are too neat to call a coincidence.",
     "c14_grade_reaction_choice_3": "Left with it, Oh Jinwoo writes replies all night. By morning his eyes are red, and the chat has been renamed 'Bank Boy Fan Club'.",
@@ -605,9 +605,9 @@ export default {
     "c14_counter_stop": "Because she needs to know the sentence she wrote down is wrong, you cross to the next window and ask Lee Jungsook to stop signing for a moment.",
     "c14_counter_report": "So it doesn’t end as the new teller’s fault, you list the missing disclosures on the inspection sheet and formally hand it to the branch manager.",
     "c14_counter_record": "Saying the evidence ends the moment you step in, you stay undercover and record the next window’s pitch to the end.",
-    "c14_desk_play": "Saying she should hear how her fund is sold, you relay the window pitch to Joo Eunchae word for word and ask her to stop it with you.",
+    "c14_desk_play": "Saying she should hear how her fund is sold, you relay the window pitch to Rachel Tan word for word and ask her to stop it with you.",
     "c14_desk_gap": "To show these were sales even the designer didn’t know about, you chart where the design document and the sales script diverge.",
-    "c14_desk_model": "Saying you’ll follow only the money without dragging her in, you take just Joo Eunchae’s model file and trace where the loans came from.",
+    "c14_desk_model": "Saying you’ll follow only the money without dragging her in, you take just Rachel Tan’s model file and trace where the loans came from.",
     "c14_class_read": "So it doesn’t end with one line on a blackboard, you and Lee Jungsook read the seniors’ forms together, one by one.",
     "c14_class_notice": "Saying what is heard changes again, you send seniors who already bought written instructions on how to cancel.",
     "c14_class_leave": "Saying the blackboard is better left to someone who stood there 38 years, you leave the class to Lee Jungsook and go back to Pangyo to follow the money.",
@@ -620,7 +620,7 @@ export default {
     "c14_husband_choice_1": "Saying the one whose sentence reached the same house twice must say it himself, you stand beside Do Yoonha as he tells Lee Jungsook what happened 3 years ago.",
     "c14_husband_choice_2": "To check it by records, not memory, you find the sales records from 3 years ago and see whether the script was the same.",
     "c14_husband_choice_3": "Since what Lee Jungsook put in is 4 years of her grandson’s tuition, you set aside what happened 3 years ago and stop this fund first.",
-    "c14_recovery_choice_1": "So buyers can see how much of their own money the 22% is, you and Joo Eunchae rewrite the model rerun at 41% in buyers’ terms.",
+    "c14_recovery_choice_1": "So buyers can see how much of their own money the 22% is, you and Rachel Tan rewrite the model rerun at 41% in buyers’ terms.",
     "c14_recovery_choice_2": "Saying the asset manager must answer where 68% came from, you formally request the basis for the recovery-rate assumption.",
     "c14_recovery_choice_3": "Saying the number is out and there is no reason to stay, you take only Kwon Dohyun’s figures and move on to the next hand.",
     "c14_grade_choice_1": "Saying it carries weight when the writers hand it in themselves, you gather the 40 notebooks and take them in with the buyers.",
@@ -629,9 +629,9 @@ export default {
     "c14_husband_reaction_choice_1": "As she asked you to be exact, you explain to Lee Jungsook just what loans the fund bought.",
     "c14_husband_reaction_choice_2": "Saying the sentence she wrote down is the most accurate record, you ask whether her notebook can be used as evidence of the sales process.",
     "c14_husband_reaction_choice_3": "Since you can’t bring out numbers while she holds his hand, you only apologize today and leave the explanation for the next class.",
-    "c14_recovery_reaction_choice_1": "To show her that this time she can object, you ask Joo Eunchae to oppose Round 2 with you.",
+    "c14_recovery_reaction_choice_1": "To show her that this time she can object, you ask Rachel Tan to oppose Round 2 with you.",
     "c14_recovery_reaction_choice_2": "So the one who named it isn’t the only one left holding it, you have her put on record who handed down the decision to sell at the window.",
-    "c14_recovery_reaction_choice_3": "Saying there’s data to read instead of time to console, you set aside Joo Eunchae’s guilt and just borrow her system access.",
+    "c14_recovery_reaction_choice_3": "Saying there’s data to read instead of time to console, you set aside Rachel Tan’s guilt and just borrow her system access.",
     "c14_grade_reaction_choice_1": "Saying the window must answer the 213 questions, you ask the seniors in the chat to go to the window together tomorrow.",
     "c14_grade_reaction_choice_2": "To show this is money switched at the window on maturity day, you match the 40 sign-up dates against their deposit maturity dates in one table.",
     "c14_grade_reaction_choice_3": "Saying the one the seniors trust is the bank boy, you leave the chat to Oh Jinwoo and prepare only tomorrow’s decision.",

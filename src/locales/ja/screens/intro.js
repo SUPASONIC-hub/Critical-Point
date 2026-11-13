@@ -34,6 +34,7 @@ export default {
   stats: { cases: "事件", oneCase: "1事件", minutes: "分前後", answers: "正解" },
   previousMessage: "前の参加者が残した言葉:「{message}」",
   rankingReset: "ランキングのお知らせ: 11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。殿堂の表はそのまま残ります。",
+  castRenamed: "登場人物のお知らせ: 何人かの人物が新しい名前と顔に変わりました。以前の記録の旧名は新しい名前で表示されます({names})。",
   setup: {
     label: "ゲーム開始の準備",
     title: "記録への入室設定",

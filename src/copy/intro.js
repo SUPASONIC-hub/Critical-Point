@@ -54,6 +54,8 @@ const introCopy = {
   previousMessage: "이전 참가자가 남긴 말: “{message}”",
   // N10: from 11-16 to the end of 11-30 (rankingResetNoticeAt).
   rankingReset: "랭킹 안내: 11월 30일(월) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남습니다.",
+  // From 11-13 to the end of 12-13 (castNoticeAt); {names} is castAliasLine.
+  castRenamed: "등장인물 안내: 몇몇 인물이 새 이름과 얼굴로 바뀌었습니다. 이전 기록의 옛 이름은 새 이름으로 보입니다({names}).",
   setup: {
     label: "게임 시작 준비",
     title: "기록 진입 설정",

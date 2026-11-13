@@ -13,6 +13,7 @@ import {
 import { getOutcomeChoiceId, makeEmptyScores } from "../gameLogic.js";
 import { serializeRunState, upgradeRunRecord } from "../gauntlet/gauntletEngine.js";
 import runLines from "../copy/runLines.js";
+import { renameCast } from "../castAliases.js";
 import { recordAppError } from "./errorRecovery.js";
 import { sanitizeTelemetryQueue } from "./payloadSchemas.js";
 
@@ -205,14 +206,17 @@ function normalizeSavedLogEntry(entry) {
   // or neither, so a save edited to carry half of it reads as not read through.
   const { readSec, readClock, ...rest } = entry;
   const briefingRead = Number.isFinite(readSec) && readSec >= 0 && Number.isFinite(readClock) && readClock > 0 ? { readSec, readClock } : {};
+  // A name a save kept from before the 11-13 renames reads as the new one (castAliases.js).
   return {
     ...rest,
     ...briefingRead,
+    ...(typeof entry.speaker === "string" ? { speaker: renameCast(entry.speaker) } : {}),
+    ...(typeof entry.sourceChoice === "string" ? { sourceChoice: renameCast(entry.sourceChoice) } : {}),
     nodeId,
-    title: typeof entry.title === "string" ? entry.title : nodes[nodeId]?.title ?? "",
+    title: typeof entry.title === "string" ? renameCast(entry.title) : nodes[nodeId]?.title ?? "",
     choiceId: typeof entry.choiceId === "string" ? entry.choiceId : "",
-    choice: typeof entry.choice === "string" ? entry.choice : "",
-    spokenChoice: typeof entry.spokenChoice === "string" ? entry.spokenChoice : "",
+    choice: typeof entry.choice === "string" ? renameCast(entry.choice) : "",
+    spokenChoice: typeof entry.spokenChoice === "string" ? renameCast(entry.spokenChoice) : "",
     reframe: Boolean(entry.reframe),
     reframeOpenedRoute: Boolean(entry.reframeOpenedRoute),
     reframeBranchId: typeof entry.reframeBranchId === "string" ? entry.reframeBranchId : "",

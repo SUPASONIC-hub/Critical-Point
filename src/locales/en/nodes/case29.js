@@ -39,11 +39,11 @@ export default {
     },
     "c29_marina": {
       "title": "More Haste, Less Speed",
-      "text": "Cho Hyunseok speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
+      "text": "Cho Hyunseok, a 1.5-generation Korean American who moved to New York at twelve, speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
       "memo": [
         "Sale price 131 billion won -- 30.7% of the 427 billion on the books",
         "Collection plan: first-month contact intensity 5 times a week",
-        "Cho Hyunseok (Ethan Cho): Roundhill partner, 12 years in Singapore",
+        "Cho Hyunseok (Ethan Cho): Roundhill partner, 1.5-generation Korean American, 12 years in Singapore",
         "36 hours to the signing ceremony"
       ],
       "choices": {
@@ -101,7 +101,7 @@ export default {
     },
     "c29_hotel": {
       "title": "New Year’s Greetings",
-      "text": "Seo Harin talks. 7 years ago her story won an award, and Ha Yoonho, who had handed her the documents, was fired over one line of print number. Now he drives a delivery truck in Daejeon. Every January 1, a text comes: 'How are you doing, reporter?' Seo Harin has never once replied. 'I didn’t see that number. My story changed one person’s life, and that person sends me New Year’s greetings. There’ll be something in Baek Daon’s photo too. There always is.'",
+      "text": "Seo Harin talks. 7 years ago her story won an award, and Ha Yoonho, who had handed her the documents, was fired over one line of print number. Now he drives a delivery truck in Daejeon. Every January 1, a text comes: 'How are you doing, reporter?' Seo Harin has never once replied. 'I didn’t see that number. My story changed one person’s life, and that person sends me New Year’s greetings. There’ll be something in Marcus Lim’s photo too. There always is.'",
       "memo": [
         "Ha Yoonho: source 7 years ago, fired two months after the story",
         "What got Ha Yoonho fired: a print number in the document’s corner",
@@ -110,7 +110,7 @@ export default {
       ],
       "choices": {
         "c29_hotel_protect": {
-          "label": "Don’t use any photo that could expose Baek Daon"
+          "label": "Don’t use any photo that could expose Marcus Lim"
         },
         "c29_hotel_official": {
           "label": "Officially request the original annex from Roundhill"
@@ -127,7 +127,7 @@ export default {
       },
       "place": "Marina Hotel, Singapore · Guest Room",
       "clock": "Thursday · 03:00",
-      "question": "A single story once changed one source’s life. What do you do with Baek Daon’s photo?",
+      "question": "A single story once changed one source’s life. What do you do with Marcus Lim’s photo?",
       "lead": "Back in the hotel room, neither of you can sleep. Only the lights of Marina outside thin out."
     },
     "c29_final": {
@@ -207,9 +207,9 @@ export default {
     },
     "c29_annex": {
       "title": "One of Four",
-      "text": "Baek Daon, 29, falls in beside you. The phone he holds halfway out shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
+      "text": "Marcus Lim, 29, falls in beside you. In his 3rd year as an analyst at Roundhill’s Singapore head office, he calls Cho Hyunseok 'Ethan' like everyone in the firm, and learned his Korean from his Korean mother. The phone Marcus Lim holds halfway out shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
       "memo": [
-        "Baek Daon: Roundhill analyst, author of the collection plan",
+        "Marcus Lim: Roundhill analyst, author of the collection plan",
         "People with access to Annex C: 4",
         "What Seo Harin got: one photo of the first page"
       ],
@@ -221,7 +221,7 @@ export default {
           "label": "Decline; you’ll demand disclosure through formal channels"
         },
         "c29_annex_choice_1": {
-          "label": "First find a way to keep Baek Daon’s identity hidden"
+          "label": "First find a way to keep Marcus Lim’s identity hidden"
         }
       },
       "place": "Singapore · Main-Road Taxi Stand",
@@ -551,8 +551,8 @@ export default {
     "c29_ledger_choice_1": "The demand to take them out shakes the price tag at once. At breakfast, Cho Hyunseok will tell you that price exactly.",
     "c29_ledger_choice_2": "Hunting for the clause, you turn through 212 pages of the contract body until dawn. All you find are four words: 'at the assignee’s discretion.'",
     "c29_ledger_choice_3": "A promise to look after them separately is for after the sale. And the first call after the sale is made by the new owner.",
-    "c29_annex_choice_1": "While you look for a way, three taxis go by. For the first time, Baek Daon sees someone worried about his name.",
-    "c29_annex_choice_2": "When you decline, Baek Daon nods and turns away. What’s left is one photo of the first page, and the answer through formal channels will come only after the signing.",
+    "c29_annex_choice_1": "While you look for a way, three taxis go by. For the first time, Marcus Lim sees someone worried about his name.",
+    "c29_annex_choice_2": "When you decline, Marcus Lim nods and turns away. What’s left is one photo of the first page, and the answer through formal channels will come only after the signing.",
     "c29_annex_choice_3": "The photos remain. So does the fact that only four people can open the file.",
     "c29_call_choice_1": "When you bring up the 46, Yoon Sanghyuk is quiet a moment. 'You always count heads instead of numbers.'",
     "c29_call_choice_2": "At the word recording, Yoon Sanghyuk laughs. 'A good habit. I never had it, and that’s how I got this far.' That sentence goes on the record too.",
@@ -561,7 +561,7 @@ export default {
     "c29_ledger_reaction_choice_2": "The formula arrives by email. At the bottom of the table, the line 'Excluded from discount: debtors in restructuring' is the line you were looking for.",
     "c29_ledger_reaction_choice_3": "The mango really is delicious. The 46 yellow marks stay in the file as they are.",
     "c29_annex_reaction_choice_1": "When you say you’ll listen, Seo Harin lowers the taxi window a little. Hot night air comes in. She says nothing until you reach the hotel.",
-    "c29_annex_reaction_choice_2": "Checking the procedure, you find 11 lines of hidden data in one photo. One of them is the model of Baek Daon’s phone.",
+    "c29_annex_reaction_choice_2": "Checking the procedure, you find 11 lines of hidden data in one photo. One of them is the model of Marcus Lim’s phone.",
     "c29_annex_reaction_choice_3": "At the words evidence first, Seo Harin turns her head away. 'I said that too, 7 years ago.'",
     "c29_call_reaction_choice_1": "After you tell her, there’s no reply for a long while, then one line. 'I was under that man a long time. Before 10, read one more clause.'",
     "c29_call_reaction_choice_2": "The notes stay on the phone of someone on standby assignment. The phone the company looks at least.",
@@ -610,7 +610,7 @@ export default {
     "c29_hawker_spare": "So that Oh Jinwoo, who says getting caught would finish him, doesn’t get hurt, you suggest getting the annex another way.",
     "c29_hawker_address": "Saying there’s somewhere you can go on your own feet before borrowing anyone’s hands, you go find Northgate’s registered address yourself.",
     "c29_hawker_photo": "Saying it’s the only way to see Annex C for now, you ask Oh Jinwoo to photograph the annex tonight.",
-    "c29_hotel_protect": "Saying you can’t make another Ha Yoonho, you decide not to use any photo that could expose Baek Daon.",
+    "c29_hotel_protect": "Saying you can’t make another Ha Yoonho, you decide not to use any photo that could expose Marcus Lim.",
     "c29_hotel_official": "Saying you need evidence that stands without a source, you officially request the original annex from Roundhill to confirm it.",
     "c29_hotel_publish": "Saying nothing can be undone once the signing is over, you have Seo Harin publish her story before the signing.",
     "c29_final_protect": "Saying that even if they’re sold, the repayment agreements must go with them, you say you’ll sign only with collection limits and restructuring carry-over clauses.",
@@ -622,7 +622,7 @@ export default {
     "c29_ledger_choice_1": "Unable to let the most faithful payers be the first to get the calls, you demand that the 46 in restructuring be taken out of the sale bundle.",
     "c29_ledger_choice_2": "Saying you have to see for yourself whether there’s really no clause to stop it, you search the contract for a clause that keeps the agreements alive after the sale.",
     "c29_ledger_choice_3": "Since it’s hard to shake the bundle with the signing ahead, you leave the bundle as it is and look after the 46 separately after the sale.",
-    "c29_annex_choice_1": "Because he’s the least powerful of only four with access, you first look together for a way to keep Baek Daon’s identity hidden.",
+    "c29_annex_choice_1": "Because he’s the least powerful of only four with access, you first look together for a way to keep Marcus Lim’s identity hidden.",
     "c29_annex_choice_2": "Saying that taking a file only four can open would expose him, you decline, saying you’ll demand disclosure of the annex through formal channels.",
     "c29_annex_choice_3": "Saying minds can change by tomorrow, you take it tonight and keep it as photos.",
     "c29_call_choice_1": "Saying you should start with what the CEO least wants to hear, you raise the 46’s restructuring agreements before the opinion.",
