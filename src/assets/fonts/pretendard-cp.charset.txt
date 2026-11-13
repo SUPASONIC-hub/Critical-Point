@@ -1421,7 +1421,6 @@ c9f0 짰
 c9f8 째
 ca4c 쩌
 ca4d 쩍
-ca50 쩐
 ca61 쩡
 ca84 쪄
 cabc 쪼

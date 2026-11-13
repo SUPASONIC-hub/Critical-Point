@@ -553,7 +553,7 @@ and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (�
 |---|---|
 | When | 2026-05-08 (금), 어버이날, 17:50 to 23:30: four days after 사건 27 opens (5월 4일) and the last working day before 도윤하's ten days at KD생명 (사건 28, 「다음 주부터」 in c27) |
 | 송하율 | 사건 26's buyer, 10월 출산 예정; her 전세 (in 은행나무빌, 강서구) ends in December, its 전세자금대출 from KD은행 강서지점 with a 전세보증. She calls the analyst on the card from 평택 |
-| 쩐 티 란 | 베트남 출신, 서울 9년째, a university engineering lab; answers in Korean. One floor below 송하율; her lease ended 4월 30일 and her 보증금 of 1억 9천만 원 (savings, no loan, no 전세보증) has not come back. She copied the 37 flats' 등기부 into one table: all bought in 2024 |
+| 레 티 호아 | 베트남 출신, 서울 9년째, a university engineering lab; answers in Korean. One floor below 송하율; her lease ended 4월 30일 and her 보증금 of 1억 9천만 원 (savings, no loan, no 전세보증) has not come back. She copied the 37 flats' 등기부 into one table: all bought in 2024 |
 | The landlord | 모아든 주식회사: 37 flats in four buildings on one lane. Its 관리 대리인 기성철 says the money is 「묶여 있는」 because 「대표님이 평택 쪽에 좀 물려서」, and that it comes back when the next tenants move in |
 | The row | 23 전세자금대출 on that lane, all from 강서지점, 21 from 5번 창구 (April's 우수 창구, 「전세자금대출 1위」; 기성철 as 소개인 21 times). Every row: 감정가 = 매매가 = 전세가 = 2억 1천만 원. How such a row is made is never said |
 | Monday | three more loans for the company's flats, 실행 예정 5월 11일 (월) 09:30. Any staff member may file a 실행 보류 요청 under their own 사번; the 지점장 decides, and answered 「월요일에 얘기합시다」 |

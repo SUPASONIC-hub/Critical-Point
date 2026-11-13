@@ -14,7 +14,7 @@ export default {
       "place": "KD Capital Headquarters, 12th Floor · Risk Management Department",
       "clock": "May 8 (Fri) 17:50, Parents’ Day",
       "lead": "One business card, handed over at the Pyeongtaek site. Just before you leave work, Song Hayul calls the number on it.",
-      "text": "On the line, Song Hayul catches her breath. She is far enough along that the stairs wind her now, she says. 'You read numbers, Analyst, so I’m asking you. Lan downstairs was meant to move out on April 30, and she still hasn’t got her deposit back (the money a jeonse tenant leaves with the landlord).' The landlord is not a person but a company. Four villa buildings on the same lane, 37 flats, all of them that company’s. 'They say she’ll get it when the next tenant moves in. My lease ends in December.' She starts to laugh and stops. 'The Pyeongtaek flat has no floor, and this one won’t give the money back.' The building is called Ginkgo Villa.",
+      "text": "On the line, Song Hayul catches her breath. She is far enough along that the stairs wind her now, she says. 'You read numbers, Analyst, so I’m asking you. Hoa downstairs was meant to move out on April 30, and she still hasn’t got her deposit back (the money a jeonse tenant leaves with the landlord).' The landlord is not a person but a company. Four villa buildings on the same lane, 37 flats, all of them that company’s. 'They say she’ll get it when the next tenant moves in. My lease ends in December.' She starts to laugh and stops. 'The Pyeongtaek flat has no floor, and this one won’t give the money back.' The building is called Ginkgo Villa.",
       "question": "Song Hayul brings up the deposit of the tenant downstairs. What do you do?",
       "memo": [
         "Tenant downstairs: lease ended April 30, deposit not returned",
@@ -37,17 +37,17 @@ export default {
     "s6_tenant": {
       "title": "Twelve Boxes",
       "place": "Ginkgo Villa, Gangseo-gu · 2nd-floor hallway",
-      "text": "Twelve moving boxes are stacked by the door on the 2nd floor. A rice cooker sits on top. Tran Thi Lan came from Vietnam and has worked in a university engineering lab in Seoul for 9 years; she answers in clear, careful Korean. 'I already paid the down payment on the new place. If I can’t move in this month, I lose that too.' Her deposit is 190 million won, 9 years of savings. She skipped going home to Hanoi for the New Year to save it. She opens her laptop. She has copied thirty-seven property registers (the public record of who owns a home and what is owed on it) into one table, like lab data. 'The company bought all of these in one year, 2024. Whether that’s strange, I don’t know.'",
-      "question": "Lan holds out a table she made herself. What do you do?",
+      "text": "Twelve moving boxes are stacked by the door on the 2nd floor. A rice cooker sits on top. Le Thi Hoa came from Vietnam and has worked in a university engineering lab in Seoul for 9 years; she answers in clear, careful Korean. 'I already paid the down payment on the new place. If I can’t move in this month, I lose that too.' Her deposit is 190 million won, 9 years of savings. She skipped going home to Hanoi for the New Year to save it. She opens her laptop. She has copied thirty-seven property registers (the public record of who owns a home and what is owed on it) into one table, like lab data. 'The company bought all of these in one year, 2024. Whether that’s strange, I don’t know.'",
+      "question": "Hoa holds out a table she made herself. What do you do?",
       "memo": [
-        "Tran Thi Lan: 9 years in Seoul, engineering researcher",
+        "Le Thi Hoa: 9 years in Seoul, engineering researcher",
         "Deposit 190 million won, lease ended April 30",
         "Down payment on the new place: lost if she can’t move in this month",
-        "Lan’s table: 37 registers, every flat bought in 2024"
+        "Hoa’s table: 37 registers, every flat bought in 2024"
       ],
       "choices": {
         "s6_tenant_sheet": {
-          "label": "Take Lan’s table and read it line by line together"
+          "label": "Take Hoa’s table and read it line by line together"
         },
         "s6_tenant_box": {
           "label": "Sit by the boxes and hear about the down payment first"
@@ -60,7 +60,7 @@ export default {
     "s6_agent": {
       "title": "Carnations",
       "place": "Ginkgo Villa, Gangseo-gu · 1st-floor parking",
-      "text": "A grey van pulls into the parking area. Gi Seongcheol, the managing agent for Moadeun Co., sets a basket of carnations down on the passenger seat and gets out. 'They’re for my mother. It’s Parents’ Day.' He bows to the tenant from the 2nd floor first. 'It’s not that there’s no money. It’s tied up. The boss got a bit stuck on something down in Pyeongtaek. The moment the next tenant moves in, you’ll get it.' He shows you the calendar on his phone. 'Three more flats signed this week. The money comes in Monday morning. KD Bank, Gangseo Branch.' 'I’m on a salary too, you know. 2 years in this job.' When the van has gone, Tran Thi Lan opens her laptop again. 'He’ll pay me back with the next tenant’s money. Then who pays that person back?'",
+      "text": "A grey van pulls into the parking area. Gi Seongcheol, the managing agent for Moadeun Co., sets a basket of carnations down on the passenger seat and gets out. 'They’re for my mother. It’s Parents’ Day.' He bows to the tenant from the 2nd floor first. 'It’s not that there’s no money. It’s tied up. The boss got a bit stuck on something down in Pyeongtaek. The moment the next tenant moves in, you’ll get it.' He shows you the calendar on his phone. 'Three more flats signed this week. The money comes in Monday morning. KD Bank, Gangseo Branch.' 'I’m on a salary too, you know. 2 years in this job.' When the van has gone, Le Thi Hoa opens her laptop again. 'He’ll pay me back with the next tenant’s money. Then who pays that person back?'",
       "question": "The agent says the deposit will be paid with the next tenants’ money. What do you do?",
       "memo": [
         "Gi Seongcheol: managing agent, Moadeun Co.",
@@ -73,7 +73,7 @@ export default {
           "label": "Ask whose money Monday’s three flats bring in"
         },
         "s6_agent_date": {
-          "label": "Have him write Lan’s pay date on the back of his card"
+          "label": "Have him write Hoa’s pay date on the back of his card"
         },
         "s6_agent_go": {
           "label": "Don’t press him; send him off to his mother"
@@ -151,19 +151,19 @@ export default {
     "s6_call": {
       "title": "The Word “Lucky”",
       "place": "Video call · Song Hayul’s kitchen",
-      "text": "The video call shows Song Hayul’s kitchen table. Tran Thi Lan sits beside her, and there is half a watermelon on the table. In the table of loans, Song Hayul’s row is the seventeenth, and its jeonse-guarantee column says 'taken.' The row for downstairs has no loan, and its guarantee column is empty. Song Hayul starts to speak. 'They say I took out the guarantee. I should call that lucky, but...' She glances at the seat beside her and stops. Tran Thi Lan pushes a slice of watermelon across. 'Call it lucky, Hayul. If even one home is lucky, that’s lucky.' Song Hayul touches the corner of the table with a finger, instead of a floor plan.",
+      "text": "The video call shows Song Hayul’s kitchen table. Le Thi Hoa sits beside her, and there is half a watermelon on the table. In the table of loans, Song Hayul’s row is the seventeenth, and its jeonse-guarantee column says 'taken.' The row for downstairs has no loan, and its guarantee column is empty. Song Hayul starts to speak. 'They say I took out the guarantee. I should call that lucky, but...' She glances at the seat beside her and stops. Le Thi Hoa pushes a slice of watermelon across. 'Call it lucky, Hayul. If even one home is lucky, that’s lucky.' Song Hayul touches the corner of the table with a finger, instead of a floor plan.",
       "question": "In the same building, one of them has a guarantee and one does not. What do you do?",
       "memo": [
         "Song Hayul: 17th row, jeonse guarantee taken",
-        "Lan: no loan, no guarantee",
-        "Lan: 'If even one home is lucky, that’s lucky'"
+        "Hoa: no loan, no guarantee",
+        "Hoa: 'If even one home is lucky, that’s lucky'"
       ],
       "choices": {
         "s6_call_both": {
           "label": "Write both of them the same steps, in the same order"
         },
         "s6_call_lan": {
-          "label": "Look first for a way for Lan, who has no guarantee"
+          "label": "Look first for a way for Hoa, who has no guarantee"
         },
         "s6_call_group": {
           "label": "Ask how many tenants in the building they can reach"
@@ -196,7 +196,7 @@ export default {
     "s6_aftershock": {
       "title": "The Back Door",
       "place": "KD Bank Gangseo Branch · Back door",
-      "text": "The guard waits, jingling the back-door keys. Do Yoonha empties the drawer at window 4 for the last time. Three things are up on his screen. A half-written hold request, the draft of a notice for Song Hayul to post in the group chat, and a one-page table for the branch manager. The night is too short for all three, and on Monday morning he’ll be in Guro. A message comes in from Tran Thi Lan. A photo of her rice cooker. 'I took it out again. I’m sleeping here tonight.' Do Yoonha shoulders his bag and looks at you. 'I’ll file just one under my name before I go. Which one?'",
+      "text": "The guard waits, jingling the back-door keys. Do Yoonha empties the drawer at window 4 for the last time. Three things are up on his screen. A half-written hold request, the draft of a notice for Song Hayul to post in the group chat, and a one-page table for the branch manager. The night is too short for all three, and on Monday morning he’ll be in Guro. A message comes in from Le Thi Hoa. A photo of her rice cooker. 'I took it out again. I’m sleeping here tonight.' Do Yoonha shoulders his bag and looks at you. 'I’ll file just one under my name before I go. Which one?'",
       "question": "Do Yoonha files just one thing tonight and goes. What do you leave?",
       "memo": [
         "Hold request: Monday’s three, under Do Yoonha’s staff number",
@@ -224,7 +224,7 @@ export default {
     },
     "s6_after_notice": {
       "title": "Group Chat",
-      "text": "Song Hayul posts the notice in the Ginkgo Villa tenants’ group chat. Look at your lease and the register again; check whether you have a jeonse guarantee; from three months before your lease ends, write the dates down. Tran Thi Lan’s table is attached as a file. Names taken out, only addresses and numbers. By past midnight the chat has grown from 2 people to 19. Someone asks, 'Ours is 210 million too. What does that mean?' Song Hayul writes an answer, deletes it, and writes again. 'Let’s look at it together tomorrow. 1st-floor parking, 10 o’clock.'"
+      "text": "Song Hayul posts the notice in the Ginkgo Villa tenants’ group chat. Look at your lease and the register again; check whether you have a jeonse guarantee; from three months before your lease ends, write the dates down. Le Thi Hoa’s table is attached as a file. Names taken out, only addresses and numbers. By past midnight the chat has grown from 2 people to 19. Someone asks, 'Ours is 210 million too. What does that mean?' Song Hayul writes an answer, deletes it, and writes again. 'Let’s look at it together tomorrow. 1st-floor parking, 10 o’clock.'"
     },
     "s6_after_branch": {
       "title": "Inbox",
