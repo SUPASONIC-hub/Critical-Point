@@ -512,10 +512,10 @@ export default {
       "voice": "He doesn’t say what he isn’t asked, and when he speaks, he says only what he saw.",
       "line": "I’ve tended this house’s garden for forty years, and more photos come down than go up."
     },
-    "은재하": {
+    "뤼카 베르나르": {
       "appearance": "Chef’s whites with the sleeves pushed up, menu cards written in careful hand, a staff bibimbap mixed from leftover ingredients.",
       "thought": "The long dish names are my revenge. The Chairman has never once memorized one.",
-      "gesture": "Before bringing something up, Eun Jaeha takes out one more spoon and sets it in front of the other person.",
+      "gesture": "Before bringing something up, Lucas Bernard takes out one more spoon and sets it in front of the other person.",
       "voice": "He recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
       "line": "The long dish names are my revenge. The Chairman has never once memorized one."
     },

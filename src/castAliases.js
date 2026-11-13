@@ -23,6 +23,7 @@ export const CAST_ALIASES = {
     ["표세린", "미즈노 사키"],
     ["백다온", "마커스 림"],
     ["우지환", "토머스 리드"],
+    ["은재하", "뤼카 베르나르"],
   ],
   en: [
     ["Ryu Seah", "Priya Nair"],
@@ -32,6 +33,7 @@ export const CAST_ALIASES = {
     ["Pyo Serin", "Mizuno Saki"],
     ["Baek Daon", "Marcus Lim"],
     ["Woo Jihwan", "Thomas Reed"],
+    ["Eun Jaeha", "Lucas Bernard"],
   ],
   ja: [
     ["リュ・セア", "プリヤ・ナイル"],
@@ -41,6 +43,7 @@ export const CAST_ALIASES = {
     ["ピョ・セリン", "水野咲"],
     ["ペク・ダオン", "マーカス・リム"],
     ["ウ・ジファン", "トーマス・リード"],
+    ["ウン・ジェハ", "リュカ・ベルナール"],
   ],
 };
 

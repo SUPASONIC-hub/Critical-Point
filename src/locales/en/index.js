@@ -93,7 +93,7 @@ export const speakers = {
   "황혜원": "Hwang Hyewon",
   "서도경": "Seo Dokyung",
   "여민규": "Yeo Minkyu",
-  "은재하": "Eun Jaeha",
+  "뤼카 베르나르": "Lucas Bernard",
   "석문호": "Seok Munho",
   "대니얼 강": "Daniel Kang",
   "선재윤": "Seon Jaeyoon",

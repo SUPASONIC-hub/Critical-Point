@@ -69,7 +69,7 @@ export default {
     },
     "c23_advisor": {
       "title": "To the Third Decimal Place",
-      "text": "Mizuno Saki of ClearVote, a proxy advisor (a firm that tells big investors how to vote on each item), brings up the group’s 48-page 'Candidate Yoon Sanghyuk’s Innovation Achievements.' She has covered Korean companies from ClearVote’s Tokyo office for 7 years and speaks the careful Korean of a year at a Seoul language school. 'I don’t take requests to recommend a no vote. I write the recommendations. Articles aren’t grounds. A rating drop is. Give me a document showing this drop came from one candidate’s decision.' Kwon Dohyun says, 'You’re precise to two decimal places.' Mizuno Saki answers. 'To three.'",
+      "text": "Mizuno Saki of ClearVote, a proxy advisor (a firm that tells big investors how to vote on each item), brings up the group’s 48-page 'Candidate Yoon Sanghyuk’s Innovation Achievements.' She has covered Korean companies from ClearVote’s Tokyo office for 7 years and speaks the careful Korean of 1 year at a Seoul language school. 'I don’t take requests to recommend a no vote. I write the recommendations. Articles aren’t grounds. A rating drop is. Give me a document showing this drop came from one candidate’s decision.' Kwon Dohyun says, 'You’re precise to two decimal places.' Mizuno Saki answers. 'To three.'",
       "memo": [
         "ClearVote recommendation deadline: tomorrow 09:00",
         "Group materials, 48 pages -- 2023 mentioned 0 times",

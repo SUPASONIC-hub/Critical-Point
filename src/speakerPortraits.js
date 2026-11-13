@@ -108,7 +108,7 @@ const SPEAKER_PORTRAITS = {
   "하정희": "/portrait-ha-jeonghui.webp",
   "김 반장": "/portrait-kim-banjang.webp",
   "문성호": "/portrait-moon-seongho.webp",
-  "은재하": "/portrait-eun-jaeha.webp",
+  "뤼카 베르나르": "/portrait-lucas-bernard.webp",
   "이하경": "/portrait-lee-hagyeong.webp",
   "권태호": "/portrait-kwon-taeho.webp",
 };

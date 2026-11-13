@@ -159,7 +159,7 @@ export default {
     },
     "c15_aftershock": {
       "title": "A Cold Lunch",
-      "text": "The gate opens again, and Na Junhyuk flips his sign over. 'Every mark was right.' The moment Lee Chanbin sees Lee Minseo, he asks, 'Sis, how was the interview?' Instead of answering, Lee Minseo holds out the lunch bag. Three spoonfuls of the cold radish soup are gone -- what his sister ate instead of breakfast. Chanbin laughs. 'For lunch the proctor gave me a chocolate bar.' Brother and sister sit on the gate steps and share the cold soup. Kang Taemin puts hand warmers on their laps, then looks at his phone and stiffens. The night-shift group chat from the fulfillment center.",
+      "text": "The gate opens again, and Na Junhyuk flips his sign over. 'Every mark was right.' The moment Lee Chanbin sees Lee Minseo, he asks, 'Sis, how was the interview?' Instead of answering, Lee Minseo holds out the lunch bag. Three spoonfuls of the cold radish soup are gone -- what his sister ate instead of breakfast. Chanbin laughs. 'For lunch the proctor gave me a chocolate bar.' Brother and sister sit on the gate steps and share the cold soup. Chanbin says something in Japanese, mimicking their mother, who came from Japan, and Lee Minseo laughs with him. Kang Taemin puts hand warmers on their laps, then looks at his phone and stiffens. The night-shift group chat from the fulfillment center.",
       "memo": [
         "Exam ends 17:45 -- Lee Chanbin finished through the last period",
         "Lunch: beef and radish soup, three spoonfuls gone",

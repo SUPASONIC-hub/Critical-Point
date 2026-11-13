@@ -230,7 +230,7 @@ export default {
     },
     "c25_firstday": {
       "title": "Those Who Look Out the Window",
-      "text": "Your first day at the Risk Management Department. Department Head Chae Ian shows you to a window seat. A third-generation Korean from Japan, he joined KD Bank’s Tokyo branch in 2009; this is his 17th year. 'The CEO picked this seat himself.' At the top of the real-estate project financing (PF) list Chae Ian sets down, an officetel (live-work studio) in Pyeongtaek is marked 'halted' in pencil. 'The work of this department isn’t reducing risk. It’s deciding whose name the risk gets written under. Spend the first week looking out the window. From the second week on, you won’t be able to.'",
+      "text": "Your first day at the Risk Management Department. Department Head Chae Ian shows you to a window seat. A 3rd-generation Korean from Japan, he joined KD Bank’s Tokyo branch in 2009; this is his 17th year. 'The CEO picked this seat himself.' At the top of the real-estate project financing (PF) list Chae Ian sets down, an officetel (live-work studio) in Pyeongtaek is marked 'halted' in pencil. 'The work of this department isn’t reducing risk. It’s deciding whose name the risk gets written under. Spend the first week looking out the window. From the second week on, you won’t be able to.'",
       "memo": [
         "KD Capital Risk Management -- window seat, designated by the CEO",
         "Top of the real-estate PF list: Pyeongtaek officetel, status 'halted'",

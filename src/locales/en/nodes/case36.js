@@ -276,14 +276,14 @@ export default {
     },
     "c36_draft_reaction": {
       "title": "The Seventh Plate",
-      "text": "Eun Jaeha, mixing bibimbap, speaks. 'The long dish names are my revenge. The chairman has never once memorized one. I’ve been adding one word at a time for 3 years now.' Then his spoon stops. 'My mom runs a side-dish shop in Mangwon Market. All three of her fridges flooded, and her emergency loan was declined in 0.6 seconds. A mom whose son works in the chairman’s kitchen.'",
+      "text": "The chef Lucas Bernard was born and trained in Lyon and came to Seoul with his Korean mother 12 years ago. Mixing bibimbap, he speaks. 'The long dish names are my revenge. The chairman has never once memorized one. I’ve been adding one word at a time for 3 years now.' Then his spoon stops. 'My mom runs a side-dish shop in Mangwon Market. All three of her fridges flooded, and her emergency loan was declined in 0.6 seconds. A mom whose son works in the chairman’s kitchen.'",
       "memo": [
         "Why the dish names are long: the chef’s revenge",
         "Emergency loan for the chef’s mother’s shop -- declined in 0.6 seconds"
       ],
       "choices": {
         "c36_draft_reaction_choice_2": {
-          "label": "Ask Eun Jaeha if you may record it as a flood decline case"
+          "label": "Ask Lucas Bernard if you may record it as a flood decline case"
         },
         "c36_draft_reaction_choice_3": {
           "label": "Have one spoonful of bibimbap and return to the table"
@@ -560,9 +560,9 @@ export default {
     "c36_phone_reaction_choice_1": "Yoon Seojin gets your reply and sends one line: 'Thank you.' That line stays unread in the basket until dinner ends.",
     "c36_phone_reaction_choice_2": "When you ask, Yoon Seojin answers 'Yes' after a long while. A daughter’s words become part of the record of her father’s case.",
     "c36_phone_reaction_choice_3": "The basket lid closes. Yoon Seojin’s question spends the Hannam-dong night with nothing but a read receipt.",
-    "c36_draft_reaction_choice_1": "When you promise, Eun Jaeha drops one word from the eighth plate’s name. The chairman still calls it 'the eighth one.'",
-    "c36_draft_reaction_choice_2": "Saying you may record it, Eun Jaeha adds a condition. 'Leave my mom’s name out. She’s embarrassed in front of the neighborhood.'",
-    "c36_draft_reaction_choice_3": "The bibimbap is the best thing you eat in this house. The fridges in Eun Jaeha’s mother’s shop are still off next week.",
+    "c36_draft_reaction_choice_1": "When you promise, Lucas Bernard drops one word from the eighth plate’s name. The chairman still calls it 'the eighth one.'",
+    "c36_draft_reaction_choice_2": "Saying you may record it, Lucas Bernard adds a condition. 'Leave my mom’s name out. She’s embarrassed in front of the neighborhood.'",
+    "c36_draft_reaction_choice_3": "The bibimbap is the best thing you eat in this house. The fridges in Lucas Bernard’s mother’s shop are still off next week.",
     "c36_gate_reaction_choice_1": "Hearing it as it was, Yoon Sanghyuk is silent a long while, then says, 'That sentence again, then.' They are the same words he heard 12 years ago.",
     "c36_gate_reaction_choice_2": "When you say you’ll attach it to your statement, Yoon Sanghyuk laughs. 'Right, that’s what you should do.' Then he hangs up first.",
     "c36_gate_reaction_choice_3": "Yoon Sanghyuk stays on the far side of the cut call. Kang Taemin stacks two empty cup noodle containers and puts them in the truck bed.",
@@ -632,7 +632,7 @@ export default {
     "c36_phone_reaction_choice_2": "So you don’t use a daughter’s words without permission, you ask Yoon Seojin if her message may go in your witness file.",
     "c36_phone_reaction_choice_3": "Saying you have nothing to tell her before you sit at that table, you put the phone in the basket without replying.",
     "c36_draft_reaction_choice_1": "Saying this shouldn’t end in 0.6 seconds, you promise to send his mother’s emergency loan back up for human review.",
-    "c36_draft_reaction_choice_2": "Because you can’t write down someone’s circumstances without permission, you ask Eun Jaeha if you may record it as a flood decline case.",
+    "c36_draft_reaction_choice_2": "Because you can’t write down someone’s circumstances without permission, you ask Lucas Bernard if you may record it as a flood decline case.",
     "c36_draft_reaction_choice_3": "Because you need to be in your seat before the chairman comes back, you have one spoonful of bibimbap and return to the table.",
     "c36_gate_reaction_choice_1": "Saying he should at least know how his own name is being used, you tell Yoon Sanghyuk the table’s offer exactly as it was made.",
     "c36_gate_reaction_choice_2": "Saying even being told to take it is a statement you can’t hide, you say you’ll attach the call to your witness statement.",

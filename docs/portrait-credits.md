@@ -15,6 +15,7 @@
 같은 생성 사진(동아시아 남성, 평범한 표정)을 그대로 두고 파일 이름만 바꿨습니다.
 같은 날 표세린 → 미즈노 사키(일본, 클리어보트 도쿄 사무소), 백다온 → 마커스 림(싱가포르)도 바꿨습니다. 미즈노 사키의 첫 후보는 cottonbro studio의 사진이라
 (네 장째가 되어) RDNE Stock project의 사진으로 바꿨고, 사진 아래 가장자리에 분홍 파일철 끝이 조금 남습니다. 마커스 림은 Ramon Karolan의 사진으로, 옛 주은채 사진이 빠져 이 사진가는 다시 한 장입니다.
+은재하 → 뤼카 베르나르(리옹 출신 셰프)는 Kampus Production의 사진으로, 이 사진가는 연하진과 두 장째이고 모델은 다른 사람입니다.
 
 ## 사진에서 만든 예순여덟 장
 
@@ -97,7 +98,7 @@
 | 하정희 | `portrait-ha-jeonghui.webp` | https://unsplash.com/photos/elderly-asian-woman-smiling-in-a-purple-jacket-RaC2IyYYY4A | Pete Walls (https://unsplash.com/@pjwphoto) | [Unsplash License](https://unsplash.com/license) |
 | 김 반장 | `portrait-kim-banjang.webp` | https://www.pexels.com/photo/candid-portrait-of-an-elderly-man-indoors-29244965/ | Hoang NC (https://www.pexels.com/@hoang-nc-483165236/) | [Pexels License](https://www.pexels.com/license/) |
 | 문성호 | `portrait-moon-seongho.webp` | https://www.pexels.com/photo/middle-aged-man-in-red-shirt-smiling-24350758/ | Tri Warno (https://www.pexels.com/@triew0814/) | [Pexels License](https://www.pexels.com/license/) |
-| 은재하 | `portrait-eun-jaeha.webp` | https://www.pexels.com/photo/professional-chef-posing-in-restaurant-interior-39576883/ | Grecia Carbajal (https://www.pexels.com/@grecia-carbajal-2155465721/) | [Pexels License](https://www.pexels.com/license/) |
+| 뤼카 베르나르 | `portrait-lucas-bernard.webp` | https://www.pexels.com/photo/a-man-wearing-a-black-and-white-striped-apron-and-a-black-hat-6605421/ | Kampus Production (https://www.pexels.com/@kampus/) | [Pexels License](https://www.pexels.com/license/) |
 | 이하경 | `portrait-lee-hagyeong.webp` | https://www.pexels.com/photo/confident-senior-woman-smiling-in-studio-portrait-30603537/ | Stephanie Gray (https://www.pexels.com/@bestinshowmedia/) | [Pexels License](https://www.pexels.com/license/) |
 | 권태호 | `portrait-kwon-taeho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-man-in-casual-attire-outdoors-36976717/ | Jayford Batobato (https://www.pexels.com/@jayford-batobato-309499020/) | [Pexels License](https://www.pexels.com/license/) |
 

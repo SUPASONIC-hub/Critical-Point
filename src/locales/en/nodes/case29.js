@@ -39,11 +39,11 @@ export default {
     },
     "c29_marina": {
       "title": "More Haste, Less Speed",
-      "text": "Cho Hyunseok, who moved to New York at twelve, speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
+      "text": "Cho Hyunseok, a 1.5-generation Korean American who moved to New York at twelve, speaks in careful Korean. 'There’s a Korean proverb: the more you hurry, the more you should take the long way round. So let’s sign fast.' He turns on a tablet. 'We’re the people who clean up bad debt. We collect what the bank can’t, and we do it humanely.' The next screen is a collection plan. Beside the first month’s target, in small print: 'Contact intensity: 5 times a week.'",
       "memo": [
         "Sale price 131 billion won -- 30.7% of the 427 billion on the books",
         "Collection plan: first-month contact intensity 5 times a week",
-        "Cho Hyunseok (Ethan Cho): Roundhill partner, Korean American, 12 years in Singapore",
+        "Cho Hyunseok (Ethan Cho): Roundhill partner, 1.5-generation Korean American, 12 years in Singapore",
         "36 hours to the signing ceremony"
       ],
       "choices": {
@@ -207,7 +207,7 @@ export default {
     },
     "c29_annex": {
       "title": "One of Four",
-      "text": "Marcus Lim, 29, falls in beside you. A third-year analyst at Roundhill’s Singapore head office, he calls Cho Hyunseok 'Ethan' like everyone in the firm, and learned his Korean from his Korean mother. The phone Marcus Lim holds halfway out shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
+      "text": "Marcus Lim, 29, falls in beside you. In his 3rd year as an analyst at Roundhill’s Singapore head office, he calls Cho Hyunseok 'Ethan' like everyone in the firm, and learned his Korean from his Korean mother. The phone Marcus Lim holds halfway out shows the first page of Annex C. 'That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel sheet.' He pulls his hand back. 'I can show you the other pages too. But only four people at the company can open this file. And I’m the least powerful of them.'",
       "memo": [
         "Marcus Lim: Roundhill analyst, author of the collection plan",
         "People with access to Annex C: 4",

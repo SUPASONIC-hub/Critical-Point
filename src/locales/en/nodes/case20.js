@@ -38,7 +38,7 @@ export default {
     },
     "c20_server": {
       "title": "Senior",
-      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Priya Nair bows to the servers. Three years after coming from a Singapore fintech firm to bring NOAH in, she greets them the way a Korean office taught her. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
+      "text": "The sticker Lee Minseo put on the four servers -- 'ECHO Units 1-4 · Do Not Kick' -- is still there. Priya Nair bows to the servers. In her 3rd year since coming from a Singapore fintech firm to bring NOAH in, she greets them the way a Korean office taught her. 'Hello, senior. NOAH learned from these. ECHO isn’t disappearing. It’s going into NOAH.' Then why erase the originals? 'That was decided above me. All I heard was, if the originals remain, the two can be compared.'",
       "memo": [
         "4 ECHO servers -- installed 2019, parts discontinued",
         "Priya Nair: KD Data Lab, in charge of introducing NOAH · hired from Singapore",
