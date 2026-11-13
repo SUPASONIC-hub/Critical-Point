@@ -112,7 +112,9 @@ export const speakers = {
   "민하랑": "Min Harang",
   "오민정": "Oh Minjeong",
   "문정택": "Moon Jeongtaek",
-  "한기호": "Han Giho"
+  "한기호": "Han Giho",
+  "그레이스 웡": "Grace Wong",
+  "모지현": "Mo Jihyun",
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -146,7 +148,9 @@ export const roles = {
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
   "KD은행 고객센터 야간 상담원 · 7년 차": "Night counsellor, KD Bank Customer Center · 7 years in",
   "김포 분식집 사장 · 12년째 · 56세": "Owner of a snack bar in Gimpo · 12 years running · age 56",
-  "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center"
+  "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center",
+  "홍콩 수취 은행 송금 조사 담당 · 29세": "Payments investigator at the receiving bank in Hong Kong · age 29",
+  "전 KD캐피탈 자금부 해외 송금 담당 · 9년 · 37세": "Former overseas-payments officer, KD Capital Treasury · 9 years · age 37"
 };
 
 
@@ -752,6 +756,10 @@ export const copy = {
       "side04": {
         "label": "Side case 4",
         "title": "Year-End Settlement"
+      },
+      "side07": {
+        "label": "Side case 7",
+        "title": "Friday, 17:58"
       }
     }
   }

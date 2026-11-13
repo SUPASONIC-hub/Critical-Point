@@ -1,6 +1,6 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호), 11월 13일에 번외 7을 위해 더한 두 장(그레이스 웡, 모지현)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
@@ -93,6 +93,8 @@
 | 권태호 | `portrait-kwon-taeho.webp` | https://www.pexels.com/photo/portrait-of-a-smiling-man-in-casual-attire-outdoors-36976717/ | Jayford Batobato (https://www.pexels.com/@jayford-batobato-309499020/) | [Pexels License](https://www.pexels.com/license/) |
 | 오민정 | `portrait-oh-minjeong.webp` | https://www.pexels.com/photo/a-close-up-shot-of-a-woman-wearing-a-headset-7709199/ | MART PRODUCTION (https://www.pexels.com/@mart-production/) | [Pexels License](https://www.pexels.com/license/) |
 | 문정택 | `portrait-moon-jeongtaek.webp` | https://unsplash.com/photos/man-sitting-on-chair-d77tidmCJqI | Raychan (https://unsplash.com/@wx1993) | [Unsplash License](https://unsplash.com/license) |
+| 그레이스 웡 | `portrait-grace-wong.webp` | https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-wearing-eyeglasses-sitting-on-gray-chair-8278977/ | ANTONI SHKRABA production (https://www.pexels.com/@anthonyshkraba-production/) | [Pexels License](https://www.pexels.com/license/) |
+| 모지현 | `portrait-mo-jihyun.webp` | https://www.pexels.com/photo/young-brunette-portrait-14255519/ | Oktavianus Mulyadi (https://www.pexels.com/@zacks1981/) | [Pexels License](https://www.pexels.com/license/) |
 
 같은 사진가의 사진이 여러 장 있지만(Vitaly Gariev, Mikhail Nilov, cottonbro studio 세 장씩) 모델은 서로 다른 사람입니다.
 10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
@@ -122,6 +124,11 @@ Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 
 악역이 아닌 사람(고객센터 야간 상담원, 거절 통보를 받은 분식집 사장)이라 실제 사람의 사진을 썼습니다. MART PRODUCTION은 오민정으로
 세 장째(차지원, 배성준과 다른 모델)입니다. 문정택은 옆을 보는 사진이라 얼굴을 가운데 두고 잘랐습니다. 먼저 본 Vitaly Gariev의 체크 셔츠
 사진은 나준혁과, Ketut Subiyanto의 사진은 지강현과, Wasin Pirom의 사진은 채이안과 같은 모델이라 쓰지 않았습니다.
+
+그레이스 웡과 모지현은 2026년 11월 13일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 둘 다 번외 7(src/nodes/side07.js)의
+악역이 아닌 사람(홍콩 수취 은행의 송금 조사 담당 29세, 이름이 도용된 퇴사자 37세)이라 실제 사람의 사진을 썼고, 설정 나이에 맞는 얼굴로 골랐습니다.
+ANTONI SHKRABA production은 최서진(Antoni Shkraba)과 같은 작업실이지만 모델이 다릅니다. 먼저 본 cottonbro studio의 사진은 사진가 한 사람에
+세 장까지라는 기준에 걸리고, Ramon Karolan의 사진은 이미 주은채에 써서 쓰지 않았습니다.
 
 ## 실존하지 않는 사람의 생성 사진 열다섯 장
 

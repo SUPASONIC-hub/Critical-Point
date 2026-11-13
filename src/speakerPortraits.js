@@ -117,6 +117,10 @@ const SPEAKER_PORTRAITS = {
   "오민정": "/portrait-oh-minjeong.webp",
   "한기호": "/portrait-han-giho.webp",
   "문정택": "/portrait-moon-jeongtaek.webp",
+  // 번외 7 (2026-11-13): the side case's two new speakers, neither on its
+  // wrong side, so both are photographs of real models (docs/portrait-credits.md).
+  "그레이스 웡": "/portrait-grace-wong.webp",
+  "모지현": "/portrait-mo-jihyun.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */
