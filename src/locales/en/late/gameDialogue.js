@@ -672,6 +672,20 @@ export default {
       "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
+    },
+    "쩐 티 란": {
+      "appearance": "A rice cooker on top of the moving boxes, a lanyard with her lab pass, a laptop holding thirty-seven property registers.",
+      "thought": "9 years of savings have become one row of a table. A row, at least, can be counted.",
+      "gesture": "When Tran Thi Lan says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
+      "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
+      "line": "Whether that’s strange, I don’t know."
+    },
+    "기성철": {
+      "appearance": "A grey van, a basket of carnations on the passenger seat, a phone calendar packed with dates.",
+      "thought": "The boss knows where the money is. I only know the dates.",
+      "gesture": "Given an awkward question, Gi Seongcheol first opens the calendar on his phone and shows it.",
+      "voice": "Polite and quick, and the sentence after every apology ends in “you’ll get it right away.”",
+      "line": "It’s not that there’s no money. It’s tied up."
     }
   },
 };
