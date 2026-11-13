@@ -563,7 +563,6 @@ ae7b 깻
 aebc 꺼
 aebe 꺾
 aecd 껍
-aecf 껏
 aed0 껐
 aed1 껑
 aed8 께
@@ -580,7 +579,6 @@ afb8 꾸
 afb9 꾹
 afbc 꾼
 afc0 꿀
-afc7 꿇
 afc8 꿈
 afc9 꿉
 afd4 꿔
@@ -1110,6 +1108,7 @@ c194 솔
 c19c 솜
 c19f 솟
 c1a1 송
+c1a5 솥
 c1c4 쇄
 c1e0 쇠
 c1f1 쇱
@@ -1157,7 +1156,6 @@ c370 썰
 c379 썹
 c37c 썼
 c3df 쏟
-c3e9 쏩
 c465 쑥
 c4f0 쓰
 c4f1 쓱
@@ -1307,7 +1305,6 @@ c7ac 재
 c7b0 잰
 c7b4 잴
 c7bd 잽
-c7c0 쟀
 c7c1 쟁
 c7e4 쟤
 c800 저
@@ -1377,6 +1374,7 @@ c9f0 짰
 c9f8 째
 ca4c 쩌
 ca4d 쩍
+ca50 쩐
 ca61 쩡
 ca84 쪄
 cabc 쪼
@@ -1511,7 +1509,6 @@ d0dd 택
 d0e0 탠
 d0e4 탤
 d0ed 탭
-d0f0 탰
 d0f1 탱
 d130 터
 d131 턱

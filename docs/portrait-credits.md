@@ -1,6 +1,6 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 13일에 번외 6을 위해 더한 한 장(쩐 티 란)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
@@ -116,7 +116,7 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 송하율은 턱에 댄 손끝이 아래 가장자리에 조금 남고, 이하경은 턱을 괸 손이 아래에 남습니다(본문의 은테 안경은 없음).
 Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 장째이고, 모델은 모두 다른 사람입니다.
 
-## 실존하지 않는 사람의 생성 사진 열네 장
+## 실존하지 않는 사람의 생성 사진 열다섯 장
 
 백아린과 윤상혁은 비리·악역을 맡고, 문하준은 미성년입니다. 실제 사람의 얼굴을 이런 역에 빌려 오지 않으려고,
 이 세 장은 AI가 만든 실존하지 않는 사람의 사진을 썼습니다(2026년 10월 20일 내려받음). 보정은 위 사진들과 같습니다.
@@ -147,6 +147,7 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 | 진세라 | `portrait-jin-sera.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8054606/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 규정 뒤에 숨어 책임을 피하는 부행장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 편종구 | `portrait-pyeon-jonggu.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 도건우 | `portrait-do-geonu.webp` | https://pixabay.com/illustrations/handsome-happy-smile-white-shirt-8988318/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 기록을 지워 주는 값으로 증언을 가져가는 위기대응 TF 팀장이라 실제 사람의 얼굴을 쓰지 않음 |
+| 쩐 티 란 | `portrait-tran-thi-lan.webp` | https://pixabay.com/illustrations/ai-generated-woman-portrait-9220639/ (ArtfulColorWorks, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 6의 세입자(베트남 출신, 서울 9년째 공대 연구원)라 악역은 아니지만, 다국적 인물의 얼굴을 실제 사람에게서 빌려 와 국적을 붙이지 않으려고 생성 사진을 씀(번외 6 지시, 우리). 2026년 11월 13일에 내려받음. 아래에서 올려다본 구도라 얼굴을 가운데 두고 정사각형으로 잘랐고, 고층 빌딩 배경은 보정으로 회청색에 묻힘. ArtfulColorWorks는 은시온에 이어 두 장째(모델은 다른 사람). 처음 본 geralt 8714004는 이미 백아린이라 쓰지 않음 |
 
 ## 직접 그린 한 장
 
@@ -156,5 +157,6 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 여든여덟 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 15 + 그린 1; 쩐 티 란은 11월 13일).
+번외 6의 관리 대리인 기성철은 장면의 화자가 아니라 서술 속에서만 말하므로 초상이 없습니다. 평범한 얼굴의 동아시아 남성 생성 사진을 업로더 상한(한 사람에 세 장) 안에서 찾지 못해(kalsstockmedia 8644546은 연서준과 같은 모델로 보이고, Joshgmit의 태권도복 시리즈는 표정이 험악함) 화자로 두지 않았습니다(우리, 11월 13일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).
