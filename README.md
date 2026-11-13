@@ -1142,6 +1142,17 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    한도보다 먼저 닿으므로 한 주소가 다른 플레이어의 하루치를 다 쓰지 못합니다. 모두 합친 두 한도(텔레메트리 바이트, 온라인 저장 새 코드)는
    `Funnel`(22:10 KST)과 `Board Reports`(09:10 KST)가 하루 두 번 읽어 Job Summary에 남기고, 80%를 넘으면 예약 실행이
    실패합니다(`scripts/report-budgets.mjs`). 요약에는 수만 들어갑니다.
+   `Funnel` 요약에는 「어제 오류 N건(상위 3 메시지 앞 40자)」과 「의견 N건」도 붙습니다(`scripts/report-ops-health.mjs`,
+   KST 어제 하루). 오류 메시지는 앞 40자를 다시 가린 것만, 의견은 수만 적고 본문은 읽지 않습니다.
+   **예약 실행 보호**: 공개 저장소는 60일 동안 활동이 없으면 GitHub이 예약 워크플로를 끕니다. `Funnel` 요약은
+   main의 마지막 커밋이 45일을 넘으면 경고하고, `Workflow Keepalive`(매달 1일 10:20 KST,
+   `scripts/workflow-keepalive.mjs`)가 비활성으로 꺼진 워크플로만 `gh workflow enable`로 다시 켭니다(손으로 끈 것은 그대로,
+   main에 빈 커밋을 만들지 않음).
+   **로컬 백업**: 랭킹(`public_rankings`)·명예의 전당·`cloud_saves`를 주인 PC에만 JSON으로 받습니다. 워크플로로
+   돌리지 않습니다(공개 저장소의 아티팩트는 누구나 받습니다). PowerShell에서
+   `$env:SUPABASE_URL="https://<ref>.supabase.co"; $env:SUPABASE_SERVICE_ROLE_KEY="<서비스 롤 키>"; node scripts/backup-local.mjs`
+   → `D:\DevData\critical-point-backup\<YYYY-MM-DD>\<테이블>.json`과 `manifest.json`(행 수). GET만 보내는 읽기 전용이고,
+   다른 위치는 인자나 `BACKUP_ROOT`로 줍니다. 파일에는 플레이어 데이터가 있으니 저장소·공유 폴더에 두지 마십시오.
 7. 텔레메트리 행은 만들어질 때 한 번 받은 `event_id`(`src/state/telemetryEventId.js`)를 재시도에도 그대로
    씁니다. `event_id`는 유니크이고, 클라이언트는 평범한 POST를 보내 유니크 위반(`409`, 코드 `23505`)만 전달 완료로
    셉니다(`on_conflict`는 `event_id`에 대한 SELECT 권한이 필요해서 쓰지 않습니다). 다른 이유의 `409`는 실패입니다. 피드백 행은
