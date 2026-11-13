@@ -5,12 +5,9 @@
 --
 --   2026-W49 (11-30 ~ 12-06)  crisis-week
 --
--- A DRAFT: merged, a migration is applied within a minute. It becomes
--- `.sql` after the user's answer, together with the line
--- `{ week: "2026-W49", id: "crisis-week", added: <merge day> }` in
--- MERGED_WEEKS (src/gauntlet/weeklyCalendar.js) and this file's name in
--- tests/unit/weekly-rules.test.mjs's list. Merge at least seven days before
--- W49 (by 2026-11-23): the start screen announces a week the Monday before.
+-- The user's answer (2026-11-13, 「전부 1」): applied, first week 2026-W49.
+-- MERGED_WEEKS (src/gauntlet/weeklyCalendar.js) names the same week. Merged
+-- by 2026-11-23 at the latest: the start screen announces a week the Monday before.
 
 insert into public.weekly_rules (week, rule_id) values
   ('2026-W49', 'crisis-week')

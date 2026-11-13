@@ -30,7 +30,7 @@
 | `near-wall` | NEAR WALL | 벽 띠를 열기 4만큼 앞당김(`wallShift`) |
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
 | `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
-| `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 마이그레이션은 `.sql.draft`(질문 뒤 켬) |
+| `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
 | `audit` / `cascade` / `audit-cascade` | AUDIT WEEK / CASCADE WEEK / AUDIT & CASCADE | 숫자는 그대로, 장치(`WEEK_RULE_DEVICES`의 `audit`·`cascade`)를 켬. W47 시험 주용 |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
