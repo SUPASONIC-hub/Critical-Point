@@ -159,7 +159,7 @@ export const characterProfiles = {
   // 번외 6 (src/nodes/side06.js): a side pack is not in CASE_PACKS, so its own
   // people are introduced here, like the season's first ones. 쩐 티 란 answers
   // in Korean (다국적 등장인물 기획 2-4: natural Korean in quotes, no mixed-in
-  // words, no broken Korean); 기성철 is the 「다음 세입자」 side, an ordinary man.
+  // words, no broken Korean).
   "쩐 티 란": {
     role: "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째",
     stance: "기록 · 버티기 · 또렷함",
@@ -169,16 +169,6 @@ export const characterProfiles = {
     gesture: "쩐 티 란은 숫자를 말할 때 노트북 화면의 그 칸을 손가락으로 짚고, 다 말할 때까지 떼지 않는다.",
     voice: "또박또박한 존댓말로, 모르는 것은 모른다고 먼저 말하고 묻는다.",
     line: "그게 이상한 건지, 저는 그걸 모르겠어요.",
-  },
-  기성철: {
-    role: "모아든 주식회사 관리 대리인",
-    stance: "일정 · 다음 세입자 · 월급",
-    job: "세입자에게 고개를 숙이고, '다음 세입자 들어오면'이라는 말을 전한다.",
-    appearance: "회색 승합차, 조수석의 카네이션 바구니, 일정이 빼곡한 휴대폰 달력.",
-    thought: "돈이 어디 있는지는 대표님이 안다. 나는 날짜만 안다.",
-    gesture: "기성철은 곤란한 질문을 받으면 휴대폰 일정표부터 켜서 보여 준다.",
-    voice: "공손하고 빠르며, 사과 다음 문장은 늘 '바로 드려요'로 끝난다.",
-    line: "돈이 없는 게 아니라 묶여 있는 거예요.",
   },
 };
 

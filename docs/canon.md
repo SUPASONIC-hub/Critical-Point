@@ -417,7 +417,7 @@ open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토) and
-11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
+11월 8일 (토) fit 2025, 1월 9일 (금), 5월 8일 (금) and 5월 11일 (월) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -461,6 +461,18 @@ season case has to keep. What each one states for the first time is below.
 | The sheet | goes to head office by itself at 06:00. Each stopped minute takes an idle reason from four: 휴식, 교육, 설비 대기, 기타. The night manager: "비고는 어차피 아무도 안 읽어요" |
 | 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
 | The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
+
+### 번외 6, 보증금 (side06)
+
+| Fact | Value |
+|---|---|
+| When | 2026-05-08 (금), 어버이날, 17:50 to 23:30: four days after 사건 27 opens (5월 4일) and the last working day before 도윤하's ten days at KD생명 (사건 28, 「다음 주부터」 in c27) |
+| 송하율 | 사건 26's buyer, 10월 출산 예정; her 전세 (in 은행나무빌, 강서구) ends in December, its 전세자금대출 from KD은행 강서지점 with a 전세보증. She calls the analyst on the card from 평택 |
+| 쩐 티 란 | 베트남 출신, 서울 9년째, a university engineering lab; answers in Korean. One floor below 송하율; her lease ended 4월 30일 and her 보증금 of 1억 9천만 원 (savings, no loan, no 전세보증) has not come back. She copied the 37 flats' 등기부 into one table: all bought in 2024 |
+| The landlord | 모아든 주식회사: 37 flats in four buildings on one lane. Its 관리 대리인 기성철 says the money is 「묶여 있는」 because 「대표님이 평택 쪽에 좀 물려서」, and that it comes back when the next tenants move in |
+| The row | 23 전세자금대출 on that lane, all from 강서지점, 21 from 5번 창구 (April's 우수 창구, 「전세자금대출 1위」; 기성철 as 소개인 21 times). Every row: 감정가 = 매매가 = 전세가 = 2억 1천만 원. How such a row is made is never said |
+| Monday | three more loans for the company's flats, 실행 예정 5월 11일 (월) 09:30. Any staff member may file a 실행 보류 요청 under their own 사번; the 지점장 decides, and answered 「월요일에 얘기합시다」 |
+| The endings | what 도윤하 files under his own name that night (a hold request, 「검토 중」 on Monday / a plain notice in the tenants' group chat, 2 to 19 people / a one-page table in the 지점장's inbox, unread). None says whether a deposit came back or a loan was held |
 
 ## Known and left alone
 

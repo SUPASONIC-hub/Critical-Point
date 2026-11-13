@@ -60,7 +60,7 @@ export default {
     "s6_agent": {
       "title": "Carnations",
       "place": "Ginkgo Villa, Gangseo-gu · 1st-floor parking",
-      "text": "A grey van pulls into the parking area. Gi Seongcheol, the managing agent for Moadeun Co., sets a basket of carnations down on the passenger seat and gets out. 'They’re for my mother. It’s Parents’ Day.' He bows to Tran Thi Lan first. 'It’s not that there’s no money. It’s tied up. The boss got a bit stuck on something down in Pyeongtaek. The moment the next tenant moves in, you’ll get it.' He shows you the calendar on his phone. 'Three more flats signed this week. The money comes in Monday morning. KD Bank, Gangseo Branch.' Then he adds, 'I’m on a salary too, you know. 2 years in this job.'",
+      "text": "A grey van pulls into the parking area. Gi Seongcheol, the managing agent for Moadeun Co., sets a basket of carnations down on the passenger seat and gets out. 'They’re for my mother. It’s Parents’ Day.' He bows to the tenant from the 2nd floor first. 'It’s not that there’s no money. It’s tied up. The boss got a bit stuck on something down in Pyeongtaek. The moment the next tenant moves in, you’ll get it.' He shows you the calendar on his phone. 'Three more flats signed this week. The money comes in Monday morning. KD Bank, Gangseo Branch.' 'I’m on a salary too, you know. 2 years in this job.' When the van has gone, Tran Thi Lan opens her laptop again. 'He’ll pay me back with the next tenant’s money. Then who pays that person back?'",
       "question": "The agent says the deposit will be paid with the next tenants’ money. What do you do?",
       "memo": [
         "Gi Seongcheol: managing agent, Moadeun Co.",

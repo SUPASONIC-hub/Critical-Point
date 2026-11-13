@@ -24,13 +24,13 @@
  * note in the tenants' group chat, a table in the branch manager's inbox --
  * never whether a deposit came back or a loan was stopped.
  *
- * Its new speakers have portraits: 쩐 티 란 (베트남 출신, 서울 9년째 공대
+ * Its one new speaker has a portrait: 쩐 티 란 (베트남 출신, 서울 9년째 공대
  * 연구원; she answers in Korean, the narration says so once, and her speech is
- * plain natural Korean -- 다국적 등장인물 기획 2-4) and 기성철 (the company's
- * 관리 대리인, the 「다음 세입자 들어오면」 side: an ordinary, tired man with a
- * carnation basket for his own mother, not the scheme's author). 송하율 and
- * 도윤하 are the season's own. The 5번 창구 colleague is never a speaker and
- * never quoted: the case is about the table he was given, not him.
+ * plain natural Korean -- 다국적 등장인물 기획 2-4). 송하율 and 도윤하 are the
+ * season's own. 기성철, the company's 관리 대리인 (the 「다음 세입자 들어오면」
+ * side, an ordinary tired man with a carnation basket for his own mother), and
+ * the 5번 창구 colleague are never speakers: the narration names no speaker
+ * before 기성철's words in s6_agent, so no balloon gives them to anyone else.
  *
  * The laughter is a villa called 은행나무빌 and 도윤하's 「숫자가 너무
  * 반듯해요」; the anger a row that repeats; the sorrow 송하율 unable to say
@@ -86,10 +86,10 @@ export const side06 = {
     s6_agent: {
       phase: "SIDE 06 AGENT",
       title: "카네이션",
-      speaker: "기성철",
+      speaker: "쩐 티 란",
       place: "강서구 은행나무빌 · 1층 주차장",
       clock: "19:30",
-      text: "주차장에 회색 승합차가 섭니다. 모아든 주식회사의 관리 대리인 기성철이 카네이션 바구니를 조수석에 내려놓고 내립니다. '어머니 갖다 드릴 거예요. 오늘 어버이날이라.' 그는 쩐 티 란에게 먼저 고개를 숙입니다. '돈이 없는 게 아니라 묶여 있는 거예요. 대표님이 평택 쪽에 좀 물려서요. 다음 세입자 들어오면 바로 드려요.' 그가 휴대폰 일정표를 보여 줍니다. '이번 주에도 세 집 계약됐어요. 월요일 아침이면 돈 들어와요. KD은행 강서지점.' 그러고는 덧붙입니다. '저도 월급 받는 사람이에요. 이 일 2년 했고요.'",
+      text: "주차장에 회색 승합차가 섭니다. 모아든 주식회사의 관리 대리인 기성철이 카네이션 바구니를 조수석에 내려놓고 내립니다. '어머니 갖다 드릴 거예요. 오늘 어버이날이라.' 그는 2층 세입자에게 먼저 고개를 숙입니다. '돈이 없는 게 아니라 묶여 있는 거예요. 대표님이 평택 쪽에 좀 물려서요. 다음 세입자 들어오면 바로 드려요.' 그가 휴대폰 일정표를 보여 줍니다. '이번 주에도 세 집 계약됐어요. 월요일 아침이면 돈 들어와요. KD은행 강서지점.' '저도 월급 받는 사람이에요. 이 일 2년 했고요.' 승합차가 떠나자 쩐 티 란이 노트북을 다시 엽니다. '다음 세입자 돈으로 제 돈을 준대요. 그럼 그분 돈은 누가 줘요?'",
       question: "대리인이 다음 세입자의 돈으로 보증금을 주겠다고 합니다. 어떻게 하겠습니까?",
       memo: ["기성철: 모아든 주식회사 관리 대리인", "'다음 세입자 들어오면 바로 드려요'", "이번 주 새 계약 3집: 월요일 아침 KD은행 강서지점", "'대표님이 평택 쪽에 좀 물려서'"],
       triggers: ["system", "injustice", "choice"],

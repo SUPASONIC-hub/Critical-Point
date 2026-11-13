@@ -111,7 +111,6 @@ export const speakers = {
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
   "쩐 티 란": "Tran Thi Lan",
-  "기성철": "Gi Seongcheol",
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -143,8 +142,7 @@ export const roles = {
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
   "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
-  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul",
-  "모아든 주식회사 관리 대리인": "Managing agent, Moadeun Co."
+  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul"
 };
 
 

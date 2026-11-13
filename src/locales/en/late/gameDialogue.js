@@ -679,13 +679,6 @@ export default {
       "gesture": "When Tran Thi Lan says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
       "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
       "line": "Whether that’s strange, I don’t know."
-    },
-    "기성철": {
-      "appearance": "A grey van, a basket of carnations on the passenger seat, a phone calendar packed with dates.",
-      "thought": "The boss knows where the money is. I only know the dates.",
-      "gesture": "Given an awkward question, Gi Seongcheol first opens the calendar on his phone and shows it.",
-      "voice": "Polite and quick, and the sentence after every apology ends in “you’ll get it right away.”",
-      "line": "It’s not that there’s no money. It’s tied up."
     }
   },
 };
