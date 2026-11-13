@@ -354,7 +354,8 @@ const budgets = [
   // 294,162 / 87,785 -> 296,033 / 88,293 번외 5. Measured 296029 / 88289 (over budget only) in the e2e build, the plus 4.
   // 296,033 / 88,293 -> 300,207 / 89,546 묶음 1113. Measured 300203 / 89542 (over budget only) in the e2e build, the plus 4.
   // 300,207 / 89,546 -> 300,667 / 89,754 다국적 인물 over main e43f7bf6. Measured 300663 / 89750 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 300_667, maxGzip: 89_754 },
+  // 300,667 / 89,754 -> 300,673 / 89,754 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured 300669 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 300_673, maxGzip: 89_754 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -676,8 +677,9 @@ const budgets = [
   // 201,645 / 73,087 -> 201,818 / 73,147 번외 5. Measured 201814 / 73143 (over budget only) in the e2e build, the plus 4.
   // 201,818 / 73,147 -> 205,322 / 74,409 묶음 1113. Measured 205318 / 74405 (over budget only) in the e2e build, the plus 4.
   // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
-  // 207,552 / 75,601 -> 207,771 / 75,686 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 207767 / 75682 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_771, maxGzip: 75_686 },
+  // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
+  // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 207_771, maxGzip: 75_684 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2029,7 +2031,7 @@ const budgets = [
   // 59,423 / 20,432 -> 59,535 / 20,560 on 2026-11-13, 다국적 인물 (cast-global): the renamed profiles' names in katakana and kanji. Measured 59,531 / 20,556, the plus 4.
   // 59,423 / 20,432 -> 61,091 / 20,936 side04 over main 1ae72e0b: 번외 4의 새 화자 셋(오민정, 문정택, 한기호) 프로필. Measured ja 61087 / 20932 in the e2e build, the plus 4.
   // 59,423 / 20,432 -> 60,464 / 20,755 side07 over main dcbbe5e0: 번외 7의 새 화자 둘(그레이스 웡, 모지현) 프로필. Measured ja 60460 / 20751 in the e2e build, the plus 4.
-  // 59,423 / 20,432 -> 60,090 / 20,647 side06 over main dcbbe5e0: 번외 6의 새 화자 쩐 티 란 프로필. Measured ja 60086 / 20643 in the e2e build, the plus 4.
+  // 59,423 / 20,432 -> 60,090 / 20,647 side06 over main dcbbe5e0: 번외 6의 새 화자 레 티 호아 프로필. Measured ja 60086 / 20643 in the e2e build, the plus 4.
   // 59,423 / 20,432 -> 61,186 / 21,029 side05 over main 7c80ccfe: 번외 5의 새 화자 셋(육성빈, 추영복, 마리사 탄) 프로필. Measured ja 61182 / 21025 in the e2e build, the plus 4.
   // 61,186 / 21,029 -> 64,562 / 22,016 묶음 1113 (번외 4·5·6·7의 새 화자 아홉 프로필 함께) over main dcbbe5e0. Measured ja 64558 / 22012 in the e2e build, the plus 4.
   // 64,562 / 22,016 -> 64,674 / 22,137 다국적 인물 over main e43f7bf6: the renamed profiles' names in katakana and kanji on top of 번외 4~7's. Measured ja 64670 / 22133 in the e2e build, the plus 4.
@@ -2428,8 +2430,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,991 / 433,702 / 441,448 번외 5. Measured first paint, the plus 4.
 // -> 375,396 / 436,255 / 444,088 묶음 1113. Measured first paint, the plus 4.
 // -> 377,166 / 438,137 / 445,978 다국적 인물 over main e43f7bf6. Measured first paint, the plus 4.
-// -> 377,362 / 438,380 / 446,229 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_362, en: 438_380, ja: 446_229 };
+// -> 377,172 / 438,144 / 445,987 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured first paint, the plus 4.
+// -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_359, en: 438_379, ja: 446_228 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

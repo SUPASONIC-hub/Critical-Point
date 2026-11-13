@@ -110,6 +110,22 @@ import { recheckCaseSettlement, recheckOpeningRoute } from "../src/settlementRec
  */
 export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK, RELIC_DRAFT_MARK]);
 
+/**
+ * The marks that take a ranking row off the public ranking once the owner turns
+ * the switch on (`ranking_hide_marked` = 1 in private_settings; the policy of
+ * supabase/migrations/*_ranking_hide_switch.sql lists the same ones, and
+ * check:grants holds the two together). Every checker mark, and the insert
+ * trigger's marks for values no table deals. Not on it, so never hidden:
+ * `time-over-gap` (a season delivered late, after playing offline) and
+ * `unchecked` (the server's own check failed), the two an honest season can earn.
+ * The switch is off until the checker has marked no honest season for 14 days.
+ */
+export const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
+export const HIDE_MARKS = Object.freeze([...DB_MARKS, ...TRIGGER_HIDE_MARKS]);
+
+/** The marks of `result` (its checker marks and its row's trigger marks) the switch would hide it for. */
+export const hiddenFor = (result) => [...new Set([...(result?.marks ?? []), ...(result?.triggerMarks ?? [])])].filter((mark) => HIDE_MARKS.includes(mark)).sort();
+
 // `suspicion` is the insert trigger's marks on the ranking row: the hall of
 // fame (src/hallOfFame.js) takes a season the trigger did not mark either.
 const SELECT = "run_id,run_tag,case_id,summary,decision_log,resources,dynamics,completed_at,suspicion";
@@ -261,7 +277,9 @@ export function verifyRows(rows) {
     // F1 step 2: the route each case opened on played again from the case before.
     const chain = recheck.status === "unverified" ? null : recheckChain(runRows, { settle: recheckCaseSettlement, opening: recheckOpeningRoute });
     const marks = [...recheck.marks, ...(chain?.marks ?? [])];
-    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, chain });
+    // The insert trigger's marks on the ranking row (its `suspicion` less the checker's, which `marks` states again).
+    const triggerMarks = Array.isArray(ranking.suspicion) ? ranking.suspicion.filter((mark) => typeof mark === "string" && !DB_MARKS.includes(mark)) : [];
+    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, triggerMarks, chain });
   }
   return results;
 }
@@ -326,7 +344,13 @@ export function formatReport(results, { redact = false } = {}) {
     if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
     if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
     if (result.chain) lines.push(...formatChain(result.chain));
+    const hidden = hiddenFor(result);
+    // The 14 days before the switch goes on are read off these lines: one on an honest season is a false flag.
+    if (hidden.length) lines.push(`  hide switch: hidden once on (${hidden.join(", ")})`);
   }
+  const checked = results.filter((result) => result.status !== "unverified");
+  const hiding = checked.filter((result) => hiddenFor(result).length).length;
+  lines.push(`Hide switch (ranking_hide_marked, off until 14 days without a false flag): would hide ${hiding} of ${checked.length} checked runs.`);
   return lines;
 }
 
