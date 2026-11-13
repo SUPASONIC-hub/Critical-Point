@@ -14,7 +14,7 @@
  * label and title, and `load`, which fetches the case file as its own chunk
  * the first time the case is opened. A release lists 번외 1 (side01, 2025년
  * 12월 20일 토요일), 번외 2 (side02, 2026년 1월 9일 금요일) and 번외 3 (side03,
- * 2025년 11월 8일 토요일) since their pull requests; the slot is hidden while the list is empty (설계안 질문 7 (1)).
+ * 2025년 11월 8일 토요일) and 번외 7 (side07, 2026년 6월 12일 금요일) since their pull requests; the slot is hidden while the list is empty (설계안 질문 7 (1)).
  *
  * `side00` is the framework's placeholder, not a case: it exists so the slot,
  * the side screen and the e2e test have something to open. It is listed only in
@@ -38,6 +38,7 @@ export const SIDE_CASES = Object.freeze([
   { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", load: () => import("./side01.js").then(({ side01 }) => localizeSidePack(side01)) },
   { id: "side02", label: "번외 2", title: "돌려줄 것", load: () => import("./side02.js").then(({ side02 }) => localizeSidePack(side02)) },
   { id: "side03", label: "번외 3", title: "보통의 밤", load: () => import("./side03.js").then(({ side03 }) => localizeSidePack(side03)) },
+  { id: "side07", label: "번외 7", title: "금요일 17시 58분", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => localizeSidePack(side00)) }]
     : []),
