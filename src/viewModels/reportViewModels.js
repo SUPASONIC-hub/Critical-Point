@@ -3,8 +3,7 @@
  * storage banner. All of it is a pure read of a finished run.
  */
 import { easyResourceLabels, subjectParticle, topicParticle } from "../playerLanguage.js";
-import { initialResources } from "../gameConstants.js";
-import { cutPerCase, getSeasonStanding } from "../seasonStanding.js";
+import { cutPerCase, getSeasonStanding, readHeldLine } from "../seasonStanding.js";
 import { fill } from "../locale.js";
 import reportLinesCopy from "../copy/reportLines.js";
 
@@ -14,28 +13,9 @@ const { standing: STANDING, heldEndings: HELD_ENDINGS, witnessHeld: WITNESS_HELD
 // (the word is STANDING's, by the level).
 const STANDING_MARKS = { clear: "○", near: "▲", over: "■" };
 
-/**
- * How far under the start the season's mean cash must have closed for the
- * season to have lost money (개선 포인트 C3, 2026-11-05 draft): under this
- * share of `initialResources.capital`, so under 80 of the 100 a season
- * starts with. The one number the held line hangs on; where it sits is the
- * owner's (감수자's) call.
- */
-export const HELD_LINE_CAPITAL_SHARE = 0.8;
-
-/**
- * Whether the season lost money and kept people: its standing is clear of
- * both collapse routes and the cash its cases closed on, on average, is
- * under `HELD_LINE_CAPITAL_SHARE` of the start. `closing` is the mean
- * closing resources (`getSeasonStrain().seasonResources`), or null before a
- * case has closed -- and then nothing is held.
- *
- * @param {{ level?: string, closing?: Record<string, any> | null }} [input]
- */
-export function readHeldLine({ level, closing } = {}) {
-  const capital = Number(closing?.capital);
-  return level === "clear" && Number.isFinite(capital) && capital < initialResources.capital * HELD_LINE_CAPITAL_SHARE ? { capital } : null;
-}
+// The held line (C3) is seasonStanding.js's, where the season-final row's
+// `seasonStanding` mark reads it too; exported here as well for the callers that read it here.
+export { HELD_LINE_CAPITAL_SHARE, readHeldLine } from "../seasonStanding.js";
 
 /**
  * What src/nearestEnding.js answers, written out here so the type check does
