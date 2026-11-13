@@ -10,7 +10,8 @@
  * players draw from nothing but their seeds (`handUnit`).
  */
 import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE } from "../../src/gauntlet/auditRisk.js";
-import { normalizeWeekRuleId } from "../../src/gauntlet/weeklyRules.js";
+import * as weeklyRules from "../../src/gauntlet/weeklyRules.js";
+import { parseWeekValues } from "./week-values.mjs";
 import { AUDIT_VALUE_SETS } from "./audit-values.mjs";
 import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_CARRY_MAX, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
 import { LINK_VALUE_SETS } from "./cascade-values.mjs";
@@ -269,6 +270,28 @@ export const AUDIT_VALUES = (() => {
 })();
 
 /**
+ * WEEK_RULE=<catalogue id> plays every season (createSeasonBot, when the
+ * caller names no week) and every case (createCaseBot) under that week's rule,
+ * as a season begun in its week would be: a rule booked in no week yet is
+ * measured this way (B4's idle money, the market shock). WEEK_VALUES plays it
+ * on other numbers (week-values.mjs, loaded first with `node --import`); the
+ * numbers played are checked, not assumed. Left out, no week, as before.
+ */
+export const WEEK_RULE = (() => {
+  const asked = process.env.WEEK_RULE;
+  if (!asked) return undefined;
+  if (!weeklyRules.normalizeWeekRuleId(asked)) throw new Error(`WEEK_RULE=${asked}: one of ${Object.keys(weeklyRules.WEEK_RULE_CATALOGUE).join(", ")}`);
+  return asked;
+})();
+export const WEEK_VALUES = (() => {
+  const asked = parseWeekValues(process.env.WEEK_VALUES);
+  for (const [name, value] of Object.entries(asked)) {
+    if (weeklyRules[name] !== value) throw new Error(`WEEK_VALUES ${name}=${value} needs the numbers rewritten as weeklyRules.js loads: node --import ./scripts/sim/week-values.mjs ...`);
+  }
+  return Object.entries(asked).map(([name, value]) => `${name}=${value}`).join(", ") || "as shipped";
+})();
+
+/**
  * One season player and the seeded stream it draws from. `seed` starts the
  * stream and `reseed` sets it again (the report's paired seasons); `random`
  * and `pick` are the same stream, for the script's own draws (the tool hand
@@ -301,8 +324,8 @@ export const AUDIT_VALUES = (() => {
  * draws nothing; the second pick of a draft that bought one more draws as the
  * first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false, spend = "never" }) {
-  const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule = WEEK_RULE, snap = false, reads = false, spend = "never" }) {
+  const stamped = weekRule === undefined ? null : weeklyRules.normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (!story && stamped ? { weekRule: stamped } : {});
   let seed = start;
   function random() {
@@ -451,6 +474,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     let skipped = 0;
     // AUDIT_ON only: the season's closes the audit took its part of, and what its closes moved.
     const audits = { caught: 0, lost: 0, secured: 0 };
+    // B4, under WEEK_RULE=idle-erosion: what the closes took from the vault.
+    let eroded = 0;
     const links = newLinkTally();
     for (const caseId of CASE_SEQUENCE) {
       // The opening route, the legacy and the hand, as `runLifecycle.startCaseNow` opens the case.
@@ -539,6 +564,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
         const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules) });
         audit = verdict.audit?.count ?? 0;
+        eroded += verdict.eroded ?? 0;
         if (verdict.audit?.caught) {
           audits.caught += 1;
           audits.lost += verdict.audit.lost;
@@ -621,7 +647,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // cases' burst scores (getSeasonScore), where it used to take the finale's.
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, relicsAt, audits, links };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, relicsAt, audits, links, eroded };
   }
 
   /**
@@ -789,7 +815,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
   function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut }, { rules });
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules });
     let audit = 0;
     const paid = { cashed: 0, bonus: 0, capped: 0 };
     let busts = 0;

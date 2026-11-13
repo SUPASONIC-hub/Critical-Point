@@ -32,6 +32,11 @@ const weekRulesCopy = {
       text: "이번 주는 벽 띠가 열기 {crisisShift}만큼 앞당겨 서고, 모든 카드의 칩이 {crisisChips}배다.",
       world: "이번 주 시장이 흔들리자 본사는 숫자부터 맞추라고 했다.",
     },
+    "idle-erosion": {
+      title: "묵힌 돈은 준다",
+      text: "이번 주는 사건이 닫힐 때마다 금고에 남아 있던 돈의 {erosion}%가 사라진다. 도구를 고를 때 쓴 돈은 줄지 않는다.",
+      world: "이번 주 물가가 올라 묵혀 둔 돈의 값이 준다.",
+    },
     "audit-cascade": {
       title: "감사와 연쇄",
       text: "이번 주는 감사와 연쇄가 함께 선다. {audit} {cascade} CASCADE 판의 확정은 감사에 세지 않는다.",

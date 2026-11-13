@@ -23,6 +23,11 @@ export default {
       text: "今週は壁の帯が熱{crisisShift}だけ手前に立ち、すべてのカードのチップが{crisisChips}倍だ。",
       world: "今週、市場が揺れると、本社はまず数字を合わせろと言った。",
     },
+    "idle-erosion": {
+      title: "寝かせた金は目減りする",
+      text: "今週は事件が閉じるたびに、金庫に残っていた額の{erosion}%が消える。道具選びで使った分は減らない。",
+      world: "今週は物価が上がり、寝かせた金の値打ちが下がる。",
+    },
     "audit-cascade": {
       title: "監査と連鎖",
       text: "今週は監査と連鎖が同時に立つ。{audit} {cascade} CASCADE勝負の確定は監査に数えない。",
