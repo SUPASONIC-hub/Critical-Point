@@ -1,0 +1,3 @@
+/* The home screen name, in Korean: the web manifest's short_name (public/manifest.webmanifest). */
+"CFBundleDisplayName" = "임계점";
+"CFBundleName" = "임계점";

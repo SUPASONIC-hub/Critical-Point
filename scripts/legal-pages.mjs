@@ -238,7 +238,9 @@ const days = DATA_RETENTION_DAYS;
  * The notice of the change, at the top of the policy in the build without
  * Google Analytics: the policy's own section 12 promises a change seven days
  * before it takes effect (사용자 결정 10-30: the notice now, the switch on
- * 11-12). The build with it takes the line out (`ANALYTICS_POLICY`).
+ * 11-12). The build with it takes the line out (`ANALYTICS_POLICY`), and so
+ * does the app build (`app`): the app never turns Google Analytics on
+ * (`analyticsFor`), so its policy has no change to announce.
  */
 export const ANALYTICS_NOTICE = {
   ko: "<p><strong>변경 예고:</strong> 2026년 11월 12일부터 방문 통계를 위해 Google 애널리틱스(Google LLC, 미국)를 사용합니다. 수집 항목·보유 기간·거부 방법은 그날 시행되는 개정 방침 2번 (5)에 적습니다.</p>",
@@ -1101,8 +1103,9 @@ export function adStage(ads) {
  * the notice of the change (`adsNotice`) and say nothing else new; with `on` they say what the web's ads need --
  * AD_EDITS on the policy as written, or ANALYTICS_AD_EDITS on the one with Google Analytics -- and carry the
  * day as their date. Without `ads` the pages are main's, byte for byte, either way.
+ * With `app` (the app build, which never has `analytics` nor `ads`) the policy has no notice of Google Analytics either.
  */
-export function renderLegalPages({ analytics = null, ads = false } = {}) {
+export function renderLegalPages({ analytics = null, ads = false, app = false } = {}) {
   const { stage, date } = adStage(ads);
   const notice = stage === "notice" ? adsNotice(date) : null;
   const effective = stage === "on" && date ? adsEffectiveDate(date) : null;
@@ -1110,7 +1113,10 @@ export function renderLegalPages({ analytics = null, ads = false } = {}) {
   const tableName = analytics ? "ANALYTICS_AD_EDITS" : "AD_EDITS";
   const edit = (body, name) => (stage === "on" ? applyEdits(body, table[name], `legal-pages ${tableName}.${name}`) : body);
   const noticed = (kind, language, body) => (notice ? `\n${notice[kind][language]}${body}` : body);
-  const privacy = (language, body) => (analytics ? withSwaps(body, ANALYTICS_POLICY[language]) : body);
+  const privacy = (language, body) => {
+    if (analytics) return withSwaps(body, ANALYTICS_POLICY[language]);
+    return app ? withSwaps(body, [[`${ANALYTICS_NOTICE[language]}\n`, ""]]) : body;
+  };
   const dateOf = ({ kind, language }) =>
     (effective ?? (analytics && kind === "privacy" ? ANALYTICS_EFFECTIVE_DATE : EFFECTIVE_DATE))[language];
   const pages = [

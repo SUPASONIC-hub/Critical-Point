@@ -20,7 +20,9 @@ import { createHash } from "node:crypto";
  *
  * Never in the e2e build or a debug build, whatever the environment says:
  * those are played by the tests and by the developer, whose visits are not
- * the players' (`analyticsFor`).
+ * the players' (`analyticsFor`). Nor in the app build (`--mode app`,
+ * app/build-web.mjs): Google's tag in the app's web view would be a tracker
+ * the app's policy and the stores' data safety answers do not declare.
  *
  * The configuration is a file of its own and not the inline <script> Google's
  * snippet is: the site's CSP is `script-src 'self'` with no 'unsafe-inline'
@@ -52,12 +54,12 @@ export function readAnalyticsEnv(env = {}) {
 }
 
 /**
- * What a build writes: off (`null`) for the dev server, the e2e build and a
- * debug build, or with no ID; else the ID, the configuration file's source
+ * What a build writes: off (`null`) for the dev server, the e2e build, a
+ * debug build and the app build, or with no ID; else the ID, the configuration file's source
  * and its path from the root.
  */
 export function analyticsFor({ id, command, mode, debug }) {
-  if (!id || command !== "build" || mode === "e2e" || debug) return null;
+  if (!id || command !== "build" || mode === "e2e" || mode === "app" || debug) return null;
   const source = analyticsConfigSource(id);
   const hash = createHash("sha256").update(source).digest("hex").slice(0, 8);
   return { id, source, path: `/assets/analytics-${hash}.js` };

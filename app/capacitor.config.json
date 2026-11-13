@@ -1,0 +1,13 @@
+{
+  "appId": "com.taknroll.criticalpoint",
+  "appName": "임계점",
+  "webDir": "dist-app",
+  "backgroundColor": "#06090a",
+  "ios": {
+    "scheme": "App",
+    "contentInset": "never",
+    "backgroundColor": "#06090a",
+    "preferredContentMode": "mobile",
+    "limitsNavigationsToAppBoundDomains": false
+  }
+}
