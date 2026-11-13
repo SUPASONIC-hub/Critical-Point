@@ -25,3 +25,10 @@ export const ACT_CARDS = Object.freeze(
 
 /** The cases from this one to the season's last, this one counted. */
 export const casesLeft = (caseId) => CASE_SEQUENCE.length - CASE_SEQUENCE.indexOf(caseId);
+
+/**
+ * N1 막 끝 중간 결산 (2026-11-12): the act cards that follow 프롤로그, 사건 18
+ * and 사건 36 carry the season so far (ActTally.jsx, a chunk of its own). They
+ * wait for 계속 instead of `ACT_CARD_MS`, so the tally can be read and shared.
+ */
+export const ACT_TALLY_CASES = Object.freeze(["case01", "case19", "case37"]);

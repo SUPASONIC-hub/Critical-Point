@@ -134,7 +134,8 @@ export function drawResultCard(ctx, model, theme) {
 
   // 3. The ending: what it is called, its label, and its one line.
   y += 110;
-  write(RESULT_CARD_LABELS.ending, LEFT, y, { size: 26, color: theme.dim });
+  // The mid-season card (actTally.js, N1) names its heading 가까운 결말.
+  write(model.endingHeading || RESULT_CARD_LABELS.ending, LEFT, y, { size: 26, color: theme.dim });
   y += 84;
   write(model.endingName, LEFT, y, { weight: HEAVY, size: 64 });
   if (model.endingLabel) {

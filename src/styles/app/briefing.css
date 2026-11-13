@@ -888,6 +888,76 @@
   content: "";
 }
 
+/* N1 중간 결산 (ActTally.jsx) on the cards after 프롤로그, 사건 18 and 사건 36:
+   taller than a phone may be, so the card scrolls; it waits for 계속, so no bar. */
+.gx-act-tallied {
+  place-items: start center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.gx-act-tallied .gx-act-page {
+  margin-block: auto;
+}
+
+.gx-act-tallied .gx-act-go::after {
+  display: none;
+}
+
+.gx-tally {
+  display: grid;
+  gap: 10px;
+  padding: 14px 12px;
+  text-align: left;
+  background: var(--ui-surface-4);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-sm);
+  cursor: auto;
+}
+
+.gx-tally h3 {
+  margin: 0;
+  color: var(--c-acid);
+  font: 800 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.08em;
+}
+
+.gx-tally dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.gx-tally dt {
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+}
+
+.gx-tally dd {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  color: var(--ui-text);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.gx-tally dd small,
+.gx-tally-note {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.gx-tally .gx-tally-failure b {
+  color: var(--c-gx-heat);
+}
+
+.gx-tally .feedback-actions {
+  margin-top: 0;
+}
+
 @keyframes gx-act-wait {
   to {
     transform: scaleX(0);

@@ -1,0 +1,32 @@
+/** The mid-season tally on the act card (src/copy/actTally.js) in English. */
+export default {
+  heading: "Mid-season tally · {end}",
+  ends: {
+    case01: "End of the Prologue",
+    case19: "End of Act 3 · Case 18",
+    case37: "End of Act 6 · Case 36",
+  },
+  habit: "Your judging type so far",
+  habitPending: "A judgment not yet named",
+  stake: "Biggest pot",
+  stakeKept: "{pot} · banked in {where}",
+  stakeLost: "{pot} · lost to the wall in {where}",
+  stakeNone: "No pot has reached the vault yet",
+  stakeShort: "Biggest pot {pot}",
+  caseNo: "Case {code}",
+  prologueNo: "Prologue {n}",
+  ending: "Nearest ending",
+  nearLine: "One step over: {ending}. Short of it: {gaps}",
+  note: "At the turn of the act, we put your season so far on one card. Your score and ending are not decided yet.",
+  shareLine: "Mid-season in Trigger Lab ({end}). My judging type: '{habit}'. Nearest ending: '{ending}'.",
+  buttons: {
+    shareLabel: "Share tally card",
+    saveLabel: "Save tally card",
+    making: "Making your card…",
+    saved: "Saved the tally card and copied its caption.",
+    savedUncopied: "Saved the tally card. The caption couldn’t be copied.",
+    shared: "Shared the tally card.",
+    failed: "Couldn’t make the card. Please press again.",
+    note: "Your name never appears on the card.",
+  },
+};
