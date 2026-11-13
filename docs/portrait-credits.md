@@ -1,6 +1,6 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 13일에 번외 5를 위해 더한 세 장(육성빈, 추영복, 마리사 탄)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
@@ -116,7 +116,7 @@ cottonbro studio는 고은비로 세 장째이고(사진가 한 사람에 세 �
 송하율은 턱에 댄 손끝이 아래 가장자리에 조금 남고, 이하경은 턱을 괸 손이 아래에 남습니다(본문의 은테 안경은 없음).
 Tran Nhu Tuan은 은시온으로 세 장째, MART PRODUCTION과 Hoang NC는 두 장째이고, 모델은 모두 다른 사람입니다.
 
-## 실존하지 않는 사람의 생성 사진 열네 장
+## 실존하지 않는 사람의 생성 사진 열일곱 장
 
 백아린과 윤상혁은 비리·악역을 맡고, 문하준은 미성년입니다. 실제 사람의 얼굴을 이런 역에 빌려 오지 않으려고,
 이 세 장은 AI가 만든 실존하지 않는 사람의 사진을 썼습니다(2026년 10월 20일 내려받음). 보정은 위 사진들과 같습니다.
@@ -147,6 +147,14 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 | 진세라 | `portrait-jin-sera.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8054606/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 규정 뒤에 숨어 책임을 피하는 부행장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 편종구 | `portrait-pyeon-jonggu.webp` | https://pixabay.com/illustrations/business-worker-manager-salesman-8053382/ (TheDigitalArtist, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 신고자에게 합의를 압박하는 법무팀장이라 실제 사람의 얼굴을 쓰지 않음 |
 | 도건우 | `portrait-do-geonu.webp` | https://pixabay.com/illustrations/handsome-happy-smile-white-shirt-8988318/ (RibhavAgrawal, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 기록을 지워 주는 값으로 증언을 가져가는 위기대응 TF 팀장이라 실제 사람의 얼굴을 쓰지 않음 |
+| 육성빈 | `portrait-yuk-seongbin.webp` | https://pixabay.com/illustrations/japanese-asian-traditional-costume-8743623/ (Arl_Dlt, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5에서 제휴 수수료를 지키려 배너 확인 칸에 이름을 넣은 제휴팀 과장(우리 계획의 악역 쪽)이라 실제 사람의 얼굴을 쓰지 않음. 정장과 넥타이 차림의 평범한 정면 얼굴. 설정(30대 후반)보다 젊어 보임 |
+| 추영복 | `portrait-chu-yeongbok.webp` | https://pixabay.com/illustrations/chinese-asian-traditional-costume-8743313/ (jsha_art, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5에서 은행 이름을 믿고 돈을 넣은 사람. 피해자 쪽이지만 금융 사기 이야기에 실제 사람의 얼굴을 빌려 오지 않으려고 생성 사진을 씀. 전통 의상의 깃은 보정과 자르기로 거의 보이지 않음 |
+| 마리사 탄 | `portrait-marisa-tan.webp` | https://pixabay.com/illustrations/ai-generated-beautiful-woman-8737181/ (popmelon, "AI generated") | [Pixabay Content License](https://pixabay.com/service/license-summary/): "Free for use under the Pixabay Content License" | 번외 5의 싱가포르 컴플라이언스 책임자. 가상 거래소 이야기에 실제 사람의 얼굴을 빌려 오지 않으려고 생성 사진을 씀. 웃는 얼굴의 평범한 정면 사진 |
+
+육성빈, 추영복, 마리사 탄은 2026년 11월 13일에 Pixabay에서 내려받아 같은 보정을 했습니다. 셋 다 페이지에 "AI generated" 표시가 있습니다.
+번외 5(src/nodes/side05.js)는 가상자산 거래소와 예치 상품을 다루는 이야기라, 악역 쪽이 아닌 사람도 실제 사람의 얼굴을 쓰지 않았습니다.
+40~60대 동아시아 사람의 사무실 생성 사진은 드물어, 육성빈은 설정보다 젊어 보이고 추영복은 전통 의상 사진에서 얼굴만 잘랐습니다.
+후보와 보정 전 원본은 cp-archive/메모-20261113/side05-portraits/에 있습니다.
 
 ## 직접 그린 한 장
 
@@ -156,5 +164,5 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 여든일곱 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 14 + 그린 1).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 아흔 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 68 + 생성 17 + 그린 1; 번외 5의 세 명은 11월 13일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).
