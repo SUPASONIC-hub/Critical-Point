@@ -36,6 +36,7 @@
     "src/gauntlet/cascadeRisk.js": 100,
     "src/gauntlet/caseCastModel.js": 100,
     "src/gauntlet/draftSpend.js": 100,
+    "src/gauntlet/edgeAlert.js": 100,
     "src/gauntlet/fxVariables.js": 100,
     "src/gauntlet/gauntletEngine.js": 99,
     "src/gauntlet/holdConfirm.js": 98,

@@ -510,7 +510,9 @@ const fileBudgets = {
   // 133 / 3047 -> 175 / 3849 on 2026-10-26 (pwa-install-hint), measured: the
   // 홈 화면에 추가 card under the settings in the intro's comfort drawer
   // (components/InstallHint.jsx), drawn only where a browser offers an install.
-  "comfort.css": { lines: 175, bytes: 3849 },
+  // 175 / 3849 -> 201 / 4431 on 2026-11-13 (a5-edge-alert), measured: 위기
+  // 가장자리 알림 (A5), the comfort switch's edge frame and its one breath.
+  "comfort.css": { lines: 201, bytes: 4431 },
   // New on 2026-11-02 (money-feedback): the bank rail's purse and the slam's
   // amount that flies into it, in a file of its own beside play.css's 360px
   // fits. Measured 128 / 2331; 133 / 2478 with the purse line set solid on a

@@ -27,6 +27,10 @@ export default {
       label: "Show edge notifications",
       text: "The more you Push, the more messages and emails pop up briefly at the top edge.",
     },
+    crisisEdge: {
+      label: "Crisis edge alert",
+      text: "As the table nears the wall, the screen edges glow softly. Cards and text stay clear.",
+    },
     letterKeys: {
       label: "Use single-key shortcuts",
       text: "1-9, W, E, Q, P, R, N. Turned off, only Space, Enter and Esc remain.",
