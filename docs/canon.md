@@ -94,6 +94,28 @@ dividends, personnel or a sale come up; the people, endings and order of the
 cases do not change for it. 사건 43's 5 대 3 and 사건 44's sentence stand.
 `check:canon` holds the name (킹스데일 / Kingsdale) and the 30%.
 
+## The crisis years (C11)
+
+Roughly once a decade the market breaks, and each time the request that comes
+down is the same: make the numbers come out. The season does not explain the
+economy; it threads seeds it already had. 금융 소재 기획 2026-11-13 (b),
+결정 Q3 (1).
+
+| Years | What it was, in general words | What the season has of it |
+|---|---|---|
+| 1997-98 | The currency crisis: banks fell one by one, and the country's dollars ran out | 임경수's 1997 심사 보고서, dated December 1997 (사건 19). Spring 1998: 경동은행 sold to 킹스데일 and its small loans cleared (번외 2), where 임경수 says the request comes down every time a crisis comes. An old man in 군산's line queued in 1998 too (사건 27) |
+| 2008 | The world financial crisis: markets fell that autumn | KD금융그룹 launched in 2008; the branch talked 41 영동 elders into shares instead of savings that autumn (사건 23) |
+| 2018-23 | Cheap money ended; rates jumped and project-finance lending froze | 제7조 (2022-11) and the 2023-0412 loan, the analyst's dissent among them: the numbers made to come out once more |
+| 2026 | The next crack, small so far | 평택 PF extended (사건 26), 군산's bank run (사건 27), bad loans sold abroad (사건 29) |
+
+- No real event is named and no real company stands in: 「외환위기」, 「세계 금융위기」
+  and the like are general words, never an organisation, a law or a ticker.
+- The word 위기 is said only by people (임경수, 번외 2); narration gives the
+  year and what could be seen. Nothing predicts the next one or reads as
+  investment advice.
+- `check:canon` holds two years: KD금융그룹 launched in 2008, and 경동은행 was
+  being sold in 1998.
+
 ## The era: 2023 and 2026 in a Korean bank
 
 The 프롤로그 is 2022-23 and the main season 2025-26, so the bank works the way
