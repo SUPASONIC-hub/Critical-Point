@@ -6,7 +6,7 @@ import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -254,6 +254,8 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+// WEEK_RULE (season-bot.mjs): every season above and below was a season begun in that week.
+if (WEEK_RULE) console.log(`Week rule (measured): every season under ${WEEK_RULE}, values ${WEEK_VALUES}`);
 /**
  * B2's links, measured (the links on (CASCADE=0 turns them off); the design's 3-2 and 3-3). The
  * population's line, then the hands that read the card's link mark: each

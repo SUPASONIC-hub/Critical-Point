@@ -64,6 +64,11 @@ const mutationsCopy = {
       title: "시즌이 버티는 법을 익혔다",
       text: "STEADY LOCK을 거듭 충전한 결과. 새 판마다 식은 채 시작하고, 시간이 조금 늘어난다.",
     },
+    // MARKET SHOCK (weeklyRules.js), a week's device: once a case.
+    shock: {
+      title: "시장이 흔들렸다",
+      text: "이번 주의 시장 충격. 이 판은 벽이 {wall} 가까워지고, 쌓은 판돈은 방금 최대 {swing}%까지 오르내렸다.",
+    },
     exposeMastery: {
       title: "시즌이 판을 읽는 법을 익혔다",
       text: "EXPOSE LOCK을 거듭 충전한 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",

@@ -23,6 +23,11 @@ export default {
       text: "今週は壁の帯が熱{crisisShift}だけ手前に立ち、すべてのカードのチップが{crisisChips}倍だ。",
       world: "今週、市場が揺れると、本社はまず数字を合わせろと言った。",
     },
+    "market-shock": {
+      title: "市場ショック",
+      text: "今週は事件ごとに一度、{shockBoard}回目の勝負で市場が揺れる。その勝負は壁の帯が熱{shockWall}だけ手前に立ち、それまで積んだ賭け金が最大{shockSwing}%上下する。",
+      world: "今週は市場が揺れ、帳簿の数字も一緒に揺れた。",
+    },
     "audit-cascade": {
       title: "監査と連鎖",
       text: "今週は監査と連鎖が同時に立つ。{audit} {cascade} CASCADE勝負の確定は監査に数えない。",

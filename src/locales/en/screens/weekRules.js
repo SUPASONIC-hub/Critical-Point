@@ -23,6 +23,11 @@ export default {
       text: "This week the Wall band stands {crisisShift} Heat earlier, and every card’s chips are worth {crisisChips} times as much.",
       world: "This week the market shook, and head office asked for the numbers first.",
     },
+    "market-shock": {
+      title: "Market shock",
+      text: "This week, once in every case, the market shakes on hand {shockBoard}. That hand’s Wall band stands {shockWall} Heat earlier, and the stake stacked so far moves up or down by as much as {shockSwing}%.",
+      world: "This week the market lurched, and the numbers in the books shook with it.",
+    },
     "audit-cascade": {
       title: "Audit and Cascade",
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",

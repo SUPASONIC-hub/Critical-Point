@@ -291,7 +291,7 @@ test("a saved list of links keeps only what a table can hold", () => {
 /* ------------------------------------------------------ a rule of the table */
 
 test("the links are a rule of the table from 사건 03 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3), told with B's numbers, and no week switches them", () => {
-  assert.deepEqual(WEEK_RULE_DEVICES, []);
+  assert.ok(!WEEK_RULE_DEVICES.includes("cascade"));
   assert.equal(weekRuleHasDevice("audit-cascade", "cascade"), false, "W47's stamp switches nothing now");
   assert.equal(getWeekRule("cascade"), null, "the cascade week is gone from the catalogue");
   assert.equal(UNLOCK_LADDER.find((step) => step.adds.includes("cascade")).caseId, "case03");

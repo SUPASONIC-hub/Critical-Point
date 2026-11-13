@@ -10,7 +10,8 @@
  * players draw from nothing but their seeds (`handUnit`).
  */
 import { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_SHARE } from "../../src/gauntlet/auditRisk.js";
-import { normalizeWeekRuleId } from "../../src/gauntlet/weeklyRules.js";
+import * as weeklyRules from "../../src/gauntlet/weeklyRules.js";
+import { parseWeekValues } from "./week-values.mjs";
 import { AUDIT_VALUE_SETS } from "./audit-values.mjs";
 import { carryLinks, getEffectBurn, isLinkDue, LINK_BURN, LINK_CARRY_MAX, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL, walkLinks } from "../../src/gauntlet/cascadeRisk.js";
 import { LINK_VALUE_SETS } from "./cascade-values.mjs";
@@ -46,6 +47,7 @@ import {
   buyExtraRelic,
   createCaseClose,
   createRunSummary,
+  countCaseBoards,
   createWindow,
   equipRelic,
   FOCUS_MAX,
@@ -56,6 +58,7 @@ import {
   getTableSchema,
   getWindowBand,
   HAND_CAP,
+  isShockDue,
   openCaseRun,
   reduceWindow,
   rerollRelicOffer,
@@ -269,6 +272,28 @@ export const AUDIT_VALUES = (() => {
 })();
 
 /**
+ * WEEK_RULE=<catalogue id> plays every season (createSeasonBot, when the
+ * caller names no week) and every case (createCaseBot) under that week's rule,
+ * as a season begun in its week would be: a rule booked in no week yet is
+ * measured this way (the market shock). WEEK_VALUES plays it
+ * on other numbers (week-values.mjs, loaded first with `node --import`); the
+ * numbers played are checked, not assumed. Left out, no week, as before.
+ */
+export const WEEK_RULE = (() => {
+  const asked = process.env.WEEK_RULE;
+  if (!asked) return undefined;
+  if (!weeklyRules.normalizeWeekRuleId(asked)) throw new Error(`WEEK_RULE=${asked}: one of ${Object.keys(weeklyRules.WEEK_RULE_CATALOGUE).join(", ")}`);
+  return asked;
+})();
+export const WEEK_VALUES = (() => {
+  const asked = parseWeekValues(process.env.WEEK_VALUES);
+  for (const [name, value] of Object.entries(asked)) {
+    if (weeklyRules[name] !== value) throw new Error(`WEEK_VALUES ${name}=${value} needs the numbers rewritten as weeklyRules.js loads: node --import ./scripts/sim/week-values.mjs ...`);
+  }
+  return Object.entries(asked).map(([name, value]) => `${name}=${value}`).join(", ") || "as shipped";
+})();
+
+/**
  * One season player and the seeded stream it draws from. `seed` starts the
  * stream and `reseed` sets it again (the report's paired seasons); `random`
  * and `pick` are the same stream, for the script's own draws (the tool hand
@@ -301,8 +326,8 @@ export const AUDIT_VALUES = (() => {
  * draws nothing; the second pick of a draft that bought one more draws as the
  * first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule, snap = false, reads = false, spend = "never" }) {
-  const stamped = weekRule === undefined ? null : normalizeWeekRuleId(weekRule);
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule = WEEK_RULE, snap = false, reads = false, spend = "never" }) {
+  const stamped = weekRule === undefined ? null : weeklyRules.normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (!story && stamped ? { weekRule: stamped } : {});
   let seed = start;
   function random() {
@@ -537,7 +562,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         if (skip) skipped += 1;
         const nextNode = skip?.nodeId ?? plannedNode;
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules) });
+        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, countCaseBoards(log), caseClosed) });
         audit = verdict.audit?.count ?? 0;
         if (verdict.audit?.caught) {
           audits.caught += 1;
@@ -789,7 +814,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
   function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut }, { rules });
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules });
     let audit = 0;
     const paid = { cashed: 0, bonus: 0, capped: 0 };
     let busts = 0;
@@ -837,7 +862,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (lock?.cashAs && win.status === "live") win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
       if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules) });
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, played - 1, caseClosed) });
       audit = verdict.audit?.count ?? 0;
       see(seen, verdict);
       if (run.schema.mutations.includes("cascade")) {

@@ -32,6 +32,11 @@ const weekRulesCopy = {
       text: "이번 주는 벽 띠가 열기 {crisisShift}만큼 앞당겨 서고, 모든 카드의 칩이 {crisisChips}배다.",
       world: "이번 주 시장이 흔들리자 본사는 숫자부터 맞추라고 했다.",
     },
+    "market-shock": {
+      title: "시장 충격",
+      text: "이번 주는 사건마다 한 번, {shockBoard}번째 판에 시장이 흔들린다. 그 판은 벽 띠가 열기 {shockWall}만큼 앞당겨 서고, 그때까지 쌓은 판돈이 최대 {shockSwing}% 오르거나 내린다.",
+      world: "이번 주 시장이 출렁이자 장부의 숫자도 같이 흔들렸다.",
+    },
     "audit-cascade": {
       title: "감사와 연쇄",
       text: "이번 주는 감사와 연쇄가 함께 선다. {audit} {cascade} CASCADE 판의 확정은 감사에 세지 않는다.",
