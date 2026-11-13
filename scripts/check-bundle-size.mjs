@@ -179,7 +179,8 @@ const budgets = [
   // 157,229 / 58,019 -> 157,367 / 58,055 a2a3-ending over main 7ec2304e. Measured 157363 / 58051 (over budget only) in the e2e build, the plus 4.
   // 157,367 / 58,055 -> 157,552 / 58,149 bundle 1112f (#530 #531) over main fbc8adc6. Measured 157548 / 58145 (over budget only) in the e2e build, the plus 4.
   // 157,552 / 58,149 -> 157,634 / 58,164 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 157630 / 58160 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_634, maxGzip: 58_164 },
+  // 157,634 / 58,164 -> 157,666 / 58,190 N1 결산 카드. Measured 157662 / 58186 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_666, maxGzip: 58_190 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1619,6 +1620,9 @@ const budgets = [
   // 2,698 / 1,542 -> 2,952 / 1,675 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 2,952 / 1,675 -> 4,089 / 2,280 n1-act-card over main 53845978. Measured 4085 / 2276 (over budget only) in the e2e build, the plus 4.
   { pattern: /^ActCard-.*\.js$/, maxBytes: 4_089, maxGzip: 2_280 },
+  // N1 막 끝 결산 카드 (src/gauntlet/ActTally.jsx, src/actTally.js), 2026-11-13: fetched by ActCard
+  // only when an act ends with a tally, so nothing at first paint carries it. Measured 5,041 / 2,493 in the e2e build, the plus 4.
+  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_045, maxGzip: 2_497 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -2312,7 +2316,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,726 / 433,153 / 440,911 bundle 1112f (#530 #531) over main fbc8adc6. Measured first paint, the plus 4.
 // -> 373,837 / 433,139 / 440,868 held-standing over f1-evening. Measured first paint, the plus 4.
 // -> 373,926 / 433,352 / 441,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 373_926, en: 433_352, ja: 441_111 };
+// -> 374,077 / 433,920 / 441,735 N1 결산 카드. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 374_077, en: 433_920, ja: 441_735 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2503,7 +2508,8 @@ function checkBudget(file, budget) {
 // -> 10,827 / 3,884 on 2026-11-11, E-11 번외 2 (#321) after merging main d53a6ab2 (#317), the plus 4.
 // -> 10,856 / 3,897 on 2026-11-11, E-11 번외 3 (#333) after merging main accd990b (#321), the plus 4.
 // -> 10,887 / 3,905 n1-act-card over main 53845978, the plus 4.
-const WORKER_BUDGET = { maxBytes: 10_887, maxGzip: 3_905 };
+// -> 10,887 / 3,912 N1 결산 카드, the plus 4.
+const WORKER_BUDGET = { maxBytes: 10_887, maxGzip: 3_912 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
