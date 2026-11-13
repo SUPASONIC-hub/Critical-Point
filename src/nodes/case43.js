@@ -590,7 +590,7 @@ export const case43 = {
       routeChoices: [
         {
           id: "c43_route_system_publish",
-          label: "10년 치 의사록 통계를 은채원과 미즈노 사키에게 보낸다",
+          label: "의사록 10년 치 통계를 은채원·미즈노 사키에게 보낸다",
           effect: { legitimacy: 10, trust: 6, capital: -5, time: -6, fatigue: 5 },
           voice: "표를 정할 사람들이 이 모양을 알고 정하게, 10년 치 의사록 통계를 은채원과 미즈노 사키에게 동시에 보낸다.",
           echo: "통계는 은채원의 설명서 여백과 미즈노 사키의 각주로 들어갑니다. 반대표를 던진 세 사람의 이름도 함께 들어갑니다.",

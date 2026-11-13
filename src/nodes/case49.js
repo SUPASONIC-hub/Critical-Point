@@ -154,7 +154,7 @@ const case49Nodes = {
       },
       {
         id: "c49_server_file",
-        label: "에코의 마지막 계산을 프리야 나이르 이름으로 공식 기록한다",
+        label: "에코의 마지막 계산을 프리야 나이르 이름으로 기록한다",
         effect: { legitimacy: 12, trust: 2, time: -5, humanCost: 2, capital: -1, fatigue: 4 },
         voice: "승인 없는 복원은 증거가 못 된다니, 에코의 마지막 계산을 프리야 나이르 이름으로 공식 기록에 올린다.",
         echo: "공식 기록에 오르자 에코의 계산은 절차를 얻습니다. 대신 프리야 나이르는 에코의 무단 복원을 보고해야 합니다.",

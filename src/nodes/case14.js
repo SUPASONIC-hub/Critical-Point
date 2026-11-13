@@ -148,9 +148,9 @@ const case14Nodes = {
       },
       {
         id: "c14_desk_model",
-        label: "레이철 탄의 모형 파일만 받아 사들인 채권의 출처를 쫓는다",
+        label: "레이철 탄의 모형 파일만 받아 채권의 출처를 쫓는다",
         effect: { capital: 8, time: 5, trust: -2, humanCost: 3, legitimacy: -1, fatigue: 2 },
-        voice: "그를 끌어들이지 않고 돈만 따라가겠다며, 레이철 탄의 모형 파일만 받아 사들인 채권의 출처를 쫓는다.",
+        voice: "그를 끌어들이지 않고 돈만 따라가겠다며, 레이철 탄의 모형 파일만 받아 채권의 출처를 쫓는다.",
         echo: "모형은 넘어옵니다. 레이철 탄은 자기 설계가 무엇에 쓰일지 묻지 못하고 파일을 보냅니다.",
         cognition: { risk: 2 },
       },

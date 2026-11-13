@@ -1,7 +1,7 @@
 /**
  * People renamed on 2026-11-13 (docs/canon.md, "The people from abroad").
  *
- * KD's Singapore office, its Tokyo branch and the people it hires from abroad
+ * The Singapore office and Tokyo branch of KD, and the people it hires from abroad
  * came into the cast, so some people got a new name and face. A save or a run
  * log written before then still holds the old name in the words it kept
  * (`speaker`, `title`, `choice`, `spokenChoice`, `sourceChoice`): savedState
@@ -47,7 +47,7 @@ export const CAST_ALIASES = {
   ],
 };
 
-// A Korean particle after a name follows the name's last sound: 가/이, 는/은 ...
+// A Korean particle after a name follows the last sound of the name: 가/이, 는/은 ...
 // [after a vowel, after a consonant]; the longer forms are tried first.
 const PARTICLES = [
   ["예요", "이에요"], ["였", "이었"], ["라고", "이라고"], ["라는", "이라는"], ["랑", "이랑"], ["나", "이나"],

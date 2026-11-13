@@ -1284,7 +1284,8 @@ const budgets = [
   // 1,934 / 948 -> 2,097 / 1,004 on 2026-10-26, E-11 번외 사건 온라인 저장
   // (draft) restacked on e11-side01 76c5b028: the side records' merge on a
   // restore. Measured 2,097 / 1,000, the gzip plus 4.
-  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_004 },
+  // 1,004 -> 1,011 gzip on 2026-11-13, 다국적 인물 (cast-global): the chunk names it imports changed hash (savedState reads castAliases.js); measured 1,007 in check:changed's build, the plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_011 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
