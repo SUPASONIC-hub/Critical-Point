@@ -55,13 +55,16 @@ async function readSeasonKeys(page) {
 }
 
 test("a device that closed a finale opens 번외 0, plays it to an ending, and finds the season as it left it @once", async ({ page }) => {
+  // Three tables played to their cash-out, then 이어하기: about 72 seconds with
+  // three local workers on 2026-11-13, past the default 60 (all steps passed).
+  test.setTimeout(150_000);
   const errors = [];
   collectRuntimeErrors(page, errors);
   await seedDevice(page, { finaleClosed: true });
   await page.goto(FIXTURE_URL);
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  // 번외 1, 번외 2, 번외 3 and the placeholder.
+  // 번외 1 to 번외 4 and the placeholder.
   await expect(slot).toContainText("번외 0/5");
   await expect(slot).toContainText("랭킹 밖");
   const before = await readSeasonKeys(page);
