@@ -161,7 +161,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · The Fridge on the Bookshop’s 1st Floor",
           "title": "Half a Watermelon Got a Name Tag",
-          "text": "On the afternoon the three days of the leak end, half a watermelon Kang Taemin split with his fist is left in the fridge on the bookshop’s 1st floor. Someone has stuck a name tag on the plastic wrap. 'All analysts · Eat it without hesitating.' Oh Jinwoo grabs the first slice, shouting 'Fastest decision, first place,' and Kwon Dohyun, halfway through calculating the cost of one slice, picks up a second. In the evening Ryu Seah drops by and sticks one more label next to the name tag. 'Reversible.'"
+          "text": "On the afternoon the three days of the leak end, half a watermelon Kang Taemin split with his fist is left in the fridge on the bookshop’s 1st floor. Someone has stuck a name tag on the plastic wrap. 'All analysts · Eat it without hesitating.' Oh Jinwoo grabs the first slice, shouting 'Fastest decision, first place,' and Kwon Dohyun, halfway through calculating the cost of one slice, picks up a second. In the evening Priya Nair drops by and sticks one more label next to the name tag. 'Reversible.'"
         }
       },
       "case38": {
@@ -347,7 +347,7 @@ export const caseRoles = {
     "서도경 회장 자택 셰프 · 3년째": "Chef at Chairman Seo Dokyung’s house · 3 years"
   },
   "case37": {
-    "KD금융그룹 위기대응TF 팀장 · 법무팀 출신 변호사": "Head of the Crisis Response TF, KD Financial Group · lawyer from the Legal team"
+    "KD금융그룹 위기대응TF 팀장 · 법무팀 출신 재미교포 변호사": "Head of the Crisis Response TF, KD Financial Group · lawyer from the Legal team · Korean American, admitted in New York"
   },
   "case38": {
     "원고 측 대리인 · 공익 변호사": "Counsel for the plaintiffs · public-interest lawyer",

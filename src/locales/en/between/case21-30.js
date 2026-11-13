@@ -325,7 +325,7 @@ export const caseRoles = {
     "의결권 자문사 클리어보트 애널리스트 · 7년차": "Analyst, proxy advisor ClearVote · 7 years in"
   },
   "case25": {
-    "KD캐피탈 위험관리부 부장 · 17년 차": "Department Head, Risk Management Department, KD Capital · 17 years in"
+    "KD캐피탈 위험관리부 부장 · 17년 차 · 재일교포 3세, 도쿄지점 입행": "Department Head, Risk Management Department, KD Capital · 17 years in · third-generation Korean from Japan, joined at the Tokyo branch"
   },
   "case26": {
     "르하임 고덕 현장 형틀 반장 · 타워크레인 농성 중": "Formwork foreman, Reheim Godeok site · on a sit-in atop the tower crane",

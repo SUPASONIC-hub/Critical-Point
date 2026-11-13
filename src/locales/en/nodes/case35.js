@@ -228,7 +228,7 @@ export default {
       "question": "Moon Sungho’s writing has surfaced under the mud. What do you do with writing on a machine that has to be cleaned?"
     },
     "c35_weight": {
-      "text": "NOAH learned the 'disaster exposure' weight (a value that sets how heavily a condition counts) from the record that 31% of businesses hit by the 2020 floods closed within 1 year. Ryu Seah speaks on a video call from Pangyo. 'But the reason they closed was that the banks turned down every extra loan that year. NOAH learned how to reject by watching the records of rejected people falling apart.'",
+      "text": "NOAH learned the 'disaster exposure' weight (a value that sets how heavily a condition counts) from the record that 31% of businesses hit by the 2020 floods closed within 1 year. Priya Nair speaks on a video call from Pangyo. 'But the reason they closed was that the banks turned down every extra loan that year. NOAH learned how to reject by watching the records of rejected people falling apart.'",
       "memo": [
         "'Disaster exposure' weight 0.41 -- bigger than all other items combined",
         "Learned from: records of businesses hit by the summer 2020 floods",
@@ -236,10 +236,10 @@ export default {
       ],
       "choices": {
         "c35_weight_choice_2": {
-          "label": "Request a weight change with Ryu Seah through official channels"
+          "label": "Request a weight change with Priya Nair through official channels"
         },
         "c35_weight_choice_3": {
-          "label": "Ask Ryu Seah to switch that weight off just for this week"
+          "label": "Ask Priya Nair to switch that weight off just for this week"
         },
         "c35_weight_choice_1": {
           "label": "Go and explain this in person to the 38 who were rejected"
@@ -261,7 +261,7 @@ export default {
           "label": "Just keep the screen photo for later"
         },
         "c35_elder_reaction_choice_2": {
-          "label": "Send Ryu Seah a formal written objection"
+          "label": "Send Priya Nair a formal written objection"
         },
         "c35_elder_reaction_choice_1": {
           "label": "Tell the merchants about this right now"
@@ -365,7 +365,7 @@ export default {
     },
     "c35_route_system": {
       "title": "Why It Goes Round in a Circle",
-      "text": "You ask NOAH the reason behind the reason, three times over. 'Why are emergency flood loans rejected?' 'Because the 1-year delinquency (passing the date when payment is due) rate of borrowers (people who borrowed money) in disaster areas is 4.2 times the average.' 'Why did those borrowers fall delinquent?' 'Because they lacked operating funds.' 'Why did they lack operating funds?' 'Because extra loans were rejected.' Ryu Seah says, 'NOAH learned the very reason emergency loans have to exist as a reason to reject them.'",
+      "text": "You ask NOAH the reason behind the reason, three times over. 'Why are emergency flood loans rejected?' 'Because the 1-year delinquency (passing the date when payment is due) rate of borrowers (people who borrowed money) in disaster areas is 4.2 times the average.' 'Why did those borrowers fall delinquent?' 'Because they lacked operating funds.' 'Why did they lack operating funds?' 'Because extra loans were rejected.' Priya Nair says, 'NOAH learned the very reason emergency loans have to exist as a reason to reject them.'",
       "memo": [
         "NOAH’s answer: disaster-area delinquency 4.2 times the average",
         "First delay, 1.4 seconds, at the third question",
@@ -391,7 +391,7 @@ export default {
     },
     "c35_final_system_route": {
       "title": "The Fourth Question",
-      "text": "Ryu Seah types a fourth question. 'Why were those extra loans rejected?' The first answer comes up again, word for word. Ryu Seah says, 'Ask it more and it comes back to the same place. Maybe what we taught the machine wasn’t how to reject, but how to come back round.'",
+      "text": "Priya Nair types a fourth question. 'Why were those extra loans rejected?' The first answer comes up again, word for word. Priya Nair says, 'Ask it more and it comes back to the same place. Maybe what we taught the machine wasn’t how to reject, but how to come back round.'",
       "memo": [
         "NOAH’s explanation: ask three times and it returns to the first answer",
         "Emergency flood loans rejected -- 312 nationwide",
@@ -554,7 +554,7 @@ export default {
     "c35_rust_choice_3": "The machines escape the rust. The writing, wiped away with the mud, now exists only in the photo album on Hajun’s phone.",
     "c35_weight_choice_1": "The merchants are angry when they hear it. Not at the machine, but at the bank that trusted it.",
     "c35_weight_choice_2": "The request goes up to KD Data Lab’s change review. The next review is the first week of August.",
-    "c35_weight_choice_3": "Ryu Seah is quiet for a long time, then answers, 'Then I’d be making a judgment I can’t explain, just like NOAH.'",
+    "c35_weight_choice_3": "Priya Nair is quiet for a long time, then answers, 'Then I’d be making a judgment I can’t explain, just like NOAH.'",
     "c35_elder_reaction_choice_1": "Ahn Gibeom reads that screen out on his live stream. 4,000 viewers open their bank apps at the same moment. Lee Minseo’s access log is left behind as well.",
     "c35_elder_reaction_choice_2": "The written objection is only received at 9 in the morning. At the same hour, the people standing at the windows are already being reviewed on lowered scores.",
     "c35_elder_reaction_choice_3": "The photo stays on your phone. When day breaks, the merchants line up at the windows knowing nothing.",
@@ -624,10 +624,10 @@ export default {
     "c35_rust_choice_2": "Following the inspector’s word to leave everything as it was, you leave the writing as it is in the damage inspection record.",
     "c35_rust_choice_3": "Saying the first thing is to make the machines turn again, as the writing says, you just photograph the writing and wipe every machine tonight.",
     "c35_weight_choice_1": "Saying the people concerned should be the first to hear why they were rejected, you go to explain this in person to the 38 who were rejected.",
-    "c35_weight_choice_2": "Saying a value bigger than all the rest combined must be changed with a record left behind, you request a weight change with Ryu Seah through official channels.",
-    "c35_weight_choice_3": "Saying shops will close while the procedure runs, you ask Ryu Seah to switch that weight off just for this week.",
+    "c35_weight_choice_2": "Saying a value bigger than all the rest combined must be changed with a record left behind, you request a weight change with Priya Nair through official channels.",
+    "c35_weight_choice_3": "Saying shops will close while the procedure runs, you ask Priya Nair to switch that weight off just for this week.",
     "c35_elder_reaction_choice_1": "Saying they can’t be left to find out only when the rejection text arrives, you tell the merchants about this right now.",
-    "c35_elder_reaction_choice_2": "Saying that lowering scores before taking applications has to be challenged through procedure, you send Ryu Seah a formal written objection.",
+    "c35_elder_reaction_choice_2": "Saying that lowering scores before taking applications has to be challenged through procedure, you send Priya Nair a formal written objection.",
     "c35_elder_reaction_choice_3": "So that Lee Minseo, who sent it, doesn’t get hurt, you just keep the screen photo for later.",
     "c35_rust_reaction_choice_1": "Saying the people who paid can’t be the last to know, you show the notice as it is to Moon Gaeul and the co-op members.",
     "c35_rust_reaction_choice_2": "Saying the rider’s name and the exclusion clause contradict each other, you go through the notice’s supporting clauses with Hwang Hyewon.",

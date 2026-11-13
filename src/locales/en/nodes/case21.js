@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c21_start": {
       "title": "The Bottom Line",
-      "text": "At the very bottom of the list NOAH learned from is the oldest line. 'TL Cohort 1 · Participant 01 · March–September 2022 · No consent form.' Sunwoo Jin, who now runs a guesthouse in Gujwa, Jeju. A message from Ryu Seah. 'Legal sent after-the-fact consent forms to past participants by registered mail. With a 3 million won thank-you payment attached.' Asked about Cohort 1, Han Seoyun only says, 'That was before my time.'",
+      "text": "At the very bottom of the list NOAH learned from is the oldest line. 'TL Cohort 1 · Participant 01 · March–September 2022 · No consent form.' Sunwoo Jin, who now runs a guesthouse in Gujwa, Jeju. A message from Priya Nair. 'Legal sent after-the-fact consent forms to past participants by registered mail. With a 3 million won thank-you payment attached.' Asked about Cohort 1, Han Seoyun only says, 'That was before my time.'",
       "memo": [
         "NOAH official launch February 10 -- D-6",
         "Participant 01 Sunwoo Jin: Cohort 1 analyst, March–September 2022",
@@ -217,7 +217,7 @@ export default {
           "label": "Have the note’s writer and approval line checked against the originals"
         },
         "c21_storehouse_choice_3": {
-          "label": "Hand the chart photo to Ryu Seah as grounds to stop NOAH"
+          "label": "Hand the chart photo to Priya Nair as grounds to stop NOAH"
         },
         "c21_storehouse_choice_1": {
           "label": "Keep the chart among ourselves until Sunwoo Jin can see it"
@@ -252,7 +252,7 @@ export default {
     },
     "c21_guestbook_reaction": {
       "title": "The Registrant Field",
-      "text": "Ryu Seah calls after midnight. 'Of the first 50 sentences, 31 have an empty registrant field. The registration dates are all in the spring and summer of 2022. NOAH builds choices from these sentences too. Even right now. Nobody wrote down who said them first.' Outside the window, Kkokji barks once.",
+      "text": "Priya Nair calls after midnight. 'Of the first 50 sentences, 31 have an empty registrant field. The registration dates are all in the spring and summer of 2022. NOAH builds choices from these sentences too. Even right now. Nobody wrote down who said them first.' Outside the window, Kkokji barks once.",
       "memo": [
         "31 sentences with an empty registrant field",
         "NOAH still builds choices from these sentences"
@@ -377,7 +377,7 @@ export default {
           "label": "Demand removing the Cohort 1 bundle and accepting the 14% accuracy loss"
         },
         "c21_route_system_disclose": {
-          "label": "Share NOAH’s explanation screen with Ryu Seah and the consent review side"
+          "label": "Share NOAH’s explanation screen with Priya Nair and the consent review side"
         },
         "c21_route_system_close": {
           "label": "Pretend you never saw the 91% and close the screen"
@@ -468,7 +468,7 @@ export default {
     },
     "c21_start_record": {
       "title": "The Blank Found by the One Who Left a Document",
-      "text": "Ryu Seah calls while filling in the appendix: the field noting consent status for each item NOAH learned from. 'I filled it all in, but the bottom four lines are empty.' The very bottom line, Participant 01, is Sunwoo Jin. The day after the document was registered, Legal sent Sunwoo Jin in Gujwa, Jeju an after-the-fact consent form and a 3 million won thank-you payment. The document you left told them first which field to fill.",
+      "text": "Priya Nair calls while filling in the appendix: the field noting consent status for each item NOAH learned from. 'I filled it all in, but the bottom four lines are empty.' The very bottom line, Participant 01, is Sunwoo Jin. The day after the document was registered, Legal sent Sunwoo Jin in Gujwa, Jeju an after-the-fact consent form and a 3 million won thank-you payment. The document you left told them first which field to fill.",
       "memo": [
         "4 blank lines in the appendix -- Participant 01 at the bottom",
         "Legal’s registered mailing: the day after the document was registered",
@@ -494,7 +494,7 @@ export default {
       "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "The appendix you left told Legal about the blank first. How do you go to the owner of that blank?",
-      "lead": "Three days after ECHO’s records were set down in a document, Ryu Seah’s call opens with the bottom line of the appendix."
+      "lead": "Three days after ECHO’s records were set down in a document, Priya Nair’s call opens with the bottom line of the appendix."
     },
     "c21_start_rush": {
       "title": "The Name Found by the One Who Opened the List First",
@@ -557,7 +557,7 @@ export default {
     "c21_letter_choice_3": "When you step away, the decision is Sunwoo Jin’s. Even what Sunwoo Jin does not know is left for Sunwoo Jin to carry.",
     "c21_guestbook_reaction_choice_1": "Not handed over, the sentences become NOAH’s choices again today. Until their owner knows, that button keeps getting pressed.",
     "c21_guestbook_reaction_choice_2": "The request remains. The department asked to fill in the registrant field puts its answer off by three days.",
-    "c21_guestbook_reaction_choice_3": "When you ask to pull them, Ryu Seah hesitates. 31 of NOAH’s choices go empty, and someone starts asking why.",
+    "c21_guestbook_reaction_choice_3": "When you ask to pull them, Priya Nair hesitates. 31 of NOAH’s choices go empty, and someone starts asking why.",
     "c21_storehouse_reaction_choice_1": "When you wait, Han Seoyun takes one more breath before hanging up. That breath stands in for a thank-you.",
     "c21_storehouse_reaction_choice_2": "Logged, those words become evidence. Han Seoyun knows her words are being written down.",
     "c21_storehouse_reaction_choice_3": "When you press, the line goes quiet. The sound of a drawer closing is the answer.",
@@ -570,7 +570,7 @@ export default {
     "c21_branch_rind_follow_a": "Reading aloud, you watch the sun sink. At page 9, Ko Eunbi stops reading and draws one more star with the highlighter.",
     "c21_branch_rind_follow_b": "The written request remains. One month to maturity, and Ko Eunbi has to wait out that month.",
     "c21_branch_rind_follow_c": "Once the stars are signed, today’s work is done. The 1.8 percentage points on page 9 arrive every month from March.",
-    "c21_route_system_disclose": "When you share it, Ryu Seah captures the explanation screen and puts it on the consent review agenda. In effect, NOAH has shown its own weak spot for the first time.",
+    "c21_route_system_disclose": "When you share it, Priya Nair captures the explanation screen and puts it on the consent review agenda. In effect, NOAH has shown its own weak spot for the first time.",
     "c21_route_system_exclude": "With the bundle removed, NOAH grows less accurate. Whose desk the 14% worth of wrong answers will land on, no one knows yet.",
     "c21_route_system_close": "Closing the screen does not erase the similarity. Your next judgment, too, piles up beside those 12,000 records.",
     "c21_final_system_route_a": "With the name field restored, 'Sunwoo Jin' is written beside option sentence #0001. No one has yet asked whether Sunwoo Jin wants that.",
@@ -622,7 +622,7 @@ export default {
     "c21_guestbook_choice_3": "Saying it is late, you just take photos and see to tomorrow’s orchard schedule first.",
     "c21_storehouse_choice_1": "So Sunwoo Jin’s story doesn’t get around before Sunwoo Jin does, you keep the chart among yourselves until Sunwoo Jin can see it.",
     "c21_storehouse_choice_2": "Saying a ballpoint note alone doesn’t show whose hand it is, you have the note’s writer and approval line checked against the originals.",
-    "c21_storehouse_choice_3": "Saying you can’t switch on judgment learned from records like these, you hand the chart photo to Ryu Seah as grounds to stop NOAH’s launch.",
+    "c21_storehouse_choice_3": "Saying you can’t switch on judgment learned from records like these, you hand the chart photo to Priya Nair as grounds to stop NOAH’s launch.",
     "c21_letter_choice_1": "Saying you can’t let the roof be the reason Sunwoo Jin signs, you say first that you’ll find the roof repair money some other way.",
     "c21_letter_choice_2": "Saying let’s see where it says it will be used for good, you read the consent form line by line with Sunwoo Jin.",
     "c21_letter_choice_3": "To buy time to see what is being signed, you ask just to hold off signing today, and step away.",
@@ -641,7 +641,7 @@ export default {
     "c21_branch_rind_follow_a": "So she signs knowing even the parts her grandfather signed unread, you read all 14 sheets aloud with Ko Eunbi, start to finish.",
     "c21_branch_rind_follow_b": "Saying no one should sign a clause without a star, you request in writing that the page 9 rate clause be removed, and hold off signing.",
     "c21_branch_rind_follow_c": "Saying the March maturity has to be gotten past first, you suggest just signing at the stars today and fighting the rate later.",
-    "c21_route_system_disclose": "Since these are not grounds to keep to yourself, you share NOAH’s explanation screen as it is with Ryu Seah and the consent review side.",
+    "c21_route_system_disclose": "Since these are not grounds to keep to yourself, you share NOAH’s explanation screen as it is with Priya Nair and the consent review side.",
     "c21_route_system_exclude": "Saying you can’t let it judge with records no one permitted, you demand removing the Cohort 1 bundle and accepting the 14% accuracy loss.",
     "c21_route_system_close": "Saying it is too big a number to touch now, you pretend you never saw the 91% and close the screen.",
     "c21_final_system_route_a": "So the screen shows whose judgment it learned from, you restore a name field for the original writer on every Cohort 1 record.",

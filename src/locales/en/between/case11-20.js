@@ -339,7 +339,7 @@ export const caseRoles = {
     "보조출연자 · 전 플로우온 야간조": "Extra · formerly on FlowOn’s night shift"
   },
   "case14": {
-    "KD자산운용 대체투자운용팀 펀드매니저 · 상생 펀드 설계자": "Fund manager, Alternative Investments Team, KD Asset Management · designer of the Sangsaeng Fund",
+    "KD자산운용 싱가포르 법인 대체투자운용팀 펀드매니저 · 상생 펀드 설계자 · 서울 근무": "Fund manager, Alternative Investments Team, KD Asset Management · designer of the Sangsaeng Fund · seconded from the Singapore office to Seoul",
     "상생 펀드 가입 고객 · 전직 초등학교 교사 · 72세": "Sangsaeng Fund buyer · retired elementary school teacher · age 72"
   },
   "case15": {
@@ -367,6 +367,6 @@ export const caseRoles = {
     "철거 용역 반장 · 경력 27년": "Demolition crew foreman · 27 years on the job"
   },
   "case20": {
-    "KD데이터랩 노아 도입 책임자": "Head of the NOAH rollout, KD Data Lab"
+    "KD데이터랩 노아 도입 책임자 · 싱가포르에서 영입": "Head of the NOAH rollout, KD Data Lab · hired from Singapore"
   }
 };

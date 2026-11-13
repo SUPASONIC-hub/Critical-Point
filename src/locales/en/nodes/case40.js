@@ -69,7 +69,7 @@ export default {
     },
     "c40_anchor": {
       "title": "Similarity 0.83",
-      "text": "The model has an 'unfit reference profile': the more responses resemble it, the lower the score. Trace its source number, and it is Analyst A: you. Ryu Seah puts Moon Hajun’s result beside it. Similarity: 0.83. On the item about recommending a product that hurts the customer, Hajun paused 7 seconds; 3 years ago you paused 9. Ryu Seah says, 'Hajun failed because he resembles you.'",
+      "text": "The model has an 'unfit reference profile': the more responses resemble it, the lower the score. Trace its source number, and it is Analyst A: you. Priya Nair puts Moon Hajun’s result beside it. Similarity: 0.83. On the item about recommending a product that hurts the customer, Hajun paused 7 seconds; 3 years ago you paused 9. Priya Nair says, 'Hajun failed because he resembles you.'",
       "memo": [
         "Unfit reference profile: Analyst A -- 3 years of your records",
         "Similarity with Moon Hajun 0.83",
@@ -96,7 +96,7 @@ export default {
       "place": "KD Data Lab, Pangyo · Data Center",
       "clock": "Tuesday, 3rd week of August · 02:10",
       "question": "The reference point that failed Hajun was your record. What do you do with this fact?",
-      "lead": "At 2 a.m., Ryu Seah calls you deep into the data center, saying she has found the record the model uses as its yardstick when it gives a low score."
+      "lead": "At 2 a.m., Priya Nair calls you deep into the data center, saying she has found the record the model uses as its yardstick when it gives a low score."
     },
     "c40_steam": {
       "title": "A Retest at the Rice Cake Shop",
@@ -131,7 +131,7 @@ export default {
     },
     "c40_final": {
       "title": "Before Monday",
-      "text": "One of the investor logos is KD Capital’s. Hong Yedam says, 'When KD’s open hiring starts on Monday, 60,000 people take our test.' Ryu Seah has three documents. A plan to give the 9,412 below 60 a human interview; documentation disclosing the algorithm; a notice ending the KD records contract. If it ends, the service stops tonight, and so does Monday for 42 employees. Hong Yedam asks. 'Either way, you’re asking me to say what I believed in was wrong, aren’t you?'",
+      "text": "One of the investor logos is KD Capital’s. Hong Yedam says, 'When KD’s open hiring starts on Monday, 60,000 people take our test.' Priya Nair has three documents. A plan to give the 9,412 below 60 a human interview; documentation disclosing the algorithm; a notice ending the KD records contract. If it ends, the service stops tonight, and so does Monday for 42 employees. Hong Yedam asks. 'Either way, you’re asking me to say what I believed in was wrong, aren’t you?'",
       "memo": [
         "9,412 people to re-review -- human interviews cost about 400 million won",
         "Disclosure documentation: 40 items and 2 reference profiles",
@@ -155,7 +155,7 @@ export default {
       "place": "Seongsu-dong · FitScore · Boardroom",
       "clock": "Friday, 3rd week of August · 17:30",
       "question": "Before Monday’s hiring, you must choose between 9,412 people and 42 employees. What do you sign?",
-      "lead": "Friday afternoon, 30 minutes before a video call with investors, Hong Yedam calls you and Ryu Seah into the boardroom."
+      "lead": "Friday afternoon, 30 minutes before a video call with investors, Hong Yedam calls you and Priya Nair into the boardroom."
     },
     "c40_aftershock": {
       "title": "A 100-Point Résumé",
@@ -183,7 +183,7 @@ export default {
     },
     "c40_weight": {
       "title": "Minus 0.31",
-      "text": "11 p.m. The configuration file FitScore received lists the weights of 40 items. The heaviest, 'hesitation time before deciding,' is minus 0.31. Ryu Seah says, 'People who read the question to the end, people who think once more before they answer, lose the most. This is a number that punishes diligence.'",
+      "text": "11 p.m. The configuration file FitScore received lists the weights of 40 items. The heaviest, 'hesitation time before deciding,' is minus 0.31. Priya Nair says, 'People who read the question to the end, people who think once more before they answer, lose the most. This is a number that punishes diligence.'",
       "memo": [
         "40 model items -- the heaviest: hesitation time",
         "Value -0.31: the longer you pause, the more you lose",
@@ -296,7 +296,7 @@ export default {
     },
     "c40_notice_reaction": {
       "title": "The Model Answer",
-      "text": "Han Seoyun speaks the moment she picks up. 'I heard from Ryu Seah. About the fit reference profile.' The standard that pushes scores up. Pseudonym Manager H: the record of returning your dissent 3 years ago in 11 minutes. 'They say I’m the model answer. The person who sent your dissent back fastest is the person this company wants to hire.'",
+      "text": "Han Seoyun speaks the moment she picks up. 'I heard from Priya Nair. About the fit reference profile.' The standard that pushes scores up. Pseudonym Manager H: the record of returning your dissent 3 years ago in 11 minutes. 'They say I’m the model answer. The person who sent your dissent back fastest is the person this company wants to hire.'",
       "memo": [
         "Fit reference profile: Manager H",
         "11 minutes to return -- the model answer"
@@ -366,7 +366,7 @@ export default {
     },
     "c40_route_system": {
       "title": "The Histories of People Who Stopped",
-      "text": "Among the 9,412 rejected, those in the top 10% for hesitation time are 3.4 times more likely to have written of 'refusing an unfair order' in their cover letters. Ryu Seah says, 'This algorithm is screening out people who hesitate. Quite a few of them are people who stopped when they should have. And the model learned that as a defect.' She sticks a 'people who stopped' label on the monitor.",
+      "text": "Among the 9,412 rejected, those in the top 10% for hesitation time are 3.4 times more likely to have written of 'refusing an unfair order' in their cover letters. Priya Nair says, 'This algorithm is screening out people who hesitate. Quite a few of them are people who stopped when they should have. And the model learned that as a defect.' She sticks a 'people who stopped' label on the monitor.",
       "memo": [
         "Top 10% in hesitation -- 3.4 times as many refused unfair orders",
         "About 2,700 of the 9,412 rejected fit this",
@@ -392,7 +392,7 @@ export default {
     },
     "c40_final_system_route": {
       "title": "A Label With No Words",
-      "text": "Friday before dawn, the 'people who stopped' label is still on the terminal. The rejected group Ryu Seah runs again comes to about 2,700. At nine on Monday, the same test runs in KD’s hiring. 'I don’t know what to write for these people. It’s not a defect. But unless the test is given a name for it, it’ll learn it as a defect again.'",
+      "text": "Friday before dawn, the 'people who stopped' label is still on the terminal. The rejected group Priya Nair runs again comes to about 2,700. At nine on Monday, the same test runs in KD’s hiring. 'I don’t know what to write for these people. It’s not a defect. But unless the test is given a name for it, it’ll learn it as a defect again.'",
       "memo": [
         "Top 10% in hesitation -- 3.4 times as many refused unfair orders",
         "About 2,700 rejected people affected",
@@ -583,7 +583,7 @@ export default {
     "c40_anchor_evidence_turn": "When you pick the overlapping name, the side that sold the records and the side that bought them meet in one person’s signature. The rejected people are outside that circle.",
     "c40_steam_evidence_turn": "When you pick the overlapping name, the side that sold the records and the side that bought them meet in one person’s signature. The rejected people are outside that circle.",
     "c40_route_system_evidence_turn": "When you pick the overlapping name, the side that sold the records and the side that bought them meet in one person’s signature. The rejected people are outside that circle.",
-    "case40_memory_system": "The newly built table appears nowhere in the documentation. There is only a field that times how long each item was hesitated over. Ryu Seah regroups the rejected people by that field.",
+    "case40_memory_system": "The newly built table appears nowhere in the documentation. There is only a field that times how long each item was hesitated over. Priya Nair regroups the rejected people by that field.",
     "case40_memory_evidence": "Overlay the two paths and the shape is the same: what was sent away comes back under another name. FitScore’s investment approval also carries a signature.",
     "c40_start_warm_visit": "When you go, the manager only nods at you over the customers at the end of the weekend line. 'It’s headquarters’ guideline. Please come back on a weekday.'",
     "c40_start_warm_claim": "The request goes to FitScore’s customer center. The auto-reply says 'the scoring method is a trade secret.'",

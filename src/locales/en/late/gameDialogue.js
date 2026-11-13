@@ -197,10 +197,10 @@ export default {
       "voice": "He calls Kang Taemin “bro” and is strictly polite with everyone else. He talks like it’s a joke and tacks a real question onto the end.",
       "line": "In bank ads I’m always the smiling customer. At a real bank I’ve never once smiled."
     },
-    "주은채": {
+    "레이철 탄": {
       "appearance": "A white shirt with the sleeves rolled twice, three highlighters in different colors, glasses reflecting the light of six monitors.",
       "thought": "Numbers don’t lie. But I never once put into the model who reads the numbers to whom.",
-      "gesture": "Every time Joo Eunchae says a number, she gives it to one decimal place, and rounds only when she isn’t sure.",
+      "gesture": "Every time Rachel Tan says a number, she gives it to one decimal place, and rounds only when she isn’t sure.",
       "voice": "She explains brightly and fast, then stops dead the moment she learns something she didn’t know.",
       "line": "It’s a structure where good money makes good returns. At least in my model."
     },
@@ -302,10 +302,10 @@ export default {
       "voice": "He says little and ends on a number. Polite, but he doesn’t bend.",
       "line": "We’ll keep to 72 hours. Not 1 minute more."
     },
-    "류세아": {
+    "프리야 나이르": {
       "appearance": "A label-printer strap around her neck, a laptop crowded with stickers, a silver thermos she carries everywhere.",
       "thought": "A model you can’t explain is a wrong model, however accurate. And yet I never read the training list to the end.",
-      "gesture": "Before answering, Ryu Seah prints a label and looks for a place to stick it. She can’t leave anything unnamed.",
+      "gesture": "Before answering, Priya Nair prints a label and looks for a place to stick it. She can’t leave anything unnamed.",
       "voice": "She talks fast and bright, and lowers her voice at the end only when she admits what she doesn’t know.",
       "line": "I don’t trust a model that can’t explain itself either. That’s why this one hurts more."
     },
@@ -519,10 +519,10 @@ export default {
       "voice": "He recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
       "line": "The long dish names are my revenge. The Chairman has never once memorized one."
     },
-    "도건우": {
+    "대니얼 강": {
       "appearance": "A crisp white shirt with silver clips instead of cuff buttons, a two-page proposal with corners exactly aligned, a bottle of water he always carries cold.",
       "thought": "Memory is a cost. If the company pays it for you, everyone’s comfortable. Comfortable people don’t talk again.",
-      "gesture": "Before handing over the proposal, Do Geonwoo taps the corners twice so the second page lines up exactly under the first.",
+      "gesture": "Before handing over the proposal, Daniel Kang taps the corners twice so the second page lines up exactly under the first.",
       "voice": "Polite to the end, he tells you first what you want. The conditions are always in the next sentence.",
       "line": "We’re erasing it for you. That’s what everyone wants, isn’t it?"
     },
@@ -638,10 +638,10 @@ export default {
       "voice": "He holds back his Yeongdong dialect, and it all bursts out at once when he laughs.",
       "line": "He said to be sure to tell you it’s from a factory that paid off its whole loan."
     },
-    "연시우": {
+    "응우옌 반 남": {
       "appearance": "Work pants stretched at the knees, three access badges around his neck, a pencil behind his ear, a worn clipboard holding the disposal register.",
       "thought": "Servers don’t lie. Only the document that says to wipe the servers lies.",
-      "gesture": "Before answering, Yeon Siwoo lays his palm once on the side of the nearest server. Even he doesn’t know if he’s checking the heat or saying hello.",
+      "gesture": "Before answering, Nguyen Van Nam lays his palm once on the side of the nearest server. Even he doesn’t know if he’s checking the heat or saying hello.",
       "voice": "He calls the servers “these guys” and is more polite to them than to people.",
       "line": "No running in here, and no talking down to the servers either. These guys have sharp ears."
     },

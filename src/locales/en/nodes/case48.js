@@ -69,7 +69,7 @@ export default {
     },
     "c48_engine": {
       "title": "Outcome: Excellent",
-      "text": "NOAH, the group’s review engine, answers 0.6 seconds after the LoopNow file goes in. 'Grade A, approval recommended. Most similar past case: 2023-0412, similarity 94.1%, outcome excellent.' On the next screen, ECHO speaks. 'Ryu Seah has just brought in two songpyeon.' Ryu Seah hides the songpyeon behind her back. ECHO runs the same file. 'This is the 173rd case of the same shape. Of the 172 before it, 169 closed with a sale.' Lee Minseo points at the last word on NOAH’s screen. 'Outcome excellent? That loan collapsed. It’s where all of us came from.'",
+      "text": "NOAH, the group’s review engine, answers 0.6 seconds after the LoopNow file goes in. 'Grade A, approval recommended. Most similar past case: 2023-0412, similarity 94.1%, outcome excellent.' On the next screen, ECHO speaks. 'Priya Nair has just brought in two songpyeon.' Priya Nair hides the songpyeon behind her back. ECHO runs the same file. 'This is the 173rd case of the same shape. Of the 172 before it, 169 closed with a sale.' Lee Minseo points at the last word on NOAH’s screen. 'Outcome excellent? That loan collapsed. It’s where all of us came from.'",
       "memo": [
         "NOAH: Grade A · approval recommended · 0.6 seconds",
         "Most similar case: 2023-0412, similarity 94.1%, 'outcome excellent'",

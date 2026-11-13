@@ -94,6 +94,31 @@ dividends, personnel or a sale come up; the people, endings and order of the
 cases do not change for it. 사건 43's 5 대 3 and 사건 44's sentence stand.
 `check:canon` holds the name (킹스데일 / Kingsdale) and the 30%.
 
+## The people from abroad (11-13)
+
+KD is a Korean group with a Singapore 법인 (KD자산운용), a Tokyo branch (KD은행)
+and engineers hired from abroad (KD데이터랩). The story stays in Seoul; those
+places are background. Every person below was hired by KD itself or works
+outside it -- none of them is Kingsdale's, and Kingsdale stays a company (above).
+A nationality is never the reason someone does right or wrong.
+
+| Person (ko / en / ja) | Was | Background | Address |
+|---|---|---|---|
+| 프리야 나이르 / Priya Nair / プリヤ・ナイル | 류세아 | Indian-Singaporean, 34; KD데이터랩 hired her from a Singapore fintech firm to bring in 노아; third year in Seoul | 「프리야 씨」; calls the servers 「선배님」 as a Korean office taught her |
+| 레이철 탄 / Rachel Tan / レイチェル・タン | 주은채 | Chinese-Singaporean; KD자산운용 싱가포르 법인 fund manager, seconded to Seoul for the 상생 펀드 | 「레이철」 among colleagues |
+| 응우옌 반 남 / Nguyen Van Nam / グエン・ヴァン・ナム | 연시우 | Vietnamese, Hanoi engineering school; sixth year at the 판교 data center; on duty over 추석 (사건 46) | 「남 씨」 |
+| 대니얼 강 / Daniel Kang / ダニエル・カン | 도건우 | Korean American (1.5 generation), New York lawyer; keeps the name from his law-firm years | 위기대응TF 팀장 |
+| 채이안 (unchanged) | -- | 재일교포 3세; joined KD은행 도쿄지점 in 2009, 17th year (사건 25); ja gives his 通名 千伊安 once | 부장 |
+
+Rules: what a foreign speaker says inside quotes is natural Korean (no English
+or Japanese mixed in, no broken Korean); whether they speak Korean or go
+through an interpreter is said once, in the first narration. The narration and
+the `speaker` key always use the full name; a short form (「남 씨」) is only ever
+inside quotes. en writes these names in ASCII. The old names live only in
+`src/castAliases.js`, which turns them into the new ones in saves and run logs
+written before the change; `check:canon` (cast-old-names) keeps them out of
+every other season file.
+
 ## The era: 2023 and 2026 in a Korean bank
 
 The 프롤로그 is 2022-23 and the main season 2025-26, so the bank works the way

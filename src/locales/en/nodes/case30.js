@@ -273,20 +273,20 @@ export default {
     },
     "c30_price_reaction": {
       "title": "Minus 0.31",
-      "text": "Ryu Seah, who was in charge of bringing in NOAH, speaks. 'The input fields of FitScore’s model are identical to NOAH’s training data list. They sold the same records twice.' The weight on 'dissent writing history' is minus 0.31. 'Anyone who has written a dissent even once gets marked down without knowing why. You were probably marked down the most.'",
+      "text": "Priya Nair, who was in charge of bringing in NOAH, speaks. 'The input fields of FitScore’s model are identical to NOAH’s training data list. They sold the same records twice.' The weight on 'dissent writing history' is minus 0.31. 'Anyone who has written a dissent even once gets marked down without knowing why. You were probably marked down the most.'",
       "memo": [
         "'Dissent writing history' weight -0.31",
         "FitScore input fields = NOAH training list"
       ],
       "choices": {
         "c30_price_reaction_choice_3": {
-          "label": "Ask Ryu Seah to copy the whole model file"
+          "label": "Ask Priya Nair to copy the whole model file"
         },
         "c30_price_reaction_choice_2": {
-          "label": "Take the weight list as Ryu Seah’s formal review opinion"
+          "label": "Take the weight list as Priya Nair’s formal review opinion"
         },
         "c30_price_reaction_choice_1": {
-          "label": "Ask Ryu Seah for a technical explanation only, without her name"
+          "label": "Ask Priya Nair for a technical explanation only, without her name"
         }
       },
       "place": "KD Data Lab, Pangyo · NOAH Operations Room",
@@ -557,9 +557,9 @@ export default {
     "c30_lunch_reaction_choice_1": "When you take the key, Lim Soyul’s sign goes up on the back door. 'After the shutter’s down -- six people only.' Lim Kyungsoo grumbles that the letters are too big.",
     "c30_lunch_reaction_choice_2": "Keeping only a list leaves Lim Kyungsoo a man who knows nothing. At the bottom of the list he writes in pencil, 'Copies of the contract: I don’t know either.'",
     "c30_lunch_reaction_choice_3": "At the idea of changing places every time, Lim Kyungsoo puts the key back. 'On days you’ve got nowhere to go, I’ll leave the back door open.' Han Seoyun ends up asking every time where to bring the next lunchboxes.",
-    "c30_price_reaction_choice_1": "With her name left out, Ryu Seah writes three pages of explanation. The last line is 'If anyone asks, I didn’t write this.'",
-    "c30_price_reaction_choice_2": "Once it is a formal opinion, Ryu Seah’s name stays at the bottom of the document. She takes one deep breath before signing.",
-    "c30_price_reaction_choice_3": "The copy takes 4 minutes. In the NOAH operations room’s access log, Ryu Seah’s employee ID stays lit for those 4 minutes.",
+    "c30_price_reaction_choice_1": "With her name left out, Priya Nair writes three pages of explanation. The last line is 'If anyone asks, I didn’t write this.'",
+    "c30_price_reaction_choice_2": "Once it is a formal opinion, Priya Nair’s name stays at the bottom of the document. She takes one deep breath before signing.",
+    "c30_price_reaction_choice_3": "The copy takes 4 minutes. In the NOAH operations room’s access log, Priya Nair’s employee ID stays lit for those 4 minutes.",
     "c30_notice_reaction_choice_1": "When you say you’ll stake yours with him, Do Yoonha writes your name first, at the top of the new notebook’s first page. 'A-000. The one with no number.'",
     "c30_notice_reaction_choice_2": "Routing it through official channels keeps the window safe. Do Yoonha looks a little let down, but nods all the same.",
     "c30_notice_reaction_choice_3": "The search takes 3 minutes. Do Yoonha’s employee ID stays in the window terminal’s search log.",
@@ -628,9 +628,9 @@ export default {
     "c30_lunch_reaction_choice_1": "Saying the scattered six need a place to come back to, you take the key and make the bookshop’s 1st floor the six’s hideout.",
     "c30_lunch_reaction_choice_2": "So the old man has nothing to answer with, you propose keeping only a list at the bookshop, not the originals.",
     "c30_lunch_reaction_choice_3": "Saying gathering in one place means being exposed all at once, you decline the key and propose changing the meeting place every time.",
-    "c30_price_reaction_choice_1": "Since you can’t make one more person stake her job, you ask Ryu Seah for a technical explanation only, without her name.",
-    "c30_price_reaction_choice_2": "Saying it carries weight only from the person who brought in NOAH, you take the weight list as Ryu Seah’s formal review opinion.",
-    "c30_price_reaction_choice_3": "Saying you need to open up the insides that send out only a score, you ask Ryu Seah to copy the whole model file.",
+    "c30_price_reaction_choice_1": "Since you can’t make one more person stake her job, you ask Priya Nair for a technical explanation only, without her name.",
+    "c30_price_reaction_choice_2": "Saying it carries weight only from the person who brought in NOAH, you take the weight list as Priya Nair’s formal review opinion.",
+    "c30_price_reaction_choice_3": "Saying you need to open up the insides that send out only a score, you ask Priya Nair to copy the whole model file.",
     "c30_notice_reaction_choice_1": "Saying you owe an answer to his plea not to be left to stake it alone, you tell Do Yoonha that if he stakes the window, you’ll stake yours beside him.",
     "c30_notice_reaction_choice_2": "Saying the window belongs to the customers too, you propose routing Do Yoonha’s part through official channels outside the window.",
     "c30_notice_reaction_choice_3": "Saying a window that will be staked anyway should be used while it still can be, you ask him to look up the contract payment records on the branch system first.",

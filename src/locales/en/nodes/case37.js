@@ -131,7 +131,7 @@ export default {
     },
     "c37_final": {
       "title": "The Price of Erasing",
-      "text": "Do Geonwoo’s proposal is two pages long. With group money, a digital undertaker (a company paid to find and erase records spread across the internet) will erase the records within a week. The condition is a confirmation that 'the leaked material is edited, distorted, unofficial material and does not match the facts.' Sign it, and even the original’s admissibility (its standing as evidence in court) is shaken. Do Geonwoo smiles politely. 'We’re erasing it for you. Isn’t that what everyone wants?' A text from Do Yoonha is waiting. 'I want mine erased. I’m sorry.'",
+      "text": "Daniel Kang, head of the Crisis Response TF, is a Korean American lawyer who still goes by the name he used at his law firm. His proposal is two pages long. With group money, a digital undertaker (a company paid to find and erase records spread across the internet) will erase the records within a week. The condition is a confirmation that 'the leaked material is edited, distorted, unofficial material and does not match the facts.' Sign it, and even the original’s admissibility (its standing as evidence in court) is shaken. Daniel Kang smiles politely. 'We’re erasing it for you. Isn’t that what everyone wants?' A text from Do Yoonha is waiting. 'I want mine erased. I’m sorry.'",
       "memo": [
         "Offer: erase 63 people’s records at group expense -- 20 million won each",
         "English version of the statement: settled first last night on a video call with Kingsdale, New York",
@@ -184,7 +184,7 @@ export default {
     },
     "c37_mirror": {
       "title": "The Rankings",
-      "text": "Ryu Seah calls. 'Someone made a mirror site (a site that copies the original exactly and puts it up at another address). It has rankings.' In the vote for 'the analyst who broke first,' Sunwoo Jin is No. 1, with 8,000 votes. 'You know I love sticking labels on things. But I’ve never seen labels like these stuck on people.'",
+      "text": "Priya Nair calls. 'Someone made a mirror site (a site that copies the original exactly and puts it up at another address). It has rankings.' In the vote for 'the analyst who broke first,' Sunwoo Jin is No. 1, with 8,000 votes. 'You know I love sticking labels on things. But I’ve never seen labels like these stuck on people.'",
       "memo": [
         "Mirror site: 3 rankings -- with voting",
         "#1 in 'the analyst who broke first': participant 01",
@@ -541,7 +541,7 @@ export default {
     "c37_source_protect": "Na Eunho tosses the ice cream stick into the bin. 'Then get the 62 people’s consent. By today.'",
     "c37_source_sign": "Na Eunho has never received a confirmation with conditions before. For the first time, he says 'Fine.' Your 0.0 seconds are now item 9 on the evidence list.",
     "c37_source_silent": "The interview ends after 11 minutes. Na Eunho writes 'On hold' in his notebook, and the confirmation goes into a drawer.",
-    "c37_final_choose": "The 13 who were reached answer first. Six erase, five keep, and two say they don’t know yet. The fields for the other 50 are left blank. Do Geonwoo’s proposal goes back with page two torn off.",
+    "c37_final_choose": "The 13 who were reached answer first. Six erase, five keep, and two say they don’t know yet. The fields for the other 50 are left blank. Daniel Kang’s proposal goes back with page two torn off.",
     "c37_final_seal": "The original goes to the court vault. The official process for erasing the spread copies is slow, and Do Yoonha’s 7.2 seconds stay on the internet for another month.",
     "c37_final_sign": "From tonight the records disappear fast. Next week in court, the group’s lawyer submits your confirmation as the first piece of evidence.",
     "c37_after_warm": "No one goes home first until the sun is up. The chart you read together to the end turns up again a few days later, in someone’s court filing.",

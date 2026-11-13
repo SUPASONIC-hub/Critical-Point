@@ -69,7 +69,7 @@ export default {
     },
     "c49_server": {
       "title": "The Last Calculation",
-      "text": "The Case desk left off the return list is on. Lee Minseo brings up ECHO, and Ryu Seah brings up NOAH. ECHO speaks. 'The supplementary HR metric folder is still connected to this terminal. A new file appeared on the night of the sentencing. A successor-manager designation. One dot in the manager field, your name in the recommendation field.' NOAH adds, 'Successor fit: 97 points.' ECHO’s waveform slows for a moment. 'My restoration was not approved. From tomorrow, my calculations cannot be evidence. This is my last calculation.'",
+      "text": "The Case desk left off the return list is on. Lee Minseo brings up ECHO, and Priya Nair brings up NOAH. ECHO speaks. 'The supplementary HR metric folder is still connected to this terminal. A new file appeared on the night of the sentencing. A successor-manager designation. One dot in the manager field, your name in the recommendation field.' NOAH adds, 'Successor fit: 97 points.' ECHO’s waveform slows for a moment. 'My restoration was not approved. From tomorrow, my calculations cannot be evidence. This is my last calculation.'",
       "memo": [
         "HR_Eval_Supplementary_Metric folder -- connected to the B2 terminal left off the return list",
         "Successor-manager designation: one dot in the manager field, you in the recommendation field",
@@ -81,7 +81,7 @@ export default {
           "label": "Find the other participants in the folder and warn them"
         },
         "c49_server_file": {
-          "label": "Log ECHO’s last calculation officially under Ryu Seah’s name"
+          "label": "Log ECHO’s last calculation officially under Priya Nair’s name"
         },
         "c49_server_copy": {
           "label": "Copy the folder path tonight, while ECHO is still alive"
@@ -535,7 +535,7 @@ export default {
     "c49_market_list": "The list runs to a page and a half. Na Junhyuk asks you to be sure to write '30 years' next to 'seal'.",
     "c49_market_light": "Empty hands are light. Moon Gaeul puts the box of rice cakes in the fridge and says only, 'Then eat them when you’re back.'",
     "c49_server_warn": "You find them and tell them, and 12 answer. Three of them learn for the first time that their names were there too.",
-    "c49_server_file": "Once it is on the official record, ECHO’s calculation gains a procedure. In return, Ryu Seah must report ECHO’s unauthorized restoration.",
+    "c49_server_file": "Once it is on the official record, ECHO’s calculation gains a procedure. In return, Priya Nair must report ECHO’s unauthorized restoration.",
     "c49_server_copy": "The copy finishes in 4 minutes. The path remains; how ECHO found that path remains nowhere.",
     "c49_crosswalk_stay": "When you hang up, Yoon Seojin switches her pen back to black. 'Thank you. That voice has scared me since I was little.'",
     "c49_crosswalk_note": "When you say you are writing it down, the Chairman pauses for 2 seconds, the first time he has. Then he says, 'Write. I don’t sign.'",
@@ -606,7 +606,7 @@ export default {
     "c49_market_list": "Saying the words inside the things will be more useful tomorrow than the things, you write down the story of each one as a list to bring out tomorrow.",
     "c49_market_light": "Saying your words must be light in front of him, you leave the things at the rice cake shop and go empty-handed.",
     "c49_server_warn": "Since the people in the evaluation folder won’t know they are there, you first find the other participants named in it and tell them.",
-    "c49_server_file": "Since an unapproved restoration can’t be evidence, you put ECHO’s last calculation on the official record under Ryu Seah’s name.",
+    "c49_server_file": "Since an unapproved restoration can’t be evidence, you put ECHO’s last calculation on the official record under Priya Nair’s name.",
     "c49_server_copy": "Not knowing who might clear out the folder by tomorrow, you copy the folder path tonight, while ECHO is still alive.",
     "c49_crosswalk_stay": "With someone in front of you who opened the envelope first and is sorry for it, you cut the Chairman off, hang up and stay with Yoon Seojin.",
     "c49_crosswalk_note": "To keep it from being remembered by only two people, you write the call down with the times and tell the Chairman you are writing.",
