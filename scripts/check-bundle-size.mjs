@@ -181,7 +181,8 @@ const budgets = [
   // 157,552 / 58,149 -> 157,634 / 58,164 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 157630 / 58160 (over budget only) in the e2e build, the plus 4.
   // 157,634 / 58,164 -> 157,634 / 58,174 #535 달력·예고 묶음 실측. Measured - / 58170 (over budget only) in the e2e build, the plus 4.
   // 157,634 / 58,164 -> 157,751 / 58,210 side04 over main 7c80ccfe. Measured 157747 / 58206 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_751, maxGzip: 58_210 },
+  // 157,634 / 58,174 -> 157,656 / 58,186 금액 $ 표시. Measured 157652 / 58182 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 157_656, maxGzip: 58_186 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -656,7 +657,8 @@ const budgets = [
   // 201,033 / 72,895 -> 203,058 / 73,777 n2n3 over main 1ae72e0b. Measured 203054 / 73773 (over budget only) in the e2e build, the plus 4.
   // 201,645 / 73,087 -> 203,679 / 73,972 N2N3 첫 시간 over main 7c80ccfe. Measured 203675 / 73968 (over budget only) in the e2e build, the plus 4.
   // 202,471 / 73,277 -> 204,500 / 74,146 N2N3 첫 시간 over main dcbbe5e0. Measured 204496 / 74142 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 204_500, maxGzip: 74_146 },
+  // 202,471 / 73,277 -> 202,527 / 73,309 금액 $ 표시. Measured 202523 / 73305 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 202_527, maxGzip: 73_309 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -928,7 +930,8 @@ const budgets = [
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
   // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,385 n2n3 over main 1ae72e0b. Measured - / 17381 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_385 },
+  // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_589, maxGzip: 17_392 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -949,7 +952,8 @@ const budgets = [
   // 51,558 / 16,961 -> 52,421 / 17,333 a2a3-ending over main 7ec2304e. Measured 52417 / 17329 (over budget only) in the e2e build, the plus 4.
   // 52,421 / 17,333 -> 52,577 / 17,378 bundle 1112f (#530 #531) over main fbc8adc6. Measured 52573 / 17374 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,385 n2n3 over main 1ae72e0b. Measured - / 17381 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_577, maxGzip: 17_385 },
+  // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_589, maxGzip: 17_392 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1292,7 +1296,8 @@ const budgets = [
   // 1,934 / 948 -> 2,097 / 1,004 on 2026-10-26, E-11 번외 사건 온라인 저장
   // (draft) restacked on e11-side01 76c5b028: the side records' merge on a
   // restore. Measured 2,097 / 1,000, the gzip plus 4.
-  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_004 },
+  // 2,097 / 1,004 -> 2,097 / 1,010 금액 $ 표시. Measured - / 1006 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^cloudDeviceRecords-.*\.js$/, maxBytes: 2_097, maxGzip: 1_010 },
   // The panel: 4,740 / 1,990 -> 5,090 / 2,100 on 2026-10-06, measured 4,845 /
   // 1,995 plus 5%, for telling a success from a failure -- two regions that
   // are on the page before they speak, where one alert said both.
@@ -2342,7 +2347,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 374,619 / 434,057 / 441,824 n2n3 over main 1ae72e0b. Measured first paint, the plus 4.
 // -> 374,814 / 434,252 / 442,020 N2N3 첫 시간 over main 7c80ccfe. Measured first paint, the plus 4.
 // -> 374,990 / 434,481 / 442,264 N2N3 첫 시간 over main dcbbe5e0. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 374_990, en: 434_481, ja: 442_264 };
+// -> 374,154 / 433,628 / 441,399 금액 $ 표시. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 374_154, en: 433_628, ja: 441_399 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

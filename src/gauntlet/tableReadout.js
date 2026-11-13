@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { formatNumber, isResourceGain } from "../gameConstants.js";
+import { formatMoney, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
@@ -13,7 +13,7 @@ import { fill } from "../locale.js";
 // The readouts' words (src/copy/table.js), read when each line is said.
 const say = tableCopy.readout;
 
-export { formatNumber };
+export { formatMoney };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the
@@ -130,7 +130,7 @@ export function describeLogicMove(logic) {
 
 /** The same move as the archive's one line under a logged decision. */
 export function describeLogicLog(logic) {
-  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: fill(say.logicLog, { streak: logic.streak, bonus: bonusText(logic.bonus), pot: formatNumber(logic.pot) }) } : null;
+  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: fill(say.logicLog, { streak: logic.streak, bonus: bonusText(logic.bonus), pot: formatMoney(logic.pot) }) } : null;
 }
 
 const MOVE_COPY = say.moves;

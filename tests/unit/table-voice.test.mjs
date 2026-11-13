@@ -27,8 +27,8 @@ const facts = ({ win = tableWindow(), live = true, dangerLine = "벽까지 최�
 test("the sentences say only what the table shows", () => {
   assert.equal(describePush({ gauge: 41.6, dangerLine: "벽까지 최소 3" }), "열기 42 · 벽까지 최소 3");
   assert.equal(describeStanceCarry({ focus: 70.4, carry: STRIKE_WAKE }), "충전 70 · 확정하면 다음 판 STRIKE WAKE · 다음 판이 더 두껍게 깨어난다");
-  assert.equal(describeBank({ hand: 1250, runPot: 1250, vault: 4800 }), "이번 판 +1,250 · 판돈 1,250 · 금고 4,800");
-  assert.equal(describeBank({ hand: -900, runPot: 0, vault: 4800 }), "이번 판 −900 · 판돈 0 · 금고 4,800");
+  assert.equal(describeBank({ hand: 1250, runPot: 1250, vault: 4800 }), "이번 판 +$1,250 · 판돈 $1,250 · 금고 $4,800");
+  assert.equal(describeBank({ hand: -900, runPot: 0, vault: 4800 }), "이번 판 −$900 · 판돈 $0 · 금고 $4,800");
   assert.equal(describeAct({ act: 2, caseId: "case08" }), "2막 시작 · 사건 08");
   // The wall this window drew is never in what is said: only the board's danger line.
   const pushed = facts({ win: tableWindow({ gauge: 52, wall: 77, pushes: 1 }) });
@@ -127,10 +127,10 @@ test("a call waiting its turn is replaced by a newer one of its kind, and the cl
 
 test("the settlement is said once, as the next window's table opens: the hand's ±N, the case pot and the vault", () => {
   const dealt = (windowIndex, runPot, vault, caseId = "case01") => ({ windowIndex, runPot, vault, caseId });
-  assert.deepEqual(findBank(dealt(4, 0, 0), dealt(5, 1250, 0)), { windowIndex: 5, text: "이번 판 +1,250 · 판돈 1,250 · 금고 0" }, "a cash banked into the case pot");
-  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 1250, "case02")), { windowIndex: 5, text: "이번 판 0 · 판돈 0 · 금고 1,250" }, "a closed case moved the pot to the vault: the money did not move");
-  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 2000, "case02")), { windowIndex: 5, text: "이번 판 +750 · 판돈 0 · 금고 2,000" }, "the closing hand's own cash, net of what the audit took");
-  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 0)), { windowIndex: 5, text: "이번 판 −1,250 · 판돈 0 · 금고 0" }, "a bust: the slam said the pot it took; this is the settlement's line after it");
+  assert.deepEqual(findBank(dealt(4, 0, 0), dealt(5, 1250, 0)), { windowIndex: 5, text: "이번 판 +$1,250 · 판돈 $1,250 · 금고 $0" }, "a cash banked into the case pot");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 1250, "case02")), { windowIndex: 5, text: "이번 판 $0 · 판돈 $0 · 금고 $1,250" }, "a closed case moved the pot to the vault: the money did not move");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 2000, "case02")), { windowIndex: 5, text: "이번 판 +$750 · 판돈 $0 · 금고 $2,000" }, "the closing hand's own cash, net of what the audit took");
+  assert.deepEqual(findBank(dealt(4, 1250, 0), dealt(5, 0, 0)), { windowIndex: 5, text: "이번 판 −$1,250 · 판돈 $0 · 금고 $0" }, "a bust: the slam said the pot it took; this is the settlement's line after it");
   assert.equal(findBank(null, dealt(5, 1250, 0)), null, "the first table after a load has nothing to compare");
   assert.equal(findBank(dealt(2, 0, 0), dealt(5, 1250, 0)), null, "a save loaded from elsewhere");
   assert.equal(findBank(dealt(5, 0, 0), dealt(5, 1250, 0)), null, "the same window mounted twice");
@@ -145,7 +145,7 @@ test("an act is said to begin on the first table of the case that opens it, once
   assert.equal(findActStart(dealt(45, "case08"), dealt(46, "case09")), null, "a case that opens no act");
   assert.equal(findActStart(null, dealt(41, "case08")), null, "a load or a debug jump into the case has no last table");
   assert.equal(findActStart(dealt(30, "case07"), dealt(41, "case08")), null, "a save loaded from elsewhere");
-  const queue = queueCalls([{ kind: "act", text: "2막 시작 · 사건 08" }, { kind: "audit", text: "감사" }], [{ kind: "bank", text: "이번 판 +750 · 판돈 0 · 금고 2,000" }]);
+  const queue = queueCalls([{ kind: "act", text: "2막 시작 · 사건 08" }, { kind: "audit", text: "감사" }], [{ kind: "bank", text: "이번 판 +$750 · 판돈 $0 · 금고 $2,000" }]);
   assert.deepEqual(queue.map((call) => call.kind), ["bank", "act", "audit"], "the last hand's money, then the act, then the table's own lines");
 });
 
@@ -166,14 +166,14 @@ test("the table has one voice: the clock is said there and not in a region of it
 test("지금 상황 듣기: asked, the table says the numbers it shows in one line, first, and never the wall", () => {
   assert.equal(
     describeStatus({ gauge: 41.6, dangerLine: "밀면 벽 사정권", runPot: 1250, remaining: 17.2, pulse: 120 }),
-    "열기 42 · 밀면 벽 사정권 · 판돈 1,250 · 남은 18초 · 심박 120",
+    "열기 42 · 밀면 벽 사정권 · 판돈 $1,250 · 남은 18초 · 심박 120",
   );
-  assert.equal(describeStatus({ gauge: 0, dangerLine: "벽까지 최소 40", runPot: 0, remaining: -0.4, pulse: "교란" }), "열기 0 · 벽까지 최소 40 · 판돈 0 · 남은 0초 · 심박 교란", "a sedated board's word, and no negative clock");
+  assert.equal(describeStatus({ gauge: 0, dangerLine: "벽까지 최소 40", runPot: 0, remaining: -0.4, pulse: "교란" }), "열기 0 · 벽까지 최소 40 · 판돈 $0 · 남은 0초 · 심박 교란", "a sedated board's word, and no negative clock");
   // The drawn wall is 77 and the band 62-81: neither number is in the line, whatever is asked.
   const before = facts({ win: tableWindow({ gauge: 52, wall: 77 }), dangerLine: "벽까지 최소 10", runPot: 300, pulse: 104 });
   const asked = facts({ win: tableWindow({ gauge: 52, wall: 77 }), dangerLine: "벽까지 최소 10", runPot: 300, pulse: 104, asked: 1 });
   const calls = listTableCalls(before, asked);
-  assert.deepEqual(calls, [{ kind: "status", text: "열기 52 · 벽까지 최소 10 · 판돈 300 · 남은 30초 · 심박 104" }]);
+  assert.deepEqual(calls, [{ kind: "status", text: "열기 52 · 벽까지 최소 10 · 판돈 $300 · 남은 30초 · 심박 104" }]);
   assert.ok(!JSON.stringify(asked).includes("77"), "the drawn wall is not in the facts");
   assert.deepEqual(listTableCalls(asked, asked), [], "no new ask, no line");
   assert.deepEqual(listTableCalls(before, { ...asked, live: false }), [], "a closed window's ask is the slam's silence");

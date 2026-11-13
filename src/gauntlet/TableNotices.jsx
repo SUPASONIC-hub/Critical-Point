@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
+import { formatMultiplier, formatMoney, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicDirection, getLogicType } from "./logicStreak.js";
 import { SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
@@ -93,7 +93,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
               : win.cause === "abandon"
                 ? say.slamAbandon
                 : fill(say.slamWall, { wall: win.wall })}{" "}
-            · {say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}
+            · {say.slamPot} {formatMoney(runPot)} → {formatMoney(bustKeeps)}
           </span>
           {/* The moment, in one line under the verdict (A2, 2026-11-05): the same
               sentence whatever the cause, read last by the alert. */}
@@ -102,7 +102,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
       ) : (
         <>
           <strong>{formatMultiplier(multiplier)}</strong>
-          {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatNumber(livePot)}</span>}
+          {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatMoney(livePot)}</span>}
           {/* The combo's copy starts on the separator the +N used to stand before. */}
           {streak > 0 && <span>{fill(say.slamCombo, { streak }).replace(/^\s*·\s*/, "")}</span>}
         </>
