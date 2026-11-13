@@ -26,6 +26,7 @@
     "src/farCallbacks.js": 100,
     "src/featurePack.js": 98,
     "src/gameConstants.js": 100,
+    "src/gameEvents.js": 100,
     "src/gameLogic.js": 99,
     "src/gauntlet/actCardCopy.js": 100,
     "src/gauntlet/actCardGate.js": 100,
@@ -90,6 +91,7 @@
     "src/serviceWorker/register.js": 100,
     "src/serviceWorker/worker.js": 99,
     "src/settlementRecheck.js": 100,
+    "src/shareLink.js": 100,
     "src/shellNotices.js": 100,
     "src/sideCases.js": 100,
     "src/speakerPortraits.js": 100,
@@ -158,7 +160,8 @@
     "src/viewModels/resultViewModel.js": 100,
     "src/viewModels/sceneBridge.js": 100,
     "src/viewModels/sceneViewModels.js": 100,
-    "src/viewModels/seasonViewModels.js": 86
+    "src/viewModels/seasonViewModels.js": 86,
+    "src/webVitals.js": 100
   },
   "unloaded": [
     "src/gauntlet/gauntletAudio.js",
