@@ -318,7 +318,7 @@ export default {
     },
     "c16_branch_locker": {
       "title": "80 Lockers",
-      "text": "Bae Sookyung, 9 years on the packing line, is already emptying her locker. Three wrist braces, her daughter’s graduation photo, a half-used box of pain patches. 'I started packing as soon as I got the text. I thought it might sting less if I packed early. My right hand’s had surgery twice. I almost filed it as a workplace injury, then didn’t. I was afraid they wouldn’t renew my contract. Honestly, I’m glad the robots are coming. Better that thing than my wrists.' She laughs. 'But where do I go?'",
+      "text": "Bae Sookyung, 9 years on the packing line, is already emptying her locker. She came from Vietnam to marry 16 years ago and naturalized long since; her Korean, learned in markets and on the floor, is half casual and half polite. On holidays she video-calls her family back home. Three wrist braces, her daughter’s graduation photo, a half-used box of pain patches. 'I started packing as soon as I got the text. I thought it might sting less if I packed early. My right hand’s had surgery twice. I almost filed it as a workplace injury, then didn’t. I was afraid they wouldn’t renew my contract. Honestly, I’m glad the robots are coming. Better that thing than my wrists.' She laughs. 'But where do I go?'",
       "memo": [
         "11 of the 80 lockers already emptied",
         "Bae Sookyung: 9 years on the packing line, 2 right-wrist surgeries",

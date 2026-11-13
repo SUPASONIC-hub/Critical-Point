@@ -348,7 +348,7 @@ export const caseRoles = {
   },
   "case16": {
     "KD캐피탈 리스 심사역 · 입사 3년차": "Lease credit officer, KD Capital · 3rd year at the company",
-    "플로우온 풀필먼트센터 포장 라인 · 9년차": "Packing line, FlowOn fulfillment center · 9 years in",
+    "플로우온 풀필먼트센터 포장 라인 · 9년차 · 베트남 출신 귀화 16년": "Packing line, FlowOn fulfillment center · 9 years in · from Vietnam, naturalized, 16 years in Korea",
     "플로우온 풀필먼트센터 야간조 막내 · 24세": "Youngest on the night shift, FlowOn fulfillment center · age 24",
     "트리거랩 데이터 기록 담당": "Data records officer, Trigger Lab",
     "플로우온 풀필먼트센터 시범 운영 물류 로봇 · 야간조가 붙인 이름": "Pilot logistics robot, FlowOn fulfillment center · named by the night shift"

@@ -16,6 +16,7 @@
 같은 날 표세린 → 미즈노 사키(일본, 클리어보트 도쿄 사무소), 백다온 → 마커스 림(싱가포르)도 바꿨습니다. 미즈노 사키의 첫 후보는 cottonbro studio의 사진이라
 (네 장째가 되어) RDNE Stock project의 사진으로 바꿨고, 사진 아래 가장자리에 분홍 파일철 끝이 조금 남습니다. 마커스 림은 Ramon Karolan의 사진으로, 옛 주은채 사진이 빠져 이 사진가는 다시 한 장입니다.
 은재하 → 뤼카 베르나르(리옹 출신 셰프)는 Kampus Production의 사진으로, 이 사진가는 연하진과 두 장째이고 모델은 다른 사람입니다.
+배수경은 이름은 그대로 두고 베트남 출신 결혼이민자(귀화 16년)라는 배경을 더하면서, 40대 여성의 사진(yun zhu)으로 초상만 바꿨습니다. 옛 사진(Esma Yıkılmaz İpek)은 더 쓰지 않습니다.
 
 ## 사진에서 만든 예순여덟 장
 
@@ -68,7 +69,7 @@
 | 신영란 | `portrait-shin-yeongran.webp` | https://www.pexels.com/photo/a-woman-is-serving-food-to-customers-in-a-restaurant-27993176/ | Paul Bill (https://www.pexels.com/@hoffman11/) | [Pexels License](https://www.pexels.com/license/) |
 | 고은비 | `portrait-go-eunbi.webp` | https://www.pexels.com/photo/9730345/ | cottonbro studio (https://www.pexels.com/@cottonbro/) | [Pexels License](https://www.pexels.com/license/) |
 | 레이철 탄 | `portrait-rachel-tan.webp` | https://www.pexels.com/photo/photo-of-a-woman-with-brown-hair-looking-at-the-camera-while-holding-a-paper-pad-7651979/ | Kindel Media (https://www.pexels.com/@kindelmedia/) | [Pexels License](https://www.pexels.com/license/) |
-| 배수경 | `portrait-bae-sugyeong.webp` | https://www.pexels.com/photo/40090548/ | Esma Yıkılmaz İpek (https://www.pexels.com/@esma-yikilmaz-i-pek-558317910/) | [Pexels License](https://www.pexels.com/license/) |
+| 배수경 | `portrait-bae-sugyeong.webp` | https://www.pexels.com/photo/portrait-of-woman-in-garden-setting-38418283/ | yun zhu (https://www.pexels.com/@yun-zhu-2157767250/) | [Pexels License](https://www.pexels.com/license/) |
 | 오상철 | `portrait-oh-sangcheol.webp` | https://www.pexels.com/photo/man-in-black-suit-jacket-10031556/ | Hải Anh (https://www.pexels.com/@h-i-anh-127251498/) | [Pexels License](https://www.pexels.com/license/) |
 | 구태형 | `portrait-koo-taehyeong.webp` | https://www.pexels.com/photo/industrial-worker-in-helmet-19544217/ | Hoang NC (https://www.pexels.com/@hoang-nc-483165236/) | [Pexels License](https://www.pexels.com/license/) |
 | 허윤경 | `portrait-heo-yungyeong.webp` | https://www.pexels.com/photo/38660512/ | dongling huang (https://www.pexels.com/@dongling-huang-2147814100/) | [Pexels License](https://www.pexels.com/license/) |

@@ -115,6 +115,7 @@ A nationality is never the reason someone does right or wrong.
 | 토머스 리드 / Thomas Reed / トーマス・リード | 우지환 (profile only) | American; KD캐피탈 hired him itself from a New York regional bank after the 사건 43 dismissal (not Kingsdale's) | speaks English, an interpreter follows a beat behind (사건 48, first and only scene); his 「다만」 is the however he says in English |
 | 뤼카 베르나르 / Lucas Bernard / リュカ・ベルナール | 은재하 | Born and trained in Lyon to a Korean mother; came to Seoul with her 12 years ago; 서도경's home chef for 3 years. His mother's 반찬가게 in 망원시장 (사건 36) is unchanged | -- |
 | 이민서 (unchanged) | -- | 다문화 가정 2세: her mother came from Japan (Korean citizen). Only in narration -- 찬빈 mimics her in Japanese at the 수능 gate (사건 15); no Japanese words are written | -- |
+| 배수경 (unchanged) | -- | Came from Vietnam to marry 16 years ago, naturalized (born 쩐 티 투 / Tran Thi Thu / チャン・ティ・トゥ; the game keeps her Korean name); 9 years on the packing line; video calls home on holidays. Said once in 사건 16; 번외 3 and side04 are unchanged | half 반말 half 존댓말, as learned in markets and on the floor; 강태민 calls her 「수경 씨」 |
 
 Rules: what a foreign speaker says inside quotes is natural Korean (no English
 or Japanese mixed in, no broken Korean); whether they speak Korean or go
