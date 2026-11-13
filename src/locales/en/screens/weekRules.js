@@ -23,6 +23,11 @@ export default {
       text: "This week the Wall band stands {crisisShift} Heat earlier, and every card’s chips are worth {crisisChips} times as much.",
       world: "This week the market shook, and head office asked for the numbers first.",
     },
+    "idle-erosion": {
+      title: "Idle money shrinks",
+      text: "This week, each time a case closes, {erosion}% of what sat in the Vault through it is gone. Money spent at the tool draft doesn’t shrink.",
+      world: "This week prices rose, and money left sitting is worth less.",
+    },
     "audit-cascade": {
       title: "Audit and Cascade",
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",

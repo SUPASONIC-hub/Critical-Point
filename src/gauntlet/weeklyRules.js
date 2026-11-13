@@ -42,11 +42,12 @@ export const WEEK_RULE_ID_MAX = 32;
 /**
  * The devices a week may switch on. B3's AUDIT and B2's CASCADE were the two
  * (B3 decision 8, widened by B2 decision 11) until RULES_MARK 3 made them
- * rules of the table (tableUnlocks.js); the list is kept, empty, for the next
+ * rules of the table (tableUnlocks.js); the list was kept, empty, for the next
  * device a week tries out first (the rule switch's question 2, user
- * 2026-10-20). A device a rule names outside it is not on.
+ * 2026-10-20). B4's idle money is that device (`erosion`, IDLE MONEY below).
+ * A device a rule names outside it is not on.
  */
-export const WEEK_RULE_DEVICES = Object.freeze([]);
+export const WEEK_RULE_DEVICES = Object.freeze(["erosion"]);
 
 /** NEAR WALL: how much closer the wall's band stands. */
 export const NEAR_WALL_SHIFT = 4;
@@ -72,6 +73,20 @@ export const CRISIS_WALL_SHIFT = 3;
 export const CRISIS_CHIPS = 1.2;
 
 /**
+ * IDLE MONEY (B4, 「가만히 있으면 돈의 가치가 줄어듦」, 개선 포인트 2026-11-13): each
+ * time a case closes, this many hundredths of what the vault held through it
+ * -- what was not spent at the drafts -- are gone, before the case's own pot
+ * is banked (gauntletEngine.js `getIdleErosion`). A device (`erosion`), not a
+ * number of the board: nothing on the table moves, the vault does. In the
+ * catalogue only, booked in no week; draft number until the user picks one of
+ * the measured candidates (check:endings with WEEK_RULE=idle-erosion).
+ * Measured 2026-11-13 (the draft-spend rows, 80 paired seasons), a player who
+ * never pays: vault a case 13,965 without the week, 10,855 at 1, 8,675 at 2,
+ * 7,134 at 3, 6,046 at 4; the endings the same at every one.
+ */
+export const IDLE_EROSION_PERCENT = 2;
+
+/**
  * The audit's numbers 2026-W47's line was written with (B3's set B, 40 / 4 /
  * one in four). The table's own are auditRisk.js's since RULES_MARK 3; these
  * stay the ones that week showed, so the week's line does not move with a
@@ -89,7 +104,7 @@ function ruleWords(id) {
   const { auditLine, cascadeLine, rules } = weekRulesCopy;
   const { title, text, world } = rules[id];
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, audit, cascade: cascadeLine };
+  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, audit, cascade: cascadeLine };
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -127,6 +142,14 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "CRISIS WEEK",
     ...ruleWords("crisis-week"),
     schema: Object.freeze({ wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS }),
+  }),
+  // B4: idle money loses value, a case at a time. In the catalogue before any
+  // week names it, so it has no migration yet (booking it adds one, as
+  // crisis-week's did).
+  "idle-erosion": Object.freeze({
+    label: "IDLE MONEY",
+    ...ruleWords("idle-erosion"),
+    rules: Object.freeze(["erosion"]),
   }),
   // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
   // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules
