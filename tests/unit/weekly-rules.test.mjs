@@ -10,6 +10,8 @@ globalThis.localStorage = createStorage();
 globalThis.sessionStorage = createStorage();
 
 const {
+  CRISIS_CHIPS,
+  CRISIS_WALL_SHIFT,
   getWeekRule,
   isoWeekKey,
   nextWeekRuleAt,
@@ -230,6 +232,43 @@ test("SHORT CLOCK moves the board's own clock and chips, on top of what relics a
   const edge = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "short-clock", schema: normalizeSchema({ seconds: 14, chipsScale: 3.9 }) });
   assert.deepEqual([edge.seconds, edge.chipsScale], [12, 4]);
   assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
+});
+
+test("CRISIS WEEK moves the wall and the chips at once, on top of the board, clamped, in three languages (B10)", async () => {
+  const rule = WEEK_RULE_CATALOGUE["crisis-week"];
+  assert.equal(rule.label, "CRISIS WEEK");
+  assert.deepEqual(rule.schema, { wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS });
+  assert.deepEqual([CRISIS_WALL_SHIFT, CRISIS_CHIPS], [3, 1.2]);
+  assert.equal(rule.title, "위기 주간");
+  assert.equal(rule.text, "이번 주는 벽 띠가 열기 3만큼 앞당겨 서고, 모든 카드의 칩이 1.2배다.");
+  assert.ok(rule.world.length > 0 && rule.world.length <= 40, "one short line in the story");
+  assert.ok(!rule.rules, "it moves numbers, it switches on no device");
+  const board = getTableSchema(normalizeRunState({ weekRule: "crisis-week" }));
+  assert.equal(board.wallMin, BASE_SCHEMA.wallMin - CRISIS_WALL_SHIFT);
+  assert.equal(board.wallMax, BASE_SCHEMA.wallMax - CRISIS_WALL_SHIFT);
+  assert.equal(board.chipsScale, BASE_SCHEMA.chipsScale * CRISIS_CHIPS);
+  assert.equal(board.seconds, BASE_SCHEMA.seconds, "the clock stays where the board has it");
+  assert.deepEqual(weekRuleOverlay("crisis-week", BASE_SCHEMA), {
+    wallMin: BASE_SCHEMA.wallMin - CRISIS_WALL_SHIFT,
+    wallMax: BASE_SCHEMA.wallMax - CRISIS_WALL_SHIFT,
+    chipsScale: BASE_SCHEMA.chipsScale * CRISIS_CHIPS,
+  });
+  const edge = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "crisis-week", schema: normalizeSchema({ chipsScale: 3.9 }) });
+  assert.equal(edge.chipsScale, 4, "the chips clamp at 4");
+  // Its words in English and Japanese, the same blanks filled with the same numbers.
+  const { fill } = await import("../../src/locale.js");
+  const values = { crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS };
+  const en = (await import("../../src/locales/en/screens/weekRules.js")).default.rules["crisis-week"];
+  const ja = (await import("../../src/locales/ja/screens/weekRules.js")).default.rules["crisis-week"];
+  assert.equal(en.title, "Crisis week");
+  assert.equal(fill(en.text, values), "This week the Wall band stands 3 Heat earlier, and every card’s chips are worth 1.2 times as much.");
+  assert.equal(ja.title, "危機の週");
+  assert.equal(fill(ja.text, values), "今週は壁の帯が熱3だけ手前に立ち、すべてのカードのチップが1.2倍だ。");
+  for (const words of [en, ja]) assert.ok(typeof words.world === "string" && words.world.length > 0, "a line in the story in each language");
+  // Not on the calendar until its migration is (supabase/migrations/*_weekly_rule_crisis_week.sql.draft).
+  assert.ok(!WEEKLY_RULES.some((entry) => entry.id === "crisis-week"), "no week names it while its migration is a draft");
+  const draft = read("supabase/migrations/20261116000000_weekly_rule_crisis_week.sql.draft").replace(/^--.*$/gm, "");
+  assert.deepEqual([...draft.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => [week, id]), [["2026-W49", "crisis-week"]]);
 });
 
 test("the calendar books W48 to 2027-W15 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {

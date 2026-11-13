@@ -61,6 +61,15 @@ const HEAVY_FRACTURE_RATE = 1.75;
  */
 export const SHORT_CLOCK_SECONDS = 8;
 export const SHORT_CLOCK_CHIPS = 1.25;
+/**
+ * CRISIS WEEK (B10, 금융 소재 기획 (c) c1, 결정 Q4 (1)): the wall's band this
+ * much closer and every card's chips this many times more, at once. Two
+ * numbers the schema already has (`wallShift`, `chipsFactor`), no new engine
+ * code: a market that shakes asks for the numbers sooner and pays more for
+ * them. Draft numbers until 결정 T's results are read.
+ */
+export const CRISIS_WALL_SHIFT = 3;
+export const CRISIS_CHIPS = 1.2;
 
 /**
  * The audit's numbers 2026-W47's line was written with (B3's set B, 40 / 4 /
@@ -80,7 +89,7 @@ function ruleWords(id) {
   const { auditLine, cascadeLine, rules } = weekRulesCopy;
   const { title, text, world } = rules[id];
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, audit, cascade: cascadeLine };
+  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, audit, cascade: cascadeLine };
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -110,6 +119,14 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     label: "SHORT CLOCK",
     ...ruleWords("short-clock"),
     schema: Object.freeze({ secondsShift: -SHORT_CLOCK_SECONDS, chipsFactor: SHORT_CLOCK_CHIPS }),
+  }),
+  // B10: the crisis week, the wall and the chips at once. In the catalogue
+  // before any week names it; its first week comes with its migration
+  // (supabase/migrations/*_weekly_rule_crisis_week.sql.draft until then).
+  "crisis-week": Object.freeze({
+    label: "CRISIS WEEK",
+    ...ruleWords("crisis-week"),
+    schema: Object.freeze({ wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS }),
   }),
   // The test week, 2026-W47 (user, 2026-10-21; moved from W44 on 10-22,
   // 11-16 to 11-22): both devices at once, which RULES_MARK 3 then made rules
