@@ -672,6 +672,69 @@ export default {
       "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
+    },
+    "오민정": {
+      "appearance": "Hair flattened by a headset, a thermos of barley tea, the empathy count in the corner of her monitor.",
+      "thought": "I say sorry in my own voice, and I don’t know what I’m sorry for either.",
+      "gesture": "Before she says something that matters, Oh Minjeong covers the headset mic with her palm.",
+      "voice": "Under a kind counsellor’s manner lies a thin layer of 7 years’ tiredness.",
+      "line": "If you ask me why, that’s what I most want to know too."
+    },
+    "문정택": {
+      "appearance": "An apron with tteokbokki stains, a wad of card-terminal receipts in his pocket, thick knuckles.",
+      "thought": "Going under doesn’t scare me. Going under without knowing why does.",
+      "gesture": "Every time he says a number, Moon Jeongtaek wipes his hand once on his apron.",
+      "voice": "The rounded way of a man who runs a shop: an apology first, then the point.",
+      "line": "What do I hand in? I’ll hand in whatever you ask."
+    },
+    "한기호": {
+      "appearance": "Shirt sleeves folded twice, the foil from a convenience-store gimbap, sticky notes all round his monitor’s frame.",
+      "thought": "File a request and a red dot goes by my name. Don’t, and it goes nowhere.",
+      "gesture": "Before saying something awkward, Han Giho gives an embarrassed laugh, and stops before the laugh is over.",
+      "voice": "Soft and apologetic, but the end of every sentence comes back to the rules.",
+      "line": "I didn’t write this. I was handed it."
+    },
+    "그레이스 웡": {
+      "appearance": "Thin gold-rimmed glasses, a striped vest over a white shirt, two desk clocks set to closing times.",
+      "thought": "A payment with nobody to make the confirmation call to is a payment nobody was ever responsible for.",
+      "gesture": "Before she says something that matters, Grace Wong takes her hands off the keyboard.",
+      "voice": "She states the rules word by word, then asks the person just one sentence at the end.",
+      "line": "Analyst, who am I supposed to call?"
+    },
+    "모지현": {
+      "appearance": "A shopping bag hung on the stroller handle, hair falling past her shoulders, a phone showing the email from her last day.",
+      "thought": "For 9 years my name meant approval. Now it means suspicion.",
+      "gesture": "When she says a number, Mo Jihyun grips the stroller handle tight.",
+      "voice": "She starts calmly, and her sentences grow short whenever her own name comes up.",
+      "line": "I asked you to delete it."
+    },
+    "쩐 티 란": {
+      "appearance": "A rice cooker on top of the moving boxes, a lanyard with her lab pass, a laptop holding thirty-seven property registers.",
+      "thought": "9 years of savings have become one row of a table. A row, at least, can be counted.",
+      "gesture": "When Tran Thi Lan says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
+      "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
+      "line": "Whether that’s strange, I don’t know."
+    },
+    "육성빈": {
+      "appearance": "A convenience-store bag, a loosened tie, the team’s target table on his phone.",
+      "thought": "If I hadn’t checked it, someone else would have. And they’d have been on a contract too.",
+      "gesture": "Before saying something awkward, Yuk Seongbin puts down whatever he is holding, and leaves it half unwrapped.",
+      "voice": "Friendly and apologetic, but the end of every sentence comes back to the team’s numbers.",
+      "line": "We only checked it. Though the checked-by box does have my name in it."
+    },
+    "추영복": {
+      "appearance": "A bunch of shutter keys, a counter by the heater, a tuition bill with his granddaughter’s name on it.",
+      "thought": "If the bank’s name is on it, the bank is watching it. That’s how it has been for 32 years.",
+      "gesture": "Every time he says a big number, Chu Yeongbok gives a small laugh and slows down a little on the next words.",
+      "voice": "A neighbourhood shopkeeper’s way of talking: it starts gruff and ends in an apology.",
+      "line": "If the bank tells me, I’ll do just that."
+    },
+    "마리사 탄": {
+      "appearance": "Singapore’s night skyline past the video-call window, a half-drunk cup of tea, an approval record on screen share.",
+      "thought": "My advice is on the record. Being on the record and being taken up are different things.",
+      "gesture": "Marisa Tan says the other person’s name, then the point, and when she is done she puts a document on the screen.",
+      "voice": "In English, short and straight. Given names before titles.",
+      "line": "All we can see is the inside of the exchange. Where the money came from, the bank sees."
     }
   },
 };

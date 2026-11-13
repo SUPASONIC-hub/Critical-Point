@@ -7,6 +7,7 @@ import { installServiceWorker } from "./serviceWorker/register.js";
 import { installChunkReload } from "./state/chunkReload.js";
 import { loadLocale } from "./locale.js";
 import { installInstallPrompt } from "./state/installPrompt.js";
+import { startVitalsSample } from "./gameEvents.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
 // does not download the code that would. Turning it on in CloudSavePanel
@@ -25,6 +26,10 @@ claimTabToken();
 installServiceWorker();
 // Before the intro renders: the browser's install offer can arrive first (state/installPrompt.js).
 installInstallPrompt();
+// N12: after `load`, one page in twenty with Google's tag fetches the speed
+// watcher (gameEvents.js startVitalsSample); the rest never download it.
+if (document.readyState === "complete") startVitalsSample();
+else window.addEventListener("load", () => startVitalsSample(), { once: true });
 
 const paint = () => createRoot(document.getElementById("root"), { onCaughtError: logCaughtRenderError }).render(
   <>

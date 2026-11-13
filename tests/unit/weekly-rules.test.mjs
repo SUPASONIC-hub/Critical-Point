@@ -10,6 +10,8 @@ globalThis.localStorage = createStorage();
 globalThis.sessionStorage = createStorage();
 
 const {
+  CRISIS_CHIPS,
+  CRISIS_WALL_SHIFT,
   getWeekRule,
   isoWeekKey,
   nextWeekRuleAt,
@@ -232,8 +234,46 @@ test("SHORT CLOCK moves the board's own clock and chips, on top of what relics a
   assert.deepEqual(weekRuleOverlay("short-clock", BASE_SCHEMA), { seconds: BASE_SCHEMA.seconds - SHORT_CLOCK_SECONDS, chipsScale: BASE_SCHEMA.chipsScale * SHORT_CLOCK_CHIPS });
 });
 
+test("CRISIS WEEK moves the wall and the chips at once, on top of the board, clamped, in three languages (B10)", async () => {
+  const rule = WEEK_RULE_CATALOGUE["crisis-week"];
+  assert.equal(rule.label, "CRISIS WEEK");
+  assert.deepEqual(rule.schema, { wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS });
+  assert.deepEqual([CRISIS_WALL_SHIFT, CRISIS_CHIPS], [3, 1.2]);
+  assert.equal(rule.title, "위기 주간");
+  assert.equal(rule.text, "이번 주는 벽 띠가 열기 3만큼 앞당겨 서고, 모든 카드의 칩이 1.2배다.");
+  assert.ok(rule.world.length > 0 && rule.world.length <= 40, "one short line in the story");
+  assert.ok(!rule.rules, "it moves numbers, it switches on no device");
+  const board = getTableSchema(normalizeRunState({ weekRule: "crisis-week" }));
+  assert.equal(board.wallMin, BASE_SCHEMA.wallMin - CRISIS_WALL_SHIFT);
+  assert.equal(board.wallMax, BASE_SCHEMA.wallMax - CRISIS_WALL_SHIFT);
+  assert.equal(board.chipsScale, BASE_SCHEMA.chipsScale * CRISIS_CHIPS);
+  assert.equal(board.seconds, BASE_SCHEMA.seconds, "the clock stays where the board has it");
+  assert.deepEqual(weekRuleOverlay("crisis-week", BASE_SCHEMA), {
+    wallMin: BASE_SCHEMA.wallMin - CRISIS_WALL_SHIFT,
+    wallMax: BASE_SCHEMA.wallMax - CRISIS_WALL_SHIFT,
+    chipsScale: BASE_SCHEMA.chipsScale * CRISIS_CHIPS,
+  });
+  const edge = getTableSchema({ ...RUN_INITIAL_STATE, weekRule: "crisis-week", schema: normalizeSchema({ chipsScale: 3.9 }) });
+  assert.equal(edge.chipsScale, 4, "the chips clamp at 4");
+  // Its words in English and Japanese, the same blanks filled with the same numbers.
+  const { fill } = await import("../../src/locale.js");
+  const values = { crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS };
+  const en = (await import("../../src/locales/en/screens/weekRules.js")).default.rules["crisis-week"];
+  const ja = (await import("../../src/locales/ja/screens/weekRules.js")).default.rules["crisis-week"];
+  assert.equal(en.title, "Crisis week");
+  assert.equal(fill(en.text, values), "This week the Wall band stands 3 Heat earlier, and every card’s chips are worth 1.2 times as much.");
+  assert.equal(ja.title, "危機の週");
+  assert.equal(fill(ja.text, values), "今週は壁の帯が熱3だけ手前に立ち、すべてのカードのチップが1.2倍だ。");
+  for (const words of [en, ja]) assert.ok(typeof words.world === "string" && words.world.length > 0, "a line in the story in each language");
+  // On the calendar once, 2026-W49, as its migration books it (사용자 「전부 1」, 11-13).
+  assert.deepEqual(WEEKLY_RULES.filter((entry) => entry.id === "crisis-week").map(({ week }) => week), ["2026-W49"]);
+  const draft = read("supabase/migrations/20261116000000_weekly_rule_crisis_week.sql").replace(/^--.*$/gm, "");
+  assert.deepEqual([...draft.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => [week, id]), [["2026-W49", "crisis-week"]]);
+});
+
 test("the calendar books W48 to 2027-W15 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
-  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48");
+  // The crisis week (B10, 2026-W49) sits between them and is checked on its own above.
+  const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48" && entry.id !== "crisis-week");
   assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
     ["2026-W48", "heavy-fracture"],
     ["2026-W50", "short-clock"],
@@ -404,7 +444,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql", "20261115000000_weekly_rule_calendar_w05_w15.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql", "20261115000000_weekly_rule_calendar_w05_w15.sql", "20261116000000_weekly_rule_crisis_week.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
@@ -512,7 +552,7 @@ test("10-22 to 11-01 (W43, W44): no rule this week and no notice of the next, un
   assert.equal(weeklyRuleLine(weekStartMs("2026-W45")).tone, "next", "W45's Monday: W46's notice");
 });
 
-test("the ranking keeps last week's board for the week after it: W47 on 11-23, beside W48's, gone when W49 ends", () => {
+test("the ranking keeps last week's board for the week after it: W47 on 11-23, beside W48's, and a week without a rule keeps only last week's", () => {
   const boards = (at) => weekBoardsAt(at).map((item) => `${item.week}:${item.rule}${item.last ? ":last" : ""}`);
   // 11-22 23:59 KST, the test week's last minute: its own board, then W46's as last week's.
   const sunday = kst("2026-11-22T23:59:00");
@@ -521,11 +561,14 @@ test("the ranking keeps last week's board for the week after it: W47 on 11-23, b
   const monday = kst("2026-11-23T00:00:00");
   assert.equal(monday, weekStartMs("2026-W48"));
   assert.deepEqual(boards(monday), ["2026-W48:heavy-fracture", "2026-W47:audit-cascade:last"]);
-  // W49 has no rule: last week's board alone. W50 starts its own, and W48's goes.
-  assert.deepEqual(boards(weekStartMs("2026-W49")), ["2026-W48:heavy-fracture:last"]);
-  assert.equal(weekHasNews(weekStartMs("2026-W49"), undefined, -7), true);
-  assert.deepEqual(boards(weekStartMs("2026-W50") - 1), ["2026-W48:heavy-fracture:last"], "W49's last minute");
-  assert.deepEqual(boards(weekStartMs("2026-W50")), ["2026-W50:short-clock"], "the next rule week: W49 had no rule, so no last week's board");
+  // W49 is the crisis week (B10, 11-13): its own board, W48's as last week's. W50 starts its own beside W49's.
+  assert.deepEqual(boards(weekStartMs("2026-W49")), ["2026-W49:crisis-week", "2026-W48:heavy-fracture:last"]);
+  assert.deepEqual(boards(weekStartMs("2026-W50")), ["2026-W50:short-clock", "2026-W49:crisis-week:last"]);
+  // W51 has no rule: last week's board alone. W52 starts its own, and W50's goes.
+  assert.deepEqual(boards(weekStartMs("2026-W51")), ["2026-W50:short-clock:last"]);
+  assert.equal(weekHasNews(weekStartMs("2026-W51"), undefined, -7), true);
+  assert.deepEqual(boards(weekStartMs("2026-W52") - 1), ["2026-W50:short-clock:last"], "W51's last minute");
+  assert.deepEqual(boards(weekStartMs("2026-W52")), ["2026-W52:near-wall"], "the next rule week: W51 had no rule, so no last week's board");
   // After the calendar's last rule week, one week of its board, then nothing.
   const lastWeek = WEEKLY_RULES.at(-1).week;
   const after = weekStartMs(lastWeek) + 7 * DAY;

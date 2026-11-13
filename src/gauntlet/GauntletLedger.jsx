@@ -2,8 +2,9 @@ import { describeAuditLedger } from "./auditRisk.js";
 import { createGauntletLedger } from "./gauntletEngine.js";
 import { normalizeRelicIds, RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
-import { formatMultiplier, formatNumber } from "./tableReadout.js";
+import { formatMultiplier, formatMoney } from "./tableReadout.js";
 import { objectParticle } from "../playerLanguage.js";
+import { MONEY_READ_AS } from "../gameConstants.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -20,9 +21,9 @@ export function GauntletLedger({ log = [], summary = null, caseId = null }) {
   const ledger = createGauntletLedger(log);
   const vault = Number(summary?.vault) || 0;
   const relics = normalizeRelicIds(summary?.relics);
-  const potLost = formatNumber(ledger.potLost);
+  const potLost = formatMoney(ledger.potLost);
   const note = ledger.busts > 0
-    ? fill(say.lost, { busts: ledger.busts, pot: potLost, particle: objectParticle(potLost) })
+    ? fill(say.lost, { busts: ledger.busts, pot: potLost, particle: objectParticle(MONEY_READ_AS) })
     : ledger.cashes > 0
       ? say.clean
       : say.unplayed;
@@ -36,7 +37,7 @@ export function GauntletLedger({ log = [], summary = null, caseId = null }) {
       <div className="pressure-ledger-grid">
         <article>
           <span>{say.vault}</span>
-          <b className={vault > 0 ? "gain" : ""}>{formatNumber(vault)}</b>
+          <b className={vault > 0 ? "gain" : ""}>{formatMoney(vault)}</b>
           <small>{say.season}</small>
         </article>
         <article>
@@ -56,13 +57,13 @@ export function GauntletLedger({ log = [], summary = null, caseId = null }) {
         </article>
         <article>
           <span>{say.comboPot}</span>
-          <b className={ledger.grooveBanked > 0 ? "gain" : ""}>{formatNumber(ledger.grooveBanked)}</b>
+          <b className={ledger.grooveBanked > 0 ? "gain" : ""}>{formatMoney(ledger.grooveBanked)}</b>
           <small>{say.comboShare}</small>
         </article>
         <article>
           <span>{say.potLost}</span>
-          <b className={ledger.potLost > 0 ? "cost" : ""}>{formatNumber(ledger.potLost)}</b>
-          <small>{fill(say.potBanked, { pot: formatNumber(ledger.potBanked) })}</small>
+          <b className={ledger.potLost > 0 ? "cost" : ""}>{formatMoney(ledger.potLost)}</b>
+          <small>{fill(say.potBanked, { pot: formatMoney(ledger.potBanked) })}</small>
         </article>
       </div>
       <p className="pressure-ledger-note">{audit ? `${note} ${audit}` : note}</p>

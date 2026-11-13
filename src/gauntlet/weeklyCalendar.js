@@ -40,6 +40,8 @@ const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
   Object.freeze({ week: "2026-W47", id: "audit-cascade", added: "2026-10-22" }),
   Object.freeze({ week: "2026-W48", id: "heavy-fracture", added: "2026-10-23" }),
+  // B10 위기 주간 (2026-11-13, 사용자 「전부 1」): its first week, between the event weeks.
+  Object.freeze({ week: "2026-W49", id: "crisis-week", added: "2026-11-13" }),
   Object.freeze({ week: "2026-W50", id: "short-clock", added: "2026-10-23" }),
   Object.freeze({ week: "2026-W52", id: "near-wall", added: "2026-10-23" }),
   Object.freeze({ week: "2027-W01", id: "heavy-fracture", added: "2026-10-23" }),

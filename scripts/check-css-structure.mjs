@@ -437,7 +437,8 @@ const fileBudgets = {
   // word is centred in its transform, which the build keeps, not by the
   // separate translate property the build dropped.
   // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
-  "briefing.css": { lines: 854, bytes: 16681 },
+  // 854 / 16681 -> 922 / 17736 on 2026-11-13, n1-act-card, measured: N1's 중간 결산 on the act card (ActTally.jsx) -- its rows, the share buttons and the tallied card's layout.
+  "briefing.css": { lines: 922, bytes: 17736 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

@@ -27,6 +27,11 @@ const weekRulesCopy = {
       text: "이번 주는 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",
       world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
     },
+    "crisis-week": {
+      title: "위기 주간",
+      text: "이번 주는 벽 띠가 열기 {crisisShift}만큼 앞당겨 서고, 모든 카드의 칩이 {crisisChips}배다.",
+      world: "이번 주 시장이 흔들리자 본사는 숫자부터 맞추라고 했다.",
+    },
     "audit-cascade": {
       title: "감사와 연쇄",
       text: "이번 주는 감사와 연쇄가 함께 선다. {audit} {cascade} CASCADE 판의 확정은 감사에 세지 않는다.",

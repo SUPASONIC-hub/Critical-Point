@@ -135,7 +135,7 @@ test("only C-12's read reaches a score (C-1(1), 판 읽기), and the board still
     assert.equal(shown({ summary: { gauntlet: { vault }, completedCaseCount: cases } }), perCaseVault(vault, cases), `${vault} / ${cases}`);
   }
   assert.equal(perCaseVault(5, undefined), null, "a row without its case count shows nothing");
-  assert.equal(describeVaultPerCase({ case01: {}, final: { gauntlet: { vault: 24690 } } }), "사건당 금고 12,345");
+  assert.equal(describeVaultPerCase({ case01: {}, final: { gauntlet: { vault: 24690 } } }), "사건당 금고 $12,345");
   assert.equal(describeVaultPerCase({}), "");
 });
 

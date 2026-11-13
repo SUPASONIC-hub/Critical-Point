@@ -159,3 +159,32 @@ test("the tab counts to the wall band on a hot table, says 징계 회부 after a
   await page.locator(".choices .choice").first().click({ force: true });
   await expect(page).not.toHaveTitle(/징계 회부/, { timeout: TRANSITION_TIMEOUT_MS });
 });
+
+/**
+ * N3 (2026-11-12): a visit from a shared card's address (`/?from=card&h=<id>`,
+ * src/shareLink.js) reads 「친구의 결과: …」 on the start screen, the habit's
+ * name in the page's own language. An id that is not a habit's, or anything
+ * that is not an id, prints nothing, and a plain visit has no line.
+ */
+test("a shared card's address names the friend's habit on the start screen, and nothing else does", async ({ page }) => {
+  // Seven page loads; on the dev server each one compiles its modules, so this takes about a minute alone.
+  // The line waits for the page's dictionary and the habits table, so each read gets a transition's wait.
+  test.slow();
+  const line = page.getByTestId("friend-result-line");
+  await page.goto("/?from=card&h=moth");
+  await expect(line).toHaveText("친구의 결과: 하이리스크 불나방형", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+
+  await page.goto("/?from=card&h=moth&lang=en");
+  await expect(line).toHaveText("Your friend's result: High-Risk Moth", { timeout: TRANSITION_TIMEOUT_MS });
+  await page.goto("/?from=card&h=moth&lang=ja");
+  await expect(line).toHaveText("友だちの結果：ハイリスク夏の虫型", { timeout: TRANSITION_TIMEOUT_MS });
+
+  for (const address of ["/?from=card&h=nobody", "/?from=card&h=%3Cimg%20src%3Dx%3E", "/?h=moth", "/"]) {
+    await page.goto(address);
+    await expect(page.getByTestId("start-first-case")).toBeVisible();
+    // Past the habits table's fetch, which an id-shaped address makes.
+    await page.waitForLoadState("networkidle");
+    await expect(line, address).toHaveCount(0);
+  }
+});

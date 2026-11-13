@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "../appConfig.js";
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
+import { noteCaseClosed } from "../gameEvents.js";
 import {
   applyEffect,
   buildSceneBeat,
@@ -402,6 +403,8 @@ export function useChoiceCommit(context) {
     let nextCaseResults = caseResults;
     let closedCase = null;
     if (completedNow) {
+      // N2: 프롤로그 01 closed for the first time (gameEvents.js).
+      noteCaseClosed(currentCase, Boolean(caseResults[currentCase]));
       const caseSummaryDraft = createCaseSummary(nextTriggers, nextCognition, nextLog, {
         resources: finalResources,
         schemaVersion: SAVE_SCHEMA_VERSION,

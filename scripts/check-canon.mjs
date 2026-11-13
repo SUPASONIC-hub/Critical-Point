@@ -594,6 +594,20 @@ export const CANON = [
     allow: ["30"],
   },
   {
+    id: "crisis-group-launch",
+    fact: "KD금융그룹 launched in 2008, the year of the world financial crisis (docs/canon.md, The crisis years)",
+    files: SEASON,
+    find: /(\d{4})년 (?:KD)?금융 ?그룹 (?:출범|발족)/g,
+    allow: ["2008"],
+  },
+  {
+    id: "crisis-bank-sale",
+    fact: "경동은행 was being sold to 킹스데일 in the spring of 1998, after the currency crisis (docs/canon.md, The crisis years)",
+    files: SEASON,
+    find: /(\d{4})년 봄, 경동은행/g,
+    allow: ["1998"],
+  },
+  {
     id: "kd-account-name",
     fact: "the player's money is the KD은행 계좌 -- KD Bank account, KD銀行口座 -- one name in each language",
     // The table's words in the three languages (stage.purse). Read loosely --

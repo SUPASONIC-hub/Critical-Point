@@ -110,6 +110,15 @@ export const speakers = {
   "연시우": "Yeon Siwoo",
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
+  "오민정": "Oh Minjeong",
+  "문정택": "Moon Jeongtaek",
+  "한기호": "Han Giho",
+  "그레이스 웡": "Grace Wong",
+  "모지현": "Mo Jihyun",
+  "쩐 티 란": "Tran Thi Lan",
+  "마리사 탄": "Marisa Tan",
+  "육성빈": "Yuk Seongbin",
+  "추영복": "Chu Yeongbok"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -140,7 +149,16 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
+  "KD은행 고객센터 야간 상담원 · 7년 차": "Night counsellor, KD Bank Customer Center · 7 years in",
+  "김포 분식집 사장 · 12년째 · 56세": "Owner of a snack bar in Gimpo · 12 years running · age 56",
+  "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center",
+  "홍콩 수취 은행 송금 조사 담당 · 29세": "Payments investigator at the receiving bank in Hong Kong · age 29",
+  "전 KD캐피탈 자금부 해외 송금 담당 · 9년 · 37세": "Former overseas-payments officer, KD Capital Treasury · 9 years · age 37",
+  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul",
+  "KD은행 디지털자산제휴팀 과장": "Manager, Digital Asset Partnerships, KD Bank",
+  "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
+  "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore"
 };
 
 
@@ -742,6 +760,22 @@ export const copy = {
       "side03": {
         "label": "Side case 3",
         "title": "An Ordinary Night"
+      },
+      "side04": {
+        "label": "Side case 4",
+        "title": "Year-End Settlement"
+      },
+      "side07": {
+        "label": "Side case 7",
+        "title": "Friday, 17:58"
+      },
+      "side06": {
+        "label": "Side case 6",
+        "title": "The Deposit"
+      },
+      "side05": {
+        "label": "Side case 5",
+        "title": "Listing Eve"
       }
     }
   }
