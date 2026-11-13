@@ -30,6 +30,11 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * 2027-W03; 2026 has a W53), the three event rules in turn. The `added` day
  * is the day the pull request is merged: 2026-10-23 (moved up from the
  * planned 10-27 by the user's choice, 10-23); W48 keeps its seven days.
+ *
+ * 2027-W05 to 2027-W15 (N9, 2026-11-12 결정 (1)): the same rotation carried
+ * on for twelve more weeks, one week in two, the three event rules in turn
+ * after W03's short-clock. `added` is the day the draft was written; the PR
+ * is merged at least seven days before W05 (2027-02-01), so the notice holds.
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
@@ -39,6 +44,12 @@ const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W52", id: "near-wall", added: "2026-10-23" }),
   Object.freeze({ week: "2027-W01", id: "heavy-fracture", added: "2026-10-23" }),
   Object.freeze({ week: "2027-W03", id: "short-clock", added: "2026-10-23" }),
+  Object.freeze({ week: "2027-W05", id: "near-wall", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W07", id: "heavy-fracture", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W09", id: "short-clock", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W11", id: "near-wall", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W13", id: "heavy-fracture", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W15", id: "short-clock", added: "2026-11-12" }),
 ]);
 
 /**
@@ -110,4 +121,19 @@ export function weekStartMs(weekKey) {
 export function weekHasNews(ms, calendar = WEEKLY_RULES, days = 7) {
   const weeks = [isoWeekKey(ms), isoWeekKey(Number(ms) + days * DAY_MS)];
   return calendar.some((entry) => weeks.includes(entry.week));
+}
+
+/**
+ * The last unscheduled ranking wipe (결정 T, N10): 2026-11-30, Monday 00:00
+ * KST. The start screen says so from two weeks before (11-16 00:00 KST) to
+ * the end of that day, read off the weekly clock, so a test build (held on a
+ * January week) never shows it.
+ */
+export const RANKING_RESET_MS = Date.parse("2026-11-30T00:00:00+09:00");
+export const RANKING_RESET_NOTICE_DAYS = 14;
+
+/** Whether the start screen tells of the 11-30 ranking wipe at `ms`. */
+export function rankingResetNoticeAt(ms) {
+  const at = Number(ms);
+  return Number.isFinite(at) && at >= RANKING_RESET_MS - RANKING_RESET_NOTICE_DAYS * DAY_MS && at < RANKING_RESET_MS + DAY_MS;
 }
