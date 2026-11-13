@@ -394,6 +394,9 @@ async function resumeAtAct(page, caseId, { shown = null, caseResults = {} } = {}
 }
 
 test("B-11(1): an act's first case opens on its title card, a key goes on to the briefing, and a run sees it once", async ({ page }) => {
+  // Two cold loads of the dev server (the resume, then the reload): 58-60s on main on three local workers, at the
+  // 60s default's edge, and over it on a busy machine. The reload is waited for, not raced.
+  test.setTimeout(120_000);
   await resumeAtAct(page, "case08");
   const card = page.getByTestId("act-card");
   await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
