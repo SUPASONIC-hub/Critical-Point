@@ -60,6 +60,8 @@
     "check:locale": "node scripts/check-locale.mjs",
     "check:locale:strict": "node scripts/check-locale.mjs --strict",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
+    "check:readme": "node scripts/check-readme.mjs",
+    "capture:readme": "node scripts/capture-readme-shots.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
     "e2e:rebalance": "node scripts/e2e-rebalance.mjs",

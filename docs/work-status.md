@@ -12,7 +12,7 @@ list of the files it touched.
 - The season is 55 cases: 프롤로그 01-05, 사건 01-49 and the finale
   (`CASE_SEQUENCE` in `src/gameCases.js`). A season deals about 490 decision
   windows, about 9 a case.
-- `npm run verify:static` (28 checks, in parallel, about a minute) and `npm run
+- `npm run verify:static` (29 checks, in parallel, about a minute) and `npm run
   verify:quick` pass. The browser tiers run against the production build served
   by `vite preview`, not the dev server.
 - The play screen holds one decision on one screen: on a 390x844 phone the page
@@ -480,7 +480,9 @@ Still open, on purpose:
   `GA_MEASUREMENT_ID`, off by default; the three policy pages announce
   Google Analytics from 2026-11-12, the policy's seven days' notice; the
   Render CSP took the Google origins on 10-30, and the variable goes in on
-  11-12); #381 (the Japanese five-card hand at 360px: label CSS 12px and
+  11-12; `GA_MEASUREMENT_ID` was set on Render on 2026-11-12, check-ga-on
+  23/23 -- the first run was 22/23, `/ja/` served from the Cloudflare edge
+  cache, cleared within minutes); #381 (the Japanese five-card hand at 360px: label CSS 12px and
   17 long labels shortened, before review; hand5 overflow on Linux CI's
   Noto CJK 46 to 0 -- a Windows measurement alone does not prove a fit);
   #382 (at 360x740 the Korean start button ended 2px below the screen in
@@ -2194,7 +2196,7 @@ Still open, on purpose:
 ## Verification Commands
 
 ```bash
-npm run verify:static   # 28 checks, in parallel
+npm run verify:static   # 29 checks, in parallel
 npm run verify:quick    # + check:specs, build:e2e, check:bundle, check:deploy:offline,
                         #   test:runtime, test:e2e:preview, test:performance
 npm run verify          # + test:e2e
@@ -2203,7 +2205,7 @@ npm run test:coverage   # the unit tests with per-module coverage floors
 npm run test:visual:docker   # visual regression in the pinned Linux container
 ```
 
-`npm run verify:static` is `scripts/verify-static.mjs`: 28 checks run side by
+`npm run verify:static` is `scripts/verify-static.mjs`: 29 checks run side by
 side in a pool, each one's output held and printed as a block, and the run fails
 after all of them have reported. The list is `CHECKS` in that file, and each
 entry is an npm script, so `npm run <check>` alone does exactly what it does
@@ -2221,7 +2223,8 @@ check passed without reading a sheet), `check:art`,
 `check:fonts`, `check:export-schema`, `check:test-storage`,
 `check:visual-baselines`, `check:node`, `check:grants`, `check:canon`,
 `check:card-labels`, `check:locale:strict` (English and Japanese with no
-missing or stale line) and `check:doc-numbers`. None of them needs a browser.
+missing or stale line), `check:doc-numbers` and `check:readme` (the README's
+portfolio rules, docs/readme-rules.md). None of them needs a browser.
 
 `test:coverage` is `scripts/check-coverage.mjs`. It leaves the authored data
 (`src/nodes/`, `gameData.js`, `gameDialogue.js`, `gameCases.js`, the copy

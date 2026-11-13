@@ -56,13 +56,34 @@ export { createTelemetryEventId } from "./telemetryEventId.js";
  * snapshot `open`. The server takes 6,144 bytes of it as jsonb text
  * (20261026000000, which writes `": "` and `", "` where JSON.stringify writes
  * `:` and `,`), so the page keeps it to 4,096 bytes as JSON.stringify counts:
- * an honest row measures at most 1.5 KB and the largest a run can make
- * 2.2 KB as jsonb, 2.0 KB of JSON (tests/unit/case-open.test.mjs), so this is
+ * an honest row measures at most 1.8 KB and the largest a run can make
+ * 2.6 KB as jsonb, 2.4 KB of JSON (tests/unit/case-open.test.mjs, with F1 step 2's
+ * carry and route), so this is
  * room, not a squeeze.
  */
 export const CASE_DYNAMICS_MAX_BYTES = 4096;
 
 const jsonBytes = (value) => new TextEncoder().encode(JSON.stringify(value) ?? "").length;
+
+const isPlainObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+/** Absent, null, or a text of at most `max` characters. */
+const shortText = (value, max) => value == null || (typeof value === "string" && value.length <= max);
+
+/**
+ * What is wrong with the snapshot's two records of F1 step 2, as the server's
+ * `playtest_sessions_dynamics_shape` reads them (20261113000000, a draft):
+ * each optional; `focusCarry` an object with a true/false `rebooted` and a
+ * `stance` that is null or a short text; `openingRoute` an object with a
+ * `nodeId` text and an `after` and a `rank` that are null or short texts.
+ */
+function openRecordErrors({ focusCarry: carry, openingRoute: route }) {
+  const errors = [];
+  if (carry != null && !(isPlainObject(carry) && typeof carry.rebooted === "boolean" && shortText(carry.stance, 32))) errors.push("invalid dynamics.open.focusCarry");
+  if (route != null && !(isPlainObject(route) && typeof route.nodeId === "string" && shortText(route.nodeId, 64) && shortText(route.after, 64) && shortText(route.rank, 8))) {
+    errors.push("invalid dynamics.open.openingRoute");
+  }
+  return errors;
+}
 
 /** What is wrong with a case row's `dynamics` as the page sends it (S3's keys); none for a row without it. */
 export function validateCaseDynamics(dynamics) {
@@ -71,6 +92,7 @@ export function validateCaseDynamics(dynamics) {
   const errors = [];
   const open = dynamics.open;
   if (open !== undefined && open !== null && (typeof open !== "object" || Array.isArray(open) || typeof open.caseId !== "string")) errors.push("invalid dynamics.open");
+  else if (isPlainObject(open)) errors.push(...openRecordErrors(open));
   for (const key of ["linksOut", "relicOffer"]) {
     if (dynamics[key] !== undefined && !Array.isArray(dynamics[key])) errors.push(`invalid dynamics.${key}`);
   }
@@ -90,6 +112,22 @@ export function fitCaseDynamics(dynamics) {
   return rest;
 }
 
+/**
+ * A season-final row's `seasonStanding` (decision T3, seasonStanding.js's
+ * `readSeasonStandingMark`): one of SEASON_STANDING_MARKS there, written out
+ * here so the first paint does not load the collapse gate's module; a test
+ * keeps the two lists one. The server takes the summary as any object of at
+ * most 4,096 bytes without reading its keys, so a row without it, or from
+ * before it, is a row as before.
+ */
+const SEASON_STANDING_VALUES = new Set(["held", "clear", "near", "over"]);
+
+/** What is wrong with a case row's `summary.seasonStanding`; none for a row without it. */
+export function validateSeasonStanding(summary) {
+  const value = summary?.seasonStanding;
+  return value === undefined || SEASON_STANDING_VALUES.has(value) ? [] : ["invalid summary.seasonStanding"];
+}
+
 export function validateTelemetryItem(item) {
   const errors = [];
   if (!TELEMETRY_TYPES.has(item?.type)) errors.push(`invalid type ${item?.type}`);
@@ -100,7 +138,7 @@ export function validateTelemetryItem(item) {
   if (containsPrivateTelemetryValue(item?.payload, ALLOWED_PRIVATE_KEYS[item?.type] ?? NO_ALLOWED_KEYS)) {
     errors.push("payload contains private fields");
   }
-  if (item?.type === "case") errors.push(...validateCaseDynamics(item?.payload?.dynamics));
+  if (item?.type === "case") errors.push(...validateCaseDynamics(item?.payload?.dynamics), ...validateSeasonStanding(item?.payload?.summary));
   return errors;
 }
 
