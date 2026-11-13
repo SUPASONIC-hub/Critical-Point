@@ -518,7 +518,7 @@ test("2026-W47, the test week, played the audit and the links together, told fro
   const entry = WEEKLY_RULES.find((item) => item.week === "2026-W47");
   assert.equal(entry?.id, "audit-cascade");
   assert.deepEqual([...getWeekRule(entry.id).rules], ["audit", "cascade"], "what it switched on, as the table record reads it");
-  assert.deepEqual(WEEK_RULE_DEVICES, [], "the devices became rules of the table (tableUnlocks.js)");
+  for (const device of ["audit", "cascade"]) assert.ok(!WEEK_RULE_DEVICES.includes(device), "the devices became rules of the table (tableUnlocks.js)");
   for (const device of ["audit", "cascade"]) assert.equal(weekRuleHasDevice(entry.id, device), false, device);
   assert.equal(getWeekRule(entry.id).schema, undefined, "no number on the board moves");
   assert.equal(weekStartMs("2026-W47"), kst("2026-11-16T00:00:00"), "Monday 2026-11-16, Korean time");

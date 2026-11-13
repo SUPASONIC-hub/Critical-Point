@@ -6,7 +6,7 @@ import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -254,6 +254,8 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+// WEEK_RULE (season-bot.mjs): every season above and below was a season begun in that week.
+if (WEEK_RULE) console.log(`Week rule (measured): every season under ${WEEK_RULE}, values ${WEEK_VALUES}`);
 /**
  * B2's links, measured (the links on (CASCADE=0 turns them off); the design's 3-2 and 3-3). The
  * population's line, then the hands that read the card's link mark: each
@@ -361,7 +363,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   const SPEND_SEASONS = Number(process.env.ENDING_SPEND_SEASONS) || POPULATION.length * 10;
   const policies = ["never", "reroll", "extra", "always", "early"];
   const bots = Object.fromEntries(policies.map((spend) => [spend, createSeasonBot({ seed: 20261104, staged, spend })]));
-  const rows = Object.fromEntries(policies.map((spend) => [spend, { endings: new Map(), slack: 0, vault: 0, spent: 0, moved: 0, slackLost: 0 }]));
+  const rows = Object.fromEntries(policies.map((spend) => [spend, { endings: new Map(), slack: 0, vault: 0, spent: 0, moved: 0, slackLost: 0, eroded: 0 }]));
   for (let index = 0; index < SPEND_SEASONS; index += 1) {
     const archetype = POPULATION[index % POPULATION.length];
     const seasons = Object.fromEntries(policies.map((spend) => {
@@ -379,13 +381,14 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
       if (season.ending.id !== bare.ending.id) row.moved += 1;
       row.vault += season.strain.seasonVaultPerCase;
       row.spent += season.caseDynamics.final?.seasonSpent ?? 0;
+      row.eroded += season.eroded ?? 0;
     }
   }
   const per = (part) => ((100 * part) / SPEND_SEASONS).toFixed(1);
   console.log(`Draft spend and the ending (measured, ${SPEND_SEASONS} population slots, each season played once per policy on one seed; slack = a vault of ${VAULT_SLACK_PER_CASE} a case):`);
   for (const spend of policies) {
     const row = rows[spend];
-    console.log(`  ${spend.padEnd(6)} vault ${Math.round(row.vault / SPEND_SEASONS)} a case, paid ${Math.round(row.spent / SPEND_SEASONS)} a season, slack ${per(row.slack)}% (lost against never ${per(row.slackLost)}%), ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
+    console.log(`  ${spend.padEnd(6)} vault ${Math.round(row.vault / SPEND_SEASONS)} a case, paid ${Math.round(row.spent / SPEND_SEASONS)} a season${WEEK_RULE ? `, eroded ${Math.round(row.eroded / SPEND_SEASONS)}` : ""}, slack ${per(row.slack)}% (lost against never ${per(row.slackLost)}%), ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
   }
 }
 

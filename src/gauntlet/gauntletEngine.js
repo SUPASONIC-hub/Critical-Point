@@ -42,7 +42,7 @@ import {
   WINDOW_SECONDS,
 } from "./tableRules.js";
 import { decisionWindowSeconds } from "./stakeClock.js";
-import { normalizeWeekRuleId, weekRuleOverlay } from "./weeklyRules.js";
+import { IDLE_EROSION_PERCENT, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
@@ -1383,6 +1383,18 @@ function canSpendAtDraft(run) {
   return Boolean(run.relicDraft) && run.relicOffer.length > 0 && !run.practice && !run.story;
 }
 
+/**
+ * IDLE MONEY (B4, a week's device, weeklyRules.js): what a case's close takes
+ * from `vault`, the money the vault held through the case, under the week
+ * `weekRule`. 0 under any other week. Whole units, rounded down, so a vault
+ * under 100 / IDLE_EROSION_PERCENT loses nothing. The chain check reads it as
+ * the most a close may take besides a draft's price (chainRecheck.js).
+ */
+export function getIdleErosion(weekRule, vault) {
+  if (!weekRuleHasDevice(weekRule, "erosion")) return 0;
+  return Math.floor((Math.max(0, Math.round(Number(vault) || 0)) * IDLE_EROSION_PERCENT) / 100);
+}
+
 /** The run with `cost` paid out of the vault: the bank rail's 방금 and the season's spent column say so. */
 function payFromVault(run, cost, draft) {
   const vault = run.vault - cost;
@@ -1800,11 +1812,17 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // and on the close the part of the vault's share and the hand's it takes.
   const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
+  // IDLE MONEY (B4): on a season's own close under the week that has it, the
+  // vault held through the case shrinks before the case's pot is banked. Not
+  // in story mode (no week's rule) nor in a replay (its vault is lent).
+  const erodes = caseClosed && !practice && !current.practice && current.story !== true;
+  const eroded = erodes ? getIdleErosion(current.weekRule, current.vault) : 0;
+  const handEroded = erodes ? getIdleErosion(current.weekRule, current.handVault) : 0;
   // The hand's money for the bank rail: the cash's pot less what a closing
   // audit took, or what the wall and the audit took. A replay's hand is still
   // shown; the season's totals are the real cases'.
   const won = outcome === "cash" ? pot : 0;
-  const taken = lostPot + (audited?.lost ?? 0);
+  const taken = lostPot + (audited?.lost ?? 0) + eroded;
   const burn = card ? getCardBurn(card, current.schema) : null;
   const fractureAxis = burn && Math.abs(burn.value) >= FRACTURE_MIN_BURN ? burn.key : null;
   const nextSchema = buildNextSchema({
@@ -1857,6 +1875,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     lostPot,
     insuredPot,
     secured,
+    // B4, under the week that has it: what the close took from the vault held through the case.
+    ...(eroded ? { eroded } : {}),
     // Only on a table that counts it: the audit after this window, and on the
     // close whether it took its part and how much (`secured` is after it).
     ...(audited ? { audit: { count: audited.count, caught: audited.caught, lost: audited.lost } } : {}),
@@ -1917,7 +1937,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     windowIndex: current.windowIndex + 1,
     practiceWindows: current.practiceWindows + (current.practice ? 1 : 0),
     runPot: caseClosed ? 0 : runPotAfter,
-    vault: current.vault + secured,
+    vault: current.vault - eroded + secured,
     streak: hotStreak,
     busts: current.busts + (outcome === "bust" ? 1 : 0),
     cashes: current.cashes + (outcome === "cash" ? 1 : 0),
@@ -1928,7 +1948,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     focusHits: current.focusHits + verdict.focus.hits,
     stanceMastery,
     runHand: caseClosed ? 0 : runHandAfter,
-    handVault: current.handVault + (caseClosed ? runHandAfter - (audited?.handLost ?? 0) : 0),
+    handVault: current.handVault - handEroded + (caseClosed ? runHandAfter - (audited?.handLost ?? 0) : 0),
     lastChange: won - taken,
     seasonGained: current.seasonGained + (current.practice ? 0 : won),
     seasonLost: current.seasonLost + (current.practice ? 0 : taken),
