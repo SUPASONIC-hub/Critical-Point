@@ -32,6 +32,7 @@ import { COLD_OPENING_ENABLED } from "../src/coldOpeningSwitch.js";
 import { getWeekRule } from "../src/gauntlet/weeklyRules.js";
 import { initialResources } from "../src/gameConstants.js";
 import { scoreMarks } from "../src/seasonScore.js";
+import { SEASON_STANDING_MARKS } from "../src/seasonStanding.js";
 import { HELD_LINE_CAPITAL_SHARE } from "../src/viewModels/reportViewModels.js";
 import { funnelQuery, quantile, readFunnel, readRun, STOPS } from "./report-funnel.mjs";
 import { SIMULATION_LINES } from "./report-test-week.mjs";
@@ -93,14 +94,17 @@ export function judgmentQuery(week, board) {
  * paid at drafts (`decision_log[].relicDraft.cost`, as chainRecheck.js's
  * draftSpend sums it, with its reroll / extra). One row per season of
  * judgmentQuery, no run id. `*_recorded` counts entries that carry the key, so
- * older rows without it read 「기록 없음」, not zero.
+ * older rows without it read 「기록 없음」, not zero. `standing` is the season
+ * row's own `seasonStanding` (seasonStanding.js's readSeasonStandingMark:
+ * held / clear / near / over), null on a row from before it.
  */
 export function gapsQuery(week, board) {
-  const seasons = judgmentQuery(week, board).replace(/^select [\s\S]*?\n {2}from public\.playtest_sessions f/, "select f.run_id, coalesce(f.summary->'endingVariant'->>'id', f.summary->>'endingVariant') as ending\n  from public.playtest_sessions f");
+  const seasons = judgmentQuery(week, board).replace(/^select [\s\S]*?\n {2}from public\.playtest_sessions f/, "select f.run_id, coalesce(f.summary->'endingVariant'->>'id', f.summary->>'endingVariant') as ending,\n       f.summary->>'seasonStanding' as standing\n  from public.playtest_sessions f");
   return `with seasons as (
 ${seasons}
 )
 select s.ending,
+       s.standing,
        count(c.*) as cases,
        avg((c.resources->>'capital')::numeric) as mean_capital,
        avg((c.resources->>'humanCost')::numeric) as mean_human_cost,
@@ -123,18 +127,31 @@ select s.ending,
            count(*) filter (where e->'relicDraft'->>'extra' = 'true') as extras
       from jsonb_array_elements(case when jsonb_typeof(c.decision_log) = 'array' then c.decision_log else '[]'::jsonb end) e
   ) x
- group by s.run_id, s.ending`;
+ group by s.run_id, s.ending, s.standing`;
 }
 
 const num = (value) => (value === null || value === undefined || value === "" ? NaN : Number(value));
 
-/** (d)'s numbers from gapsQuery's rows. A count is null (「기록 없음」) when no row carried its key. */
+const STANDINGS = new Set(SEASON_STANDING_MARKS);
+
+/**
+ * (d)'s numbers from gapsQuery's rows. A count is null (「기록 없음」) when no row carried its key.
+ *
+ * T3's held seasons (cash lost, people kept: the held sentence) are counted
+ * from the row's `standing` where it has one (`heldRecorded`), and for an older
+ * row approximated as before -- under the line and not ending in collapse
+ * (`heldApprox`, of `unrecorded` rows). `held` is the two together.
+ */
 export function readGaps(rows) {
   const line = initialResources.capital * HELD_LINE_CAPITAL_SHARE;
   const withCash = rows.filter((row) => Number.isFinite(num(row.mean_capital)));
   const capitals = withCash.map((row) => num(row.mean_capital));
   const harms = rows.map((row) => num(row.mean_human_cost)).filter(Number.isFinite);
   const under = withCash.filter((row) => num(row.mean_capital) < line);
+  const recorded = rows.filter((row) => STANDINGS.has(row.standing));
+  const heldRecorded = recorded.filter((row) => row.standing === "held").length;
+  const heldApprox = under.filter((row) => !STANDINGS.has(row.standing) && row.ending !== "collapse").length;
+  const standings = Object.fromEntries(SEASON_STANDING_MARKS.map((mark) => [mark, recorded.filter((row) => row.standing === mark).length]));
   const sum = (key) => rows.reduce((total, row) => total + (num(row[key]) || 0), 0);
   const scoutRecorded = sum("scout_recorded") > 0;
   const draftRecorded = sum("drafts") > 0;
@@ -143,6 +160,7 @@ export function readGaps(rows) {
     seasons: rows.length,
     line,
     cash: withCash.length ? { n: withCash.length, ...quartiles(capitals), under: under.length, underNotCollapse: under.filter((row) => row.ending !== "collapse").length } : null,
+    held: { held: heldRecorded + heldApprox, heldRecorded, heldApprox, recorded: recorded.length, unrecorded: rows.length - recorded.length, standings },
     harm: harms.length ? { n: harms.length, ...quartiles(harms) } : null,
     scout: scoutRecorded
       ? { windows: sum("windows"), scouts: sum("scouts"), seasonsUsing: rows.filter((row) => num(row.scouts) > 0).length, perSeason: quartiles(rows.map((row) => num(row.scouts) || 0)) }
@@ -166,6 +184,9 @@ export function describeGaps(g) {
     g.cash
       ? `- T3 「돈을 잃음」 선 ${g.line}: 시즌 평균 마감 돈 p10 / p50 / p90 = ${fmt(g.cash)}; ${g.line} 밑 ${g.cash.under}/${g.cash.n} (${pct(g.cash.under, g.cash.n)}), 그중 붕괴 결말 아님 ${g.cash.underNotCollapse}`
       : `- T3 「돈을 잃음」 선 ${g.line}: ${NONE}`,
+    g.held.recorded > 0
+      ? `- T3 held(돈 잃고 사람 지킴): ${g.held.held}/${g.seasons} (${pct(g.held.held, g.seasons)}) = 행 기록 ${g.held.heldRecorded}/${g.held.recorded}${g.held.unrecorded > 0 ? ` + 기록 전 행 근사 ${g.held.heldApprox}/${g.held.unrecorded}` : ""}; 기록된 standing ${SEASON_STANDING_MARKS.map((mark) => `${mark} ${g.held.standings[mark]}`).join(" · ")}`
+      : `- T3 held: standing을 실은 행이 아직 없음 — 위 「붕괴 결말 아님」 근사 ${g.held.heldApprox}`,
     g.harm ? `- T3 사람 피해(humanCost) 시즌 평균 p10 / p50 / p90 = ${fmt(g.harm)}` : `- T3 사람 피해: ${NONE}`,
     g.scout
       ? `- T6 조회(믿음) 사용: 판 ${g.scout.windows}개 중 ${g.scout.scouts} (${pct(g.scout.scouts, g.scout.windows)}); 한 번이라도 쓴 시즌 ${g.scout.seasonsUsing}/${g.seasons} (${pct(g.scout.seasonsUsing, g.seasons)}); 시즌당 p10 / p50 / p90 = ${fmt(g.scout.perSeason)}`

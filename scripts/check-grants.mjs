@@ -1133,6 +1133,40 @@ withHeaders(null);
   }
 }
 
+// The case-open snapshot's carry and route (*_case_open_focus_carry_route,
+// F1 step 2; a draft until the user is asked after #466's reset): the
+// snapshot's `focusCarry` and `openingRoute`, each optional and each typed.
+// Run once the migration is among the files; skipped and said to be while it
+// is still a `.sql.draft`.
+if (files.some((file) => file.endsWith("_case_open_focus_carry_route.sql"))) {
+  let carryRun = 0;
+  const route = { after: "p5_after_hold", rank: "A", nodeId: "c09_open" };
+  const opened = openCaseRun({ ...RUN_INITIAL_STATE, schema: { ...RUN_INITIAL_STATE.schema, mutations: ["reboot"] } }, { caseId: "case09", resources: initialResources, route });
+  const honest = casePayload({ session: sessionId(1), runId: "run-carry-0", caseId: "case09" });
+  const withOpen = (open) => ({ ...casePayload({ session: sessionId(1), runId: `run-carry-${++carryRun}`, caseId: "case09" }), dynamics: { ...honest.dynamics, open } });
+  check(opened.open.focusCarry?.rebooted === true && opened.open.openingRoute?.nodeId === route.nodeId, "openCaseRun no longer stamps the snapshot's focusCarry and openingRoute; this check sends what it does not build.");
+  await post("send a case row whose snapshot carries its focusCarry and openingRoute", "playtest_sessions", withOpen(opened.open));
+  await post("send a case row whose snapshot has neither (a build before them)", "playtest_sessions", withOpen((({ focusCarry: _carry, openingRoute: _route, ...rest }) => rest)(opened.open)));
+  await post("send a case row whose snapshot's two records are null", "playtest_sessions", withOpen({ ...opened.open, focusCarry: null, openingRoute: null }));
+  await post("send a case row from the season's start (no case before)", "playtest_sessions", withOpen({ ...opened.open, openingRoute: { after: null, rank: null, nodeId: "p1_n1" } }));
+  for (const [what, patch] of [
+    ["a focusCarry that is an array", { focusCarry: [] }],
+    ["a focusCarry with no rebooted", { focusCarry: { stance: null } }],
+    ["a focusCarry whose rebooted is a string", { focusCarry: { rebooted: "true", stance: null } }],
+    ["a focusCarry whose stance is a number", { focusCarry: { rebooted: false, stance: 3 } }],
+    ["a focusCarry whose stance is longer than 32", { focusCarry: { rebooted: false, stance: "s".repeat(33) } }],
+    ["an openingRoute that is a string", { openingRoute: "c09_open" }],
+    ["an openingRoute with no scene", { openingRoute: { after: null, rank: null } }],
+    ["an openingRoute whose scene is longer than 64", { openingRoute: { after: null, rank: null, nodeId: "n".repeat(65) } }],
+    ["an openingRoute whose after is a number", { openingRoute: { after: 4, rank: null, nodeId: "c09_open" } }],
+    ["an openingRoute whose rank is longer than 8", { openingRoute: { after: null, rank: "r".repeat(9), nodeId: "c09_open" } }],
+  ]) {
+    await postRefused(`send a case row with ${what}`, "playtest_sessions", withOpen({ ...opened.open, ...patch }), /^23514 .*playtest_sessions_dynamics_shape/);
+  }
+} else {
+  console.log("Case-open carry and route: skipped, the migration is still a draft (supabase/migrations/*_case_open_focus_carry_route.sql.draft).");
+}
+
 // ---- the ranking
 
 /** A run's stored case rows' summaries, by case id: what getSeasonScore reads on the client. */

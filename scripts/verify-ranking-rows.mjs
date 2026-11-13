@@ -99,7 +99,7 @@ import {
   readHallOfFameCounts,
 } from "../src/hallOfFame.js";
 import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingRecheck.js";
-import { recheckCaseSettlement } from "../src/settlementRecheck.js";
+import { recheckCaseSettlement, recheckOpeningRoute } from "../src/settlementRecheck.js";
 
 /**
  * The marks ranking_set_recheck_marks takes (20261023000000, then 20261103020000).
@@ -257,8 +257,9 @@ export function verifyRows(rows) {
     const ranking = runRows.find((row) => row.case_id === "season-final");
     if (!ranking) continue;
     const recheck = recheckRun(runRows);
-    // F1 step 1: the settlement inside each case played again (the next scene, `resourcesAfter`).
-    const chain = recheck.status === "unverified" ? null : recheckChain(runRows, { settle: recheckCaseSettlement });
+    // F1 step 1: the settlement inside each case played again (the next scene, `resourcesAfter`);
+    // F1 step 2: the route each case opened on played again from the case before.
+    const chain = recheck.status === "unverified" ? null : recheckChain(runRows, { settle: recheckCaseSettlement, opening: recheckOpeningRoute });
     const marks = [...recheck.marks, ...(chain?.marks ?? [])];
     results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, chain });
   }
@@ -353,12 +354,14 @@ export function formatChain(chain) {
   if (settled) notChecked.push(`the board, audit and link of ${settled} cases`);
   const routed = SETTLED_INSIDE.map((field) => `${field} ${unchecked.fields[field] ?? 0}`).filter((text) => !text.endsWith(" 0"));
   if (routed.length) notChecked.push(`entries not read again (cases): ${routed.join(", ")}`);
-  // A row from a build before the snapshot (UNCHECKED.open); the board and the
-  // route a case opened on wait for the settlement (UNCHECKED.between, S2).
+  // A row from a build before the snapshot (UNCHECKED.open); LOCK's carry and
+  // the route a case opened on where they could not be read (UNCHECKED.between:
+  // a build before F1 step 2, a replay, a window between).
   const opened = unchecked.fields[UNCHECKED.open[0]] ?? 0;
   if (opened) notChecked.push(`the opening state of ${opened} cases (no opening snapshot)`);
-  const carried = unchecked.fields[UNCHECKED.between[0]] ?? 0;
-  if (carried) notChecked.push(`the board and route ${carried} cases opened on`);
+  const [carry, route] = UNCHECKED.between.map((field) => unchecked.fields[field] ?? 0);
+  if (carry) notChecked.push(`LOCK's carry ${carry} cases opened on`);
+  if (route) notChecked.push(`the route ${route} cases opened on`);
   if (notChecked.length) lines.push(`  chain not checked: ${notChecked.join("; ")}`);
   return lines;
 }

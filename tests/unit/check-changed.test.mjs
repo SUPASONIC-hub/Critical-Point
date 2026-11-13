@@ -35,7 +35,9 @@ test("files land in the area their path says", () => {
     ".github/workflows/verify.yml": "workflows",
     "supabase/migrations/20261101_x.sql": "database",
     "docs/canon.md": "canon-doc",
-    "README.md": "docs",
+    "README.md": "readme",
+    "docs/readme-rules.md": "readme",
+    "docs/images/title.webp": "readme",
     "docs/work-status.md": "docs",
     "scripts/check-canon.mjs": "scripts",
     "eslint.config.js": "config",
@@ -96,14 +98,17 @@ test("a check whose script imports the file runs, with that as the reason", () =
   assert.ok(!plan(["src/nodes/case03.js"], { closures: scene, textOnly: () => true }).checks.has("check:pressure"));
 });
 
-test("workflows run check:specs and actionlint; documents run the doc numbers", () => {
+test("workflows run check:specs and actionlint; documents run the doc numbers, the README its rules too", () => {
   const workflow = plan([".github/workflows/verify.yml"]);
   assert.deepEqual(workflow.specs, [".github/workflows/verify.yml"]);
   assert.deepEqual(workflow.actionlint, [".github/workflows/verify.yml"]);
   assert.ok(workflow.checks.has("check:node"));
-  const docs = plan(["README.md"]);
+  const docs = plan(["docs/work-status.md"]);
   assert.deepEqual(picked(docs), ["check:doc-numbers", "check:visual-baselines"]);
   assert.deepEqual(docs.build, []);
+  const readme = plan(["README.md"]);
+  assert.deepEqual(picked(readme), ["check:doc-numbers", "check:readme", "check:visual-baselines"]);
+  assert.deepEqual(readme.build, []);
 });
 
 test("an unknown file, the package or the check list itself runs everything", () => {
