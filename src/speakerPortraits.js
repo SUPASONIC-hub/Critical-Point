@@ -121,6 +121,9 @@ const SPEAKER_PORTRAITS = {
   // wrong side, so both are photographs of real models (docs/portrait-credits.md).
   "그레이스 웡": "/portrait-grace-wong.webp",
   "모지현": "/portrait-mo-jihyun.webp",
+  // 번외 6 (2026-11-13): the side case's one new speaker, a generated face
+  // of someone who does not exist.
+  "쩐 티 란": "/portrait-tran-thi-lan.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */

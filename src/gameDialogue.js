@@ -210,6 +210,20 @@ export const characterProfiles = {
     voice: "차분하게 시작해, 자기 이름이 나오면 문장이 짧아진다.",
     line: "제가 지워 달라고 했잖아요.",
   },
+  // 번외 6 (src/nodes/side06.js): a side pack is not in CASE_PACKS, so its own
+  // people are introduced here, like the season's first ones. 쩐 티 란 answers
+  // in Korean (다국적 등장인물 기획 2-4: natural Korean in quotes, no mixed-in
+  // words, no broken Korean).
+  "쩐 티 란": {
+    role: "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째",
+    stance: "기록 · 버티기 · 또렷함",
+    job: "못 받은 보증금을 실험 데이터처럼 표로 만들고, 그 표가 무슨 뜻인지 묻는다.",
+    appearance: "이삿짐 상자 맨 위의 밥솥, 연구실 출입증이 걸린 목줄, 등기부 서른일곱 장을 옮겨 둔 노트북.",
+    thought: "9년 모은 돈이 표의 한 줄이 됐다. 줄이면 적어도 셀 수는 있다.",
+    gesture: "쩐 티 란은 숫자를 말할 때 노트북 화면의 그 칸을 손가락으로 짚고, 다 말할 때까지 떼지 않는다.",
+    voice: "또박또박한 존댓말로, 모르는 것은 모른다고 먼저 말하고 묻는다.",
+    line: "그게 이상한 건지, 저는 그걸 모르겠어요.",
+  },
 };
 
 /**
