@@ -611,7 +611,7 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await page.getByTestId("commit-confirm").click();
   const burst = page.getByTestId("gauntlet-burst");
   // The cash's +N is the slam's own line, read with it.
-  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).toHaveText(/^\+\$[\d,]+$/);
   await expect(burst).not.toHaveAttribute("aria-hidden", "true");
   const won = await readNumber(burst);
   expect(won).toBeGreaterThan(0);
@@ -634,7 +634,7 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   const lost = page.getByTestId("gauntlet-burst");
-  await expect(lost).toHaveText(/^−[\d,]+$/);
+  await expect(lost).toHaveText(/^−\$[\d,]+$/);
   await expect(lost).toHaveAttribute("aria-hidden", "true");
   await expect(lost).toHaveCSS("animation-name", "none");
   await expect(lost).toHaveCSS("opacity", "1");
@@ -653,7 +653,7 @@ test("a cash and a bust throw their amount, signed, and the purse holds it", asy
   const cashed = page.locator(".gx-slam-cashed");
   await expect(cashed).toBeVisible();
   await expect(cashed.locator("strong").first()).toHaveCSS("animation-name", "none");
-  await expect(page.getByTestId("gauntlet-burst")).toHaveText(/^\+[\d,]+$/);
+  await expect(page.getByTestId("gauntlet-burst")).toHaveText(/^\+\$[\d,]+$/);
   await expect(page.getByTestId("gauntlet-burst")).toHaveCSS("animation-name", "none");
   expect(await cashed.evaluate((slam) => slam.getAnimations({ subtree: true }).map((motion) => motion.animationName ?? "transition"))).toEqual([]);
 });
@@ -668,7 +668,7 @@ test("under reduced motion a cash's amount and the purse it lands in stand still
   await page.getByTestId("commit-push").click();
   await page.getByTestId("commit-confirm").click();
   const burst = page.getByTestId("gauntlet-burst");
-  await expect(burst).toHaveText(/^\+[\d,]+$/);
+  await expect(burst).toHaveText(/^\+\$[\d,]+$/);
   await expect(burst).toHaveCSS("animation-name", "none");
   await expect(page.getByTestId("gauntlet-purse")).toHaveClass(/is-landing is-up/);
   const total = page.getByTestId("gauntlet-purse-total");
@@ -724,7 +724,7 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 800 
     await openTable(page, "case01", "start");
     const account = page.getByTestId("gauntlet-purse");
     const head = account.getByRole("button");
-    await expect(head).toHaveAccessibleName(/^KD은행 계좌 0/);
+    await expect(head).toHaveAccessibleName(/^KD은행 계좌 \$0/);
     await expect(page.getByTestId("gauntlet-purse-total")).toHaveText("$0");
     await expectAccountPinned(page, viewport);
 

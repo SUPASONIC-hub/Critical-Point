@@ -716,7 +716,7 @@ test("the verdict is the slam's alone, and the next table says what the cash set
  * line at the front of the voice -- the heat, the danger line, the case pot,
  * the seconds and the heartbeat the screen shows. The wall is never in it.
  */
-const STATUS_CALL = /^열기 \d+ · (벽까지 최소 \d+|밀면 벽 사정권|벽 구간 안) · 판돈 [\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
+const STATUS_CALL = /^열기 \d+ · (벽까지 최소 \d+|밀면 벽 사정권|벽 구간 안) · 판돈 \$[\d,]+ · 남은 \d+초 · 심박 (\d+|교란)$/;
 
 test("지금 상황 듣기: the heart's button and I each say the table in one line, its shown numbers and never the wall", async ({ page }) => {
   await startDebugNode(page, "case01", "start");
