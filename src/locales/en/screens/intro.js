@@ -34,6 +34,7 @@ export default {
   round: " · Season {round}",
   stats: { cases: "Cases", oneCase: "Per case", minutes: " min or so", answers: "Right answers" },
   previousMessage: "Left by the last player: “{message}”",
+  rankingReset: "Ranking notice: on Monday, November 30, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
   setup: {
     label: "Get ready to start",
     title: "Record access setup",

@@ -92,6 +92,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: 나머지 모두.</li>
 </ul>
 <p>스토리 모드로 연 사건이 있는 시즌은 공개 랭킹에 오르지 않습니다.</p>
+<p>2026년 11월 30일(월) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남으며, 시작 화면에도 11월 16일부터 같은 안내가 나옵니다.</p>
 
 <h2>시즌의 끝</h2>
 <p>결말은 아홉 가지이고, 시즌 전체를 읽어 정해집니다. 사건이 닫힐 때마다의 믿음, 공정함, 현금의 평균, 사건당 평균 사람 피해, BUST한 판의 비율, 찾은 숨은 기록의 비율, 판을 다시 짜 숨은 경로를 연 비율, 압력이 얼마나 높게 이어졌는지, 그리고 마지막 사건의 결정입니다. 사람 피해가 사건당 평균 20 이상이거나, 판의 20% 이상에서 BUST하면서 사람 피해도 평균 10 이상이면 시즌은 버티지 못한 것으로 읽힙니다. BUST 없이 높은 배율을 지켰거나 콤보를 아주 길게 이었거나 사건당 금고를 넉넉히 쌓은 시즌은, 기록을 묻는 결말의 문턱이 조금 낮아집니다. 나머지는 직접 찾아보십시오.</p>
@@ -201,6 +202,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: everyone else.</li>
 </ul>
 <p>A season with any case opened in Story Mode stays off the public ranking.</p>
+<p>On Monday, November 30, 2026, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is, and the start screen says the same from November 16.</p>
 
 <h2>The end of a season</h2>
 <p>There are nine endings, and yours is read from the whole season: your average Trust, Fairness and Cash as each case closed, your average Human cost per case, the share of hands that busted, the share of hidden records found, how often a reframe opened a hidden route, how high the pressure stayed, and your decision in the last case. An average Human cost of 20 a case, or busting in 20% of hands while averaging 10, reads as a season that could not hold. A season with no BUST at a high multiplier, a very long combo or a rich Vault per case needs slightly fewer records. The rest is yours to find.</p>
@@ -310,6 +312,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: 残りすべて。</li>
 </ul>
 <p>ストーリーモードで開いた事件があるシーズンは公開ランキングに載りません。</p>
+<p>2026年11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。殿堂の表はそのまま残り、最初の画面でも11月16日から同じお知らせが出ます。</p>
 
 <h2>シーズンの終わり</h2>
 <p>結末は九つあり、シーズン全体を読んで決まります。読むのは、事件が閉じるたびの信頼、公正さ、現金の平均、事件あたりの平均の人的被害、BUSTした勝負の割合、見つけた隠れた記録の割合、卓を組み替えて隠れたルートを開いた割合、圧力がどれだけ高く続いたか、そして最後の事件の決定です。人的被害が事件あたり平均20以上、または勝負の20%以上でBUSTしつつ人的被害も平均10以上なら、シーズンは持ちこたえられなかったと読まれます。BUSTなしで高い倍率を守った、コンボをとても長く続けた、事件あたりの金庫をたっぷり積んだシーズンは、記録を求める結末の敷居が少し下がります。残りはご自身で見つけてください。</p>

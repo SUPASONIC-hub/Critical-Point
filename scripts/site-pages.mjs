@@ -210,6 +210,8 @@ const FAQ_KO = `
 <p>모든 진행은 이 기기의 브라우저 저장소(localStorage)에 자동으로 저장됩니다. 판을 걸어 둔 채로 「저장 후 나가기」(키보드 Shift+P)를 누르거나 앱을 백그라운드로 보내도, 걸어 둔 카드와 올린 열기, 흐른 시간이 그대로 보관됩니다. 이미 벽에 닿아 터진 판은 보관되지 않으므로, 멈췄다 돌아오는 것으로 BUST를 되돌릴 수는 없습니다. 일반 저장과 따로 최근 복구 지점 다섯 개도 둡니다. 브라우저에서 이 사이트의 데이터를 지우면 이 기기의 진행도 함께 지워집니다.</p>
 <h3>다른 기기에서 이어 할 수 있나요? 이어하기 코드는 무엇인가요?</h3>
 <p>시작 화면의 「다른 기기에서 이어하기」 패널에서 「온라인 저장 사용」을 켜면 됩니다. 기본은 꺼져 있습니다. 켜면 XXXX-XXXX-XXXX 모양의 이어하기 코드가 만들어지고, 그 뒤의 저장은 이 코드로 서버에도 올라갑니다. 다른 기기에서 같은 코드를 입력하면 멈춘 자리부터 이어지고, 그 뒤로는 두 기기가 같은 코드에 저장합니다. 올라가는 사본에서는 분석관 이름과 피드백의 자유 의견이 빠지고, 서버는 코드 자체가 아니라 되돌릴 수 없게 바꾼 값만 저장합니다. 서버 사본은 마지막 저장으로부터 ${days}일 뒤 자동으로 지워지며, 그 전에 패널에서 직접 지울 수도 있습니다. 코드를 아는 사람은 그 진행을 불러올 수 있으니 다른 사람에게 알려 주지 마세요.</p>
+<h3>오래 쉬면 온라인 저장은 어떻게 되나요?</h3>
+<p>${days}일 동안 플레이하지 않아 새 저장이 없으면 서버의 온라인 저장 사본은 자동으로 지워집니다. 이 기기 브라우저에 저장된 진행은 그대로 남습니다.</p>
 <h3>인터넷 연결 없이 할 수 있나요?</h3>
 <p>할 수 있습니다. 한 번 연결된 상태로 연 기기에서는 연결이 없어도 게임이 열리고 저장한 자리에서 이어집니다. 첫 판이 열린 뒤 기기가 한가할 때 남은 사건과 화면을 미리 받아 두며, 브라우저의 데이터 절약 모드에서는 미리 받지 않습니다. 다 받기 전에 연결이 끊기면 아직 받지 못한 화면에서 다시 시도하라는 안내가 나옵니다. 랭킹, 참가자 게시판, 온라인 저장은 연결이 있어야 합니다.</p>
 <h3>홈 화면에 추가하려면 어떻게 하나요?</h3>
@@ -250,6 +252,8 @@ const FAQ_EN = `
 <p>All progress is saved automatically in this device's browser storage (localStorage). If you press “Save and exit” (Shift+P on a keyboard) in the middle of a hand, or send the app to the background, the card you played, the Heat you pushed and the time that passed are all kept. A hand that has already hit the Wall is not kept, so stopping and coming back cannot undo a BUST. Apart from the regular save, the game also keeps your five most recent recovery points. Clearing this site's data in your browser removes the progress on this device as well.</p>
 <h3>Can I continue on another device? What is a continue code?</h3>
 <p>Turn on “Use online save” in the “Continue on another device” panel on the start screen. It is off by default. Once it is on, a continue code shaped like XXXX-XXXX-XXXX is created, and from then on your saves are also uploaded to the server under that code. Enter the same code on another device to pick up where you left off; after that, both devices save to the same code. The uploaded copy leaves out your analyst name and your feedback comments, and the server stores only a one-way hash of the code, never the code itself. The server copy is deleted automatically ${days} days after your last save, and you can delete it yourself from the panel before then. Anyone who knows your code can load that progress, so don't share it.</p>
+<h3>What happens to my online save if I stop playing for a while?</h3>
+<p>If you don't play for ${days} days and nothing new is saved, the online save copy on the server is deleted automatically. The progress saved in this device's browser stays.</p>
 <h3>Can I play without an internet connection?</h3>
 <p>Yes. A device that has opened the game once while online can open it without a connection and continue from where you saved. After your first hand opens, the game fetches the remaining cases and screens while the device is idle; it does not do this in your browser's data saver mode. If the connection drops before everything has arrived, a screen not yet fetched asks you to try again. The ranking, the player board and online save need a connection.</p>
 <h3>How do I add the game to my home screen?</h3>
@@ -290,6 +294,8 @@ const FAQ_JA = `
 <p>すべての進行は、この端末のブラウザのストレージ(localStorage)に自動で保存されます。勝負の途中で「保存して終了」(キーボードではShift+P)を押したり、アプリをバックグラウンドに回したりしても、賭けたカード、上げた熱、経過した時間はそのまま保管されます。すでに壁に当たってBUSTした勝負は保管されないため、止めて戻ってくることでBUSTを取り消すことはできません。通常のセーブとは別に、直近の復旧地点を五つ残します。ブラウザでこのサイトのデータを消すと、この端末の進行も一緒に消えます。</p>
 <h3>別の端末で続けられますか？ 続行コードとは何ですか？</h3>
 <p>最初の画面の「別の端末で続ける」パネルで「オンライン保存を使う」をオンにしてください。初期設定はオフです。オンにすると XXXX-XXXX-XXXX の形の続行コードが作られ、それ以降のセーブはこのコードでサーバーにもアップロードされます。別の端末で同じコードを入力すると、止めたところから続けられ、それ以降は二つの端末が同じコードに保存します。アップロードされるコピーからは分析官の名前とフィードバックの自由記述が除かれ、サーバーにはコードそのものではなく、元に戻せないように変換した値だけが保存されます。サーバー上のコピーは最後の保存から${days}日後に自動で削除され、それより前にパネルから自分で削除することもできます。コードを知っている人はその進行を読み込めるので、他人には教えないでください。</p>
+<h3>しばらく遊ばないとオンライン保存はどうなりますか?</h3>
+<p>${days}日間プレイせず新しい保存がないと、サーバーのオンライン保存のコピーは自動で削除されます。この端末のブラウザに保存された進行はそのまま残ります。</p>
 <h3>インターネットに接続せずに遊べますか？</h3>
 <p>遊べます。一度オンラインの状態で開いた端末では、接続がなくてもゲームが開き、保存したところから続けられます。最初の勝負が開いたあと、端末に余裕があるときに残りの事件と画面を先に受け取っておきます。ブラウザのデータセーバーモードでは先に受け取りません。すべて受け取る前に接続が切れると、まだ受け取っていない画面で再試行の案内が出ます。ランキング、参加者掲示板、オンライン保存には接続が必要です。</p>
 <h3>ホーム画面に追加するには？</h3>
