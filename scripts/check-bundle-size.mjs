@@ -311,7 +311,8 @@ const budgets = [
   // 34,317 / 14,618 -> 34,603 / 14,728 f1-evening (#466 4a28054e + f1-stage2 + f1-checker) 837ec8de. Measured 34599 / 14724 (over budget only) in the e2e build, the plus 4.
   // 34,528 / 14,703 -> 34,528 / 14,709 c4c5-copy over main 7ec2304e. Measured - / 14705 (over budget only) in the e2e build, the plus 4.
   // 34,528 / 14,709 -> 34,601 / 14,731 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 34597 / 14727 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_601, maxGzip: 14_731 },
+  // 34,601 / 14,731 -> 34,673 / 14,761 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 34669 / 14757 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_673, maxGzip: 14_761 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1421,7 +1422,8 @@ const budgets = [
   // 49,605 / 18,880 -> 50,344 / 19,104 f1-stage2 over f8dd481d. Measured 50340 / 19100 (over budget only) in the e2e build, the plus 4.
   // 49,605 / 18,880 -> 49,605 / 18,891 c4c5-copy over main 7ec2304e. Measured - / 18887 (over budget only) in the e2e build, the plus 4.
   // 49,605 / 18,891 -> 50,344 / 19,111 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 50340 / 19107 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 50_344, maxGzip: 19_111 },
+  // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_160, maxGzip: 19_410 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1599,7 +1601,8 @@ const budgets = [
   // 2,637 / 1,403 -> 3,215 / 1,600 on 2026-10-26, 영어판 3단계 (N1): the catalogue's words read by key (src/copy/weekRules.js, in this chunk), their numbers filled in from the constants when a rule is read. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 3,215 / 1,600 -> 3,360 / 1,671 on 2026-11-03, week-board-after over main 36104abd: weekBoardsAt, this week's board and last week's for the seven days after it (W47 점검 P9). Measured 3,356 / 1,667 in the e2e build, the plus 4.
   // 3,360 / 1,671 -> 3,414 / 1,707 위기 줄기·주간. Measured 3410 / 1703 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_414, maxGzip: 1_707 },
+  // 3,414 / 1,707 -> 3,994 / 1,924 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 3990 / 1920 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 3_994, maxGzip: 1_924 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1922,7 +1925,8 @@ const budgets = [
   // 189,888 / 63,261 -> 190,369 / 63,482 번외 5. Measured 190365 / 63478 (over budget only) in the e2e build, the plus 4.
   // 190,369 / 63,482 -> 193,344 / 64,621 묶음 1113. Measured 193340 / 64617 (over budget only) in the e2e build, the plus 4.
   // 193,344 / 64,621 -> 193,626 / 64,762 다국적 인물 over main e43f7bf6. Measured 193622 / 64758 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 193_626, maxGzip: 64_762 },
+  // 193,626 / 64,762 -> 194,146 / 64,949 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 194142 / 64945 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_146, maxGzip: 64_949 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -1996,7 +2000,8 @@ const budgets = [
   // 158,306 / 56,407 -> 158,737 / 56,644 번외 5. Measured 158733 / 56640 (over budget only) in the e2e build, the plus 4.
   // 158,737 / 56,644 -> 161,313 / 57,695 묶음 1113. Measured 161309 / 57691 (over budget only) in the e2e build, the plus 4.
   // 161,313 / 57,695 -> 161,518 / 57,831 다국적 인물 over main e43f7bf6. Measured 161514 / 57827 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 161_518, maxGzip: 57_831 },
+  // 161,518 / 57,831 -> 162,006 / 57,995 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 162002 / 57991 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_006, maxGzip: 57_995 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2424,7 +2429,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 373,991 / 433,702 / 441,448 번외 5. Measured first paint, the plus 4.
 // -> 375,396 / 436,255 / 444,088 묶음 1113. Measured first paint, the plus 4.
 // -> 377,166 / 438,137 / 445,978 다국적 인물 over main e43f7bf6. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_166, en: 438_137, ja: 445_978 };
+// -> 377,166 / 438,300 / 446,167 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_166, en: 438_300, ja: 446_167 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
