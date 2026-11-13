@@ -168,16 +168,17 @@ test("the tab counts to the wall band on a hot table, says 징계 회부 after a
  */
 test("a shared card's address names the friend's habit on the start screen, and nothing else does", async ({ page }) => {
   // Seven page loads; on the dev server each one compiles its modules, so this takes about a minute alone.
+  // The line waits for the page's dictionary and the habits table, so each read gets a transition's wait.
   test.slow();
   const line = page.getByTestId("friend-result-line");
   await page.goto("/?from=card&h=moth");
-  await expect(line).toHaveText("친구의 결과: 하이리스크 불나방형");
+  await expect(line).toHaveText("친구의 결과: 하이리스크 불나방형", { timeout: TRANSITION_TIMEOUT_MS });
   await expect(page.getByTestId("start-first-case")).toBeVisible();
 
   await page.goto("/?from=card&h=moth&lang=en");
-  await expect(line).toHaveText("Your friend's result: High-Risk Moth");
+  await expect(line).toHaveText("Your friend's result: High-Risk Moth", { timeout: TRANSITION_TIMEOUT_MS });
   await page.goto("/?from=card&h=moth&lang=ja");
-  await expect(line).toHaveText("友だちの結果：ハイリスク夏の虫型");
+  await expect(line).toHaveText("友だちの結果：ハイリスク夏の虫型", { timeout: TRANSITION_TIMEOUT_MS });
 
   for (const address of ["/?from=card&h=nobody", "/?from=card&h=%3Cimg%20src%3Dx%3E", "/?h=moth", "/"]) {
     await page.goto(address);
