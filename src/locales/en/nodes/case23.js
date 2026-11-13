@@ -38,7 +38,7 @@ export default {
     },
     "c23_proxy": {
       "title": "Because the Branch Manager Asked",
-      "text": "Forty-one elderly customers sit waiting, who took shares instead of their savings when the financial group launched in 2008. Na Junhyuk hands out proxy forms (letting someone else vote for you at the meeting). Seo Jungran, 84, is the first to stamp hers. 'I don’t know what it is, but the branch manager asked.' All 41 are filled in 17 minutes. Kwon Dohyun says, 'There isn’t a single ID copy. Turn these in as they are and the head office secretariat will throw out every one.'",
+      "text": "Forty-one elderly customers sit waiting, who took shares instead of their savings when the financial group launched in 2008. It was the autumn the world’s markets fell, and the branch had recommended the shares. Na Junhyuk hands out proxy forms (letting someone else vote for you at the meeting). Seo Jungran, 84, is the first to stamp hers. 'I don’t know what it is, but the branch manager asked.' All 41 are filled in 17 minutes. Kwon Dohyun says, 'There isn’t a single ID copy. Turn these in as they are and the head office secretariat will throw out every one.'",
       "memo": [
         "41 Yeongdong elders · 63,000 shares in total",
         "About 20 times the whole one-share group",
