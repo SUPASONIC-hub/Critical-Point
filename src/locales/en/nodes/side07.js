@@ -39,7 +39,7 @@ export default {
       "text": "You write four lines on the whiteboard, and Lee Minseo reads out each bank’s closing time over the phone. The two in Hong Kong close at 19:00 Seoul time. 45 minutes left. London at 1 a.m., New York at 6 on Saturday morning. Whatever closes on Friday opens again only on Monday. A stop request (a formal letter asking the receiving bank not to let the money out) goes one at a time, and only with a responsible officer’s signature. Tonight the only person on this floor who can sign is you. Lee Minseo asks, 'The biggest first, or the one that closes soonest?'",
       "question": "One letter has to go out within 45 minutes. In what order will you go?",
       "memo": [
-        "Hong Kong ① 3.1 billion · Hong Kong ② 900 million: close at 19:00",
+        "Hong Kong 3.1 billion · Hong Kong 900 million: close at 19:00",
         "London 1.8 billion: 01:00 / New York 2.6 billion: Sat 06:00",
         "Stop requests: one at a time, an officer’s signature"
       ],
@@ -129,7 +129,7 @@ export default {
       "text": "Grace Wong, payments investigator at the bank in Hong Kong, calls without having gone home. The call is in English. 'It tripped our own unusual-transaction check too. We’ve frozen the receiving account. But of the 3.1 billion, only about 1.1 billion is left. The rest was already moved to other accounts in the afternoon.' The second Hong Kong transfer went to a different bank, so she doesn’t know about it. Two hours until London closes. Grace Wong adds, 'Returning the frozen money isn’t my decision. Papers and a court decide, and it takes weeks.' Her voice drops a little. 'The name of someone who has left is in the approver field. Does she know?'",
       "question": "Only part of the money is frozen, and London’s close is coming. What do you do?",
       "memo": [
-        "Hong Kong ①: receiving account frozen, about 1.1 billion left",
+        "Hong Kong 3.1 billion: receiving account frozen, about 1.1 billion left",
         "Getting it back: papers and a court, weeks",
         "London closes at 01:00"
       ],
@@ -221,7 +221,7 @@ export default {
       "text": "Han Jiwoo is back, pulling just one black suitcase. Receiving reports of financial incidents is the supervisor’s job too. Three things lie on the meeting-room table: a bundle of stop requests chasing the balance of the frozen Hong Kong account, a note on the cause with Mo Jihyun’s email and the permission list attached, and Seok Jaewoo’s draft statement. London and New York have not answered yet. Han Jiwoo opens her notebook and writes the time. 'The report is one page. What goes on the first line is yours to decide, Analyst. I will write it down as I receive it. Those are the rules.'",
       "question": "The report has one first line. What will you write?",
       "memo": [
-        "Hong Kong ①: about 1.1 billion frozen, back weeks later",
+        "Hong Kong 3.1 billion: about 1.1 billion frozen, back weeks later",
         "London, New York: no answer",
         "The ending you choose stays on this device only"
       ],

@@ -468,9 +468,9 @@ season case has to keep. What each one states for the first time is below.
 |---|---|
 | When | 2026-06-12 (금) 17:58 to 06-15 (월) 09:00: the last day of 사건 31's five-day inspection (6월 8일 opening) to the morning before 사건 32's search (6월 16일) |
 | Where | KD캐피탈 자금부; a café in 상암동 on the Saturday; the corridor outside the 대표이사실 on the Sunday |
-| The payments | four overseas transfers approved at 17:58: 홍콩 ① 31억, 홍콩 ② 9억 (another bank), 런던 18억, 뉴욕 26억 -- 84억 원. Supplier names as usual, receiving accounts new. Closing times in Seoul time: 홍콩 19:00, 런던 01:00, 뉴욕 토 06:00 |
+| The payments | four overseas transfers approved at 17:58: 홍콩 31억, 홍콩 9억 (another bank), 런던 18억, 뉴욕 26억 -- 84억 원. Supplier names as usual, receiving accounts new. Closing times in Seoul time: 홍콩 19:00, 런던 01:00, 뉴욕 토 06:00 |
 | The approvers | 모지현 (해외 송금 승인 9년, 퇴사 3월 31일; her last-day mail asking to delete her rights was answered 「확인했습니다」 and nothing was done; the HR list and the payment-permission list do not know each other) and 「자금-공용02」, shared by six. How anyone got in is never said |
-| 그레이스 웡 (29) | payments investigator at the receiving bank in Hong Kong, on the phone in English; her bank froze 홍콩 ①'s receiving account with about 11억 left |
+| 그레이스 웡 (29) | payments investigator at the receiving bank in Hong Kong, on the phone in English; her bank froze the 31억 transfer's receiving account with about 11억 left |
 | 한지우 | on the inspection's last day: 「금융사고는 알게 된 즉시 보고가 원칙」; she takes Monday's report |
 | 석재우 | Sunday's draft statement: 「외부 세력의 정교한 공격 ... 고객 피해는 없습니다」 |
 | The ransom | Monday 08:40, a notice on every 자금부 screen; the first folder locked is 「해외송금_2026_06」. 이민서's Friday-night copy on the KD데이터랩 side is untouched |
