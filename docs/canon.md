@@ -417,7 +417,7 @@ open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토) and
-11월 8일 (토) fit 2025, 1월 9일 (금) fits 2026) and nothing else here.
+11월 8일 (토) fit 2025, 1월 9일 (금), 2월 12일 (목) and 2월 13일 (금) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -461,6 +461,22 @@ season case has to keep. What each one states for the first time is below.
 | The sheet | goes to head office by itself at 06:00. Each stopped minute takes an idle reason from four: 휴식, 교육, 설비 대기, 기타. The night manager: "비고는 어차피 아무도 안 읽어요" |
 | 강태민 | first on the ranking; still buys his cup noodles two at a time and still does not say why (c16_roof does). He says "내년에도 이렇게만 했으면 좋겠네요" on the loading dock |
 | The endings | what is left that morning (a note on the whiteboard, which the day-shift lead adds to and nobody erases that week / 유하온's first line of notes on what he fixes / every reason typed into the 비고 and sent, unanswered). None says the measurement changed anything |
+
+### 번외 5, 상장 전야 (side05)
+
+| Fact | Value |
+|---|---|
+| When | 2026-02-12 (목) 21:40 to 02-13 (금) 09:00: three days after 사건 21, eleven before 사건 22 opens (2월 23일), four before 설 (2월 16일). 문하준's internship is still ahead ("다음다음 주") |
+| Where | 트리거랩 분석관실. 이민서 brings the analyst in; the bank's 자금세탁방지팀 has two people on duty and asks for a count before its 09:00 meeting |
+| The partnership | KD은행 gives the virtual-asset exchange 카노바 its 실명확인 계좌; 디지털자산제휴팀 earns a fee on it, 40% of that team's year target. 카노바 and its new coin 미레온 are invented (searched 2026-11-13, no ticker printed) |
+| The night | deposits to 카노바 at nine times the usual; 1,900 이상거래 경보; 미레온 lists 10:00 Friday |
+| The banner | 「연 12% 예치 이자, KD은행 제휴」 in 카노바's app; the terms' last line, 「이 상품은 예금자 보호 대상이 아닙니다」. The wording's approval record names 디지털자산제휴팀 in the 확인자 box, and 육성빈 put his own name there after the exchange refused to drop 「제휴」 |
+| 육성빈 | 디지털자산제휴팀 과장, on duty alone; three of his team's seven are on contracts, renewed in March |
+| 추영복 (64) | a 공덕동 철물점, 32 years a KD은행 customer; sent 3,800만 원 at 22:58 to earn one month's 38만 원 before his granddaughter's March tuition, "KD은행이 같이 한다길래" |
+| 마리사 탄 | Singaporean, regional compliance head of the group that owns 카노바; advised putting off the listing the week before and the Seoul business side did not take it. Speaks English, calls 이민서 「민서 씨」 |
+| The three rows | 312 accounts opened that day sending similar amounts / some 1,400 old accounts sending one large sum / the rest, unknown |
+| The line (Q5 (1)) | only the people who put money in and the analysts are seen; no price, no profit, no buy-or-sell sentence, no method |
+| The endings | what goes to the 09:00 meeting (312 reports filed at 9:40 / 「KD은행 제휴」 taken off the banner at 9:50, the 12% stays / nothing, a folder named by date). The listing goes ahead at 10:00 in all three; none says what it did or whether anyone's money came back |
 
 ## Known and left alone
 
