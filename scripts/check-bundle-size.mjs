@@ -314,7 +314,8 @@ const budgets = [
   // 34,601 / 14,731 -> 34,673 / 14,761 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 34669 / 14757 (over budget only) in the e2e build, the plus 4.
   // 34,673 / 14,761 -> 34,867 / 14,850 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 34863 / 14846 (over budget only) in the e2e build, the plus 4.
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_867, maxGzip: 14_850 },
+  // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_900 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -688,7 +689,8 @@ const budgets = [
   // 207,771 / 75,684 -> 207,860 / 75,725 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 207856 / 75721 (over budget only) in the e2e build, the plus 4.
   // 207,771 / 75,684 -> 207,940 / 75,730 번외 8 over main 29120d32. Measured 207936 / 75726 (over budget only) in the e2e build, the plus 4.
   // 207,940 / 75,730 -> 207,940 / 75,736 번외 8, CI build (run 43819751212) measured - / 75732, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 208_749, maxGzip: 76_072 },
+  // 208,749 / 76,072 -> 209,357 / 76,215 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 209353 / 76211 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 209_357, maxGzip: 76_215 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1975,7 +1977,8 @@ const budgets = [
   // 194,601 / 65,105 -> 194,762 / 65,146 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 194758 / 65142 in the CI e2e build, the plus 4.
   // 194,601 / 65,105 -> 194,627 / 65,154 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 194623 / 65150 (over budget only) in the e2e build, the plus 4.
   // 194,601 / 65,105 -> 195,140 / 65,333 번외 8 over main 29120d32. Measured 195136 / 65329 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_641, maxGzip: 65_117 },
+  // 194,641 / 65,117 -> 195,067 / 65,336 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 195063 / 65332 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_067, maxGzip: 65_336 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2058,7 +2061,8 @@ const budgets = [
   // 162,399 / 58,136 -> 162,578 / 58,188 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 162574 / 58184 in the CI e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,405 / 58,143 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 162401 / 58139 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,918 / 58,372 번외 8 over main 29120d32. Measured 162914 / 58368 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_433, maxGzip: 58_148 },
+  // 162,433 / 58,148 -> 162,859 / 58,327 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 162855 / 58323 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_327 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2503,7 +2507,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,404 / 438,945 / 446,816 번외 8 over main 29120d32. Measured first paint, the plus 4.
 // -> 377,410 / 438,945 / 446,816 번외 8, CI first paint ko 377406 (run 43819751212), the plus 4.
 // -> 377,861 / 439,153 / 447,032 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
+// -> 378,010 / 439,505 / 447,425 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_010, en: 439_505, ja: 447_425 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2704,7 +2709,8 @@ function checkBudget(file, budget) {
 // -> 11,122 / 3,979 weekly-page over main 29120d32: the worker keeps /weekly.html (DOCUMENT_PAGE) and warms it, the plus 4.
 // -> 11,064 / 3,979 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33, the plus 4.
 // -> 11,093 / 3,983 번외 8 over main 29120d32, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_122, maxGzip: 3_979 };
+// -> 11,151 / 3,997 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_151, maxGzip: 3_997 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
