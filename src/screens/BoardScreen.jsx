@@ -1,10 +1,15 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Flag, RotateCw, Send, ShieldExclamationPoint } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { BOARD_REPORT_REASONS } from "../boardReport.js";
 import { useBoardReport } from "../state/useBoardReport.js";
 import words from "../copy/board.js";
 import { fill, LANG, SOURCE_LOCALE } from "../locale.js";
+import { adminWanted } from "../boardAdminEntry.js";
+
+// The makers' admin bar (components/BoardAdmin.jsx), fetched only on a page
+// that asked for it or holds a sign-in (boardAdminEntry.js): never a player's.
+const BoardAdminBar = lazy(() => import("../components/BoardAdmin.jsx").then(({ BoardAdminBar }) => ({ default: BoardAdminBar })));
 
 // Dates as the page's language writes them; a Korean page as it always has.
 const DATE_LOCALE = LANG === SOURCE_LOCALE ? "ko-KR" : LANG;
@@ -59,6 +64,7 @@ export function BoardScreen({
   }, []);
   const isBoardBusy = boardStatus === "loading" || boardStatus === "idle";
   const report = useBoardReport();
+  const [showAdmin] = useState(() => adminWanted());
 
   return (
       <main className="shell board-shell">
@@ -76,6 +82,11 @@ export function BoardScreen({
             <h1 ref={headingRef} tabIndex={-1}>{words.title}</h1>
             <p>{words.intro}</p>
           </header>
+          {showAdmin && (
+            <Suspense fallback={null}>
+              <BoardAdminBar onChanged={() => reloadBoard()} />
+            </Suspense>
+          )}
           <section className="board-status-bar" aria-busy={isBoardBusy}>
             <div role="status">
               <span>{boardStatus === "ready" ? "REMOTE BOARD" : isBoardBusy ? "CONNECTING" : "BOARD OFFLINE"}</span>

@@ -150,6 +150,7 @@ export default {
   },
   readout: {
     clockHeat: "Clock heat ×{value}",
+    caseShock: "Market shock {change}",
     nextBusted: "The next hand starts under rules changed by hitting the Wall.",
     nextColdFeet: "Because you stopped without a single push, the next hand’s most expensive card is sealed.",
     nextRecalculated: "This hand’s Heat and costs reset the next hand’s conditions.",

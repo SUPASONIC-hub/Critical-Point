@@ -125,6 +125,10 @@ const CASE_PAGE = /^\/(?:(?:en|ja)\/)?cases\/(?!index\.html$)[a-z0-9]+\.html$/;
 // `?lang=<code>` page asks for them, so a Korean device is not made to fetch
 // them in the warm-up. A page in that language fetches them as it goes.
 const OTHER_LANGUAGES = /^\/assets\/locale-/;
+// The makers' admin sheet and bar (src/components/BoardAdmin.jsx): only a page
+// opened with `?admin`, or holding a maker's sign-in, asks for them, so no
+// player's device fetches them in the warm-up either.
+const ADMIN_ONLY = /^\/assets\/BoardAdmin-/;
 // The second font file (scripts/build-fonts.mjs): no page names it -- a
 // preload would put it back into the first paint -- but the first scene prints
 // its syllables, so the worker keeps it at install with what the page names.
@@ -177,7 +181,7 @@ export function workerConfigFor({ html, files, logic = "" }) {
   const first = new Set(precache);
   const warm = files
     .map(([file]) => file)
-    .filter((file) => !first.has(file) && !OTHER_LANGUAGES.test(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file) || (DOCUMENT_PAGE.test(file) && !CASE_PAGE.test(file))))
+    .filter((file) => !first.has(file) && !OTHER_LANGUAGES.test(file) && !ADMIN_ONLY.test(file) && (file.startsWith("/assets/") || WARM_ROOT.test(file) || (DOCUMENT_PAGE.test(file) && !CASE_PAGE.test(file))))
     .sort();
   return { release: releaseIdFor({ html, files, logic }), entry, precache, warm };
 }

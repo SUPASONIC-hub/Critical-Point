@@ -150,6 +150,7 @@ export default {
   },
   readout: {
     clockHeat: "時計が上げる熱 {value}倍",
+    caseShock: "市場ショック {change}",
     nextBusted: "次の勝負は、壁に触れた代償として変わったルールで始まる。",
     nextColdFeet: "一度も押さずに止めた代償として、次の勝負でいちばん高いカードが封印される。",
     nextRecalculated: "今回の熱と消耗が、次の勝負の環境を計算し直す。",

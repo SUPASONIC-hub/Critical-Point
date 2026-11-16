@@ -11,6 +11,8 @@
     "src/advancedSystems.js": 100,
     "src/analystTitle.js": 100,
     "src/appConfig.js": 96,
+    "src/boardAdmin.js": 98,
+    "src/boardAdminEntry.js": 100,
     "src/boardBlockedTerms.js": 100,
     "src/boardReport.js": 100,
     "src/castAliases.js": 100,

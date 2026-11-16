@@ -103,6 +103,7 @@ const DEFAULT_SPECS = [
   "tests/accessibility-locales.spec.js",
   "tests/accessibility-settings.spec.js",
   "tests/audio-preference.spec.js",
+  "tests/board-admin.spec.js",
   "tests/board-ranking.spec.js",
   "tests/cloud-save.spec.js",
   "tests/cold-opening.spec.js",
