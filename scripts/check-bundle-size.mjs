@@ -2472,7 +2472,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
 // -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
 // -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
+// -> 377,762 / 439,054 / 446,933 브랜드 로고 11-16: favicon.svg 링크·사전 캐시. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_762, en: 439_054, ja: 446_933 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2670,7 +2671,8 @@ function checkBudget(file, budget) {
 // -> 10,887 / 3,912 N1 결산 카드, the plus 4.
 // -> 10,885 / 3,904 번외 5, the plus 4.
 // -> 11,064 / 3,974 묶음 1113, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_064, maxGzip: 3_974 };
+// -> 11,085 / 3,980 브랜드 로고 11-16: favicon.svg 링크·사전 캐시, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_085, maxGzip: 3_980 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
