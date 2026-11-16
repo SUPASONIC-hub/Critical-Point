@@ -243,6 +243,9 @@ const tableCopy = {
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",
+    // The stake clock (B5): the heat crossed a tier and the clock moved by {cut} seconds.
+    stakeClockCut: "열기 {gauge} · 시계 {cut}초 줄었다 · 남은 {seconds}초",
+    stakeClockBack: "열기 {gauge} · 시계 {cut}초 돌아왔다 · 남은 {seconds}초",
     // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
     status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },

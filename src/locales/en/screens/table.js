@@ -215,6 +215,8 @@ export default {
     scout: "Scouted for {trust} Trust. The Wall is somewhere between {min} and {max}",
     bank: "This hand {hand} · Stake {pot} · Vault {vault}",
     act: "Act {act} begins · Case {case}",
+    stakeClockCut: "Heat {gauge} · the clock lost {cut} seconds · {seconds} seconds left",
+    stakeClockBack: "Heat {gauge} · the clock got {cut} seconds back · {seconds} seconds left",
     status: "Heat {gauge} · {danger} · Stake {pot} · {seconds} seconds left · Heartbeat {bpm}",
   },
   afterword: {
