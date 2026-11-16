@@ -124,6 +124,8 @@ const MUTATION_KINDS = {
   strikeMastery: "carry",
   steadyMastery: "carry",
   exposeMastery: "carry",
+  // A week's device (MARKET SHOCK, weeklyRules.js): no decision broke the board.
+  shock: "week",
   reboot: "reset",
 };
 

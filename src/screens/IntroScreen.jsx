@@ -9,6 +9,9 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
+import { rankingResetNoticeAt } from "../gauntlet/weeklyCalendar.js";
+import { castAliasLine, castNoticeAt } from "../castAliases.js";
+import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
@@ -25,6 +28,8 @@ import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from ".
 import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
+import { GAME_EVENTS, sendGameEventOnce } from "../gameEvents.js";
+import { readSharedHabitId, sharedHabitTitle } from "../shareLink.js";
 
 // E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
 const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
@@ -122,6 +127,32 @@ function DeletionRequest() {
   );
 }
 
+/**
+ * N3: 「친구의 결과: …」 for a visit from a shared card's address
+ * (`/?from=card&h=<habit id>`, shareLink.js). The names live in the habits
+ * table, which the first paint does not carry: it is fetched only for such a
+ * visit, and the line is the name that table has under the id, in the page's
+ * language, or nothing.
+ */
+function FriendResultLine() {
+  const [line, setLine] = useState("");
+  useEffect(() => {
+    const id = readSharedHabitId(globalThis.location?.search);
+    if (!id) return undefined;
+    let live = true;
+    import("../copy/habits.js")
+      .then(({ default: habits }) => {
+        const title = sharedHabitTitle(habits, id);
+        if (live && title) setLine(fill(habits.friendLine, { habit: title }));
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return line ? <p className="intro-friend-line" data-testid="friend-result-line">{line}</p> : null;
+}
+
 export function IntroScreen({ view, renderers = {} }) {
   // The case the burst is opening, or null when there is none.
   const [openingBurst, setOpeningBurst] = useState(null);
@@ -201,6 +232,8 @@ export function IntroScreen({ view, renderers = {} }) {
   // opens the burst, and starts its sound, inside the press itself.
   const startNewRun = async () => {
     if (!hasResumableSave || (await confirmAction(CONFIRM.startOver))) {
+      // N2: the press, counted once per page (gameEvents.js); nothing without Google's tag.
+      sendGameEventOnce(GAME_EVENTS.start);
       // B-3(1) 냉정한 오프닝 (state/coldOpening.js). `__CP_COLD_OPENING__` is
       // the switch, written by vite.config.js: off, this branch is not in the
       // build. On, a first season plays the page first, and the page's last
@@ -393,6 +426,7 @@ export function IntroScreen({ view, renderers = {} }) {
                   {consentLine}
                 </div>
               )}
+              <FriendResultLine />
               <CloudSavePanel />
               {/* The resume card has no row for it, so with a save it reads
                   under the fold that follows the card. */}
@@ -430,6 +464,12 @@ export function IntroScreen({ view, renderers = {} }) {
           </div>
           {nextParticipantMessage && (
             <p className="previous-participant-message">{fill(introCopy.previousMessage, { message: nextParticipantMessage })}</p>
+          )}
+          {rankingResetNoticeAt(weeklyRuleNow()) && (
+            <p className="previous-participant-message" data-testid="ranking-reset-notice">{introCopy.rankingReset}</p>
+          )}
+          {castNoticeAt(weeklyRuleNow()) && (
+            <p className="previous-participant-message" data-testid="cast-rename-notice">{fill(introCopy.castRenamed, { names: castAliasLine(LANG) })}</p>
           )}
           <WeeklyRuleNotice />
           <section id="case-access-setup" className="start-priority" aria-label={introCopy.setup.label} tabIndex={-1}>

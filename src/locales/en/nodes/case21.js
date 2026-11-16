@@ -10,7 +10,7 @@ export default {
   "nodes": {
     "c21_start": {
       "title": "The Bottom Line",
-      "text": "At the very bottom of NOAH’s training data list is the oldest line. 'TL Cohort 1 · Participant 01 · March–September 2022 · No consent form.' It is Sunwoo Jin, who sat in the same basement a year before Trigger Lab existed and now runs a guesthouse in Gujwa, Jeju. Ryu Seah sends a message. 'Legal sent retroactive consent forms to past participants by registered mail. With a 3 million won thank-you payment attached.' Asked about Cohort 1, Han Seoyun only says, 'That was before my time.'",
+      "text": "At the very bottom of the list NOAH learned from is the oldest line. 'TL Cohort 1 · Participant 01 · March–September 2022 · No consent form.' Sunwoo Jin, who now runs a guesthouse in Gujwa, Jeju. A message from Priya Nair. 'Legal sent after-the-fact consent forms to past participants by registered mail. With a 3 million won thank-you payment attached.' Asked about Cohort 1, Han Seoyun only says, 'That was before my time.'",
       "memo": [
         "NOAH official launch February 10 -- D-6",
         "Participant 01 Sunwoo Jin: Cohort 1 analyst, March–September 2022",
@@ -38,7 +38,7 @@ export default {
     },
     "c21_inn": {
       "title": "Slow Island",
-      "text": "A tangerine warehouse built in 1978 has become the guesthouse 'Slow Island.' Pouring tangerine-peel tea, Sunwoo Jin speaks one word at a time. 'The bank... people. Faces... yes. I was there too. In the basement.' Sunwoo Jin remembers those days as a training course called 'Crisis Response Capability Assessment.' Then Sunwoo Jin points to a KD registered envelope on the counter, held down by a single tangerine. 'My old company says it’s giving me money as thanks. I haven’t opened it yet. Nothing’s urgent here.' The reply deadline is February 9.",
+      "text": "Pouring tangerine-peel tea, Sunwoo Jin speaks one word at a time. 'The bank... people. Faces... yes. I was there too. In the basement.' Sunwoo Jin remembers those days as a training course called 'Crisis Response Capability Assessment.' Then Sunwoo Jin points to a KD registered envelope held down by a single tangerine. 'My old company says it’s giving me money as thanks. I haven’t opened it yet. Nothing’s urgent here.'",
       "memo": [
         "Slow Island: four rooms, we are the only guests this week",
         "Sunwoo Jin: remembers those days as 'training'",
@@ -69,7 +69,7 @@ export default {
     },
     "c21_orchard": {
       "title": "Then Don’t Pick at It",
-      "text": "A cold snap comes tonight, so the remaining 3 tons of tangerines have to be picked today. Ko Eunbi next door, who said she would never borrow a bank person’s hands, holds out shears at Sunwoo Jin’s request. Na Junhyuk, with 30 years of stamping skill, snips each stem in a single cut and hogs all the praise. When Kwon Dohyun starts counting something, shears in hand, Ko Eunbi’s shears stop. 'Then don’t pick at it.' Ko Eunbi comes over to you. 'When Sunwoo Jin first came here, it was three months of picking tangerines without a single word. That letter, Sunwoo Jin was so glad, called it money to fix the roof. Is it really good money?'",
+      "text": "Ko Eunbi, who said she would never borrow a bank person’s hands, holds out shears too. Na Junhyuk, with 30 years of stamping skill, snips each stem in a single cut and hogs all the praise. When Kwon Dohyun starts counting something, Ko Eunbi speaks. 'Then don’t pick at it.' Then she comes over to you. 'When Sunwoo Jin first came here, it was three months of picking tangerines without a single word. That letter, Sunwoo Jin was so glad, called it money to fix the roof. Is it really good money?'",
       "memo": [
         "3 tons of tangerines left -- before tonight’s cold snap",
         "40 crates, eight pairs of hands",
@@ -100,7 +100,7 @@ export default {
     },
     "c21_breakwater": {
       "title": "The Stem Gets Bruised",
-      "text": "Sunwoo Jin walks to the end of the breakwater with a flashlight. Only after the lighthouse beam has turned four times does Sunwoo Jin speak. 'That training got a little harder every week. When my father collapsed, I asked for leave, and they said no, this week was important. At the end of July, at three in the morning, I got up from my desk and collapsed. My father’s funeral... I went. Late.' 'Back then I thought I fell apart because I was weak. Pick a tangerine in a hurry, they say, and the stem gets bruised.' Sunwoo Jin holds out half the tangerine. 'But you people aren’t here on vacation, are you?'",
+      "text": "After a long while, Sunwoo Jin speaks. 'That training got a little harder every week. When my father collapsed, I asked for leave, and they said no, this week was important. At the end of July, at three in the morning, I got up from my desk and collapsed. My father’s funeral... I went. Late.' 'Back then I thought I fell apart because I was weak. Pick a tangerine in a hurry, they say, and the stem gets bruised. But you people aren’t here on vacation, are you?'",
       "memo": [
         "Sunwoo Jin’s memory matches the Cohort 1 weekly chart dates: second week of July",
         "Father died August 2022 -- after leave was rejected",
@@ -131,7 +131,7 @@ export default {
     },
     "c21_final": {
       "title": "Someone Who Wants to Know",
-      "text": "One hour left until the registered-mail cutoff at Gujwa Post Office. Since the night on the breakwater, Sunwoo Jin has not rushed you once. 'The night before last, I saw you reading the guestbook. And I heard what Eunbi said this morning. There’s something I don’t know, isn’t there. From that basement 4 years ago.' The photo of the weekly chart Ban Jaewook sent is on your phone, and the rest of Cohort 1’s originals are still in the sealed section. Sunwoo Jin puts the pen down. 'You might tell me, or you might not. Either way, today I have to write something on this paper.'",
+      "text": "Sunwoo Jin does not rush you. 'The night before last, I saw you reading the guestbook. And I heard what Eunbi said this morning. There’s something I don’t know, isn’t there. From that basement 4 years ago.' The photo of the weekly chart is on your phone; the rest of Cohort 1’s originals are in the sealed section. Sunwoo Jin puts the pen down. 'You might tell me, or you might not. Either way, today I have to write something on this paper.'",
       "memo": [
         "Consent form unsigned -- registered-mail cutoff 17:00",
         "What we have: 1 weekly chart, the guestbook sentence, NOAH’s training list",
@@ -159,7 +159,7 @@ export default {
     },
     "c21_aftershock": {
       "title": "Tangerines Not Picked in a Hurry",
-      "text": "The post office cutoff passes, and snow flurries drift across the yard of Slow Island. Ko Eunbi presses a box of off-grade tangerines into Kwon Dohyun’s arms and holds out a statement. In the amount field, '0 won'; in the remarks field, 'Don’t pick at it.' Sunwoo Jin hands you a box of tangerines. 'These weren’t picked in a hurry.' Then a text arrives from Moon Gaeul. 'I put in the application today to borrow money for a new machine for To-the-End Precision. They say a new computer does the review. And Hajun starts as an intern at Gangseo Branch after Lunar New Year.'",
+      "text": "Ko Eunbi presses a box of off-grade tangerines into Kwon Dohyun’s arms and holds out a statement. Amount: '0 won'; remarks: 'Don’t pick at it.' Sunwoo Jin hands you a box too. 'These weren’t picked in a hurry.' A text arrives from Moon Gaeul. 'I put in the application today to borrow money for a new machine for To-the-End Precision. They say a new computer does the review. And Hajun starts as an intern at Gangseo Branch after Lunar New Year.'",
       "memo": [
         "Retroactive consent reply deadline passed",
         "One box of off-grade tangerines -- statement 0 won",
@@ -183,7 +183,7 @@ export default {
     },
     "c21_guestbook": {
       "title": "12 Guestbooks",
-      "text": "Eleven at night: 12 guestbooks stand beside the living-room stove. Under every guest’s entry, Sunwoo Jin left a handwritten reply. Turning the pages of one, Lee Minseo stops. 'Count the people first, and the numbers after.' It does not differ by a single letter from the first line of the option-sentence library in Trigger Lab’s case template. Lee Minseo whispers. 'This is the button we pressed every day.'",
+      "text": "12 guestbooks by the stove, a handwritten reply from Sunwoo Jin under every guest’s entry. Turning the pages of one, Lee Minseo stops. 'Count the people first, and the numbers after.' It does not differ by a single letter from the first line of Trigger Lab’s option-sentence library. Lee Minseo whispers. 'This is the button we pressed every day.'",
       "memo": [
         "12 guestbooks -- Sunwoo Jin’s reply under every entry",
         "Same sentence as option sentence #0001",
@@ -206,7 +206,7 @@ export default {
     },
     "c21_storehouse": {
       "title": "+2 Levels",
-      "text": "The night the tangerines are all in, Ban Jaewook calls from B2 in Seoul. 'I’ve found Participant 01’s weekly chart. The rest of the originals are in the sealed section, beyond my clearance.' Second week of July 2022: beside the response scores is a ballpoint note. 'Participant 01 responses slowing. Adjust pressure intensity +2 levels. Leave request for father’s hospitalization -- recommend rejection.' Sunwoo Jin is on the other side of the warehouse, whistling.",
+      "text": "Ban Jaewook calls from B2 in Seoul. 'I’ve found Participant 01’s weekly chart. The rest of the originals are in the sealed section, beyond my clearance.' Second week of July 2022: a ballpoint note beside the response scores. 'Participant 01 responses slowing. Adjust pressure intensity +2 levels. Leave request for father’s hospitalization -- recommend rejection.' On the other side of the warehouse, Sunwoo Jin is whistling.",
       "memo": [
         "1 weekly chart, second week of July 2022",
         "Note: adjust pressure intensity +2 levels, recommend rejecting leave",
@@ -217,7 +217,7 @@ export default {
           "label": "Have the note’s writer and approval line checked against the originals"
         },
         "c21_storehouse_choice_3": {
-          "label": "Hand the chart photo to Ryu Seah as grounds to stop NOAH"
+          "label": "Hand the chart photo to Priya Nair as grounds to stop NOAH"
         },
         "c21_storehouse_choice_1": {
           "label": "Keep the chart among ourselves until Sunwoo Jin can see it"
@@ -229,7 +229,7 @@ export default {
     },
     "c21_letter": {
       "title": "Roof Money",
-      "text": "The next morning, Sunwoo Jin opens the envelope. Two consent forms. 'I consent to the use of my 2022 capability assessment participation records for research purposes.' Replies are due by the post office’s registered-mail cutoff at five this afternoon. Sunwoo Jin is the data subject of those records, and can file an access request before signing. Sunwoo Jin looks up at the roof. 'If it’s for research... it’ll be used for something good, right? It’s money to fix the roof.' Sunwoo Jin uncaps the pen.",
+      "text": "Sunwoo Jin opens the envelope. Two consent forms. 'I consent to the use of my 2022 capability assessment participation records for research purposes.' Sunwoo Jin is the data subject of those records, and can file an access request before signing. Sunwoo Jin looks up at the roof. 'If it’s for research... it’ll be used for something good, right? It’s money to fix the roof.'",
       "memo": [
         "2 consent forms + 3 million won thank-you payment",
         "Reply cutoff: today 17:00, Gujwa Post Office",
@@ -252,7 +252,7 @@ export default {
     },
     "c21_guestbook_reaction": {
       "title": "The Registrant Field",
-      "text": "Lee Minseo asked about the registration record for the library’s first line, and Ryu Seah calls back after midnight. 'Of the first 50 sentences, 31 have an empty registrant field. The registration dates are all in the spring and summer of 2022. NOAH builds choices from these sentences too. Even right now. Nobody wrote down who said them first.' Outside the window, Kkokji barks once.",
+      "text": "Priya Nair calls after midnight. 'Of the first 50 sentences, 31 have an empty registrant field. The registration dates are all in the spring and summer of 2022. NOAH builds choices from these sentences too. Even right now. Nobody wrote down who said them first.' Outside the window, Kkokji barks once.",
       "memo": [
         "31 sentences with an empty registrant field",
         "NOAH still builds choices from these sentences"
@@ -274,7 +274,7 @@ export default {
     },
     "c21_storehouse_reaction": {
       "title": "The 33rd-Floor Format",
-      "text": "Han Seoyun sees the photo and calls late at night. This time she does not say 'before my time.' 'That note’s layout, the way the fields are divided, is the 33rd-floor format. The files I was handed when I first came to Trigger Lab looked the same.' Over the line comes the sound of a drawer opening. 'I can’t say more right now. When I can, I’ll say it with my name on it.'",
+      "text": "Han Seoyun sees the photo and calls. This time she does not say 'before my time.' 'That note’s layout, the way the fields are divided, is the 33rd-floor format. The files I was handed when I first came to Trigger Lab looked the same. I can’t say more right now. When I can, I’ll say it with my name on it.'",
       "memo": [
         "'The 33rd-floor format'",
         "When it can be said, with a name on it"
@@ -296,7 +296,7 @@ export default {
     },
     "c21_letter_reaction": {
       "title": "Only Where the Stars Are",
-      "text": "Ko Eunbi, who came by for a box of tangerines, leafs through the consent form. 'Banks always hand you paper along with the money. It was like that in my grandfather’s day too. Just sign where the stars are.' On the second page, in small print, is the line 'the scope of participation records is determined by the company.' 'If the company decides the scope, Sunwoo Jin is giving permission without even knowing what for.' Behind the counter, Sunwoo Jin listens, pen in hand.",
+      "text": "Ko Eunbi leafs through the consent form. 'Banks always hand you paper along with the money. It was like that in my grandfather’s day too. Just sign where the stars are.' On the second page, in small print, is the line 'the scope of participation records is determined by the company.' 'If the company decides the scope, Sunwoo Jin is giving permission without even knowing what for.'",
       "memo": [
         "'The scope of participation records is determined by the company'",
         "The words: just sign where the stars are"
@@ -318,7 +318,7 @@ export default {
     },
     "c21_branch_rind": {
       "title": "2 Tons of Off-Grade Fruit",
-      "text": "'If you’ve got money for day wages, take a look at the tangerines in our warehouse.' Ko Eunbi opens her own tangerine warehouse. The yellow crates hold 2 tons of off-grade tangerines. The co-op buying price is 300 won for 1 kilogram. On the wall is her grandfather’s farm-loan calendar. The repayment date in March is circled in red: 40 million won. '2 years ago, when the hail hit, the bank wouldn’t extend, so Grandfather sold half the fields. That’s why I don’t trust bank people.'",
+      "text": "'If you’ve got money for day wages, take a look at the tangerines in our warehouse.' Ko Eunbi opens the warehouse. There are 2 tons of off-grade tangerines. The co-op buys them at 300 won for 1 kilogram. On the wall is her grandfather’s farm-loan calendar, with March circled in red: 40 million won. '2 years ago, when the hail hit, the bank wouldn’t extend, so Grandfather sold half the fields. That’s why I don’t trust bank people.'",
       "memo": [
         "2 tons of off-grade tangerines -- buying price 300 won per 1 kg",
         "Farm loan 40 million won, due in March",
@@ -342,7 +342,7 @@ export default {
     },
     "c21_branch_rind_follow": {
       "title": "14 Stars",
-      "text": "Ko Eunbi takes a document envelope from the drawer under the calendar and tips it out onto the wooden platform. Fourteen sheets: a maturity extension application, printed out on Friday at the Gujwa co-op window. Every place to sign has a highlighter star. 'The clerk said, You don’t need to read it all, just sign where the stars are.' It is exactly what her grandfather heard 2 years ago. Kwon Dohyun draws a line on a blank sheet. 'On page 9 there’s a clause raising the interest rate by 1.8 percentage points in exchange for the extension. There’s no star there.' Ko Eunbi looks Kwon Dohyun straight in the eye for the first time.",
+      "text": "Ko Eunbi tips a document envelope out onto the wooden platform. Fourteen sheets of a maturity extension application from the co-op window, a highlighter star at every place to sign. 'The clerk said, You don’t need to read it all, just sign where the stars are.' It is exactly what her grandfather heard 2 years ago. Kwon Dohyun speaks. 'On page 9 there’s a clause raising the interest rate by 1.8 percentage points in exchange for the extension. There’s no star there.' Ko Eunbi looks Kwon Dohyun straight in the eye for the first time.",
       "memo": [
         "14-sheet maturity extension application, 14 stars",
         "Page 9: clause raising the rate 1.8 percentage points -- no star",
@@ -366,7 +366,7 @@ export default {
     },
     "c21_route_system": {
       "title": "91% Similarity",
-      "text": "On the remote terminal, NOAH answers instead of ECHO. 'Closest training case to the table just reframed: Participant 01, May 11, 2022, 03:12. Similarity 91%.' Among NOAH’s training data, the response records of Cohort 1’s four number 12,000. It is the bundle with the highest weight. 'Removing this bundle lowers my judgment accuracy by 14%. Whether this bundle had consent is outside the scope of my explanation.'",
+      "text": "NOAH answers. 'Closest training case to the table just reframed: Participant 01, May 11, 2022, 03:12. Similarity 91%.' Cohort 1’s four, 12,000 response records: the bundle with the highest weight. 'Removing this bundle lowers my judgment accuracy by 14%. Whether this bundle had consent is outside the scope of my explanation.'",
       "memo": [
         "12,000 Cohort 1 response records -- top weight",
         "Similarity between your reframed table and Participant 01’s records: 91%",
@@ -377,7 +377,7 @@ export default {
           "label": "Demand removing the Cohort 1 bundle and accepting the 14% accuracy loss"
         },
         "c21_route_system_disclose": {
-          "label": "Share NOAH’s explanation screen with Ryu Seah and the consent review side"
+          "label": "Share NOAH’s explanation screen with Priya Nair and the consent review side"
         },
         "c21_route_system_close": {
           "label": "Pretend you never saw the 91% and close the screen"
@@ -392,7 +392,7 @@ export default {
     },
     "c21_final_system_route": {
       "title": "Outside the Scope of Explanation",
-      "text": "Before dawn on February 9, NOAH’s explanation screen glows on the remote terminal. Every field asking for a basis is filled in; only the one field asking about consent is gray. NOAH adds a line beneath the gray field. 'I was not built to answer this field. The one who can answer it is the owner of this house, Participant 01, Sunwoo Jin, who is asleep downstairs right now.'",
+      "text": "On NOAH’s explanation screen, every field asking for a basis is filled in; only the one field asking about consent is gray. NOAH adds a line beneath it. 'I was not built to answer this field. The one who can answer it is the owner of this house, Participant 01, Sunwoo Jin, who is asleep downstairs right now.'",
       "memo": [
         "12,000 Cohort 1 response records -- consent is outside the scope of NOAH’s explanation",
         "Retroactive consent reply deadline: today 17:00",
@@ -415,7 +415,7 @@ export default {
     },
     "c21_evidence_turn": {
       "title": "The Blank on the Order Form",
-      "text": "When you read out the clues, Ban Jaewook in B2 in Seoul holds an operations statement up to the screen. Project name 'TL-2022-01 HR Innovation Foundational Research,' ordering department Group Strategy Office, deliverable format 'HR reference material.' The next page is the company’s written opinion attached to the industrial accident claim Sunwoo Jin filed just before leaving. 'Judged to be personal stress.' The signature field is blank. Ban Jaewook closes his notebook. 'No name in the field that ordered the experiment, and none in the field that turned that person into personal reasons. The same habit of hand.'",
+      "text": "An operations statement from B2. Project name 'TL-2022-01 HR Innovation Foundational Research,' ordering department Group Strategy Office, deliverable format 'HR reference material.' The next page is the company’s written opinion attached to the industrial accident claim Sunwoo Jin filed just before leaving. 'Judged to be personal stress.' The signature field is blank. Ban Jaewook speaks. 'No name in the field that ordered the experiment, and none in the field that turned that person into personal reasons. The same habit of hand.'",
       "memo": [
         "Ordered by: Group Strategy Office, project TL-2022-01",
         "Deliverable format: HR reference material",
@@ -438,7 +438,7 @@ export default {
     },
     "c21_start_warm": {
       "title": "A Trip for the People Who Cleared the Server Room Together",
-      "text": "The day NOAH came on, the nine of them cleared the server room together. Someone said, 'Next time, let’s go on a real trip.' Three days later Lee Minseo brings over the bottom line of NOAH’s training data. 'TL Cohort 1 · Participant 01 · No consent form.' It is Sunwoo Jin, who runs a guesthouse in Gujwa, Jeju. A retroactive consent form is on its way to Sunwoo Jin. Do Yoonha looks at the calendar. 'A trip, then. To Jeju.'",
+      "text": "The day NOAH came on, the nine of them cleared the server room together and said, 'Next time, let’s go on a real trip.' Lee Minseo brings over the bottom line of the list NOAH learned from. 'TL Cohort 1 · Participant 01 · No consent form.' It is Sunwoo Jin, who runs a guesthouse in Gujwa, Jeju. An after-the-fact consent form is on its way to Sunwoo Jin. Do Yoonha looks at the calendar. 'A trip, then. To Jeju.'",
       "memo": [
         "Six people requesting annual leave this week",
         "Participant 01 Sunwoo Jin -- no consent form",
@@ -468,7 +468,7 @@ export default {
     },
     "c21_start_record": {
       "title": "The Blank Found by the One Who Left a Document",
-      "text": "Ryu Seah calls while filling in that document’s appendix: the field noting consent status for each item of NOAH’s training data. 'I filled it all in, but the bottom four lines are empty.' TL Cohort 1, Participants 01 through 04. The very bottom line is Sunwoo Jin. But the day after the document was registered, Legal sent Sunwoo Jin in Gujwa, Jeju a retroactive consent form and a 3 million won thank-you payment. The document you left told them first which field to fill.",
+      "text": "Priya Nair calls while filling in the appendix: the field noting consent status for each item NOAH learned from. 'I filled it all in, but the bottom four lines are empty.' The very bottom line, Participant 01, is Sunwoo Jin. The day after the document was registered, Legal sent Sunwoo Jin in Gujwa, Jeju an after-the-fact consent form and a 3 million won thank-you payment. The document you left told them first which field to fill.",
       "memo": [
         "4 blank lines in the appendix -- Participant 01 at the bottom",
         "Legal’s registered mailing: the day after the document was registered",
@@ -494,11 +494,11 @@ export default {
       "place": "Trigger Lab, 4th-floor analyst room",
       "clock": "Early February · NOAH launch in D-6",
       "question": "The appendix you left told Legal about the blank first. How do you go to the owner of that blank?",
-      "lead": "Three days after ECHO’s records were set down in a document, Ryu Seah’s call opens with the bottom line of the appendix."
+      "lead": "Three days after ECHO’s records were set down in a document, Priya Nair’s call opens with the bottom line of the appendix."
     },
     "c21_start_rush": {
       "title": "The Name Found by the One Who Opened the List First",
-      "text": "On the morning NOAH came on, as soon as you read Ryu Seah’s email, you left the half-cleared server room and downloaded NOAH’s training data list. Kang Taemin cleared the server room alone. The oldest line: 'TL Cohort 1 · Participant 01 · 2022 · No consent form.' Sunwoo Jin, Gujwa, Jeju. Three days later Ban Jaewook adds, 'Legal sent this person a retroactive consent form. They hurried because they saw us open the list.' When you look up, no one is left on the 4th floor.",
+      "text": "On the morning NOAH came on, you left the half-cleared server room and downloaded the list NOAH learned from first. Kang Taemin cleared the server room alone. The oldest line: 'TL Cohort 1 · Participant 01 · 2022 · No consent form.' Sunwoo Jin, Gujwa, Jeju. Three days later Ban Jaewook adds, 'Legal sent this person an after-the-fact consent form. They hurried because they saw us open the list.'",
       "memo": [
         "Downloaded the whole list the morning NOAH came on",
         "Participant 01 Sunwoo Jin -- no consent form",
@@ -557,7 +557,7 @@ export default {
     "c21_letter_choice_3": "When you step away, the decision is Sunwoo Jin’s. Even what Sunwoo Jin does not know is left for Sunwoo Jin to carry.",
     "c21_guestbook_reaction_choice_1": "Not handed over, the sentences become NOAH’s choices again today. Until their owner knows, that button keeps getting pressed.",
     "c21_guestbook_reaction_choice_2": "The request remains. The department asked to fill in the registrant field puts its answer off by three days.",
-    "c21_guestbook_reaction_choice_3": "When you ask to pull them, Ryu Seah hesitates. 31 of NOAH’s choices go empty, and someone starts asking why.",
+    "c21_guestbook_reaction_choice_3": "When you ask to pull them, Priya Nair hesitates. 31 of NOAH’s choices go empty, and someone starts asking why.",
     "c21_storehouse_reaction_choice_1": "When you wait, Han Seoyun takes one more breath before hanging up. That breath stands in for a thank-you.",
     "c21_storehouse_reaction_choice_2": "Logged, those words become evidence. Han Seoyun knows her words are being written down.",
     "c21_storehouse_reaction_choice_3": "When you press, the line goes quiet. The sound of a drawer closing is the answer.",
@@ -570,7 +570,7 @@ export default {
     "c21_branch_rind_follow_a": "Reading aloud, you watch the sun sink. At page 9, Ko Eunbi stops reading and draws one more star with the highlighter.",
     "c21_branch_rind_follow_b": "The written request remains. One month to maturity, and Ko Eunbi has to wait out that month.",
     "c21_branch_rind_follow_c": "Once the stars are signed, today’s work is done. The 1.8 percentage points on page 9 arrive every month from March.",
-    "c21_route_system_disclose": "When you share it, Ryu Seah captures the explanation screen and puts it on the consent review agenda. In effect, NOAH has shown its own weak spot for the first time.",
+    "c21_route_system_disclose": "When you share it, Priya Nair captures the explanation screen and puts it on the consent review agenda. In effect, NOAH has shown its own weak spot for the first time.",
     "c21_route_system_exclude": "With the bundle removed, NOAH grows less accurate. Whose desk the 14% worth of wrong answers will land on, no one knows yet.",
     "c21_route_system_close": "Closing the screen does not erase the similarity. Your next judgment, too, piles up beside those 12,000 records.",
     "c21_final_system_route_a": "With the name field restored, 'Sunwoo Jin' is written beside option sentence #0001. No one has yet asked whether Sunwoo Jin wants that.",
@@ -622,7 +622,7 @@ export default {
     "c21_guestbook_choice_3": "Saying it is late, you just take photos and see to tomorrow’s orchard schedule first.",
     "c21_storehouse_choice_1": "So Sunwoo Jin’s story doesn’t get around before Sunwoo Jin does, you keep the chart among yourselves until Sunwoo Jin can see it.",
     "c21_storehouse_choice_2": "Saying a ballpoint note alone doesn’t show whose hand it is, you have the note’s writer and approval line checked against the originals.",
-    "c21_storehouse_choice_3": "Saying you can’t switch on judgment learned from records like these, you hand the chart photo to Ryu Seah as grounds to stop NOAH’s launch.",
+    "c21_storehouse_choice_3": "Saying you can’t switch on judgment learned from records like these, you hand the chart photo to Priya Nair as grounds to stop NOAH’s launch.",
     "c21_letter_choice_1": "Saying you can’t let the roof be the reason Sunwoo Jin signs, you say first that you’ll find the roof repair money some other way.",
     "c21_letter_choice_2": "Saying let’s see where it says it will be used for good, you read the consent form line by line with Sunwoo Jin.",
     "c21_letter_choice_3": "To buy time to see what is being signed, you ask just to hold off signing today, and step away.",
@@ -641,7 +641,7 @@ export default {
     "c21_branch_rind_follow_a": "So she signs knowing even the parts her grandfather signed unread, you read all 14 sheets aloud with Ko Eunbi, start to finish.",
     "c21_branch_rind_follow_b": "Saying no one should sign a clause without a star, you request in writing that the page 9 rate clause be removed, and hold off signing.",
     "c21_branch_rind_follow_c": "Saying the March maturity has to be gotten past first, you suggest just signing at the stars today and fighting the rate later.",
-    "c21_route_system_disclose": "Since these are not grounds to keep to yourself, you share NOAH’s explanation screen as it is with Ryu Seah and the consent review side.",
+    "c21_route_system_disclose": "Since these are not grounds to keep to yourself, you share NOAH’s explanation screen as it is with Priya Nair and the consent review side.",
     "c21_route_system_exclude": "Saying you can’t let it judge with records no one permitted, you demand removing the Cohort 1 bundle and accepting the 14% accuracy loss.",
     "c21_route_system_close": "Saying it is too big a number to touch now, you pretend you never saw the 91% and close the screen.",
     "c21_final_system_route_a": "So the screen shows whose judgment it learned from, you restore a name field for the original writer on every Cohort 1 record.",

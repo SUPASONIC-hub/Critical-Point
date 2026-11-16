@@ -5,7 +5,7 @@ export default {
     bust: "[懲戒回付] {title}",
   },
   result: {
-    collapse: "[SYSTEM COLLAPSE] シーズン崩壊 · {title}",
+    collapse: "[崩壊] シーズン判定 · {title}",
     season: "[{ending}] シーズン判定 · {title}",
     case: "[事件終了] {tag} · {title}",
   },

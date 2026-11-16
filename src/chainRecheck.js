@@ -15,8 +15,10 @@
  *
  *   inside a case   each entry's `caseId` is its row's case, and its
  *                   `resourcesBefore` is the entry before's `resourcesAfter`.
- *                   The board, the next scene, `resourcesAfter` itself, the
- *                   audit and the CASCADE need the settlement run again (S2).
+ *                   The next scene and `resourcesAfter` itself are played
+ *                   again by settlementRecheck.js when the checker hands it
+ *                   in (`settle`, F1 step 1); the board, the audit and the
+ *                   CASCADE need run state the snapshot does not carry yet.
  *   between cases   the run counters in `dynamics` (createRunSummary) only
  *                   move forward and by no more than the windows between:
  *                   `windowIndex` by at least the next case's decisions (more
@@ -24,7 +26,9 @@
  *                   least the busts that case logged and at most those plus the
  *                   practice windows, `cashes` by at most its windows, `vault`
  *                   and `handVault` never down but by what the case's draft
- *                   paid (C9, `relicDraft.cost`; a practice run restores them,
+ *                   paid (C9, `relicDraft.cost`) and, under IDLE MONEY's
+ *                   week (B4), its share of the close before (`getIdleErosion`;
+ *                   a practice run restores them,
  *                   the audit takes from what is being secured, not from the
  *                   vault), and the table mark and the week stamp the same.
  *   the opening     the snapshot each case row carries as `dynamics.open`
@@ -41,18 +45,28 @@
  *                   opens empty: no vault, tools or links, and with no window
  *                   played no busts, cashes, mastery or streak. The opening
  *                   resources are its first decision's `resourcesBefore`.
- *                   Still not checked: the board it opened on (LOCK's carry,
- *                   `focusCarry`, needs the settlement, S2) and the opening
- *                   route's resources against the case before's result
- *                   (`openingRoute`, describeCaseOpening). A row from a build
- *                   before the snapshot counts all of the opening as not
- *                   checked (UNCHECKED.open).
+ *                   LOCK's carry (`focusCarry`, F1 step 2) is the close's
+ *                   board read the way openCaseRun reads it: the REBOOT
+ *                   board a close deals kept (its marks the close's
+ *                   `mutations`), and the stance carry it held; the season's
+ *                   first case on a fresh table, neither. A board kept is
+ *                   the close's board; a board laid fresh holds neither
+ *                   REBOOT nor a stance carry. Read only when no window lay
+ *                   between (a replay leaves its own board, a case left half
+ *                   way its own). The route a case opened on (`openingRoute`)
+ *                   against the case before's result is played again by
+ *                   settlementRecheck.js when the checker hands it in
+ *                   (`opening`, F1 step 2). Each of the two is counted as
+ *                   not checked where it could not be read (UNCHECKED.between):
+ *                   a row from a build before them carries them null. A row
+ *                   from a build before the snapshot counts all of the
+ *                   opening as not checked (UNCHECKED.open).
  *
  * A gap in the rows (a case not delivered, or past retention) breaks no link:
  * the two sides of it are counted as not checked.
  */
 import { CASE_SEQUENCE } from "./gameCases.js";
-import { RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
+import { getIdleErosion, RULES_MARK_KEY, STANCE_CARRY_MUTATIONS } from "./gauntlet/gauntletEngine.js";
 
 /**
  * What a case row's drafts paid out of the vault (C9): the first decision
@@ -84,19 +98,26 @@ const COUNTERS = ["windowIndex", "busts", "cashes", "vault", "handVault"];
  * per case (inside) or per link (between) in `unchecked`.
  */
 export const UNCHECKED = Object.freeze({
-  // TODO(S2): with settleChoice(state, input) out of useChoiceCommit, play the
-  // settlement entry by entry and compare: the board each window was dealt
-  // (buildNextSchema, with isLinkDue/carryLinksOut for CASCADE), the next
-  // scene (card `next`, reframeTarget, the detour, BLACKOUT's skip),
-  // `resourcesAfter` (card effect + applyGauntletEffect), and the audit
-  // (countAudit/settleAudit) on the vault. Import the engine's functions, never
-  // copies, so the 11-02 verdict's rules follow (question 6 (1)).
+  // The settlement inside a case. With a `settle` checker handed to
+  // recheckChain (settlementRecheck.js, F1 step 1: the checker passes it),
+  // the next scene and `resourcesAfter` are played again and only what it
+  // could not read is counted; the board each window was dealt
+  // (buildNextSchema, with LOCK's carry), the audit on the vault and the
+  // CASCADE link need run state the opening snapshot does not carry (F1
+  // step 2) and are counted on every case. `board` stays first: the report
+  // counts the cases by it.
   inside: Object.freeze(["board", "scene", "resourcesAfter", "audit", "cascade"]),
-  // What the opening snapshot (S3) still cannot answer, on every link.
+  // F1 step 2's two records of the opening snapshot, counted on a link only
+  // where they could not be read: null (a build before them), a replay, a
+  // window between the close and the opening, or (`openingRoute`) no
+  // `opening` checker handed in.
   between: Object.freeze(["focusCarry", "openingRoute"]),
   // What a row without the snapshot (a build before S3) leaves unchecked.
   open: Object.freeze(["open", "relics", "stanceMastery", "links", "logic", "openingResources", "newGamePlusStart"]),
 });
+
+/** What a `settle` checker (settlementRecheck.js) answers of UNCHECKED.inside: counted only where it could not read. */
+export const SETTLED_INSIDE = Object.freeze(["scene", "resourcesAfter"]);
 
 const isObject = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 const numberOf = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
@@ -110,11 +131,11 @@ function sameResources(left, right) {
  * One case's decisions, chained. A row with no readable log is not checked;
  * a log entry without both resource sets leaves its link not checked.
  */
-export function recheckCaseLinks(row) {
+export function recheckCaseLinks(row, { settled = false } = {}) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : null;
   if (!log) return { status: "unchecked", breaks: [], unchecked: ["log"] };
   const breaks = [];
-  const unchecked = [...UNCHECKED.inside];
+  const unchecked = settled ? UNCHECKED.inside.filter((field) => !SETTLED_INSIDE.includes(field)) : [...UNCHECKED.inside];
   // The case opened on the hand its first decision started from (S3).
   const opening = row?.dynamics?.open?.resources;
   if (isObject(opening) && isObject(log[0]?.resourcesBefore) && !sameResources(opening, log[0].resourcesBefore)) {
@@ -142,6 +163,32 @@ const loggedBusts = (log) => log.filter((entry) => entry?.threshold?.busted === 
 const sameList = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 const STANCES = ["strike", "steady", "expose"];
 
+/** The carry openCaseRun reads off a board's marks: REBOOT kept, and the stance carry on it. */
+function carryOf(mutations) {
+  return { rebooted: mutations.includes("reboot"), stance: STANCE_CARRY_MUTATIONS.find((id) => mutations.includes(id)) ?? null };
+}
+
+/**
+ * LOCK's carry the snapshot records (F1 step 2) against what it was read off
+ * (`expected`, null when no window-free close is there to read it from), and
+ * against the board the snapshot itself opened on: a board kept is the
+ * close's (`kept`, its marks), a board laid fresh holds neither REBOOT nor a
+ * stance carry. Returns whether it was read.
+ */
+function recheckFocusCarry(snapshot, expected, kept, breaks) {
+  const carry = snapshot.focusCarry;
+  if (!isObject(carry) || typeof carry.rebooted !== "boolean") return false;
+  const found = { rebooted: carry.rebooted, stance: carry.stance ?? null };
+  const board = Array.isArray(snapshot.schema?.mutations) ? snapshot.schema.mutations : null;
+  if (board) {
+    const fresh = !board.includes("reboot") && !board.some((id) => STANCE_CARRY_MUTATIONS.includes(id));
+    if (found.rebooted ? kept && !sameList(board, kept) : !fresh) breaks.push({ field: "open.schema", expected: found.rebooted ? kept : "a fresh board", found: board });
+  }
+  if (!expected) return Boolean(board);
+  if (found.rebooted !== expected.rebooted || found.stance !== expected.stance) breaks.push({ field: "open.focusCarry", expected, found });
+  return true;
+}
+
 /**
  * The opening snapshot of `after` (S3) against the close of `before`, or
  * against an empty start when `before` is null. Pushes onto `breaks` and
@@ -157,7 +204,7 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
   }
   // A first close sent from a replay is the replay's table: not read as the season's.
   if (snapshot.practice === true) {
-    unchecked.push("practice");
+    unchecked.push("practice", "focusCarry");
     return;
   }
   const relics = Array.isArray(snapshot.relics) ? snapshot.relics : null;
@@ -171,8 +218,13 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
     // Left half way and opened again: the windows of the first try moved these.
     if (snapshot.windowIndex !== 0) {
       unchecked.push("reopened");
+      // The board it opened on is still read against its own carry; the carry is not.
+      recheckFocusCarry(snapshot, null, null, breaks);
+      unchecked.push("focusCarry");
       return;
     }
+    // A fresh table: no REBOOT board kept, no stance carried.
+    if (!recheckFocusCarry(snapshot, carryOf([]), null, breaks)) unchecked.push("focusCarry");
     for (const key of ["busts", "cashes"]) {
       if (snapshot[key] !== 0) breaks.push({ field: `open.${key}`, expected: 0, found: snapshot[key] ?? null });
     }
@@ -201,6 +253,10 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
   if (typeof veteran === "boolean" && snapshot.veteran !== veteran) breaks.push({ field: "open.veteran", expected: veteran, found: snapshot.veteran ?? null });
   // Only practice between the two (a replay hands its table back), or nothing.
   const practiceBetween = numberOf(close.practiceWindows) === null || numberOf(snapshot.practiceWindows) === null ? null : snapshot.practiceWindows - close.practiceWindows;
+  // LOCK's carry is the close's board only with no window between (a replay's board is its own).
+  const closeBoard = Array.isArray(close.mutations) ? close.mutations.filter((id) => typeof id === "string") : null;
+  const carried = recheckFocusCarry(snapshot, between === 0 && closeBoard ? carryOf(closeBoard) : null, between === 0 ? closeBoard : null, breaks);
+  if (!carried || between !== 0 || !closeBoard) unchecked.push("focusCarry");
   if (between === null || (between !== 0 && practiceBetween !== between)) {
     unchecked.push("reopened");
     return;
@@ -219,15 +275,19 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
 /**
  * The link from the case `before` closed on to the case `after`, both rows as
  * stored. `before` null is the run's start: every counter from zero.
+ *
+ * `opening` (F1 step 2) is the opening route's checker, settlementRecheck.js's
+ * `recheckOpeningRoute(after, before)`, handed in like `settle`; without it
+ * the route is counted as not checked.
  */
-export function recheckCaseGap(before, after) {
+export function recheckCaseGap(before, after, { opening = null } = {}) {
   const close = before ? before.dynamics : {};
   const open = after?.dynamics;
   const log = Array.isArray(after?.decision_log) ? after.decision_log : null;
   if ((before && !isObject(close)) || !isObject(open) || !log) return { status: "unchecked", breaks: [], unchecked: ["dynamics"] };
   const read = (state, key) => (before || state === open ? numberOf(state[key]) : 0);
   const values = Object.fromEntries(COUNTERS.map((key) => [key, { from: read(close, key), to: numberOf(open[key]) }]));
-  const unchecked = [...UNCHECKED.between];
+  const unchecked = [];
   const breaks = [];
   const missing = COUNTERS.filter((key) => values[key].from === null || values[key].to === null);
   if (missing.length) unchecked.push(...missing);
@@ -240,18 +300,25 @@ export function recheckCaseGap(before, after) {
   if (busts !== null && busts < own) breaks.push({ field: "busts", expected: `+${own} or more`, found: busts });
   if (busts !== null && windows !== null && busts > own + Math.max(0, windows - log.length)) breaks.push({ field: "busts", expected: `+${own + Math.max(0, windows - log.length)} or less`, found: busts });
   if (cashes !== null && windows !== null && (cashes < 0 || cashes > Math.max(0, windows - own))) breaks.push({ field: "cashes", expected: `0 to +${Math.max(0, windows - own)}`, found: cashes });
-  // A draft's price (C9) is the one way down.
+  // A draft's price (C9) is one way down; the other is IDLE MONEY's (B4), a
+  // week's device: the close may take at most its share of what the close
+  // before left (the vault it held through the case is that less a price).
   const spent = draftSpend(log);
   for (const key of ["vault", "handVault"]) {
-    if (delta(key) !== null && delta(key) < -spent) breaks.push({ field: key, expected: spent ? `-${spent} or more` : "+0 or more", found: delta(key) });
+    const down = spent + (before ? getIdleErosion(close.weekRule, numberOf(close[key]) ?? 0) : 0);
+    if (delta(key) !== null && delta(key) < -down) breaks.push({ field: key, expected: down ? `-${down} or more` : "+0 or more", found: delta(key) });
   }
   if (before) {
     for (const key of [RULES_MARK_KEY, "weekRule"]) {
       if ((close[key] ?? null) !== (open[key] ?? null)) breaks.push({ field: key, expected: close[key] ?? null, found: open[key] ?? null });
     }
   }
-  if (isObject(open.open)) recheckOpening(before, after, open.open, breaks, unchecked);
-  else unchecked.push(...UNCHECKED.open);
+  if (isObject(open.open)) {
+    recheckOpening(before, after, open.open, breaks, unchecked);
+    const route = opening ? opening(after, before) : { breaks: [], unchecked: ["openingRoute"] };
+    breaks.push(...route.breaks);
+    unchecked.push(...route.unchecked);
+  } else unchecked.push(...UNCHECKED.open, ...UNCHECKED.between);
   return { status: breaks.length ? "broken" : "linked", breaks, unchecked };
 }
 
@@ -261,8 +328,15 @@ export function recheckCaseGap(before, after) {
  * are left out. A case delivered twice is a break (the server keeps one row per
  * close). Returns the mark, the breaks with where they are, and how many
  * links and fields were not checked.
+ *
+ * `settle` (F1 step 1) is the settlement checker, settlementRecheck.js's
+ * `recheckCaseSettlement(row, before)`, handed in by the checker so this file
+ * stays light for the page: its breaks are the chain's ("inside"), and of
+ * UNCHECKED.inside only what it did not answer is counted. `opening` (F1 step
+ * 2) is the opening route's checker, settlementRecheck.js's
+ * `recheckOpeningRoute(row, before)`, handed in the same way.
  */
-export function recheckChain(rows = []) {
+export function recheckChain(rows = [], { settle = null, opening = null } = {}) {
   const byCase = new Map();
   const breaks = [];
   for (const row of Array.isArray(rows) ? rows : []) {
@@ -284,10 +358,17 @@ export function recheckChain(rows = []) {
       if (before || cases.length) gap = true;
       continue;
     }
-    const inside = recheckCaseLinks(row);
+    const inside = recheckCaseLinks(row, { settled: Boolean(settle) });
+    if (settle && inside.status !== "unchecked") {
+      // The case before in the season, only when it is the row before here.
+      const settlement = settle(row, before && !gap ? before : null);
+      inside.breaks.push(...settlement.breaks);
+      inside.unchecked.push(...settlement.unchecked);
+      if (settlement.breaks.length) inside.status = "broken";
+    }
     // The run's start is read only when prologue01 is the first row; after a
     // gap the link is not checked.
-    const link = gap || (!before && caseId !== CASE_SEQUENCE[0]) ? { status: "unchecked", breaks: [], unchecked: ["gap"] } : recheckCaseGap(before, row);
+    const link = gap || (!before && caseId !== CASE_SEQUENCE[0]) ? { status: "unchecked", breaks: [], unchecked: ["gap"] } : recheckCaseGap(before, row, { opening });
     if (inside.status === "unchecked") unchecked.cases += 1;
     if (link.status === "unchecked") unchecked.links += 1;
     count(inside.unchecked);
@@ -298,8 +379,5 @@ export function recheckChain(rows = []) {
     before = row;
     gap = false;
   }
-  // TODO(S2): once settleChoice is out, the inside check plays each case again
-  // here (with the rules getRowRules reads off the row, as rankingRecheck.js
-  // does) and adds its breaks; until then UNCHECKED.inside is counted.
   return { status: cases.length ? (breaks.length ? "broken" : "linked") : "unchecked", marks: breaks.length ? [CHAIN_MARK] : [], breaks, cases, unchecked };
 }

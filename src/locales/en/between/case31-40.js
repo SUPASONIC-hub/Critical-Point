@@ -147,7 +147,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Lunch the Day After the Dinner",
           "title": "Kang Taemin’s Cup Noodles Got a Name",
-          "text": "At lunch on Monday, Chef Eun Jaeha sends a photo to the group chat. It is the cup of noodles Kang Taemin shared with the security guard outside the gate last night. Under the photo is one line. 'The night-shift foreman’s second cup noodles, cooked 3 minutes with water poured exactly to the line, in the cargo bed outside the gate in Hannam-dong.' Kwon Dohyun replies at once. 'Priced by the letters in its name, that’s 40,000 won a bowl. The cost is 1,200 won.' Oh Jinwoo memorizes the name, posts a voice message reading it aloud, and writes '1st place.' Much later, Kang Taemin sends just one line. 'It’s just ramen.'"
+          "text": "At lunch on Monday, Chef Lucas Bernard sends a photo to the group chat. It is the cup of noodles Kang Taemin shared with the security guard outside the gate last night. Under the photo is one line. 'The night-shift foreman’s second cup noodles, cooked 3 minutes with water poured exactly to the line, in the cargo bed outside the gate in Hannam-dong.' Kwon Dohyun replies at once. 'Priced by the letters in its name, that’s 40,000 won a bowl. The cost is 1,200 won.' Oh Jinwoo memorizes the name, posts a voice message reading it aloud, and writes '1st place.' Much later, Kang Taemin sends just one line. 'It’s just ramen.'"
         }
       },
       "case37": {
@@ -161,7 +161,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · The Fridge on the Bookshop’s 1st Floor",
           "title": "Half a Watermelon Got a Name Tag",
-          "text": "On the afternoon the three days of the leak end, half a watermelon Kang Taemin split with his fist is left in the fridge on the bookshop’s 1st floor. Someone has stuck a name tag on the plastic wrap. 'All analysts · Eat it without hesitating.' Oh Jinwoo grabs the first slice, shouting 'Fastest decision, first place,' and Kwon Dohyun, halfway through calculating the cost of one slice, picks up a second. In the evening Ryu Seah drops by and sticks one more label next to the name tag. 'Reversible.'"
+          "text": "On the afternoon the three days of the leak end, half a watermelon Kang Taemin split with his fist is left in the fridge on the bookshop’s 1st floor. Someone has stuck a name tag on the plastic wrap. 'All analysts · Eat it without hesitating.' Oh Jinwoo grabs the first slice, shouting 'Fastest decision, first place,' and Kwon Dohyun, halfway through calculating the cost of one slice, picks up a second. In the evening Priya Nair drops by and sticks one more label next to the name tag. 'Reversible.'"
         }
       },
       "case38": {
@@ -344,10 +344,10 @@ export const caseRoles = {
     "KD금융그룹 회장": "Chairman, KD Financial Group",
     "KD금융그룹 회장 비서실장": "Chief of staff to the Chairman, KD Financial Group",
     "서도경 회장 자택 정원사 · 40년째": "Gardener at Chairman Seo Dokyung’s house · 40 years",
-    "서도경 회장 자택 셰프 · 3년째": "Chef at Chairman Seo Dokyung’s house · 3 years"
+    "서도경 회장 자택 셰프 · 3년째 · 리옹 출신, 서울 12년": "Chef at Chairman Seo Dokyung’s house · 3 years · from Lyon, 12 years in Seoul"
   },
   "case37": {
-    "KD금융그룹 위기대응TF 팀장 · 법무팀 출신 변호사": "Head of the Crisis Response TF, KD Financial Group · lawyer from the Legal team"
+    "KD금융그룹 위기대응TF 팀장 · 법무팀 출신 재미교포 변호사": "Head of the Crisis Response TF, KD Financial Group · lawyer from the Legal team · Korean American, admitted in New York"
   },
   "case38": {
     "원고 측 대리인 · 공익 변호사": "Counsel for the plaintiffs · public-interest lawyer",

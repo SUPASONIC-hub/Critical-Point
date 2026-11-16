@@ -29,6 +29,7 @@
  */
 
 import { subjectParticle } from "../playerLanguage.js";
+import { formatMoney } from "../gameConstants.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
 import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
@@ -114,7 +115,7 @@ export const RELICS = Object.freeze({
   fieldNote: relic("fieldNote", { label: "FIELD NOTES", icon: "notebook" }, { hold: LOGIC_HOLD - 1 }),
   encore: relic("encore", { label: "ENCORE", icon: "repeat", unlock: "combo" }, { combo: ENCORE_UNLOCK_COMBO }),
   insurance: relic("insurance", { label: "INSURANCE", icon: "shield", unlock: "loss" }, {
-    share: INSURANCE_SHARE, loss: INSURANCE_UNLOCK_LOSS.toLocaleString("en-US"),
+    share: INSURANCE_SHARE, loss: formatMoney(INSURANCE_UNLOCK_LOSS),
   }),
   stethoscope: relic("stethoscope", { label: "STETHOSCOPE", icon: "stethoscope", softens: "silence", unlock: "silence" }, { seconds: SILENCE_SECONDS }),
   kineticGrip: relic("kineticGrip", { label: "KINETIC GRIP", icon: "crosshair", softens: "strikeMastery", unlock: "strikeMastery" }, {

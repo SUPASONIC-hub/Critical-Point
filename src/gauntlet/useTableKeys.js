@@ -39,7 +39,8 @@ function letterOf(event) {
 
 /**
  * The table's keys: 1-9 stake a card, Space or W pushes, E locks focus, Q
- * cycles the stance, R scouts the wall (SCOUT, once a window), Enter cashes.
+ * cycles the stance, R scouts the wall (SCOUT, once a window), I asks the
+ * table's voice for where the hand stands (지금 상황 듣기, E3), Enter cashes.
  * On the draft, 1-3 take a relic and Escape passes; with the slots full, 1-9
  * then put down a carried relic and Escape goes back to the offer; on the
  * briefing page, Space, Enter, W or a card key opens the table.
@@ -222,6 +223,8 @@ export function handleTableKey(event, current, walked = false) {
   if (letter === "e" && current.focus) take(() => current.focus(event));
   else if (letter === "q" && current.cycleFocusMode) take(() => current.cycleFocusMode());
   else if (letter === "r" && current.scout) take(() => current.scout());
+  // 지금 상황 듣기 (E3): one line at the front of the voice's queue. The heart's button asks the same.
+  else if (letter === "i" && current.status) take(() => current.status());
   // 안전선까지 (C-5): the pushes no wall can stop, as one press.
   else if (letter === "s" && current.safe) take(() => current.safe());
   else if (key === " " || letter === "w") take(() => current.push(event));

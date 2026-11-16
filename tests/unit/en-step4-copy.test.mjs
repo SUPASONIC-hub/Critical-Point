@@ -52,7 +52,7 @@ test("the English dictionary is printed once it is laid over the tables", () => 
   const [coldFeet] = describeMutations({ mutations: ["coldFeet"], sealHighest: false });
   assert.equal(coldFeet.title, "Chips shrank");
   assert.equal(getHoldArmedCall(), "Press once more to Commit");
-  assert.equal(describeBank({ hand: 1200, runPot: 1200, vault: 0 }), "This hand +1,200 · Stake 1,200 · Vault 0");
+  assert.equal(describeBank({ hand: 1200, runPot: 1200, vault: 0 }), "This hand +$1,200 · Stake $1,200 · Vault $0");
   assert.equal(describeAct({ act: 2, caseId: "case08" }), "Act 2 begins · Case 08");
   assert.equal(describeWall({ gauge: 60.2, dangerLine: "Inside the Wall band" }), "Now Heat 60 · Inside the Wall band");
   assert.equal(describeStanceCarry({ focus: 12.4, carry: MUTATIONS.steadyLine }), "Charge 12 · Commit for STEADY LINE next hand · The next hand opens cool");

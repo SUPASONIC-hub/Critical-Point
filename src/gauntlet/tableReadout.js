@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { formatNumber, isResourceGain } from "../gameConstants.js";
+import { formatMoney, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { hasRelic } from "./relics.js";
@@ -13,7 +13,7 @@ import { fill } from "../locale.js";
 // The readouts' words (src/copy/table.js), read when each line is said.
 const say = tableCopy.readout;
 
-export { formatNumber };
+export { formatMoney };
 
 /**
  * Rounded down, because the table's rules read the multiplier as a floor: the
@@ -130,7 +130,7 @@ export function describeLogicMove(logic) {
 
 /** The same move as the archive's one line under a logged decision. */
 export function describeLogicLog(logic) {
-  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: fill(say.logicLog, { streak: logic.streak, bonus: bonusText(logic.bonus), pot: formatNumber(logic.pot) }) } : null;
+  return logic?.pot > 0 ? { label: "LOGIC STREAK", text: fill(say.logicLog, { streak: logic.streak, bonus: bonusText(logic.bonus), pot: formatMoney(logic.pot) }) } : null;
 }
 
 const MOVE_COPY = say.moves;
@@ -238,6 +238,19 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
       gain: isResourceGain(key, Number(value)),
     }))
     .sort((left, right) => Math.abs(right.value) - Math.abs(left.value));
+}
+
+/**
+ * The staked card's detail line (GauntletHand's preview). C-15 (2026-10-25,
+ * draft for after W47): it leaves out the number the card's burn already
+ * prints. That number was printed twice, and on a FRACTURE board twice apart --
+ * the burn billed (믿음 -15), the detail not (믿음 -10). Three at most; the
+ * rest is 외 N, and all of it is in the reveal.
+ */
+export function describeStakedDetail(card, schema, resourceMeta) {
+  const burnKey = card ? getCardBurn(card, schema)?.key : null;
+  const effects = card ? describeEffect(card.effect, resourceMeta).filter((effect) => effect.key !== burnKey) : [];
+  return { visibleEffects: effects.slice(0, 3), hiddenEffectCount: Math.max(0, effects.length - 3) };
 }
 
 /**

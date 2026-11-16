@@ -580,6 +580,13 @@ export const CANON = [
     allow: [],
   },
   {
+    id: "cast-old-names",
+    fact: "the renamed people (11-13) go by their new names; the old ones live only in castAliases.js",
+    files: /src\/(?!locales\/|castAliases\.js$)/,
+    find: /(류세아|주은채|연시우|도건우|표세린|백다온|우지환|은재하)/g,
+    allow: [],
+  },
+  {
     id: "kd-owner-name",
     fact: "KD금융그룹's largest shareholder is 킹스데일 파트너스 (Kingsdale Partners), New York",
     files: SEASON,
@@ -592,6 +599,20 @@ export const CANON = [
     files: SEASON,
     find: /킹스데일[^."\d]{0,24}?지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%|지분 ?(?:약 )?(\d{1,2}(?:\.\d)?)%[^."\d]{0,12}킹스데일/g,
     allow: ["30"],
+  },
+  {
+    id: "crisis-group-launch",
+    fact: "KD금융그룹 launched in 2008, the year of the world financial crisis (docs/canon.md, The crisis years)",
+    files: SEASON,
+    find: /(\d{4})년 (?:KD)?금융 ?그룹 (?:출범|발족)/g,
+    allow: ["2008"],
+  },
+  {
+    id: "crisis-bank-sale",
+    fact: "경동은행 was being sold to 킹스데일 in the spring of 1998, after the currency crisis (docs/canon.md, The crisis years)",
+    files: SEASON,
+    find: /(\d{4})년 봄, 경동은행/g,
+    allow: ["1998"],
   },
   {
     id: "kd-account-name",

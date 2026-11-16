@@ -14,7 +14,7 @@ import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { CHAIN_MARK } from "../../src/chainRecheck.js";
 import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
-import { fetchRunRows, formatChain, formatReport, groupByRun, marksSql, rankingRunsSql, readRows, readRunIds, runRowsSql, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
+import { DB_MARKS, fetchRunRows, formatChain, formatReport, groupByRun, hiddenFor, HIDE_MARKS, marksSql, rankingRunsSql, readRows, readRunIds, runRowsSql, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
 
 /**
@@ -187,6 +187,32 @@ test("the checker reads runs from exported rows and reports each ranked one", ()
   assert.deepEqual(formatReport([]), ["No ranked run among the rows (none has a season-final row)."]);
   assert.deepEqual(readRows(JSON.stringify({ rows })), readRows(JSON.stringify(rows)));
   assert.throws(() => readRows("{}"), /no array of rows/);
+});
+
+test("the report says which runs the hide switch would take off the ranking, and how many", () => {
+  const rows = [...seasonRows("run-a"), ...edit(seasonRows("run-b"), (finalRow) => {
+    finalRow.summary.burstScore = (finalRow.summary.burstScore + 9) % 101;
+  }), ...edit(seasonRows("run-c"), (row, ranking) => {
+    // The trigger's marks as stored, and a checker mark from a night before that this night states again.
+    ranking.suspicion = ["time-over-gap", "unchecked", "score-off-log"];
+  }), ...edit(seasonRows("run-d"), (row, ranking) => {
+    ranking.suspicion = ["wall-out-of-range"];
+  })];
+  const results = verifyRows(rows);
+  assert.deepEqual(results.map((result) => [result.runId, result.triggerMarks, hiddenFor(result)]), [
+    ["run-a", [], []],
+    ["run-b", [], ["score-off-log"]],
+    ["run-c", ["time-over-gap", "unchecked"], []],
+    ["run-d", ["wall-out-of-range"], ["wall-out-of-range"]],
+  ]);
+  const report = formatReport(results);
+  assert.equal(report.filter((line) => line.startsWith("  hide switch:")).length, 2);
+  assert.ok(report.includes("  hide switch: hidden once on (score-off-log)"));
+  assert.ok(report.includes("  hide switch: hidden once on (wall-out-of-range)"));
+  assert.match(report.at(-1), /^Hide switch \(ranking_hide_marked, off .*\): would hide 2 of 4 checked runs\.$/);
+  // Every mark the checker writes hides; the two an honest season can earn never do.
+  assert.ok(DB_MARKS.every((mark) => HIDE_MARKS.includes(mark)));
+  assert.ok(!HIDE_MARKS.includes("time-over-gap") && !HIDE_MARKS.includes("unchecked"));
 });
 
 test("the report names unchecked runs, window findings and rows written before the record", () => {
@@ -398,7 +424,7 @@ test("the report says where the chain broke and what it did not check", () => {
   // Not replayed: the scores' line shows the scores' marks, the chain's line the chain's.
   assert.match(report, /\n {2}scores: {2}no marks\n/);
   assert.match(report, new RegExp(`chain break: ${rows[19].case_id} -> ${rows[20].case_id} vault \\(expected "\\+0 or more", found -1\\)`));
-  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the settlement of 54 cases; the opening state of 53 cases \(no opening snapshot\); the board and route 53 cases opened on$/m);
+  assert.match(report, /chain not checked: 1 links \(a gap in the rows, or the counters missing\); the board, audit and link of 54 cases; entries not read again \(cases\): scene \d+; the opening state of 53 cases \(no opening snapshot\); LOCK's carry 53 cases opened on; the route 53 cases opened on$/m);
   assert.deepEqual(formatChain({ status: "unchecked", marks: [], breaks: [], cases: [], unchecked: { cases: 0, links: 0, fields: {} } }), ["  chain: not checked (no case row to chain)"]);
   const many = formatChain({ status: "broken", marks: [CHAIN_MARK], breaks: Array.from({ length: 12 }, () => ({ case: "case01", field: "case", found: "twice" })), cases: [], unchecked: { cases: 1, links: 0, fields: {} } });
   assert.equal(many[1], '  chain break: case01 case ("twice")');

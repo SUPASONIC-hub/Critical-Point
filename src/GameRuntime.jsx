@@ -810,7 +810,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     resources,
     riskTier,
     runId,
-    secondSeason,
+    secondSeason, finishedSeason: newGamePlusUnlocked,
     weekRule: gauntletRun?.weekRule,
     tabScreen: !started ? "intro" : isResult ? "result" : "play",
     triggers,

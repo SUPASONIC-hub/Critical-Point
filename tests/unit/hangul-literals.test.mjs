@@ -35,6 +35,7 @@ const KOREAN_MODULES = {
   "src/boardBlockedTerms.js": "the board's blocked words: a filter, never printed",
   "src/boardReport.js": "the report reasons and refusals, laid over through src/copy/board.js",
   "src/caseCopy.js": "the runtime's case tables, laid over as they load (localizeTables)",
+  "src/castAliases.js": "the 11-13 renames: old and new speaker names as data, and Korean particles a saved line is fixed with (en and ja have their own tables beside them)",
   "src/components/coldOpeningCopy.js": "the Korean beside src/locales/<lang>/coldOpening.js",
   "src/components/musicData.js": "speaker names as keys",
   "src/components/proseMarks.js": "patterns for Korean prose",

@@ -131,7 +131,7 @@ test("the held line prints when harm is clear and the season's mean cash closed 
   const lost = initialResources.capital * HELD_LINE_CAPITAL_SHARE - 1;
   const line = readout(season(140), { closing: { capital: lost }, endingId: "quiet-cover" });
   assert.equal(line.held, `현금은 평균 ${lost}까지 내려갔지만 사람 피해는 붕괴선 아래입니다.`);
-  assert.equal(line.endingHeld, "현금을 잃었지만 진 것은 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.");
+  assert.equal(line.endingHeld, "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.");
   assert.deepEqual(readHeldLine({ level: "clear", closing: { capital: lost } }), { capital: lost });
 });
 
@@ -157,7 +157,7 @@ test("every ending that can be reached on lost cash has its sentence, and the co
   for (const id of [...withOne, "open-question"]) {
     const line = readout(season(140), { closing: lost, endingId: id });
     assert.equal(typeof line.endingHeld, "string", id);
-    assert.match(line.endingHeld, /^현금을 잃었지만 진 것은 아니라, /, id);
+    assert.match(line.endingHeld, /^현금을 잃었지만 진 것이 아니라, /, id);
   }
   for (const id of ["collapse", "profitable-silence", "", "toString", undefined]) {
     assert.equal(readout(season(140), { closing: lost, endingId: id }).endingHeld, null, String(id));
@@ -167,6 +167,12 @@ test("every ending that can be reached on lost cash has its sentence, and the co
   for (const [lang, table] of Object.entries({ ko: reportLinesCopy.heldEndings, en: enScreens.reportLines.heldEndings, ja: jaScreens.reportLines.heldEndings })) {
     assert.deepEqual(Object.keys(table).sort(), expected, lang);
     for (const [id, sentence] of Object.entries(table)) assert.ok(typeof sentence === "string" && sentence.length > 0, `${lang} ${id}`);
+  }
+  // 감수 질문 1·9 (C3-1): Korean reads 「진 것이 아니라」, English has no "lost … did not lose" pun.
+  for (const sentence of Object.values(reportLinesCopy.heldEndings)) assert.doesNotMatch(sentence, /진 것은 아니라/);
+  for (const sentence of Object.values(enScreens.reportLines.heldEndings)) {
+    assert.match(sentence, /^Cash fell, but the season was not lost: it kept /);
+    assert.doesNotMatch(sentence, /did not lose/);
   }
   assert.equal(typeof enScreens.reportLines.standing.held, "string");
   assert.equal(typeof jaScreens.reportLines.standing.held, "string");

@@ -1873,6 +1873,21 @@
   :root:not([data-calm-effects]) .ending-visual-collapse.ending-step-0 .ending-sequence-header {
     animation: gx-break 0.9s steps(1);
   }
+  /* 언어의 엔트로피 (endingEntropy.js): the collapse ending's headline, split
+     into letters only on this record, scatters and comes back in 0.8 s.
+     left/top on relatively placed inline letters: the line wraps as it did. */
+  :root:not([data-calm-effects]) .ending-entropy > span > span {
+    position: relative;
+    animation: ending-entropy 0.8s ease-out;
+  }
+}
+/* From and to are the letter where it stands (offset 0, opaque). */
+@keyframes ending-entropy {
+  30% {
+    left: var(--dx);
+    top: var(--dy);
+    opacity: 0.35;
+  }
 }
 
 /* gx-break lives here though the verdict slam's BUST word (play.css) uses it

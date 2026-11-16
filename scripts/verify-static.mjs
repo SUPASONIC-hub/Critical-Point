@@ -54,6 +54,8 @@ export const CHECKS = [
   // line changed without its translations, or a translation left over, fails here.
   "check:locale:strict",
   "check:doc-numbers",
+  // README.md keeps docs/readme-rules.md: a short portfolio page, detail in <details>.
+  "check:readme",
 ];
 
 async function main() {

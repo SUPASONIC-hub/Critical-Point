@@ -12,6 +12,7 @@ import {
   normalizeCaseOpen,
   normalizeRunState,
   openCaseRun,
+  OPENING_ROUTE_ID_MAX,
   resolveWindow,
   RUN_INITIAL_STATE,
   serializeRunState,
@@ -138,7 +139,11 @@ test("row size: the snapshot and the whole dynamics, honest seasons and the larg
     logic: { streak: 9999, best: 9999, type: "reframing", held: 9999, heat: 3, rose: true, reach: 9 },
     stanceMastery: { strike: 99, steady: 99, expose: 99 },
   };
-  const opened = openCaseRun(longest, { caseId: "prologue03", resources: { time: -99999.5, capital: -99999.5, trust: -99999.5, legitimacy: -99999.5, humanCost: -99999.5, fatigue: -99999.5 } });
+  // F1 step 2: the route at its longest ids, and the longest stance a fresh board can drop.
+  const route = { after: "a".repeat(OPENING_ROUTE_ID_MAX), rank: "r".repeat(8), nodeId: "n".repeat(OPENING_ROUTE_ID_MAX) };
+  const opened = openCaseRun({ ...longest, schema: { ...longest.schema, mutations: ["exposedHand"] } }, { caseId: "prologue03", resources: { time: -99999.5, capital: -99999.5, trust: -99999.5, legitimacy: -99999.5, humanCost: -99999.5, fatigue: -99999.5 }, route });
+  assert.deepEqual(opened.open.openingRoute, route);
+  assert.equal(opened.open.focusCarry.stance, "exposedHand");
   const run = {
     ...opened,
     linksOut: longest.linksIn,

@@ -23,6 +23,8 @@ const habitsCopy = {
   // D1: the one line the result card and its copied line say the name in,
   // made here (judgementHabit.habitCardLine) and handed to the card's chunk.
   cardLine: "당신의 심사 성향은 「{habit}」입니다.",
+  // N3: the start page's line for a visit from a shared card (shareLink.js), the habit's name in its blank.
+  friendLine: "친구의 결과: {habit}",
 };
 export default habitsCopy;
 

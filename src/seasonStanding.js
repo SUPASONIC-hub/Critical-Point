@@ -1,5 +1,5 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
-import { ENDING_GATES } from "./gameConstants.js";
+import { ENDING_GATES, initialResources } from "./gameConstants.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -137,4 +137,46 @@ export function getSeasonStanding({ caseResults = {}, pending = null, resources 
       .sort((a, b) => b.harm - a.harm || seasonOrder(a.caseId) - seasonOrder(b.caseId))
       .slice(0, HARM_CASES_LISTED),
   };
+}
+
+/**
+ * How far under the start the season's mean cash must have closed for the
+ * season to have lost money (개선 포인트 C3, 2026-11-05 draft): under this
+ * share of `initialResources.capital`, so under 80 of the 100 a season
+ * starts with. The one number the held line hangs on; where it sits is the
+ * owner's (감수자's) call.
+ */
+export const HELD_LINE_CAPITAL_SHARE = 0.8;
+
+/**
+ * Whether the season lost money and kept people: its standing is clear of
+ * both collapse routes and the cash its cases closed on, on average, is
+ * under `HELD_LINE_CAPITAL_SHARE` of the start. `closing` is the mean
+ * closing resources (`getSeasonStrain().seasonResources`), or null before a
+ * case has closed -- and then nothing is held.
+ *
+ * @param {{ level?: string, closing?: Record<string, any> | null }} [input]
+ */
+export function readHeldLine({ level, closing } = {}) {
+  const capital = Number(closing?.capital);
+  return level === "clear" && Number.isFinite(capital) && capital < initialResources.capital * HELD_LINE_CAPITAL_SHARE ? { capital } : null;
+}
+
+/** The values a season-final row's `seasonStanding` takes (`readSeasonStandingMark`; payloadSchemas.js checks it). */
+export const SEASON_STANDING_MARKS = Object.freeze(["held", "clear", "near", "over"]);
+
+/**
+ * The season's standing as its finale's report reads it, for the season-final
+ * row's summary (`seasonStanding`, decision T3): "held" where `readHeldLine`
+ * prints the held sentence -- clear of both collapse routes, cash lost -- else
+ * the level of `getSeasonStanding`. Given what the report is given: the
+ * season's case summaries with the finale's, the resources on the table, and
+ * the mean closing resources (`getSeasonStrain().seasonResources`). A record
+ * only: nothing ranks or scores on it.
+ *
+ * @param {{ caseResults?: Record<string, any>, resources?: Record<string, any>, closing?: Record<string, any> | null }} [input]
+ */
+export function readSeasonStandingMark({ caseResults = {}, resources = {}, closing = null } = {}) {
+  const { level } = getSeasonStanding({ caseResults, resources });
+  return readHeldLine({ level, closing }) ? "held" : level;
 }

@@ -237,7 +237,7 @@ test("D1: the card says the habit's name in one sentence over the large line, an
   assert.ok(texts.some((entry) => entry.text === habit.title), "the name is still drawn large");
   assert.ok(!texts.some((entry) => entry.text === habit.line), "the habit's own line is still not drawn");
   const copied = buildShareText(model, "https://example.org");
-  assert.equal(copied, `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '결말'. 최고 버스트 0점, C 랭크. ${sentence} https://example.org/`);
+  assert.equal(copied, `트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '결말'. 최고 버스트 0점, C 랭크. ${sentence} https://example.org/?from=card&h=${habit.id}`);
   assert.ok(buildShareText(model).endsWith(sentence), "without an address the line ends on the sentence");
 
   // A habit handed over without its sentence prints the card #393 printed.

@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "../appConfig.js";
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
+import { noteCaseClosed } from "../gameEvents.js";
 import {
   applyEffect,
   buildSceneBeat,
@@ -32,6 +33,7 @@ import noticesCopy from "../copy/notices.js";
 import runLines from "../copy/runLines.js";
 import { hasBeatTableCase } from "../logicReport.js";
 import { getSeasonScore } from "../seasonScore.js";
+import { readSeasonStandingMark } from "../seasonStanding.js";
 import { telemetryEnabled } from "../telemetry.js";
 import { findFinalChoiceEntry } from "../verdictBranch.js";
 import { newGamePlusMark } from "./newGamePlusCarry.js";
@@ -188,9 +190,14 @@ export function useChoiceCommit(context) {
     // The season row is ranked on the mean of the season's case scores
     // (`getSeasonScore`), not on the finale's own: the finale's case row above
     // keeps its score, and its other keys still speak for the season row.
-    const seasonScore = getSeasonScore({ ...caseResults, [currentCase]: caseSummary });
+    const seasonResults = { ...caseResults, [currentCase]: caseSummary };
+    const seasonScore = getSeasonScore(seasonResults);
+    // Only the season row says where the season stood (decision T3: "held" is
+    // cash lost with people kept), as the finale's report reads it; the save
+    // and the local ranking row carry nothing new, and nothing ranks on it.
+    const seasonStanding = readSeasonStandingMark({ caseResults: seasonResults, resources: finalResources, closing: getSeasonStrain(seasonResults).seasonResources });
     const seasonTelemetryPayload = createSeasonTelemetryPayload({
-      caseSummary: { ...rowSummary, ...seasonScore },
+      caseSummary: { ...rowSummary, ...seasonScore, seasonStanding },
       title: seasonTitle,
       completedCaseCount: nextCompletedCases.length,
       cognition: nextCognition,
@@ -396,6 +403,8 @@ export function useChoiceCommit(context) {
     let nextCaseResults = caseResults;
     let closedCase = null;
     if (completedNow) {
+      // N2: 프롤로그 01 closed for the first time (gameEvents.js).
+      noteCaseClosed(currentCase, Boolean(caseResults[currentCase]));
       const caseSummaryDraft = createCaseSummary(nextTriggers, nextCognition, nextLog, {
         resources: finalResources,
         schemaVersion: SAVE_SCHEMA_VERSION,

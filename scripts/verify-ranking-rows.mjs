@@ -83,7 +83,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { CHAIN_MARK, recheckChain, UNCHECKED } from "../src/chainRecheck.js";
+import { CHAIN_MARK, recheckChain, SETTLED_INSIDE, UNCHECKED } from "../src/chainRecheck.js";
 import { isoWeekKey } from "../src/gauntlet/weeklyCalendar.js";
 import { RULES_MARK } from "../src/gauntlet/gauntletEngine.js";
 import {
@@ -91,6 +91,7 @@ import {
   formatHallOfFameMarkdown,
   HALL_OF_FAME_CANDIDATES,
   HALL_OF_FAME_COUNTS_SQL,
+  HALL_OF_FAME_MIN_SEASONS,
   HALL_OF_FAME_READ_SQL,
   hallOfFameBoardLabel,
   hallOfFameSql,
@@ -99,15 +100,32 @@ import {
   readHallOfFameCounts,
 } from "../src/hallOfFame.js";
 import { RECHECK_MARKS, recheckRun, RELIC_DRAFT_MARK } from "../src/rankingRecheck.js";
+import { recheckCaseSettlement, recheckOpeningRoute } from "../src/settlementRecheck.js";
 
 /**
- * The marks ranking_set_recheck_marks takes today (20261023000000). The
- * draft's mark (RELIC_DRAFT_MARK, C9) is shown in the report but left out of
- * the write until the 11-12 ranking wipe's migration adds it to the function's
- * list (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql.draft) (the SQL is beside the mark in src/rankingRecheck.js): the function
- * raises on a mark it does not know, and one run's would stop the whole write.
+ * The marks ranking_set_recheck_marks takes (20261023000000, then 20261103020000).
+ * The draft's mark (RELIC_DRAFT_MARK, C9) is among them from the 11-12 ranking
+ * wipe (supabase/migrations/20261112000000_ranking_reset_rules_mark4_relic_draft.sql),
+ * which adds it to the function's list: the function raises on a mark it does
+ * not know, and one run's would stop the whole write.
  */
-export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK]);
+export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK, RELIC_DRAFT_MARK]);
+
+/**
+ * The marks that take a ranking row off the public ranking once the owner turns
+ * the switch on (`ranking_hide_marked` = 1 in private_settings; the policy of
+ * supabase/migrations/*_ranking_hide_switch.sql lists the same ones, and
+ * check:grants holds the two together). Every checker mark, and the insert
+ * trigger's marks for values no table deals. Not on it, so never hidden:
+ * `time-over-gap` (a season delivered late, after playing offline) and
+ * `unchecked` (the server's own check failed), the two an honest season can earn.
+ * The switch is off until the checker has marked no honest season for 14 days.
+ */
+export const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
+export const HIDE_MARKS = Object.freeze([...DB_MARKS, ...TRIGGER_HIDE_MARKS]);
+
+/** The marks of `result` (its checker marks and its row's trigger marks) the switch would hide it for. */
+export const hiddenFor = (result) => [...new Set([...(result?.marks ?? []), ...(result?.triggerMarks ?? [])])].filter((mark) => HIDE_MARKS.includes(mark)).sort();
 
 // `suspicion` is the insert trigger's marks on the ranking row: the hall of
 // fame (src/hallOfFame.js) takes a season the trigger did not mark either.
@@ -256,9 +274,13 @@ export function verifyRows(rows) {
     const ranking = runRows.find((row) => row.case_id === "season-final");
     if (!ranking) continue;
     const recheck = recheckRun(runRows);
-    const chain = recheck.status === "unverified" ? null : recheckChain(runRows);
+    // F1 step 1: the settlement inside each case played again (the next scene, `resourcesAfter`);
+    // F1 step 2: the route each case opened on played again from the case before.
+    const chain = recheck.status === "unverified" ? null : recheckChain(runRows, { settle: recheckCaseSettlement, opening: recheckOpeningRoute });
     const marks = [...recheck.marks, ...(chain?.marks ?? [])];
-    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, chain });
+    // The insert trigger's marks on the ranking row (its `suspicion` less the checker's, which `marks` states again).
+    const triggerMarks = Array.isArray(ranking.suspicion) ? ranking.suspicion.filter((mark) => typeof mark === "string" && !DB_MARKS.includes(mark)) : [];
+    results.push({ runId, runTag: ranking.run_tag ?? null, score: ranking.summary?.burstScore ?? null, caseRows: runRows.length - 1, ...recheck, marks, triggerMarks, chain });
   }
   return results;
 }
@@ -323,7 +345,13 @@ export function formatReport(results, { redact = false } = {}) {
     if (unrecorded) lines.push(`  ${unrecorded} windows carry no replay record`);
     if (seedTails) lines.push(`  ${seedTails} windows were dealt again (a seed with a ~n tail: a rolled-back save, or a wall shopped for)`);
     if (result.chain) lines.push(...formatChain(result.chain));
+    const hidden = hiddenFor(result);
+    // The 14 days before the switch goes on are read off these lines: one on an honest season is a false flag.
+    if (hidden.length) lines.push(`  hide switch: hidden once on (${hidden.join(", ")})`);
   }
+  const checked = results.filter((result) => result.status !== "unverified");
+  const hiding = checked.filter((result) => hiddenFor(result).length).length;
+  lines.push(`Hide switch (ranking_hide_marked, off until 14 days without a false flag): would hide ${hiding} of ${checked.length} checked runs.`);
   return lines;
 }
 
@@ -346,16 +374,38 @@ export function formatChain(chain) {
   const notChecked = [];
   if (unchecked.cases) notChecked.push(`${unchecked.cases} cases with no readable log`);
   if (unchecked.links) notChecked.push(`${unchecked.links} links (a gap in the rows, or the counters missing)`);
+  // The board, the audit and the link (UNCHECKED.inside less what settlementRecheck.js plays again).
   const settled = unchecked.fields[UNCHECKED.inside[0]] ?? 0;
-  if (settled) notChecked.push(`the settlement of ${settled} cases`);
-  // A row from a build before the snapshot (UNCHECKED.open); the board and the
-  // route a case opened on wait for the settlement (UNCHECKED.between, S2).
+  if (settled) notChecked.push(`the board, audit and link of ${settled} cases`);
+  const routed = SETTLED_INSIDE.map((field) => `${field} ${unchecked.fields[field] ?? 0}`).filter((text) => !text.endsWith(" 0"));
+  if (routed.length) notChecked.push(`entries not read again (cases): ${routed.join(", ")}`);
+  // A row from a build before the snapshot (UNCHECKED.open); LOCK's carry and
+  // the route a case opened on where they could not be read (UNCHECKED.between:
+  // a build before F1 step 2, a replay, a window between).
   const opened = unchecked.fields[UNCHECKED.open[0]] ?? 0;
   if (opened) notChecked.push(`the opening state of ${opened} cases (no opening snapshot)`);
-  const carried = unchecked.fields[UNCHECKED.between[0]] ?? 0;
-  if (carried) notChecked.push(`the board and route ${carried} cases opened on`);
+  const [carry, route] = UNCHECKED.between.map((field) => unchecked.fields[field] ?? 0);
+  if (carry) notChecked.push(`LOCK's carry ${carry} cases opened on`);
+  if (route) notChecked.push(`the route ${route} cases opened on`);
   if (notChecked.length) lines.push(`  chain not checked: ${notChecked.join("; ")}`);
   return lines;
+}
+
+/**
+ * Decision T's T12 (the 2026-11-12 draft, read on 11-23): would a lower
+ * threshold open any board? Read only from the day's counts (every board
+ * hall_of_fame_counts returns, not only the ones read today); the threshold
+ * itself stays HALL_OF_FAME_MIN_SEASONS until the owner answers T-11.
+ */
+export const HALL_OF_FAME_T12_ALTERNATIVE = 5;
+
+/** T12's one line for the Job Summary: boards at the threshold and at the alternative, and the fullest board. */
+export function formatHallOfFameThreshold(counts, { min = HALL_OF_FAME_MIN_SEASONS, alternative = HALL_OF_FAME_T12_ALTERNATIVE } = {}) {
+  const entries = (counts instanceof Map ? [...counts] : Object.entries(counts ?? {})).filter(([, checked]) => Number.isInteger(checked) && checked >= 0);
+  if (!entries.length) return `T12 문턱(읽기만): 센 판이 없음 — 문턱 ${min}, 대안 ${alternative}`;
+  const atLeast = (n) => entries.filter(([, checked]) => checked >= n).length;
+  const [fullest, most] = entries.reduce((best, entry) => (entry[1] > best[1] ? entry : best));
+  return `T12 문턱(읽기만): 판 ${entries.length}개 중 표시 없는 완주 ${min}건 이상 ${atLeast(min)}개 · ${alternative}건 이상 ${atLeast(alternative)}개; 가장 많은 판 ${hallOfFameBoardLabel(fullest)} ${most}건`;
 }
 
 /** The day's boards as lines for the Job Summary: run tags only. */
@@ -462,7 +512,7 @@ async function main(argv) {
   }
   if (argv.includes("--hall-of-fame-sql") || argv.includes("--hall-of-fame")) {
     const picked = pickHallOfFame({ results, rows, rulesMark: RULES_MARK, counts });
-    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : formatHallOfFamePick(picked).join("\n"));
+    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : [...formatHallOfFamePick(picked), formatHallOfFameThreshold(counts)].join("\n"));
     return 0;
   }
   console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));

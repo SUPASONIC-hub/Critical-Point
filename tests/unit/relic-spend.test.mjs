@@ -233,15 +233,14 @@ test("a draft edited in the log is marked relic-draft, and a vault taken down pa
   if (free[at].dynamics.vault < free[at - 1].dynamics.vault) assert.ok(recheckChain(free).breaks.length > 0, "a spend the log does not admit to");
 });
 
-test("the mark is shown, and left out of the database write until the 11-30 migration takes it", () => {
+test("the mark is shown, and written to the database from the 11-12 ranking wipe", () => {
   assert.equal(RELIC_DRAFT_MARK, "relic-draft");
-  assert.ok(!DB_MARKS.includes(RELIC_DRAFT_MARK));
+  assert.ok(DB_MARKS.includes(RELIC_DRAFT_MARK));
   const rows = structuredClone(spent);
   const at = rows.findIndex((row) => row.decision_log.some((entry) => entry.relicDraft));
   rows[at].decision_log.find((entry) => entry.relicDraft).relicDraft.cost += 1;
   const result = recheckRun(rows);
   if (result.status !== "unverified") assert.ok(result.marks.includes(RELIC_DRAFT_MARK));
   const sql = marksSql([{ status: "checked", runId: "run-z", marks: ["score-off-log", RELIC_DRAFT_MARK] }]);
-  assert.match(sql, /array\['score-off-log'\]::text\[\]/);
-  assert.doesNotMatch(sql, /relic-draft/);
+  assert.match(sql, /array\['score-off-log', 'relic-draft'\]::text\[\]/);
 });
