@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { MessagesSquare, X } from "lucide-react";
 import { weekRuleAt } from "../gauntlet/weeklyRules.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getSideSlot } from "../sideCases.js";
@@ -17,7 +16,8 @@ const POST_LIMIT = 50;
  * (`.resume-panel`), so no style is added, and says only what is there: the
  * case a save is in, this week's rule, the side cases listed since the last
  * visit (on a device that has them open) and the board's posts since then.
- * With none of them it draws nothing. The board is read the way the board
+ * With none of them it draws nothing. Its two buttons are words only: an
+ * icon here would join the icon chunk every first paint downloads. The board is read the way the board
  * screen reads it; a board that cannot be reached just leaves its line out.
  */
 export function SinceLastCard({ visit, view, onClose }) {
@@ -55,12 +55,10 @@ export function SinceLastCard({ visit, view, onClose }) {
       <div>
         {posts > 0 && (
           <button type="button" onClick={() => common.setShowBoard(true)}>
-            <MessagesSquare size={16} aria-hidden="true" />
             {words.board}
           </button>
         )}
         <button type="button" data-testid="since-last-close" onClick={onClose}>
-          <X size={16} aria-hidden="true" />
           {words.close}
         </button>
       </div>
