@@ -21,7 +21,7 @@
   --v2-ease: var(--ui-ease-out);
 }
 
-/* ── The briefing page: the messenger ─────────────────────────────────── */
+/* -- The briefing page: the messenger ----------------------------------- */
 
 :root[data-ui="v2"] .gx-comic {
   background: var(--c-gx-shade);
@@ -402,7 +402,7 @@
   display: none;
 }
 
-/* ── The hand ─────────────────────────────────────────────────────────── */
+/* -- The hand ----------------------------------------------------------- */
 
 /* Both hands -- the briefing's and the table's -- are one fanned row. Each
    card leans by its place from the middle and the outer ones sit a little
@@ -582,7 +582,7 @@
   font: 600 0.6875rem / 1 var(--font-mono);
 }
 
-/* ── The HUD: three numbers ───────────────────────────────────────────── */
+/* -- The HUD: three numbers --------------------------------------------- */
 
 :root[data-ui="v2"] .gauntlet-stage .gx-hud {
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto auto;
@@ -714,7 +714,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Phones ───────────────────────────────────────────────────────────── */
+/* -- Phones ------------------------------------------------------------- */
 
 @media (max-width: 719px) {
   :root[data-ui="v2"] .gx-comic-page {
@@ -799,7 +799,7 @@
   }
 }
 
-/* ── Motion ───────────────────────────────────────────────────────────── */
+/* -- Motion ------------------------------------------------------------- */
 
 @keyframes v2-rise {
   from {
@@ -820,7 +820,7 @@
   transition: none;
 }
 
-/* ── Forced colours: every edge the redesign drew with a fill gets a line. */
+/* -- Forced colours: every edge the redesign drew with a fill gets a line. */
 
 @media (forced-colors: active) {
   .v2-msg,
