@@ -124,25 +124,23 @@
   min-width: 0;
 }
 
+/* Where and when, as a messenger dates its day: one quiet centred line. */
 .v2-day {
-  display: flex;
-  gap: 10px;
-  align-items: center;
   margin: 0;
+  padding: 2px 8px;
   color: var(--ui-text-3);
   font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.v2-day::before,
-.v2-day::after {
-  flex: 1;
-  border-top: 1px solid var(--ui-line);
-  content: "";
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .v2-day time {
-  font: 500 0.75rem / 1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-day span + time::before {
+  content: " · ";
 }
 
 .v2-from {
@@ -342,8 +340,12 @@
   border-bottom: 0;
 }
 
-/* The rules panels keep their words and lose the comic's frame. */
+/* The rules panels keep their words and lose the comic's frame: a quiet
+   sheet with one edge in the panel's colour (red stays red for a breach). */
 :root[data-ui="v2"] .gx-comic-page .gx-panel-breach {
+  background: var(--ui-surface-1);
+  border-width: 0 0 0 2px;
+  border-radius: var(--ui-radius-sm);
   box-shadow: none;
 }
 
@@ -369,8 +371,9 @@
 
 .v2-call b {
   color: var(--ui-accent);
-  font: 600 0.6875rem / 1.4 var(--font-mono);
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 :root[data-ui="v2"] .v2-call p {
@@ -424,7 +427,7 @@
   flex: 1 1 0;
   min-width: 0;
   max-width: 210px;
-  margin-inline: -3px;
+  margin-inline: -2px;
   border-radius: var(--ui-radius-md);
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.32);
   touch-action: pan-x;
@@ -553,11 +556,24 @@
 }
 
 :root[data-ui="v2"] .gx-card-stats {
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 :root[data-ui="v2"] .gx-card-chips {
   box-shadow: none;
+}
+
+:root[data-ui="v2"] .gx-hand :is(.gx-card-burn, .gx-card-chips) {
+  border-radius: var(--ui-radius-xs);
+}
+
+/* The wild card's name sits at its foot, so on a narrow card it never lies
+   over the direction tag on the top edge. */
+:root[data-ui="v2"] :is(.gx-comic-cards, .gx-hand) .gx-card-type.gx-card-name {
+  position: static;
+  order: 5;
+  align-self: start;
+  justify-self: start;
 }
 
 /* Key digits: a keyboard's, so a fine pointer's hover or a keyboard focus
