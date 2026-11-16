@@ -111,6 +111,13 @@
   border-color: var(--ui-text-3);
 }
 
+/* The comic's grid holds the thread and the rules panels: one column. */
+:root[data-ui="v2"] .gx-comic-grid[data-v2] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-gap);
+}
+
 .v2-thread {
   display: grid;
   gap: 12px;

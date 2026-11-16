@@ -273,27 +273,6 @@ export function SceneBriefing({
   const broken = penalties.length > 0;
   const sfx = pickSfx(nodeId, broken);
   const late = !held && shown <= 5;
-  // The rules this board carries and the ones the last decision broke: the
-  // comic page's last grid rows, under the thread on v2.
-  const rulePanels = (
-    <>
-      {carried.length > 0 && (
-        <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
-          <p className="gx-breach-kicker">{briefingCopy.carried}</p>
-          <RuleRows rules={carried} resourceMeta={resourceMeta} />
-        </div>
-      )}
-
-      {broken && (
-        <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
-          <p className="gx-breach-kicker">
-            <TriangleExclamationPoint size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
-          </p>
-          <RuleRows rules={penalties} resourceMeta={resourceMeta} />
-        </div>
-      )}
-    </>
-  );
   const judgment = (
     <div className={`gx-judgment${v2 ? " v2-call" : ""}`} data-testid="briefing-question">
       <b>{briefingCopy.yourCall}</b>
@@ -347,13 +326,12 @@ export function SceneBriefing({
           </button>
         </header>
 
-        {v2 ? (
-          <>
+        {/* ?ui=v2: the messenger thread stands in for the picture, the speaker, the story and the file; the rules stay. */}
+        <div className="gx-comic-grid" data-v2={v2 ? "" : undefined}>
+          {v2 ? (
             <v2.BriefingThread node={node} nodeId={nodeId} portrait={portrait} speakerRole={speakerRole} speech={speech} told={told} bridge={bridge} reaction={reaction} trace={trace} unfold={unfold} />
-            {rulePanels}
-          </>
-        ) : (
-        <div className="gx-comic-grid">
+          ) : (
+          <>
           <figure className="gx-panel gx-panel-splash">
             <ScenePlate node={node} nodeId={nodeId} sound={sfx.label} soundKind={sfx.kind} />
             {(node.place || node.clock) && (
@@ -406,9 +384,25 @@ export function SceneBriefing({
             </div>
           )}
 
-          {rulePanels}
+          </>
+          )}
+
+          {carried.length > 0 && (
+            <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
+              <p className="gx-breach-kicker">{briefingCopy.carried}</p>
+              <RuleRows rules={carried} resourceMeta={resourceMeta} />
+            </div>
+          )}
+
+          {broken && (
+            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
+              <p className="gx-breach-kicker">
+                <TriangleExclamationPoint size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
+              </p>
+              <RuleRows rules={penalties} resourceMeta={resourceMeta} />
+            </div>
+          )}
         </div>
-        )}
 
         {/* Under the page's grid, so it takes none of its rows. */}
         {weekRulePanel}
