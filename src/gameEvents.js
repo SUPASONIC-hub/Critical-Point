@@ -1,3 +1,4 @@
+import { readStoredValue, STORAGE_KEY } from "./appConfig.js";
 import { authoredNodeOrders, CASE_SEQUENCE } from "./gameCases.js";
 
 /**
@@ -89,10 +90,13 @@ export function noteCaseClosed(caseId, closedBefore, scope = globalThis) {
  * 1 to 5) -- once per scene per page. The scenes the graph adds between
  * them (aftermath, reaction, route) send nothing: a number for those would
  * shift whenever the graph grows. Only on a device that left 「기록 보내기」
- * on (`consent`, the start page's checkbox): a player who said no to the
- * play record is not counted scene by scene either. Returns whether it went.
+ * on (`consent`, the start page's checkbox, read from the save when the
+ * caller does not say): a player who said no to the play record is not
+ * counted scene by scene either. Returns whether it went. Called as each
+ * table stage mounts (GauntletStage.jsx); a scene's later windows are the
+ * same scene and go nowhere.
  */
-export function noteSceneShown(caseId, nodeId, { consent = false, scope = globalThis } = {}) {
+export function noteSceneShown(caseId, nodeId, { consent = readSavedConsent(), scope = globalThis } = {}) {
   if (consent !== true || !Object.hasOwn(SCENE_EVENT_CASES, caseId)) return false;
   const sceneNo = (authoredNodeOrders[caseId] ?? []).indexOf(nodeId) + 1;
   if (sceneNo < 1) return false;
@@ -101,6 +105,15 @@ export function noteSceneShown(caseId, nodeId, { consent = false, scope = global
   const sent = sendGameEvent(GAME_EVENTS.scene, { case_no: SCENE_EVENT_CASES[caseId], scene_no: sceneNo }, scope);
   if (sent) sentOnce.add(key);
   return sent;
+}
+
+/** The save's 「기록 보내기」: true only when the save says so in as many words. */
+export function readSavedConsent() {
+  try {
+    return JSON.parse(readStoredValue(STORAGE_KEY, "null"))?.dataConsent === true;
+  } catch {
+    return false;
+  }
 }
 
 /**

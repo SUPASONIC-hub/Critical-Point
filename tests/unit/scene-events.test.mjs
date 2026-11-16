@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { GAME_EVENTS, noteSceneShown, resetGameEventsForTest, SCENE_EVENT_CASES } from "../../src/gameEvents.js";
-import { authoredNodeOrders } from "../../src/gameCases.js";
+import { createStorage } from "./helpers/browser.mjs";
+
+globalThis.localStorage = createStorage();
+
+const { GAME_EVENTS, noteSceneShown, readSavedConsent, resetGameEventsForTest, SCENE_EVENT_CASES } = await import("../../src/gameEvents.js");
+const { authoredNodeOrders } = await import("../../src/gameCases.js");
+const { STORAGE_KEY } = await import("../../src/appConfig.js");
 
 /**
  * N16 (2026-11-16): 프롤로그 01·02's written scenes as one GA event,
@@ -52,4 +57,22 @@ test("no consent, no tag, another case or an in-between scene sends nothing", ()
 test("only 프롤로그 01 and 02 are counted scene by scene, with their own numbers", () => {
   assert.deepEqual(SCENE_EVENT_CASES, { prologue01: 1, prologue02: 2 });
   assert.ok(authoredNodeOrders.prologue01.length <= 9 && authoredNodeOrders.prologue02.length <= 9);
+});
+
+test("without a word from the caller, consent is the save's 기록 보내기", () => {
+  resetGameEventsForTest();
+  const { calls, scope } = pageWithTag();
+  const first = authoredNodeOrders.prologue02[0];
+  globalThis.localStorage.clear();
+  assert.equal(readSavedConsent(), false, "no save");
+  globalThis.localStorage.setItem(STORAGE_KEY, "{not json");
+  assert.equal(readSavedConsent(), false, "a save that does not read");
+  globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify({ dataConsent: false }));
+  assert.equal(noteSceneShown("prologue02", first, { scope }), false);
+  globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify({ dataConsent: "yes" }));
+  assert.equal(readSavedConsent(), false, "only true is a yes");
+  globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify({ dataConsent: true }));
+  assert.equal(noteSceneShown("prologue02", first, { scope }), true);
+  assert.deepEqual(calls, [["event", "cp_scene", { case_no: 2, scene_no: 1 }]]);
+  globalThis.localStorage.clear();
 });

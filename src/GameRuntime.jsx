@@ -87,7 +87,6 @@ import { useRuntimeRenderers } from "./viewModels/runtimeRenderers.jsx";
 import * as sceneViewModels from "./viewModels/sceneViewModels.js";
 import * as seasonViewModels from "./viewModels/seasonViewModels.js";
 import { getSpeakerPortrait } from "./speakerPortraits.js";
-import { noteSceneShown } from "./gameEvents.js";
 import { getOperatorProfile, getOperatorProfiles } from "./advancedSystems.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { whenCaseReady } from "./state/caseArrival.js";
@@ -506,10 +505,6 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
       }
     };
   }, [dataConsent, isOnline, pendingTelemetry.length, scheduleTelemetryRetryEvent]);
-  // N16: 프롤로그 01·02's written scenes, one GA event each per page, with consent (gameEvents.js).
-  useEffect(() => {
-    if (started && !isResult) noteSceneShown(currentCase, resolvedNodeId, { consent: dataConsent });
-  }, [currentCase, dataConsent, isResult, resolvedNodeId, started]);
   useEffect(() => {
     if (!debugToolsEnabled) return undefined;
     let cancelled = false;
