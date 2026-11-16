@@ -395,6 +395,44 @@ export const case12 = {
       ],
     },
   ],
+  // 「반전」 (N26, gameData.js `turnScenes`): the night before the committee,
+  // the line that left the 212 out turns out to be the team's own. 사건 10's
+  // list became the group's agenda by being fitted to its form, and the 212
+  // were the names that did not fit (c10_final); the compensation roster was
+  // built on that agenda. Nothing later is changed by it: the final scene's
+  // 212 are the same 212, only who drew the line is new.
+  turnScene: {
+    id: "c12_turn",
+    after: "c12_letter_reaction",
+    next: "c12_final",
+    title: "우리 명단",
+    speaker: "도윤하",
+    text: "조정 전날 자정 무렵, 도윤하가 조정안 대상 명단의 원본 파일을 엽니다. 작성자 칸에 트리거랩 4층, 그 아래 자기 이름이 있습니다. 지난번 그룹 안건으로 올린 그 명단이 배상 기준의 뼈대가 된 것입니다. 안건 서식에 맞추느라 212명이 빠진 그 판 그대로. '212명을 뺀 건 그룹이 아니었어요. 우리 명단이 먼저 뺐고, 그룹은 그걸 받아 적었어요.' 도윤하가 수첩 첫 장의 212를 손끝으로 누릅니다.",
+    memo: ["조정안 명단 원본 작성자: 트리거랩 4층", "212명이 처음 빠진 곳: 그룹 안건 서식에 맞춘 4층의 명단", "조정위원회 마지막 회의: 내일"],
+    choices: [
+      {
+        label: "명단을 만든 4층의 이름으로 위원회에 정정서를 낸다",
+        effect: { legitimacy: 11, trust: 4, capital: -5, time: -5, fatigue: 5 },
+        cognition: { inference: 1 },
+        voice: "212명을 처음 뺀 게 우리 명단이라서, 명단을 만든 4층의 이름으로 조정위원회에 정정서를 낸다.",
+        echo: "정정서를 내면 4층의 이름이 위원회 기록에 남습니다. 212명을 뺀 쪽으로도, 다시 넣자는 쪽으로도.",
+      },
+      {
+        label: "도윤하와 함께 문가을에게 이 사실부터 털어놓는다",
+        effect: { trust: 12, humanCost: -5, legitimacy: -3, time: -6, fatigue: 6 },
+        cognition: { persistence: 1 },
+        voice: "모르는 채로 내일 회의에 앉게 할 수는 없어서, 도윤하와 함께 문가을에게 이 사실부터 털어놓는다.",
+        echo: "털어놓자 문가을이 한참 말이 없다가 묻습니다. '그럼 내일은 어느 쪽 줄에 앉으실 거예요?'",
+      },
+      {
+        label: "명단 얘기는 조정 뒤로 미루고 내일 회의를 지킨다",
+        effect: { time: 6, capital: 5, trust: -6, legitimacy: -4, humanCost: 4, fatigue: -4 },
+        cognition: { risk: 1 },
+        voice: "오늘 밤 판을 흔들면 추석 전 입금이 늦어져서, 명단 얘기는 조정 뒤로 미루고 내일 회의를 지킨다.",
+        echo: "미루자 도윤하가 파일을 닫습니다. 수첩 첫 장의 212 옆에 오늘 날짜가 하나 더 붙습니다.",
+      },
+    ],
+  },
   reactionScenes: [
     {
       id: "c12_line_reaction",
@@ -813,6 +851,11 @@ export const case12 = {
       place: "트리거랩 4층 분석관실 · 야간",
       clock: "조정 전날 · 23:10",
       question: "반려한 사람이 유족 앞에서 자기 이름을 말하고 싶어 합니다. 어떻게 하겠습니까?",
+    },
+    c12_turn: {
+      place: "트리거랩 4층 분석관실 · 야간",
+      clock: "조정 전날 · 23:50",
+      question: "212명을 처음 뺀 줄이 4층의 명단이었습니다. 이 사실을 어떻게 하겠습니까?",
     },
     c12_route_system: {
       place: "트리거랩 4층 분석관실 · 실험 단말",

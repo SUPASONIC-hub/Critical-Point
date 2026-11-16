@@ -316,6 +316,29 @@ export default {
       "clock": "Day before mediation · 23:10",
       "question": "The person who returned the dissent wants to give her name to the bereaved family. What do you do?"
     },
+    "c12_turn": {
+      "title": "Our List",
+      "text": "Near midnight the day before mediation, Do Yoonha opens the source file of the settlement’s roster. In the author field: Trigger Lab, 4th floor, and under it, his own name. The list the team sent up as a group agenda item became the frame of the compensation standard, exactly as it stood when 212 people dropped out to fit the agenda form. 'It wasn’t the group that left out the 212. Our list did it first, and the group just copied it down.' Do Yoonha presses a fingertip to the 212 on the first page of his notebook.",
+      "memo": [
+        "Author of the roster’s source file: Trigger Lab, 4th floor",
+        "Where the 212 first dropped out: the 4th floor’s list, fitted to the group’s agenda form",
+        "Last meeting of the mediation committee: tomorrow"
+      ],
+      "choices": {
+        "c12_turn_choice_1": {
+          "label": "File a correction with the committee in the 4th floor’s name"
+        },
+        "c12_turn_choice_2": {
+          "label": "Tell Moon Gaeul this first, together with Do Yoonha"
+        },
+        "c12_turn_choice_3": {
+          "label": "Put the list aside until after mediation and keep tomorrow’s meeting"
+        }
+      },
+      "place": "Trigger Lab, 4th-floor analyst room · Night",
+      "clock": "Day before mediation · 23:50",
+      "question": "The line that first left out the 212 was the 4th floor’s list. What do you do with that?"
+    },
     "c12_branch_factory": {
       "title": "The Stopped Factory",
       "text": "In a factory closed for 1 year, six lathes stand under plastic. Moon Gaeul only handed over the key: 'I can’t go in.' The calendar stopped in the month of the bankruptcy, and a note reading 'Delivery D-3' is still on the workbench. Kang Taemin pulls back a sheet. 'This one’s still alive. It just needs oil.' Outside, three of the seven machinists have come.",
@@ -567,6 +590,9 @@ export default {
     "c12_letter_reaction_choice_1": "Together, the one who objected and the one who returned it stand side by side before the bereaved. Moon Gaeul has to decide which of you to look at first. Han Seoyun waits her turn on a corridor chair until the meeting ends.",
     "c12_letter_reaction_choice_2": "You ask, and Moon Gaeul takes a day to think. Then she answers, 'I want to see that person’s face.'",
     "c12_letter_reaction_choice_3": "You go alone, and the meeting is quiet. That night Han Seoyun looks at the photo of the letter for a long time.",
+    "c12_turn_choice_1": "File the correction, and the 4th floor’s name stays in the committee’s record, as the side that left out the 212 and as the side asking to put them back.",
+    "c12_turn_choice_2": "You tell her, and Moon Gaeul is silent a long while before she asks, 'Then which row will you sit in tomorrow?'",
+    "c12_turn_choice_3": "You put it off, and Do Yoonha closes the file. Beside the 212 on the first page of his notebook, one more date goes in: today’s.",
     "c12_branch_factory_a": "With a plan, the lathes get a date to turn again. Who pays until that date is still a blank.",
     "c12_branch_factory_b": "Closing it keeps the family warm this winter. The three machinists cover the lathes again and leave.",
     "c12_branch_factory_c": "The papers show the collateral was added two months before the bankruptcy. Who recommended it is written there too.",
@@ -638,6 +664,9 @@ export default {
     "c12_letter_reaction_choice_1": "Saying the family should know it was returned, too, you go to the mediation committee with Han Seoyun.",
     "c12_letter_reaction_choice_2": "Since this means the one who returned it giving her name to the bereaved, you ask the family first whether they want it.",
     "c12_letter_reaction_choice_3": "Saying it is the family’s place, not a place for confession, you talk Han Seoyun out of it and go alone today.",
+    "c12_turn_choice_1": "Since it was our list that first left out the 212, you file a correction with the mediation committee in the name of the 4th floor that made it.",
+    "c12_turn_choice_2": "Since you cannot let her sit through tomorrow’s meeting not knowing, you tell Moon Gaeul this first, together with Do Yoonha.",
+    "c12_turn_choice_3": "Since shaking things up tonight would delay the payout before Chuseok, you put the list aside until after mediation and keep tomorrow’s meeting.",
     "c12_branch_factory_a": "Since the lathes are still alive and three people are waiting outside, you draw up a restart plan with the three machinists.",
     "c12_branch_factory_b": "Saying the family left behind has to live first, you suggest closing the factory and using the money to live on.",
     "c12_branch_factory_c": "Saying you need to know first whether the factory can run, you check the loan papers for how the collateral was taken.",

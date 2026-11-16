@@ -44,6 +44,7 @@ import {
 import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
+import { caseRuleFor } from "./caseRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -648,7 +649,9 @@ const storyBoards = new WeakMap();
  */
 export function getTableSchema(run) {
   const schema = run?.schema ?? BASE_SCHEMA;
-  if (run?.story !== true) return getWeekBoard(schema, run?.weekRule);
+  // A case with a rule of its own (caseRules.js, N26) is dealt it the way a
+  // week's is, and only in a season without one: never two rules on a board.
+  if (run?.story !== true) return getWeekBoard(schema, run?.weekRule || caseRuleFor(run?.open?.caseId, run));
   if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
   return storyBoards.get(schema);
 }

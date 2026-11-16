@@ -113,13 +113,23 @@ const connectiveScenes = CASE_PACKS.flatMap((pack) => pack.connectiveScenes);
 
 const reactionScenes = CASE_PACKS.flatMap((pack) => pack.reactionScenes);
 
+/**
+ * 「반전」 (N26, 다음 개선점 2차 2026-11-16, Q3 (1)): a case may write one
+ * scene more, `turnScene`, where the story turns over -- 사건 12 alone, the
+ * middle of the longest stretch with nothing new on the table (사건 08-17).
+ * Built like a reaction scene (the same fields, the same checks) and played
+ * after the scene it follows, which may itself be a generated one: it is
+ * built after them all.
+ */
+const turnScenes = CASE_PACKS.flatMap((pack) => (pack.turnScene ? [pack.turnScene] : []));
+
 // A phase is printed on the scene chip and in the mission strip, so it is
 // player-facing copy, not a pipeline label. These scenes were shipping as
 // "CONNECTIVE SCENE" -- the name of the function that builds them -- for the
 // same reason the reaction, branch and route-final families read as build
 // steps. They are all the same story beat: the part that happens outside the
 // meeting that was scheduled.
-const GENERATED_SCENE_PHASES = { connective: "OFF THE RECORD", reaction: "THE ROOM AFTER" };
+const GENERATED_SCENE_PHASES = { connective: "OFF THE RECORD", reaction: "THE ROOM AFTER", turn: "THE TURN" };
 const REACTION_MEMO_FALLBACK = ["다음 선택에 남은 비용", "다음 장면에서 다시 확인할 말"];
 
 function addGeneratedScene(kind, { id, after, next, title, speaker, text, memo, choices }) {
@@ -164,6 +174,13 @@ reactionScenes.forEach(({ id, after }) => {
   const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
   if (!order) throw new Error(`reaction scene ${id} follows ${after}, which is in no case`);
   order.splice(order.indexOf(after) + 1, 0, id);
+});
+
+turnScenes.forEach((scene) => {
+  addGeneratedScene("turn", scene);
+  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(scene.after));
+  if (!order) throw new Error(`turn scene ${scene.id} follows ${scene.after}, which is in no case`);
+  order.splice(order.indexOf(scene.after) + 1, 0, scene.id);
 });
 
 // Each case has one authored detour. The second scene always rejoins the existing route.
