@@ -29,7 +29,7 @@ export default {
     },
     crisisEdge: {
       label: "Crisis edge alert",
-      text: "As the table nears the wall, the screen edges glow softly. Cards and text stay clear.",
+      text: "As the table nears the Wall, the screen edges glow softly. Cards and text stay clear.",
     },
     letterKeys: {
       label: "Use single-key shortcuts",
@@ -47,7 +47,7 @@ export default {
   },
   textScale: {
     legend: "Text size",
-    text: "Enlarges the text on every screen. The pot, clock and timer figures stay the same. Saved on this device only.",
+    text: "Enlarges the text on every screen. The stake, clock and timer figures stay the same. Saved on this device only.",
     labels: ["Default", "Large", "Larger"],
   },
 };

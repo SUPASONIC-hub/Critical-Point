@@ -1,0 +1,82 @@
+# Terminology (ko / en / ja)
+
+One word per idea in each language, so a term the table taught in prologue 01
+reads the same in case 07 and on every screen. Korean is the source and is
+never changed to fit this table; English and Japanese follow it. The game's
+own words on screen (`src/locales/<lang>/screens/`) are the reference, and
+`tests/unit/terminology.test.mjs` holds the screen copy to the rows marked
+**held**.
+
+Written 2026-11-16 (N31, 결정 Q8 (1)) from the two translation notes of the
+store work (영어 용어집 10-25, 일본어 용어집 10-28, kept outside git) and from
+what the copy actually says today.
+
+## Style
+
+- **Korea stays Korea.** Seoul places, Korean names (family name first),
+  won amounts. No numbers change: dates, times, amounts, ratios, head-counts
+  are the canon's (`docs/canon.md`).
+- **English**: short declarative sentences, present tense, second person
+  ("you"). No hard-boiled noir. Scene titles in Title Case; an outcome's
+  title is a sentence in sentence case ("You wrote one name in the author box
+  and filed it").
+- **Japanese**: です・ます for the narrator and the screens, the characters'
+  own register in quotes. Katakana names with a middle dot (オ・ジヌ). The
+  makers say 私たち.
+- **The makers' voice** (board, notices) is 「우리」 / "we" / 私たち.
+- A card label is one action, short enough for a phone line; a question is
+  one sentence. A rewrite that lengthens a label is measured on Linux CI
+  (Noto CJK) before it ships.
+
+## Game terms
+
+| 한국어 | English | 日本語 | Note |
+|---|---|---|---|
+| 사건 / 장면 / 시즌 / 프롤로그 | Case / Scene / Season / Prologue | 事件 / シーン / シーズン / プロローグ | 「事件01」「Case 01」 |
+| 판 | hand | 勝負 | 「이번 판」 this hand / この勝負 |
+| 테이블 | the table | テーブル | ja 卓 only in 卓を組み替える (below) |
+| 판돈 | stake | 賭け金 | **held**: not "pot", "bet" (en); not 掛け金, ベット (ja) |
+| 칩 | chips | チップ | |
+| 금고 | the Vault | 金庫 | **held**: capital V on screens |
+| 벽 | the Wall | 壁 | **held**: capital W on screens; a wall in a room stays "wall" |
+| 열기 | Heat | 熱 | 「熱ゲージ」 |
+| 심박 | heartbeat | 心拍 | |
+| 밀어붙인다 (button) | Push | 押し切る | |
+| 확정 (button) | Commit | 確定 | **held**: never "Lock in" (LOCK is its own word) |
+| BUST / LOCK / COLD FEET / FRACTURE / OVERCLOCK | as is | as is | already English |
+| 판을 다시 짠다 (wild card) | Reframe the Table | 卓を組み替える | |
+| 논리 콤보 | Logic Combo | ロジックコンボ | |
+| 버스트 점수 / 최고 버스트 / 랭크 | Burst Score / Best Burst / Rank | バーストスコア / 最高バースト / ランク | |
+| 판단 DNA / 판단 유형 | Judgment DNA / judging type | 判断DNA / 判断タイプ | |
+| 결말 / 판결 | Ending / Verdict | 結末 / 判決 | |
+| 이번 주의 규칙 | Rule of the Week | 今週のルール | |
+| 번외 사건 | side case | 番外事件 | |
+| 스토리 모드 / 테이블 시간 | Story Mode / Table Time | ストーリーモード / テーブル時間 | |
+| 명예의 전당 | Hall of Fame | 名誉の殿堂 | **held** (ja): not 殿堂 alone |
+| 도구 드래프트 / 도감 | Tool Draft / Tool Index | ツール / ツール図鑑 | |
+| 분석관 (the player) | the analyst / Analyst | 分析官 | |
+| 사건 파일 | Case File | 事件ファイル | |
+
+## People (prologue 01 to case 07)
+
+| 한국어 | English | 日本語 |
+|---|---|---|
+| 오진우 | Oh Jinwoo | オ・ジヌ |
+| 윤상혁 | Yoon Sanghyuk | ユン・サンヒョク |
+| 한서윤 | Han Seoyun | ハン・ソユン |
+| 임경수 | Lim Kyungsoo | イム・ギョンス |
+| 반재욱 | Ban Jaewook | パン・ジェウク |
+| 정해린 | Jung Haerin | チョン・ヘリン |
+| 이민서 | Lee Minseo | イ・ミンソ |
+| 차지원 | Cha Jiwon | チャ・ジウォン |
+
+Titles go before the name in English (Assistant Manager Oh, Team Head Yoon)
+and after it in Japanese (オ代理, ユン・チーム長). The full cast is each
+dictionary's `speakers` (`src/locales/<lang>/index.js`).
+
+## Not settled yet
+
+- 판 in long prose: "hand" reads as cards; a human reviewer may prefer
+  "round" in a few story lines. Screens keep "hand".
+- ja 卓 vs テーブル in narrative lines outside 卓を組み替える (about 70 in
+  prologue 01 to case 07, all in that metaphor today).
