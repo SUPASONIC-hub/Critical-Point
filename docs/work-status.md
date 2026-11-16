@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-16 (the state of `main` at `bded5a33`, after #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-16 (the state of `main` at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -211,6 +211,21 @@ Still open, on purpose:
   complete seasons with no mark, and the fullest board. Read only; the
   threshold `HALL_OF_FAME_MIN_SEASONS = 10` and the server stay, for decision
   T's T12 (11-23).
+- Bundle 11-16a (#566, 2026-11-16, `60dc8551`): the board has an admin tool
+  for the two makers only (#561): `?admin` or `#admin` opens it, Google sign-in
+  through Supabase Auth's REST (no supabase-js), and `is_board_admin()` asks
+  for an address in `board_admins` and the `google` provider; five
+  `authenticated`-only RPCs search, hide, restore and delete, each written to
+  `board_admin_log` (`20261118000000_board_admins.sql`). Players load only
+  `src/boardAdminEntry.js`; the tool is its own `BoardAdmin` chunk, left out
+  of the service worker's warm list. A MARKET SHOCK week's case result shows
+  the shock's sum in one line (#562, `describeCaseShock`, the log's
+  `threshold.shock`; no run-state key), which no week shows yet.
+  `docs/writing-a-case.md` gains chapter 18 (people from abroad, renames,
+  money) and `tests/unit/case-template.test.mjs` checks every command and
+  path it names (#557); `docs/event-week.md` follows the calendar to
+  2027-W15 and `tests/unit/event-week-doc.test.mjs` holds its table to
+  `MERGED_WEEKS` (#558).
 - Two weekly rules sit in the catalogue only (#555, 2026-11-16): IDLE MONEY
   (`idle-erosion`, B4, the device `erosion`: 2% of what the vault held through a
   case is gone when it closes, `IDLE_EROSION_PERCENT`) and MARKET SHOCK
