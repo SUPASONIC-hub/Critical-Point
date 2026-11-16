@@ -16,7 +16,7 @@ export default {
     prologue02: {
       intro: [
         "Pick cards leaning the same way (People side or Position side) three times in a row to build a Logic Combo and grow the multiplier. If you closed the last hand hotter, the combo carries on even when you switch sides. The Shifting View score rises the more evenly you use the thinking types, so you can hold your side and still change types.",
-        "Hit the Wall and the next hand starts with the cards hidden and Heat already on.",
+        "Hit the Wall and the next hand starts with the cards hidden.",
       ],
     },
     prologue03: {
@@ -47,6 +47,12 @@ export default {
     },
     case03: {
       intro: ["From this case on, Links join the table. Commit with a card that burns 8 or more of one resource, and in one hand 2–4 hands later the Wall comes 6 closer."],
+    },
+    case04: {
+      intro: ["From this case on, hit the Wall and the next hand starts at Heat 22."],
+    },
+    case05: {
+      intro: ["From this case on, let the clock run out and lose the hand, and the next hand’s heartbeat won’t point at the Wall, with 30 seconds to decide."],
     },
   },
 };

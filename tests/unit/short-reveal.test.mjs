@@ -28,9 +28,9 @@ test("the table is taught from 사건 01, the first case past the prologues, and
     // A story run is told less in a prologue, and the prologue is still a step.
     assert.equal(isTableTaught(caseId, { story: true }, true), !onLadder, `${caseId}, a story run`);
   }
-  // The last step (사건 03 since C-4) plays under every rule and is still introducing one of them.
-  assert.deepEqual([...getTableRules("case03", {}, true)].sort(), [...ALL_RULES].sort());
-  assert.equal(isTableTaught("case03", {}, true), true, "it opens one rule on its briefing and is not teaching");
+  // The last step (사건 05 since N18, 사건 03 from C-4) plays under every rule and is still introducing one of them.
+  assert.deepEqual([...getTableRules("case05", {}, true)].sort(), [...ALL_RULES].sort());
+  assert.equal(isTableTaught("case05", {}, true), true, "it opens one rule on its briefing and is not teaching");
   assert.equal(isTableTaught("prologue05", {}, true), false);
   assert.equal(isTableTaught("case01", {}, true), true);
 });
@@ -49,7 +49,7 @@ test("with the switch off nothing is being introduced, and a case nobody named i
   assert.equal(isTableTaught("prologue01", {}), !STAGED, "asked without a flag it answers for the shipped switch");
 });
 
-test("where the table is taught, the case plays under everything (or, in 사건 01 to 03, adds one rule) and says at most one line", () => {
+test("where the table is taught, the case plays under everything (or, in 사건 01 to 05, adds one rule) and says at most one line", () => {
   // An act's last case adds 「고점 판」 to everything (C-10): held in table-unlocks.test.mjs.
   for (const caseId of CASE_SEQUENCE.filter((id) => !PEAK_CASES.includes(id))) {
     for (const run of [{}, { veteran: true }, { story: true }, { veteran: true, story: true }]) {
@@ -57,10 +57,10 @@ test("where the table is taught, the case plays under everything (or, in 사건 
         assert.ok(LADDER.includes(caseId) && run.veteran !== true);
         continue;
       }
-      // C-4: 사건 01 to 03 open one rule each on a table already taught.
+      // C-4 and N18: 사건 01 to 05 open one rule each on a table already taught.
       const opening = LADDER.includes(caseId) && run.veteran !== true;
       if (opening && !run.story) {
-        assert.equal(getTableRules(caseId, run, true).size, ALL_RULES.size - (2 - ["case01", "case02", "case03"].indexOf(caseId)), `${caseId}: one rule a case`);
+        assert.equal(getTableRules(caseId, run, true).size, ALL_RULES.size - (4 - ["case01", "case02", "case03", "case04", "case05"].indexOf(caseId)), `${caseId}: one rule a case`);
         assert.equal(getUnlockIntro(caseId, run, true).length, 1, `${caseId}: one line`);
         continue;
       }

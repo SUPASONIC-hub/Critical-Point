@@ -37,11 +37,11 @@ export const GUIDE_BODY = {
 <p>프롤로그 04부터 카드를 건 뒤 LOCK을 누를 수 있습니다. 한 번에 1.5초가 들고 충전이 쌓여, 카드의 자원 효과와 칩 배율이 커집니다(칩 배율은 1.5배까지). 프롤로그 05부터 자세를 고릅니다. STRIKE는 배율을 가장 빨리 키우고, STEADY는 한 번 민 뒤의 LOCK마다 열기를 2씩 식히며, EXPOSE는 자원 효과를 키웁니다. 충전 70 이상으로 확정하면 자세가 다음 판으로 이어지고, 한 자세로 이렇게 세 번 확정하면 시즌 숙련이 생깁니다.</p>
 
 <h2>판단이 남기는 흔적</h2>
-<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 03부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
+<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 05부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
 <dl>
 <dt>BLACKOUT (프롤로그 02)</dt><dd>BUST 다음 판은 카드의 칩과 소모가 가려지고 벽 구간이 6 가까워집니다.</dd>
-<dt>AFTERSHOCK (프롤로그 02)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
-<dt>SILENCE (프롤로그 02)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
+<dt>AFTERSHOCK (사건 04)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
+<dt>SILENCE (사건 05)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
 <dt>COLD FEET (프롤로그 03)</dt><dd>한 번도 밀지 않고 확정하면 다음 판의 칩이 가장 많은 카드가 열기 30을 넘을 때까지 봉인되고, 칩이 0.6배가 됩니다.</dd>
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
@@ -147,11 +147,11 @@ export const GUIDE_BODY = {
 <p>From Prologue 04 you can press LOCK after staking a card. Each press costs 1.5 seconds and builds charge, which grows the card’s resource effects and the chip multiplier, up to ×1.5. From Prologue 05 you pick a Stance: STRIKE grows the multiplier fastest, STEADY cools Heat by 2 with each LOCK after a push, and EXPOSE boosts resource effects. Commit with a charge of 70 or more and the Stance carries into the next hand; three such commits in one Stance earn its season mastery.</p>
 
 <h2>The marks your calls leave</h2>
-<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 03 all of them are on, and NEW GAME+ has them all from the start.</p>
+<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 05 all of them are on, and NEW GAME+ has them all from the start.</p>
 <dl>
 <dt>BLACKOUT (Prologue 02)</dt><dd>After a BUST, the cards’ chips and costs are hidden and the Wall band comes 6 closer.</dd>
-<dt>AFTERSHOCK (Prologue 02)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
-<dt>SILENCE (Prologue 02)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
+<dt>AFTERSHOCK (Case 04)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
+<dt>SILENCE (Case 05)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
 <dt>COLD FEET (Prologue 03)</dt><dd>Commit without a single push and the next hand seals its card with the most chips until Heat passes 30, with chips at ×0.6.</dd>
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
@@ -257,11 +257,11 @@ export const GUIDE_BODY = {
 <p>プロローグ04から、カードを賭けたあとにLOCKを押せます。一回に1.5秒かかってチャージがたまり、カードのリソース効果とチップ倍率が大きくなります（チップ倍率は1.5倍まで）。プロローグ05から構えを選びます。STRIKEは倍率をいちばん速く伸ばし、STEADYは一度押したあとのLOCKごとに熱を2ずつ冷まし、EXPOSEはリソース効果を伸ばします。チャージ70以上で確定すると構えが次の勝負に続き、一つの構えでこれを3回確定するとシーズンの熟練が付きます。</p>
 
 <h2>判断が残す跡</h2>
-<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件03からはすべてオン、NEW GAME+では最初から全部オンです。</p>
+<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件05からはすべてオン、NEW GAME+では最初から全部オンです。</p>
 <dl>
 <dt>BLACKOUT（プロローグ02）</dt><dd>BUSTの次の勝負は、カードのチップと消耗が伏せられ、壁の区間が6近づきます。</dd>
-<dt>AFTERSHOCK（プロローグ02）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
-<dt>SILENCE（プロローグ02）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
+<dt>AFTERSHOCK（事件04）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
+<dt>SILENCE（事件05）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
 <dt>COLD FEET（プロローグ03）</dt><dd>一度も押さずに確定すると、次の勝負でチップがいちばん多いカードが熱30を超えるまで封印され、チップが0.6倍になります。</dd>
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>

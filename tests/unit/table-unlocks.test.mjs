@@ -28,9 +28,9 @@ import {
  */
 
 const staged = { staged: true };
-const PROLOGUES = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02", "case03"];
+const PROLOGUES = ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02", "case03", "case04", "case05"];
 
-test("the ladder is the five prologues and 사건 01 to 03 in the season's order, each step holding the one before it, and it ends in everything", () => {
+test("the ladder is the five prologues and 사건 01 to 05 in the season's order, each step holding the one before it, and it ends in everything", () => {
   assert.deepEqual(UNLOCK_LADDER.map((step) => step.caseId), PROLOGUES);
   assert.deepEqual(CASE_SEQUENCE.slice(0, PROLOGUES.length), PROLOGUES, "the season opens on them, in this order");
   let before = new Set();
@@ -49,20 +49,22 @@ test("the ladder is the five prologues and 사건 01 to 03 in the season's order
 test("each step is the one the author decided", () => {
   const rules = (caseId) => [...rulesFor(caseId, staged)].sort();
   assert.deepEqual(rules("prologue01"), []);
-  assert.deepEqual(rules("prologue02"), ["aftershock", "blackout", "logic", "silence"]);
-  assert.deepEqual(rules("prologue03"), ["aftershock", "blackout", "coldFeet", "heatDebt", "logic", "scout", "silence"]);
+  // 프롤로그 02 opens two, the logic combo and BLACKOUT (N18, 2026-11-16 (1)); it opened four until 11-30.
+  assert.deepEqual(rules("prologue02"), ["blackout", "logic"]);
+  assert.deepEqual(rules("prologue03"), ["blackout", "coldFeet", "heatDebt", "logic", "scout"]);
   // 프롤로그 04 opens two rules, FRACTURE and LOCK (C-4, the user's answer of 2026-10-25, (1)); it
   // opened five at RULES_MARK 3, OVERCLOCK and the audit and the links with them.
-  assert.deepEqual(rules("prologue04"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "scout", "silence"]);
+  assert.deepEqual(rules("prologue04"), ["blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "scout"]);
   // The stance and the draft: a draft in 05 is the offer made as 04 closes.
-  assert.deepEqual(rules("prologue05"), ["aftershock", "blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "relics", "scout", "silence", "stance"]);
+  assert.deepEqual(rules("prologue05"), ["blackout", "coldFeet", "fracture", "heatDebt", "lock", "logic", "relics", "scout", "stance"]);
   assert.ok(!rulesFor("prologue04", staged).has("relics") && !rulesFor("prologue04", staged).has("stance"));
-  // Then one rule a case: OVERCLOCK in 사건 01, the audit in 사건 02, the links in 사건 03, the whole table.
+  // Then one rule a case: OVERCLOCK in 사건 01, the audit in 사건 02, the links in 사건 03,
+  // AFTERSHOCK in 사건 04 and SILENCE in 사건 05 (N18), the whole table.
   const added = (caseId) => [...rulesFor(caseId, staged)].filter((rule) => !rulesFor(CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1], staged).has(rule));
-  assert.deepEqual(["case01", "case02", "case03"].map(added), [["overclock"], ["audit"], ["cascade"]]);
-  assert.deepEqual(rules("case03"), [...TABLE_RULES].sort());
-  // No step opens five any more, as 프롤로그 04 did: what C-4 was about. (프롤로그 02 opens four.)
-  for (const step of UNLOCK_LADDER) assert.ok(step.adds.length <= 4, `${step.caseId} opens ${step.adds.length}`);
+  assert.deepEqual(["case01", "case02", "case03", "case04", "case05"].map(added), [["overclock"], ["audit"], ["cascade"], ["aftershock"], ["silence"]]);
+  assert.deepEqual(rules("case05"), [...TABLE_RULES].sort());
+  // No step opens more than three any more: 프롤로그 04 opened five until C-4, 프롤로그 02 four until N18.
+  for (const step of UNLOCK_LADDER) assert.ok(step.adds.length <= 3, `${step.caseId} opens ${step.adds.length}`);
   assert.ok(rulesFor("prologue04", staged).size - rulesFor("prologue03", staged).size <= 3, "프롤로그 04 opens two or three");
 });
 
@@ -77,7 +79,7 @@ test("a case the ladder does not name, and a run begun with NEW GAME+, play unde
     assert.deepEqual(getUnlockIntro(caseId, { veteran: true }, true), []);
     // Only the mark itself: a run that is merely far along is not a veteran's. (사건 03, the step
     // that completes the table, is the whole table either way.)
-    if (caseId !== "case03") assert.notEqual(getTableRules(caseId, { veteran: "yes", windowIndex: 400 }, true), ALL_RULES);
+    if (caseId !== "case05") assert.notEqual(getTableRules(caseId, { veteran: "yes", windowIndex: 400 }, true), ALL_RULES);
     assert.equal(getTableRules(caseId, {}, true), rulesFor(caseId, staged), "a plain run takes the case's step");
     assert.equal(getTableRules(caseId, null, true), rulesFor(caseId, staged), "and so does no run at all");
   }
@@ -203,4 +205,14 @@ test("사건 02 and 03 tell the audit and the links by their own numbers", async
   assert.equal(links, `이번 사건부터 연결이 판에 붙습니다. 한 자원을 ${LINK_BURN} 이상 태운 카드로 확정하면, ${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 뒤의 한 판에서 벽이 ${LINK_WALL} 가까워집니다.`);
   // A story run plays without all three of 사건 01 to 03's rules, and is told none of them.
   for (const caseId of ["case01", "case02", "case03"]) assert.deepEqual(introFor(caseId, { staged: true, story: true }), [], caseId);
+});
+
+// N18: AFTERSHOCK and SILENCE have a line of their own in 사건 04 and 05, by their own numbers.
+test("사건 04 and 05 tell AFTERSHOCK and SILENCE by their own numbers, and a story run is told neither", async () => {
+  const { AFTERSHOCK_START, SILENCE_SECONDS } = await import("../../src/gauntlet/tableRules.js");
+  assert.deepEqual(introFor("case04", staged), [`이번 사건부터 벽에 닿으면 다음 판은 열기 ${AFTERSHOCK_START}에서 시작합니다.`]);
+  assert.deepEqual(introFor("case05", staged), [`이번 사건부터 시간을 다 흘려보내 판을 잃으면, 다음 판은 심박이 벽을 알려 주지 않고 결정 시간이 ${SILENCE_SECONDS}초입니다.`]);
+  for (const caseId of ["case04", "case05"]) assert.deepEqual(introFor(caseId, { staged: true, story: true }), [], caseId);
+  // 프롤로그 02 says what a bust does at its own table: the cards hidden, no Heat carried.
+  assert.equal(introFor("prologue02", staged)[1], "벽에 닿으면 다음 판은 카드가 가려집니다.");
 });
