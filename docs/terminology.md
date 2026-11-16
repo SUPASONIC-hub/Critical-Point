@@ -71,7 +71,8 @@ what the copy actually says today.
 | 차지원 | Cha Jiwon | チャ・ジウォン |
 
 Titles go before the name in English (Assistant Manager Oh, Team Head Yoon)
-and after it in Japanese (オ代理, ユン・チーム長). The full cast is each
+and after the full name in Japanese narration (オ・ジヌ代理, ユン・サンヒョクチーム長;
+spoken lines may shorten it, ハン課長). The full cast is each
 dictionary's `speakers` (`src/locales/<lang>/index.js`).
 
 ## Not settled yet
