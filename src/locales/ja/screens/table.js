@@ -234,6 +234,8 @@ export default {
     scout: "照会した。信頼を{trust}使った。壁は {min} から {max} のあいだのどこか",
     bank: "この勝負 {hand} · 賭け金 {pot} · 金庫 {vault}",
     act: "第{act}幕 開始 · 事件 {case}",
+    stakeClockCut: "熱 {gauge} · 時計が{cut}秒減った · 残り{seconds}秒",
+    stakeClockBack: "熱 {gauge} · 時計が{cut}秒戻った · 残り{seconds}秒",
     status: "熱 {gauge} · {danger} · 賭け金 {pot} · 残り{seconds}秒 · 心拍 {bpm}",
   },
   afterword: {

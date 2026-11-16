@@ -1,5 +1,5 @@
 import { CREATORS, studioName } from "../src/credits.js";
-import { GAME_NAME, gamePath, pagePath, SHARE_IMAGE } from "./legal-pages.mjs";
+import { GAME_NAME, gamePath, pagePath, shareImagePath } from "./legal-pages.mjs";
 
 /**
  * What a search engine reads about the site besides its words: schema.org
@@ -55,7 +55,7 @@ export function gameStructuredData({ language, description }) {
         url,
         inLanguage: language,
         description,
-        image: SHARE_IMAGE.path,
+        image: shareImagePath(language),
         genre: GAME_GENRES[language],
         gamePlatform: "Web browser",
         applicationCategory: "Game",
