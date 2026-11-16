@@ -1741,6 +1741,12 @@ Still open, on purpose:
     once a page and says nothing when it has no answer.
     `check:grants` replays that migration over a seeded database and fails if
     it removes or rewrites any row but the `season-final` ones.
+    The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
+    from its `final` case row as well, since the reset takes the ranking row:
+    every reset (11-30's included, and the quarterly ones after it) deletes
+    `season-final` only and keeps the `final` case rows, or snapshots the
+    finished count first, and moves `LAST_RANKING_RESET` there to its own
+    merge time; point check:grants' newest reset at the new file too.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
     copy, and requires every glossary term (191) to carry a plain explanation
