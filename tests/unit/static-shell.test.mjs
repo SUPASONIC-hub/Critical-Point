@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { GAME_TITLE } from "../../src/appCopy.js";
+import { wordmarkLogoMarkup } from "../../src/components/wordmarkLogo.js";
 import introCopy from "../../src/copy/intro.js";
 import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
@@ -48,6 +49,8 @@ test("the shell lays out the intro's words in the page's language and shows none
     assert.equal(hidden.length, 5, language);
     assert.ok(hidden[0].includes(`>${copy.ranking}</button>`) && hidden[0].includes(`>${copy.board}</button>`), `${language}: the pills`);
     assert.ok(hidden[1].startsWith('<p class="wordmark-sub" lang="en"'), `${language}: the tagline`);
+    // The title is the drawn logo GameWordmark.jsx draws, its words in the heading as text.
+    assert.ok(markup.includes(`<h1 class="game-wordmark"><span class="sr-only">${GAME_TITLE}</span>${wordmarkLogoMarkup()}`), `${language}: the logo`);
     assert.ok(hidden[2].includes(copy.subtitle.replace(/&/g, "&amp;")), `${language}: the kicker`);
     assert.ok(hidden[3].includes(copy.premise.replace(/&/g, "&amp;")), `${language}: the premise`);
     // The floor that keeps the column longer than the stage, as the intro's is.
