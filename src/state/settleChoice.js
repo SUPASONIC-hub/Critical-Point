@@ -1,7 +1,7 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
 import { getBranchDetourBypass } from "../gameData.js";
-import { applyGauntletEffect, resolveWindow } from "../gauntlet/gauntletEngine.js";
+import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedDirections } from "../gauntlet/logicStreak.js";
@@ -148,6 +148,8 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     ...settlementRules,
     // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
     cascade: isLinkDue(run, log, runId, settlementRules.rules),
+    // MARKET SHOCK, under the week that has it: whether the next board is the case's shock board, off the case's log.
+    shock: isShockDue(run, countCaseBoards(log), route.caseClosed),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {

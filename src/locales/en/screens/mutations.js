@@ -53,6 +53,10 @@ export default {
       title: "The season learned to hold on",
       text: "The result of charging STEADY LOCK again and again. Every new hand starts cooler, with a little more time.",
     },
+    shock: {
+      title: "The market shook",
+      text: "This week’s market shock. This hand’s Wall is {wall} closer, and your stacked stake just moved by up to {swing}%.",
+    },
     exposeMastery: {
       title: "The season learned to read the table",
       text: "The result of charging EXPOSE LOCK again and again. Seals open earlier, and with more, even a face-down hand can’t hide.",
