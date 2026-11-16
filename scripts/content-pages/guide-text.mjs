@@ -69,6 +69,8 @@ export const GUIDE_BODY = {
 <li><strong>HEAVY FRACTURE (균열이 깊다)</strong>: FRACTURE가 1.75배로 청구합니다.</li>
 <li><strong>SHORT CLOCK (시간이 짧다)</strong>: 판마다 8초 짧고, 모든 카드의 칩이 1.25배입니다.</li>
 <li><strong>CRISIS WEEK (위기 주간)</strong>: 벽 구간이 열기 3만큼 앞당겨지고, 모든 카드의 칩이 1.2배입니다.</li>
+<li><strong>IDLE MONEY (묵힌 돈은 준다)</strong>: 사건이 닫힐 때마다 금고에 남아 있던 돈의 2%가 사라집니다. 도구를 고를 때 쓴 돈은 줄지 않습니다.</li>
+<li><strong>MARKET SHOCK (시장 충격)</strong>: 사건마다 한 번, 4번째 판에 벽 구간이 열기 4만큼 앞당겨지고, 그때까지 쌓은 판돈이 최대 20% 오르거나 내립니다.</li>
 </ul>
 <p>시즌은 시작한 주의 규칙을 끝까지 지니고, 따로 순위가 쌓입니다. 스토리 모드에는 붙지 않습니다.</p>
 <p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
@@ -181,6 +183,8 @@ export const GUIDE_BODY = {
 <li><strong>HEAVY FRACTURE (The cracks run deep)</strong>: FRACTURE charges ×1.75.</li>
 <li><strong>SHORT CLOCK (Time is short)</strong>: every hand has 8 seconds less, and every card’s chips are ×1.25.</li>
 <li><strong>CRISIS WEEK (Crisis week)</strong>: the Wall band stands 3 Heat earlier, and every card’s chips are ×1.2.</li>
+<li><strong>IDLE MONEY (Idle money shrinks)</strong>: each time a case closes, 2% of what sat in the Vault through it is gone. Money spent at the tool draft doesn’t shrink.</li>
+<li><strong>MARKET SHOCK (Market shock)</strong>: once in every case, on hand 4, the Wall band stands 4 Heat earlier and the stake stacked so far moves up or down by as much as 20%.</li>
 </ul>
 <p>A season keeps the rule of the week it started in until it ends, on a ranking of its own. Story Mode never gets one.</p>
 <p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
@@ -293,6 +297,8 @@ export const GUIDE_BODY = {
 <li><strong>HEAVY FRACTURE（ひびが深い）</strong>: FRACTUREが1.75倍で請求します。</li>
 <li><strong>SHORT CLOCK（時間が短い）</strong>: 勝負ごとに8秒短く、すべてのカードのチップが1.25倍です。</li>
 <li><strong>CRISIS WEEK（危機の週）</strong>: 壁の区間が熱3だけ手前に立ち、すべてのカードのチップが1.2倍です。</li>
+<li><strong>IDLE MONEY（寝かせた金は目減りする）</strong>: 事件が閉じるたびに、金庫に残っていた額の2%が消えます。道具選びで使った分は減りません。</li>
+<li><strong>MARKET SHOCK（市場ショック）</strong>: 事件ごとに一度、4回目の勝負で壁の区間が熱4だけ手前に立ち、それまで積んだ賭け金が最大20%上下します。</li>
 </ul>
 <p>シーズンは始めた週のルールを最後まで持ち続け、記録は別のランキングに積まれます。ストーリーモードには付きません。</p>
 <p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>

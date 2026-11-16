@@ -1,4 +1,10 @@
-import { WEEK_RULE_CATALOGUE } from "../../src/gauntlet/weeklyRules.js";
+import {
+  WEEK_RULE_CATALOGUE,
+  IDLE_EROSION_PERCENT,
+  MARKET_SHOCK_BOARD,
+  MARKET_SHOCK_WALL,
+  MARKET_SHOCK_WOBBLE,
+} from "../../src/gauntlet/weeklyRules.js";
 import { WEEKLY_RULES, weekStartMs } from "../../src/gauntlet/weeklyCalendar.js";
 import weekRulesKo from "../../src/copy/weekRules.js";
 import weekRulesEn from "../../src/locales/en/screens/weekRules.js";
@@ -56,9 +62,16 @@ const WORDS = {
   ja: { world: "その週の物語", play: "ゲームを始める", empty: "決まっている週はまだありません。" },
 };
 
-/** The numbers a rule's words name, off its schema (weeklyRules.js fills the same blanks from its constants). */
-export function ruleValues(schema) {
+/**
+ * The numbers a rule's words name, off its schema (weeklyRules.js fills the same blanks from its constants).
+ * A device rule (IDLE MONEY, MARKET SHOCK) has no schema; its numbers are the devices' constants.
+ */
+export function ruleValues(schema = {}) {
   return {
+    erosion: IDLE_EROSION_PERCENT,
+    shockBoard: MARKET_SHOCK_BOARD + 1,
+    shockWall: MARKET_SHOCK_WALL,
+    shockSwing: MARKET_SHOCK_WOBBLE,
     shift: -(schema.wallShift ?? 0),
     crisisShift: -(schema.wallShift ?? 0),
     rate: schema.fractureRate,
