@@ -129,6 +129,10 @@ const SPEAKER_PORTRAITS = {
   "육성빈": "/portrait-yuk-seongbin.webp",
   "추영복": "/portrait-chu-yeongbok.webp",
   "마리사 탄": "/portrait-marisa-tan.webp",
+  // 번외 8 (2026-11-14): the side case's one new speaker, not on its wrong
+  // side, so a photograph of a real model (docs/portrait-credits.md). 설경민
+  // and 심재만 speak only in the narration, as 번외 6's 기성철.
+  "비노드 타파": "/portrait-binod-thapa.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */

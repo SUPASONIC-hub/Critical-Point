@@ -785,6 +785,8 @@ export function localizedStartPage(html, language, origin = "") {
       [metaContent("property", "og:locale"), value(OG_LOCALE[language])],
       [metaContent("property", "og:title"), value(copy.title)],
       [metaContent("property", "og:description"), value(copy.description)],
+      [/(<meta\s+property="og:image"\s+content="[^"]*\/)og-ko\.jpg(")/, `$1og-${language}.jpg$2`],
+      [/(<meta\s+name="twitter:image"\s+content="[^"]*\/)og-ko\.jpg(")/, `$1og-${language}.jpg$2`],
       [metaContent("property", "og:image:alt"), value(SHARE_IMAGE_ALT[language])],
       [metaContent("name", "twitter:title"), value(copy.title)],
       [metaContent("name", "twitter:description"), value(copy.description)],
