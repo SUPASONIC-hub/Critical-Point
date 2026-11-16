@@ -1,0 +1,129 @@
+-- 묶음 R (2026-11-30): the public ranking is emptied once with the rules
+-- change, as the start screen and the guide have said since 11-16 (#535,
+-- `rankingReset` in src/copy/intro.js). DRAFT PR: NOT to be merged before
+-- Monday 2026-11-30. Merging a `.sql` to main applies it within a minute,
+-- before the client deploys (Supabase migrations apply on merge).
+--
+-- Same pattern as the one wipe of 11-12
+-- (20261112000000_ranking_reset_rules_mark4_relic_draft.sql), narrower:
+--
+-- 1. `ranking_check_run_marks` is restated (check:grants asks the newest
+--    reset to: the older-table refusal lives in no other function the
+--    trigger calls). Word for word as 20261112000000 left it, mark 4.
+--
+--    [SLOT RULES_MARK] If bundle R bumps RULES_MARK (src/gauntlet/
+--    gauntletEngine.js) because N18/N21 or a decision-T outcome changes
+--    what a season pays, change `>= 4` below to the new mark, SERVER_MARK in
+--    scripts/check-grants.mjs, and DB_MARKS in scripts/verify-ranking-rows.mjs,
+--    in this same PR. Today nothing in the slots below changes scoring, so
+--    the mark stays 4 (question 1 of the PR).
+--
+-- 2. The finished count is snapshotted before the delete (N15, 2026-11-16):
+--    a `raise notice` with the `season-final` rows and finished runs, read
+--    in the migration's log. The numbers to keep are taken by hand first
+--    (`node scripts/report-funnel.mjs`, the 11-30 checklist in
+--    docs/work-status.md); this line is the second copy. No table is
+--    written: check:grants holds a reset to deleting `season-final` rows and
+--    changing nothing else.
+--
+-- 3. Only `season-final` rows are deleted. The `final` case rows stay, and
+--    with them every finish (scripts/report-funnel.mjs counts a run finished
+--    from its `final` case row too, and LAST_RANKING_RESET there moves to
+--    this merge). The hall of fame (`hall_of_fame`, `hall_of_fame_boards`)
+--    is not touched: it is what stays when the ranking is emptied. The
+--    client's local board keeps its key (v12): the notice promised the
+--    public ranking only (question 2 of the PR).
+--
+-- [SLOT N18] Prologue 02 rules split (two rules there, the rest to cases
+-- 04/05): a separate draft PR. Content only, no server change expected;
+-- if it does need one, its statement goes here, above the delete.
+--
+-- [SLOT N21] First BUST keeps the scene in prologue 01/02: a separate draft
+-- PR. Client only, no server change expected; same rule as N18.
+--
+-- [SLOT DECISION-T] Outcomes of the 11-23 run (`node
+-- scripts/report-decision-t.mjs --fetch`, #563) that bundle R adopts at the
+-- case level (T-11 honour threshold 10 → 5 when no board passed 10, and the
+-- rest of T1~T12). Fill in on 11-23..11-29; a statement that changes what
+-- the server accepts goes here, above the delete, and is idempotent.
+--
+-- Every statement is idempotent: `create or replace` with every attribute
+-- and the grants restated, a notice, and a delete that finds nothing the
+-- second time.
+
+-- 1. The run marks the ranking asks for: RULES_MARK 4 (see [SLOT RULES_MARK]).
+create or replace function public.ranking_check_run_marks(p_run_id text)
+returns void
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  -- A case closed in story mode carries `assistStory: true` in its own
+  -- row's summary, and one such case keeps the whole season off the
+  -- ranking. Read from the run's rows; a plain exception, since no later
+  -- attempt can change what the run was.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and s.summary->'assistStory' = 'true'::jsonb
+  ) then
+    raise exception 'story-mode runs are not ranked';
+  end if;
+  -- A case closed at the table that paid for a press timed to the beat has
+  -- no `logicStreak` in its row's `dynamics`; a case closed at this one
+  -- always has, as a number. One such case keeps the whole season off the
+  -- ranking, read from the run's rows like the story mark above, and a
+  -- row with no `dynamics` is such a row. `is not true`, so a missing
+  -- key, a missing object and a value of another type all read alike.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and (jsonb_typeof(s.dynamics->'logicStreak') = 'number') is not true
+  ) then
+    raise exception 'beat-table runs are not ranked';
+  end if;
+  -- A case closed at a table before this one has no `tableRules` in its
+  -- row's `dynamics`, or one below 4 (3 is the table of the audit and the
+  -- links from prologue 04, 2 the day-ten table of 2026-10-20); a case
+  -- closed at this one always has, as a number of 4 or more. One such case
+  -- keeps the whole season off the ranking, read from the run's rows like
+  -- the two marks above. `is not true`, so a missing key, a missing object,
+  -- a value of another type and a smaller number all read alike. The `case`
+  -- keeps the cast off a stored row whose key is not a number.
+  if exists (
+    select 1 from public.playtest_sessions s
+    where s.run_id = p_run_id
+      and s.case_id = any(public.season_case_ids())
+      and (case when jsonb_typeof(s.dynamics->'tableRules') = 'number'
+                then (s.dynamics->>'tableRules')::numeric >= 4 end) is not true
+  ) then
+    raise exception 'older-table runs are not ranked';
+  end if;
+end;
+$$;
+
+revoke all on function public.ranking_check_run_marks(text) from public, anon, authenticated;
+grant execute on function public.ranking_check_run_marks(text) to service_role;
+
+-- 2. The finished count before the delete (N15): read only, into the log.
+do $$
+declare
+  v_rows int;
+  v_runs int;
+  v_finals int;
+begin
+  select count(*), count(distinct run_id) into v_rows, v_runs
+    from public.playtest_sessions where case_id = 'season-final';
+  select count(distinct run_id) into v_finals
+    from public.playtest_sessions where case_id = 'final';
+  raise notice 'ranking reset 2026-11-30: % season-final rows (% runs) deleted; % runs keep a final case row', v_rows, v_runs, v_finals;
+end;
+$$;
+
+-- 3. The ranking starts over: `season-final` rows only, as every reset before.
+delete from public.playtest_sessions where case_id = 'season-final';
+
+notify pgrst, 'reload schema';

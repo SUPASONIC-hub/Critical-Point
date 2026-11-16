@@ -137,7 +137,10 @@ const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules
 // two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql` (promoted 11-12, the one wipe, with C9's
 // `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
 const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
-const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// The resets after 11-12 keep the mark and are named by their day (`*_ranking_reset_<MMDD>.sql`, 11-30's
+// first, then the quarterly ones of docs/ops-mode.md): the newest of them, by name, is the one replayed here.
+const DATED_RESET = readdirSync(MIGRATIONS).filter((file) => /_ranking_reset_\d{4}\.sql$/.test(file)).sort().at(-1) ?? null;
+const RANKING_RESET = DATED_RESET ?? MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
 /** The table mark the replayed server asks of every case row of a ranked season. */
 const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
 const RESET_SEED = "grants-check-reset";
@@ -200,6 +203,10 @@ async function seedBeforeRankingReset() {
       await db.query(`insert into public.hall_of_fame_boards (board, kind, checked_seasons, settled_at) values ('table-1', 'table', 12, now())`);
       await db.query(`insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-1', 1, 'RESETSD1', 90, 'S', 'BOARD BREAKER')`);
     }
+    // The board admins' log (20261118000000) exists before the 11-30 reset: a reset leaves it as it found it.
+    if (await boardAdminLogExists()) {
+      await db.query(`insert into public.board_admin_log (admin_email, action, post_id) values ($1, 'hide', 0)`, [`${RESET_SEED}@check.invalid`]);
+    }
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -223,7 +230,11 @@ async function removeRankingResetSeed() {
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
   if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
+  if (await boardAdminLogExists()) await db.query(`delete from public.board_admin_log where admin_email = $1`, [`${RESET_SEED}@check.invalid`]);
   return removed;
+}
+async function boardAdminLogExists() {
+  return (await db.query(`select to_regclass('public.board_admin_log') is not null as here`)).rows[0].here;
 }
 async function hallOfFameExists() {
   return (await db.query(`select to_regclass('public.hall_of_fame') is not null as here`)).rows[0].here;
