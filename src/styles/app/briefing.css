@@ -5,6 +5,8 @@
    and a reading clock that opens the table when it runs out. */
 
 .gx-comic {
+  /* A darker amber for the callouts' bar: --c-amber is too light to see on cream. */
+  --c-amber-bar: rgb(214 148 34);
   position: fixed;
   inset: 0;
   z-index: 30;
@@ -173,10 +175,12 @@
   margin: 0;
   overflow: hidden;
   background: var(--ui-surface-2);
-  border: 3px solid var(--c-black);
-  box-shadow:
-    0 0 0 2px var(--ui-text),
-    6px 6px 0 var(--c-black);
+  /* A hairline, not a frame (2026-11-16, UI quick wins): the white ring and
+     the black drop shadow stacked every panel inside another box. The 3px
+     border stays, unseen, so the measured page keeps its sizes. */
+  border: 3px solid transparent;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--ui-line-strong);
   animation: gx-panel-pop 0.46s var(--ui-ease-spring) both;
 }
 
@@ -212,8 +216,8 @@
   padding: 8px 11px;
   color: var(--c-ink);
   background: var(--c-cream);
-  border: 2px solid var(--c-black);
-  box-shadow: 3px 3px 0 var(--c-black);
+  border: 2px solid transparent;
+  border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.7;
@@ -227,7 +231,9 @@
   display: grid;
   max-width: 72%;
   padding: 6px 10px;
-  background: var(--c-amber);
+  padding-left: 8px;
+  background: var(--c-cream);
+  border-left: 4px solid var(--c-amber-bar);
   line-height: 1.55;
   transform: rotate(-1.5deg);
 }
@@ -448,21 +454,24 @@
   gap: 10px;
   align-content: start;
   padding: 14px;
-  background: linear-gradient(160deg, rgb(255 255 255 / 0.04), transparent 50%), var(--ui-surface-1);
+  background: var(--ui-surface-1);
   animation-delay: 0.16s;
 }
 
 /* The lead is told by its colour, not by slanting Hangul, which has no
-   italic of its own and reads as a smeared upright. */
+   italic of its own and reads as a smeared upright. An amber bar on its left
+   rather than an amber fill (2026-11-16): the fill shouted. 4px of bar for
+   2px of border and 2px of padding, so the box is as wide as before. */
 .gx-caption-lead {
-  background: var(--c-amber);
+  padding-left: 9px;
+  border-left: 4px solid var(--c-amber-bar);
 }
 
 /* The speaker on the last table (C-13): a box of its own, not the lead's
    amber, so the scene's lead stays the one yellow box. */
 .gx-caption-reaction {
+  border-color: var(--c-ink-muted);
   border-style: dashed;
-  box-shadow: none;
 }
 
 /* What the line is about, on a line of its own above it. */
@@ -514,8 +523,8 @@
   padding: 8px 10px 8px 22px;
   color: var(--c-ink);
   background: var(--c-paper-soft);
-  border: 2px solid var(--c-black);
-  box-shadow: 3px 3px 0 var(--c-black);
+  border: 2px solid transparent;
+  border-radius: 6px;
   font-size: 0.8125rem;
   font-weight: 700;
   line-height: 1.45;

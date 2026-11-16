@@ -361,7 +361,8 @@ const fileBudgets = {
   // 3151 / 61522 (C-15) and 3143 / 61347 (phone-390-staked, #503) -> 3153 / 61576 on 2026-11-11, C-15 after merging main 568572d3, measured: both.
   // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
   // 3160 / 61634 (E3) and 3153 / 61576 (main 4f927085, C-15) -> 3170 / 61863 on 2026-11-12, bundle 1112c (#520 #521) over main 4f927085, measured: both.
-  "play.css": { lines: 3170, bytes: 61863 },
+  // 3170 / 61863 -> 3195 / 62160 on 2026-11-16, ui-quickwins, measured: the card key unseen until a mouse hovers or a key focuses the hand, the run line and signals as small print.
+  "play.css": { lines: 3195, bytes: 62160 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -438,7 +439,8 @@ const fileBudgets = {
   // separate translate property the build dropped.
   // 849 / 16498 -> 854 / 16681 on 2026-11-06, mood-boost, measured: the briefing veil's mood edge and the page's mood frame.
   // 854 / 16681 -> 922 / 17736 on 2026-11-13, n1-act-card, measured: N1's 중간 결산 on the act card (ActTally.jsx) -- its rows, the share buttons and the tallied card's layout.
-  "briefing.css": { lines: 922, bytes: 17736 },
+  // 922 / 17736 -> 925 / 17772 on 2026-11-16, ui-quickwins, measured: hairline panels and the callouts' amber bar for the white ring, the drop shadows and the amber fill.
+  "briefing.css": { lines: 925, bytes: 17772 },
   // 270 / 5754 -> 330 / 7100 on 2026-10-06, measured 328 / 7068: the
   // developer's overlay came here from the foot of play.css.
   // 330 / 7100 -> 324 / 6702 on 2026-10-13: comments no longer counted

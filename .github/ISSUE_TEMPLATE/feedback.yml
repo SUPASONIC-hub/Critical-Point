@@ -1,0 +1,15 @@
+name: 의견 · Feedback
+description: 재미있었던 것, 어려웠던 것, 바라는 것 / What you liked, what was hard, what you wish for
+body:
+  - type: textarea
+    id: feedback
+    attributes:
+      label: 하고 싶은 말 · Your feedback
+      placeholder: 예) 사건 12의 결말이 기억에 남았습니다. 벽 범위를 읽기가 조금 어려웠어요.
+    validations:
+      required: true
+  - type: input
+    id: progress
+    attributes:
+      label: 어디까지 해 봤나요? · How far did you play?
+      placeholder: 예) 프롤로그까지 / Case 20 / 시즌 끝까지

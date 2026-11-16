@@ -66,7 +66,7 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|cases\/[a-z0-9]+)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|weekly|cases\/[a-z0-9]+)\.html$/;
 // The start page in English and Japanese (scripts/site-pages.mjs, since
 // 11-03): the network's copy while there is one, and offline the kept page,
 // which opens in the folder's language (src/locale.js `folderLanguage`).

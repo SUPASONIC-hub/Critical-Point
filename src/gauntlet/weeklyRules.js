@@ -78,9 +78,10 @@ export const CRISIS_CHIPS = 1.2;
  * time a case closes, this many hundredths of what the vault held through it
  * -- what was not spent at the drafts -- are gone, before the case's own pot
  * is banked (gauntletEngine.js `getIdleErosion`). A device (`erosion`), not a
- * number of the board: nothing on the table moves, the vault does. In the
- * catalogue only, booked in no week; draft number until the user picks one of
- * the measured candidates (check:endings with WEEK_RULE=idle-erosion).
+ * number of the board: nothing on the table moves, the vault does. Booked
+ * once, 2027-W19 (migration 20261121000000, 초안); draft number until the
+ * user picks one of the measured candidates (check:endings with
+ * WEEK_RULE=idle-erosion), at the latest before that week starts.
  * Measured 2026-11-13 (the draft-spend rows, 80 paired seasons), a player who
  * never pays: vault a case 13,965 without the week, 10,855 at 1, 8,675 at 2,
  * 7,134 at 3, 6,046 at 4; the endings the same at every one.
@@ -95,9 +96,10 @@ export const IDLE_EROSION_PERCENT = 2;
  * opens like every next-board rule, and the pot the case has stacked so far
  * moves by up to `MARKET_SHOCK_WOBBLE` hundredths, up or down, drawn from the
  * window's seed (gauntletEngine.js `drawShockSwing`). A device (`shock`), not
- * a number of every board. In the catalogue only, booked in no week; draft
- * numbers until the user picks one of the measured candidates (check:pressure
- * and check:endings with WEEK_RULE=market-shock).
+ * a number of every board. Booked once, 2027-W25 (migration 20261121000000,
+ * 초안); draft numbers until the user picks one of the measured candidates
+ * (check:pressure and check:endings with WEEK_RULE=market-shock), at the
+ * latest before that week starts.
  */
 export const MARKET_SHOCK_BOARD = 3;
 export const MARKET_SHOCK_WALL = 4;
@@ -160,16 +162,15 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     ...ruleWords("crisis-week"),
     schema: Object.freeze({ wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS }),
   }),
-  // B4: idle money loses value, a case at a time. In the catalogue before any
-  // week names it, so it has no migration yet (booking it adds one, as
-  // crisis-week's did).
+  // B4: idle money loses value, a case at a time. Its week, 2027-W19, comes
+  // with its migration (20261121000000), as crisis-week's did.
   "idle-erosion": Object.freeze({
     label: "IDLE MONEY",
     ...ruleWords("idle-erosion"),
     rules: Object.freeze(["erosion"]),
   }),
-  // c2: the market shock, once a case. In the catalogue before any week names
-  // it, so it has no migration yet (booking it adds one, as crisis-week's did).
+  // c2: the market shock, once a case. Its week, 2027-W25, comes with its
+  // migration (20261121000000), as crisis-week's did.
   "market-shock": Object.freeze({
     label: "MARKET SHOCK",
     ...ruleWords("market-shock"),
