@@ -6,6 +6,7 @@
     "branches": 89
   },
   "files": {
+    "src/actProgress.js": 100,
     "src/actTally.js": 100,
     "src/ads/adSlotWords.js": 100,
     "src/advancedSystems.js": 100,

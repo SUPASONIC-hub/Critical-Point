@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ACT_TALLY_CASES, buildActTallyModel, buildActTallyShareText, describeNearLine, readLargestStake, tallyCaseLabel, toResultCardModel } from "../../src/actTally.js";
+import { ACT_TALLY_CASES, MINI_TALLY_CASES, buildActTallyModel, buildActTallyShareText, describeNearLine, readLargestStake, tallyCaseLabel, toResultCardModel } from "../../src/actTally.js";
 import { ACT_START_CASES } from "../../src/gauntlet/actCardGate.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { getEndingVariant, getSeasonStrain } from "../../src/gameLogic.js";
@@ -49,9 +49,12 @@ test("the tally rides on the act cards after 프롤로그, 사건 18 and 사건 
   for (const caseId of ACT_TALLY_CASES) assert.ok(ACT_START_CASES.includes(caseId), `${caseId} opens an act`);
   assert.deepEqual(ACT_TALLY_CASES.map((caseId) => CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1]), ["prologue05", "case18", "case36"]);
   const played = season(upTo("case08"));
-  for (const caseId of ACT_START_CASES.filter((id) => !ACT_TALLY_CASES.includes(id))) assert.equal(buildActTallyModel(caseId, played), null, caseId);
-  assert.deepEqual(Object.keys(actTallyCopy.ends), [...ACT_TALLY_CASES]);
-  assert.deepEqual(Object.keys(actTallyCopy.corners), [...ACT_TALLY_CASES]);
+  // N23: 사건 07's report carries a small one, keyed by the act card that follows it (사건 08's).
+  assert.deepEqual([...MINI_TALLY_CASES], ["case08"]);
+  assert.ok(buildActTallyModel("case08", played));
+  for (const caseId of ACT_START_CASES.filter((id) => !ACT_TALLY_CASES.includes(id) && !MINI_TALLY_CASES.includes(id))) assert.equal(buildActTallyModel(caseId, played), null, caseId);
+  assert.deepEqual(Object.keys(actTallyCopy.ends), [...ACT_TALLY_CASES, ...MINI_TALLY_CASES]);
+  assert.deepEqual(Object.keys(actTallyCopy.corners), [...ACT_TALLY_CASES, ...MINI_TALLY_CASES]);
 });
 
 test("a season with no closed case, or a save that does not read, draws no tally", () => {

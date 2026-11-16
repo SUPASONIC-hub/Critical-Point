@@ -29,6 +29,13 @@ import { fill } from "./locale.js";
 /** The act cards that carry the tally (actCardCopy.js). */
 export { ACT_TALLY_CASES };
 
+/**
+ * N23 (2026-11-16): the small tally on 사건 07's report, at the end of 1막
+ * (actProgress.js, ActProgress.jsx), keyed like the act cards' by the case
+ * the act it closes leads into.
+ */
+export const MINI_TALLY_CASES = Object.freeze(["case08"]);
+
 const toCount = (value) => (Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) : 0);
 
 /** 「사건 12」 or 「프롤로그 3」, as a row of the card names a case. */
@@ -78,7 +85,7 @@ export function describeNearLine(nearest) {
  * @param {{ caseResults?: object, discoveredClues?: any[], log?: any[], resources?: object }} [season]
  */
 export function buildActTallyModel(caseId, season = {}) {
-  if (!ACT_TALLY_CASES.includes(caseId)) return null;
+  if (!ACT_TALLY_CASES.includes(caseId) && !MINI_TALLY_CASES.includes(caseId)) return null;
   const caseResults = season?.caseResults && typeof season.caseResults === "object" ? season.caseResults : {};
   if (!readClosedCases(caseResults).length) return null;
   const input = {

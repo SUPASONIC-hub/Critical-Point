@@ -6,6 +6,7 @@ import * as endingCopy from "../endingCopy.js";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
 import { SIDE_CASES } from "../sideCases.js";
+import { ActProgress } from "../components/ActProgress.jsx";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -191,6 +192,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               {caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}{caseOutcome.shock && <p data-testid="case-shock">{caseOutcome.shock}</p>}
               {seasonStanding.titleRise && <p data-testid="title-rise">{fill(resultCopy.titleRise, { title: seasonStanding.titleRise })}</p>}
               <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
+              <ActProgress caseId={currentCase} />{/* N23: 사건 01~17, and 사건 07's small 중간 결산 */}
             </div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
