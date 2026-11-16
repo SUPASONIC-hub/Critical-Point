@@ -102,7 +102,12 @@ test("?admin signs in with Google, and the admin bar hides, restores and deletes
   await expect(sheet).toBeVisible();
   await sheet.getByTestId("board-admin-google").click();
 
-  await expect(page.getByTestId("board-admin-status")).toContainText("goeun.nam@gmail.com 관리자 모드가 켜졌습니다");
+  // The 302 lands on a fresh page load (/?admin#access_token=…): wait for it to
+  // arrive and settle before reading the status line, which a cold load on a busy
+  // runner took past 8 s to show (1–2 runs in 6 blank after the redirect, 11-16).
+  await page.waitForURL(/\?admin/, { timeout: 30_000 });
+  await page.waitForLoadState("load");
+  await expect(page.getByTestId("board-admin-status")).toContainText("goeun.nam@gmail.com 관리자 모드가 켜졌습니다", { timeout: 30_000 });
   expect(redirectTo).toBe(`${new URL(baseURL).origin}/?admin`);
   await expect(page, "the tokens leave the address").toHaveURL(/\?admin$/);
   expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).refresh_token, AUTH_KEY)).toBe("r1");
