@@ -742,6 +742,13 @@ export default {
       "gesture": "Before he says a number, Binod Thapa takes off his gloves and lays them neatly on the machine.",
       "voice": "Short, careful Korean, and he always leaves one question at the end.",
       "line": "Then does my severance go with the machines too?"
+    },
+    "아이굴 세리코바": {
+      "appearance": "A forehead still marked by a food-factory hairnet, her husband’s truck key, a faded copy of their marriage registration.",
+      "thought": "He said four more months and it would be paid off. What isn’t paid off doesn’t come to him. It comes to us.",
+      "gesture": "Before she answers, Aigul Serikova closes the truck key in her palm once and lets it go.",
+      "voice": "Clear, unhurried Korean, and she asks about any word she doesn’t know right there.",
+      "line": "If he said he would pay it, then I should pay it."
     }
   },
 };
