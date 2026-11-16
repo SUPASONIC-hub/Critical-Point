@@ -256,6 +256,20 @@ export const characterProfiles = {
     voice: "영어로, 짧고 곧게 말한다. 직함보다 이름을 먼저 부른다.",
     line: "우리가 볼 수 있는 건 거래소 안쪽뿐이에요. 돈이 어디서 왔는지는 은행이 봐요.",
   },
+  // 번외 8 (src/nodes/side08.js): a side pack is not in CASE_PACKS, so its own
+  // people are introduced here, like the season's first ones. 비노드 타파
+  // answers in Korean (nine years here), said once in the narration. 설경민
+  // and 심재만 speak only in the narration (no portrait yet, as 번외 6's 기성철).
+  "비노드 타파": {
+    role: "도담사출 3번 사출기 담당 · 네팔 · 9년 8개월 · 39세",
+    stance: "기술 · 기록 · 떠나는 날",
+    job: "마지막 근무 날, 자기 몫의 퇴직금과 3번 기계의 온도를 다음 사람에게 넘긴다.",
+    appearance: "기름 묻은 면장갑, 손으로 쓴 온도표, 23킬로그램에 맞춘 가방 두 개.",
+    thought: "9년 동안 이 기계는 내 손을 알았다. 이제 그 돈이 내 손에 오는지 알고 싶다.",
+    gesture: "비노드 타파는 숫자를 말하기 전에 장갑을 벗어 기계 위에 가지런히 올려놓는다.",
+    voice: "또박또박한 한국어로 짧게 말하고, 마지막에 꼭 질문을 하나 남긴다.",
+    line: "그럼 제 퇴직금도 기계랑 같이 가요?",
+  },
 };
 
 /**
