@@ -7,7 +7,7 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
-import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks, withoutHtmlComments } from "./scripts/site-pages.mjs";
 import { withStaticShell } from "./scripts/static-shell.mjs";
 import { adsTxt, insertAdSlots, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
@@ -405,9 +405,10 @@ function serviceWorker() {
  * the same addresses from the same source.
  *
  * Their canonical and hreflang links and the sitemap's addresses are absolute
- * on the build's origin (`siteOrigin`), relative without one. The sitemap is
- * dated the day of the build, so it is the one file a rebuild of the same
- * commit can change; the service worker leaves it and robots.txt out of the
+ * on the build's origin (`siteOrigin`), relative without one. The sitemap
+ * dates each page by scripts/sitemap-dates.json, and a page changed since by
+ * the day of the build, so it is the one file a rebuild of the same commit
+ * can change; the service worker leaves it and robots.txt out of the
  * release's name (`shippedFiles`, scripts/service-worker-build.mjs), which
  * a device would otherwise download everything again for. Before
  * `serviceWorker()` in the list, which reads every file on disk. With Google
@@ -425,7 +426,8 @@ function serviceWorker() {
 function staticPages({ analytics, ads }) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    const dates = JSON.parse(readFileSync("scripts/sitemap-dates.json", "utf8")).pages;
+    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10), dates }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -491,7 +493,9 @@ function startPages() {
       handler(_options, bundle) {
         const page = bundle["index.html"];
         if (!page || page.type !== "asset") throw new Error("start-pages: the bundle has no index.html to write the English and Japanese start pages from.");
-        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        // index.html's notes to developers stay in the source, not in what ships (withoutHtmlComments).
+        const html = withoutHtmlComments(typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8"));
+        page.source = html;
         for (const [fileName, source] of Object.entries(renderStartPages(html, siteOrigin()))) this.emitFile({ type: "asset", fileName, source });
       },
     },

@@ -700,6 +700,14 @@ export const COPY = {
 export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
 
 /**
+ * What a plain page's <title> (and its og:title and twitter:title) says after
+ * the page's own name. English leads with what the game is and that it is
+ * free, for a search result read in English (owner decision 2026-11-16 「1」);
+ * Korean and Japanese keep the game's name alone.
+ */
+export const TITLE_TAIL = { ko: ` · ${GAME_NAME.ko}`, en: " — Critical Point, free browser mystery game", ja: ` · ${GAME_NAME.ja}` };
+
+/**
  * Japanese puts no spaces between words, so `keep-all` would hold a sentence
  * together until `overflow-wrap: anywhere` cut it mid-line. Only the Japanese
  * pages carry the line; the Korean and English ones are as they were.
@@ -786,7 +794,7 @@ export { escapeHtml };
 export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
   const copy = COPY[language];
   const name = heading ?? copy[kind];
-  const title = `${name} · ${GAME_NAME[language]}`;
+  const title = `${name}${TITLE_TAIL[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
