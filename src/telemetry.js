@@ -22,6 +22,11 @@ function publishTelemetryStats() {
 // weeklyCalendar.js): its seasons are the maker's tests, not the ranking's.
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY) && !DEV_WEEK_RULE;
 
+/** The project the page talks to, for the board's admin sign-in (boardAdmin.js); null without one. */
+export function supabaseTarget() {
+  return SUPABASE_URL && SUPABASE_ANON_KEY ? { url: SUPABASE_URL, key: SUPABASE_ANON_KEY } : null;
+}
+
 /**
  * One request under one deadline, body included. The answer comes back with
  * its body already read: the timer used to be cleared as soon as the headers

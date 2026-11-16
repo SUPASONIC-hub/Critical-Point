@@ -679,7 +679,8 @@ const budgets = [
   // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_771, maxGzip: 75_684 },
+  // 207,771 / 75,684 -> 208,749 / 76,072 on 2026-11-16, board-admin over main 83570151: src/boardAdminEntry.js (two string tests and one storage read that decide whether any admin code loads) and the shell's lazy sign-in sheet for ?admin. Measured 208745 / 76068 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 208_749, maxGzip: 76_072 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -955,7 +956,8 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_388 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -980,7 +982,8 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_388 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1265,7 +1268,14 @@ const budgets = [
   // 9,029 / 3,768 -> 9,030 / 3,768 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 9,030 / 3,768 -> 10,077 / 4,118 on 2026-10-26, 영어판 3단계: the board's words read by key (src/copy/board.js), with the report form's reasons and refusals named from boardReport.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 10,077 -> 10,078 raw on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: only the names of the chunks it imports. Measured 10,078 in the e2e build.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_078, maxGzip: 4_118 },
+  // 10,078 / 4,118 -> 10,676 / 4,394 on 2026-11-16, board-admin over main 83570151: the board asks boardAdminEntry.js whether to fetch the makers' admin bar, and lazy-loads it (BoardAdmin.jsx) only then. Measured 10672 / 4390 in the e2e build, the plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_676, maxGzip: 4_394 },
+  // The board's admin sheet and bar (src/components/BoardAdmin.jsx, src/boardAdmin.js, BoardAdmin.css), fetched only
+  // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
+  // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
+  // e2e build, the plus 4.
+  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 11_789, maxGzip: 4_552 },
+  { pattern: /^BoardAdmin-.*\.css$/, maxBytes: 2_011, maxGzip: 665 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -2432,7 +2442,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,166 / 438,137 / 445,978 다국적 인물 over main e43f7bf6. Measured first paint, the plus 4.
 // -> 377,172 / 438,144 / 445,987 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured first paint, the plus 4.
 // -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_359, en: 438_379, ja: 446_228 };
+// 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_748, en: 438_772, ja: 446_622 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

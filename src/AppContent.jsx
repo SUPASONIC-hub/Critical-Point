@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import {
   NEW_GAME_PLUS_KEY,
@@ -45,6 +45,7 @@ import { recordAppError } from "./state/errorRecovery.js";
 import { loadedChunk } from "./state/chunkReload.js";
 import { storageNeedsEveryCase } from "./state/savedRunScope.js";
 import { retryableLazy } from "./state/retryableLazy.js";
+import { adminSheetWanted } from "./boardAdminEntry.js";
 
 // The intro is the first thing painted, so it ships in the entry chunk: lazy()
 // put a second round trip between the page and its first screen. The runtime
@@ -72,6 +73,8 @@ const GameRuntime = retryableLazy(() =>
 );
 const RankingScreen = retryableLazy(() => import("./screens/RankingScreen.jsx").then(loadedChunk).then(({ RankingScreen }) => ({ default: RankingScreen })));
 const BoardScreen = retryableLazy(() => import("./screens/BoardScreen.jsx").then(loadedChunk).then(({ BoardScreen }) => ({ default: BoardScreen })));
+// The makers' sign-in sheet, opened by `?admin` or `#admin` only (boardAdminEntry.js).
+const BoardAdminSheet = retryableLazy(() => import("./components/BoardAdmin.jsx").then(loadedChunk).then(({ BoardAdminSheet }) => ({ default: BoardAdminSheet })));
 
 // How long the intro waits for an idle moment before it fetches the runtime anyway.
 const RUNTIME_PREFETCH_TIMEOUT_MS = 4000;
@@ -188,6 +191,24 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     localSeasonLeaderboardRow: null,
   });
   const board = useBoard({ showBoard, isOnline });
+  const [adminSheetOpen, setAdminSheetOpen] = useState(() => adminSheetWanted());
+  const adminSheet = adminSheetOpen ? (
+    <LazyScreen>
+      <Suspense fallback={null}>
+        <BoardAdminSheet
+          onClose={() => setAdminSheetOpen(false)}
+          onOpenBoard={
+            runtimeActive
+              ? null
+              : () => {
+                  setAdminSheetOpen(false);
+                  setShowBoard(true);
+                }
+          }
+        />
+      </Suspense>
+    </LazyScreen>
+  ) : null;
 
   const saveControls = useMemo(
     () => ({
@@ -244,13 +265,16 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
 
   if (runtimeActive) {
     return (
-      <LazyScreen>
-        <GameRuntime
-          onSuppressSaves={onSuppressSaves}
-          saveControls={saveControls}
-          initialStartState={initialStartState}
-        />
-      </LazyScreen>
+      <>
+        <LazyScreen>
+          <GameRuntime
+            onSuppressSaves={onSuppressSaves}
+            saveControls={saveControls}
+            initialStartState={initialStartState}
+          />
+        </LazyScreen>
+        {adminSheet}
+      </>
     );
   }
 
@@ -404,5 +428,10 @@ export function AppContent({ onSuppressSaves = suppressSaves }) {
     ),
   });
 
-  return <IntroScreen view={introView} />;
+  return (
+    <>
+      <IntroScreen view={introView} />
+      {adminSheet}
+    </>
+  );
 }
