@@ -16,6 +16,14 @@
  *     player stays away before coming back), median and P90;
  *   - how many days a finished season took (its season-final row less its
  *     first case row);
+ *   - finished seasons counted from the `final` case row as well (N15,
+ *     2026-11-16): a ranking reset deletes every `season-final` row (the
+ *     11-12 one, 20261112000000_*.sql, and every reset before it), but leaves
+ *     the case rows, so a run whose finale case row survives is finished
+ *     whether or not its ranking row does. One run counts once, however many
+ *     of either it sent. A finish with a `final` row and no `season-final`
+ *     before the last reset (LAST_RANKING_RESET) is 「비움 전 완주」; one after
+ *     it never sent a ranking row (a story-mode or beat-table season);
  *   - how many finished seasons were followed by a new run on the same device;
  *   - the funnel of runs a row marks as NEW GAME+ (`summary.newGamePlus`, the
  *     mark NEWGAMEPLUS-이어받기-설계안 3절 5 plans), or 「아직 없음」 while no
@@ -77,6 +85,17 @@ export const STOPS = [
   ["피날레", "final", "final"],
 ];
 
+/**
+ * When the last ranking reset deleted the `season-final` rows: the merge of
+ * bundle R (20261130000000_ranking_reset_1130.sql, applied on merge) plus a
+ * minute. [FILL on 11-30] The time below is the planned one: set it to the
+ * real merge time + 1 minute in the bundle before it merges (the 11-30
+ * checklist in docs/work-status.md). The reset before it was #466's
+ * (20261112000000_ranking_reset_rules_mark4_relic_draft.sql) at 2026-11-12
+ * 17:25 KST. Move it on with the next reset.
+ */
+export const LAST_RANKING_RESET = "2026-11-30T10:01:00+09:00";
+
 const FINAL_INDEX = CASE_SEQUENCE.indexOf("final");
 const indexOf = (caseId) => CASE_SEQUENCE.indexOf(caseId);
 
@@ -126,6 +145,8 @@ export function readRun(row) {
     .sort((a, b) => a.at - b.at);
   const plays = cases.filter((entry) => indexOf(entry.caseId) >= 0);
   const finalRow = cases.find((entry) => entry.caseId === "season-final");
+  // The finale's own case row: a reset leaves it. The first, should the finale have been played again.
+  const finaleRow = cases.find((entry) => entry.caseId === "final");
   const reached = plays.reduce((most, entry) => Math.max(most, indexOf(entry.caseId)), -1);
   const gaps = plays.slice(1).map((entry, index) => entry.at - plays[index].at);
   return {
@@ -136,7 +157,9 @@ export function readRun(row) {
     reached,
     firstAt: plays[0]?.at ?? null,
     lastAt: plays.at(-1)?.at ?? null,
-    finishedAt: finalRow?.at ?? null,
+    // The ranking row's time where it survives, else the finale case row's (sent just before it).
+    finishedAt: finalRow?.at ?? finaleRow?.at ?? null,
+    ranked: finalRow !== undefined,
     times: plays.map((entry) => entry.at),
     gaps,
   };
@@ -161,6 +184,8 @@ export function readFunnel(rows, now = Date.now() / 1000) {
   const gaps = runs.flatMap((run) => run.gaps);
   const breaks = gaps.filter((gap) => gap >= BREAK_SECONDS);
   const finished = runs.filter((run) => run.finishedAt !== null);
+  const unranked = finished.filter((run) => !run.ranked);
+  const lastReset = Date.parse(LAST_RANKING_RESET) / 1000;
   const seasonDays = finished.filter((run) => run.firstAt !== null).map((run) => (run.finishedAt - run.firstAt) / 86400);
   const byDevice = new Map();
   for (const run of runs) {
@@ -183,6 +208,9 @@ export function readFunnel(rows, now = Date.now() / 1000) {
     breakP90: quantile(breaks, 0.9),
     runsWithBreak: runs.filter((run) => run.gaps.some((gap) => gap >= BREAK_SECONDS)).length,
     finished: finished.length,
+    finishedRanked: finished.length - unranked.length,
+    finishedBeforeReset: unranked.filter((run) => run.finishedAt < lastReset).length,
+    finishedUnrankedSince: unranked.filter((run) => run.finishedAt >= lastReset).length,
     seasonDaysMedian: quantile(seasonDays, 0.5),
     seasonDaysP90: quantile(seasonDays, 0.9),
     restarted,
@@ -332,8 +360,11 @@ export function describeFunnel(f, { since = SINCE, at = new Date() } = {}) {
     "",
     "| 지표 | 값 |",
     "|---|---|",
-    `| 시즌을 끝낸 런(season-final) | ${f.finished} (${pct(f.finished, f.runs)}) |`,
-    `| 완주에 걸린 날(첫 사건 행 → season-final): 중앙값 / P90 | ${days(f.seasonDaysMedian)} / ${days(f.seasonDaysP90)} |`,
+    `| 시즌을 끝낸 런(season-final 또는 피날레 사건 행, 런마다 한 번) | ${f.finished} (${pct(f.finished, f.runs)}) |`,
+    `| └ season-final 행이 남은 완주 | ${f.finishedRanked} |`,
+    `| └ 비움 전 완주(피날레 사건 행만 남음: ${LAST_RANKING_RESET.slice(0, 10)} 랭킹 비움 전에 끝냄, 비움이 season-final을 지움) | ${f.finishedBeforeReset} |`,
+    `| └ 그 뒤 랭킹 행 없이 끝낸 완주(스토리 모드·비트 판 등) | ${f.finishedUnrankedSince} |`,
+    `| 완주에 걸린 날(첫 사건 행 → season-final, 없으면 피날레 사건 행): 중앙값 / P90 | ${days(f.seasonDaysMedian)} / ${days(f.seasonDaysP90)} |`,
     `| 끝낸 뒤 같은 기기에서 새 런을 연 비율 | ${pct(f.restarted, f.finished)} (${f.restarted}/${f.finished}) |`,
     "",
   ];
