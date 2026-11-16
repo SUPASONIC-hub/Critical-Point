@@ -2648,7 +2648,8 @@ function checkBudget(file, budget) {
 // -> 10,887 / 3,912 N1 결산 카드, the plus 4.
 // -> 10,885 / 3,904 번외 5, the plus 4.
 // -> 11,064 / 3,974 묶음 1113, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_064, maxGzip: 3_974 };
+// -> 11,122 / 3,979 weekly-page over main 29120d32: the worker keeps /weekly.html (DOCUMENT_PAGE) and warms it, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_122, maxGzip: 3_979 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
