@@ -189,7 +189,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   const panel = source("components/AccessibilityPanel.jsx");
   const start = panel.indexOf("const TOGGLES = [");
   const keys = [...panel.slice(start, panel.indexOf("];", start)).matchAll(/"(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
+  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
   // The words are the panel's copy table (src/copy/comfort.js), one entry per switch.
   const { default: comfortCopy } = await import("../../src/copy/comfort.js");

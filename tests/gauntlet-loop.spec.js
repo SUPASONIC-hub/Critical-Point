@@ -1596,3 +1596,44 @@ test("a third push brings an edge notice that covers no number, and the switch t
   await page.waitForTimeout(400);
   await expect(notice).toHaveCount(0);
 });
+
+/**
+ * 위기 가장자리 알림 (A5, gauntlet/edgeAlert.js): with the comfort switch on,
+ * the screen's edge is framed exactly while the 현재 위험 line stands in reach
+ * of the band or in it, on the overlay a pointer passes through. The line and
+ * the frame are read in one task, as React draws them in one commit. 사건 01
+ * is a quiet table, so the frame stands still there.
+ */
+test("the crisis edge frames the screen while the danger line is in reach of the band", async ({ page }) => {
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ tableTime: 2, edgeNotices: false, crisisEdge: true }) });
+  await openTable(page, "case01", "c1_aftershock");
+  await page.locator(".choices .choice").first().click();
+  const stage = page.getByTestId("gauntlet-stage");
+  const read = () =>
+    page.evaluate(() => {
+      const edge = document.querySelector("[data-testid='crisis-edge']");
+      return {
+        status: document.querySelector("[data-testid='gauntlet-stage']")?.dataset.status,
+        line: document.querySelector(".gx-situation-risk b")?.textContent ?? "",
+        level: edge?.dataset.level ?? "",
+        pointer: edge ? getComputedStyle(edge).pointerEvents : "",
+        animation: edge ? getComputedStyle(edge).animationName : "",
+      };
+    });
+  let seen = null;
+  for (let press = 0; press < 20 && !seen; press += 1) {
+    const now = await read();
+    if (now.status !== "live") break;
+    if (/사정권|구간 안/.test(now.line)) seen = now;
+    else {
+      expect(now.level, `no frame at "${now.line}"`).toBe("");
+      const gauge = await stage.getAttribute("data-gauge");
+      await page.getByTestId("commit-push").click({ timeout: 2_000 }).catch(() => {});
+      await expect(stage).not.toHaveAttribute("data-gauge", gauge);
+    }
+  }
+  expect(seen, "the line came within reach of the band before the table closed").not.toBeNull();
+  expect(seen.level).toBe(seen.line.includes("사정권") ? "inReach" : "inBand");
+  expect(seen.pointer).toBe("none");
+  expect(seen.animation, "a quiet table holds the frame still").toBe("none");
+});
