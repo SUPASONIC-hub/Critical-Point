@@ -682,7 +682,8 @@ const budgets = [
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
   // 207,771 / 75,684 -> 207,940 / 75,730 번외 8 over main 29120d32. Measured 207936 / 75726 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_940, maxGzip: 75_730 },
+  // 207,940 / 75,730 -> 207,940 / 75,736 번외 8, CI build (run 43819751212) measured - / 75732, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 207_940, maxGzip: 75_736 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2457,7 +2458,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
 // -> 377,359 / 438,632 / 446,512 묶음 B4+c2 over main 83570151 (#551 A5). Measured first paint, the plus 4.
 // -> 377,404 / 438,945 / 446,816 번외 8 over main 29120d32. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_404, en: 438_945, ja: 446_816 };
+// -> 377,410 / 438,945 / 446,816 번외 8, CI first paint ko 377406 (run 43819751212), the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_410, en: 438_945, ja: 446_816 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
