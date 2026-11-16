@@ -29,7 +29,8 @@ import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
 import { GAME_EVENTS, sendGameEventOnce } from "../gameEvents.js";
-import { readSharedHabitId, sharedHabitTitle } from "../shareLink.js";
+import { readSharedHabitId, readSharedScore, sharedHabitTitle } from "../shareLink.js";
+import { FRIEND_TARGET_KEY, readStoredValue } from "../appConfig.js";
 
 // E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
 const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
@@ -133,24 +134,38 @@ function DeletionRequest() {
  * table, which the first paint does not carry: it is fetched only for such a
  * visit, and the line is the name that table has under the id, in the page's
  * language, or nothing.
+ *
+ * N32: with the friend's best burst on the address (`&s=<score>`), or kept
+ * from such a visit (friendTarget.js, this device only), a goal line under
+ * it: 「친구 기록 넘기기」. Both modules are fetched only when there is one.
  */
 function FriendResultLine() {
   const [line, setLine] = useState("");
+  const [goal, setGoal] = useState("");
   useEffect(() => {
-    const id = readSharedHabitId(globalThis.location?.search);
-    if (!id) return undefined;
+    const search = globalThis.location?.search;
+    const id = readSharedHabitId(search);
+    const target = readSharedScore(search) > 0 || readStoredValue(FRIEND_TARGET_KEY, null) !== null;
+    if (!id && !target) return undefined;
     let live = true;
-    import("../copy/habits.js")
-      .then(({ default: habits }) => {
+    Promise.all([import("../copy/habits.js"), target ? import("../friendTarget.js") : null])
+      .then(([{ default: habits }, friend]) => {
         const title = sharedHabitTitle(habits, id);
         if (live && title) setLine(fill(habits.friendLine, { habit: title }));
+        const kept = friend?.takeFriendTarget(search);
+        if (live && kept) setGoal(fill(habits.friendTarget, { score: kept.score }));
       })
       .catch(() => {});
     return () => {
       live = false;
     };
   }, []);
-  return line ? <p className="intro-friend-line" data-testid="friend-result-line">{line}</p> : null;
+  return (
+    <>
+      {line && <p className="intro-friend-line" data-testid="friend-result-line">{line}</p>}
+      {goal && <p className="intro-friend-line" data-testid="friend-target-line">{goal}</p>}
+    </>
+  );
 }
 
 export function IntroScreen({ view, renderers = {} }) {

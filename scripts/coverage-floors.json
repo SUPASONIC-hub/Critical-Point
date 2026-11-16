@@ -29,6 +29,7 @@
     "src/endingEntropy.js": 100,
     "src/farCallbacks.js": 100,
     "src/featurePack.js": 98,
+    "src/friendTarget.js": 100,
     "src/gameConstants.js": 100,
     "src/gameEvents.js": 100,
     "src/gameLogic.js": 99,

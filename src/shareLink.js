@@ -48,3 +48,29 @@ export function sharedHabitTitle(table, id) {
   const title = table[id]?.title;
   return typeof title === "string" ? title : "";
 }
+
+/**
+ * N32 (2026-11-16 결정 Q9 (1)): the season's best burst rides on the shared
+ * address as `&s=<1..100>`, so a friend who opens it has a number to beat
+ * (「친구 기록 넘기기」, friendTarget.js). Display only: the start page and the
+ * friend's own ending say it, and nothing that ranks or sends reads it, so an
+ * address edited by hand changes what one screen says and nothing else. A
+ * score of 0 is nothing to beat and is not written.
+ */
+const SCORE_TEXT = /^(?:100|[1-9]\d?)$/;
+
+/** `address` with `&s=<score>` for a whole score from 1 to 100; the address as it was otherwise. */
+export function withSharedScore(address, score) {
+  const text = String(address ?? "");
+  if (!text) return "";
+  const value = Number(score);
+  return Number.isInteger(value) && value >= 1 && value <= 100 ? `${text}&s=${value}` : text;
+}
+
+/** The best burst a shared address carries (`location.search`), or 0 when it carries none or not one written as `withSharedScore` writes it. */
+export function readSharedScore(search = "") {
+  const query = new URLSearchParams(String(search ?? ""));
+  if (query.get("from") !== SHARE_SOURCE) return 0;
+  const text = query.get("s") ?? "";
+  return SCORE_TEXT.test(text) ? Number(text) : 0;
+}
