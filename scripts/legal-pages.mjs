@@ -676,6 +676,15 @@ strong{color:var(--text)}
 .credit-mail{flex-basis:100%}
 .credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
 .credit-mail a{display:inline-flex;align-items:center;min-height:32px}
+.hero{margin:20px 0 8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.hero img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.hero-text{position:relative;padding:20px}
+.hero img+.hero-text{margin-top:-72px;padding-top:40px;background:linear-gradient(to bottom,transparent,var(--surface) 64px)}
+.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:700;letter-spacing:.16em}
+.hero h1{margin:6px 0 12px}
+.cta{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--accent);color:var(--bg);font-weight:700;text-decoration:none}
+.cta:hover{filter:brightness(1.08)}
+main>h2,main>section>h2{padding-left:12px;border-left:3px solid var(--accent)}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -705,6 +714,39 @@ export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point"
  * pages carry the line; the Korean and English ones are as they were.
  */
 const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
+
+/**
+ * The art each page's hero opens on (2026-11-16, 「wow」 pages): pictures the
+ * game already ships in public/, so the pages add no file. The policy and the
+ * terms keep a hero without a picture. A case page takes the five case scenes
+ * in turn.
+ */
+const HERO_ART = { about: "triggerlab-key-visual", guide: "scene-case02", faq: "scene-case03", contact: "ending-oversight-room", "cases/index": "scene-case01", characters: "scene-case04", making: "scene-case05" };
+export function heroArt(kind) {
+  if (HERO_ART[kind]) return HERO_ART[kind];
+  const n = /^cases\/(?:case|prologue)(\d+)$/.exec(kind)?.[1];
+  if (n) return `scene-case0${((Number(n) - 1) % 5) + 1}`;
+  return kind === "cases/final" ? "ending-final-archive" : null;
+}
+const PLAY = { ko: "지금 무료로 플레이", en: "Play free now", ja: "無料で今すぐ遊ぶ" };
+
+/** The hero over a page's heading: its picture (decorative, at the two widths the game cut), the game's name, the heading and a button into the game. The policy's date stays right under it, with any notice after the date. */
+function heroBlock({ kind, language, name }) {
+  const art = heroArt(kind);
+  const picture = art
+    ? `<img src="/${art}-960.webp" srcset="/${art}-480.webp 480w, /${art}-960.webp 960w" sizes="(max-width: 760px) 100vw, 728px" width="960" height="540" alt="" decoding="async" />
+`
+    : "";
+  const start = language === "ko" ? "/" : `/${language}/`;
+  return `<div class="hero">
+${picture}<div class="hero-text">
+<p class="eyebrow">${escapeHtml(GAME_NAME[language])}</p>
+<h1>${escapeHtml(name)}</h1>
+<a class="cta" href="${start}">${PLAY[language]}</a>
+</div>
+</div>
+`;
+}
 
 const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 
@@ -815,8 +857,7 @@ ${tags}</head>
 ${siteHeaderNav({ kind, language })}
 </header>
 <main id="main" tabindex="-1">
-<h1>${escapeHtml(name)}</h1>
-${dated}${body.trim()}
+${heroBlock({ kind, language, name })}${dated}${body.trim()}
 </main>
 <footer>
 ${siteFooterNav({ kind, language })}
