@@ -5,7 +5,8 @@ import { playClockTick, playHeartbeat, playZoneThud, startTensionDrone } from ".
 import { zoneThudDue } from "./zoneThud.js";
 import { HESITATION_IDLE, hesitationKey, hesitationSwell, stepHesitation } from "./heartbeat.js";
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
-import { getAccessibility } from "../state/accessibilitySettings.js";
+import { getAccessibility, useAccessibility } from "../state/accessibilitySettings.js";
+import { edgeAlertLevel, edgeAlertPulses } from "./edgeAlert.js";
 import { setMusicStake } from "../components/AdaptiveMusic.jsx";
 
 /**
@@ -79,6 +80,12 @@ import { setMusicStake } from "../components/AdaptiveMusic.jsx";
  * the mode's own lead (musicScore.js, `STAKE_LAYER_GAUGES`), and lets them go
  * when the window closes. Like the steps it reads what is drawn, not the wall.
  *
+ * The crisis edge (edgeAlert.js, A5, 2026-11-13): with its comfort switch
+ * on, the screen's edges breathe as the same line steps up. It is drawn by
+ * React off `zone`, not by the loop: the line changes a few times a window.
+ * Reduced motion is CSS's to answer; the comfort setting and a quiet table
+ * hold it still here.
+ *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
  */
@@ -96,6 +103,8 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
   const flashRef = useRef(0);
   const flashedAt = useRef(0);
   const overlayRef = useRef(null);
+  const { crisisEdge, calmEffects } = useAccessibility();
+  const edge = edgeAlertLevel({ enabled: crisisEdge, zone, live: liveWindow.status === "live" && !paused });
 
   useEffect(() => {
     stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId), zone, hold };
@@ -261,6 +270,13 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       <div className="gx-fx-vignette" />
       <div className="gx-fx-border" />
       <div className="gx-fx-flash" />
+      {edge ? (
+        <div
+          className={`gx-fx-edge${edgeAlertPulses({ calm: calmEffects, quiet: isQuietTable(caseId) }) ? " is-pulsing" : ""}`}
+          data-level={edge}
+          data-testid="crisis-edge"
+        />
+      ) : null}
     </div>,
     document.body,
   );

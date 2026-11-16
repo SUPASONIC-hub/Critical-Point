@@ -679,7 +679,8 @@ const budgets = [
   // 201,818 / 73,147 -> 205,322 / 74,409 묶음 1113. Measured 205318 / 74405 (over budget only) in the e2e build, the plus 4.
   // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_552, maxGzip: 75_610 },
+  // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 207_771, maxGzip: 75_684 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1191,7 +1192,8 @@ const budgets = [
   // 214,508 / 41,536 -> 214,722 / 41,632 다국적 인물. Measured 214718 / 41628 (over budget only) in the e2e build, the plus 4.
   // 214,508 / 41,536 -> 215,366 / 41,680 n1-act-card over main 53845978. Measured 215362 / 41676 (over budget only) in the e2e build, the plus 4.
   // 215,366 / 41,680 -> 215,606 / 41,786 다국적 인물 over main e43f7bf6. Measured 215602 / 41782 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 215_606, maxGzip: 41_786 },
+  // 215,606 / 41,786 -> 216,101 / 41,898 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 216097 / 41894 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 216_101, maxGzip: 41_898 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1934,7 +1936,8 @@ const budgets = [
   // 193,626 / 64,762 -> 193,913 / 64,859 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 193909 / 64855 (over budget only) in the e2e build, the plus 4.
   // 193,626 / 64,762 -> 194,146 / 64,949 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 194142 / 64945 (over budget only) in the e2e build, the plus 4.
   // 194,146 / 64,949 -> 194,430 / 65,049 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 194426 / 65045 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_430, maxGzip: 65_049 },
+  // 193,626 / 64,762 -> 193,797 / 64,818 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 193793 / 64814 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 193_797, maxGzip: 64_818 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2011,7 +2014,8 @@ const budgets = [
   // 161,518 / 57,831 -> 161,778 / 57,920 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 161774 / 57916 (over budget only) in the e2e build, the plus 4.
   // 161,518 / 57,831 -> 162,006 / 57,995 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 162002 / 57991 (over budget only) in the e2e build, the plus 4.
   // 162,006 / 57,995 -> 162,267 / 58,084 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 162263 / 58080 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_267, maxGzip: 58_084 },
+  // 161,518 / 57,831 -> 161,650 / 57,881 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 161646 / 57877 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 161_650, maxGzip: 57_881 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2442,7 +2446,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,172 / 438,144 / 445,987 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured first paint, the plus 4.
 // -> 377,166 / 438,300 / 446,167 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured first paint, the plus 4.
 // -> 377,172 / 438,397 / 446,272 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_172, en: 438_397, ja: 446_272 };
+// -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_359, en: 438_379, ja: 446_228 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
