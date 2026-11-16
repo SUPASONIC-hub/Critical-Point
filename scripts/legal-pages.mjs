@@ -676,6 +676,15 @@ strong{color:var(--text)}
 .credit-mail{flex-basis:100%}
 .credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
 .credit-mail a{display:inline-flex;align-items:center;min-height:32px}
+.hero{margin:20px 0 8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.hero img{display:block;width:100%;height:auto;max-height:320px;aspect-ratio:16/9;object-fit:cover}
+.hero-text{position:relative;padding:20px}
+.hero img+.hero-text{margin-top:-72px;padding-top:40px;background:linear-gradient(to bottom,transparent,var(--surface) 64px)}
+.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:700;letter-spacing:.16em}
+.hero h1{margin:6px 0 12px}
+.cta{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--accent);color:var(--bg);font-weight:700;text-decoration:none}
+.cta:hover{filter:brightness(1.08)}
+main>h2,main>section>h2{padding-left:12px;border-left:3px solid var(--accent)}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -706,6 +715,39 @@ export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point"
  */
 const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
 
+/**
+ * The art each page's hero opens on (2026-11-16, 「wow」 pages): pictures the
+ * game already ships in public/, so the pages add no file. The policy and the
+ * terms keep a hero without a picture. A case page takes the five case scenes
+ * in turn.
+ */
+const HERO_ART = { about: "triggerlab-key-visual", guide: "scene-case02", faq: "scene-case03", contact: "ending-oversight-room", "cases/index": "scene-case01", characters: "scene-case04", making: "scene-case05" };
+export function heroArt(kind) {
+  if (HERO_ART[kind]) return HERO_ART[kind];
+  const n = /^cases\/(?:case|prologue)(\d+)$/.exec(kind)?.[1];
+  if (n) return `scene-case0${((Number(n) - 1) % 5) + 1}`;
+  return kind === "cases/final" ? "ending-final-archive" : null;
+}
+const PLAY = { ko: "지금 무료로 플레이", en: "Play free now", ja: "無料で今すぐ遊ぶ" };
+
+/** The hero over a page's heading: its picture (decorative, at the two widths the game cut), the game's name, the heading and a button into the game. The policy's date stays right under it, with any notice after the date. */
+function heroBlock({ kind, language, name }) {
+  const art = heroArt(kind);
+  const picture = art
+    ? `<img src="/${art}-960.webp" srcset="/${art}-480.webp 480w, /${art}-960.webp 960w" sizes="(max-width: 760px) 100vw, 728px" width="960" height="540" alt="" decoding="async" />
+`
+    : "";
+  const start = language === "ko" ? "/" : `/${language}/`;
+  return `<div class="hero">
+${picture}<div class="hero-text">
+<p class="eyebrow">${escapeHtml(GAME_NAME[language])}</p>
+<h1>${escapeHtml(name)}</h1>
+<a class="cta" href="${start}">${PLAY[language]}</a>
+</div>
+</div>
+`;
+}
+
 const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 
 /** A page's address from the root: `/faq.html`, `/en/faq.html`. The policy's two are PRIVACY_PAGE_PATH and TERMS_PAGE_PATH. */
@@ -722,12 +764,16 @@ export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`
 export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /**
- * The picture a shared link shows (the start screen's key visual, 1200x675),
- * and what it shows in each language: the start screen's own `heroAlt`
+ * The picture a shared link shows, one per language (1200x675, 2026-11-16):
+ * the start screen's key visual with the game's name, one line and 「free, in
+ * the browser」 in that language over it (scripts/build-og-images.mjs writes
+ * public/og-<lang>.jpg). Its alt is the start screen's own `heroAlt`
  * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
  * holds them to it).
  */
-export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE = { width: 1200, height: 675 };
+/** The share picture's address in `language`: `/og-ko.jpg`, `/og-en.jpg`, `/og-ja.jpg`. */
+export const shareImagePath = (language) => `/og-${language}.jpg`;
 export const SHARE_IMAGE_ALT = {
   ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
   en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
@@ -753,7 +799,7 @@ export function shareMetaLines({ language, url, title, description }) {
     ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
     meta("property", "og:title", title),
     meta("property", "og:description", description),
-    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image", shareImagePath(language)),
     meta("property", "og:image:type", "image/jpeg"),
     meta("property", "og:image:width", String(SHARE_IMAGE.width)),
     meta("property", "og:image:height", String(SHARE_IMAGE.height)),
@@ -761,7 +807,7 @@ export function shareMetaLines({ language, url, title, description }) {
     meta("name", "twitter:card", "summary_large_image"),
     meta("name", "twitter:title", title),
     meta("name", "twitter:description", description),
-    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image", shareImagePath(language)),
     meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
   ];
 }
@@ -815,8 +861,7 @@ ${tags}</head>
 ${siteHeaderNav({ kind, language })}
 </header>
 <main id="main" tabindex="-1">
-<h1>${escapeHtml(name)}</h1>
-${dated}${body.trim()}
+${heroBlock({ kind, language, name })}${dated}${body.trim()}
 </main>
 <footer>
 ${siteFooterNav({ kind, language })}
