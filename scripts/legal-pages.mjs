@@ -677,7 +677,7 @@ strong{color:var(--text)}
 .credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
 .credit-mail a{display:inline-flex;align-items:center;min-height:32px}
 .hero{margin:20px 0 8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
-.hero img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.hero img{display:block;width:100%;height:auto;max-height:320px;aspect-ratio:16/9;object-fit:cover}
 .hero-text{position:relative;padding:20px}
 .hero img+.hero-text{margin-top:-72px;padding-top:40px;background:linear-gradient(to bottom,transparent,var(--surface) 64px)}
 .eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:700;letter-spacing:.16em}
