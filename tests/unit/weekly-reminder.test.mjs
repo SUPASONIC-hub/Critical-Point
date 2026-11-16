@@ -140,6 +140,9 @@ test("where the browser will not wake the worker, it still syncs and says so", a
   assert.equal(await syncReminder({ scope: pageScope({ ready: false }) }), "off", "a worker that never gets ready");
   assert.equal(await syncReminder({ scope: pageScope({ standalone: false }) }), "off", "a browser tab");
   assert.equal(await syncReminder({ scope: { ...pageScope(), navigator: { serviceWorker: {} } } }), "off");
+  const rejecting = pageScope();
+  rejecting.navigator.serviceWorker.ready = Promise.reject(new Error("registration failed"));
+  assert.equal(await syncReminder({ scope: rejecting }), "off", "a worker that failed to register");
 });
 
 test("turning it off is stored at once and the worker forgets its plan", async () => {
