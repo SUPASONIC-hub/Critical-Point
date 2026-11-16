@@ -21,6 +21,7 @@ import { loadedChunk } from "../state/chunkReload.js";
 import { retryableLazy } from "../state/retryableLazy.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
+import { setAccessibility } from "../state/accessibilitySettings.js";
 import { DEFAULT_PLAYER_NAME, getDeletionRequestText } from "../appConfig.js";
 import introPanelsCopy from "../copy/introPanels.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
@@ -249,6 +250,18 @@ export function IntroScreen({ view, renderers = {} }) {
       beginOpeningBurst(startGame);
     }
   };
+  // N19 (owner's answer Q4 (1), 2026-11-16): the start screen's second door.
+  // It turns the comfort panel's 스토리 모드 on and starts as 「프롤로그 시작」
+  // does; the season's first case reads the setting at this press
+  // (runLifecycle.startGame, or the shell's save as runState loads it), so the
+  // first case is already played in story mode. Shown only with no run to
+  // lose, so it never asks to throw one away. The setting stays on afterwards,
+  // as it would from the panel, where it can be turned off.
+  const startStoryRun = () => {
+    if (openingBurst) return;
+    setAccessibility({ storyMode: true });
+    startNewRun();
+  };
   const startNewGamePlusRun = async () => {
     if (!hasResumableSave || (await confirmAction(CONFIRM.newGamePlus))) beginOpeningBurst(startNewGamePlus);
   };
@@ -423,6 +436,18 @@ export function IntroScreen({ view, renderers = {} }) {
                   <a className="intro-briefing-link" href={`#${BRIEFING_DRAWER_ID}`} onClick={openBriefingDrawer}>
                     {introCopy.briefingLink}
                   </a>
+                  <button
+                    type="button"
+                    className="intro-story-start"
+                    data-testid="start-story-mode"
+                    onClick={startStoryRun}
+                    onPointerEnter={prefetchGameRuntime}
+                    onFocus={prefetchGameRuntime}
+                    disabled={Boolean(openingBurst)}
+                  >
+                    {introCopy.storyStart.label}
+                    <small>{introCopy.storyStart.hint}</small>
+                  </button>
                   {consentLine}
                 </div>
               )}

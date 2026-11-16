@@ -7,6 +7,7 @@ export default {
     "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last trainee task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
+  storyStart: { label: "Start in Story Mode", hint: "Easier · not ranked" },
   ranking: "Ranking",
   board: "Board",
   heroAlt: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
