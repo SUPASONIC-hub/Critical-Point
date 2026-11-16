@@ -7,7 +7,7 @@ import { useDialogFocus } from "./useDialogFocus.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
-import { formatNumber } from "./tableReadout.js";
+import { formatMoney } from "./tableReadout.js";
 import { readDraftSpend } from "./draftSpend.js";
 
 // The draft's words (src/copy/relics.js).
@@ -196,7 +196,7 @@ function DraftBuy({ id, state, label, shortcut, onPress }) {
         aria-keyshortcuts={state.open ? shortcut : undefined}
         onClick={state.open ? onPress : undefined}
       >
-        {fill(label, { cost: formatNumber(state.cost) })}
+        {fill(label, { cost: formatMoney(state.cost) })}
       </button>
       {why && (
         <small id={`gx-draft-${id}-why`} className="gx-draft-why">

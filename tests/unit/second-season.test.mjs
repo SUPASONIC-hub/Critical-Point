@@ -139,7 +139,7 @@ test("E-5: the card and its shared line carry the season's number, the ending be
   const card = getSeasonCard({ secondSeason: second, pastEndingName });
   const model = buildResultCardModel({ ...card, endingName: "사람과 기록" });
   assert.equal(model.season, "SEASON 02 · FINAL RECORD");
-  assert.match(buildShareText(model, "https://a.example"), /결말은 '사람과 기록'\. 최고 버스트 .+ 랭크\. 2회차 · 지난 시즌 결말 ‘보호와 은폐’\. https:\/\/a\.example\/$/);
+  assert.match(buildShareText(model, "https://a.example"), /결말은 '사람과 기록'\. 최고 버스트 .+ 랭크\. 2회차 · 지난 시즌 결말 ‘보호와 은폐’\. https:\/\/a\.example\/\?from=card$/);
   // A card handed nothing keeps the first season's words.
   assert.equal(buildResultCardModel({}).season, RESULT_CARD_LABELS.season);
   assert.ok(!buildShareText(buildResultCardModel({})).includes("회차"));

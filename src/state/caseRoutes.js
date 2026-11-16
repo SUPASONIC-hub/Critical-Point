@@ -31,6 +31,9 @@ import { createOpeningResources } from "./openingState.js";
 /**
  * What a case opens with, worked out from how the one before it closed: the
  * scene, the hand, the legacy the table shows, and the line under the scene.
+ * `route` is what the opening was picked by, for the case-open snapshot (F1
+ * step 2, gauntletEngine `normalizeOpeningRoute`): the case before's outcome
+ * and rank, and the scene they led to.
  */
 export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
   const baseStartNode = CASE_START_NODES[caseId];
@@ -79,7 +82,8 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
   const resources = seasonOpening
     ? createOpeningResources(operatorOrigin)
     : previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
-  return { nodeId, resources, openingLegacy, echo, note: previousResult?.outcomeChoiceId ?? "season-start" };
+  const route = { after: previousResult?.outcomeChoiceId ?? null, rank: previousResult?.rank ?? null, nodeId };
+  return { nodeId, resources, openingLegacy, echo, note: previousResult?.outcomeChoiceId ?? "season-start", route };
 }
 
 /**

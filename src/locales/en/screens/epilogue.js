@@ -32,7 +32,7 @@ export default {
   toll: {
     over: "{harm} is recorded as having crossed the line you could carry.",
     worst: "The worst harm was at {label}, “{title}.” That one case alone left {harm} {value}.",
-    favours: "The allowances and support the company gave people while it held up are the first to be taken back before that number. The {harm} you pushed up came to {total} in all, an average of {perCase} a case.",
+    favours: "The vacation allowance and tuition support the company gave people while it held up are the first to be taken back before that number. The {harm} you pushed up came to {total} in all, an average of {perCase} a case.",
     paid: "That price was paid not by the books, but by the people waiting on your judgment.",
   },
 };

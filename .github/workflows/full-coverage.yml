@@ -54,7 +54,11 @@ jobs:
     # than the runner had. So: two workers (scripts/run-e2e.mjs) and twice the
     # shards, which is the same work for each worker as before and half the
     # contention. The limit stays where the slowest shard so far would fit.
-    timeout-minutes: 90
+    # 90 -> 150 on 2026-11-11 (the user's choice 1): run 42792158666 cut three
+    # shards at 90 minutes with no failure (ten tests of ~20 minutes on two
+    # workers, after the sweep was split per case in #495), and the sweep
+    # gained a fourth size (wide phone 411x846) the same day.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:

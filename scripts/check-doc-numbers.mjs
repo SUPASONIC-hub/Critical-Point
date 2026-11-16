@@ -109,7 +109,7 @@ const said = (source, flags = "") => new RegExp(source.replaceAll("#", N), `gd${
 const DOC_NUMBERS = [
   // README.md
   { file: "README.md", what: "static checks", pattern: said("검사 #개(?:를 병렬로|, 병렬)"), compute: () => game.staticChecks },
-  { file: "README.md", what: "static checks", pattern: said("\\(`check:doc-numbers`\\) #개 검사"), compute: () => game.staticChecks },
+  { file: "README.md", what: "static checks", pattern: said("\\(`check:readme`\\) #개 검사"), compute: () => game.staticChecks },
   {
     file: "README.md",
     what: "coverage floors (lines, functions, branches)",

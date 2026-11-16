@@ -742,3 +742,48 @@ test("an older client reads a copy with records as a save, and a copy it sends b
   assert.equal(JSON.parse(browser.storage.getItem(config.STORAGE_KEY)).deviceRecords, undefined);
   assert.equal(JSON.parse(browser.storage.getItem(config.SEASON_RECORD_KEY)).seasons, 1);
 });
+
+test("a closed side case goes up as its mark beside the run, and comes down merged into the other device", async () => {
+  resetDevice();
+  const server = newServer();
+  const inProgress = { nodeId: "s1_shop", resources: {}, log: [], run: {}, runId: "side-x" };
+  browser.storage.setItem(
+    config.SIDE_CASES_KEY,
+    JSON.stringify({ side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: null }, side02: { closedAt: null, outcomeChoiceId: null, inProgress } }),
+  );
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.deepEqual(server.stored.payload.save.deviceRecords, { sideCases: { side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers" } } });
+  assert.equal(JSON.stringify(server.stored.payload).includes("side-x"), false, "a run in progress stays on its device");
+
+  // The other device: the copy comes down, the mark joins its record, its own run stays.
+  const other = { nodeId: "s2_start", resources: {}, log: [], run: {}, runId: "there" };
+  resetDevice({ save: makeSave({ runId: "run-other" }) });
+  browser.storage.setItem(config.SIDE_CASES_KEY, JSON.stringify({ side02: { closedAt: null, outcomeChoiceId: null, inProgress: other } }));
+  const there = await loadCloudSave();
+  const found = await there.fetchCloudSave(CODE);
+  assert.equal(await there.applyCloudSave(found), true);
+  assert.deepEqual(JSON.parse(browser.storage.getItem(config.SIDE_CASES_KEY)), {
+    side02: { closedAt: null, outcomeChoiceId: null, inProgress: other },
+    side01: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s1_after_hers", inProgress: null },
+  });
+  assert.equal(readSync().pending, "", "nothing here the copy lacks: in step");
+});
+
+test("a side case closed after the save was sent sends the same save again, for the mark", async () => {
+  const save = makeSave();
+  resetDevice({ save, sync: { pending: "", synced: save.savedAt, revision: 1, conflict: null } });
+  const server = newServer({ stored: { saved_at: save.savedAt, payload: { save, settledWindows: [] }, revision: 1 } });
+  const cloud = await loadCloudSave();
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal(puts().length, 0, "in step: nothing to send");
+  // What the listener for DEVICE_RECORD_WRITTEN_EVENT notes: a pending copy, stamped now.
+  browser.storage.setItem(config.SIDE_CASES_KEY, JSON.stringify({ side01: { closedAt: "2026-12-05T10:00:00.000Z", outcomeChoiceId: "s1_after_order", inProgress: null } }));
+  browser.storage.setItem(config.CLOUD_SAVE_SYNC_KEY, JSON.stringify({ ...readSync(), pending: "2026-12-05T10:00:00.000Z" }));
+  assert.equal(await cloud.flushCloudSave(), true);
+  assert.equal(puts().length, 1);
+  assert.equal(puts()[0].body.p_expected_revision, 1, "built on the copy it replaces");
+  assert.equal(server.stored.payload.save.savedAt, save.savedAt, "the run is the one already sent");
+  assert.equal(server.stored.payload.save.deviceRecords.sideCases.side01.outcomeChoiceId, "s1_after_order");
+  assert.deepEqual({ pending: readSync().pending, synced: readSync().synced, revision: readSync().revision }, { pending: "", synced: save.savedAt, revision: 2 });
+});

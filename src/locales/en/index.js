@@ -51,7 +51,7 @@ export const speakers = {
   "서하린": "Seo Harin",
   "봉영훈": "Bong Younghoon",
   "곽민재": "Kwak Minjae",
-  "주은채": "Joo Eunchae",
+  "레이철 탄": "Rachel Tan",
   "이정숙": "Lee Jungsook",
   "채윤슬": "Chae Yoonseul",
   "이찬빈": "Lee Chanbin",
@@ -64,12 +64,12 @@ export const speakers = {
   "도하람": "Do Haram",
   "임소율": "Lim Soyul",
   "구태형": "Koo Taehyung",
-  "류세아": "Ryu Seah",
+  "프리야 나이르": "Priya Nair",
   "선우진": "Sunwoo Jin",
   "고은비": "Ko Eunbi",
   "문하준": "Moon Hajun",
   "탁예린": "Tak Yerin",
-  "표세린": "Pyo Serin",
+  "미즈노 사키": "Mizuno Saki",
   "채이안": "Chae Ian",
   "지강현": "Ji Kanghyun",
   "송하율": "Song Hayul",
@@ -78,7 +78,7 @@ export const speakers = {
   "연하진": "Yeon Hajin",
   "채도훈": "Chae Dohoon",
   "조현석": "Cho Hyunseok",
-  "백다온": "Baek Daon",
+  "마커스 림": "Marcus Lim",
   "진서우": "Jin Seowoo",
   "하도율": "Ha Doyul",
   "한지우": "Han Jiwoo",
@@ -93,9 +93,9 @@ export const speakers = {
   "황혜원": "Hwang Hyewon",
   "서도경": "Seo Dokyung",
   "여민규": "Yeo Minkyu",
-  "은재하": "Eun Jaeha",
+  "뤼카 베르나르": "Lucas Bernard",
   "석문호": "Seok Munho",
-  "도건우": "Do Geonwoo",
+  "대니얼 강": "Daniel Kang",
   "선재윤": "Seon Jaeyoon",
   "연서준": "Yeon Seojun",
   "엄동균": "Eom Donggyun",
@@ -107,9 +107,18 @@ export const speakers = {
   "은채원": "Eun Chaewon",
   "이하경": "Lee Hakyung",
   "임재윤": "Lim Jaeyoon",
-  "연시우": "Yeon Siwoo",
+  "응우옌 반 남": "Nguyen Van Nam",
   "김 반장": "Foreman Kim",
   "민하랑": "Min Harang",
+  "오민정": "Oh Minjeong",
+  "문정택": "Moon Jeongtaek",
+  "한기호": "Han Giho",
+  "그레이스 웡": "Grace Wong",
+  "모지현": "Mo Jihyun",
+  "레 티 호아": "Le Thi Hoa",
+  "마리사 탄": "Marisa Tan",
+  "육성빈": "Yuk Seongbin",
+  "추영복": "Chu Yeongbok"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -140,7 +149,16 @@ export const roles = {
   "플로우온 재무책임자 · 권도현의 고모부 · 47세": "CFO of FlowOn · Kwon Dohyun’s uncle by marriage · age 47",
   "KD은행 부행장 · 대출심사위원회 위원장": "Deputy President, KD Bank · chair of the Credit Committee",
   "인천 남동공단 가온정밀 대표 · 문가을의 남편": "CEO of Gaon Precision, Namdong Industrial Complex, Incheon · Moon Gaeul’s husband",
-  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market"
+  "피해자 모임 대표 · 망원시장 가을떡방 사장": "Head of the victims’ group · owner of Gaeul Rice Cake Shop, Mangwon Market",
+  "KD은행 고객센터 야간 상담원 · 7년 차": "Night counsellor, KD Bank Customer Center · 7 years in",
+  "김포 분식집 사장 · 12년째 · 56세": "Owner of a snack bar in Gimpo · 12 years running · age 56",
+  "KD은행 고객센터 야간조 팀장": "Night-shift team leader, KD Bank Customer Center",
+  "홍콩 수취 은행 송금 조사 담당 · 29세": "Payments investigator at the receiving bank in Hong Kong · age 29",
+  "전 KD캐피탈 자금부 해외 송금 담당 · 9년 · 37세": "Former overseas-payments officer, KD Capital Treasury · 9 years · age 37",
+  "은행나무빌 2층 세입자 · 공대 연구원 · 서울 9년째": "Tenant, 2nd floor, Ginkgo Villa · engineering researcher · 9 years in Seoul",
+  "KD은행 디지털자산제휴팀 과장": "Manager, Digital Asset Partnerships, KD Bank",
+  "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
+  "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore"
 };
 
 
@@ -292,7 +310,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Leaving on Day One",
           "title": "The River from the 4th-Floor Window",
-          "text": "Everyone calls it the basement, but the room has a window, and through it you can see the river. Byun Yujin says in passing, 'Everyone calls it the basement, but this is actually the 4th floor. New people always check that first.' You stand at the window for a long time, then turn off the light. For 3 years after that, you stand there almost every day."
+          "text": "Everyone calls it the basement, but the room has a window, and through it you can see the river. Byun Yujin says in passing, 'Everyone calls it the basement, but this is actually the 4th floor. New people always check that first.' The first line of the welfare notice on your desk reads 'Tuition support for staff children, paid in full.' You stand at the window for a long time, then turn off the light. For 3 years after that, you stand there almost every day."
         }
       },
       "case01": {
@@ -440,7 +458,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · Rota, Week 3",
           "title": "Na Junhyuk Sends Squid Sundae",
-          "text": "3 weeks after the rota starts going around, an ice box arrives at the office. The sender is Na Junhyuk, and inside are six servings of squid sundae and a handwritten note. 'Six slots, so six servings. I put in double for Kang Taemin. The night shift needs to eat a lot.' That day Lee Minseo leaves on time for the first time, and Oh Jinwoo puts his share in the fridge and eats it two days later."
+          "text": "3 weeks after the rota starts going around, an ice box arrives at the office. The sender is Na Junhyuk, and inside are six servings of squid sundae and a handwritten note. 'Six slots, so six servings. I put in double for Kang Taemin. The night shift needs to eat a lot.' That day Lee Minseo leaves on time for the first time, and Oh Jinwoo puts his share in the fridge and eats it two days later. That same week, a notice goes up on the company board: 'This year’s vacation allowance will be paid in full, not a won cut.'"
         }
       }
     },
@@ -734,6 +752,30 @@ export const copy = {
       "side01": {
         "label": "Side case 1",
         "title": "The Seven Not Yet Visited"
+      },
+      "side02": {
+        "label": "Side case 2",
+        "title": "What Must Be Given Back"
+      },
+      "side03": {
+        "label": "Side case 3",
+        "title": "An Ordinary Night"
+      },
+      "side04": {
+        "label": "Side case 4",
+        "title": "Year-End Settlement"
+      },
+      "side07": {
+        "label": "Side case 7",
+        "title": "Friday, 17:58"
+      },
+      "side06": {
+        "label": "Side case 6",
+        "title": "The Deposit"
+      },
+      "side05": {
+        "label": "Side case 5",
+        "title": "Listing Eve"
       }
     }
   }

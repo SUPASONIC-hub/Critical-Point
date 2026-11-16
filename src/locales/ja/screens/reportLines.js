@@ -37,6 +37,21 @@ export default {
     "quiet-cover": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、静かに閉じたシーズンです。",
     "open-question": "現金は失いましたが、負けたのではありません。人的被害を線の下に抑え、問いを引き継いだシーズンです。",
   },
+  witnessHeld: "最後にあなたは告発を選びました。現金は減り、スコアにも残りませんが、人的被害を線の下に抑えたまま、隠された記録を外に出しました。このシーズンが勝ち取ったものは、数字の外にあります。",
+  nearest: {
+    line: "最も近かった別の結末：{ending}まで{gaps}",
+    gaps: {
+      trust: "{label}が{value}不足",
+      legitimacy: "{label}が{value}不足",
+      capital: "{label}が{value}不足",
+      trustOver: "{label}が{value}超過",
+      clues: "手がかりが{value}件不足",
+      reframes: "卓の組み替えが{value}回不足",
+      coldGap: "{legitimacy}が{trust}をあと{value}上回る必要",
+      pactGap: "{trust}が{legitimacy}をあと{value}上回る必要",
+    },
+    burn: "最後に封印を選んだため、記録が残ってこそ開く結末（OPEN OVERSIGHT・EVIDENCE REFORM・HUMAN RECORD）は今シーズン閉じていました。",
+  },
   score: {
     points: "{score}点",
     penalty: "-{score}点",

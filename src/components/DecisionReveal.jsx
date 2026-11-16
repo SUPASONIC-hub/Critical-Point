@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, Skull, Sparkles, Vault } from "lucide-react";
 import { playDecisionRevealCue } from "./AdaptiveMusic.jsx";
-import { byEffectWeight, formatNumber, isResourceGain } from "../gameConstants.js";
+import { byEffectWeight, formatMoney, isResourceGain, MONEY_READ_AS } from "../gameConstants.js";
 import { objectParticle, topicParticle } from "../playerLanguage.js";
 import { RELICS } from "../gauntlet/relics.js";
 import { RelicIcon } from "../gauntlet/RelicDraft.jsx";
@@ -20,10 +20,10 @@ function createConsequenceLines({ verdict, busted, nextMutations }) {
   if (!verdict) return [];
   const cause = describeVerdictCause(verdict);
   // The particle agrees with the number as it is read aloud (priority 10).
-  const lostPot = formatNumber(verdict.lostPot);
+  const lostPot = formatMoney(verdict.lostPot);
   const wall = String(verdict.wall);
   const heatLine = busted
-    ? fill(revealCopy.heat.bust, { gauge: verdict.gauge, wall, pot: lostPot, particle: objectParticle(lostPot) })
+    ? fill(revealCopy.heat.bust, { gauge: verdict.gauge, wall, pot: lostPot, particle: objectParticle(MONEY_READ_AS) })
     : fill(revealCopy.heat.cashed, { gauge: verdict.gauge, multiplier: formatMultiplier(verdict.multiplier), wall, particle: topicParticle(wall) });
   const nextRule = nextMutations.length > 0
     ? nextMutations.map((mutation) => mutation.label).join(" / ")
@@ -203,30 +203,30 @@ export function DecisionReveal({ view }) {
           <div className="gx-reveal-pot" role="group" aria-label={revealCopy.pot.label}>
             {busted ? (
               <p className="gx-reveal-loss">
-                {revealCopy.pot.lost}<b>{formatNumber((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatNumber(verdict.insuredPot ?? 0)}</b>
+                {revealCopy.pot.lost}<b>{formatMoney((verdict.lostPot ?? 0) + (verdict.insuredPot ?? 0))}</b> → <b>{formatMoney(verdict.insuredPot ?? 0)}</b>
               </p>
             ) : (
               <p className="gx-reveal-gain">
                 {verdict.chips} × {verdict.multiplier}
                 {verdict.logic?.pot > 0 && <span>{revealCopy.pot.combo}{verdict.logic.bonus.toFixed(2)}</span>} ={" "}
-                <b>+{formatNumber(verdict.pot)}</b>
+                <b>+{formatMoney(verdict.pot)}</b>
               </p>
             )}
             <p className="gx-reveal-bank">
               {decisionReveal.caseClosed && verdict.audit?.caught ? (
                 // AUDIT (B3): the line says what the audit took of the case's share, in the system's words (no 반재욱 line: user, 2026-10-20).
                 <>
-                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.auditCaught}<b>{formatNumber(verdict.secured + verdict.audit.lost)}</b>{revealCopy.pot.auditOf}{" "}
-                  <b>{formatNumber(verdict.audit.lost)}</b>{revealCopy.pot.auditTaken}<b>{formatNumber(decisionReveal.vault)}</b>
+                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.auditCaught}<b>{formatMoney(verdict.secured + verdict.audit.lost)}</b>{revealCopy.pot.auditOf}{" "}
+                  <b>{formatMoney(verdict.audit.lost)}</b>{revealCopy.pot.auditTaken}<b>{formatMoney(decisionReveal.vault)}</b>
                 </>
               ) : decisionReveal.caseClosed ? (
                 <>
-                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.toVault}<b>{formatNumber(verdict.secured)}</b>{revealCopy.pot.vault}{" "}
-                  <b>{formatNumber(decisionReveal.vault)}</b>
+                  <Vault size={14} aria-hidden="true" />{revealCopy.pot.toVault}<b>{formatMoney(verdict.secured)}</b>{revealCopy.pot.vault}{" "}
+                  <b>{formatMoney(decisionReveal.vault)}</b>
                 </>
               ) : (
                 <>
-                  {revealCopy.pot.staked}<b>{formatNumber(decisionReveal.runPot)}</b>{revealCopy.pot.vaultAfterStake}<b>{formatNumber(decisionReveal.vault)}</b>
+                  {revealCopy.pot.staked}<b>{formatMoney(decisionReveal.runPot)}</b>{revealCopy.pot.vaultAfterStake}<b>{formatMoney(decisionReveal.vault)}</b>
                 </>
               )}
             </p>

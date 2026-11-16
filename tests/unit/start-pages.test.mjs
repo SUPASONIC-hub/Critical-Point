@@ -137,6 +137,33 @@ test("with no script, each start page says what the game is and links the five p
   assert.match(noscript(pages.ja), /JavaScriptをオンに/);
 });
 
+/**
+ * 개선 포인트 E2: a line in the game's world (the case file, the analyst's
+ * terminal -- the words the cases use), the plain fact, then each browser's
+ * own help page in the page's language. Samsung publishes its page in US
+ * English only, so that one link is the same in all three.
+ */
+test("with no script, each start page links five browsers' official help in its own language", () => {
+  const locale = {
+    ko: { chrome: "hl=ko", apple: "/ko-kr/", mozilla: "/ko/kb/", microsoft: "/ko-kr/" },
+    en: { chrome: "hl=en", apple: "/en-us/", mozilla: "/en-US/kb/", microsoft: "/en-us/" },
+    ja: { chrome: "hl=ja", apple: "/ja-jp/", mozilla: "/ja/kb/", microsoft: "/ja-jp/" },
+  };
+  const world = { ko: /분석관 단말/, en: /analyst's terminal/, ja: /分析官の端末/ };
+  for (const [language, html] of Object.entries(pages)) {
+    const block = noscript(html).replace(/&#39;/g, "'");
+    assert.match(block, world[language], `${language}: the world's line`);
+    const hrefs = [...block.matchAll(/<a href="(https:[^"]*)"/g)].map((match) => match[1]);
+    assert.equal(hrefs.length, 5, `${language}: five browsers`);
+    const host = (name) => hrefs.find((href) => new URL(href).hostname === name) ?? "";
+    assert.ok(host("support.google.com").includes(locale[language].chrome), `${language}: Chrome`);
+    assert.ok(host("support.apple.com").includes(locale[language].apple), `${language}: Safari`);
+    assert.ok(host("support.mozilla.org").includes(locale[language].mozilla), `${language}: Firefox`);
+    assert.ok(host("support.microsoft.com").includes(locale[language].microsoft), `${language}: Edge`);
+    assert.ok(host("www.samsung.com"), `${language}: Samsung Internet`);
+  }
+});
+
 test("with Google Analytics on (11-12), the two pages carry its tag once, as the Korean does", () => {
   const on = analyticsFor({ id: "G-CN8M5TQ77N", command: "build", mode: "production", debug: false });
   const tagged = withAbsoluteSiteLinks(withAnalyticsTags(INDEX, on), ORIGIN);

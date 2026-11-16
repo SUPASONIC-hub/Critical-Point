@@ -147,7 +147,7 @@ export const copy = {
         "interlude": {
           "label": "Interlude · The Morning After the Shredding",
           "title": "31 Jokes",
-          "text": "The morning after the shredding, Kang Taemin pins a notebook page to the bulletin board on the bookshop’s 1st floor. '31 jokes ECHO never heard -- in order.' No. 1: 'Why is the server room cold? Because the servers are so cool.' Kwon Dohyun draws a laugh-probability field under it, and Na Junhyuk leaves an instant-coffee stain in every field. At the very bottom Lim Soyul draws a small picture. Her grandfather, sitting in the chair on the stair landing, covering his ears and laughing. A text comes from Yeon Siwoo. 'I left that shelf from yesterday empty. These guys seemed to miss them.'"
+          "text": "The morning after the shredding, Kang Taemin pins a notebook page to the bulletin board on the bookshop’s 1st floor. '31 jokes ECHO never heard -- in order.' No. 1: 'Why is the server room cold? Because the servers are so cool.' Kwon Dohyun draws a laugh-probability field under it, and Na Junhyuk leaves an instant-coffee stain in every field. At the very bottom Lim Soyul draws a small picture. Her grandfather, sitting in the chair on the stair landing, covering his ears and laughing. A text comes from Nguyen Van Nam. 'I left that shelf from yesterday empty. These guys seemed to miss them.'"
         }
       },
       "case47": {
@@ -319,7 +319,7 @@ export const caseRoles = {
     "영동 바다결수산 대표 · 30년 전 그 오징어 공장 사장의 아들": "Head of Badagyeol Seafood, Yeongdong · son of the owner of that squid factory 30 years ago"
   },
   "case46": {
-    "KD데이터랩 판교 데이터센터 인프라 엔지니어 · 야간 당직": "Infrastructure engineer, KD Data Lab data center, Pangyo · on night duty"
+    "KD데이터랩 판교 데이터센터 인프라 엔지니어 · 야간 당직 · 하노이 출신 6년 차": "Infrastructure engineer, KD Data Lab data center, Pangyo · on night duty · from Hanoi, 6 years in"
   },
   "case47": {
     "가온정밀 전 구내식당 사장 · 서류 없는 31명 중 한 사람": "Former owner of the Gaon Precision cafeteria · one of the 31 with no paperwork",
@@ -327,6 +327,6 @@ export const caseRoles = {
   },
   "case48": {
     "루프나우 대표 · 전 플로우온 야간 배차 매니저 · 31세": "CEO of LoopNow · former night dispatch manager at FlowOn · age 31",
-    "KD캐피탈 기업금융본부장 · 루프나우 안건 발의자": "Head of Corporate Finance, KD Capital · proposer of the LoopNow agenda item"
+    "KD캐피탈 기업금융본부장 · 루프나우 안건 발의자 · 뉴욕 지역은행 출신 외부 영입": "Head of Corporate Finance, KD Capital · proposer of the LoopNow agenda item · hired from a New York regional bank"
   }
 };

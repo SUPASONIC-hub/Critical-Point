@@ -24,6 +24,10 @@ const resultCardDrawCopy = {
   // What a card with a piece missing prints in its place.
   unreadMode: "기록되지 않은 판단",
   unreadEnding: "미확정 경로",
+  // C3-3 (1), 2026-11-11: under the ending on a season that lost cash and kept
+  // people under the collapse line (readHeldLine), so a shared card does not
+  // read as a lost one.
+  held: "현금은 잃었어도 사람 피해는 붕괴선 아래",
   shareLine: "트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '{mode}', 결말은 '{ending}'. 최고 버스트 {burst}{points}, {rank} 랭크.{share}",
 };
 export default resultCardDrawCopy;

@@ -153,6 +153,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -336,6 +345,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -532,6 +550,15 @@
             "legitimacy": 55,
             "humanCost": 0,
             "fatigue": 12
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -715,6 +742,15 @@
             "legitimacy": 55,
             "humanCost": 0,
             "fatigue": 12
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -911,6 +947,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -1115,6 +1160,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -1311,6 +1365,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -1515,6 +1578,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -1711,6 +1783,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -1915,6 +1996,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -4553,6 +4643,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -4736,6 +4835,15 @@
             "legitimacy": 58,
             "humanCost": 0,
             "fatigue": 13
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p1_start"
           }
         },
         "schema": {
@@ -4987,6 +5095,15 @@
             "legitimacy": 46,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": "p1_after_credit",
+            "rank": "A",
+            "nodeId": "p2_start_credit"
           }
         },
         "schema": {
@@ -5232,6 +5349,15 @@
             "legitimacy": 46,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": "p1_after_credit",
+            "rank": "A",
+            "nodeId": "p2_start_credit"
           }
         },
         "schema": {
@@ -5457,6 +5583,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p3_start"
           }
         },
         "schema": {
@@ -5676,6 +5811,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "p3_start"
           }
         },
         "schema": {
@@ -5956,6 +6100,15 @@
             "legitimacy": 46,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": "p1_after_credit",
+            "rank": "A",
+            "nodeId": "p2_start_credit"
           }
         },
         "schema": {
@@ -6230,6 +6383,15 @@
             "legitimacy": 46,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": "p1_after_credit",
+            "rank": "A",
+            "nodeId": "p2_start_credit"
           }
         },
         "schema": {
@@ -6469,6 +6631,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "c5_voice"
           }
         },
         "schema": {
@@ -6702,6 +6873,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "c5_voice"
           }
         },
         "schema": {
@@ -6939,6 +7119,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "c5_voice"
           }
         },
         "schema": {
@@ -7180,6 +7369,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "c5_start_rule"
           }
         },
         "schema": {
@@ -7373,6 +7571,15 @@
             "legitimacy": 50,
             "humanCost": 0,
             "fatigue": 10
+          },
+          "focusCarry": {
+            "rebooted": false,
+            "stance": null
+          },
+          "openingRoute": {
+            "after": null,
+            "rank": null,
+            "nodeId": "c5_start_rule"
           }
         },
         "schema": {

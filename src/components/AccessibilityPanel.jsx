@@ -5,7 +5,7 @@ import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, TEXT_SCALES, useAcce
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
 // Each switch's words are src/copy/comfort.js's, under its key.
-const TOGGLES = ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"];
+const TOGGLES = ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"];
 
 /**
  * The comfort settings: in the intro's setup console, and in the dialog the

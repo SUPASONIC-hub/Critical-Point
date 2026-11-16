@@ -67,6 +67,7 @@ export default {
     holdToCommit: "長押しで確定",
     holdHint: "長押しが必要",
     holdHelp: "長押しで確定",
+    listen: "いまの状況を聞く",
   },
   keys: {
     stake: "賭ける",
@@ -232,6 +233,7 @@ export default {
     scout: "照会した。信頼を{trust}使った。壁は {min} から {max} のあいだのどこか",
     bank: "この勝負 {hand} · 賭け金 {pot} · 金庫 {vault}",
     act: "第{act}幕 開始 · 事件 {case}",
+    status: "熱 {gauge} · {danger} · 賭け金 {pot} · 残り{seconds}秒 · 心拍 {bpm}",
   },
   afterword: {
     nextPush: "もう一度押していたら +{step} → {gauge}、壁 {wall}: {outcome}。",

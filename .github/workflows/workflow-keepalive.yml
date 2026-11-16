@@ -1,0 +1,49 @@
+name: Workflow Keepalive
+
+# GitHub turns off a public repository's scheduled workflows after 60 days with
+# no activity (N7 of the 2026-11-12 next-improvements note). On the 1st of
+# every month this lists the workflows, turns back on those GitHub turned off
+# for inactivity (`disabled_inactivity`, never the ones turned off by hand) and
+# writes what it did and how long main has been quiet to the Job Summary
+# (scripts/workflow-keepalive.mjs). It never commits. This workflow can be
+# turned off with the rest; the Funnel summary warns from 45 quiet days so the
+# owner sees it before then. No new secret: the run's own GITHUB_TOKEN with
+# `actions: write`.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 1st of the month, 10:20 KST.
+    - cron: "20 1 1 * *"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Turn back on what GitHub turned off
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/workflows?per_page=100" > workflows.json
+          for id in $(node scripts/workflow-keepalive.mjs --ids workflows.json); do
+            gh workflow enable "$id" --repo "$GITHUB_REPOSITORY"
+          done
+          node scripts/workflow-keepalive.mjs --summary workflows.json "$(git log -1 --format=%cI)" >> "$GITHUB_STEP_SUMMARY"
+          rm -f workflows.json

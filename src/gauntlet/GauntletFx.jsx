@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getCloseness, getHeartbeatBpm, getRemainingSeconds, getWindowSeconds } from "./gauntletEngine.js";
-import { playClockTick, playHeartbeat, startTensionDrone } from "./gauntletAudio.js";
+import { playClockTick, playHeartbeat, playZoneThud, startTensionDrone } from "./gauntletAudio.js";
+import { zoneThudDue } from "./zoneThud.js";
+import { HESITATION_IDLE, hesitationKey, hesitationSwell, stepHesitation } from "./heartbeat.js";
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, isQuietTable, monotonicNow, registerFxVariables } from "./fxVariables.js";
-import { getAccessibility } from "../state/accessibilitySettings.js";
+import { getAccessibility, useAccessibility } from "../state/accessibilitySettings.js";
+import { edgeAlertLevel, edgeAlertPulses } from "./edgeAlert.js";
 import { setMusicStake } from "../components/AdaptiveMusic.jsx";
 
 /**
@@ -61,10 +64,27 @@ import { setMusicStake } from "../components/AdaptiveMusic.jsx";
  * nothing here reaches the engine, so the wall, the pot and the verdict of a
  * quiet table are what they were (tests/unit/table-motion.test.mjs).
  *
+ * The step marker (zoneThud.js, A1-1 · E3, 2026-11-12): as the 현재 위험 line
+ * the stage prints steps up (`zone`, tableMeters.js `dangerZoneOf`), one low
+ * thud, once. It reads the line, not `fxTier`, so neither setting reaches it;
+ * a quiet table keeps it out of the ear as it keeps the heartbeat out.
+ *
+ * The hesitation swell (heartbeat.js, A1-2, 2026-11-12): a card staked and
+ * nothing else pressed for over 3 s, and the heartbeat grows in volume only,
+ * over 8 s, to +20%. `hold` is the held 확정's phase, so a press on 확정 that
+ * has not finished is a press too. The beat's count, its tempo and every
+ * number drawn stay as they were.
+ *
  * The score hears the table too (`setMusicStake`, 2026-11-02): as the gauge
  * the table shows climbs, AdaptiveMusic brings in up to three layers over
  * the mode's own lead (musicScore.js, `STAKE_LAYER_GAUGES`), and lets them go
  * when the window closes. Like the steps it reads what is drawn, not the wall.
+ *
+ * The crisis edge (edgeAlert.js, A5, 2026-11-13): with its comfort switch
+ * on, the screen's edges breathe as the same line steps up. It is drawn by
+ * React off `zone`, not by the loop: the line changes a few times a window.
+ * Reduced motion is CSS's to answer; the comfort setting and a quiet table
+ * hold it still here.
  *
  * The loop allocates nothing per frame: numbers are formatted only when they
  * change, and `write` skips a style write when the string is the same.
@@ -77,16 +97,18 @@ const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const PULSE_MIN_MS = 345;
 /** How often the loop looks for readers that mounted since it last looked. */
 const READERS_REFRESH_MS = 400;
-export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef, caseId }) {
-  const stateRef = useRef({ window: liveWindow, paused, quiet: isQuietTable(caseId) });
+export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef, caseId, zone = "", hold = "" }) {
+  const stateRef = useRef({ window: liveWindow, paused, quiet: isQuietTable(caseId), zone, hold });
   const impactRef = useRef(0);
   const flashRef = useRef(0);
   const flashedAt = useRef(0);
   const overlayRef = useRef(null);
+  const { crisisEdge, calmEffects } = useAccessibility();
+  const edge = edgeAlertLevel({ enabled: crisisEdge, zone, live: liveWindow.status === "live" && !paused });
 
   useEffect(() => {
-    stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId) };
-  }, [liveWindow, paused, caseId]);
+    stateRef.current = { window: liveWindow, paused, quiet: isQuietTable(caseId), zone, hold };
+  }, [liveWindow, paused, caseId, zone, hold]);
 
   useEffect(() => {
     if (!impact) return;
@@ -143,10 +165,14 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
     let rate = -1;
     let lastTickSecond = -1;
     let droneAt = 0;
+    // The 현재 위험 step the last live frame stood on; "" until the first one.
+    let zoneSeen = "";
+    // How long the staked card has been held with nothing else pressed.
+    let held = HESITATION_IDLE;
     let readersAt = 0;
 
     const loop = (time) => {
-      const { window: win, paused: isPaused, quiet } = stateRef.current;
+      const { window: win, paused: isPaused, quiet, zone, hold } = stateRef.current;
       const delta = last ? Math.min(64, time - last) : 16;
       last = time;
       if (time >= readersAt) {
@@ -171,9 +197,10 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       // not: the tick light shows it, and is on screen for as long as it is.
       const bpm = getHeartbeatBpm(win.gauge, tellWall, win.schema.sedated, win.elapsed / getWindowSeconds(win));
       rate = fxRateStep(rate, fxRateTarget(bpm, win.status), delta, win.status);
+      held = stepHesitation(held, hesitationKey(win, hold), live, now);
       if (live) {
         if (time >= nextBeat) {
-          if (!quiet) playHeartbeat(heat, tier);
+          if (!quiet) playHeartbeat(heat, tier, hesitationSwell(held, now));
           nextBeat = time + 60000 / bpm;
           if (now - pulsedAt >= PULSE_MIN_MS) {
             pulsedAt = now;
@@ -181,6 +208,8 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
             impactRef.current = Math.min(1, impactRef.current + 0.04 + heat * 0.12);
           }
         }
+        if (zoneThudDue(zoneSeen, zone, quiet)) playZoneThud();
+        zoneSeen = zone;
         const remaining = Math.ceil(getRemainingSeconds(win));
         if (remaining <= 5 && remaining !== lastTickSecond) {
           lastTickSecond = remaining;
@@ -241,6 +270,13 @@ export function GauntletFx({ window: liveWindow, paused, impact, flash, stageRef
       <div className="gx-fx-vignette" />
       <div className="gx-fx-border" />
       <div className="gx-fx-flash" />
+      {edge ? (
+        <div
+          className={`gx-fx-edge${edgeAlertPulses({ calm: calmEffects, quiet: isQuietTable(caseId) }) ? " is-pulsing" : ""}`}
+          data-level={edge}
+          data-testid="crisis-edge"
+        />
+      ) : null}
     </div>,
     document.body,
   );
