@@ -1201,7 +1201,8 @@ const budgets = [
   // 214,508 / 41,536 -> 215,366 / 41,680 n1-act-card over main 53845978. Measured 215362 / 41676 (over budget only) in the e2e build, the plus 4.
   // 215,366 / 41,680 -> 215,606 / 41,786 다국적 인물 over main e43f7bf6. Measured 215602 / 41782 (over budget only) in the e2e build, the plus 4.
   // 215,606 / 41,786 -> 216,101 / 41,898 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 216097 / 41894 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_101, maxGzip: 41_898 },
+  // 216,101 / 41,898 -> 216,432 / 42,019 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured 216428 / 42015 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 216_432, maxGzip: 42_019 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2472,7 +2473,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
 // -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
 // -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
+// -> 377,861 / 439,153 / 447,032 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_861, en: 439_153, ja: 447_032 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
