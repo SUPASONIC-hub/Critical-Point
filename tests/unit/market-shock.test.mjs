@@ -33,14 +33,14 @@ function playCase(weekRule, windows, extra = {}) {
   return { verdicts, boards, run };
 }
 
-test("MARKET SHOCK is a catalogue device, booked in no week, with its words in three languages", async () => {
+test("MARKET SHOCK is a catalogue device, booked in one week (2027-W25, 초안), with its words in three languages", async () => {
   const rule = WEEK_RULE_CATALOGUE["market-shock"];
   assert.equal(rule.label, "MARKET SHOCK");
   assert.deepEqual([...rule.rules], ["shock"]);
   assert.equal(rule.schema, undefined);
   assert.ok(WEEK_RULE_DEVICES.includes("shock"));
   assert.equal(weekRuleHasDevice("market-shock", "shock"), true);
-  assert.deepEqual(WEEKLY_RULES.filter((entry) => entry.id === "market-shock"), [], "no week books it before the user picks its numbers");
+  assert.deepEqual(WEEKLY_RULES.filter((entry) => entry.id === "market-shock").map(({ week }) => week), ["2027-W25"], "one week, booked by 20261121000000");
   for (const value of [MARKET_SHOCK_BOARD + 1, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE]) assert.ok(rule.text.includes(String(value)), rule.text);
   assert.ok(rule.world.length > 0 && rule.world.length <= 40);
   const values = { shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE };

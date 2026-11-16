@@ -31,8 +31,8 @@
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
 | `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
-| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 카탈로그에만, 달력·마이그레이션 없음(초안) |
-| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 카탈로그에만, 달력·마이그레이션 없음(초안) |
+| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 2027-W19 한 주(마이그레이션 20261121000000, 초안·사용자 확인 전) |
+| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 2027-W25 한 주(마이그레이션 20261121000000, 초안·사용자 확인 전) |
 | `audit` / `cascade` / `audit-cascade` | AUDIT WEEK / CASCADE WEEK / AUDIT & CASCADE | 숫자는 그대로, 장치(`WEEK_RULE_DEVICES`의 `audit`·`cascade`)를 켬. W47 시험 주용 |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
@@ -88,19 +88,34 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 
 ## 2. 달력
 
-`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-05 기준).
+`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-16 기준, W17~W25는 초안 PR의 줄).
 
 | 주 | 날짜 | 규칙 | 병합일 |
 | --- | --- | --- | --- |
 | 2026-W46 | 11-09 ~ 11-15 | `near-wall` | 10-16 |
 | 2026-W47 | 11-16 ~ 11-22 | `audit-cascade` (시험 주) | 10-22 |
 | 2026-W48 | 11-23 ~ 11-29 | `heavy-fracture` | 10-23 |
+| 2026-W49 | 11-30 ~ 12-06 | `crisis-week` (B10 위기 주간) | 11-13 |
 | 2026-W50 | 12-07 ~ 12-13 | `short-clock` | 10-23 |
 | 2026-W52 | 12-21 ~ 12-27 | `near-wall` | 10-23 |
 | 2027-W01 | 01-04 ~ 01-10 | `heavy-fracture` | 10-23 |
 | 2027-W03 | 01-18 ~ 01-24 | `short-clock` | 10-23 |
+| 2027-W05 | 02-01 ~ 02-07 | `near-wall` | 11-12 |
+| 2027-W07 | 02-15 ~ 02-21 | `heavy-fracture` | 11-12 |
+| 2027-W09 | 03-01 ~ 03-07 | `short-clock` | 11-12 |
+| 2027-W11 | 03-15 ~ 03-21 | `near-wall` | 11-12 |
+| 2027-W13 | 03-29 ~ 04-04 | `heavy-fracture` | 11-12 |
+| 2027-W15 | 04-12 ~ 04-18 | `short-clock` | 11-12 |
+| 2027-W17 | 04-26 ~ 05-02 | `near-wall` | 11-16 |
+| 2027-W19 | 05-10 ~ 05-16 | `idle-erosion` (B4 IDLE MONEY) | 11-16 |
+| 2027-W21 | 05-24 ~ 05-30 | `heavy-fracture` | 11-16 |
+| 2027-W23 | 06-07 ~ 06-13 | `short-clock` | 11-16 |
+| 2027-W25 | 06-21 ~ 06-27 | `market-shock` (c2 MARKET SHOCK) | 11-16 |
 
-둘 중 하나가 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). 사이의 주는 규칙 없는 평범한 주이고,
+대체로 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). W49의 위기 주간은 W48·W50 사이에 끼운 주라
+W48~W50이 세 주 이어집니다. W17~W25는 세 규칙의 차례를 이어 가되, 장치 규칙 둘(IDLE MONEY, MARKET SHOCK)이
+그 격주 자리를 하나씩 받아 다른 규칙 주와 붙지 않습니다(W19·W25, 6주 간격). W26은 평범한 주입니다.
+사이의 주는 규칙 없는 평범한 주이고,
 그 주의 시작 화면은 다음 주 예고만 보입니다.
 
 ---
@@ -213,7 +228,7 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 | 기기의 상자 둘, 시즌의 도장 | `src/state/weeklyRuleChoice.js`, `src/state/runState.js` |
 | 테스트 시계 | `src/state/weeklyClock.js`, `.env.e2e` |
 | 순위 판 고르기 | `src/state/useLeaderboard.js`, `src/screens/RankingScreen.jsx` |
-| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql` |
+| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql`, `20261115000000_weekly_rule_calendar_w05_w15.sql`, `20261116000000_weekly_rule_crisis_week.sql`, `20261121000000_weekly_rule_calendar_w17_w26.sql` |
 | 달력 비교, 주 판 재계산 | `scripts/check-grants.mjs` (`check:grants`), `scripts/verify-ranking-rows.mjs` (`verify:ranking`) |
 | 시험 주 보고 | `.github/workflows/test-week.yml`, `scripts/report-test-week.mjs`, 저장소 변수 `TEST_WEEK_SIM_LINES` |
 | 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
