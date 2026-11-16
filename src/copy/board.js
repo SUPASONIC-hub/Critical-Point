@@ -42,6 +42,18 @@ const boardCopy = {
     local: "지금은 게시판에 연결되어 있지 않습니다.",
     ready: "아직 남겨진 글이 없습니다. 첫 글을 남겨보세요.",
   },
+  // N33: the pinned 「이번 주 질문」 over the posts (src/boardQuestions.js has which id is which week).
+  weekQuestion: {
+    label: "이번 주 질문",
+    from: "우리가 묻습니다",
+    note: "답은 아래에 글로 남겨 주세요. 질문은 월요일마다 바뀝니다.",
+    questions: {
+      "first-stake": "첫 사건에서 처음 LOCK을 누른 순간, 무엇을 믿고 눌렀나요? 우리는 점수보다 그 이유가 궁금합니다.",
+      "stopped-at-wall": "벽 바로 앞에서 손을 멈춘 적이 있나요? 무엇이 손을 멈추게 했는지 들려주세요.",
+      "numbers-or-people": "숫자와 사람 중 하나만 지킬 수 있던 장면이 있었나요? 우리는 그런 장면을 쓰며 오래 망설였습니다. 당신은 어느 쪽이었나요?",
+      "short-clock": "시간이 짧으면 더 빨라지나요, 더 조심하게 되나요? 이번 주 짧은 시계에서 달라진 점을 남겨 주세요.",
+    },
+  },
   noTime: "기록 시각 없음",
   reportedLabel: "{name}님의 글을 신고했습니다",
   reportLabel: "{name}님의 글 신고",
