@@ -140,6 +140,7 @@
     "src/state/telemetryEventId.js": 52,
     "src/state/telemetryQueuePolicy.js": 100,
     "src/state/trace.js": 66,
+    "src/state/uiVersion.js": 85,
     "src/state/useAppPersistence.js": 92,
     "src/state/useBoard.js": 70,
     "src/state/useChoiceCommit.js": 98,
@@ -157,6 +158,7 @@
     "src/state/weeklyRuleChoice.js": 100,
     "src/telemetry.js": 80,
     "src/threeScenes.js": 100,
+    "src/uiV2/motion.js": 100,
     "src/verdictBranch.js": 100,
     "src/viewModels/appViewModels.js": 99,
     "src/viewModels/introViewModel.js": 100,
@@ -190,6 +192,7 @@
     "src/state/useRuntimeSavedState.js",
     "src/state/useRuntimeShortcuts.js",
     "src/state/useStableEvent.js",
+    "src/uiV2/index.js",
     "src/state/useWindowSuspension.js"
   ]
 }
