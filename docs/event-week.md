@@ -31,12 +31,13 @@
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
 | `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
+| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 카탈로그에만, 달력·마이그레이션 없음(#555, 11-16 병합) |
+| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 카탈로그에만, 달력·마이그레이션 없음(#555, 11-16 병합) |
 | `audit-cascade` | AUDIT & CASCADE | W47 시험 주의 줄. 감사·연쇄는 RULES_MARK 3부터 판의 규칙(`tableUnlocks.js`)이라 이 규칙이 켜는 장치는 이제 없습니다. 달력과 서버 `weekly_rules`가 이 id를 들고 있고 그 주에 시작한 시즌이 도장을 지니므로 카탈로그에 남깁니다 |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
-  고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`)에 있는 것만 켤 수 있고, 감사·연쇄가 판의 규칙이 된
-  뒤로 그 목록은 **비어 있습니다**(다음에 한 주로 먼저 시험해 볼 장치를 위한 자리). `tests/unit/weekly-rules.test.mjs`가
-  둘 다 지킵니다.
+  고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`)에 있는 것만 켤 수 있습니다.
+  감사·연쇄는 판의 규칙이 되어 목록에서 빠졌습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다 지킵니다.
 - 규칙의 말(제목·본문·이야기 속 한 줄 `world`)은 `src/copy/weekRules.js`, 시작 화면·순위 화면의 줄과 상자 문구는
   `src/copy/weekRule.js`이고, 영어·일본어는 `src/locales/<lang>/screens/weekRules.js`·`weekRule.js`에 같은
   키로 있습니다. 숫자는 `{shift}` 같은 빈칸으로 들어가 상수 하나를 고치면 세 언어가 따라옵니다.
