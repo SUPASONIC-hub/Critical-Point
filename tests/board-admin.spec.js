@@ -115,9 +115,11 @@ test("?admin signs in with Google, and the admin bar hides, restores and deletes
 
   await page.getByRole("button", { name: "게시판 열기" }).click();
   const bar = page.getByTestId("board-admin-bar");
-  await expect(bar).toBeVisible();
+  // The bar is a lazy chunk fetched only now; on a busy runner it came after 8 s
+  // (the failure screenshot showed it drawn), so give it the same 30 s.
+  await expect(bar).toBeVisible({ timeout: 30_000 });
   const rows = bar.getByTestId("board-admin-post");
-  await expect(rows).toHaveCount(2);
+  await expect(rows).toHaveCount(2, { timeout: 30_000 });
   await expect(rows.first()).toContainText("신고 3");
   await expect(rows.nth(1)).toHaveClass(/is-hidden/);
   await expect(rows.nth(1)).toContainText("신고로 자동 숨김");
@@ -173,7 +175,7 @@ test("the admin bar counts the waiting posts, decides them, and reads the admin 
   await page.goto("/");
   await page.getByRole("button", { name: "게시판" }).first().click();
   const bar = page.getByTestId("board-admin-bar");
-  await expect(bar).toBeVisible();
+  await expect(bar).toBeVisible({ timeout: 30_000 });
   await expect(bar.getByTestId("board-admin-waiting")).toHaveText("신고 대기 2건");
 
   await bar.getByRole("tab", { name: "신고 대기" }).click();
