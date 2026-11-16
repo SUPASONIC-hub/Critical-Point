@@ -31,11 +31,12 @@
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
 | `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
-| `audit` / `cascade` / `audit-cascade` | AUDIT WEEK / CASCADE WEEK / AUDIT & CASCADE | 숫자는 그대로, 장치(`WEEK_RULE_DEVICES`의 `audit`·`cascade`)를 켬. W47 시험 주용 |
+| `audit-cascade` | AUDIT & CASCADE | W47 시험 주의 줄. 감사·연쇄는 RULES_MARK 3부터 판의 규칙(`tableUnlocks.js`)이라 이 규칙이 켜는 장치는 이제 없습니다. 달력과 서버 `weekly_rules`가 이 id를 들고 있고 그 주에 시작한 시즌이 도장을 지니므로 카탈로그에 남깁니다 |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
-  고치지 않습니다(D4). 장치는 허용 목록 둘 말고는 켤 수 없습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다
-  지킵니다.
+  고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`)에 있는 것만 켤 수 있고, 감사·연쇄가 판의 규칙이 된
+  뒤로 그 목록은 **비어 있습니다**(다음에 한 주로 먼저 시험해 볼 장치를 위한 자리). `tests/unit/weekly-rules.test.mjs`가
+  둘 다 지킵니다.
 - 규칙의 말(제목·본문·이야기 속 한 줄 `world`)은 `src/copy/weekRules.js`, 시작 화면·순위 화면의 줄과 상자 문구는
   `src/copy/weekRule.js`이고, 영어·일본어는 `src/locales/<lang>/screens/weekRules.js`·`weekRule.js`에 같은
   키로 있습니다. 숫자는 `{shift}` 같은 빈칸으로 들어가 상수 하나를 고치면 세 언어가 따라옵니다.
@@ -86,19 +87,28 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 
 ## 2. 달력
 
-`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-05 기준).
+`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-16 기준). 이 표는 `tests/unit/event-week-doc.test.mjs`가
+`MERGED_WEEKS`와 한 줄씩 대조하므로, 달력 줄을 더하는 PR은 이 표도 같이 고쳐야 `npm test`를 통과합니다.
 
 | 주 | 날짜 | 규칙 | 병합일 |
 | --- | --- | --- | --- |
 | 2026-W46 | 11-09 ~ 11-15 | `near-wall` | 10-16 |
 | 2026-W47 | 11-16 ~ 11-22 | `audit-cascade` (시험 주) | 10-22 |
 | 2026-W48 | 11-23 ~ 11-29 | `heavy-fracture` | 10-23 |
+| 2026-W49 | 11-30 ~ 12-06 | `crisis-week` (B10 위기 주간) | 11-13 |
 | 2026-W50 | 12-07 ~ 12-13 | `short-clock` | 10-23 |
 | 2026-W52 | 12-21 ~ 12-27 | `near-wall` | 10-23 |
 | 2027-W01 | 01-04 ~ 01-10 | `heavy-fracture` | 10-23 |
 | 2027-W03 | 01-18 ~ 01-24 | `short-clock` | 10-23 |
+| 2027-W05 | 02-01 ~ 02-07 | `near-wall` | 11-12 |
+| 2027-W07 | 02-15 ~ 02-21 | `heavy-fracture` | 11-12 |
+| 2027-W09 | 03-01 ~ 03-07 | `short-clock` | 11-12 |
+| 2027-W11 | 03-15 ~ 03-21 | `near-wall` | 11-12 |
+| 2027-W13 | 03-29 ~ 04-04 | `heavy-fracture` | 11-12 |
+| 2027-W15 | 04-12 ~ 04-18 | `short-clock` | 11-12 |
 
-둘 중 하나가 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). 사이의 주는 규칙 없는 평범한 주이고,
+대체로 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). W49의 위기 주간은 W48·W50 사이에 끼운 주라
+W48~W50이 세 주 이어집니다. 사이의 주는 규칙 없는 평범한 주이고,
 그 주의 시작 화면은 다음 주 예고만 보입니다.
 
 ---
@@ -118,7 +128,7 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 
 한 PR에 둘을 같이 넣습니다.
 
-1. `src/gauntlet/weeklyCalendar.js`의 `MERGED_WEEKS`에 `{ week: "2027-W05", id: "near-wall", added: "<병합일>" }`.
+1. `src/gauntlet/weeklyCalendar.js`의 `MERGED_WEEKS`에 `{ week: "2027-W17", id: "near-wall", added: "<병합일>" }`.
    `added`는 **실제로 병합하는 날**로 씁니다. 날짜가 밀리면 줄을 고쳐서 다시 올립니다. 유닛 테스트가 7일을
    재므로 늦은 줄은 `npm test`에서 떨어집니다.
 2. `supabase/migrations/<main의 마지막 마이그레이션 뒤 날짜>_weekly_rule_calendar_<주>.sql`:
@@ -126,8 +136,8 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
    (20261023010000 파일의 꼴). 마이그레이션이 든 PR은 병합하면 1분 안에 운영 DB에 적용되므로 **병합 직전에
    우리에게 따로 묻습니다.** 아직 시작하지 않은 주의 줄이라 적용 순간에 판정받는 런은 없습니다.
 3. `npm run check:grants`(두 달력 비교), `npm test`(`weekly-rules.test.mjs`), `npm run check:changed`.
-4. README 「이번 주의 규칙」 문단의 주 목록과 이 문서 2장의 표를 맞춥니다(`check:doc-numbers`는 이 표를 세지
-   않으니 손으로).
+4. README 「이번 주의 규칙」 문단의 주 목록과 이 문서 2장의 표를 맞춥니다. 2장의 표는 `event-week-doc.test.mjs`가
+   달력과 대조하고, README 문단은 손으로 봅니다.
 
 ### 3-3. 알리기
 
@@ -211,7 +221,7 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 | 기기의 상자 둘, 시즌의 도장 | `src/state/weeklyRuleChoice.js`, `src/state/runState.js` |
 | 테스트 시계 | `src/state/weeklyClock.js`, `.env.e2e` |
 | 순위 판 고르기 | `src/state/useLeaderboard.js`, `src/screens/RankingScreen.jsx` |
-| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql` |
+| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql`, `20261115000000_weekly_rule_calendar_w05_w15.sql`, `20261116000000_weekly_rule_crisis_week.sql` |
 | 달력 비교, 주 판 재계산 | `scripts/check-grants.mjs` (`check:grants`), `scripts/verify-ranking-rows.mjs` (`verify:ranking`) |
 | 시험 주 보고 | `.github/workflows/test-week.yml`, `scripts/report-test-week.mjs`, 저장소 변수 `TEST_WEEK_SIM_LINES` |
-| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
+| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/event-week-doc.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
