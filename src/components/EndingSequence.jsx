@@ -6,8 +6,27 @@ import { focusSceneTitle } from "../state/sceneFocus.js";
 import { getThreeScenes, threeScenesHeading } from "../threeScenes.js";
 import endingCopy from "../copy/ending.js";
 import { fill } from "../locale.js";
+import { isStillPage, scatterGlyphs, shouldScatterEndingLine } from "../endingEntropy.js";
 
 const words = endingCopy.sequence;
+
+/**
+ * A record's headline. On the collapse ending's first record it scatters and
+ * comes back once (endingEntropy.js, result.css ending-entropy); the sentence
+ * stays the heading's name, the letters are hidden from a screen reader.
+ */
+function EndingHeadline({ text, scatter }) {
+  if (!scatter) return <h2>{text}</h2>;
+  return (
+    <h2 className="ending-entropy" aria-label={text} data-testid="ending-entropy">
+      <span aria-hidden="true">
+        {scatterGlyphs(text).map((letter, index) => letter.space
+          ? letter.glyph
+          : <span key={index} style={{ "--dx": letter.dx, "--dy": letter.dy }}>{letter.glyph}</span>)}
+      </span>
+    </h2>
+  );
+}
 
 export function EndingSequence({
   endingStep,
@@ -112,7 +131,10 @@ export function EndingSequence({
           </span>
           <blockquote>{currentEndingTwist.evidence}</blockquote>
           <div className="ending-twist-card">
-            <h2>{currentEndingTwist.title}</h2>
+            <EndingHeadline
+              text={currentEndingTwist.title}
+              scatter={shouldScatterEndingLine({ endingVisualClass, endingStep, endingTwistIndex, still: isStillPage() })}
+            />
             <p>{currentEndingTwist.copy}</p>
             <small>{finalChoiceText}</small>
           </div>

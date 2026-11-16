@@ -197,10 +197,10 @@ export default {
       "voice": "He calls Kang Taemin “bro” and is strictly polite with everyone else. He talks like it’s a joke and tacks a real question onto the end.",
       "line": "In bank ads I’m always the smiling customer. At a real bank I’ve never once smiled."
     },
-    "주은채": {
+    "레이철 탄": {
       "appearance": "A white shirt with the sleeves rolled twice, three highlighters in different colors, glasses reflecting the light of six monitors.",
       "thought": "Numbers don’t lie. But I never once put into the model who reads the numbers to whom.",
-      "gesture": "Every time Joo Eunchae says a number, she gives it to one decimal place, and rounds only when she isn’t sure.",
+      "gesture": "Every time Rachel Tan says a number, she gives it to one decimal place, and rounds only when she isn’t sure.",
       "voice": "She explains brightly and fast, then stops dead the moment she learns something she didn’t know.",
       "line": "It’s a structure where good money makes good returns. At least in my model."
     },
@@ -302,10 +302,10 @@ export default {
       "voice": "He says little and ends on a number. Polite, but he doesn’t bend.",
       "line": "We’ll keep to 72 hours. Not 1 minute more."
     },
-    "류세아": {
+    "프리야 나이르": {
       "appearance": "A label-printer strap around her neck, a laptop crowded with stickers, a silver thermos she carries everywhere.",
       "thought": "A model you can’t explain is a wrong model, however accurate. And yet I never read the training list to the end.",
-      "gesture": "Before answering, Ryu Seah prints a label and looks for a place to stick it. She can’t leave anything unnamed.",
+      "gesture": "Before answering, Priya Nair prints a label and looks for a place to stick it. She can’t leave anything unnamed.",
       "voice": "She talks fast and bright, and lowers her voice at the end only when she admits what she doesn’t know.",
       "line": "I don’t trust a model that can’t explain itself either. That’s why this one hurts more."
     },
@@ -337,10 +337,10 @@ export default {
       "voice": "He asks straight out, and when adults dodge the answer, he asks the same question once more.",
       "line": "You teach how to sell. Don’t you teach how not to sell?"
     },
-    "표세린": {
+    "미즈노 사키": {
       "appearance": "A white shirt with the cuffs turned once, a desk without a single plant, an Excel sheet balanced to the third decimal place.",
       "thought": "A recommendation written as a favor is one nobody trusts the next year. What I sell isn’t a yes or a no; it’s being trustworthy.",
-      "gesture": "Before answering, Pyo Serin turns her laptop screen toward the other person. She shows her numbers first, then speaks.",
+      "gesture": "Before answering, Mizuno Saki turns her laptop screen toward the other person. She shows her numbers first, then speaks.",
       "voice": "She doesn’t write down words carried by feeling. When those words come with grounds, she doesn’t drop a single letter.",
       "line": "I don’t take requests for a vote-against recommendation. Give me grounds. I write the recommendation."
     },
@@ -400,10 +400,10 @@ export default {
       "voice": "He uses Korean proverbs backwards and doesn’t correct them even when he knows they’re wrong. His accent disappears only when he says numbers.",
       "line": "There’s a Korean proverb: the more urgent it is, the more you go around. So let’s sign quickly."
     },
-    "백다온": {
+    "마커스 림": {
       "appearance": "He keeps his ID badge tucked inside his shirt. The corner of his laptop shows a half-peeled Korean university sticker.",
       "thought": "Four people can open the file. One in four is as good as a name.",
-      "gesture": "Baek Daon holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
+      "gesture": "Marcus Lim holds out only half of what he has to show, and pulls it back before the other person can reach for it.",
       "voice": "His polite speech is fast and quiet. He always ends a sentence by saying he’s the one with the least power.",
       "line": "That collection plan, I made it. Contact intensity 5 times a week, that’s my Excel."
     },
@@ -512,17 +512,17 @@ export default {
       "voice": "He doesn’t say what he isn’t asked, and when he speaks, he says only what he saw.",
       "line": "I’ve tended this house’s garden for forty years, and more photos come down than go up."
     },
-    "은재하": {
+    "뤼카 베르나르": {
       "appearance": "Chef’s whites with the sleeves pushed up, menu cards written in careful hand, a staff bibimbap mixed from leftover ingredients.",
       "thought": "The long dish names are my revenge. The Chairman has never once memorized one.",
-      "gesture": "Before bringing something up, Eun Jaeha takes out one more spoon and sets it in front of the other person.",
+      "gesture": "Before bringing something up, Lucas Bernard takes out one more spoon and sets it in front of the other person.",
       "voice": "He recites clearly when setting down a plate, and talks fast and smiling in the kitchen.",
       "line": "The long dish names are my revenge. The Chairman has never once memorized one."
     },
-    "도건우": {
+    "대니얼 강": {
       "appearance": "A crisp white shirt with silver clips instead of cuff buttons, a two-page proposal with corners exactly aligned, a bottle of water he always carries cold.",
       "thought": "Memory is a cost. If the company pays it for you, everyone’s comfortable. Comfortable people don’t talk again.",
-      "gesture": "Before handing over the proposal, Do Geonwoo taps the corners twice so the second page lines up exactly under the first.",
+      "gesture": "Before handing over the proposal, Daniel Kang taps the corners twice so the second page lines up exactly under the first.",
       "voice": "Polite to the end, he tells you first what you want. The conditions are always in the next sentence.",
       "line": "We’re erasing it for you. That’s what everyone wants, isn’t it?"
     },
@@ -638,10 +638,10 @@ export default {
       "voice": "He holds back his Yeongdong dialect, and it all bursts out at once when he laughs.",
       "line": "He said to be sure to tell you it’s from a factory that paid off its whole loan."
     },
-    "연시우": {
+    "응우옌 반 남": {
       "appearance": "Work pants stretched at the knees, three access badges around his neck, a pencil behind his ear, a worn clipboard holding the disposal register.",
       "thought": "Servers don’t lie. Only the document that says to wipe the servers lies.",
-      "gesture": "Before answering, Yeon Siwoo lays his palm once on the side of the nearest server. Even he doesn’t know if he’s checking the heat or saying hello.",
+      "gesture": "Before answering, Nguyen Van Nam lays his palm once on the side of the nearest server. Even he doesn’t know if he’s checking the heat or saying hello.",
       "voice": "He calls the servers “these guys” and is more polite to them than to people.",
       "line": "No running in here, and no talking down to the servers either. These guys have sharp ears."
     },
@@ -666,12 +666,75 @@ export default {
       "voice": "She talks fast and bright, and slows by half a beat the moment numbers turn into people’s names.",
       "line": "We won’t go under. That’s what we built this company for."
     },
-    "우지환": {
+    "토머스 리드": {
       "appearance": "A tablet with a marathon-finish photo as wallpaper, a neat knit sweater instead of a tie, watch alarms set to the minute.",
       "thought": "This is an age where dissents stay on the record. So even with a dissent, the loan can go out.",
-      "gesture": "When Woo Jihwan gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
+      "gesture": "When Thomas Reed gets an unfavorable question, he glances once at his watch and cuts his answer short, like a split time.",
       "voice": "Courteous and smooth, and every sentence turns once at “however.”",
       "line": "This time we fill all five signature lines. Isn’t that reform?"
+    },
+    "오민정": {
+      "appearance": "Hair flattened by a headset, a thermos of barley tea, the empathy count in the corner of her monitor.",
+      "thought": "I say sorry in my own voice, and I don’t know what I’m sorry for either.",
+      "gesture": "Before she says something that matters, Oh Minjeong covers the headset mic with her palm.",
+      "voice": "Under a kind counsellor’s manner lies a thin layer of 7 years’ tiredness.",
+      "line": "If you ask me why, that’s what I most want to know too."
+    },
+    "문정택": {
+      "appearance": "An apron with tteokbokki stains, a wad of card-terminal receipts in his pocket, thick knuckles.",
+      "thought": "Going under doesn’t scare me. Going under without knowing why does.",
+      "gesture": "Every time he says a number, Moon Jeongtaek wipes his hand once on his apron.",
+      "voice": "The rounded way of a man who runs a shop: an apology first, then the point.",
+      "line": "What do I hand in? I’ll hand in whatever you ask."
+    },
+    "한기호": {
+      "appearance": "Shirt sleeves folded twice, the foil from a convenience-store gimbap, sticky notes all round his monitor’s frame.",
+      "thought": "File a request and a red dot goes by my name. Don’t, and it goes nowhere.",
+      "gesture": "Before saying something awkward, Han Giho gives an embarrassed laugh, and stops before the laugh is over.",
+      "voice": "Soft and apologetic, but the end of every sentence comes back to the rules.",
+      "line": "I didn’t write this. I was handed it."
+    },
+    "그레이스 웡": {
+      "appearance": "Thin gold-rimmed glasses, a striped vest over a white shirt, two desk clocks set to closing times.",
+      "thought": "A payment with nobody to make the confirmation call to is a payment nobody was ever responsible for.",
+      "gesture": "Before she says something that matters, Grace Wong takes her hands off the keyboard.",
+      "voice": "She states the rules word by word, then asks the person just one sentence at the end.",
+      "line": "Analyst, who am I supposed to call?"
+    },
+    "모지현": {
+      "appearance": "A shopping bag hung on the stroller handle, hair falling past her shoulders, a phone showing the email from her last day.",
+      "thought": "For 9 years my name meant approval. Now it means suspicion.",
+      "gesture": "When she says a number, Mo Jihyun grips the stroller handle tight.",
+      "voice": "She starts calmly, and her sentences grow short whenever her own name comes up.",
+      "line": "I asked you to delete it."
+    },
+    "레 티 호아": {
+      "appearance": "A rice cooker on top of the moving boxes, a lanyard with her lab pass, a laptop holding thirty-seven property registers.",
+      "thought": "9 years of savings have become one row of a table. A row, at least, can be counted.",
+      "gesture": "When Le Thi Hoa says a number, she puts a finger on that cell of her laptop screen and keeps it there until she has finished.",
+      "voice": "Clear, careful and polite; she says first what she doesn’t know, then asks.",
+      "line": "Whether that’s strange, I don’t know."
+    },
+    "육성빈": {
+      "appearance": "A convenience-store bag, a loosened tie, the team’s target table on his phone.",
+      "thought": "If I hadn’t checked it, someone else would have. And they’d have been on a contract too.",
+      "gesture": "Before saying something awkward, Yuk Seongbin puts down whatever he is holding, and leaves it half unwrapped.",
+      "voice": "Friendly and apologetic, but the end of every sentence comes back to the team’s numbers.",
+      "line": "We only checked it. Though the checked-by box does have my name in it."
+    },
+    "추영복": {
+      "appearance": "A bunch of shutter keys, a counter by the heater, a tuition bill with his granddaughter’s name on it.",
+      "thought": "If the bank’s name is on it, the bank is watching it. That’s how it has been for 32 years.",
+      "gesture": "Every time he says a big number, Chu Yeongbok gives a small laugh and slows down a little on the next words.",
+      "voice": "A neighbourhood shopkeeper’s way of talking: it starts gruff and ends in an apology.",
+      "line": "If the bank tells me, I’ll do just that."
+    },
+    "마리사 탄": {
+      "appearance": "Singapore’s night skyline past the video-call window, a half-drunk cup of tea, an approval record on screen share.",
+      "thought": "My advice is on the record. Being on the record and being taken up are different things.",
+      "gesture": "Marisa Tan says the other person’s name, then the point, and when she is done she puts a document on the screen.",
+      "voice": "In English, short and straight. Given names before titles.",
+      "line": "All we can see is the inside of the exchange. Where the money came from, the bank sees."
     }
   },
 };

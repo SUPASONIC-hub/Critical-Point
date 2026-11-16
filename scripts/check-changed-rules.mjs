@@ -155,6 +155,15 @@ export const CATEGORIES = [
     tests: "none",
   },
   {
+    id: "readme",
+    label: "README, its rules or its images",
+    // docs/readme-rules.md: the README is a portfolio page first; check:readme
+    // keeps the measurable half (length above the fold, tables, summaries, images).
+    test: (file) => file === "README.md" || file === "docs/readme-rules.md" || /^docs\/images\//.test(file),
+    checks: ["check:readme", "check:doc-numbers", "check:visual-baselines"],
+    tests: "none",
+  },
+  {
     id: "docs",
     label: "document",
     // `format:check` covers src/styles only (the README's "개발 메모"), so a

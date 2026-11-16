@@ -69,7 +69,7 @@ export default {
     },
     "p4_quota": {
       "title": "The 2nd-Floor Whiteboard",
-      "text": "Lunchtime, the 2nd-floor meeting room. The whiteboard shows the branch’s May target of 1.2 billion won. Of the six window boxes, the ones that missed keep a name, and Windows 3 and 6 have kept theirs two months running. The memo that sent the target down came from your team. Its approval field carries only a department name. The 18 pages of attached terms never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways. If this is about mis-selling, my people only followed the script.'",
+      "text": "Lunchtime, the 2nd-floor meeting room. The whiteboard shows the branch’s May target of 1.2 billion won. Of the six window boxes, the ones that missed keep a name, and Windows 3 and 6 have kept theirs two months running. The memo that sent the target down came from your team. Its approval field carries only a department name. The 18 pages of attached terms never reached the windows. Branch Manager Bae grips a marker and lets it go. 'I didn’t make that target. I just got it and split it six ways. If this is about mis-selling, my people only followed the script.' His phone lights up with a group message from the head of sales promotion at head office. 'Enjoy your lunch, everyone ^^ By 1 o’clock, one line each on why your window missed, please.'",
       "memo": [
         "May branch target 1.2 billion won -- 200 million won per window",
         "Names of windows under target never erased -- Windows 3 and 6, 2 months running",

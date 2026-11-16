@@ -5,7 +5,7 @@ export default {
     bust: "[Disciplinary referral] {title}",
   },
   result: {
-    collapse: "[SYSTEM COLLAPSE] Season collapse · {title}",
+    collapse: "[Collapse] Season verdict · {title}",
     season: "[{ending}] Season verdict · {title}",
     case: "[Case closed] {tag} · {title}",
   },

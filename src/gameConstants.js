@@ -10,10 +10,23 @@ export const initialResources = {
 /** One clamp for the rules, the risk readout and the table: `riskLogic.js` and the engine each kept their own. */
 export const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 
-/** A whole number with thousands separators, as every pot, vault and ledger line prints it. */
+/** A whole number with thousands separators. */
 export function formatNumber(value) {
   return Math.round(Number(value) || 0).toLocaleString("en-US");
 }
+
+/**
+ * Money as every pot, vault, purse and ledger line prints it: dollars, in every
+ * language, because KD is a global financial group (2026-11-13, user). The
+ * number itself is unchanged; only the sign is added.
+ */
+export const MONEY_SIGN = "$";
+export function formatMoney(value) {
+  return `${MONEY_SIGN}${formatNumber(value)}`;
+}
+
+/** Korean reads "$12,345" as "…달러", so the particle follows 달러, not the last digit. */
+export const MONEY_READ_AS = "달러";
 
 /**
  * The two resources where a rising number is the loss. Colour, arrows and the

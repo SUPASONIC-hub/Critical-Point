@@ -1,6 +1,6 @@
 import { drawStep, GAUGE_MAX, getMultiplier } from "./gauntletEngine.js";
 import { tableReactions } from "../caseCopy.js";
-import { formatNumber } from "../gameConstants.js";
+import { formatMoney } from "../gameConstants.js";
 import { getCaseRead } from "../seasonScore.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
@@ -169,5 +169,5 @@ export function perCaseVault(vault, cases) {
 export function describeVaultPerCase(caseResults = {}) {
   const results = caseResults && typeof caseResults === "object" ? caseResults : {};
   const perCase = perCaseVault(results.final?.gauntlet?.vault, Object.keys(results).length);
-  return perCase === null ? "" : fill(words().vaultPerCase, { vault: formatNumber(perCase) });
+  return perCase === null ? "" : fill(words().vaultPerCase, { vault: formatMoney(perCase) });
 }

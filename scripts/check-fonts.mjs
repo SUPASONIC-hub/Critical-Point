@@ -50,10 +50,13 @@ import {
 // they replaced, since both are cut from the same face and axis. (Before the merge,
 // 2026-11-03/04: 96,236 and then 129,424 / 85,744.) Measured 131,352 / 82,780 plus 4.
 // 131,356 -> 131,476 on 2026-11-11, bundle 1111 (#301 adds 냄 and 짧 to the start screen). Measured 131,472 plus 4.
-const MAX_FONT_BYTES = 131_476;
+// 131,476 -> 131,832 on 2026-11-13, 다국적 인물 (cast-global): the start screen's one-month rename notice lists the old and new names (프리야 나이르, 레이철 탄 ...). Measured 131,828 plus 4.
+const MAX_FONT_BYTES = 131_832;
 // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (냄 and 짧 left this file). Measured 82,424 plus 4.
 // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
-const MAX_REST_FONT_BYTES = 82_688;
+// 82,688 -> 86,328 on 2026-11-13, 다국적 인물 (cast-global): the new names' syllables (뤼, 옌, 응, 즈 ...). Measured 86,324 plus 4.
+// 86,328 -> 87,100 on 2026-11-13, 다국적 인물 over main e43f7bf6: the new names' syllables plus 번외 4~7's. Measured 87,096 plus 4.
+const MAX_REST_FONT_BYTES = 87_100;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
@@ -69,6 +72,9 @@ const SYSTEM_FACE_CHARACTERS = {
   "日": { drawn: true, where: "locale.js: the language choice's 日本語" },
   "本": { drawn: true, where: "locale.js: the language choice's 日本語" },
   "語": { drawn: true, where: "locale.js: the language choice's 日本語" },
+  "水": { drawn: true, where: "castAliases.js: 水野咲 in the Japanese rename notice (a ja page)" },
+  "野": { drawn: true, where: "castAliases.js: 水野咲 in the Japanese rename notice (a ja page)" },
+  "咲": { drawn: true, where: "castAliases.js: 水野咲 in the Japanese rename notice (a ja page)" },
   "▒": { drawn: true, where: "GauntletHand.jsx: a sealed card's hidden numbers (aria-hidden)" },
   "｡": { drawn: false, where: "useBoard.js: a full stop the board's link filter reads" },
   "‏": { drawn: false, where: "useBoard.js: BOARD_INVISIBLE_PATTERN, the end of a range" },

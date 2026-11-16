@@ -189,7 +189,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   const panel = source("components/AccessibilityPanel.jsx");
   const start = panel.indexOf("const TOGGLES = [");
   const keys = [...panel.slice(start, panel.indexOf("];", start)).matchAll(/"(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "letterKeys", "stillIntro"]);
+  assert.deepEqual(keys, ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"]);
   for (const key of keys) assert.equal(typeof settings.DEFAULT_ACCESSIBILITY[key], "boolean", `${key} is a switch`);
   // The words are the panel's copy table (src/copy/comfort.js), one entry per switch.
   const { default: comfortCopy } = await import("../../src/copy/comfort.js");
@@ -270,7 +270,7 @@ test("a verdict is announced once, by the slam, and the reveal's name does not r
   assert.match(slam, /<strong lang="en">BUST<\/strong>/);
   // Its words are the table's copy (src/copy/table.js, `notices`), read by key.
   // The moment's one line (A2, 2026-11-05) is the last thing the alert reads.
-  for (const said of ["say.slamTimeout", "say.slamAbandon", "fill(say.slamWall, { wall: win.wall })", "{say.slamPot} {formatNumber(runPot)} → {formatNumber(bustKeeps)}", "<small>{say.slamStill}</small>"]) {
+  for (const said of ["say.slamTimeout", "say.slamAbandon", "fill(say.slamWall, { wall: win.wall })", "{say.slamPot} {formatMoney(runPot)} → {formatMoney(bustKeeps)}", "<small>{say.slamStill}</small>"]) {
     assert.ok(slam.includes(said), `the slam says: ${said}`);
   }
   const slamCopy = source("copy/table.js");

@@ -4,7 +4,8 @@ import { test } from "node:test";
 
 import { FX_READERS, FX_VARIABLES, fxBeatValue, fxFlashValue, fxRateStep, fxRateTarget, fxShake, fxTier, RATE_REST_BPM, RATE_SWEEP_MS, RATE_TOP_BPM } from "../../src/gauntlet/fxVariables.js";
 import { BASE_SCHEMA, getHeartbeatBpm } from "../../src/gauntlet/gauntletEngine.js";
-import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
+import { dangerZoneOf, readTableMeters } from "../../src/gauntlet/tableMeters.js";
+import { zoneThudDue } from "../../src/gauntlet/zoneThud.js";
 
 test("the comfort setting stills the shake and the pulse, and leaves a third of the flash", () => {
   // Trauma at its ceiling, a beat just struck, a bust's flash.
@@ -47,6 +48,33 @@ test("the tension steps read the gauge the table draws, and either setting takes
   assert.equal(FX_READERS["--gx-tier"], ".gx-gauge-track");
 });
 
+test("the step marker stays under either setting, where the steps go, and a quiet table has none (A1-1, E3)", () => {
+  // The lowest wall 56 and a step of up to 15, as above; the 현재 위험 line the stage prints at each gauge.
+  const schema = { ...BASE_SCHEMA, seconds: 45, wallMin: 56, wallMax: 70, stepMax: 15 };
+  const zoneAt = (gauge) => {
+    const win = { status: "live", gauge, wall: 60, tellOffset: 0, focus: 0, focusMode: "steady", elapsed: 0, schema };
+    return dangerZoneOf(readTableMeters({ win, schema, selectedCard: null }).dangerLine);
+  };
+  assert.deepEqual([30, 41, 56].map(zoneAt), ["distance", "inReach", "inBand"]);
+  for (const [reducedMotion, calm] of [[true, false], [false, true], [true, true]]) {
+    // Under either setting the screen's step is gone...
+    assert.equal(fxTier({ gauge: 60, schema }, true, reducedMotion, calm), 0);
+    // ...and the marker, which asks neither, still sounds each step up.
+    assert.equal(zoneThudDue(zoneAt(30), zoneAt(41)), true);
+    assert.equal(zoneThudDue(zoneAt(41), zoneAt(56)), true);
+  }
+  assert.equal(zoneThudDue(zoneAt(56), zoneAt(41)), false, "nothing on the way down");
+  assert.equal(zoneThudDue(zoneAt(30), zoneAt(56), true), false, "a quiet table has none");
+
+  // The loop hands it the line's step and the quiet flag -- no setting -- and only while the table is live.
+  const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
+  const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
+  const live = frame.slice(frame.indexOf("if (live) {"), frame.indexOf("} else {"));
+  assert.match(live, /if \(zoneThudDue\(zoneSeen, zone, quiet\)\) playZoneThud\(\);\s+zoneSeen = zone;/);
+  assert.equal(frame.split("playZoneThud(").length - 1, 1);
+  assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /<GauntletFx[^>]*zone=\{dangerZoneOf\(dangerLine\)\}/s);
+});
+
 test("the frame loop reads the setting every frame and writes what those three return", () => {
   const loop = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
@@ -80,7 +108,7 @@ test("nothing on the table marks a beat to press on, and the pulse is still writ
   }
   // The heart still sounds on its own tempo, and the vignette still takes the beat.
   const frame = loop.slice(loop.indexOf("const loop = "), loop.lastIndexOf("requestAnimationFrame(loop)"));
-  assert.match(frame, /playHeartbeat\(heat, tier\);\s+nextBeat = time \+ 60000 \/ bpm;/);
+  assert.match(frame, /playHeartbeat\(heat, tier, hesitationSwell\(held, now\)\);\s+nextBeat = time \+ 60000 \/ bpm;/);
   assert.match(frame, /if \(now - pulsedAt >= PULSE_MIN_MS\)/, "under three screen-wide pulses a second, as before");
   assert.match(FX_READERS["--gx-beat"], /\.gx-fx-vignette/);
   const css = ["play", "responsive", "comfort", "plate", "relics", "briefing", "result", "base-intro-ranking", "recovery"].map((name) => readFileSync(`src/styles/app/${name}.css`, "utf8")).join(" ");
@@ -283,7 +311,7 @@ test("the cases where the season rests play a quiet table, and the table is the 
   // The frame loop plays it as the comfort setting, and keeps the heartbeat and the drone out of the ear.
   const fx = readFileSync("src/gauntlet/GauntletFx.jsx", "utf8");
   assert.match(fx, /const calm = quiet \|\| getAccessibility\(\)\.calmEffects;/);
-  assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier\);/);
+  assert.match(fx, /if \(!quiet\) playHeartbeat\(heat, tier, hesitationSwell\(held, now\)\);/);
   assert.match(fx, /drone\.set\(live && !quiet \? closeness : 0, win\.schema\.sedated, win\.status === "bust"\);/);
   assert.match(readFileSync("src/gauntlet/GauntletStage.jsx", "utf8"), /<GauntletFx[^>]*caseId=\{scene\.node\.caseId\}/s);
 

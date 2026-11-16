@@ -18,7 +18,7 @@ import { funnelQuery, readFunnel } from "./report-funnel.mjs";
 import { DEFAULTS as BUDGET_DEFAULTS, QUERY as BUDGETS_QUERY, nearLimits, readBudgets } from "./report-budgets.mjs";
 import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
-import { marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
+import { DB_MARKS, HIDE_MARKS, marksSql, rankingRunsSql, runRowsSql } from "./verify-ranking-rows.mjs";
 import { CHAIN_MARK } from "../src/chainRecheck.js";
 import { BOARD_REPORT_REASONS, createBoardReportPayload } from "../src/boardReport.js";
 import { BOARD_BLOCKED_TERMS, BOARD_TERM_GUARDS, BOARD_TERM_SCOPE, boardUnits, findBlockedTerm, foldBoardText } from "../src/boardBlockedTerms.js";
@@ -122,7 +122,7 @@ await db.exec(`
 const DAY_TEN_RESET = "20261020010000_rules_day10_ranking_reset.sql";
 const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark3_ranking_reset.sql")) ?? null;
 // RULES_MARK 4's (C-3 and C-4, drafted 2026-10-25) the same way, once it is a `.sql`. Since 2026-11-05 the
-// two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql.draft` (the one wipe of 11-12, with C9's
+// two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql` (promoted 11-12, the one wipe, with C9's
 // `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
 const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
 const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
@@ -171,6 +171,10 @@ async function seedBeforeRankingReset() {
     await db.query(`insert into public.app_error_logs (session_id, session_code, occurred_at, source, error_name) values ($1, 'RESETSEED', now(), 'window-error', 'TypeError')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.free_text_analyses (session_id, case_id, node_id, analysis) values ($1, 'case01', 'n1', '{}')`, [`${RESET_SEED}-session`]);
     await db.query(`insert into public.board_posts (session_id, nickname, body, actor_key) values ($1, '점검', '랭킹을 비우기 전에 쓴 글', 'board:${RESET_SEED}')`, [`${RESET_SEED}-session`]);
+    // A report on that post (20261027000000): the reset leaves it, and the post's delete in removeRankingResetSeed takes it (on delete cascade).
+    if ((await db.query(`select to_regclass('public.board_reports') is not null as here`)).rows[0].here) {
+      await db.query(`insert into public.board_reports (post_id, session_id, reason, actor_key) select id, $1, 'spam', $2 from public.board_posts where session_id = $1`, [`${RESET_SEED}-session`, `board:${RESET_SEED}`]);
+    }
     await db.query(`insert into public.cloud_saves (code_hash, saved_at, payload) values ($1, now(), '{"save": {}}')`, [RESET_SEED]);
     await db.query(`insert into public.telemetry_rate_limits (actor_key, request_count) values ($1, 7)`, [RESET_SEED]);
     await db.query(`insert into public.private_settings (name, value) values ($1, 'kept')`, [RESET_SEED]);
@@ -229,6 +233,10 @@ if (!files.includes(RANKING_RESET)) failures.push(`supabase/migrations/${RANKING
 // and from then on they must pass; while it is still a `.sql.draft` they are
 // skipped and said to be.
 const SUSPICION_MARKS = files.some((file) => file.endsWith("_ranking_suspicion_marks.sql"));
+// The hide switch narrowed to the marks a forged season earns
+// (`*_ranking_hide_switch.sql`, F1's last piece, 2026-11-13): the switch block
+// below holds the policy's list to HIDE_MARKS once it is a `.sql`.
+const HIDE_SWITCH = files.some((file) => file.endsWith("_ranking_hide_switch.sql"));
 // The season's score as the mean of its cases' (`*_season_score_case_mean.sql`,
 // drafted 2026-10-22 beside RULES_MARK 3's reset). Once it is a `.sql` the
 // ranking checks below expect the mean and its letters where they expected
@@ -1129,6 +1137,40 @@ withHeaders(null);
   }
 }
 
+// The case-open snapshot's carry and route (*_case_open_focus_carry_route,
+// F1 step 2; a draft until the user is asked after #466's reset): the
+// snapshot's `focusCarry` and `openingRoute`, each optional and each typed.
+// Run once the migration is among the files; skipped and said to be while it
+// is still a `.sql.draft`.
+if (files.some((file) => file.endsWith("_case_open_focus_carry_route.sql"))) {
+  let carryRun = 0;
+  const route = { after: "p5_after_hold", rank: "A", nodeId: "c09_open" };
+  const opened = openCaseRun({ ...RUN_INITIAL_STATE, schema: { ...RUN_INITIAL_STATE.schema, mutations: ["reboot"] } }, { caseId: "case09", resources: initialResources, route });
+  const honest = casePayload({ session: sessionId(1), runId: "run-carry-0", caseId: "case09" });
+  const withOpen = (open) => ({ ...casePayload({ session: sessionId(1), runId: `run-carry-${++carryRun}`, caseId: "case09" }), dynamics: { ...honest.dynamics, open } });
+  check(opened.open.focusCarry?.rebooted === true && opened.open.openingRoute?.nodeId === route.nodeId, "openCaseRun no longer stamps the snapshot's focusCarry and openingRoute; this check sends what it does not build.");
+  await post("send a case row whose snapshot carries its focusCarry and openingRoute", "playtest_sessions", withOpen(opened.open));
+  await post("send a case row whose snapshot has neither (a build before them)", "playtest_sessions", withOpen((({ focusCarry: _carry, openingRoute: _route, ...rest }) => rest)(opened.open)));
+  await post("send a case row whose snapshot's two records are null", "playtest_sessions", withOpen({ ...opened.open, focusCarry: null, openingRoute: null }));
+  await post("send a case row from the season's start (no case before)", "playtest_sessions", withOpen({ ...opened.open, openingRoute: { after: null, rank: null, nodeId: "p1_n1" } }));
+  for (const [what, patch] of [
+    ["a focusCarry that is an array", { focusCarry: [] }],
+    ["a focusCarry with no rebooted", { focusCarry: { stance: null } }],
+    ["a focusCarry whose rebooted is a string", { focusCarry: { rebooted: "true", stance: null } }],
+    ["a focusCarry whose stance is a number", { focusCarry: { rebooted: false, stance: 3 } }],
+    ["a focusCarry whose stance is longer than 32", { focusCarry: { rebooted: false, stance: "s".repeat(33) } }],
+    ["an openingRoute that is a string", { openingRoute: "c09_open" }],
+    ["an openingRoute with no scene", { openingRoute: { after: null, rank: null } }],
+    ["an openingRoute whose scene is longer than 64", { openingRoute: { after: null, rank: null, nodeId: "n".repeat(65) } }],
+    ["an openingRoute whose after is a number", { openingRoute: { after: 4, rank: null, nodeId: "c09_open" } }],
+    ["an openingRoute whose rank is longer than 8", { openingRoute: { after: null, rank: "r".repeat(9), nodeId: "c09_open" } }],
+  ]) {
+    await postRefused(`send a case row with ${what}`, "playtest_sessions", withOpen({ ...opened.open, ...patch }), /^23514 .*playtest_sessions_dynamics_shape/);
+  }
+} else {
+  console.log("Case-open carry and route: skipped, the migration is still a draft (supabase/migrations/*_case_open_focus_carry_route.sql.draft).");
+}
+
 // ---- the ranking
 
 /** A run's stored case rows' summaries, by case id: what getSeasonScore reads on the client. */
@@ -1518,17 +1560,43 @@ if (!SUSPICION_MARKS) {
   await refused("read a ranking row's suspicion marks", "anon", `select suspicion from public.playtest_sessions`);
   await postRefused("send a case row with its own suspicion marks", "playtest_sessions", { ...casePayload({ session: sessionId(39), runId: "run-marks-self", caseId: "case01" }), suspicion: [] }, /^42501 /);
 
-  // The switch: off by default, so the ranking shows every row; on, it shows only the unmarked ones.
-  const shown = async () =>
-    ((await allowed("read the ranking with marked rows", "anon", `select run_tag from public.public_rankings where case_id = 'season-final'`))?.rows ?? []).length;
+  // The switch: off by default, so the ranking shows every row; on, it shows
+  // only the unmarked ones -- and, from *_ranking_hide_switch.sql (F1's last
+  // piece), the ones whose marks are none of HIDE_MARKS: a season delivered
+  // late (`time-over-gap`) or one the server failed to check (`unchecked`)
+  // stays on the ranking.
+  const shownTags = async () =>
+    ((await allowed("read the ranking with marked rows", "anon", `select run_tag from public.public_rankings where case_id = 'season-final'`))?.rows ?? []).map((row) => row.run_tag);
+  const shown = async () => (await shownTags()).length;
+  const hideList = HIDE_SWITCH ? HIDE_MARKS : null;
   const counts = await one(
-    `select count(*)::int as all_rows, (count(*) filter (where coalesce(cardinality(suspicion), 0) = 0))::int as clean
+    `select count(*)::int as all_rows,
+            (count(*) filter (where ${hideList ? "not (coalesce(suspicion, '{}'::text[]) && $1::text[])" : "coalesce(cardinality(suspicion), 0) = 0"}))::int as clean
        from public.playtest_sessions where case_id = 'season-final' and summary->>'seasonComplete' = 'true' and score is not null`,
+    hideList ? [hideList] : [],
   );
   check((await shown()) === counts.all_rows, `with the switch off the ranking shows ${await shown()} of ${counts.all_rows} rows; marked rows have to stay on it.`);
   await db.query(`insert into public.private_settings (name, value) values ('ranking_hide_marked', '1')`);
   const hidden = await shown();
-  check(hidden === counts.clean && hidden >= 1, `with the switch on the ranking shows ${hidden} rows; expected the ${counts.clean} unmarked ones.`);
+  check(hidden === counts.clean && hidden >= 1 && hidden < counts.all_rows, `with the switch on the ranking shows ${hidden} rows; expected the ${counts.clean} ${hideList ? "rows without a hiding mark" : "unmarked ones"}.`);
+  if (hideList) {
+    const tagOf = async (runId) => (await one(`select run_tag from public.playtest_sessions where run_id = $1 and case_id = 'season-final'`, [runId]))?.run_tag;
+    const timeTag = await tagOf("run-marks-time");
+    check(Boolean(timeTag) && (await shownTags()).includes(timeTag), "with the switch on a season marked only time-over-gap (delivered late) left the ranking; that mark never hides.");
+    // Every mark, one at a time on the honest run's ranking row: the list in the
+    // policy is HIDE_MARKS, and a mark not on it (here the two an honest season
+    // can earn, and one nobody has named yet) leaves the row where it is.
+    const honestTag = await tagOf("run-marks-honest");
+    const markHides = async (mark) => {
+      await db.query(`update public.playtest_sessions set suspicion = array[$1]::text[] where run_id = 'run-marks-honest' and case_id = 'season-final'`, [mark]);
+      return !(await shownTags()).includes(honestTag);
+    };
+    for (const mark of HIDE_MARKS) check(await markHides(mark), `with the switch on a row marked ${mark} is still on the ranking; the policy's list (*_ranking_hide_switch.sql) is not HIDE_MARKS (scripts/verify-ranking-rows.mjs).`);
+    for (const mark of ["time-over-gap", "unchecked", "a-mark-not-named-yet"]) check(!(await markHides(mark)), `with the switch on a row marked only ${mark} left the ranking; only HIDE_MARKS hide.`);
+    await db.query(`update public.playtest_sessions set suspicion = '{}' where run_id = 'run-marks-honest' and case_id = 'season-final'`);
+    // Every mark the checker writes hides: a new checker mark has to be weighed here, not shown by accident.
+    for (const mark of DB_MARKS) check(HIDE_MARKS.includes(mark), `the checker's mark ${mark} is not in HIDE_MARKS; add it there and to the policy of *_ranking_hide_switch.sql, or say here why it never hides.`);
+  }
   await db.query(`delete from public.private_settings where name = 'ranking_hide_marked'`);
   check((await shown()) === counts.all_rows, "the ranking did not come back whole when the switch was turned off.");
 

@@ -339,7 +339,7 @@ export const caseRoles = {
     "보조출연자 · 전 플로우온 야간조": "Extra · formerly on FlowOn’s night shift"
   },
   "case14": {
-    "KD자산운용 대체투자운용팀 펀드매니저 · 상생 펀드 설계자": "Fund manager, Alternative Investments Team, KD Asset Management · designer of the Sangsaeng Fund",
+    "KD자산운용 싱가포르 법인 대체투자운용팀 펀드매니저 · 상생 펀드 설계자 · 서울 근무": "Fund manager, Alternative Investments Team, KD Asset Management · designer of the Sangsaeng Fund · seconded from the Singapore office to Seoul",
     "상생 펀드 가입 고객 · 전직 초등학교 교사 · 72세": "Sangsaeng Fund buyer · retired elementary school teacher · age 72"
   },
   "case15": {
@@ -348,7 +348,7 @@ export const caseRoles = {
   },
   "case16": {
     "KD캐피탈 리스 심사역 · 입사 3년차": "Lease credit officer, KD Capital · 3rd year at the company",
-    "플로우온 풀필먼트센터 포장 라인 · 9년차": "Packing line, FlowOn fulfillment center · 9 years in",
+    "플로우온 풀필먼트센터 포장 라인 · 9년차 · 베트남 출신 귀화 16년": "Packing line, FlowOn fulfillment center · 9 years in · from Vietnam, naturalized, 16 years in Korea",
     "플로우온 풀필먼트센터 야간조 막내 · 24세": "Youngest on the night shift, FlowOn fulfillment center · age 24",
     "트리거랩 데이터 기록 담당": "Data records officer, Trigger Lab",
     "플로우온 풀필먼트센터 시범 운영 물류 로봇 · 야간조가 붙인 이름": "Pilot logistics robot, FlowOn fulfillment center · named by the night shift"
@@ -367,6 +367,6 @@ export const caseRoles = {
     "철거 용역 반장 · 경력 27년": "Demolition crew foreman · 27 years on the job"
   },
   "case20": {
-    "KD데이터랩 노아 도입 책임자": "Head of the NOAH rollout, KD Data Lab"
+    "KD데이터랩 노아 도입 책임자 · 싱가포르에서 영입": "Head of the NOAH rollout, KD Data Lab · hired from Singapore"
   }
 };

@@ -1,7 +1,7 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
 import { getBranchDetourBypass } from "../gameData.js";
-import { applyGauntletEffect, resolveWindow } from "../gauntlet/gauntletEngine.js";
+import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedDirections } from "../gauntlet/logicStreak.js";
@@ -82,9 +82,10 @@ export function getOfferedDirections(node, standing) {
  * Where a card leads: a reframe that cashed opens the case's hidden route once,
  * a branch may be bypassed (`getBranchDetourBypass`), and a bust off the story
  * table skips the scene the room plays without the analyst (`getBlackoutSkip`).
- * `caseClosed` is whether that scene is the case's result.
+ * `caseClosed` is whether that scene is the case's result. Exported for the
+ * server check (settlementRecheck.js), which routes each logged decision again.
  */
-function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
+export function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, reframeCount = 0 }, { choice, window }) {
   const reframe = choice.type === "reframe";
   // A reframe that busts is still a reframe the player paid for, but it does
   // not open a door: the wall took the window before the new board was laid.
@@ -147,6 +148,8 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     ...settlementRules,
     // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
     cascade: isLinkDue(run, log, runId, settlementRules.rules),
+    // MARKET SHOCK, under the week that has it: whether the next board is the case's shock board, off the case's log.
+    shock: isShockDue(run, countCaseBoards(log), route.caseClosed),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {

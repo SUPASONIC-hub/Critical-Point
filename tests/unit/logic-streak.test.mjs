@@ -597,7 +597,7 @@ test("the commit copies the verdict's line onto the log entry, under the case's 
   assert.deepEqual(six(patch.gauntletRun.logic), { streak: 4, best: 4, type, held: 3, heat: 1, rose: true });
   assert.equal("tempo" in entry.threshold || "tempoBonus" in entry, false, "neither line a build before 2026-10-11 wrote is written");
   assert.deepEqual(entry.handLine, describeLogicLog(entry.threshold.logic), "and the archive's line is the streak's");
-  assert.match(entry.handLine.text, /^논리 콤보 4 · 배율 ×1\.25 · \+\d/);
+  assert.match(entry.handLine.text, /^논리 콤보 4 · 배율 ×1\.25 · \+\$\d/);
 
   // A direction the scene does not deal is one the hand could not have held: the streak is kept.
   const offered = getOfferedDirections(scene, { clueCount: 0, trust: 50, legitimacy: 50, casesOpened: 0 });
@@ -735,7 +735,7 @@ test("the reveal says what the card did to the streak, one sentence a move", () 
   assert.equal(line("bust", { streak: 5 }), "벽에 닿았지만 논리 콤보 5는 남았다.");
   for (const none of [line("none"), describeLogicMove(null), describeLogicMove(undefined), describeLogicMove({ move: "leap" })]) assert.equal(none, null);
   // The archive's one line is only written when the streak paid.
-  assert.deepEqual(describeLogicLog({ streak: 4, bonus: 1.25, pot: 1200 }), { label: "LOGIC STREAK", text: "논리 콤보 4 · 배율 ×1.25 · +1,200" });
+  assert.deepEqual(describeLogicLog({ streak: 4, bonus: 1.25, pot: 1200 }), { label: "LOGIC STREAK", text: "논리 콤보 4 · 배율 ×1.25 · +$1,200" });
   for (const unpaid of [{ streak: 0, bonus: 1, pot: 0 }, { streak: 3 }, null]) assert.equal(describeLogicLog(unpaid), null);
 });
 
