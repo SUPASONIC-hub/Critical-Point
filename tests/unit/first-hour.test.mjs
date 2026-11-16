@@ -51,7 +51,7 @@ test("every event name is one GA4 accepts and none says who played", () => {
   for (const name of Object.values(GAME_EVENTS)) {
     assert.match(name, /^cp_[a-z0-9_]{1,37}$/);
   }
-  assert.deepEqual(Object.keys(GAME_EVENTS).sort(), ["firstTable", "inp", "lcp", "prologueDone", "start"]);
+  assert.deepEqual(Object.keys(GAME_EVENTS).sort(), ["firstTable", "inp", "lcp", "prologueDone", "scene", "start"]);
 });
 
 test("start, the first table and the prologue's end are each counted once per page", () => {

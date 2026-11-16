@@ -1,4 +1,4 @@
-import { CASE_SEQUENCE } from "./gameCases.js";
+import { authoredNodeOrders, CASE_SEQUENCE } from "./gameCases.js";
 
 /**
  * The first hour as Google Analytics counts it (N2, 2026-11-12), and the
@@ -18,6 +18,8 @@ export const GAME_EVENTS = Object.freeze({
   firstTable: "cp_first_table_open",
   /** The season's first case closed for the first time. */
   prologueDone: "cp_prologue01_done",
+  /** N16: a written scene of 프롤로그 01 or 02 shown, as two whole numbers (case_no, scene_no). */
+  scene: "cp_scene",
   /** Largest Contentful Paint of the start page, in ms (N12). */
   lcp: "cp_lcp",
   /** Interaction to Next Paint over the page's life, in ms (N12). */
@@ -26,6 +28,13 @@ export const GAME_EVENTS = Object.freeze({
 
 /** The case the first-hour events are about: the season's first, 프롤로그 01. */
 export const FIRST_CASE = CASE_SEQUENCE[0];
+
+/**
+ * N16 (owner's answer Q2 (1), 2026-11-16): the cases whose scenes are counted
+ * one by one -- 프롤로그 01 and 02, where most first players leave -- each
+ * with the number it goes as. Nothing else in the season sends a scene.
+ */
+export const SCENE_EVENT_CASES = Object.freeze({ prologue01: 1, prologue02: 2 });
 
 /** One in twenty page loads measures its speed (N12: 1 to 5%). */
 export const VITALS_SAMPLE_RATE = 0.05;
@@ -71,6 +80,27 @@ export function noteTableOpened(caseId, scope = globalThis) {
 /** A case closed (useChoiceCommit): 프롤로그 01 closed for the first time is counted. */
 export function noteCaseClosed(caseId, closedBefore, scope = globalThis) {
   return caseId === FIRST_CASE && !closedBefore && sendGameEventOnce(GAME_EVENTS.prologueDone, {}, scope);
+}
+
+/**
+ * N16: a written scene of 프롤로그 01 or 02 came on screen. It goes as
+ * `cp_scene` with two whole numbers -- `case_no` (1 or 2) and `scene_no`, the
+ * scene's place in the case as written (gameCases.js `authoredNodeOrders`,
+ * 1 to 5) -- once per scene per page. The scenes the graph adds between
+ * them (aftermath, reaction, route) send nothing: a number for those would
+ * shift whenever the graph grows. Only on a device that left 「기록 보내기」
+ * on (`consent`, the start page's checkbox): a player who said no to the
+ * play record is not counted scene by scene either. Returns whether it went.
+ */
+export function noteSceneShown(caseId, nodeId, { consent = false, scope = globalThis } = {}) {
+  if (consent !== true || !Object.hasOwn(SCENE_EVENT_CASES, caseId)) return false;
+  const sceneNo = (authoredNodeOrders[caseId] ?? []).indexOf(nodeId) + 1;
+  if (sceneNo < 1) return false;
+  const key = `${GAME_EVENTS.scene}:${caseId}:${sceneNo}`;
+  if (sentOnce.has(key)) return false;
+  const sent = sendGameEvent(GAME_EVENTS.scene, { case_no: SCENE_EVENT_CASES[caseId], scene_no: sceneNo }, scope);
+  if (sent) sentOnce.add(key);
+  return sent;
 }
 
 /**
