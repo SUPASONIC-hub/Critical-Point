@@ -1,0 +1,156 @@
+/* The board's admin sheet and bar (BoardAdmin.jsx). Imported by that lazy
+   chunk only, so no player's page carries it. Colours are the existing tokens. */
+.board-admin-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--ui-glass-strong);
+}
+.board-admin-sheet {
+  display: grid;
+  gap: 12px;
+  width: min(440px, 100%);
+  padding: 20px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+  color: var(--ui-text);
+}
+.board-admin-sheet h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+.board-admin-sheet p {
+  margin: 0;
+  color: var(--ui-text-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.board-admin-actions,
+.board-admin-post-actions,
+.board-admin-search,
+.board-admin-bar-head,
+.board-admin-post-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.board-admin-status {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+}
+.board-admin-bar {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  background: var(--ui-surface-2);
+  border: 1px solid var(--ui-line-accent);
+  border-radius: var(--ui-radius-md);
+}
+.board-admin-bar-head span {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+.board-admin-search label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+}
+.board-admin-search input[type="search"] {
+  min-width: 0;
+  width: min(260px, 100%);
+}
+.board-admin-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.board-admin-list li {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+.board-admin-list li.is-hidden {
+  border-style: dashed;
+  opacity: 0.72;
+}
+.board-admin-list p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.board-admin-post-head span {
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+}
+.board-admin-tag {
+  padding: 1px 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-xs);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 700;
+}
+.board-admin-tag.is-warn {
+  border-color: var(--ui-heat);
+  color: var(--ui-heat);
+}
+.board-admin-tag.is-quiet {
+  color: var(--ui-text-3);
+}
+.board-admin-danger {
+  color: var(--ui-heat);
+}
+/* The bar's three views (글 검색 / 신고 대기 / 관리 기록) and the queue's and log's rows. */
+.board-admin-views,
+.board-admin-post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.board-admin-note,
+.board-admin-post-meta {
+  margin: 0;
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+.board-admin-log {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+.board-admin-log li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ui-line);
+  overflow-wrap: anywhere;
+}
+.board-admin-log li span {
+  color: var(--ui-text-3);
+}

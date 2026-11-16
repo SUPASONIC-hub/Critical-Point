@@ -294,6 +294,19 @@ export function describeCaseChange(log = [], labels = {}) {
     }));
 }
 
+/**
+ * MARKET SHOCK (weeklyRules.js, c2 follow-up), on the case's result: the
+ * swings the case's shock boards dealt its stacked pot (`threshold.shock`,
+ * written by the commit from the verdict), summed and signed --
+ * 「시장 충격 +$1,200」 or 「시장 충격 −$800」. Empty when no shock moved
+ * anything: a week without it, a log from before it, or a swing of 0.
+ */
+export function describeCaseShock(log = []) {
+  const total = log.reduce((sum, entry) => sum + (Number(entry?.threshold?.shock) || 0), 0);
+  // Signed as the bank rail signs (moneyFeedback.js `formatChange`, not imported: its chunk is not this one), U+2212 for minus.
+  return total ? fill(say.caseShock, { change: `${total > 0 ? "+" : "−"}${formatMoney(Math.abs(total))}` }) : "";
+}
+
 export function joinRules(items) {
   if (!items.length) return say.baseRules;
   return items.map((item) => item.label).join(" / ");

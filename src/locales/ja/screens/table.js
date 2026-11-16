@@ -150,6 +150,7 @@ export default {
   },
   readout: {
     clockHeat: "時計が上げる熱 {value}倍",
+    caseShock: "市場ショック {change}",
     nextBusted: "次の勝負は、壁に触れた代償として変わったルールで始まる。",
     nextColdFeet: "一度も押さずに止めた代償として、次の勝負でいちばん高いカードが封印される。",
     nextRecalculated: "今回の熱と消耗が、次の勝負の環境を計算し直す。",
@@ -233,6 +234,8 @@ export default {
     scout: "照会した。信頼を{trust}使った。壁は {min} から {max} のあいだのどこか",
     bank: "この勝負 {hand} · 賭け金 {pot} · 金庫 {vault}",
     act: "第{act}幕 開始 · 事件 {case}",
+    stakeClockCut: "熱 {gauge} · 時計が{cut}秒減った · 残り{seconds}秒",
+    stakeClockBack: "熱 {gauge} · 時計が{cut}秒戻った · 残り{seconds}秒",
     status: "熱 {gauge} · {danger} · 賭け金 {pot} · 残り{seconds}秒 · 心拍 {bpm}",
   },
   afterword: {

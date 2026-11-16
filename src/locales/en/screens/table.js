@@ -150,6 +150,7 @@ export default {
   },
   readout: {
     clockHeat: "Clock heat ×{value}",
+    caseShock: "Market shock {change}",
     nextBusted: "The next hand starts under rules changed by hitting the Wall.",
     nextColdFeet: "Because you stopped without a single push, the next hand’s most expensive card is sealed.",
     nextRecalculated: "This hand’s Heat and costs reset the next hand’s conditions.",
@@ -212,6 +213,8 @@ export default {
     scout: "Scouted for {trust} Trust. The Wall is somewhere between {min} and {max}",
     bank: "This hand {hand} · Stake {pot} · Vault {vault}",
     act: "Act {act} begins · Case {case}",
+    stakeClockCut: "Heat {gauge} · the clock lost {cut} seconds · {seconds} seconds left",
+    stakeClockBack: "Heat {gauge} · the clock got {cut} seconds back · {seconds} seconds left",
     status: "Heat {gauge} · {danger} · Stake {pot} · {seconds} seconds left · Heartbeat {bpm}",
   },
   afterword: {

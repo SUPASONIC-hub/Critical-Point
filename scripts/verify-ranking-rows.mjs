@@ -91,6 +91,7 @@ import {
   formatHallOfFameMarkdown,
   HALL_OF_FAME_CANDIDATES,
   HALL_OF_FAME_COUNTS_SQL,
+  HALL_OF_FAME_MIN_SEASONS,
   HALL_OF_FAME_READ_SQL,
   hallOfFameBoardLabel,
   hallOfFameSql,
@@ -390,6 +391,23 @@ export function formatChain(chain) {
   return lines;
 }
 
+/**
+ * Decision T's T12 (the 2026-11-12 draft, read on 11-23): would a lower
+ * threshold open any board? Read only from the day's counts (every board
+ * hall_of_fame_counts returns, not only the ones read today); the threshold
+ * itself stays HALL_OF_FAME_MIN_SEASONS until the owner answers T-11.
+ */
+export const HALL_OF_FAME_T12_ALTERNATIVE = 5;
+
+/** T12's one line for the Job Summary: boards at the threshold and at the alternative, and the fullest board. */
+export function formatHallOfFameThreshold(counts, { min = HALL_OF_FAME_MIN_SEASONS, alternative = HALL_OF_FAME_T12_ALTERNATIVE } = {}) {
+  const entries = (counts instanceof Map ? [...counts] : Object.entries(counts ?? {})).filter(([, checked]) => Number.isInteger(checked) && checked >= 0);
+  if (!entries.length) return `T12 문턱(읽기만): 센 판이 없음 — 문턱 ${min}, 대안 ${alternative}`;
+  const atLeast = (n) => entries.filter(([, checked]) => checked >= n).length;
+  const [fullest, most] = entries.reduce((best, entry) => (entry[1] > best[1] ? entry : best));
+  return `T12 문턱(읽기만): 판 ${entries.length}개 중 표시 없는 완주 ${min}건 이상 ${atLeast(min)}개 · ${alternative}건 이상 ${atLeast(alternative)}개; 가장 많은 판 ${hallOfFameBoardLabel(fullest)} ${most}건`;
+}
+
 /** The day's boards as lines for the Job Summary: run tags only. */
 export function formatHallOfFamePick({ boards, left }) {
   const lines = [];
@@ -494,7 +512,7 @@ async function main(argv) {
   }
   if (argv.includes("--hall-of-fame-sql") || argv.includes("--hall-of-fame")) {
     const picked = pickHallOfFame({ results, rows, rulesMark: RULES_MARK, counts });
-    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : formatHallOfFamePick(picked).join("\n"));
+    console.log(argv.includes("--hall-of-fame-sql") ? hallOfFameSql(picked.boards) : [...formatHallOfFamePick(picked), formatHallOfFameThreshold(counts)].join("\n"));
     return 0;
   }
   console.log(json ? JSON.stringify(results, null, 2) : formatReport(results, { redact: argv.includes("--redact") }).join("\n"));

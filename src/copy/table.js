@@ -171,6 +171,8 @@ const tableCopy = {
   // tableReadout.js: the readouts the table, the reveal and the archive print.
   readout: {
     clockHeat: "시계가 올리는 열기 {value}배",
+    // MARKET SHOCK (weeklyRules.js), on the case's result: what the shock did to the case's stacked pot, signed.
+    caseShock: "시장 충격 {change}",
     nextBusted: "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.",
     nextColdFeet: "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 봉인된다.",
     nextRecalculated: "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.",
@@ -238,6 +240,9 @@ const tableCopy = {
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",
+    // The stake clock (B5): the heat crossed a tier and the clock moved by {cut} seconds.
+    stakeClockCut: "열기 {gauge} · 시계 {cut}초 줄었다 · 남은 {seconds}초",
+    stakeClockBack: "열기 {gauge} · 시계 {cut}초 돌아왔다 · 남은 {seconds}초",
     // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
     status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },

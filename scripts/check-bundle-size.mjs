@@ -312,7 +312,10 @@ const budgets = [
   // 34,528 / 14,703 -> 34,528 / 14,709 c4c5-copy over main 7ec2304e. Measured - / 14705 (over budget only) in the e2e build, the plus 4.
   // 34,528 / 14,709 -> 34,601 / 14,731 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 34597 / 14727 (over budget only) in the e2e build, the plus 4.
   // 34,601 / 14,731 -> 34,673 / 14,761 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 34669 / 14757 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_673, maxGzip: 14_761 },
+  // 34,673 / 14,761 -> 34,867 / 14,850 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 34863 / 14846 (over budget only) in the e2e build, the plus 4.
+  // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
+  // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_900 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -681,9 +684,13 @@ const budgets = [
   // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
+  // 207,771 / 75,684 -> 208,749 / 76,072 on 2026-11-16, board-admin over main 83570151: src/boardAdminEntry.js (two string tests and one storage read that decide whether any admin code loads) and the shell's lazy sign-in sheet for ?admin. Measured 208745 / 76068 in the e2e build, the plus 4.
+  // 207,771 / 75,684 -> 208,119 / 75,736 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured 208115 / 75732 (over budget only) in the e2e build, the plus 4.
+  // 207,771 / 75,684 -> 207,860 / 75,725 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 207856 / 75721 (over budget only) in the e2e build, the plus 4.
   // 207,771 / 75,684 -> 207,940 / 75,730 번외 8 over main 29120d32. Measured 207936 / 75726 (over budget only) in the e2e build, the plus 4.
   // 207,940 / 75,730 -> 207,940 / 75,736 번외 8, CI build (run 43819751212) measured - / 75732, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_940, maxGzip: 75_736 },
+  // 208,749 / 76,072 -> 209,357 / 76,215 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 209353 / 76211 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 209_357, maxGzip: 76_215 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -959,7 +966,13 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,651 / 17,398 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 52647 / 17394 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
+  // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured - / 17384 (over budget only) in the CI e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,390 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured - / 17386 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -984,7 +997,13 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,651 / 17,398 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 52647 / 17394 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
+  // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured - / 17384 (over budget only) in the CI e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,390 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured - / 17386 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -1196,7 +1215,8 @@ const budgets = [
   // 214,508 / 41,536 -> 215,366 / 41,680 n1-act-card over main 53845978. Measured 215362 / 41676 (over budget only) in the e2e build, the plus 4.
   // 215,366 / 41,680 -> 215,606 / 41,786 다국적 인물 over main e43f7bf6. Measured 215602 / 41782 (over budget only) in the e2e build, the plus 4.
   // 215,606 / 41,786 -> 216,101 / 41,898 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 216097 / 41894 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_101, maxGzip: 41_898 },
+  // 216,101 / 41,898 -> 216,432 / 42,019 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured 216428 / 42015 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 216_432, maxGzip: 42_019 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1269,7 +1289,16 @@ const budgets = [
   // 9,029 / 3,768 -> 9,030 / 3,768 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 9,030 / 3,768 -> 10,077 / 4,118 on 2026-10-26, 영어판 3단계: the board's words read by key (src/copy/board.js), with the report form's reasons and refusals named from boardReport.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 10,077 -> 10,078 raw on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: only the names of the chunks it imports. Measured 10,078 in the e2e build.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_078, maxGzip: 4_118 },
+  // 10,078 / 4,118 -> 10,676 / 4,394 on 2026-11-16, board-admin over main 83570151: the board asks boardAdminEntry.js whether to fetch the makers' admin bar, and lazy-loads it (BoardAdmin.jsx) only then. Measured 10672 / 4390 in the e2e build, the plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_676, maxGzip: 4_394 },
+  // The board's admin sheet and bar (src/components/BoardAdmin.jsx, src/boardAdmin.js, BoardAdmin.css), fetched only
+  // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
+  // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
+  // e2e build, the plus 4.
+  // 11,789 / 4,552 -> 15,773 / 5,645 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 15769 / 5641 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 15_773, maxGzip: 5_645 },
+  // 2,011 / 665 -> 2,495 / 735 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 2491 / 731 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^BoardAdmin-.*\.css$/, maxBytes: 2_495, maxGzip: 735 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
@@ -1477,7 +1506,8 @@ const budgets = [
   // 8,959 / 4,325 -> 8,977 / 4,325 n2n3 over main 1ae72e0b. Measured 8973 / - (over budget only) in the e2e build, the plus 4.
   // 8,959 / 4,325 -> 9,276 / 4,430 n1-act-card over main 53845978. Measured 9272 / 4426 (over budget only) in the e2e build, the plus 4.
   // 9,276 / 4,430 -> 9,294 / 4,430 묶음 1113. Measured 9290 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_294, maxGzip: 4_430 },
+  // 9,294 / 4,430 -> 9,313 / 4,442 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 9309 / 4438 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_313, maxGzip: 4_442 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -1613,7 +1643,8 @@ const budgets = [
   // 3,414 / 1,707 -> 3,884 / 1,881 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 3880 / 1877 (over budget only) in the e2e build, the plus 4.
   // 3,414 / 1,707 -> 3,994 / 1,924 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 3990 / 1920 (over budget only) in the e2e build, the plus 4.
   // 3,994 / 1,924 -> 4,391 / 2,073 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 4387 / 2069 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 4_391, maxGzip: 2_073 },
+  // 4,391 / 2,073 -> 4,391 / 2,078 board-admin over main 29120d32: only the names of the chunks it imports. Measured - / 2074 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 4_391, maxGzip: 2_078 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1694,7 +1725,8 @@ const budgets = [
   { pattern: /^ActCard-.*\.js$/, maxBytes: 4_120, maxGzip: 2_299 },
   // N1 막 끝 결산 카드 (src/gauntlet/ActTally.jsx, src/actTally.js), 2026-11-13: fetched by ActCard
   // only when an act ends with a tally, so nothing at first paint carries it. Measured 5,041 / 2,493 in the e2e build, the plus 4.
-  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_045, maxGzip: 2_497 },
+  // 5,045 / 2,497 -> 5,054 / 2,504 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 5050 / 2500 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_054, maxGzip: 2_504 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1941,8 +1973,12 @@ const budgets = [
   // 194,146 / 64,949 -> 194,430 / 65,049 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 194426 / 65045 (over budget only) in the e2e build, the plus 4.
   // 193,626 / 64,762 -> 193,797 / 64,818 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 193793 / 64814 (over budget only) in the e2e build, the plus 4.
   // 193,797 / 64,818 -> 194,601 / 65,105 묶음 B4+c2 over main 83570151 (#551 A5). Measured 194597 / 65101 (over budget only) in the e2e build, the plus 4.
+  // 194,601 / 65,105 -> 194,641 / 65,117 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 194637 / 65113 (over budget only) in the e2e build, the plus 4.
+  // 194,601 / 65,105 -> 194,762 / 65,146 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 194758 / 65142 in the CI e2e build, the plus 4.
+  // 194,601 / 65,105 -> 194,627 / 65,154 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 194623 / 65150 (over budget only) in the e2e build, the plus 4.
   // 194,601 / 65,105 -> 195,140 / 65,333 번외 8 over main 29120d32. Measured 195136 / 65329 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_140, maxGzip: 65_333 },
+  // 194,641 / 65,117 -> 195,067 / 65,336 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 195063 / 65332 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_067, maxGzip: 65_336 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2021,8 +2057,12 @@ const budgets = [
   // 162,006 / 57,995 -> 162,267 / 58,084 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 162263 / 58080 (over budget only) in the e2e build, the plus 4.
   // 161,518 / 57,831 -> 161,650 / 57,881 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 161646 / 57877 (over budget only) in the e2e build, the plus 4.
   // 161,650 / 57,881 -> 162,399 / 58,136 묶음 B4+c2 over main 83570151 (#551 A5). Measured 162395 / 58132 (over budget only) in the e2e build, the plus 4.
+  // 162,399 / 58,136 -> 162,433 / 58,148 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 162429 / 58144 (over budget only) in the e2e build, the plus 4.
+  // 162,399 / 58,136 -> 162,578 / 58,188 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 162574 / 58184 in the CI e2e build, the plus 4.
+  // 162,399 / 58,136 -> 162,405 / 58,143 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 162401 / 58139 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,918 / 58,372 번외 8 over main 29120d32. Measured 162914 / 58368 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_918, maxGzip: 58_372 },
+  // 162,433 / 58,148 -> 162,859 / 58,327 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 162855 / 58323 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_327 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2457,9 +2497,20 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,172 / 438,397 / 446,272 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured first paint, the plus 4.
 // -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
 // -> 377,359 / 438,632 / 446,512 묶음 B4+c2 over main 83570151 (#551 A5). Measured first paint, the plus 4.
+// -> 377,359 / 438,640 / 446,519 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured first paint, the plus 4.
+// 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
+// -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
+// -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
+// -> 377,409 / 438,687 / 446,565 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured first paint, the plus 4.
+// -> 377,359 / 438,691 / 446,559 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured first paint (CI), the plus 4.
+// -> 377,401 / 438,688 / 446,610 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured first paint, the plus 4.
 // -> 377,404 / 438,945 / 446,816 번외 8 over main 29120d32. Measured first paint, the plus 4.
 // -> 377,410 / 438,945 / 446,816 번외 8, CI first paint ko 377406 (run 43819751212), the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_410, en: 438_945, ja: 446_816 };
+// -> 377,861 / 439,153 / 447,032 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured first paint, the plus 4.
+// -> 378,010 / 439,505 / 447,425 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured first paint, the plus 4.
+// -> 377,762 / 439,054 / 446,933 브랜드 로고 11-16: favicon.svg 링크·사전 캐시. Measured first paint, the plus 4.
+// -> 378,025 / 439,518 / 447,438 묶음 11-16b 최종 (+#576 #578) over main 6fef686f. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_518, ja: 447_438 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2657,8 +2708,13 @@ function checkBudget(file, budget) {
 // -> 10,887 / 3,912 N1 결산 카드, the plus 4.
 // -> 10,885 / 3,904 번외 5, the plus 4.
 // -> 11,064 / 3,974 묶음 1113, the plus 4.
+// -> 11,122 / 3,979 weekly-page over main 29120d32: the worker keeps /weekly.html (DOCUMENT_PAGE) and warms it, the plus 4.
+// -> 11,064 / 3,979 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33, the plus 4.
 // -> 11,093 / 3,983 번외 8 over main 29120d32, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_093, maxGzip: 3_983 };
+// -> 11,151 / 3,997 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551, the plus 4.
+// -> 11,085 / 3,980 브랜드 로고 11-16: favicon.svg 링크·사전 캐시, the plus 4.
+// -> 11,172 / 4,002 묶음 11-16b 최종 (+#576 #578) over main 6fef686f, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_172, maxGzip: 4_002 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
