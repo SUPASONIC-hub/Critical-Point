@@ -534,6 +534,10 @@ const fileBudgets = {
   // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
   // every line spent. Measured 41 / 808.
   "draft-spend.css": { lines: 41, bytes: 808 },
+  // New on 2026-11-16 (N22, draft over main 6fef686f): the one between-hands
+  // question of 프롤로그 01·02 on the reveal sheet (BetweenHandsPulse.jsx), in a
+  // file of its own so play.css's budget is not touched. Measured 41 / 765.
+  "pulse.css": { lines: 41, bytes: 765 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

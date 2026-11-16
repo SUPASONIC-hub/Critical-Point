@@ -7,7 +7,7 @@
 // that an untagged test does not press on the phone on the same screen. A test
 // that is the only one to press a control stays in both projects.
 import { expect, test } from "./helpers/network.js";
-import { completeCurrentCase, openIntroDrawer } from "./helpers/gameFlow.js";
+import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, openIntroDrawer } from "./helpers/gameFlow.js";
 import { startDebugNode } from "./helpers/seasonFlow.js";
 import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
 import { recheckCaseGap, recheckCaseLinks } from "../src/chainRecheck.js";
@@ -323,4 +323,48 @@ test("a season's case rows carry their opening snapshot and what they hand on, a
   expect(result.cases.reduce((sum, entry) => sum + entry.windows.counts.match, 0), "each window replays to what the log says").toBe(windows);
   expect(result.cases.every((entry) => entry.windows.findings.length === 0), "no window's seed is off its place").toBe(true);
   expect(result.chain).toMatchObject({ status: "linked", breaks: [] });
+});
+
+// N22 (2026-11-16): once a season, the sheet between two hands of 프롤로그 01·02
+// asks 「여기까지 어땠나요?」; one press sends one playtest_feedback row with a
+// word of three, and the question does not come back.
+test("the between-hands question is asked once in 프롤로그 01 and sends one feedback row", async ({ page }) => {
+  test.setTimeout(90_000);
+  const feedbackRows = [];
+  await page.route("https://e2e.supabase.co/**", async (route) => {
+    const request = route.request();
+    if (request.method() === "POST" && request.url().includes("/playtest_feedback")) feedbackRows.push(request.postDataJSON());
+    await route.fulfill({ status: 201, contentType: "application/json", body: "{}" });
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+    localStorage.setItem("critical-point-telemetry-key", "anon");
+  });
+  await page.goto("/?debug=1");
+  await startDebugNode(page, "prologue01", "p1_start");
+  const pulse = page.getByTestId("between-hands-pulse");
+  const decisionNext = page.getByTestId("decision-next");
+  /** Stakes the first open card, cashes it, and stops on the sheet. */
+  const settleOneHand = async () => {
+    await dismissProtocolBreach(page);
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await cashStakedCard(page);
+    await expect(decisionNext).toBeVisible({ timeout: 15_000 });
+  };
+  await settleOneHand();
+  await expect(pulse, "not on the season's first sheet").toHaveCount(0);
+  await decisionNext.click();
+  await settleOneHand();
+  await expect(pulse).toBeVisible();
+  await expect(pulse.getByRole("button")).toHaveText(["재밌음", "어려움", "길다"]);
+  await expect(decisionNext, "the way on keeps the focus").toBeFocused();
+  await pulse.getByTestId("pulse-hard").click();
+  await expect(pulse).toContainText("고맙습니다");
+  await expect.poll(() => feedbackRows.length).toBe(1);
+  const [row] = [feedbackRows[0]].flat();
+  expect(row).toMatchObject({ case_id: "prologue01", feedback: { kind: "between-hands", answer: "hard", comment: null } });
+  expect(Object.keys(row.feedback).sort()).toEqual(["answer", "clarity", "comment", "difficulty", "kind", "sceneNo", "submittedAt"]);
+  await decisionNext.click();
+  await settleOneHand();
+  await expect(pulse, "once a season").toHaveCount(0);
 });

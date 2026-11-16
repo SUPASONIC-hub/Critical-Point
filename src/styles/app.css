@@ -16,7 +16,8 @@
      money               the KD은행 계좌 and the slam's amount that flies to it
      draft-spend         the draft's two buys out of the KD은행 계좌 (다시 뽑기, 하나 더)
      briefing            the graphic-novel briefing page in front of each table
-     comfort             what the player turned down, and the panel for it */
+     comfort             what the player turned down, and the panel for it
+     pulse               the one between-hands question of 프롤로그 01·02 (N22) */
 @import "./app/base-intro-ranking.css";
 @import "./app/play.css";
 @import "./app/plate.css";
@@ -28,3 +29,4 @@
 @import "./app/money.css";
 @import "./app/briefing.css";
 @import "./app/comfort.css";
+@import "./app/pulse.css";
