@@ -30,7 +30,7 @@ import { hallOfFameBadges, hallOfFameBoardLabel } from "../../src/hallOfFameBadg
 import rankingWords from "../../src/copy/ranking.js";
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
-import { formatHallOfFamePick, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
+import { formatHallOfFamePick, formatHallOfFameThreshold, HALL_OF_FAME_T12_ALTERNATIVE, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
 import { createWindowRecorder, thresholdOfVerdict } from "./helpers/windowRecorder.mjs";
 
 /**
@@ -180,6 +180,17 @@ test("a refused run takes no place, its board is still written with its count, a
   assert.match(lines, /^2026-W48: 3 checked seasons; 표본 부족$/m);
   assert.match(lines, /left out RUN TAG00001: marked by the trigger: rank-off-score/);
   assert.doesNotMatch(lines, /run-\d/, "a full run id reached the log");
+});
+
+test("T12 (decision T): one read-only line on every counted board, at the threshold and at the alternative", () => {
+  assert.equal(HALL_OF_FAME_T12_ALTERNATIVE, 5);
+  assert.ok(HALL_OF_FAME_T12_ALTERNATIVE < HALL_OF_FAME_MIN_SEASONS, "the alternative is the lower threshold the draft asks about");
+  const counts = readHallOfFameCounts([{ board: "table-4", checked: 7 }, { board: "2026-W47", checked: 12 }, { board: "2026-W48", checked: 3 }]);
+  assert.equal(formatHallOfFameThreshold(counts), "T12 문턱(읽기만): 판 3개 중 표시 없는 완주 10건 이상 1개 · 5건 이상 2개; 가장 많은 판 2026-W47 12건");
+  assert.equal(formatHallOfFameThreshold({ "table-4": 4 }), "T12 문턱(읽기만): 판 1개 중 표시 없는 완주 10건 이상 0개 · 5건 이상 0개; 가장 많은 판 본 판 (판 규칙 4) 4건");
+  assert.match(formatHallOfFameThreshold(new Map()), /센 판이 없음/);
+  assert.match(formatHallOfFameThreshold(undefined), /센 판이 없음/);
+  assert.match(formatHallOfFameThreshold({ "table-4": 6 }, { min: 6, alternative: 3 }), /6건 이상 1개 · 3건 이상 1개/);
 });
 
 test("the count is read apart, over the whole board, and the replay reads each board's first candidates", () => {
