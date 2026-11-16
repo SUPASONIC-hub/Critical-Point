@@ -9,7 +9,6 @@ import { directionParticle, easyCognitionLabels, objectParticle, topicParticle }
 import { getTableRules } from "./tableUnlocks.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
-import { formatChange } from "./moneyFeedback.js";
 
 // The readouts' words (src/copy/table.js), read when each line is said.
 const say = tableCopy.readout;
@@ -304,7 +303,8 @@ export function describeCaseChange(log = [], labels = {}) {
  */
 export function describeCaseShock(log = []) {
   const total = log.reduce((sum, entry) => sum + (Number(entry?.threshold?.shock) || 0), 0);
-  return total ? fill(say.caseShock, { change: formatChange(total) }) : "";
+  // Signed as the bank rail signs (moneyFeedback.js `formatChange`, not imported: its chunk is not this one), U+2212 for minus.
+  return total ? fill(say.caseShock, { change: `${total > 0 ? "+" : "−"}${formatMoney(Math.abs(total))}` }) : "";
 }
 
 export function joinRules(items) {
