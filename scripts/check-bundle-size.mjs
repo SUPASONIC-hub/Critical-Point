@@ -313,6 +313,7 @@ const budgets = [
   // 34,528 / 14,709 -> 34,601 / 14,731 f1-evening (#518 #525 #532) over #466 1331e71d. Measured 34597 / 14727 (over budget only) in the e2e build, the plus 4.
   // 34,601 / 14,731 -> 34,673 / 14,761 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 34669 / 14757 (over budget only) in the e2e build, the plus 4.
   // 34,673 / 14,761 -> 34,867 / 14,850 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 34863 / 14846 (over budget only) in the e2e build, the plus 4.
+  // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 34_867, maxGzip: 14_850 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -963,6 +964,7 @@ const budgets = [
   // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
   // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured - / 17384 (over budget only) in the CI e2e build, the plus 4.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
@@ -992,6 +994,7 @@ const budgets = [
   // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
   // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  // 52,590 / 17,383 -> 52,590 / 17,388 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured - / 17384 (over budget only) in the CI e2e build, the plus 4.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
@@ -1958,6 +1961,7 @@ const budgets = [
   // 193,626 / 64,762 -> 193,797 / 64,818 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 193793 / 64814 (over budget only) in the e2e build, the plus 4.
   // 193,797 / 64,818 -> 194,601 / 65,105 묶음 B4+c2 over main 83570151 (#551 A5). Measured 194597 / 65101 (over budget only) in the e2e build, the plus 4.
   // 194,601 / 65,105 -> 194,641 / 65,117 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 194637 / 65113 (over budget only) in the e2e build, the plus 4.
+  // 194,601 / 65,105 -> 194,762 / 65,146 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 194758 / 65142 in the CI e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_641, maxGzip: 65_117 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -2038,6 +2042,7 @@ const budgets = [
   // 161,518 / 57,831 -> 161,650 / 57,881 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 161646 / 57877 (over budget only) in the e2e build, the plus 4.
   // 161,650 / 57,881 -> 162,399 / 58,136 묶음 B4+c2 over main 83570151 (#551 A5). Measured 162395 / 58132 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,433 / 58,148 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 162429 / 58144 (over budget only) in the e2e build, the plus 4.
+  // 162,399 / 58,136 -> 162,578 / 58,188 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 162574 / 58184 in the CI e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_433, maxGzip: 58_148 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
@@ -2476,6 +2481,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
 // -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
 // -> 377,409 / 438,687 / 446,565 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured first paint, the plus 4.
+// -> 377,359 / 438,691 / 446,559 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured first paint (CI), the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
