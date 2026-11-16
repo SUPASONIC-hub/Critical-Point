@@ -37,7 +37,7 @@ import { DOCUMENT_PAGE } from "../src/serviceWorker/worker.js";
  *             gives it to a screen that asked for another (`artVariants`).
  *             And the plain pages -- the privacy policy, the terms, the
  *             about, FAQ and contact pages, the guide, the cast, the
- *             making-of and the case files' index (`DOCUMENT_PAGE`; a case's
+ *             making-of, the weekly calendar and the case files' index (`DOCUMENT_PAGE`; a case's
  *             own page only once read) -- so a device offline can still read
  *             what it agreed to and where to write.
  */

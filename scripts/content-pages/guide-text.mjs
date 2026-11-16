@@ -68,8 +68,10 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL (벽이 가깝다)</strong>: 벽 구간이 열기 4만큼 앞당겨집니다.</li>
 <li><strong>HEAVY FRACTURE (균열이 깊다)</strong>: FRACTURE가 1.75배로 청구합니다.</li>
 <li><strong>SHORT CLOCK (시간이 짧다)</strong>: 판마다 8초 짧고, 모든 카드의 칩이 1.25배입니다.</li>
+<li><strong>CRISIS WEEK (위기 주간)</strong>: 벽 구간이 열기 3만큼 앞당겨지고, 모든 카드의 칩이 1.2배입니다.</li>
 </ul>
 <p>시즌은 시작한 주의 규칙을 끝까지 지니고, 따로 순위가 쌓입니다. 스토리 모드에는 붙지 않습니다.</p>
+<p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
 
 <h2>리포트와 버스트 점수</h2>
 <p>리포트는 사건마다 얼마나 벌었는지가 아니라 어떻게 판단했는지를 0~100점으로 매깁니다.</p>
@@ -178,8 +180,10 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL (The Wall is closer)</strong>: the Wall band stands 4 Heat earlier.</li>
 <li><strong>HEAVY FRACTURE (The cracks run deep)</strong>: FRACTURE charges ×1.75.</li>
 <li><strong>SHORT CLOCK (Time is short)</strong>: every hand has 8 seconds less, and every card’s chips are ×1.25.</li>
+<li><strong>CRISIS WEEK (Crisis week)</strong>: the Wall band stands 3 Heat earlier, and every card’s chips are ×1.2.</li>
 </ul>
 <p>A season keeps the rule of the week it started in until it ends, on a ranking of its own. Story Mode never gets one.</p>
+<p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
 
 <h2>The report and the Burst Score</h2>
 <p>The report scores each case from 0 to 100 on how you judged, not on how much you banked:</p>
@@ -288,8 +292,10 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL（壁が近い）</strong>: 壁の区間が熱4だけ手前に立ちます。</li>
 <li><strong>HEAVY FRACTURE（ひびが深い）</strong>: FRACTUREが1.75倍で請求します。</li>
 <li><strong>SHORT CLOCK（時間が短い）</strong>: 勝負ごとに8秒短く、すべてのカードのチップが1.25倍です。</li>
+<li><strong>CRISIS WEEK（危機の週）</strong>: 壁の区間が熱3だけ手前に立ち、すべてのカードのチップが1.2倍です。</li>
 </ul>
 <p>シーズンは始めた週のルールを最後まで持ち続け、記録は別のランキングに積まれます。ストーリーモードには付きません。</p>
+<p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>
 
 <h2>レポートとバーストスコア</h2>
 <p>レポートは事件ごとに、いくら稼いだかではなく、どう判断したかを0〜100点で採点します。</p>
