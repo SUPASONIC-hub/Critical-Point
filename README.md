@@ -1,40 +1,75 @@
 <div align="center">
 
+<a href="https://critical-point-wn6p.onrender.com"><img src="docs/images/hero-banner.webp" alt="노을 진 도시 옥상에 선 분석관 옆으로 「판돈을 올릴수록 벽이 가까워진다」 문구와 연두색 심박 선이 지나가는 배너" width="880"></a>
+
+<!-- 로고 자리: 로고가 정해지면 이 자리에 docs/images/logo 파일을 img 태그(alt·width 포함)로 넣습니다. -->
+
 # 임계점 · CRITICAL POINT
 
 **판돈을 올릴수록 벽이 가까워진다.**<br>
-은행 심사 분석관이 되어 쉰다섯 개의 사건을 지나는 금융 미스터리 × 푸시 유어 럭 게임
+은행 심사 분석관이 되어 쉰다섯 개의 사건을 지나는 금융 미스터리 × 푸시 유어 럭 게임<br>
+<sub><i>A financial-mystery push-your-luck game. Free in your browser, in Korean, English and Japanese.</i></sub>
 
-**[▶ 지금 바로 플레이](https://critical-point-wn6p.onrender.com)** · 무료 · 설치 없음 · 휴대폰과 PC<br>
-한국어 · [English](https://critical-point-wn6p.onrender.com/en/) · [日本語](https://critical-point-wn6p.onrender.com/ja/)
+<a href="https://critical-point-wn6p.onrender.com"><img src="docs/images/badge-play.svg" alt="플레이: 무료, 설치 없음" width="198"></a>
+<a href="https://critical-point-wn6p.onrender.com/en/"><img src="docs/images/badge-languages.svg" alt="언어: 한국어, 영어, 일본어" width="183"></a>
+<img src="docs/images/badge-pwa.svg" alt="PWA: 오프라인에서도 열림" width="158">
+<img src="docs/images/badge-cases.svg" alt="이야기: 사건 쉰다섯 개와 번외 사건" width="236"><br>
+<img src="docs/images/badge-stack.svg" alt="기술: React, Vite, Supabase" width="236">
+<a href="https://github.com/SUPASONIC-hub/Critical-Point/releases/latest"><img src="docs/images/badge-release.svg" alt="최신 릴리스 노트" width="180"></a>
+<a href="#라이선스"><img src="docs/images/badge-license.svg" alt="저작권: All rights reserved" width="183"></a>
+
+### [▶ 지금 바로 플레이](https://critical-point-wn6p.onrender.com)
+
+무료 · 설치 없음 · 휴대폰과 PC<br>
+**한국어** · [English](https://critical-point-wn6p.onrender.com/en/) · [日本語](https://critical-point-wn6p.onrender.com/ja/)
 
 **STUDIO** 찹쌀떡 (Mochi Verse · もちぷよ) · **CREATOR** SUPASONIC & ALICE
 
 </div>
 
-<p align="center">
-  <img src="docs/images/title.webp" alt="노을 진 옥상에 선 분석관 옆으로 TRIGGERLAB: CRITICAL POINT 제목과 프롤로그 시작 버튼이 있는 첫 화면" width="720">
-</p>
-
 ## 어떤 게임인가
 
-- **카드 한 장, 버튼 두 개.** 장면마다 카드 한 장을 걸고 `확정`할지 `밀어붙일지` 고릅니다.
-  밀 때마다 판돈은 1.5배 넘게 불어납니다.
-- **보이지 않는 벽.** 벽이 어디 있는지는 오차 섞인 심박만 알려 줍니다. 닿으면 그 사건의 판돈이 모두
-  사라집니다.
-- **판단이 다음 판의 규칙을 부순다.** 이번 선택이 다음 판을 바꾸고, 시즌이 끝나면 결말과 리포트가
-  당신의 판단 습관을 돌려줍니다.
+- **카드 한 장, 버튼 두 개.** 카드 한 장을 걸고 `확정`할지 `밀어붙일지` 고릅니다. 밀 때마다 판돈은
+  1.5배 넘게 불어납니다.
+- **보이지 않는 벽.** 벽의 자리는 오차 섞인 심박만 알려 줍니다. 닿으면 그 사건의 판돈이 모두 사라집니다.
+- **판단이 다음 판의 규칙을 부순다.** 이번 선택이 다음 판을 바꾸고, 시즌 끝의 결말과 리포트가 당신의
+  판단 습관을 돌려줍니다.
 - **대출 한 건에서 시작된 사슬.** 310억짜리 대출 한 건부터 본사 33층의 빈 서명란까지, 프롤로그 다섯 장과
   본편 사건이 한 이야기로 이어집니다.
 
 > 이 게임이 묻는 것은 "나는 얼마나 똑똑한가"가 아니라 **"나는 언제 똑똑해지는가"** 입니다.
 
+## 한눈에
+
+| 🃏 **45초의 판단** | 💓 **심박으로 읽는 벽** | 🧾 **쉰다섯 개의 사건** |
+|:---|:---|:---|
+| 밀지, 멈출지. 시계는 판마다 돈다 | 벽은 안 보이고 심박만 흔들린다 | 프롤로그 다섯 장과 번외 사건들 |
+| 🎭 **결말과 판단 리포트** | 🗓️ **매주 바뀌는 규칙** | 🌏 **세 언어, 어디서나** |
+| 결말 카드와 칭호를 나눠 보세요 | 위기 주간처럼 한 주씩 판이 바뀐다 | 한·영·일, 오프라인 PWA |
+
 ## 화면
 
-| 브리핑 | 테이블 | 사건의 결과 |
-|:---:|:---:|:---:|
-| <img src="docs/images/briefing.webp" alt="휴대폰에서 사수 오진우가 요약표 합계가 어긋났다고 묻는 프롤로그 브리핑" width="240"> | <img src="docs/images/table.webp" alt="휴대폰 테이블: 45초 판단 시계, 벽 범위와 심박, 카드 네 장과 밀어붙인다·LOCK 버튼" width="240"> | <img src="docs/images/result.webp" alt="휴대폰 결과 카드: 침묵을 택한 결말 「조용한 하루를 샀다」와 새벽 4시 막간" width="240"> |
-| 장면마다 읽고 판단할 것을 받습니다 | 밀지, 멈출지 45초 안에 | 판단이 결말과 다음 사건을 바꿉니다 |
+<p align="center">
+  <img src="docs/images/demo-table.webp" alt="휴대폰 테이블에서 카드를 걸고 밀어붙일 때마다 판돈이 커지고 심박과 벽 범위가 바뀌는 한 판의 움직임" width="280">
+</p>
+
+| 브리핑 | 사건의 결과 |
+|:---:|:---:|
+| <img src="docs/images/briefing.webp" alt="휴대폰에서 사수 오진우가 요약표 합계가 어긋났다고 묻는 프롤로그 브리핑" width="240"> | <img src="docs/images/result.webp" alt="휴대폰 결과 카드: 침묵을 택한 결말 「조용한 하루를 샀다」와 새벽 4시 막간" width="240"> |
+| 장면마다 읽고 판단할 것을 받습니다 | 판단이 결말과 다음 사건을 바꿉니다 |
+
+<p align="center">
+  <img src="docs/images/title.webp" alt="PC 첫 화면: 노을 진 옥상에 선 분석관 옆으로 TRIGGERLAB: CRITICAL POINT 제목과 프롤로그 시작 버튼" width="720">
+</p>
+
+## 새 소식
+
+최근 운영에 들어간 것들입니다. 전체 목록은 **[최신 릴리스 노트](https://github.com/SUPASONIC-hub/Critical-Point/releases/latest)**에 있습니다.
+
+- **번외 사건 일곱 편** — 고객센터 야간조, 상장 전야, 전세 보증금, 금요일 17시 58분의 송금까지.
+- **막이 끝날 때의 중간 결산** — 그때까지의 판단 유형, 가장 큰 판돈, 가장 가까웠던 결말.
+- **판돈은 $로** — 판돈·금고·랭킹의 금액을 한눈에 읽히는 달러로 보여 줍니다.
+- **위기 가장자리 알림** — 벽이 가까워지면 화면 테두리가 숨 쉬듯 밝아집니다(편의 설정, 기본 꺼짐).
 
 ## 우리가 만든 방식
 
@@ -72,6 +107,9 @@ npm run dev
 기획부터 제작까지 SUPASONIC과 ALICE가 함께 만들었습니다.<br>
 SUPASONIC and ALICE made the game together, from the first plan to the finished build.<br>
 企画から制作まで、SUPASONICとALICEが一緒に作りました。
+
+버그나 의견은 **[이슈로 남겨](https://github.com/SUPASONIC-hub/Critical-Point/issues/new/choose)** 주거나
+SUPASONIC 메일로 보내 주세요. Bug reports and feedback are welcome in Korean, English or Japanese.
 
 ## 라이선스
 
