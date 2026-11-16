@@ -51,3 +51,12 @@ export function wordmarkLogoMarkup() {
     `<circle class="wordmark-point" cx="${WORDMARK_STOP.cx}" cy="${WORDMARK_STOP.cy}" r="${WORDMARK_STOP.r}"/></svg>`
   );
 }
+
+/**
+ * Whether the reading line also prints the title's hanja: not when the reading
+ * is already written in Han characters (the Japanese 臨界点), where 臨界點
+ * beside it would say the same thing twice.
+ */
+export function showHanja(reading, hanja) {
+  return Boolean(hanja) && !/\p{Script=Han}/u.test(String(reading));
+}

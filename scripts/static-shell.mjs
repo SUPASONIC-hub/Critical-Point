@@ -5,7 +5,7 @@ import jaIntro from "../src/locales/ja/screens/intro.js";
 import { style as jaStyle } from "../src/locales/ja/index.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../src/responsiveArt.js";
 import { MENU_KINDS, MENU_LABELS, menuPath } from "./content-pages/site-nav.mjs";
-import { wordmarkLogoMarkup } from "../src/components/wordmarkLogo.js";
+import { showHanja, wordmarkLogoMarkup } from "../src/components/wordmarkLogo.js";
 
 /**
  * The intro's first viewport as plain HTML, inside `#root`, so the page paints
@@ -80,7 +80,7 @@ function wordmark(label, reading) {
   return (
     `<h1 class="game-wordmark"><span class="sr-only">${escape(label)}</span>${wordmarkLogoMarkup()}` +
     `<span class="wordmark-rule"></span>` +
-    `<span class="wordmark-reading"><b>${escape(reading)}</b><i>${HANJA}</i></span></h1>`
+    `<span class="wordmark-reading"><b>${escape(reading)}</b>${showHanja(reading, HANJA) ? `<i>${HANJA}</i>` : ""}</span></h1>`
   );
 }
 

@@ -61,8 +61,9 @@ test("the shell lays out the intro's words in the page's language and shows none
   // Japanese carries its dictionary's face and line breaks, as the intro it stands for has them.
   assert.ok(staticShellMarkup({ language: "ja" }).includes('<style>:root:lang(ja){--font-sans:"Hiragino Sans"'));
   assert.ok(!staticShellMarkup({ language: "en" }).includes("<style>") && !staticShellMarkup().includes("<style>"));
-  // What shows is the same frame in every language but the reading under the name.
-  const frames = Object.entries(COPY).map(([language, copy]) => shown(staticShellMarkup({ language })).replace(copy.titleReading, "READING"));
+  // What shows is the same frame in every language but the reading under the name
+  // (and its hanja, which a reading already in Han characters goes without).
+  const frames = Object.entries(COPY).map(([language, copy]) => shown(staticShellMarkup({ language })).replace(copy.titleReading, "READING").replace("<i>臨界點</i>", ""));
   assert.equal(new Set(frames).size, 1);
 });
 
@@ -72,9 +73,9 @@ test("the shell shows no sentence: only the game's name, its reading and hanja, 
     const words = textOf(markup);
     const allowed = new Set([...GAME_TITLE.split(" "), ...copy.titleReading.split(" "), "臨界點"]);
     for (const word of words) assert.ok(allowed.has(word), `${language}: "${word}" is not the game's name`);
-    // Hangul only in the Korean reading, kana only in the Japanese one.
+    // Hangul only in the Korean reading; the Japanese reading is the title in kanji, 臨界点, with no 臨界點 beside it.
     assert.deepEqual(words.filter((word) => /[가-힣]/.test(word)), language === "ko" ? [copy.titleReading] : [], language);
-    assert.deepEqual(words.filter((word) => /[぀-ヿ]/.test(word)), language === "ja" ? [copy.titleReading] : [], language);
+    assert.deepEqual(words.filter((word) => /\p{Script=Han}/u.test(word)), language === "ja" ? [copy.titleReading] : ["臨界點"], language);
     assert.deepEqual(shownAttributes(markup), [""], "the picture's alt is empty: the shell is hidden from assistive tech");
     assert.match(markup, /<div class="start-input-row intro-launch"><button type="button" tabindex="-1"><\/button><\/div>/, "the start button has no label");
   }

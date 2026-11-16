@@ -1,4 +1,4 @@
-import { WORDMARK_LETTERS, WORDMARK_MARK, WORDMARK_STOP, WORDMARK_STROKE, WORDMARK_VIEWBOX } from "./wordmarkLogo.js";
+import { showHanja, WORDMARK_LETTERS, WORDMARK_MARK, WORDMARK_STOP, WORDMARK_STROKE, WORDMARK_VIEWBOX } from "./wordmarkLogo.js";
 
 /**
  * The title lockup: the game's logo (the GAUGE mark and the drawn wordmark
@@ -33,7 +33,7 @@ export function GameWordmark({ label = "CRITICAL POINT", reading = "임계점", 
       <span className="wordmark-rule" aria-hidden="true" />
       <span className="wordmark-reading">
         <b>{reading}</b>
-        <i aria-hidden="true">{hanja}</i>
+        {showHanja(reading, hanja) && <i aria-hidden="true">{hanja}</i>}
       </span>
     </h1>
     {tagline && (
