@@ -1275,8 +1275,10 @@ const budgets = [
   // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
   // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
   // e2e build, the plus 4.
-  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 11_789, maxGzip: 4_552 },
-  { pattern: /^BoardAdmin-.*\.css$/, maxBytes: 2_011, maxGzip: 665 },
+  // 11,789 / 4,552 -> 15,773 / 5,645 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 15769 / 5641 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 15_773, maxGzip: 5_645 },
+  // 2,011 / 665 -> 2,495 / 735 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 2491 / 731 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^BoardAdmin-.*\.css$/, maxBytes: 2_495, maxGzip: 735 },
   // 3,860 / 1,759, with rows typed before they are rendered.
   // 4,060 / 1,850 -> 4,420 / 1,980 on 2026-10-06, measured 4,210 / 1,883 plus
   // 5%: the count that is not "0명" while it loads, the region that says when
