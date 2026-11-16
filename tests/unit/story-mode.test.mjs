@@ -144,7 +144,8 @@ test("a story rule set is the same object every time it is asked for, and nothin
 test("a story run is introduced only to the rules it plays under", () => {
   const [one, two, three, four, five] = UNLOCK_LADDER;
   const told = (caseId) => introFor(caseId, { staged: true, story: true });
-  assert.deepEqual(told("prologue01"), [one.intro[0]], "the table itself is explained as ever, without the skipped scene a story bust does not cost");
+  // Both lines since N21: the second is the stake alone, which a story bust costs too.
+  assert.deepEqual(told("prologue01"), [...one.intro], "the table itself, and what a bust costs");
   assert.deepEqual(told("prologue02"), [two.intro[0]], "the logic streak, and not the wall's three rules");
   assert.match(told("prologue02")[0], /논리 콤보/);
   assert.deepEqual(told("prologue03"), [three.intro[2]], "SCOUT is the hand's own; COLD FEET and HEAT DEBT are both off");
