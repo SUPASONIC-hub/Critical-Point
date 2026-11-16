@@ -611,7 +611,8 @@ test("the built worker is the source without its exports, and says what it was b
   // It runs as a classic script against a scope, and registers its listeners.
   const heard = [];
   new Function("self", source)({ addEventListener: (type) => heard.push(type), location: { origin: ORIGIN } });
-  assert.deepEqual(heard, ["install", "activate", "fetch", "message"]);
+  // `periodicsync` and `notificationclick` are 주 1회 알림's (N25).
+  assert.deepEqual(heard, ["install", "activate", "fetch", "periodicsync", "notificationclick", "message"]);
   assert.throws(() => buildWorkerSource('import x from "./y.js";\n', config), /classic worker/);
 });
 

@@ -108,6 +108,12 @@ export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 export const LOCALE_KEY = "critical-point-locale-v1";
 // "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
 export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
+/**
+ * 주 1회 알림 (N25, state/weeklyReminder.js): "1" once the player turned it on
+ * in the comfort settings of an installed copy; anything else is off, which
+ * is where every device starts.
+ */
+export const WEEKLY_REMINDER_KEY = "critical-point-weekly-reminder-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited
