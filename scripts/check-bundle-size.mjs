@@ -680,7 +680,8 @@ const budgets = [
   // 205,322 / 74,409 -> 207,552 / 75,601 다국적 인물 over main e43f7bf6. Measured 207548 / 75597 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 207_771, maxGzip: 75_684 },
+  // 207,771 / 75,684 -> 208,119 / 75,736 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured 208115 / 75732 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 208_119, maxGzip: 75_736 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -956,7 +957,8 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_389 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -981,7 +983,8 @@ const budgets = [
   // 52,577 / 17,378 -> 52,589 / 17,392 금액 $ 표시. Measured 52585 / 17388 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,378 -> 52,577 / 17,383 번외 5. Measured - / 17379 (over budget only) in the e2e build, the plus 4.
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_383 },
+  // 52,590 / 17,383 -> 52,590 / 17,389 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured - / 17385 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_590, maxGzip: 17_389 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -2450,7 +2453,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,172 / 438,397 / 446,272 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured first paint, the plus 4.
 // -> 377,359 / 438,379 / 446,228 a5-edge-alert over main bd2bd589. Measured first paint, the plus 4.
 // -> 377,359 / 438,632 / 446,512 묶음 B4+c2 over main 83570151 (#551 A5). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_359, en: 438_632, ja: 446_512 };
+// -> 377,409 / 438,687 / 446,565 calendar-w17 over main bded5a33: 주간 달력 2027-W17~W25 다섯 줄(초안, 마이그레이션 20261121000000). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_409, en: 438_687, ja: 446_565 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
