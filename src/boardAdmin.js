@@ -31,6 +31,9 @@ const REQUEST_TIMEOUT_MS = 10000;
 /** A token this close to its end is refreshed before it is sent. */
 const REFRESH_MARGIN_SECONDS = 60;
 export const ADMIN_PAGE_SIZE = 30;
+/** The report queue's rows and the admin log's rows the bar asks for at once (20261118010000). */
+export const ADMIN_QUEUE_SIZE = 50;
+export const ADMIN_LOG_SIZE = 50;
 
 /** Where Google sends the page back to: this page, with the sheet asked for. */
 export function adminRedirectUrl(location) {
@@ -146,6 +149,30 @@ export function toAdminPost(row) {
     kept: Boolean(row.kept_at),
     reports: Number(row.report_count) || 0,
     sameWriter: Number(row.same_writer_count) || 1,
+  };
+}
+
+/**
+ * One post of the report queue: an admin row, plus how many writers reported
+ * it, the reasons they picked and when its first report came. No writer key.
+ */
+export function toQueuePost(row) {
+  return {
+    ...toAdminPost(row),
+    writers: Number(row.writer_count) || 0,
+    reasons: Array.isArray(row.reasons) ? row.reasons.map(String) : [],
+    firstReportAt: row.first_report_at ?? null,
+  };
+}
+
+/** One row of board_admin_log as the bar's 관리 기록 reads it. */
+export function toLogRow(row) {
+  return {
+    id: Number(row.id),
+    at: row.at ?? null,
+    email: String(row.admin_email ?? ""),
+    action: String(row.action ?? ""),
+    postId: Number(row.post_id),
   };
 }
 
@@ -321,6 +348,16 @@ export function createBoardAdmin({
     },
     async remove(postId) {
       return (await rpc("admin_board_delete", { p_post_id: postId })) === true;
+    },
+    /** The posts waiting for a person: reported, or hidden by the reports themselves. */
+    async queue() {
+      return ((await rpc("admin_board_queue", { p_limit: ADMIN_QUEUE_SIZE })) ?? []).map(toQueuePost);
+    },
+    async queueCount() {
+      return Number(await rpc("admin_board_queue_count")) || 0;
+    },
+    async log() {
+      return ((await rpc("admin_board_log", { p_limit: ADMIN_LOG_SIZE })) ?? []).map(toLogRow);
     },
   };
 }

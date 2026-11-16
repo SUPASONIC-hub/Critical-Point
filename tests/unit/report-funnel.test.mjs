@@ -175,3 +175,40 @@ test("the funnel's JSON for the run's artifact carries the summary's numbers and
   assert.ok(!/"device"/.test(text) && !/700[12]/.test(text), "no device, not even its rank");
   assert.ok(!/"cases"|"times"|"firstAt"|"lastAt"/.test(text), "no row and no run's own times");
 });
+
+test("a season counts as finished from its finale case row too, once a run, and the summary keeps the finishes a ranking reset emptied (N15)", async () => {
+  const { LAST_RANKING_RESET, readTraffic } = await import("../../scripts/report-funnel.mjs");
+  const reset = Date.parse(LAST_RANKING_RESET) / 1000;
+  const before = reset - 10 * DAY;
+  const after = reset + 2 * DAY;
+  const rows = [
+    // Finished before the reset: its season-final row is gone, its finale case row is not.
+    { device: 1, marked: false, new_game_plus: false, cases: through("final", before) },
+    // The same, its finale played twice: one finish, from the first finale row.
+    { device: 2, marked: false, new_game_plus: false, cases: [...through("final", before), ["final", before + DAY]] },
+    // Finished after the reset with its ranking row: one finish, at the ranking row's time.
+    { device: 3, marked: false, new_game_plus: false, cases: [...through("final", after), ["season-final", after + 54 * 600 + 60]] },
+    // Finished after the reset with no ranking row (a story-mode season).
+    { device: 4, marked: false, new_game_plus: false, cases: through("final", after) },
+    // Not finished.
+    { device: 5, marked: false, new_game_plus: false, cases: through("case36", before) },
+  ];
+  const f = readFunnel(rows, after + 3 * DAY);
+  assert.equal(f.finished, 4);
+  assert.equal(f.finishedRanked, 1);
+  assert.equal(f.finishedBeforeReset, 2);
+  assert.equal(f.finishedUnrankedSince, 1);
+  assert.equal(f.finished, f.finishedRanked + f.finishedBeforeReset + f.finishedUnrankedSince);
+  assert.ok(Math.abs(f.seasonDaysMedian - (54 * 600) / DAY) < 1e-9, "a finish without a ranking row is timed from its finale case row");
+  assert.equal(f.restarted, 0);
+
+  const text = describeFunnel(f, { since: "", at: new Date((after + 3 * DAY) * 1000) });
+  assert.match(text, /시즌을 끝낸 런\(season-final 또는 피날레 사건 행, 런마다 한 번\) \| 4 \(80\.0%\) \|/);
+  assert.match(text, /└ season-final 행이 남은 완주 \| 1 \|/);
+  assert.match(text, /└ 비움 전 완주\(피날레 사건 행만 남음: 2026-11-12 랭킹 비움 전에 끝냄[^|]*\| 2 \|/);
+  assert.match(text, /└ 그 뒤 랭킹 행 없이 끝낸 완주[^|]*\| 1 \|/);
+
+  // The traffic tables count the same finishes, on the day each was made.
+  const t = readTraffic(rows, after + 3 * DAY);
+  assert.equal(t.weeks.reduce((sum, week) => sum + week.finished, 0), 4);
+});
