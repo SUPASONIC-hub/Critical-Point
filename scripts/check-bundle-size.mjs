@@ -960,7 +960,8 @@ const budgets = [
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,651 / 17,398 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 52647 / 17394 (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_398 },
+  // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   // ScenePlate (src/components/ScenePlate.jsx) became its own chunk on 2026-11-02, plate-story over main 9be94346 (#392): scene plates place the sound beside its source (src/plateStory.js), mark the player figure, and draw the case ending on the result screen. The briefing and ResultScreen both import it. Measured 47,057 / 14,458 in the e2e build, the plus 4.
   // 47,061 / 14,462 -> 47,091 / 14,478 on 2026-11-03, plate-room-locale over main 16b6d349: a translated scene keeps its Korean place and clock for the plate (src/locales/overlay.js, src/scenePlate.js), and the sound tries 17 and 14 before it gives up (src/plateStory.js). Measured 47,087 / 14,474 in the e2e build, the plus 4.
   // 50,356 / 16,517 -> 50,367 / 16,517 on 2026-11-03, #224 merged with main cb904fb6 (#392 #398): #224's personal bests beside main's plate story. Measured 50,367 raw (gzip under 16,517) in the e2e build.
@@ -987,7 +988,8 @@ const budgets = [
   // 52,577 / 17,383 -> 52,590 / 17,383 묶음 1113. Measured 52586 / - (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,651 / 17,398 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 52647 / 17394 (over budget only) in the e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,590 / 17,388 board-admin over main 83570151: only the names of the chunks it imports. Measured - / 17384 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_398 },
+  // 52,651 / 17,398 -> 52,651 / 17,406 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured - / 17402 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
   { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
@@ -2469,7 +2471,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,359 / 438,640 / 446,519 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured first paint, the plus 4.
 // 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
 // -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_738, en: 439_018, ja: 446_897 };
+// -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
