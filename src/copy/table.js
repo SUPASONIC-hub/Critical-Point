@@ -53,6 +53,9 @@ const tableCopy = {
     bpm: "심박",
     sedated: "교란",
     caseFile: "사건 파일",
+    // ?ui=v2: the HUD keeps 이번 판, 판돈 and the clock; the rest opens under this switch.
+    more: "자세히",
+    moreLabel: "판 수치 자세히 보기",
     briefChallenge: "이 장면의 챌린지: {challenge}.",
     briefPot: "현재 판돈: {pot}. 벽에 닿으면 금고 밖 판돈은 사라진다.",
     briefRules: "이번 판 규칙: {rules}.",

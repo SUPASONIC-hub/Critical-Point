@@ -52,6 +52,7 @@ import { ComfortDialog, useComfortDialogOpen } from "../components/ComfortDialog
 import { ScenePlate } from "../components/ScenePlate.jsx";
 import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
+import { useUiV2 } from "../state/uiVersion.js";
 import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
@@ -465,6 +466,10 @@ export function GauntletStage({
   useTableTabTitle({ win, band, schema, tableOpen, live });
   // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
+  // ?ui=v2 (state/uiVersion.js): three numbers in the HUD, the rest under 자세히; the pot and the stake roll up.
+  const v2 = useUiV2();
+  const [more, setMore] = useState(false);
+  const money = (value) => (v2 ? <v2.RollingNumber value={value} format={formatMoney} /> : formatMoney(value));
 
   return (
     <section
@@ -473,6 +478,7 @@ export function GauntletStage({
       data-testid="gauntlet-stage"
       data-gauge={Math.round(win.gauge)}
       data-status={win.status}
+      data-more={v2 ? String(more) : undefined}
       aria-label={say.label} style={{ "--gx-question": scene.question.length }}
     >
       <GauntletFx
@@ -498,7 +504,7 @@ export function GauntletStage({
               {BOARD_MARK_LABELS[boardMark] ?? say.pot}
             </span>
             <strong className="gx-pot-value" data-testid="gauntlet-pot">
-              {win.status === "bust" ? 0 : formatMoney(livePot)}
+              {win.status === "bust" ? 0 : money(livePot)}
             </strong>
             <span className="gx-pot-math">
               <b className="gx-chips">{selectedChips || "—"}</b>
@@ -516,7 +522,7 @@ export function GauntletStage({
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
-              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatMoney(bustKeeps) : formatMoney(run.runPot)}</b>
+              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatMoney(bustKeeps) : money(run.runPot)}</b>
             </span>
             <span className="gx-stat">
               <Vault size={13} aria-hidden="true" />
@@ -561,6 +567,11 @@ export function GauntletStage({
           >
             <b>{Math.ceil(remaining)}</b>
           </div>
+          {v2 && (
+            <button type="button" className="v2-more" data-testid="hud-more" aria-expanded={more} title={say.moreLabel} onClick={() => setMore(!more)}>
+              {say.more}
+            </button>
+          )}
         </div>
 
         {(tableRules.length > 0 || ruleHeat > 0) && (

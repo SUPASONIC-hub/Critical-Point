@@ -8,6 +8,7 @@ import { installChunkReload } from "./state/chunkReload.js";
 import { loadLocale } from "./locale.js";
 import { installInstallPrompt } from "./state/installPrompt.js";
 import { startVitalsSample } from "./gameEvents.js";
+import { installUiVersion } from "./state/uiVersion.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
 // does not download the code that would. Turning it on in CloudSavePanel
@@ -45,5 +46,7 @@ const paint = () => createRoot(document.getElementById("root"), { onCaughtError:
 // (`?lang=<code>`, src/locale.js) first takes its dictionary, and paints in
 // Korean if that cannot be fetched.
 const dictionary = loadLocale();
-if (dictionary) dictionary.then(paint, paint);
+// `?ui=v2` (state/uiVersion.js): the redesign's chunk is in before the first paint, so nothing swaps.
+const redesign = installUiVersion();
+if (dictionary || redesign) Promise.all([dictionary, redesign]).then(paint, paint);
 else paint();

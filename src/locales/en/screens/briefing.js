@@ -20,6 +20,12 @@ export default {
   open: "Open the table",
   openSeconds: "{seconds}s start",
   openLabel: "Open the table {seconds}s start. The clock starts now and you can stake a card",
+  v2: {
+    thread: "Office messenger",
+    attachment: "Attachment",
+    openFile: "Open document",
+    closeFile: "Close document",
+  },
   cast: {
     trail: "Earlier scenes in this case",
     people: "People",

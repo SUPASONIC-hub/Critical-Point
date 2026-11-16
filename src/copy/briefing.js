@@ -31,6 +31,13 @@ const briefingCopy = {
   open: "판 열기",
   openSeconds: "{seconds}초 시작",
   openLabel: "판 열기 {seconds}초 시작. 지금부터 시계가 흐르고 카드를 걸 수 있다",
+  // ?ui=v2 (src/uiV2/BriefingThread.jsx): the page as the office messenger and the file it sends.
+  v2: {
+    thread: "업무 메신저",
+    attachment: "첨부 파일",
+    openFile: "문서 열기",
+    closeFile: "문서 접기",
+  },
   cast: {
     trail: "이 사건의 지난 장면",
     people: "등장인물",

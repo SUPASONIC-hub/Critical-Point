@@ -1,9 +1,11 @@
+import { useRef } from "react";
 import { Link2, Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { getLogicDirection } from "./logicStreak.js";
 import { describeCardMove, getDirectionParts, getMoveMark, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
+import { useUiV2 } from "../state/uiVersion.js";
 import { pastPick } from "./WeekRulePanel.jsx";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
@@ -91,9 +93,13 @@ export function GauntletHand({
   const overclocked = schema.mutations.includes("overclock");
   const reframeSelected = selectedId === REFRAME_CARD_ID;
   const labelOf = (key) => resourceMeta[key]?.label ?? key;
+  // ?ui=v2: drag a card up to play it (src/uiV2/HandGestures.jsx).
+  const v2 = useUiV2();
+  const handRef = useRef(null);
 
   return (
-    <div className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label={say.label}>
+    <div ref={handRef} className={`choices gx-hand hand-${handSize}`} data-hand={handSize} role="group" aria-label={say.label}>
+      {v2 && <v2.HandGestures handRef={handRef} />}
       {cards.map((card, index) => {
         const open = isCardOpen(card);
         const burn = getCardBurn(card, schema);

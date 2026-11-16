@@ -37,6 +37,8 @@ export default {
     bpm: "Heartbeat",
     sedated: "Jammed",
     caseFile: "Case File",
+    more: "Details",
+    moreLabel: "Show the table's other numbers",
     briefChallenge: "This scene’s challenge: {challenge}.",
     briefPot: "Current stake: {pot}. If you hit the Wall, any stake outside the Vault is lost.",
     briefRules: "Rules this hand: {rules}.",

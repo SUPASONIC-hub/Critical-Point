@@ -37,6 +37,8 @@ export default {
     bpm: "心拍",
     sedated: "攪乱",
     caseFile: "事件ファイル",
+    more: "詳しく",
+    moreLabel: "卓の数値を詳しく見る",
     briefChallenge: "このシーンのチャレンジ: {challenge}。",
     briefPot: "現在の賭け金: {pot}。壁に触れると、金庫の外の賭け金は消える。",
     briefRules: "この勝負のルール: {rules}。",

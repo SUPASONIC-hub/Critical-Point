@@ -20,6 +20,12 @@ export default {
   open: "卓を開く",
   openSeconds: "{seconds}秒で開始",
   openLabel: "卓を開く、{seconds}秒で開始。ここから時計が流れ、カードを賭けられる",
+  v2: {
+    thread: "業務メッセンジャー",
+    attachment: "添付ファイル",
+    openFile: "文書を開く",
+    closeFile: "文書を閉じる",
+  },
   cast: {
     trail: "この事件のこれまでのシーン",
     people: "登場人物",

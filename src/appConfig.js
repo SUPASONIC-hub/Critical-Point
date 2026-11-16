@@ -108,6 +108,8 @@ export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 export const LOCALE_KEY = "critical-point-locale-v1";
 // "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
 export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
+// "v2" while the first-five-minutes redesign is switched on by `?ui=v2` (`?ui=v1` turns it off): src/state/uiVersion.js.
+export const UI_VERSION_KEY = "critical-point-ui-version-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

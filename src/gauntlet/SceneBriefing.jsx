@@ -22,6 +22,7 @@ import { SpeakerPortrait } from "../components/SpeakerPortrait.jsx";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { ReadingClockAsk, readingClockStart } from "./ReadingClockAsk.jsx";
 import { useSceneTraceLine } from "../state/useSceneBustRates.js";
+import { useUiV2 } from "../state/uiVersion.js";
 
 // The sound a panel makes. A board that just broke slams; everything else is
 // drawn from the scene id so the same scene always makes the same noise. Its
@@ -206,6 +207,9 @@ export function SceneBriefing({
   const dialogRef = useRef(null);
   const timerRef = useRef(null);
   const trapTab = useDialogFocus(dialogRef);
+  // ?ui=v2 (state/uiVersion.js): the page as the office messenger, the cards as a hand.
+  const v2 = useUiV2();
+  const cardsRef = useRef(null);
 
   useEffect(() => {
     onOpenRef.current = onOpen;
@@ -269,6 +273,33 @@ export function SceneBriefing({
   const broken = penalties.length > 0;
   const sfx = pickSfx(nodeId, broken);
   const late = !held && shown <= 5;
+  // The rules this board carries and the ones the last decision broke: the
+  // comic page's last grid rows, under the thread on v2.
+  const rulePanels = (
+    <>
+      {carried.length > 0 && (
+        <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
+          <p className="gx-breach-kicker">{briefingCopy.carried}</p>
+          <RuleRows rules={carried} resourceMeta={resourceMeta} />
+        </div>
+      )}
+
+      {broken && (
+        <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
+          <p className="gx-breach-kicker">
+            <TriangleExclamationPoint size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
+          </p>
+          <RuleRows rules={penalties} resourceMeta={resourceMeta} />
+        </div>
+      )}
+    </>
+  );
+  const judgment = (
+    <div className={`gx-judgment${v2 ? " v2-call" : ""}`} data-testid="briefing-question">
+      <b>{briefingCopy.yourCall}</b>
+      <p><Prose text={question} /></p>
+    </div>
+  );
 
   return (
     <div className="gx-comic" data-testid="scene-briefing">
@@ -316,6 +347,12 @@ export function SceneBriefing({
           </button>
         </header>
 
+        {v2 ? (
+          <>
+            <v2.BriefingThread node={node} nodeId={nodeId} portrait={portrait} speakerRole={speakerRole} speech={speech} told={told} bridge={bridge} reaction={reaction} trace={trace} unfold={unfold} />
+            {rulePanels}
+          </>
+        ) : (
         <div className="gx-comic-grid">
           <figure className="gx-panel gx-panel-splash">
             <ScenePlate node={node} nodeId={nodeId} sound={sfx.label} soundKind={sfx.kind} />
@@ -340,10 +377,7 @@ export function SceneBriefing({
                 <Prose text={speech.line} />
               </Balloon>
             )}
-            <div className="gx-judgment" data-testid="briefing-question">
-              <b>{briefingCopy.yourCall}</b>
-              <p><Prose text={question} /></p>
-            </div>
+            {judgment}
           </figure>
 
           <div className="gx-panel gx-panel-story">
@@ -372,22 +406,9 @@ export function SceneBriefing({
             </div>
           )}
 
-          {carried.length > 0 && (
-            <div className="gx-panel gx-panel-breach gx-carry" data-testid="carried-rules" style={at(broken ? 3 : 0)}>
-              <p className="gx-breach-kicker">{briefingCopy.carried}</p>
-              <RuleRows rules={carried} resourceMeta={resourceMeta} />
-            </div>
-          )}
-
-          {broken && (
-            <div className="gx-panel gx-panel-breach" data-testid="protocol-breach" style={at(carried.length > 0 ? 4 : 0)}>
-              <p className="gx-breach-kicker">
-                <TriangleExclamationPoint size={14} aria-hidden="true" /> <span><span lang="en">PROTOCOL BREACH</span>{briefingCopy.breach}</span>
-              </p>
-              <RuleRows rules={penalties} resourceMeta={resourceMeta} />
-            </div>
-          )}
+          {rulePanels}
         </div>
+        )}
 
         {/* Under the page's grid, so it takes none of its rows. */}
         {weekRulePanel}
@@ -415,11 +436,13 @@ export function SceneBriefing({
         )}
 
         <footer className="gx-comic-actions">
+          {v2 && judgment}
           <p className="gx-comic-hint">
             {briefingCopy.hint}
             {letterKeys && <> · <kbd>1</kbd>–<kbd>{cards.length + (reframeChoice ? 1 : 0)}</kbd></>}
           </p>
-          <div className="gx-comic-cards" role="group" aria-label={briefingCopy.cardsLabel}>
+          <div ref={cardsRef} className="gx-comic-cards" role="group" aria-label={briefingCopy.cardsLabel}>
+            {v2 && <v2.HandGestures handRef={cardsRef} />}
             {cards.map((card, index) => {
               const open = isCardOpen(card);
               return (
