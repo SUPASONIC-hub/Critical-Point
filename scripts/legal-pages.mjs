@@ -764,12 +764,16 @@ export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`
 export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /**
- * The picture a shared link shows (the start screen's key visual, 1200x675),
- * and what it shows in each language: the start screen's own `heroAlt`
+ * The picture a shared link shows, one per language (1200x675, 2026-11-16):
+ * the start screen's key visual with the game's name, one line and 「free, in
+ * the browser」 in that language over it (scripts/build-og-images.mjs writes
+ * public/og-<lang>.jpg). Its alt is the start screen's own `heroAlt`
  * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
  * holds them to it).
  */
-export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE = { width: 1200, height: 675 };
+/** The share picture's address in `language`: `/og-ko.jpg`, `/og-en.jpg`, `/og-ja.jpg`. */
+export const shareImagePath = (language) => `/og-${language}.jpg`;
 export const SHARE_IMAGE_ALT = {
   ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
   en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
@@ -795,7 +799,7 @@ export function shareMetaLines({ language, url, title, description }) {
     ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
     meta("property", "og:title", title),
     meta("property", "og:description", description),
-    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image", shareImagePath(language)),
     meta("property", "og:image:type", "image/jpeg"),
     meta("property", "og:image:width", String(SHARE_IMAGE.width)),
     meta("property", "og:image:height", String(SHARE_IMAGE.height)),
@@ -803,7 +807,7 @@ export function shareMetaLines({ language, url, title, description }) {
     meta("name", "twitter:card", "summary_large_image"),
     meta("name", "twitter:title", title),
     meta("name", "twitter:description", description),
-    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image", shareImagePath(language)),
     meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
   ];
 }

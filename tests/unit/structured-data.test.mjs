@@ -36,7 +36,7 @@ function expectGame(data, language, file) {
   assert.equal(game.url, home, file);
   assert.equal(game.inLanguage, language, file);
   assert.ok(game.description?.length > 40, `${file}: a description`);
-  assert.equal(game.image, `${ORIGIN}/triggerlab-key-visual.jpg`, `${file}: the share image, absolute`);
+  assert.equal(game.image, `${ORIGIN}/og-${language}.jpg`, `${file}: the share image, absolute`);
   assert.deepEqual(game.genre, GAME_GENRES[language], file);
   assert.equal(game.gamePlatform, "Web browser", file);
   assert.deepEqual(game.offers, { "@type": "Offer", price: "0", priceCurrency: { ko: "KRW", en: "USD", ja: "JPY" }[language] }, `${file}: free`);
