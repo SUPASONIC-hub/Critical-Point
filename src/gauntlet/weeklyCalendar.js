@@ -35,6 +35,15 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * on for twelve more weeks, one week in two, the three event rules in turn
  * after W03's short-clock. `added` is the day the draft was written; the PR
  * is merged at least seven days before W05 (2027-02-01), so the notice holds.
+ *
+ * 2027-W17 to 2027-W26 (초안, 2026-11-16, 사용자 확인 전): the same one week in
+ * two, five event weeks. The three event rules go on in turn after W15's
+ * short-clock (W17, W21, W23), and the two catalogue devices of #555 come in
+ * once each, in the rotation's slots and so never beside another rule's week:
+ * IDLE MONEY at W19, MARKET SHOCK at W25, six weeks apart, after the
+ * crisis week and the plain rules have had their turns. W26 is an ordinary
+ * week. `added` is the day the draft was written; merged at least seven days
+ * before W17 (2027-04-26).
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
@@ -52,6 +61,11 @@ const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2027-W11", id: "near-wall", added: "2026-11-12" }),
   Object.freeze({ week: "2027-W13", id: "heavy-fracture", added: "2026-11-12" }),
   Object.freeze({ week: "2027-W15", id: "short-clock", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W17", id: "near-wall", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W19", id: "idle-erosion", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W21", id: "heavy-fracture", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W23", id: "short-clock", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W25", id: "market-shock", added: "2026-11-16" }),
 ]);
 
 /**

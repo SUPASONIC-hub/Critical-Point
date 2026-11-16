@@ -36,7 +36,7 @@ const actTallyCopy = {
   nearLine: "한 걸음 옆: {ending}까지 {gaps}",
   // The makers' line under the three rows.
   note: "막이 바뀌는 자리에서 우리가 지금까지를 한 장에 묶었습니다. 점수와 결말은 아직 정해지지 않았습니다.",
-  shareLine: "임계점 시즌을 {end}까지 왔습니다. 판단 유형은 '{habit}', 가까운 결말은 '{ending}'.",
+  shareLine: "「임계점: CRITICAL POINT」 시즌을 {end}까지 왔습니다. 판단 유형은 '{habit}', 가까운 결말은 '{ending}'.",
   // The two buttons and what a press says (ResultCardShare.jsx, with these words).
   buttons: {
     shareLabel: "중간 결산 카드 공유",

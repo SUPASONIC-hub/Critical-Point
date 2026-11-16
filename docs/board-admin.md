@@ -12,6 +12,13 @@
    - 검색(본문·이름 일부), `숨긴 글 포함` 켜고 끄기, `더 보기`
    - 글마다 `숨기기` / `되살리기`, `같은 사람 글 N`, `영구 삭제`(확인 창), 신고 수
    - 숨긴 글은 점선 테두리와 `숨김` 또는 `신고로 자동 숨김` 표시
+   - 막대 위 `신고 대기 N건` 배지: 사람이 볼 차례인 글 수(아래 「신고 대기」와 같은 기준)
+   - 보기 셋: `글 검색` · `신고 대기` · `관리 기록`
+     - `신고 대기`: 신고가 들어와 아직 보이는 글과 신고로 자동 숨김된 글(`auto_hidden_at`), 오래 기다린 글부터 50개.
+       신고 수, 신고한 사람 수, 사유(광고·도배 등), 첫 신고 시각. `숨기기 확정`(= 숨기기) 또는
+       `되살리기`/`그대로 두기`(= 되살리기, 신고도 지움). 어느 쪽이든 대기에서 빠집니다.
+       기준은 `Board Reports` 워크플로(`scripts/board-reports.mjs`)의 「기다리는 글」과 같습니다.
+     - `관리 기록`: `board_admin_log` 최근 50줄(언제·누가·숨김/되살림/영구 삭제·몇 번 글)
 4. 로그인은 이 브라우저에 남습니다. 다음에는 `?admin` 없이 게시판만 열어도 관리 막대가 보입니다. 끝나면 `로그아웃`.
 
 되살리기는 `Board Reports` 워크플로의 `restore`와 같습니다. 글이 다시 보이고(`kept_at`, 다시는 신고로 자동 숨김되지
@@ -27,6 +34,7 @@
   계정만으로는 관리자가 되지 않습니다.
 - `admin_board_search` · `admin_board_same_writer` · `admin_board_set_hidden` · `admin_board_delete` ·
   `admin_board_me` 다섯 RPC는 `authenticated`만 실행할 수 있고, 관리자가 아니면 `board admin only`로 거절합니다.
+  `admin_board_queue` · `admin_board_queue_count` · `admin_board_log`(`20261118010000_board_admin_queue.sql`)도 같습니다.
   글쓴이 키(`actor_key`)는 내보내지 않습니다. `npm run check:grants`가 이 규칙을 매번 돌려 봅니다.
 - 화면(`src/boardAdmin.js`)도 두 주소가 아니면 바로 로그아웃시키지만, 이것은 안내일 뿐입니다.
 - 관리자를 바꾸려면 SQL Editor에서 `insert into public.board_admins values ('새주소@gmail.com');`(소문자) 또는

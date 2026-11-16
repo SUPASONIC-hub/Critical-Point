@@ -59,8 +59,8 @@ test("each start page has its language, title, description, cards and its own ca
     assert.equal(one(html, "property", "og:locale"), OG[language]);
     assert.deepEqual(metas(html, "property", "og:locale:alternate"), Object.keys(OG).filter((code) => code !== language).map((code) => OG[code]));
     assert.equal(one(html, "property", "og:url"), url);
-    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/triggerlab-key-visual.jpg`);
-    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/triggerlab-key-visual.jpg`);
+    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/og-${language}.jpg`);
+    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/og-${language}.jpg`);
     assert.equal(one(html, "property", "og:image:alt"), SHARE_IMAGE_ALT[language]);
     assert.equal(one(html, "name", "twitter:image:alt"), SHARE_IMAGE_ALT[language]);
     assert.equal(one(html, "name", "twitter:card"), "summary_large_image");
@@ -186,8 +186,8 @@ test("the plain pages carry a card too: title, description, own address and the 
     assert.equal(one(html, "property", "og:description"), description, file);
     assert.equal(one(html, "name", "twitter:description"), description, file);
     assert.equal(one(html, "property", "og:url"), `${ORIGIN}/${file}`, file);
-    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/triggerlab-key-visual.jpg`, file);
-    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/triggerlab-key-visual.jpg`, file);
+    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/og-${language}.jpg`, file);
+    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/og-${language}.jpg`, file);
     assert.equal(one(html, "property", "og:locale"), OG[language], file);
     assert.equal(one(html, "property", "og:site_name"), GAME_NAME[language], file);
     assert.equal(one(html, "name", "twitter:card"), "summary_large_image", file);

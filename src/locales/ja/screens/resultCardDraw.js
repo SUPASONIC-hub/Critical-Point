@@ -14,5 +14,5 @@ export default {
   unreadMode: "記録されなかった判断",
   unreadEnding: "未確定の経路",
   held: "現金は失っても、人的被害は崩壊線の下",
-  shareLine: "臨界点でひとつのシーズンを終えました。判断DNAは'{mode}'、結末は'{ending}'。最高バースト{burst}{points}、{rank}ランク。{share}",
+  shareLine: "『臨界点: CRITICAL POINT』でひとつのシーズンを終えました。判断DNAは'{mode}'、結末は'{ending}'。最高バースト{burst}{points}、{rank}ランク。{share}",
 };
