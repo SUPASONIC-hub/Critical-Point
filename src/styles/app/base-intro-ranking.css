@@ -621,6 +621,11 @@ summary:focus-visible {
    the reading line under it keeps its place in the column. */
 .game-wordmark {
   display: grid;
+  /* As wide as the copy column: the logo's width is a share of it. The column
+     is a flex box that starts its children, which would shrink the heading to
+     an svg's 300px default. */
+  align-self: stretch;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: 0;
   margin: 0;

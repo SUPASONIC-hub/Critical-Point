@@ -62,7 +62,7 @@
 | 장면마다 읽고 판단할 것을 받습니다 | 판단이 결말과 다음 사건을 바꿉니다 |
 
 <p align="center">
-  <img src="docs/images/title.webp" alt="PC 첫 화면: 노을 진 옥상에 선 분석관 옆으로 TRIGGERLAB: CRITICAL POINT 제목과 프롤로그 시작 버튼" width="720">
+  <img src="docs/images/title.webp" alt="PC 첫 화면: 노을 진 옥상에 선 분석관 옆으로 C자 게이지 로고와 CRITICAL POINT 제목, 프롤로그 시작 버튼" width="720">
 </p>
 
 ## 새 소식
