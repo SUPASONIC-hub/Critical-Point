@@ -76,7 +76,7 @@ try {
     const file = join(scratch, `${language}.html`);
     writeFileSync(file, page(language));
     await tab.goto(pathToFileURL(file).href, { waitUntil: "load" });
-    await tab.evaluate(() => document.fonts.ready);
+    await tab.evaluate(() => globalThis.document.fonts.ready);
     const out = `public/og-${language}.jpg`;
     await tab.screenshot({ path: out, type: "jpeg", quality: 82 });
     console.log(`${out} ${statSync(out).size} bytes`);
