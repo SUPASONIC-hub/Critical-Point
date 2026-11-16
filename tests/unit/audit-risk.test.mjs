@@ -34,7 +34,7 @@ function playCase(run, windows, rules = ALL_RULES) {
 }
 
 test("the audit is a rule of the table from 사건 02 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3), and no week switches it any more", () => {
-  assert.deepEqual(WEEK_RULE_DEVICES, [], "the week's devices are empty; the frame stays");
+  assert.ok(!WEEK_RULE_DEVICES.includes("audit"), "no week switches the audit; the frame stays for a week's own device");
   assert.equal(weekRuleHasDevice("audit-cascade", "audit"), false, "W47's stamp switches nothing now");
   assert.equal(getWeekRule("audit"), null, "the audit week is gone from the catalogue");
   const opens = UNLOCK_LADDER.find((step) => step.adds.includes("audit"));

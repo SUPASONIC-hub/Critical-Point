@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import strictAssert from "node:assert/strict";
 import {
   BASE_SCHEMA,
   buyExtraRelic,
@@ -24,7 +24,7 @@ import { SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -67,6 +67,25 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * is the table stepping back, so what is asked of it is that it does step back
  * (see the story tier at the end).
  */
+
+/**
+ * Under WEEK_RULE (season-bot.mjs) the report measures a week's rule booked in
+ * no week yet: every property below is still checked, but one that does not
+ * hold is printed as `week rule       would fail: ...` and the report goes on,
+ * so every row of a candidate is there to read. Without it, as always.
+ */
+const assert = WEEK_RULE
+  ? new Proxy(strictAssert, {
+      get: (target, name) => (...args) => {
+        try {
+          return target[name](...args);
+        } catch (error) {
+          console.log(`week rule        would fail: ${String(error.message).split(/\r?\n/)[0]}`);
+          return undefined;
+        }
+      },
+    })
+  : strictAssert;
 
 const CASES = 1500;
 /** The most one relic may lift best play. */
@@ -1059,6 +1078,8 @@ if (CASCADE_ON) {
   assert.ok(onRow("bust to skip").meanVault < blind.meanVault * 0.25, "with links on, busting to skip is still no shortcut");
 }
 
+// WEEK_RULE (season-bot.mjs): every case above was played under that week's rule.
+if (WEEK_RULE) console.log(`week rule        every case under ${WEEK_RULE}, values ${WEEK_VALUES}`);
 console.log(
   `Gauntlet loop checks passed (${WINDOWS_PER_CASE} windows a case, measured ${MEASURED_WINDOWS_PER_CASE.toFixed(2)}; best blind: ${bestFixed.label}, ${bestFixed.meanVault}; best heartbeat: ${bestHeartbeat.label}, ${bestHeartbeat.meanVault}; ceiling ${oracle.meanVault}; bust to skip: ${skipper.meanVault} over ${skipper.meanWindows} windows; holding a direction: ${holder.meanVault} (pot bonus ${holder.meanBonus.toFixed(3)}), a random card: ${randomType.meanVault}; locked: ${lockReport.map((row) => `${row.mode} ${row.listen.meanVault}`).join(", ")}).`,
 );

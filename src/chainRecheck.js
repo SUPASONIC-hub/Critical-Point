@@ -26,7 +26,9 @@
  *                   least the busts that case logged and at most those plus the
  *                   practice windows, `cashes` by at most its windows, `vault`
  *                   and `handVault` never down but by what the case's draft
- *                   paid (C9, `relicDraft.cost`; a practice run restores them,
+ *                   paid (C9, `relicDraft.cost`) and, under IDLE MONEY's
+ *                   week (B4), its share of the close before (`getIdleErosion`;
+ *                   a practice run restores them,
  *                   the audit takes from what is being secured, not from the
  *                   vault), and the table mark and the week stamp the same.
  *   the opening     the snapshot each case row carries as `dynamics.open`
@@ -64,7 +66,7 @@
  * the two sides of it are counted as not checked.
  */
 import { CASE_SEQUENCE } from "./gameCases.js";
-import { RULES_MARK_KEY, STANCE_CARRY_MUTATIONS } from "./gauntlet/gauntletEngine.js";
+import { getIdleErosion, RULES_MARK_KEY, STANCE_CARRY_MUTATIONS } from "./gauntlet/gauntletEngine.js";
 
 /**
  * What a case row's drafts paid out of the vault (C9): the first decision
@@ -298,10 +300,13 @@ export function recheckCaseGap(before, after, { opening = null } = {}) {
   if (busts !== null && busts < own) breaks.push({ field: "busts", expected: `+${own} or more`, found: busts });
   if (busts !== null && windows !== null && busts > own + Math.max(0, windows - log.length)) breaks.push({ field: "busts", expected: `+${own + Math.max(0, windows - log.length)} or less`, found: busts });
   if (cashes !== null && windows !== null && (cashes < 0 || cashes > Math.max(0, windows - own))) breaks.push({ field: "cashes", expected: `0 to +${Math.max(0, windows - own)}`, found: cashes });
-  // A draft's price (C9) is the one way down.
+  // A draft's price (C9) is one way down; the other is IDLE MONEY's (B4), a
+  // week's device: the close may take at most its share of what the close
+  // before left (the vault it held through the case is that less a price).
   const spent = draftSpend(log);
   for (const key of ["vault", "handVault"]) {
-    if (delta(key) !== null && delta(key) < -spent) breaks.push({ field: key, expected: spent ? `-${spent} or more` : "+0 or more", found: delta(key) });
+    const down = spent + (before ? getIdleErosion(close.weekRule, numberOf(close[key]) ?? 0) : 0);
+    if (delta(key) !== null && delta(key) < -down) breaks.push({ field: key, expected: down ? `-${down} or more` : "+0 or more", found: delta(key) });
   }
   if (before) {
     for (const key of [RULES_MARK_KEY, "weekRule"]) {
