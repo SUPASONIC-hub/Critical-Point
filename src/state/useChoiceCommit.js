@@ -347,6 +347,8 @@ export function useChoiceCommit(context) {
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
         lostPot: verdict.lostPot,
+        // MARKET SHOCK, on the window that dealt it: what the shock did to the stacked pot, signed (the case's result sums it).
+        ...(verdict.shock ? { shock: verdict.shock.pot } : {}),
         // Only on the entry that closes a replayed case (`createTableRecord`).
         ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,

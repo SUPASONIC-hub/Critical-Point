@@ -125,3 +125,20 @@ test("a season under MARKET SHOCK chains with no mark", () => {
   assert.deepEqual(report.breaks, [], JSON.stringify(report.breaks.slice(0, 3)));
   assert.deepEqual(report.marks, []);
 });
+
+test("the case's result says what the shock did to its pot, signed, and nothing when it did nothing", async () => {
+  const { describeCaseShock } = await import("../../src/gauntlet/tableReadout.js");
+  // The shock's swing as the commit writes it on the window's log entry.
+  const { verdicts } = playCase("market-shock", [cash(0), cash(1), cash(2), cash(3), cash(4)]);
+  const swing = verdicts.find((verdict) => verdict.shock)?.shock.pot;
+  assert.equal(typeof swing, "number");
+  const log = verdicts.map((verdict) => ({ threshold: { pot: verdict.pot, ...(verdict.shock ? { shock: verdict.shock.pot } : {}) } }));
+  const line = describeCaseShock(log);
+  assert.equal(swing === 0, line === "");
+  assert.equal(describeCaseShock([{ threshold: { shock: 1200 } }]), "시장 충격 +$1,200");
+  assert.equal(describeCaseShock([{ threshold: { shock: -800 } }, { threshold: { pot: 50 } }]), "시장 충격 −$800");
+  assert.equal(describeCaseShock([{ threshold: { shock: 300 } }, { threshold: { shock: -300 } }]), "");
+  // A week without it, a log from before it, an empty log.
+  assert.equal(describeCaseShock([{ threshold: { pot: 900 } }, {}, null]), "");
+  assert.equal(describeCaseShock(), "");
+});

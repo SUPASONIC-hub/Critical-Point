@@ -9,6 +9,7 @@ import { directionParticle, easyCognitionLabels, objectParticle, topicParticle }
 import { getTableRules } from "./tableUnlocks.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
+import { formatChange } from "./moneyFeedback.js";
 
 // The readouts' words (src/copy/table.js), read when each line is said.
 const say = tableCopy.readout;
@@ -292,6 +293,18 @@ export function describeCaseChange(log = [], labels = {}) {
       text: `${label} ${before[key]} → ${after[key]}`,
       gain: before[key] === after[key] ? null : isResourceGain(key, after[key] - before[key]),
     }));
+}
+
+/**
+ * MARKET SHOCK (weeklyRules.js, c2 follow-up), on the case's result: the
+ * swings the case's shock boards dealt its stacked pot (`threshold.shock`,
+ * written by the commit from the verdict), summed and signed --
+ * 「시장 충격 +$1,200」 or 「시장 충격 −$800」. Empty when no shock moved
+ * anything: a week without it, a log from before it, or a swing of 0.
+ */
+export function describeCaseShock(log = []) {
+  const total = log.reduce((sum, entry) => sum + (Number(entry?.threshold?.shock) || 0), 0);
+  return total ? fill(say.caseShock, { change: formatChange(total) }) : "";
 }
 
 export function joinRules(items) {
