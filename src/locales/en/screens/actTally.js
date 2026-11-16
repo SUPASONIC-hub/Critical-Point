@@ -19,7 +19,7 @@ export default {
   ending: "Nearest ending",
   nearLine: "One step over: {ending}. Short of it: {gaps}",
   note: "At the turn of the act, we put your season so far on one card. Your score and ending are not decided yet.",
-  shareLine: "Mid-season in Trigger Lab ({end}). My judging type: '{habit}'. Nearest ending: '{ending}'.",
+  shareLine: "Mid-season in Critical Point ({end}). My judging type: '{habit}'. Nearest ending: '{ending}'.",
   buttons: {
     shareLabel: "Share tally card",
     saveLabel: "Save tally card",

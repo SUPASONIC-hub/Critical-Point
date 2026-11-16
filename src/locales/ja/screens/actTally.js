@@ -19,7 +19,7 @@ export default {
   ending: "近い結末",
   nearLine: "一歩となり：{ending}まで{gaps}",
   note: "幕が変わるところで、私たちがここまでを一枚にまとめました。スコアと結末はまだ決まっていません。",
-  shareLine: "トリガーラボのシーズンを{end}まで進めました。判断タイプは'{habit}'、近い結末は'{ending}'。",
+  shareLine: "『臨界点: CRITICAL POINT』のシーズンを{end}まで進めました。判断タイプは'{habit}'、近い結末は'{ending}'。",
   buttons: {
     shareLabel: "中間決算カードを共有",
     saveLabel: "中間決算カードを保存",

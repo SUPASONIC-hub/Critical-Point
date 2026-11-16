@@ -179,7 +179,11 @@ test("the picture is the finale's card with 가까운 결말, the act in its cor
 test("the copied line names the act, the type and the ending, and ends at the site", () => {
   const model = buildActTallyModel("case37", season(upTo("case37")));
   const text = buildActTallyShareText(model, `${ORIGIN}/`);
-  assert.equal(text, `트리거랩 시즌을 6막 끝 · 사건 36까지 왔습니다. 판단 유형은 '${model.habitTitle}', 가까운 결말은 '${model.endingName}'. ${ORIGIN}/`);
+  const mark = `?from=card${model.habitId ? `&h=${model.habitId}` : ""}`;
+  assert.equal(text, `「임계점: CRITICAL POINT」 시즌을 6막 끝 · 사건 36까지 왔습니다. 판단 유형은 '${model.habitTitle}', 가까운 결말은 '${model.endingName}'. ${ORIGIN}/${mark}`);
+  // 유입 1: an English or Japanese page shares its own start page.
+  assert.ok(buildActTallyShareText(model, ORIGIN, "en").endsWith(`${ORIGIN}/en/${mark}`));
+  assert.ok(buildActTallyShareText(model, ORIGIN, "ja").endsWith(`${ORIGIN}/ja/${mark}`));
   assert.ok(!buildActTallyShareText(model).includes("http"));
 });
 

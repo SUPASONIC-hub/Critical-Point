@@ -6,6 +6,7 @@ import { getJudgementHabit, habitCardLine } from "./judgementHabit.js";
 import { nearestEnding } from "./nearestEnding.js";
 import { easyResourceLabels, subjectParticle } from "./playerLanguage.js";
 import { buildResultCardModel } from "./resultCardModel.js";
+import { shareAddress } from "./shareLink.js";
 import { readClosedCases } from "./seasonStanding.js";
 import actTallyCopy from "./copy/actTally.js";
 import reportLinesCopy from "./copy/reportLines.js";
@@ -106,6 +107,8 @@ export function buildActTallyModel(caseId, season = {}) {
     habitTitle: habit?.title ?? actTallyCopy.habitPending,
     habitLine: habit?.line ?? "",
     habitCard: habit ? habitCardLine(habit) : "",
+    // The habit's id, for the shared address (shareLink.js); never printed.
+    habitId: habit?.id ?? "",
     stakeLine: stake
       ? fill(stake.kept ? actTallyCopy.stakeKept : actTallyCopy.stakeLost, { pot: formatNumber(stake.pot), where: tallyCaseLabel(stake.caseId) })
       : actTallyCopy.stakeNone,
@@ -120,12 +123,16 @@ export function buildActTallyModel(caseId, season = {}) {
   };
 }
 
-/** The line copied with the picture, ending at the site's address when there is one. */
-export function buildActTallyShareText(model, origin = "") {
+/**
+ * The line copied with the picture, ending at the site's address when there
+ * is one: the start page in the page's language, marked as a shared card's
+ * the way the finale's is (shareLink.js `shareAddress`).
+ */
+export function buildActTallyShareText(model, origin = "", language) {
   if (!model) return "";
-  const address = String(origin ?? "").trim().replace(/\/+$/, "");
+  const address = shareAddress(origin, model.habitId, language);
   const line = fill(actTallyCopy.shareLine, { end: model.end, habit: model.habitTitle, ending: model.endingName });
-  return [line, address && `${address}/`].filter(Boolean).join(" ");
+  return [line, address].filter(Boolean).join(" ");
 }
 
 /**
