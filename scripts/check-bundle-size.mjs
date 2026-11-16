@@ -2508,6 +2508,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 377,410 / 438,945 / 446,816 번외 8, CI first paint ko 377406 (run 43819751212), the plus 4.
 // -> 377,861 / 439,153 / 447,032 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured first paint, the plus 4.
 // -> 378,010 / 439,505 / 447,425 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured first paint, the plus 4.
+// -> 377,762 / 439,054 / 446,933 브랜드 로고 11-16: favicon.svg 링크·사전 캐시. Measured first paint, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 378_010, en: 439_505, ja: 447_425 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
@@ -2710,6 +2711,7 @@ function checkBudget(file, budget) {
 // -> 11,064 / 3,979 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33, the plus 4.
 // -> 11,093 / 3,983 번외 8 over main 29120d32, the plus 4.
 // -> 11,151 / 3,997 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551, the plus 4.
+// -> 11,085 / 3,980 브랜드 로고 11-16: favicon.svg 링크·사전 캐시, the plus 4.
 const WORKER_BUDGET = { maxBytes: 11_151, maxGzip: 3_997 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));

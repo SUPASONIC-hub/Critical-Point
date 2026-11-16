@@ -2,7 +2,10 @@
 
 <a href="https://critical-point-wn6p.onrender.com"><img src="docs/images/hero-banner.webp" alt="노을 진 도시 옥상에 선 분석관 옆으로 「판돈을 올릴수록 벽이 가까워진다」 문구와 연두색 심박 선이 지나가는 배너" width="880"></a>
 
-<!-- 로고 자리: 로고가 정해지면 이 자리에 docs/images/logo 파일을 img 태그(alt·width 포함)로 넣습니다. -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/lockup-dark-transparent.svg">
+  <img src="docs/images/brand/lockup-light-transparent.svg" alt="CRITICAL POINT 임계점 로고: C자 게이지에서 막 벗어난 점" width="420">
+</picture>
 
 # 임계점 · CRITICAL POINT
 
@@ -1604,8 +1607,8 @@ test:e2e:webkit`은 프로덕션 빌드에서 `@prod` 테스트를, `npm run tes
   (목록 전체 1,731자, 한글 1,227자 가운데 시작 화면 몫)입니다. 완성형 2,350자(KS X 1001)를 통째로 담는 고정 목록으로 바꾸는 안은 재 보고
   접었습니다. 2026-10-09에 재 보니 축을 줄이기 전 파일에 2,350자를 합치면 461,852바이트(2,803자)로 1.7배가
   되어 당시 폰트 예산(283,500바이트)을 넘었습니다. 첫 화면이 미리 받는 파일이라 그만큼이 첫 방문에 얹힙니다.
-- `npm run build:icons` — 앱 아이콘(`public/icons/`)을 제작자 그림 `public/profile.jpg`에서 크기별로
-  잘라 만듭니다. 파비콘은 이 그림입니다. `public/manifest.webmanifest`의 테마 색은 `#06090a`.
+- `npm run build:icons` — 앱 아이콘(`public/icons/`)을 게임 로고 `docs/images/brand/mark-dark.svg`에서
+  크기별로 그립니다(손으로 그린 SVG 선, 폰트·외부 그림 없음). `public/manifest.webmanifest`의 테마 색은 `#06090a`.
 
 예산은 내리기만 하고 올리지 않습니다. `npm run check:bundle`은 청크마다의 크기에 더해 **첫 페인트**
 전체(HTML, 그것이 거는 스크립트·스타일시트, 미리 받는 폰트, 휴대폰이 고르는 키 비주얼)의 전송 바이트를
