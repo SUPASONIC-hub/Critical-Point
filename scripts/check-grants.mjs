@@ -291,6 +291,8 @@ const RECHECK_SEEN = files.some((file) => file.endsWith("_ranking_recheck_seen.s
 // The hall of fame (D2, `*_hall_of_fame.sql`): its cases run once it is among the files.
 const HALL_OF_FAME = files.some((file) => file.endsWith("_hall_of_fame.sql"));
 const BOARD_ADMINS = files.some((file) => file.endsWith("_board_admins.sql"));
+// Its queue and log views (`*_board_admin_queue.sql`): three more RPCs for the same two.
+const BOARD_ADMIN_QUEUE = files.some((file) => file.endsWith("_board_admin_queue.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -435,7 +437,11 @@ const CLIENT_FUNCTIONS = {
   ],
   // The board's two makers, signed in (20261118000000_board_admins.sql); each
   // refuses anyone `is_board_admin()` does not name.
-  authenticated: BOARD_ADMINS ? ["admin_board_delete", "admin_board_me", "admin_board_same_writer", "admin_board_search", "admin_board_set_hidden"] : [],
+  authenticated: [
+    ...(BOARD_ADMINS ? ["admin_board_delete", "admin_board_me", "admin_board_same_writer", "admin_board_search", "admin_board_set_hidden"] : []),
+    // The queue, its count and the log (20261118010000_board_admin_queue.sql), for the same two.
+    ...(BOARD_ADMIN_QUEUE ? ["admin_board_log", "admin_board_queue", "admin_board_queue_count"] : []),
+  ],
 };
 {
   const { rows } = await db.query(`
@@ -3623,6 +3629,86 @@ if (BOARD_ADMINS) {
 
   await signIn("");
   await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[first, second]]);
+  await db.query(`delete from public.board_admin_log`);
+}
+
+// ---- the makers' report queue and log (20261118010000_board_admin_queue.sql)
+//
+// The queue is the posts scripts/board-reports.mjs counts as waiting: on the
+// board with a report, or hidden by the reports themselves. A post a person
+// hid, and a post with no report, are not in it; hiding for good or restoring
+// takes a post out. The log reads back the newest actions. Strangers are
+// refused, anon cannot call any of the three, and no row carries a writer key.
+if (BOARD_ADMINS && BOARD_ADMIN_QUEUE) {
+  const claims = (email) => JSON.stringify({ role: "authenticated", email, app_metadata: { provider: "google", providers: ["google"] } });
+  const signIn = (value) => db.query(`select set_config('request.jwt.claims', $1, false)`, [value]);
+  await db.exec(`set session_replication_role = replica`);
+  let seeded;
+  try {
+    seeded = (
+      await db.query(`
+        insert into public.board_posts (session_id, nickname, body, actor_key, hidden, auto_hidden_at)
+        values ('queue-check-1', '대기확인', '신고 두 건 보이는 글', 'board:queue-check-a', false, null),
+               ('queue-check-2', '대기확인', '신고로 자동 숨김된 글', 'board:queue-check-a', true, now()),
+               ('queue-check-3', '끝난글', '사람이 숨긴 글', 'board:queue-check-b', true, null),
+               ('queue-check-4', '조용한글', '신고 없는 글', 'board:queue-check-c', false, null)
+        returning id`)
+    ).rows.map((row) => Number(row.id));
+    const [reported, autoHidden, personHidden] = seeded;
+    await db.query(
+      `insert into public.board_reports (post_id, session_id, reason, actor_key)
+       values ($1, 'queue-check-r1', 'spam', 'board-report:queue-check-1'),
+              ($1, 'queue-check-r2', 'abuse', 'board-report:queue-check-2'),
+              ($2, 'queue-check-r3', 'privacy', 'board-report:queue-check-3'),
+              ($3, 'queue-check-r4', 'spam', 'board-report:queue-check-4')`,
+      [reported, autoHidden, personHidden],
+    );
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  const [reported, autoHidden, personHidden, quiet] = seeded;
+
+  await refused("read the report queue as an admin", "anon", `select * from public.admin_board_queue()`);
+  await refused("count the report queue as an admin", "anon", `select public.admin_board_queue_count()`);
+  await refused("read the admin log as an admin", "anon", `select * from public.admin_board_log()`);
+
+  await signIn(claims("someone@example.com"));
+  await raises("read the report queue as a stranger", "authenticated", `select * from public.admin_board_queue()`, [], /^42501 .*board admin only/);
+  await raises("count the report queue as a stranger", "authenticated", `select public.admin_board_queue_count()`, [], /^42501 .*board admin only/);
+  await raises("read the admin log as a stranger", "authenticated", `select * from public.admin_board_log()`, [], /^42501 .*board admin only/);
+
+  await signIn(claims("goeun.nam@gmail.com"));
+  const queue = (await allowed("read the report queue as a maker", "authenticated", `select * from public.admin_board_queue()`))?.rows ?? [];
+  const ids = queue.map((row) => Number(row.id));
+  check(ids.includes(reported) && ids.includes(autoHidden), `the queue ${ids.join(", ")} lacks a reported post or an auto-hidden one.`);
+  check(!ids.includes(personHidden) && !ids.includes(quiet), `the queue ${ids.join(", ")} lists a post a person hid or one nobody reported.`);
+  check(queue.every((row) => !("actor_key" in row)), "a queue row carries a writer key.");
+  const reportedRow = queue.find((row) => Number(row.id) === reported);
+  check(
+    reportedRow?.report_count === 2 && reportedRow?.writer_count === 2 && reportedRow?.same_writer_count === 2 && JSON.stringify(reportedRow?.reasons) === '["abuse","spam"]' && reportedRow?.first_report_at,
+    `a queue row reads ${JSON.stringify(reportedRow)}; two reports from two writers, both reasons, its first report's time.`,
+  );
+  const counted = await allowed("count the report queue as a maker", "authenticated", `select public.admin_board_queue_count() as n`);
+  const before = counted?.rows[0]?.n;
+  check(before === queue.length, `the queue's count ${before} is not the ${queue.length} rows it lists.`);
+
+  await allowed("hide an auto-hidden post for good", "authenticated", `select public.admin_board_set_hidden(${autoHidden}, true)`);
+  await allowed("keep a reported post", "authenticated", `select public.admin_board_set_hidden(${reported}, false)`);
+  const after = (await allowed("count the queue after two decisions", "authenticated", `select public.admin_board_queue_count() as n`))?.rows[0]?.n;
+  check(after === before - 2, `two decided posts left the queue at ${after}, from ${before}.`);
+  const left = ((await allowed("read the queue after two decisions", "authenticated", `select id from public.admin_board_queue()`))?.rows ?? []).map((row) => Number(row.id));
+  check(!left.includes(reported) && !left.includes(autoHidden), `decided posts are still in the queue: ${left.join(", ")}.`);
+
+  const log = (await allowed("read the admin log as a maker", "authenticated", `select * from public.admin_board_log(2)`))?.rows ?? [];
+  check(
+    log.length === 2 &&
+      log.map((row) => `${row.action}:${Number(row.post_id)}`).join() === `restore:${reported},hide:${autoHidden}` &&
+      log.every((row) => row.admin_email === "goeun.nam@gmail.com" && row.at && !("actor_key" in row)),
+    `the admin log reads ${JSON.stringify(log)}; the restore, then the hide, by the maker.`,
+  );
+
+  await signIn("");
+  await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [seeded]);
   await db.query(`delete from public.board_admin_log`);
 }
 
