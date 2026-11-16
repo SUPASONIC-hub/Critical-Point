@@ -92,3 +92,27 @@ ID 없는 빌드에서는 아무것도 나가지 않습니다. 이름과 0 이�
   탐색 분석에서 `page_location`에 `from=card`가 든 방문을 세면 공유로 온 방문입니다. 받은 사람의 첫 화면에는
   「친구의 결과: ○○형」 한 줄이 그 사람의 언어로 나옵니다. 열한 개 id 말고는 아무것도 찍히지 않습니다.
 - GA4에서 `value` 말고 다른 매개변수는 없으므로 맞춤 측정기준 등록은 필요 없습니다. 보고서 → 참여도 → 이벤트에서 봅니다.
+
+## GA4 숫자를 funnel 요약에 (N17, `scripts/report-ga4.mjs`)
+
+Funnel 워크플로(매일 22:10 KST)가 GA4 Data API로 첫 시간 숫자를 읽어 Job Summary 끝에 「첫 시간 (GA4)」 절을 붙입니다.
+
+- 주별(최근 8주): 시작 누름(`cp_start_pressed`) → 첫 판(`cp_first_table_open`) → 프롤로그 01 끝(`cp_prologue01_done`)의 사용자 수와 앞 단계 대비 비율
+- 장면별(최근 28일): 프롤로그 01·02 장면마다 사용자 수와 그 사건 첫 장면 대비 비율(N16의 `cp_scene`, 맞춤 측정기준 `case_no`·`scene_no` 등록 뒤)
+- 합계·비율만 씁니다. 사람·기기·주소·지역은 묻지 않습니다(저장소와 실행 요약은 공개).
+
+GitHub Secrets 둘이 있어야 읽습니다. 없으면 「비밀이 없어 GA4를 읽지 않았습니다」 한 줄만 쓰고 나머지 요약은 그대로입니다.
+
+| Secret | 값 |
+| --- | --- |
+| `GA4_SA_KEY` | 서비스 계정 JSON 키 파일의 내용 전체 |
+| `GA4_PROPERTY_ID` | GA4 속성 번호(숫자, 관리 → 속성 설정 → 속성 ID). 측정 ID `G-…`가 아님 |
+
+등록 순서(사용자, 약 15분):
+
+1. Google Cloud 콘솔 → 프로젝트 하나(새로 만들어도 됨) → API 및 서비스 → 라이브러리 → 「Google Analytics Data API」 사용 설정
+2. IAM 및 관리자 → 서비스 계정 → 만들기(이름 예: `cp-funnel-reader`, 역할은 주지 않음) → 그 계정 → 키 → 키 추가 → JSON → 파일이 내려받아짐
+3. GA4 관리 → 속성 액세스 관리 → + → 2의 서비스 계정 이메일(`…@….iam.gserviceaccount.com`)을 **뷰어**로 추가
+4. GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret: `GA4_SA_KEY`(2의 JSON 파일 내용 전체), `GA4_PROPERTY_ID`(속성 번호)
+5. Actions → Funnel → Run workflow로 한 번 돌려 요약 끝 「첫 시간 (GA4)」 표를 확인. 내려받은 JSON 파일은 지웁니다(키는 Secrets에만)
+6. (N16 배포 뒤) GA4 관리 → 맞춤 정의 → 맞춤 측정기준 만들기: 범위 「이벤트」, 이벤트 매개변수 `case_no`, `scene_no` 둘. 등록 전에는 장면별 표 대신 「아직 등록되지 않았습니다」가 나옵니다

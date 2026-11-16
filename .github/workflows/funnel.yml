@@ -126,6 +126,20 @@ jobs:
         run: |
           warning="$(node scripts/report-ops-health.mjs --inactivity "$(git log -1 --format=%cI)")"
           case "$warning" in *⚠*) echo "::warning title=Scheduled runs may stop::main has had no commit for 45+ days; GitHub turns scheduled workflows off at 60. Workflow Keepalive turns them back on monthly."; echo "$warning" >> "$GITHUB_STEP_SUMMARY";; esac
+      # The first hour as Google Analytics counts it (N17, scripts/report-ga4.mjs):
+      # by week, users who pressed start, opened the first table and closed
+      # prologue 01, and users per scene of prologues 01 and 02 (N16's cp_scene).
+      # Totals and shares only. Its own two secrets, a service account's JSON key
+      # with Viewer on the GA4 property and the property's number
+      # (docs/analytics.md); without them the section says it skipped. Plain
+      # node, no npm ci: the script imports nothing outside the repository.
+      - name: Read the first hour from GA4
+        if: ${{ !cancelled() }}
+        shell: bash
+        env:
+          GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        run: node scripts/report-ga4.mjs >> "$GITHUB_STEP_SUMMARY"
       - name: Remove the rows
         if: always()
         run: rm -f rows.json query.err ops.json ops.err
