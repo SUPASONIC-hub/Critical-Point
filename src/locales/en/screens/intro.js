@@ -1,6 +1,6 @@
 /** The start screen in English (src/copy/intro.js). */
 export default {
-  pageTitle: "Critical Point - Every 45 seconds, your judgment goes on the record",
+  pageTitle: "Critical Point — Free Browser Mystery Game",
   subtitle: "Every 45 seconds, your judgment goes on the record",
   titleReading: "Critical Point",
   premise:

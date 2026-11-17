@@ -110,8 +110,8 @@ export const CATEGORIES = [
     id: "build-config",
     label: "build or deploy configuration",
     test: (file) =>
-      ["vite.config.js", "render.yaml", ".env.e2e"].includes(file) ||
-      /^scripts\/(critical-css-rules|service-worker-build|site-pages|legal-pages|adsense-config|search-console|analytics-config|vite-season-data|check-bundle-size|check-deploy|deploy-policy|css-size|build-cache)\.mjs$/.test(file),
+      ["vite.config.js", "render.yaml", ".env.e2e", "scripts/sitemap-dates.json"].includes(file) ||
+      /^scripts\/(critical-css-rules|service-worker-build|site-pages|sitemap-dates|legal-pages|adsense-config|search-console|analytics-config|vite-season-data|check-bundle-size|check-deploy|deploy-policy|css-size|build-cache)\.mjs$/.test(file),
     checks: ["lint", "check:encoding"],
     build: true,
     tests: "related",
