@@ -14,5 +14,5 @@ export default {
   unreadMode: "An unrecorded judgment",
   unreadEnding: "Undecided path",
   held: "Cash lost, but human cost stayed below the collapse line",
-  shareLine: "I finished a season at Trigger Lab. Judgment DNA: '{mode}'. Ending: '{ending}'. Best Burst {burst}{points}, Rank {rank}.{share}",
+  shareLine: "I finished a season of Critical Point. Judgment DNA: '{mode}'. Ending: '{ending}'. Best Burst {burst}{points}, Rank {rank}.{share}",
 };

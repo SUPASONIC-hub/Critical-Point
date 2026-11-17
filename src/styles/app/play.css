@@ -550,6 +550,20 @@
   color: var(--c-gx-ember);
 }
 
+/* The run's record (연속, BUST, 최고, 감사) is a quiet line, not a pill like
+   판돈 and 금고 (2026-11-16, UI quick wins): the same numbers, dimmer, so the
+   first screen reads 이번 판, 판돈 and the clock first. Border kept, unseen,
+   so the measured widths stay. */
+.gx-stat.gx-run-signal {
+  background: transparent;
+  border-color: transparent;
+}
+
+.gx-stat.gx-run-signal b {
+  color: var(--ui-text-2);
+  font-weight: 600;
+}
+
 /* The audit count's second place, beside the signals: a 360px phone shows it
    there instead of in the run's line (the max-width: 360px block). */
 .gx-hud-audit {
@@ -645,16 +659,20 @@
 
 .gx-overdrive em {
   background: linear-gradient(90deg, var(--c-violet), var(--c-acid), var(--c-gx-ember));
-  box-shadow: 0 0 10px var(--ui-accent-glow);
 }
 
+/* The signals row is the table's small print (2026-11-16): grey words, the
+   coloured name and bar carry the state. */
 .gx-focus-signal {
+  color: var(--ui-text-3);
+}
+
+.gx-focus-signal b {
   color: var(--c-gx-hand);
 }
 
 .gx-focus-signal em {
   background: linear-gradient(90deg, var(--c-gx-hand), var(--c-gx-fever));
-  box-shadow: 0 0 12px var(--c-gx-hand-a45);
 }
 
 .gx-focus-signal.focus-deadeye b,
@@ -1344,12 +1362,31 @@
   border-radius: 6px;
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
   font: 700 0.6875rem/1 var(--font-sans);
+  /* Drawn but unseen until asked for (2026-11-16, UI quick wins): a 1-4 in
+     every card's corner read as a feature-phone quiz. The card still names
+     its key (aria-keyshortcuts), and a mouse or keyboard shows it below. */
+  opacity: 0;
+  transition: opacity 0.12s;
 }
 
 .selected .gx-card-key {
   color: var(--ui-accent-ink);
   background: var(--c-acid);
   border-color: var(--c-acid);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gx-card:hover .gx-card-key,
+  .gx-card:focus-visible .gx-card-key,
+  .gx-hand:has(:focus-visible) .gx-card-key {
+    opacity: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  .gx-card-key {
+    opacity: 1;
+  }
 }
 
 .gx-card-label {
@@ -3398,8 +3435,8 @@
 .gx-streak {
   display: flex;
   gap: 8px;
-  color: var(--ui-text-2);
-  font: 700 0.6875rem/1.25 var(--font-sans);
+  color: var(--ui-text-3);
+  font: 600 0.6875rem/1.25 var(--font-sans);
   white-space: nowrap;
 }
 
