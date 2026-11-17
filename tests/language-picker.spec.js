@@ -1,5 +1,5 @@
 import { expect, test } from "./helpers/network.js";
-import { LOCALE_KEY } from "../src/appConfig.js";
+import { FRIEND_TARGET_KEY, LOCALE_KEY } from "../src/appConfig.js";
 import introCopy from "../src/copy/intro.js";
 import enIntro from "../src/locales/en/screens/intro.js";
 import jaIntro from "../src/locales/ja/screens/intro.js";
@@ -187,4 +187,27 @@ test("a shared card's address names the friend's habit on the start screen, and 
     await page.waitForLoadState("networkidle");
     await expect(line, address).toHaveCount(0);
   }
+});
+
+/**
+ * N32: an address with the friend's best burst (`&s=<score>`) adds the goal
+ * 「친구 기록 넘기기」 under the friend's line, and this device keeps it, so a
+ * plain visit later still has the goal. An address without a score adds none.
+ */
+test("a shared card's score is a goal on the start screen, kept on the device for the next visit", async ({ page }) => {
+  test.slow();
+  const goal = page.getByTestId("friend-target-line");
+  await page.goto("/?from=card&h=moth");
+  await expect(page.getByTestId("friend-result-line")).toHaveText("친구의 결과: 하이리스크 불나방형", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(goal).toHaveCount(0);
+
+  await page.goto("/?from=card&h=moth&s=64");
+  await expect(goal).toHaveText("친구 기록 넘기기: 최고 버스트 64점을 넘어 보세요.", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("friend-result-line")).toHaveText("친구의 결과: 하이리스크 불나방형");
+  const kept = JSON.parse(await page.evaluate((key) => localStorage.getItem(key), FRIEND_TARGET_KEY));
+  expect(kept).toMatchObject({ habit: "moth", score: 64 });
+
+  await page.goto("/");
+  await expect(goal).toHaveText("친구 기록 넘기기: 최고 버스트 64점을 넘어 보세요.", { timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("friend-result-line")).toHaveCount(0);
 });

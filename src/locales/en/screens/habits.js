@@ -13,4 +13,5 @@ export default {
   steady: { title: "Even-Keel Balancer", line: "Nothing flashy, but you saw every hand through to the end." },
   cardLine: "Your judging type: {habit}.",
   friendLine: "Your friend's result: {habit}",
+  friendTarget: "Beat your friend: top their Best Burst of {score} pts.",
 };

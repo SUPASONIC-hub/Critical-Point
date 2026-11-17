@@ -4,6 +4,8 @@ import path from "node:path";
 import { expect, test } from "./helpers/network.js";
 import { cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { FRIEND_TARGET_KEY } from "../src/appConfig.js";
+import { fill } from "../src/locale.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { getSeasonLogic } from "../src/gameLogic.js";
 import { RESULT_CARD_FILE_NAME, RESULT_CARD_HEIGHT, RESULT_CARD_WIDTH } from "../src/resultCard.js";
@@ -212,7 +214,7 @@ async function expectedShareLine(page) {
   const modeTitle = habit ? "[^']+" : await page.locator(".result-why-grid article").nth(1).locator("strong").innerText();
   const tail = habit ? ` ${habitCardLine(habit).replace(/[.「」]/g, "\\$&")}` : "";
   const origin = new URL(page.url()).origin;
-  const pattern = new RegExp(`^「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/\\?from=card${habit ? `&h=${habit.id}` : ""}$`);
+  const pattern = new RegExp(`^「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/\\?from=card${habit ? `&h=${habit.id}` : ""}${bestBurst > 0 ? `&s=${bestBurst}` : ""}$`);
   return { pattern, bestBurst, bestRank, logicHold };
 }
 
@@ -251,6 +253,25 @@ test("결과 카드 저장 downloads a drawn 1080x1350 card and copies its line"
   if (habit) await expect(page.locator(".result-why-grid article").nth(1).locator("p").first()).toHaveText(habit.line);
 
   await keepScreenshots(page, testInfo, "buttons-after-save");
+});
+
+/**
+ * N32: a device that came from a friend's card keeps the friend's best burst
+ * (src/friendTarget.js); the ending says beside the buttons whether this
+ * season beat it. Said, not drawn: the card and its copied line are as before.
+ */
+test("a kept friend's record is measured against the season beside the card", async ({ page }) => {
+  test.setTimeout(120_000);
+  await withoutWebShare(page);
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, JSON.stringify({ habit: "moth", score: 1, at: Date.now() }));
+  }, FRIEND_TARGET_KEY);
+  await reachTheRecordByDebugJump(page);
+  await expectCardReady(page);
+  const { bestBurst } = await expectedShareLine(page);
+  const said = page.getByTestId("friend-target-result");
+  const standing = bestBurst > 1 ? fill(RESULT_CARD_COPY.friendBeaten, { score: 1, mine: bestBurst }) : fill(RESULT_CARD_COPY.friendShort, { score: 1, mine: bestBurst, gap: 2 - bestBurst });
+  await expect(said).toHaveText(standing);
 });
 
 // The way a returning player arrives, so the production build runs it too: no

@@ -48,6 +48,8 @@ export const BOARD_OWN_POSTS_KEY = "critical-point-board-posted-v1";
 // The id the board files this device's posts under; apart from the telemetry
 // session id on purpose (getBoardWriterId in src/telemetry.js).
 export const BOARD_WRITER_ID_KEY = "critical-point-board-id-v1";
+// N32: the friend's record this device was sent (`{ habit, score, at }`, src/friendTarget.js), kept on the device only.
+export const FRIEND_TARGET_KEY = "critical-point-friend-target-v1";
 /**
  * Where a player asks for their records to be deleted (앱 출시 노트 E-6: the
  * notice said requests are handled by the session code, and named nowhere to
