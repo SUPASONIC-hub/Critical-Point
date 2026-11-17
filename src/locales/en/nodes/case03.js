@@ -132,7 +132,7 @@ export default {
           "label": "Release the evidence of the flaw before the score"
         },
         "c3_after_win": {
-          "label": "Lock in the last tally as your win, use his gaps"
+          "label": "Claim the last tally as your win, use his gaps"
         },
         "c3_after_share": {
           "label": "Merge both bids’ strengths and re-propose"
@@ -208,7 +208,7 @@ export default {
           "label": "Present under joint liability"
         },
         "c3_verdict_choice_3": {
-          "label": "Hide the uncertainty and lock in the win"
+          "label": "Hide the uncertainty and secure the win"
         }
       },
       "place": "Behind the Novaworks presentation hall",
@@ -317,7 +317,7 @@ export default {
           "label": "Announce joint owners of liability"
         },
         "c3_branch_signal_follow_c": {
-          "label": "Lock in the performance figures first"
+          "label": "Fix the performance figures first"
         },
         "c3_branch_signal_follow_a": {
           "label": "Attach a verification deadline to the win"
@@ -487,7 +487,7 @@ export default {
       ],
       "choices": {
         "c3_route_system_ride": {
-          "label": "Ride the changed scoreboard to lock in the lead"
+          "label": "Ride the changed scoreboard to secure the lead"
         },
         "c3_route_system_read": {
           "label": "Trace where the new category came from"
@@ -744,7 +744,7 @@ export default {
     "c3_trap_deep": "Since not being wrong beats winning, you open your files to Oh Jinwoo next door and draft a joint bid.",
     "c3_after_share": "Setting win and loss aside, you merge both bids’ strengths and propose again to the client.",
     "c3_after_proof": "Since the side that hid the flaw scored higher, you release the evidence of the security flaw before the score.",
-    "c3_after_win": "Cutting off your hesitation, you lock in the last tally as your win and use your rival’s gaps.",
+    "c3_after_win": "Cutting off your hesitation, you claim the last tally as your win and use your rival’s gaps.",
     "c3_rival_choice_1": "I’ll check the liability clause sentence by sentence and put it at the very front of the proposal.",
     "c3_rival_choice_2": "I’ll separate the client’s aim from the aim of cutting costs and recalculate the cost table first.",
     "c3_rival_choice_3": "I’ll ask Oh Jinwoo directly where those numbers came from.",
@@ -754,7 +754,7 @@ export default {
     "c3_signal_choice_4": "I’ll share my reading of the signal with my rival.",
     "c3_verdict_choice_1": "I’ll present once verification is finished.",
     "c3_verdict_choice_2": "I’ll present together, on the condition that we share the liability.",
-    "c3_verdict_choice_3": "I’ll cover the uncertain parts and lock in the win first.",
+    "c3_verdict_choice_3": "I’ll cover the uncertain parts and secure the win first.",
     "c3_rival_reaction_choice_1": "I’ll propose terms for joint verification first.",
     "c3_rival_reaction_choice_2": "I’ll halt the talks until the data’s source is confirmed.",
     "c3_rival_reaction_choice_3": "I’ll use my rival’s bid and submit first.",
@@ -763,13 +763,13 @@ export default {
     "c3_signal_reaction_choice_3": "I’ll leave the signal and secure the score first.",
     "c3_verdict_reaction_choice_1": "I’ll fill in the liability sheet together.",
     "c3_verdict_reaction_choice_2": "I’ll write my name at the top of the liability sheet.",
-    "c3_verdict_reaction_choice_3": "I’ll discuss liability after the results are locked in.",
+    "c3_verdict_reaction_choice_3": "I’ll discuss liability after the results are final.",
     "c3_branch_signal_a": "Hiding nothing, you turn the signal on the screen into a public question and put it on stage.",
     "c3_branch_signal_b": "Knowing it will break the flow, you stop the rehearsal and check the source.",
     "c3_branch_signal_c": "Pretending not to see the signal, you finish the contest while you can win.",
     "c3_branch_signal_follow_a": "Before locking in the win, you nail a verification deadline onto the terms sheet.",
     "c3_branch_signal_follow_b": "Sharing the applause you would get alone, you announce joint owners of liability.",
-    "c3_branch_signal_follow_c": "Leaving the blanks as they are, you lock in the performance figures first.",
+    "c3_branch_signal_follow_c": "Leaving the blanks as they are, you fix the performance figures first.",
     "c3_route_fast_lock": "To keep the fast answer from setting as is, you attach a verification deadline as a condition.",
     "c3_route_fast_polish": "Judging it time to secure your lead, you polish the numbers and pin the scoreboard in place.",
     "c3_route_fast_reopen": "Seeing that you should be the first to name what you skipped, you disclose the security items.",
@@ -789,7 +789,7 @@ export default {
     "c3_final_joint_b": "Judging that a contest is a contest, you push a solo bid on the grounds of your rival’s blank.",
     "c3_final_joint_c": "Seeing this contest itself as the problem, you raise its structure as an issue before the client.",
     "c3_route_system_read": "Seeing that you need to know where the new category came from, you trace its source.",
-    "c3_route_system_ride": "Judging the changed table favors you, you ride it and lock in your lead.",
+    "c3_route_system_ride": "Judging the changed table favors you, you ride it and secure your lead.",
     "c3_route_system_tell": "As if refusing to win on information only you have, you tell Oh Jinwoo first.",
     "c3_final_system_a": "Starting with the fact that you were the one who made the standard, you open it to the client.",
     "c3_final_system_b": "Seeing no reason to explain, you keep the standard covered and use only the result.",

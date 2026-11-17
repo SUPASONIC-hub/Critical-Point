@@ -2022,6 +2022,7 @@ const budgets = [
   // 195,067 / 65,336 -> 195,930 / 65,658 N33 게시판 이번 주 질문 over main 705a809f. Measured 195926 / 65654 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 197,070 / 66,109 묶음 11-17 over main 705a809f. Measured 197066 / 66105 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,413 / 65,434 N32 친구 기록 넘기기 over main 705a809f. Measured 195409 / 65430 (over budget only) in the e2e build, the plus 4.
+  // 195,067 / 65,336 -> 195,076 / 65,336 N31 draft over main 705a809f. Measured 195072 / - (over budget only) in the e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_070, maxGzip: 66_109 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -2117,6 +2118,7 @@ const budgets = [
   // 162,859 / 58,327 -> 163,542 / 58,598 N33 게시판 이번 주 질문 over main 705a809f. Measured 163538 / 58594 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 164,483 / 59,064 묶음 11-17 over main 705a809f. Measured 164479 / 59060 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,134 / 58,425 N32 친구 기록 넘기기 over main 705a809f. Measured 163130 / 58421 (over budget only) in the e2e build, the plus 4.
+  // 162,859 / 58,327 -> 162,867 / 58,327 N31 draft over main 705a809f. Measured 162863 / - (over budget only) in the e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 164_483, maxGzip: 59_064 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
