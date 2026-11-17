@@ -1,0 +1,3 @@
+/* The home screen name, in Japanese: GAME_NAME.ja before its colon, as the Korean one is (scripts/legal-pages.mjs). */
+"CFBundleDisplayName" = "臨界点";
+"CFBundleName" = "臨界点";
