@@ -68,6 +68,7 @@ const SYSTEM_FACE_CHARACTERS = {
   "臨": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "界": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "點": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
+  "点": { drawn: true, where: "ja/screens/intro.js: the Japanese reading 臨界点 under the wordmark (a ja page)" },
   "故": { drawn: true, where: "case17.js: 고(故) 하윤재" },
   "日": { drawn: true, where: "locale.js: the language choice's 日本語" },
   "本": { drawn: true, where: "locale.js: the language choice's 日本語" },

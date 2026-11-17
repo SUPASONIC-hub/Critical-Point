@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { GAME_TITLE } from "../../src/appCopy.js";
+import { wordmarkLogoMarkup } from "../../src/components/wordmarkLogo.js";
 import introCopy from "../../src/copy/intro.js";
 import enIntro from "../../src/locales/en/screens/intro.js";
 import jaIntro from "../../src/locales/ja/screens/intro.js";
@@ -48,6 +49,8 @@ test("the shell lays out the intro's words in the page's language and shows none
     assert.equal(hidden.length, 5, language);
     assert.ok(hidden[0].includes(`>${copy.ranking}</button>`) && hidden[0].includes(`>${copy.board}</button>`), `${language}: the pills`);
     assert.ok(hidden[1].startsWith('<p class="wordmark-sub" lang="en"'), `${language}: the tagline`);
+    // The title is the drawn logo GameWordmark.jsx draws, its words in the heading as text.
+    assert.ok(markup.includes(`<h1 class="game-wordmark"><span class="sr-only">${GAME_TITLE}</span>${wordmarkLogoMarkup()}`), `${language}: the logo`);
     assert.ok(hidden[2].includes(copy.subtitle.replace(/&/g, "&amp;")), `${language}: the kicker`);
     assert.ok(hidden[3].includes(copy.premise.replace(/&/g, "&amp;")), `${language}: the premise`);
     // The floor that keeps the column longer than the stage, as the intro's is.
@@ -58,8 +61,9 @@ test("the shell lays out the intro's words in the page's language and shows none
   // Japanese carries its dictionary's face and line breaks, as the intro it stands for has them.
   assert.ok(staticShellMarkup({ language: "ja" }).includes('<style>:root:lang(ja){--font-sans:"Hiragino Sans"'));
   assert.ok(!staticShellMarkup({ language: "en" }).includes("<style>") && !staticShellMarkup().includes("<style>"));
-  // What shows is the same frame in every language but the reading under the name.
-  const frames = Object.entries(COPY).map(([language, copy]) => shown(staticShellMarkup({ language })).replace(copy.titleReading, "READING"));
+  // What shows is the same frame in every language but the reading under the name
+  // (and its hanja, which a reading already in Han characters goes without).
+  const frames = Object.entries(COPY).map(([language, copy]) => shown(staticShellMarkup({ language })).replace(copy.titleReading, "READING").replace("<i>臨界點</i>", ""));
   assert.equal(new Set(frames).size, 1);
 });
 
@@ -69,9 +73,9 @@ test("the shell shows no sentence: only the game's name, its reading and hanja, 
     const words = textOf(markup);
     const allowed = new Set([...GAME_TITLE.split(" "), ...copy.titleReading.split(" "), "臨界點"]);
     for (const word of words) assert.ok(allowed.has(word), `${language}: "${word}" is not the game's name`);
-    // Hangul only in the Korean reading, kana only in the Japanese one.
+    // Hangul only in the Korean reading; the Japanese reading is the title in kanji, 臨界点, with no 臨界點 beside it.
     assert.deepEqual(words.filter((word) => /[가-힣]/.test(word)), language === "ko" ? [copy.titleReading] : [], language);
-    assert.deepEqual(words.filter((word) => /[぀-ヿ]/.test(word)), language === "ja" ? [copy.titleReading] : [], language);
+    assert.deepEqual(words.filter((word) => /\p{Script=Han}/u.test(word)), language === "ja" ? [copy.titleReading] : ["臨界點"], language);
     assert.deepEqual(shownAttributes(markup), [""], "the picture's alt is empty: the shell is hidden from assistive tech");
     assert.match(markup, /<div class="start-input-row intro-launch"><button type="button" tabindex="-1"><\/button><\/div>/, "the start button has no label");
   }

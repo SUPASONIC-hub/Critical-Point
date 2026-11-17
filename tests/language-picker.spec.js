@@ -62,14 +62,14 @@ test("the intro's language choice opens English, keeps it through a reload and r
  * Every text on the page and every tooltip is read, all the case cards with
  * it. Korean belongs in one place, the picker's 한국어 button, marked
  * lang="ko"; the brand's reading under the wordmark and on the case chip is
- * the page's own (Trigger Lab, the user's choice 2026-11-04). The <noscript>
+ * the page's own (Critical Point since 2026-11-16, when TRIGGERLAB left the product's name). The <noscript>
  * page is not drawn.
  */
 test("the English start screen prints no Korean, case cards and tooltips included", async ({ page }) => {
   await page.goto("/?lang=en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.locator(".case-card", { hasText: "Prologue 03" }).first()).toBeAttached();
-  await expect(page.locator(".game-wordmark .wordmark-reading b")).toHaveText("Trigger Lab");
+  await expect(page.locator(".game-wordmark .wordmark-reading b")).toHaveText("Critical Point");
   const korean = await page.evaluate(() => {
     const hangul = /[가-힣]/;
     const found = [];

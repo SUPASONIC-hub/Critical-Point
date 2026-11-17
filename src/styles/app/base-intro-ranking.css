@@ -614,49 +614,34 @@ summary:focus-visible {
 }
 
 /* Title lockup ------------------------------------------------------------
-   Heavy caps set tight in Pretendard, with a thin chromatic flicker. The flicker
-   and the charge are decoration only: both stop under prefers-reduced-motion,
-   and the readable copy is the element's own text, never a transparent fill. */
+   The game's logo (GameWordmark.jsx, src/components/wordmarkLogo.js): the
+   GAUGE mark and the drawn wordmark, thin lines on one row, the point and the
+   full stop in the heat red. The heading's text is the title in .sr-only; the
+   svg is the picture of it. The font size still sets the logo's measure, so
+   the reading line under it keeps its place in the column. */
 .game-wordmark {
   display: grid;
+  /* As wide as the copy column: the logo's width is a share of it. The column
+     is a flex box that starts its children, which would shrink the heading to
+     an svg's 300px default. */
+  align-self: stretch;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: 0;
   margin: 0;
   font-size: clamp(2.5rem, 6.1vw, 6rem);
-  font-weight: 800;
   line-height: 0.92;
-  letter-spacing: -0.045em;
-  text-transform: uppercase;
 }
-.wordmark-line {
-  position: relative;
+.wordmark-logo {
   display: block;
+  width: min(100%, 8.8em);
+  height: auto;
+  aspect-ratio: 11 / 1;
   color: var(--ui-text);
-  text-shadow: 0 8px 40px rgb(0 0 0 / 0.6);
+  overflow: hidden;
 }
-.wordmark-line::before,
-.wordmark-line::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-.wordmark-line::before {
-  color: rgb(217 255 98 / 0.85);
-  transform: translate3d(-0.018em, 0.012em, 0);
-  animation: wordmark-drift-a 5.2s steps(2, end) infinite;
-}
-.wordmark-line::after {
-  color: rgb(88 214 255 / 0.72);
-  transform: translate3d(0.018em, -0.012em, 0);
-  animation: wordmark-drift-b 6.7s steps(2, end) infinite;
-}
-.wordmark-line-accent {
-  color: var(--ui-accent);
-  text-shadow:
-    0 8px 40px rgb(0 0 0 / 0.6),
-    0 0 60px rgb(217 255 98 / 0.32);
+.wordmark-point {
+  fill: var(--ui-heat);
 }
 .wordmark-rule {
   display: block;
@@ -693,38 +678,6 @@ summary:focus-visible {
   letter-spacing: 0.2em;
 }
 
-@keyframes wordmark-drift-a {
-  0%,
-  88%,
-  100% {
-    opacity: 0;
-    transform: translate3d(-0.018em, 0.012em, 0);
-  }
-  90% {
-    opacity: 1;
-    transform: translate3d(-0.05em, 0.02em, 0);
-  }
-  95% {
-    opacity: 0.6;
-    transform: translate3d(-0.008em, -0.01em, 0);
-  }
-}
-@keyframes wordmark-drift-b {
-  0%,
-  84%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0.018em, -0.012em, 0);
-  }
-  87% {
-    opacity: 1;
-    transform: translate3d(0.052em, -0.024em, 0);
-  }
-  93% {
-    opacity: 0.55;
-    transform: translate3d(0.01em, 0.012em, 0);
-  }
-}
 @keyframes wordmark-charge {
   0%,
   100% {
@@ -738,10 +691,6 @@ summary:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wordmark-line::before,
-  .wordmark-line::after {
-    display: none;
-  }
   .wordmark-rule,
   .intro-visual img,
   .brand-mark-dot::before,

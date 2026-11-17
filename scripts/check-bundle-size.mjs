@@ -690,7 +690,8 @@ const budgets = [
   // 207,771 / 75,684 -> 207,940 / 75,730 번외 8 over main 29120d32. Measured 207936 / 75726 (over budget only) in the e2e build, the plus 4.
   // 207,940 / 75,730 -> 207,940 / 75,736 번외 8, CI build (run 43819751212) measured - / 75732, the plus 4.
   // 208,749 / 76,072 -> 209,357 / 76,215 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 209353 / 76211 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 209_357, maxGzip: 76_215 },
+  // 209,357 / 76,215 -> 210,480 / 76,738 타이틀 로고 11-16 (#581): SVG 워드마크·이름 변경. Measured 210476 / 76734 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 210_480, maxGzip: 76_738 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2510,7 +2511,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,010 / 439,505 / 447,425 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured first paint, the plus 4.
 // -> 377,762 / 439,054 / 446,933 브랜드 로고 11-16: favicon.svg 링크·사전 캐시. Measured first paint, the plus 4.
 // -> 378,025 / 439,518 / 447,438 묶음 11-16b 최종 (+#576 #578) over main 6fef686f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_518, ja: 447_438 };
+// -> 378,668 / 440,160 / 448,079 타이틀 로고 11-16 (#581): SVG 워드마크·이름 변경. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_668, en: 440_160, ja: 448_079 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

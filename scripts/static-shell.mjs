@@ -5,6 +5,7 @@ import jaIntro from "../src/locales/ja/screens/intro.js";
 import { style as jaStyle } from "../src/locales/ja/index.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../src/responsiveArt.js";
 import { MENU_KINDS, MENU_LABELS, menuPath } from "./content-pages/site-nav.mjs";
+import { showHanja, wordmarkLogoMarkup } from "../src/components/wordmarkLogo.js";
 
 /**
  * The intro's first viewport as plain HTML, inside `#root`, so the page paints
@@ -76,14 +77,10 @@ const escape = (text) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;
 
 /** The wordmark as GameWordmark.jsx writes it, without the tagline sentence under it. */
 function wordmark(label, reading) {
-  const [first, ...rest] = label.split(" ");
-  const second = rest.join(" ");
-  const line = (text, accent) =>
-    `<span class="wordmark-line${accent ? " wordmark-line-accent" : ""}" data-text="${escape(text)}">${escape(text)}</span>`;
   return (
-    `<h1 class="game-wordmark">${line(first, false)}${second ? line(second, true) : ""}` +
+    `<h1 class="game-wordmark"><span class="sr-only">${escape(label)}</span>${wordmarkLogoMarkup()}` +
     `<span class="wordmark-rule"></span>` +
-    `<span class="wordmark-reading"><b>${escape(reading)}</b><i>${HANJA}</i></span></h1>`
+    `<span class="wordmark-reading"><b>${escape(reading)}</b>${showHanja(reading, HANJA) ? `<i>${HANJA}</i>` : ""}</span></h1>`
   );
 }
 

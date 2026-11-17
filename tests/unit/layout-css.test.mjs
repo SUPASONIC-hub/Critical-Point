@@ -327,7 +327,7 @@ test("the result page's brand pill keeps clear of two music icons, not of two la
   assert.ok(reserved >= 76, "the pill ends before the music icons begin");
   // The title is 165px of text in a pill with 30px of padding and border, on a
   // row of 328px at 360px.
-  assert.ok(328 - reserved >= 195, "and TRIGGERLAB: CRITICAL POINT is printed whole at 360px");
+  assert.ok(328 - reserved >= 195, "and the title is printed whole at 360px");
   const phone = sheet("responsive").match(/@media \(max-width: 480px\) \{\s*\.music-controls \{[\s\S]*?\.music-controls span \{\s*display: none;\s*\}/)?.[0] ?? "";
   assert.match(phone, /right: max\(10px, env\(safe-area-inset-right\)\);/);
   assert.match(phone, /padding: 0 9px;/, "the icons are still the size this was measured against");
