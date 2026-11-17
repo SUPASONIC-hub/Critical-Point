@@ -2350,9 +2350,12 @@ Manual steps after pushing the 2026-09-28 migrations:
    한 번 돌리고, 결과를 `..\cp-archive\메모-20261123\`에 남긴 뒤 질문 12개를 묻는다.
 2. **11-24~11-29 숫자 채움**: 답을 마이그레이션의 `[SLOT DECISION-T]`에 넣는다(서버가
    받는 것을 바꾸는 문장만, 지우기 위에, 다시 돌려도 같은 결과). 사건 단위 판단도
-   여기서 정한다. 채점이 바뀌면 `[SLOT RULES_MARK]`를 따른다: RULES_MARK,
-   `>= 4`, check:grants의 `SERVER_MARK`, verify-ranking-rows.mjs의 `DB_MARKS`를 한
-   PR에서 함께 올린다.
+   여기서 정한다. RULES_MARK는 11-17에 5로 올렸다(`[SLOT RULES_MARK]` 채움):
+   N26(#591)이 주간 규칙 없는 시즌의 사건 09·11·14·16에 「이번 사건만」 규칙을
+   깔아 채점이 바뀌기 때문이다. 마이그레이션은 `>= 5`를 요구하고, check:grants의
+   `SERVER_MARK`는 그 파일의 `>= N`을 읽는다. verify-ranking-rows.mjs의 `DB_MARKS`는
+   검사기의 글자 표시라 이 숫자와 상관없다. 기기 안 로컬 랭킹 키는 v12 그대로다(Q2).
+   명예의 전당 본 판은 `table-5`로 새로 시작하고 `table-4`는 남는다.
 3. **N18·N21 합치기**: 프롤로그 02 규칙 나누기(N18)와 첫 BUST 장면 유지(N21)의 draft
    갈래를 묶음 R 갈래에 병합한다(충돌은 표시된 부분만 고친다). main 따라가기는
    병합 직전에 한 번만 한다. 그 뒤 `npm run check:grants`, `npm test`,

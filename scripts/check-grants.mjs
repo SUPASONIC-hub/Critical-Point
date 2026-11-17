@@ -137,12 +137,18 @@ const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules
 // two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql` (promoted 11-12, the one wipe, with C9's
 // `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
 const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
-// The resets after 11-12 keep the mark and are named by their day (`*_ranking_reset_<MMDD>.sql`, 11-30's
+// The resets after 11-12 are named by their day (`*_ranking_reset_<MMDD>.sql`, 11-30's
 // first, then the quarterly ones of docs/ops-mode.md): the newest of them, by name, is the one replayed here.
 const DATED_RESET = readdirSync(MIGRATIONS).filter((file) => /_ranking_reset_\d{4}\.sql$/.test(file)).sort().at(-1) ?? null;
 const RANKING_RESET = DATED_RESET ?? MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// A dated reset may raise the mark (11-30's to RULES_MARK 5, N26) or keep it, so its mark is read from
+// the file itself: the `>= N` its `ranking_check_run_marks` asks of `tableRules`.
+const datedMark = DATED_RESET
+  ? Number(readFileSync(path.join(MIGRATIONS, DATED_RESET), "utf8").match(/'tableRules'\)::numeric >= (\d+) end/)?.[1] ?? Number.NaN)
+  : null;
+if (DATED_RESET && !Number.isInteger(datedMark)) throw new Error(`supabase/migrations/${DATED_RESET}: no \`(dynamics->>'tableRules')::numeric >= N\` in ranking_check_run_marks to read the server's mark from.`);
 /** The table mark the replayed server asks of every case row of a ranked season. */
-const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
+const SERVER_MARK = datedMark ?? (MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2);
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {

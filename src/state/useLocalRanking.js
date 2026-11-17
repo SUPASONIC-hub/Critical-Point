@@ -24,6 +24,8 @@ import { isSideCaseId } from "../sideCases.js";
 // v12 is the same season at RULES_MARK 4: the logic streak is held on the card's direction
 // (사람 or 자리, C-3) and OVERCLOCK, the audit and the links open in 사건 01 to 03 (C-4), so the
 // same play pays a different streak and the first three cases play under fewer rules.
+// RULES_MARK 5 (N26, 2026-11-30) keeps v12: the reset notice promised the public ranking only
+// (bundle R, question 2), so a device's rows from mark 4 stay beside the new ones.
 // A retired key is read once, when the ranking screen first opens, for one thing only: the
 // player's best row of that table, kept under the personal-bests key (src/personalBests.js,
 // a chunk of its own, so the entry chunk does not carry it). Then it is removed. When this key

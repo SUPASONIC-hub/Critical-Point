@@ -9,14 +9,18 @@
 --
 -- 1. `ranking_check_run_marks` is restated (check:grants asks the newest
 --    reset to: the older-table refusal lives in no other function the
---    trigger calls). Word for word as 20261112000000 left it, mark 4.
+--    trigger calls). Word for word as 20261112000000 left it, but for the
+--    mark: RULES_MARK 5 (src/gauntlet/gauntletEngine.js), so `>= 5` below.
 --
---    [SLOT RULES_MARK] If bundle R bumps RULES_MARK (src/gauntlet/
---    gauntletEngine.js) because N18/N21 or a decision-T outcome changes
---    what a season pays, change `>= 4` below to the new mark, SERVER_MARK in
---    scripts/check-grants.mjs, and DB_MARKS in scripts/verify-ranking-rows.mjs,
---    in this same PR. Today nothing in the slots below changes scoring, so
---    the mark stays 4 (question 1 of the PR).
+--    [SLOT RULES_MARK] Filled (2026-11-17): N26 (#591, n26-case-variants)
+--    deals 사건 09, 11, 14 and 16 a rule of their own in a season with no
+--    weekly rule, so the same play scores differently there and the mark goes
+--    to 5 (the decision 「RULES_MARK 묶음 R에서 5로(채점 바뀜)」). A season
+--    begun at mark 4 before this and finished after it is refused, as at
+--    every mark before. scripts/check-grants.mjs reads the mark from the
+--    `>= N` of this file (SERVER_MARK); DB_MARKS in
+--    scripts/verify-ranking-rows.mjs is the checker's text marks, not this
+--    number, and does not move.
 --
 -- 2. The finished count is snapshotted before the delete (N15, 2026-11-16):
 --    a `raise notice` with the `season-final` rows and finished runs, read
@@ -51,7 +55,7 @@
 -- and the grants restated, a notice, and a delete that finds nothing the
 -- second time.
 
--- 1. The run marks the ranking asks for: RULES_MARK 4 (see [SLOT RULES_MARK]).
+-- 1. The run marks the ranking asks for: RULES_MARK 5 (see [SLOT RULES_MARK]).
 create or replace function public.ranking_check_run_marks(p_run_id text)
 returns void
 language plpgsql
@@ -86,9 +90,9 @@ begin
     raise exception 'beat-table runs are not ranked';
   end if;
   -- A case closed at a table before this one has no `tableRules` in its
-  -- row's `dynamics`, or one below 4 (3 is the table of the audit and the
-  -- links from prologue 04, 2 the day-ten table of 2026-10-20); a case
-  -- closed at this one always has, as a number of 4 or more. One such case
+  -- row's `dynamics`, or one below 5 (4 is the table of C-3 and C-4, 3 the
+  -- audit and the links from prologue 04, 2 the day-ten table of 2026-10-20);
+  -- a case closed at this one always has, as a number of 5 or more. One such case
   -- keeps the whole season off the ranking, read from the run's rows like
   -- the two marks above. `is not true`, so a missing key, a missing object,
   -- a value of another type and a smaller number all read alike. The `case`
@@ -98,7 +102,7 @@ begin
     where s.run_id = p_run_id
       and s.case_id = any(public.season_case_ids())
       and (case when jsonb_typeof(s.dynamics->'tableRules') = 'number'
-                then (s.dynamics->>'tableRules')::numeric >= 4 end) is not true
+                then (s.dynamics->>'tableRules')::numeric >= 5 end) is not true
   ) then
     raise exception 'older-table runs are not ranked';
   end if;
