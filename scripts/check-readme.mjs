@@ -32,7 +32,7 @@ export const LIMITS = {
 };
 
 /** The expanded part's `##` sections, in this order (others may sit between). */
-export const SECTION_ORDER = ["어떤 게임인가", "우리가 만든 방식", "바로 해 보기", "만든 이", "자세히 보기"];
+const SECTION_ORDER = ["어떤 게임인가", "우리가 만든 방식", "바로 해 보기", "만든 이", "자세히 보기"];
 
 const IMAGE_DIR = "docs/images/";
 

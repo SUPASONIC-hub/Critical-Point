@@ -46,7 +46,7 @@ import { BOARD_REPORT_REASONS } from "../src/boardReport.js";
 /** The promise: acted on within this long. */
 export const DEADLINE_HOURS = 24;
 /** Distinct writers that hide a post by themselves (`board_auto_hide_writers`, unset). */
-export const AUTO_HIDE_WRITERS = 3;
+const AUTO_HIDE_WRITERS = 3;
 /** The reasons a report can carry (board_reports_reason_check), in the words the button uses. */
 export const REASON_NAMES = Object.fromEntries(BOARD_REPORT_REASONS.map((reason) => [reason.id, reason.label]));
 export const ACTIONS = ["hide", "restore", "dismiss"];

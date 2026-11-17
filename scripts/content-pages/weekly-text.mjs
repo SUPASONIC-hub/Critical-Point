@@ -66,7 +66,7 @@ const WORDS = {
  * The numbers a rule's words name, off its schema (weeklyRules.js fills the same blanks from its constants).
  * A device rule (IDLE MONEY, MARKET SHOCK) has no schema; its numbers are the devices' constants.
  */
-export function ruleValues(schema = {}) {
+function ruleValues(schema = {}) {
   return {
     erosion: IDLE_EROSION_PERCENT,
     shockBoard: MARKET_SHOCK_BOARD + 1,
