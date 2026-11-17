@@ -821,7 +821,9 @@ export { escapeHtml };
  * the credit.
  * `effective` is the policy's date line, which only the two policies have;
  * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head;
- * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs).
+ * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs);
+ * `hero({ name })` writes the page's own hero in place of the common one (the
+ * about page's showcase, scripts/content-pages/about-showcase.mjs).
  *
  * The landmarks (2026-11-09 audit): a skip link to the main text first, the
  * site menu in a <header>, the page in <main id="main">, and the foot's menu,
@@ -829,7 +831,7 @@ export { escapeHtml };
  * the foot sat inside <main>, so the page had no banner or contentinfo, and
  * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "", hero = null }) {
   const copy = COPY[language];
   const name = heading ?? copy[kind];
   const title = `${name} · ${GAME_NAME[language]}`;
@@ -861,7 +863,7 @@ ${tags}</head>
 ${siteHeaderNav({ kind, language })}
 </header>
 <main id="main" tabindex="-1">
-${heroBlock({ kind, language, name })}${dated}${body.trim()}
+${hero ? hero({ name }) : heroBlock({ kind, language, name })}${dated}${body.trim()}
 </main>
 <footer>
 ${siteFooterNav({ kind, language })}

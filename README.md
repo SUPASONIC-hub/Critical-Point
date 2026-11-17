@@ -56,10 +56,10 @@
   <img src="docs/images/demo-table.webp" alt="휴대폰 테이블에서 카드를 걸고 밀어붙일 때마다 판돈이 커지고 심박과 벽 범위가 바뀌는 한 판의 움직임" width="280">
 </p>
 
-| 브리핑 | 사건의 결과 |
-|:---:|:---:|
-| <img src="docs/images/briefing.webp" alt="휴대폰에서 사수 오진우가 요약표 합계가 어긋났다고 묻는 프롤로그 브리핑" width="240"> | <img src="docs/images/result.webp" alt="휴대폰 결과 카드: 침묵을 택한 결말 「조용한 하루를 샀다」와 새벽 4시 막간" width="240"> |
-| 장면마다 읽고 판단할 것을 받습니다 | 판단이 결말과 다음 사건을 바꿉니다 |
+| 브리핑 | 사건의 결과 | 판단 리포트 |
+|:---:|:---:|:---:|
+| <img src="docs/images/briefing.webp" alt="휴대폰에서 사수 오진우가 요약표 합계가 어긋났다고 묻는 프롤로그 브리핑" width="240"> | <img src="docs/images/result.webp" alt="휴대폰 결과 카드: 침묵을 택한 결말 「조용한 하루를 샀다」와 새벽 4시 막간" width="240"> | <img src="docs/images/report.webp" alt="휴대폰 시즌 결산 화면: 결말 「실험은 남았지만 혼자 결정할 수 없게 되었다」와 기록 칭호, 가장 가까웠던 다른 결말" width="240"> |
+| 장면마다 읽고 판단할 것을 받습니다 | 판단이 결말과 다음 사건을 바꿉니다 | 시즌 끝에 판단 습관이 남습니다 |
 
 <p align="center">
   <img src="docs/images/title.webp" alt="PC 첫 화면: 노을 진 옥상에 선 분석관 옆으로 C자 게이지 로고와 CRITICAL POINT 제목, 프롤로그 시작 버튼" width="720">

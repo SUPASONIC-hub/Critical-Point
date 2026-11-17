@@ -9,6 +9,7 @@ import { localizeStaticShell } from "./static-shell.mjs";
 import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
 import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
+import { aboutShowcase } from "./content-pages/about-showcase.mjs";
 import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
   adStage,
@@ -559,10 +560,15 @@ export function renderSitePages({ analytics = null, ads = false } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
+      // The about page opens on the README's first screen over the key visual (scripts/content-pages/about-showcase.mjs), its text whole below.
+      const showcase = kind === "about" ? aboutShowcase(language) : null;
+      const body = siteBody(kind, language, { analytics, ads });
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: siteBody(kind, language, { analytics, ads }),
+        body: showcase ? withShowcase(body, showcase) : body,
+        hero: showcase?.hero ?? null,
+        style: showcase?.style ?? "",
         description: DESCRIPTION[kind][language],
         analytics,
         // The about page names the game as the start page does (scripts/structured-data.mjs).
@@ -571,6 +577,13 @@ export function renderSitePages({ analytics = null, ads = false } = {}) {
     }
   }
   return pages;
+}
+
+/** The showcase put into the about page's text, before its first `showcase.before` (its first paragraph). */
+function withShowcase(body, showcase) {
+  const at = body.indexOf(showcase.before);
+  if (at < 0) throw new Error(`site-pages: the about page has no ${showcase.before} to put the showcase before`);
+  return `${body.slice(0, at)}${showcase.body}${body.slice(at)}`;
 }
 
 /**
