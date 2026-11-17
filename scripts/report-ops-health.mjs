@@ -21,10 +21,10 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-export const MESSAGE_CHARS = 40;
+const MESSAGE_CHARS = 40;
 export const TOP = 3;
-export const INACTIVITY_DISABLE_DAYS = 60;
-export const INACTIVITY_WARN_DAYS = 45;
+const INACTIVITY_DISABLE_DAYS = 60;
+const INACTIVITY_WARN_DAYS = 45;
 
 /** Yesterday in KST: counts, and the top messages already cut to 40 characters. */
 export const QUERY = `with bounds as (

@@ -154,7 +154,7 @@ const countIn = (text, word, cap) =>
 const wordLabel = (word) => (typeof word === "string" ? word : word.source.replace(/\(\?<?[!=][^)]*\)/g, ""));
 
 /** The calm-pool sound word the briefing letters on this scene (Korean copy). */
-export function sceneSound(nodeId) {
+function sceneSound(nodeId) {
   const pool = briefingCopy.sfxCalm;
   return pool[hashSeed(`sfx:${nodeId}`) % pool.length];
 }
@@ -271,7 +271,7 @@ export function capCaseShare(rows, cap = CASE_SHARE_CAP) {
 }
 
 /** Every scene, in case order, scored. */
-export function draftMoods() {
+function draftMoods() {
   const rows = [];
   for (const caseId of CASE_SEQUENCE) {
     const caseRows = [];
