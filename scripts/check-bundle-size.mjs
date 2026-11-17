@@ -1461,7 +1461,8 @@ const budgets = [
   // 50,344 / 19,111 -> 50,576 / 19,198 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 50572 / 19194 (over budget only) in the e2e build, the plus 4.
   // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_385, maxGzip: 19_490 },
+  // 51,385 / 19,490 -> 51,673 / 19,622 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 51669 / 19618 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_673, maxGzip: 19_622 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1644,7 +1645,8 @@ const budgets = [
   // 3,414 / 1,707 -> 3,994 / 1,924 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 3990 / 1920 (over budget only) in the e2e build, the plus 4.
   // 3,994 / 1,924 -> 4,391 / 2,073 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 4387 / 2069 (over budget only) in the e2e build, the plus 4.
   // 4,391 / 2,073 -> 4,391 / 2,078 board-admin over main 29120d32: only the names of the chunks it imports. Measured - / 2074 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 4_391, maxGzip: 2_078 },
+  // 4,391 / 2,078 -> 5,432 / 2,351 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 5428 / 2347 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 5_432, maxGzip: 2_351 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1691,7 +1693,8 @@ const budgets = [
   // the gzip plus 4.
   // 2,460 / 1,158 -> 2,304 / 1,114 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,304 / 1,110 in the e2e build, the gzip plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 2_304, maxGzip: 1_114 },
+  // 2,304 / 1,114 -> 2,343 / 1,114 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 2339 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 2_343, maxGzip: 1_114 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -1978,7 +1981,8 @@ const budgets = [
   // 194,601 / 65,105 -> 194,627 / 65,154 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 194623 / 65150 (over budget only) in the e2e build, the plus 4.
   // 194,601 / 65,105 -> 195,140 / 65,333 번외 8 over main 29120d32. Measured 195136 / 65329 (over budget only) in the e2e build, the plus 4.
   // 194,641 / 65,117 -> 195,067 / 65,336 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 195063 / 65332 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_067, maxGzip: 65_336 },
+  // 195,067 / 65,336 -> 196,019 / 65,533 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 196015 / 65529 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 196_019, maxGzip: 65_533 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2062,7 +2066,8 @@ const budgets = [
   // 162,399 / 58,136 -> 162,405 / 58,143 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 162401 / 58139 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,918 / 58,372 번외 8 over main 29120d32. Measured 162914 / 58368 (over budget only) in the e2e build, the plus 4.
   // 162,433 / 58,148 -> 162,859 / 58,327 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 162855 / 58323 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_327 },
+  // 162,859 / 58,327 -> 163,717 / 58,506 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 163713 / 58502 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_717, maxGzip: 58_506 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2510,7 +2515,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,010 / 439,505 / 447,425 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured first paint, the plus 4.
 // -> 377,762 / 439,054 / 446,933 브랜드 로고 11-16: favicon.svg 링크·사전 캐시. Measured first paint, the plus 4.
 // -> 378,025 / 439,518 / 447,438 묶음 11-16b 최종 (+#576 #578) over main 6fef686f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_518, ja: 447_438 };
+// -> 378,025 / 439,699 / 447,637 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_699, ja: 447_637 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
