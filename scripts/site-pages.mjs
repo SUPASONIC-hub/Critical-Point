@@ -693,7 +693,7 @@ export const START_PAGE = {
  */
 export const startStructuredData = (language) => structuredDataTag(gameStructuredData({ language, description: START_PAGE[language].description }));
 
-const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
+const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #16603e; text-decoration: underline";
 const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
 
 /** The content pages the no-script text links, after the five: each section's first page. */
@@ -705,7 +705,9 @@ const NOSCRIPT_CONTENT = ["guide", "cases/index", "characters", "making"];
  * where each browser says how to turn it on, and the five plain pages -- the
  * text a reader, a crawler that runs no script, or an AdSense reviewer finds
  * at the address. Inline styles only (index.html says why). index.html holds
- * the Korean as this writes it, byte for byte.
+ * the Korean as this writes it, byte for byte. Its colours are the plain
+ * pages' paper (2026-11-18, scripts/legal-pages.mjs PAGE_STYLE): ink, the
+ * second ink and the link green, each over 6.7:1 on the paper.
  */
 export function startNoscript(language) {
   const copy = START_PAGE[language];
@@ -716,7 +718,7 @@ export function startNoscript(language) {
     ...NOSCRIPT_CONTENT.map((kind) => [MENU_LABELS[language][kind], pagePath(kind, language)]),
   ];
   return `<noscript>
-      <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
+      <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #16181a; background: #f7f2e6; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
         <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">${escapeHtml(GAME_NAME[language])}</h1>
         <p style="margin: 0 0 24px">${copy.intro.map(escapeHtml).join(" ")}</p>
         <p style="margin: 0 0 12px; font-weight: 700">
@@ -725,7 +727,7 @@ export function startNoscript(language) {
         <p style="margin: 0 0 24px">
           ${escapeHtml(copy.turnOn)}
         </p>
-        <p style="margin: 0 0 8px; color: #c9d3cd; font-size: 14px">${escapeHtml(copy.howTo)}</p>
+        <p style="margin: 0 0 8px; color: #3e3c38; font-size: 14px">${escapeHtml(copy.howTo)}</p>
         <ul style="${NOSCRIPT_LIST}">
 ${copy.help.map(item).join("")}        </ul>
         <ul style="${NOSCRIPT_LIST}; margin-top: 24px">
