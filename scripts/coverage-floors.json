@@ -102,6 +102,7 @@
     "src/sideCases.js": 100,
     "src/speakerPortraits.js": 100,
     "src/state/accessibilitySettings.js": 100,
+    "src/state/betweenHandsPulse.js": 100,
     "src/state/caseArrival.js": 100,
     "src/state/caseRoutes.js": 99,
     "src/state/chunkReload.js": 98,

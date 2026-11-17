@@ -452,7 +452,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setSaveStatus,
     setLastSavedAt,
   });
-  const { choose, isAdvancing, releaseAdvance } = useChoiceCommit({
+  const { choose, isAdvancing, releaseAdvance, answerPulse } = useChoiceCommit({
     currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
     caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
     sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
@@ -876,7 +876,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup: retryStorageCleanupEvent,
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
-    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup,
+    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
   });
 
   if (showRanking && !started) {

@@ -1,0 +1,44 @@
+/* N22 (2026-11-16): 「여기까지 어땠나요?」 on one reveal sheet between two
+   hands of 프롤로그 01·02, once a season (BetweenHandsPulse.jsx). A quiet row
+   above the sheet's footer: the question, then three equal buttons that wrap
+   to a second line on a narrow phone; one line of thanks once pressed. */
+.gx-pulse {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 9px 12px;
+  color: var(--ui-text-2);
+  background: var(--ui-surface-1);
+  border-radius: var(--ui-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.gx-pulse-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gx-pulse-answers button {
+  flex: 1 1 0;
+  min-width: 5.5em;
+  min-height: 44px;
+  padding: 0 10px;
+  color: var(--ui-text);
+  background: transparent;
+  border: 1px solid var(--ui-line-field);
+  border-radius: var(--ui-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.gx-pulse-answers button:hover:not(:disabled),
+.gx-pulse-answers button:focus-visible {
+  color: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+
+.gx-pulse-thanks {
+  margin: 0;
+}
