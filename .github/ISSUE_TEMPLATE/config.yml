@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ▶ 게임 하러 가기 · Play the game
+    url: https://critical-point-wn6p.onrender.com
+    about: 무료 웹 게임 (한국어 · English · 日本語)
+  - name: 메일로 문의 · Contact by email (SUPASONIC)
+    url: https://github.com/SUPASONIC-hub/Critical-Point#만든-이
+    about: 공개하기 어려운 이야기는 README 「만든 이」의 SUPASONIC 메일로. / Anything private goes to SUPASONIC's email in the README.
