@@ -1304,7 +1304,8 @@ const budgets = [
   // 9,030 / 3,768 -> 10,077 / 4,118 on 2026-10-26, 영어판 3단계: the board's words read by key (src/copy/board.js), with the report form's reasons and refusals named from boardReport.js. The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 10,077 -> 10,078 raw on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: only the names of the chunks it imports. Measured 10,078 in the e2e build.
   // 10,078 / 4,118 -> 10,676 / 4,394 on 2026-11-16, board-admin over main 83570151: the board asks boardAdminEntry.js whether to fetch the makers' admin bar, and lazy-loads it (BoardAdmin.jsx) only then. Measured 10672 / 4390 in the e2e build, the plus 4.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 10_676, maxGzip: 4_394 },
+  // 10,676 / 4,394 -> 12,339 / 5,108 N33 게시판 이번 주 질문 over main 705a809f. Measured 12335 / 5104 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 12_339, maxGzip: 5_108 },
   // The board's admin sheet and bar (src/components/BoardAdmin.jsx, src/boardAdmin.js, BoardAdmin.css), fetched only
   // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
   // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
@@ -2004,7 +2005,8 @@ const budgets = [
   // 195,067 / 65,336 -> 195,331 / 65,470 번외 9 over main 705a809f. Measured 195327 / 65466 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,873 / 65,675 묶음 11-17 over main 705a809f. Measured 195869 / 65671 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,401 / 65,451 N24 draft over main 705a809f. Measured 195397 / 65447 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_401, maxGzip: 65_451 },
+  // 195,067 / 65,336 -> 195,930 / 65,658 N33 게시판 이번 주 질문 over main 705a809f. Measured 195926 / 65654 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_930, maxGzip: 65_658 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2096,7 +2098,8 @@ const budgets = [
   // 162,859 / 58,327 -> 162,859 / 58,340 #587 영어 시작 화면 제목(장르·무료) 실측 +4. Measured - / 58336 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,340 -> 163,516 / 58,676 묶음 11-17 over main 705a809f. Measured 163512 / 58672 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,143 / 58,440 N24 draft over main 705a809f. Measured 163139 / 58436 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_143, maxGzip: 58_440 },
+  // 162,859 / 58,327 -> 163,542 / 58,598 N33 게시판 이번 주 질문 over main 705a809f. Measured 163538 / 58594 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_542, maxGzip: 58_598 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2554,7 +2557,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,059 / 439,719 / 447,636 번외 9 over main 705a809f. Measured first paint, the plus 4.
 // -> 380,776 / 442,627 / 450,549 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
 // -> 378,470 / 440,076 / 447,997 N24 draft over main 705a809f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 378_470, en: 440_076, ja: 447_997 };
+// -> 378,025 / 439,783 / 447,753 N33 게시판 이번 주 질문 over main 705a809f. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_783, ja: 447_753 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -325,6 +325,32 @@ test("a deployment with no server says the board is not connected", async ({ pag
   await expectBlockedAndExplained(page, "연결된 뒤에");
 });
 
+/**
+ * N33: 「이번 주 질문」 is pinned over the composer in a week that has one
+ * (src/boardQuestions.js), on the week's rule's clock; the pinned test week
+ * (January) has none, which every other test here already plays.
+ */
+test("a week with a question pins ours over the composer, and the test week has none", async ({ page }) => {
+  await openBoard(page);
+  await expect(page.locator(".board-composer")).toBeVisible();
+  await expect(page.getByTestId("board-week-question")).toHaveCount(0);
+
+  await page.addInitScript((ms) => {
+    globalThis.__weeklyRuleClock = ms;
+  }, Date.parse("2026-11-24T12:00:00+09:00"));
+  await openBoard(page);
+  const question = page.getByTestId("board-week-question");
+  await expect(question).toBeVisible();
+  await expect(question).toContainText("이번 주 질문 · 우리가 묻습니다");
+  await expect(question).toContainText("벽 바로 앞에서 손을 멈춘 적이 있나요?");
+  const order = await page.evaluate(() => {
+    const pinned = document.querySelector("[data-testid=board-week-question]");
+    const composer = document.querySelector(".board-composer");
+    return Boolean(pinned.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(order, "the question sits above the composer").toBe(true);
+});
+
 test("no ranking row can take the ranking screen down", async ({ page }) => {
   const honest = {
     run_tag: "HONEST01",
