@@ -118,7 +118,7 @@
      family, lightness, and -aNN for the alpha when it is not opaque. A trailing
      -2 or -3 marks a near-identical neighbour that has not been merged, because
      merging it would change what renders. */
-  --c-danger-81: rgb(176 38 30);
+  --c-danger-81: rgb(150 30 24);
   --c-gray-68: rgb(88 84 76);
   --c-green-70: rgb(22 96 62);
   --c-danger-14: rgb(45 30 28);
@@ -139,7 +139,7 @@
   --c-gx-heat-deep: rgb(120 16 20);
   --c-gx-heat-a55: rgb(196 34 28 / 0.55);
   --c-gx-heat-a18: rgb(196 34 28 / 0.14);
-  --c-gx-ember: rgb(166 70 0);
+  --c-gx-ember: rgb(150 62 0);
   --c-gx-chip: rgb(20 82 160);
   --c-gx-band: rgb(196 34 28 / 0.26);
   --c-gx-next: rgb(214 148 34 / 0.45);
@@ -387,6 +387,9 @@ html {
   --ledger-paper-a10: rgb(247 242 230 / 0.1);
   --ledger-pencil: rgb(176 38 30);
   --ledger-pencil-soft: rgb(176 38 30 / 0.1);
+  /* The pencil's wash laid on white, opaque: a cost chip reads on it and on
+     nothing under it (pencil on it 5.3:1). */
+  --ledger-pencil-wash: rgb(247 229 223);
   --ledger-pencil-line: rgb(176 38 30 / 0.4);
   --ledger-stamp-soft: rgb(22 96 62 / 0.14);
   --ledger-tape: rgb(255 248 200 / 0.7);

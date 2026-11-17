@@ -789,7 +789,7 @@
   padding: 8px 11px;
   border: 1px solid var(--c-gx-heat-a55);
   border-radius: var(--ui-radius-sm);
-  background: linear-gradient(90deg, rgb(196 34 28 / 0.13), transparent 70%), var(--ui-surface-1);
+  background: linear-gradient(90deg, rgb(196 34 28 / 0.07), transparent 70%), var(--ui-surface-1);
   box-shadow:
     inset 3px 0 0 var(--c-gx-heat),
     0 0 calc(var(--gx-heat, 0) * 24px) var(--c-gx-heat-a18);
@@ -1413,7 +1413,7 @@
   gap: 3px;
   padding: 3px 8px;
   color: var(--ledger-pencil);
-  background: var(--ledger-pencil-soft);
+  background: var(--ledger-pencil-wash);
   border: 1px solid var(--ledger-pencil-line);
   border-radius: var(--radius-pill);
   font-weight: 650;
@@ -1590,8 +1590,8 @@
 }
 
 .gx-actions button small {
-  padding: 2px 7px;
-  background: rgb(0 0 0 / 0.22);
+  padding: 1px 6px;
+  border: 1px solid currentColor;
   border-radius: var(--radius-pill);
   font: 700 0.6875rem/1.3 var(--font-sans);
   font-variant-numeric: tabular-nums;
@@ -1629,11 +1629,6 @@
 .gx-focus.focus-deadeye {
   color: var(--c-gx-fever);
   border-color: var(--c-gx-fever);
-}
-
-/* LOCK is a white key: its timing line on paper, not on a dark wash. */
-.gx-focus small {
-  background: var(--ui-surface-3);
 }
 
 .gx-cash {
@@ -1959,7 +1954,7 @@
    A glass sheet over the table: the verdict big, then the ledger in rows. */
 .decision-reveal.gx-reveal {
   color: var(--ui-text);
-  background: var(--ledger-ruled), var(--ledger-white);
+  background: var(--ledger-white);
   border: 2px solid var(--ui-text);
   border-radius: 4px;
   box-shadow: 10px 10px 0 var(--ledger-shadow);
@@ -3523,7 +3518,9 @@
 .gx-card-type.gx-card-link {
   right: 9px;
   left: auto;
-  color: var(--c-danger-81);
+  color: var(--ledger-white);
+  background: var(--ledger-pencil);
+  border-color: var(--ledger-pencil);
 }
 
 .gx-card-name ~ .gx-card-type.gx-card-link {

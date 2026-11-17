@@ -38,7 +38,7 @@
 .recovery-notice p,
 .error-log-panel p {
   margin: 6px 0 0;
-  color: rgba(247, 241, 227, 0.78);
+  color: var(--ui-text-2);
 }
 .recovery-guidance,
 .error-recovery-hint {
@@ -55,7 +55,7 @@
 }
 .error-recovery-hint {
   margin-top: 14px;
-  color: rgba(247, 241, 227, 0.72);
+  color: var(--ui-text-2);
 }
 .recovery-actions,
 .error-log-actions,
@@ -154,7 +154,7 @@
   margin: 10px 0 0;
 }
 .error-log-details dt {
-  color: rgba(247, 241, 227, 0.72);
+  color: var(--ui-text-2);
   font-size: 0.6875rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -163,7 +163,7 @@
   max-height: 110px;
   margin: 0;
   overflow: auto;
-  color: rgba(247, 241, 227, 0.82);
+  color: var(--ui-text-2);
   font-family:
     ui-monospace,
     SFMono-Regular,
@@ -194,7 +194,7 @@
   display: block;
 }
 .save-slot-list small {
-  color: rgba(247, 241, 227, 0.68);
+  color: var(--ui-text-2);
 }
 .save-slot-actions {
   display: flex;
@@ -222,7 +222,7 @@
 }
 .error-log-list small,
 .error-log-empty {
-  color: rgba(247, 241, 227, 0.68);
+  color: var(--ui-text-2);
 }
 .debug-jump-panel {
   border-color: rgb(20 82 160 / 0.26);

@@ -831,7 +831,7 @@
   gap: 12px;
   width: min(560px, 100%);
   padding: 28px 22px 22px;
-  background: var(--ledger-ruled), var(--ui-surface-1);
+  background: var(--ui-surface-1);
   border: 2px solid var(--ui-frame);
   border-radius: 4px;
   box-shadow: 12px 12px 0 var(--ledger-shadow);
