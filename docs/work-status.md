@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-11 (the state of `main` at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-16 (the state of `main` at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -48,10 +48,10 @@ list of the files it touched.
 - The ranking is ordered by a score the server reads off the run's own `final`
   case row and types, and the server decides every timestamp, identity and
   rate a telemetry row claims (priority 60).
-- Six comfort settings sit in a folded drawer on the intro's setup console,
+- Seven comfort settings sit in a folded drawer on the intro's setup console,
   and in a dialog the play header opens that holds the table's clock:
   story mode, table time, a reading clock that waits, calm effects, no letter
-  keys, a still intro (priority 87).
+  keys, a still intro, a crisis edge alert (priority 87).
 - The table's rules turn on in steps over 프롤로그 01-05 and are all on from
   사건 01 (`src/gauntlet/tableUnlocks.js`); a NEW GAME+ run has them all from
   the first case.
@@ -205,6 +205,36 @@ Still open, on purpose:
   board is first written. Not merged: the migration applies on merge, and the
   design waits for #224 and seven days of the daily check (the week of 11-16
   at the earliest).
+- Since #556 (2026-11-16) the nightly Verify Ranking summary's "Hall of fame
+  (D2)" section carries one line, `formatHallOfFameThreshold` in
+  `scripts/verify-ranking-rows.mjs`: how many boards hold ten and five or more
+  complete seasons with no mark, and the fullest board. Read only; the
+  threshold `HALL_OF_FAME_MIN_SEASONS = 10` and the server stay, for decision
+  T's T12 (11-23).
+- Bundle 11-16a (#566, 2026-11-16, `60dc8551`): the board has an admin tool
+  for the two makers only (#561): `?admin` or `#admin` opens it, Google sign-in
+  through Supabase Auth's REST (no supabase-js), and `is_board_admin()` asks
+  for an address in `board_admins` and the `google` provider; five
+  `authenticated`-only RPCs search, hide, restore and delete, each written to
+  `board_admin_log` (`20261118000000_board_admins.sql`). Players load only
+  `src/boardAdminEntry.js`; the tool is its own `BoardAdmin` chunk, left out
+  of the service worker's warm list. A MARKET SHOCK week's case result shows
+  the shock's sum in one line (#562, `describeCaseShock`, the log's
+  `threshold.shock`; no run-state key), which no week shows yet.
+  `docs/writing-a-case.md` gains chapter 18 (people from abroad, renames,
+  money) and `tests/unit/case-template.test.mjs` checks every command and
+  path it names (#557); `docs/event-week.md` follows the calendar to
+  2027-W15 and `tests/unit/event-week-doc.test.mjs` holds its table to
+  `MERGED_WEEKS` (#558).
+- Two weekly rules sit in the catalogue only (#555, 2026-11-16): IDLE MONEY
+  (`idle-erosion`, B4, the device `erosion`: 2% of what the vault held through a
+  case is gone when it closes, `IDLE_EROSION_PERCENT`) and MARKET SHOCK
+  (`market-shock`, c2, the device `shock`: once a case the 4th board's wall band
+  comes 4 closer and the pot so far moves by up to 20% from the window's seed).
+  No week books them (`weeklyCalendar.js` and `weekly_rules` unchanged), so the
+  game is as before; `WEEK_RULE=<id>` and `WEEK_VALUES=NAME=n` measure them in
+  check:pressure / check:endings. Booking one is a calendar line and a
+  migration, after decision T.
 - The audit risk (#201, B3) and the visible chain risk (#208, B2) change
   course on 2026-10-21: instead of no test week (2026-10-19), they go live as
   weekly rules for one test week, 2026-W44 (10-26 to 11-01), audit and chain
@@ -1711,6 +1741,12 @@ Still open, on purpose:
     once a page and says nothing when it has no answer.
     `check:grants` replays that migration over a seeded database and fails if
     it removes or rewrites any row but the `season-final` ones.
+    The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
+    from its `final` case row as well, since the reset takes the ranking row:
+    every reset (11-30's included, and the quarterly ones after it) deletes
+    `season-final` only and keeps the `final` case rows, or snapshots the
+    finished count first, and moves `LAST_RANKING_RESET` there to its own
+    merge time; point check:grants' newest reset at the new file too.
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
     copy, and requires every glossary term (191) to carry a plain explanation
@@ -2022,6 +2058,11 @@ Still open, on purpose:
     - Letter keys off: 1-9, W, E, Q, P, R, N do nothing, and nothing on screen
       names them (WCAG 2.1.4; priority 83).
     - A still intro: ticker, drifting art and wordmark glitch stop (WCAG 2.2.2).
+    - Crisis edge alert (A5, #551), off by default: while the risk line reads
+      in reach of the wall the screen's edge breathes amber, inside the wall
+      band red (`src/gauntlet/edgeAlert.js`, drawn by `GauntletFx` as an
+      inset shadow, so nothing moves or is covered). Under 3 Hz; reduced
+      motion, calm effects and a resting board keep the colour still.
     CSS answers two of them through attributes on `<html>`,
     `data-calm-effects` and `data-still-intro`, set in `main.jsx` before the
     first paint; their rules are `comfort.css`, the last sheet, with a budget
