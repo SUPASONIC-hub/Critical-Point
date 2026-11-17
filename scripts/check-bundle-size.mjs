@@ -693,7 +693,8 @@ const budgets = [
   // 208,749 / 76,072 -> 209,357 / 76,215 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 209353 / 76211 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 210,480 / 76,738 타이틀 로고 11-16 (#581): SVG 워드마크·이름 변경. Measured 210476 / 76734 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 213,209 / 77,612 N22 draft over main 705a809f. Measured 213205 / 77608 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 213_209, maxGzip: 77_612 },
+  // 209,357 / 76,215 -> 213,609 / 77,800 N16 draft over main 705a809f. Measured 213605 / 77796 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 213_609, maxGzip: 77_800 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2519,7 +2520,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,025 / 439,518 / 447,438 묶음 11-16b 최종 (+#576 #578) over main 6fef686f. Measured first paint, the plus 4.
 // -> 378,668 / 440,160 / 448,079 타이틀 로고 11-16 (#581): SVG 워드마크·이름 변경. Measured first paint, the plus 4.
 // -> 379,550 / 441,118 / 449,054 N22 draft over main 705a809f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 379_550, en: 441_118, ja: 449_054 };
+// -> 379,608 / 441,101 / 449,020 N16 draft over main 705a809f. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 379_608, en: 441_101, ja: 449_020 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
