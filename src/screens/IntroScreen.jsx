@@ -9,6 +9,7 @@ import { GameWordmark } from "../components/GameWordmark.jsx";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
+import { SinceLastSlot } from "../components/SinceLastSlot.jsx";
 import { rankingResetNoticeAt } from "../gauntlet/weeklyCalendar.js";
 import { castAliasLine, castNoticeAt } from "../castAliases.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
@@ -453,6 +454,7 @@ export function IntroScreen({ view, renderers = {} }) {
               )}
               <FriendResultLine />
               <CloudSavePanel />
+              <SinceLastSlot view={view} />
               {/* The resume card has no row for it, so with a save it reads
                   under the fold that follows the card. */}
               {hasResumableSave && consentLine}

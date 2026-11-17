@@ -699,7 +699,8 @@ const budgets = [
   // 209,357 / 76,215 -> 209,736 / 76,349 N19 draft over main 705a809f. Measured 209732 / 76345 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 209,522 / 76,250 번외 9 over main 705a809f. Measured 209518 / 76246 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 215,291 / 78,576 묶음 11-17 over main 705a809f. Measured 215287 / 78572 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 215_291, maxGzip: 78_576 },
+  // 209,357 / 76,215 -> 210,392 / 76,660 N24 draft over main 705a809f. Measured 210388 / 76656 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 210_392, maxGzip: 76_660 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1474,7 +1475,8 @@ const budgets = [
   // 50,344 / 19,111 -> 50,576 / 19,198 b4-idle-erosion over main 311a3dd8: IDLE MONEY 주간 규칙(카탈로그만, ko/en/ja 문구, 엔진 닫힘 침식, chainRecheck 허용). Measured 50572 / 19194 (over budget only) in the e2e build, the plus 4.
   // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_385, maxGzip: 19_490 },
+  // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_385, maxGzip: 19_540 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1851,7 +1853,10 @@ const budgets = [
   // the runtime's and the play screen's chunks. Measured 4,293 / 1,954
   // 2026-10-25, E-11 번외 사건 틀 (draft, main 7236f80b), the gzip plus 4.
   // 4,293 / 1,958 -> 4,594 / 2,081 on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main 43078a46: the screen's words read by key (src/copy/sideCase.js). The Korean is the same. Measured 4,594 / 2,077, the gzip plus 4.
-  { pattern: /^SideCaseScreen-.*\.js$/, maxBytes: 4_594, maxGzip: 2_081 },
+  // 4,594 / 2,081 -> 4,600 / 2,081 N24 draft over main 705a809f. Measured 4596 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^SideCaseScreen-.*\.js$/, maxBytes: 4_600, maxGzip: 2_081 },
+  // The 지난번 이후 card (components/SinceLastCard.jsx, N24 11-17), fetched only on a visit back after 3+ days. Measured 2,110 / 1,165, the plus 4.
+  { pattern: /^SinceLastCard-.*\.js$/, maxBytes: 2_114, maxGzip: 1_169 },
   // The locale preload (scripts/locale-preload.mjs, perf-first-visit 2026-11-03): the other languages' first files by name,
   // asked for from the head. Grows with each language's between-cases files; measured 951 raw / 492 gzip with two languages.
   { pattern: /^locale-preload-[0-9a-f]{8}\.js$/, maxBytes: 1_600, maxGzip: 700 },
@@ -1998,7 +2003,8 @@ const budgets = [
   // 195,067 / 65,336 -> 195,244 / 65,390 N19 draft over main 705a809f. Measured 195240 / 65386 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,331 / 65,470 번외 9 over main 705a809f. Measured 195327 / 65466 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,873 / 65,675 묶음 11-17 over main 705a809f. Measured 195869 / 65671 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_873, maxGzip: 65_675 },
+  // 195,067 / 65,336 -> 195,401 / 65,451 N24 draft over main 705a809f. Measured 195397 / 65447 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_401, maxGzip: 65_451 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2089,7 +2095,8 @@ const budgets = [
   // 162,859 / 58,327 -> 163,539 / 58,662 묶음 11-17 over main 705a809f. Measured 163535 / 58658 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 162,859 / 58,340 #587 영어 시작 화면 제목(장르·무료) 실측 +4. Measured - / 58336 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,340 -> 163,516 / 58,676 묶음 11-17 over main 705a809f. Measured 163512 / 58672 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_516, maxGzip: 58_676 },
+  // 162,859 / 58,327 -> 163,143 / 58,440 N24 draft over main 705a809f. Measured 163139 / 58436 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_143, maxGzip: 58_440 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2546,7 +2553,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,290 / 439,832 / 447,757 N19 draft over main 705a809f. Measured first paint, the plus 4.
 // -> 378,059 / 439,719 / 447,636 번외 9 over main 705a809f. Measured first paint, the plus 4.
 // -> 380,776 / 442,627 / 450,549 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_776, en: 442_627, ja: 450_549 };
+// -> 378,470 / 440,076 / 447,997 N24 draft over main 705a809f. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_470, en: 440_076, ja: 447_997 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2753,7 +2761,8 @@ function checkBudget(file, budget) {
 // -> 11,201 / 4,002 번외 9 over main 705a809f, the plus 4.
 // -> 11,201 / 4,002 묶음 11-17 over main 705a809f, the plus 4.
 // -> 11,201 / 4,012 묶음 11-17 over main 705a809f, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_201, maxGzip: 4_012 };
+// -> 11,208 / 4,017 N24 draft over main 705a809f, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_208, maxGzip: 4_017 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
