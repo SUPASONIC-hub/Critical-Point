@@ -1,0 +1,1342 @@
+/* ui-polish 시안 (2026-11-17): three looks over the same screens, switched by
+   ?skin=1|2|3 (main.jsx puts data-skin on <html>). One is kept, folded into
+   the files that own its selectors, and this file is deleted before the PR is
+   ready. Colours are in tokens.css under --sk-*. */
+
+/* =========================================================================
+   1 and 3: the night desk. The logo's ink, a desk lamp over the table, a red
+   dot for a signature, keycap buttons that sink when pressed.
+   ========================================================================= */
+:is([data-skin="1"], [data-skin="3"]) .game-shell {
+  background:
+    radial-gradient(70% 34% at 50% -4%, var(--sk-lamp), transparent 72%),
+    radial-gradient(120% 60% at 50% 122%, var(--c-gx-heat-a18), transparent 62%),
+    linear-gradient(180deg, var(--ui-bg), var(--sk-ink) 85%);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .game-shell::before {
+  background-image: repeating-linear-gradient(0deg, var(--sk-grain) 0 1px, transparent 1px 3px);
+  background-size: auto;
+  mask-image: radial-gradient(100% 80% at 50% 30%, var(--c-black), transparent 90%);
+}
+
+/* The HUD: a terminal slab under the lamp. */
+:is([data-skin="1"], [data-skin="3"]) .gx-hud {
+  padding: 11px 13px 10px;
+  border-color: var(--sk-hair-hi);
+  border-radius: var(--ui-radius-lg);
+  background:
+    linear-gradient(180deg, var(--sk-shine), transparent 34%),
+    radial-gradient(90% 120% at 0% 0%, var(--sk-lamp-soft), transparent 60%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--sk-ink));
+  box-shadow:
+    inset 0 1px 0 var(--sk-hair-hi),
+    0 0 0 1px var(--sk-ink),
+    0 18px 40px var(--sk-shade),
+    inset 0 0 calc(var(--gx-heat, 0) * 56px) var(--c-gx-heat-a18);
+}
+
+/* The red dot of the logo before 이번 판: the table's signature. */
+:is([data-skin="1"], [data-skin="3"]) .gx-label::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  vertical-align: 1px;
+  content: "";
+  background: var(--ui-heat);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--sk-dot-glow);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-label {
+  color: var(--ui-text-2);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-pot-value {
+  font-size: clamp(2.375rem, 11vw, 3.125rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  text-shadow:
+    0 2px 0 var(--sk-shade-deep),
+    0 0 calc(16px + var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-chips,
+:is([data-skin="1"], [data-skin="3"]) .gx-card-chips {
+  background: linear-gradient(180deg, var(--sk-chip-hi), var(--c-gx-chip) 60%);
+  box-shadow:
+    inset 0 1px 0 var(--sk-shine),
+    inset 0 -2px 0 var(--sk-shade),
+    0 0 16px rgb(104 196 255 / 0.32);
+  font-weight: 900;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-mult {
+  background: linear-gradient(180deg, var(--sk-heat-mid), var(--c-gx-heat-deep));
+  box-shadow:
+    inset 0 1px 0 var(--sk-shine),
+    0 0 0 1px var(--c-gx-heat-a55),
+    0 0 14px var(--c-gx-heat-a18);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-clock {
+  width: 3.25rem;
+  height: 3.25rem;
+  background: radial-gradient(closest-side, var(--sk-ink) 76%, transparent 78%);
+  box-shadow:
+    0 0 0 1px var(--sk-hair),
+    0 0 24px rgb(217 255 98 / calc(0.1 + var(--gx-clock, 1) * 0.16));
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-clock b {
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-stat {
+  background: linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-1));
+  border-color: var(--sk-hair);
+  box-shadow: inset 0 1px 0 var(--sk-hair);
+}
+
+/* The wall gauge: a lit glass tube. */
+:is([data-skin="1"], [data-skin="3"]) .gx-gauge-track {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--sk-hair) calc(10% - 1px) 10%),
+    linear-gradient(180deg, var(--sk-ink), var(--ui-surface-1));
+  border-color: var(--sk-hair-hi);
+  box-shadow:
+    inset 0 3px 10px var(--sk-shade-deep),
+    0 1px 0 var(--sk-hair),
+    0 0 calc(var(--gx-tier, 0) * 12px) calc(var(--gx-tier, 0) * 2px) var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-gauge-fill {
+  background:
+    linear-gradient(180deg, var(--sk-shine), transparent 45%, var(--sk-shade) 100%),
+    linear-gradient(90deg, var(--c-acid), var(--c-gx-ember) 60%, var(--c-gx-heat));
+  box-shadow:
+    inset 0 1px 0 var(--sk-hair-hi),
+    0 0 calc(10px + var(--gx-heat, 0) * 30px) var(--c-gx-heat);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-gauge-wall {
+  width: 3px;
+  background: var(--c-paper);
+  box-shadow:
+    0 0 8px var(--c-paper),
+    0 0 22px var(--c-gx-heat),
+    0 0 40px var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-gauge-read {
+  font-weight: 700;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-bpm svg {
+  filter: drop-shadow(0 0 calc(4px + var(--gx-beat, 0) * 8px) var(--c-gx-heat));
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-bpm {
+  font-weight: 800;
+}
+
+/* The speaker on the table: larger, in a ringed frame. A phone at 800px or
+   less keeps the scene's single column and hides the face, as it did. */
+@media (min-height: 801px), (min-width: 481px) {
+  :is([data-skin="1"], [data-skin="3"]) .gx-scene {
+    grid-template-columns: 52px 1fr;
+    gap: 12px;
+  }
+
+  :is([data-skin="1"], [data-skin="3"]) .gx-portrait {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-portrait {
+  border: 2px solid var(--c-paper);
+  box-shadow:
+    0 0 0 2px var(--sk-ink),
+    0 0 0 3px var(--sk-hair-hi),
+    0 8px 18px var(--sk-shade-deep);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-question {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-situation-card {
+  background:
+    linear-gradient(180deg, var(--sk-hair), transparent 40%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--sk-ink));
+  border-color: var(--sk-hair);
+  box-shadow: inset 0 1px 0 var(--sk-hair);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-situation-card span {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-situation-risk {
+  border-color: var(--c-gx-heat-a55);
+  box-shadow:
+    inset 0 2px 0 var(--ui-heat),
+    inset 0 0 calc(10px + var(--gx-heat, 0) * 30px) var(--c-gx-heat-a18);
+}
+
+/* 1's cards: embossed tiles lit from above, sinking when pressed. */
+[data-skin="1"] .gauntlet-stage .gx-card {
+  background:
+    linear-gradient(180deg, var(--sk-shine), transparent 30%),
+    radial-gradient(130% 90% at 100% 0%, var(--sk-lamp-soft), transparent 60%),
+    linear-gradient(170deg, var(--c-gx-felt-card), var(--ui-surface-1) 60%, var(--sk-ink));
+  box-shadow:
+    inset 0 1px 0 var(--sk-hair-hi),
+    inset 0 -3px 0 var(--sk-shade),
+    0 3px 0 var(--sk-shade-deep),
+    0 14px 26px var(--sk-shade);
+}
+
+[data-skin="1"] .gx-card-label {
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gauntlet-stage .gx-card:not([aria-disabled="true"]):active {
+  transform: translateY(2px) scale(0.985);
+  transition-duration: 60ms;
+}
+
+[data-skin="1"] .gauntlet-stage :is(.gx-card.selected, .gx-card.selected:hover) {
+  background:
+    linear-gradient(180deg, rgb(217 255 98 / 0.16), transparent 45%),
+    linear-gradient(170deg, var(--c-gx-felt-card), var(--ui-surface-1) 60%, var(--sk-ink));
+  box-shadow:
+    inset 0 3px 0 var(--c-acid),
+    0 0 0 1px var(--c-acid),
+    0 16px 34px var(--sk-shade-deep),
+    0 0 36px rgb(217 255 98 / 0.26);
+}
+
+[data-skin="1"] .gx-card-type {
+  padding: 1px 6px;
+  color: var(--ui-text);
+  background: var(--sk-ink);
+  border-color: var(--sk-hair-hi);
+  letter-spacing: 0.08em;
+}
+
+/* The two keys: thick caps on a lit lip; a press takes the lip away. */
+:is([data-skin="1"], [data-skin="3"]) .gx-actions {
+  background: linear-gradient(180deg, transparent, var(--sk-ink) 38%);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-actions button {
+  font-weight: 900;
+  letter-spacing: 0;
+  transition:
+    transform 70ms var(--ui-ease),
+    box-shadow 70ms var(--ui-ease),
+    filter var(--ui-dur-fast) linear;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-actions button:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 3px;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-cash {
+  background: linear-gradient(180deg, rgb(238 255 170), var(--c-acid) 48%, var(--c-acid-deep));
+  border-color: rgb(238 255 170);
+  box-shadow:
+    inset 0 1px 0 var(--c-paper),
+    inset 0 -3px 0 var(--sk-lip-acid),
+    0 5px 0 var(--sk-lip-acid),
+    0 16px 34px rgb(217 255 98 / 0.3);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-cash b {
+  font-size: 1.375rem;
+  font-weight: 900;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-push {
+  background: linear-gradient(180deg, var(--sk-heat-mid), var(--c-gx-heat-deep));
+  border-color: var(--c-gx-heat);
+  box-shadow:
+    inset 0 1px 0 var(--sk-shine),
+    inset 0 -3px 0 var(--sk-lip-heat),
+    0 5px 0 var(--sk-lip-heat),
+    0 16px 30px rgb(120 16 20 / 0.5),
+    0 0 calc(var(--gx-heat, 0) * 34px) var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) :is(.gx-cash, .gx-push):not(:disabled):active,
+:is([data-skin="1"], [data-skin="3"]) .gx-cash.is-holding {
+  transform: translateY(4px);
+  box-shadow: inset 0 2px 6px var(--sk-shade);
+}
+
+/* The bust: the logo's red, extruded, on hazard stripes. */
+:is([data-skin="1"], [data-skin="3"]) .gx-slam-bust {
+  background:
+    repeating-linear-gradient(-45deg, var(--c-gx-heat-a18) 0 18px, transparent 18px 36px),
+    radial-gradient(60% 40% at 50% 50%, var(--c-gx-heat-a55), transparent 75%);
+}
+
+[data-skin="1"] .gx-slam-bust strong {
+  text-shadow:
+    0 3px 0 var(--sk-heat-mid),
+    0 6px 0 var(--c-gx-heat-deep),
+    0 10px 30px var(--sk-shade-deep),
+    0 0 60px var(--c-gx-heat);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-slam span {
+  background: var(--sk-ink);
+  border-color: var(--c-gx-heat);
+  box-shadow: 0 0 24px var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .decision-reveal.gx-reveal {
+  background:
+    linear-gradient(180deg, var(--sk-shine), transparent 18%),
+    radial-gradient(90% 50% at 50% 0%, rgb(217 255 98 / 0.12), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--sk-ink));
+  box-shadow:
+    inset 0 1px 0 var(--sk-hair-hi),
+    0 30px 80px var(--sk-shade-deep),
+    0 0 0 1px var(--sk-ink);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .decision-reveal.gx-reveal.is-bust {
+  background:
+    repeating-linear-gradient(-45deg, var(--c-gx-heat-a18) 0 14px, transparent 14px 28px) top / 100% 7px no-repeat,
+    radial-gradient(90% 46% at 50% 0%, var(--c-gx-heat-a55), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-2), var(--sk-ink));
+  border-color: var(--c-gx-heat);
+  box-shadow:
+    inset 0 7px 0 var(--c-gx-heat-a18),
+    0 30px 80px var(--sk-shade-deep),
+    0 0 50px var(--c-gx-heat-a18);
+}
+
+[data-skin="1"] .gx-reveal.is-bust .gx-reveal-verdict h2 {
+  font-size: clamp(3.75rem, 17vw, 6.5rem);
+  color: var(--c-gx-heat);
+  text-shadow:
+    0 3px 0 var(--c-gx-heat-deep),
+    0 0 50px var(--c-gx-heat-a55);
+}
+
+:is([data-skin="1"], [data-skin="3"]) :is(.gx-reveal-gain b, .gx-reveal-loss b) {
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-reveal-pot,
+:is([data-skin="1"], [data-skin="3"]) .gx-reveal-consequence {
+  background: linear-gradient(180deg, var(--sk-hair), transparent 50%), var(--sk-ink);
+  border-color: var(--sk-hair);
+}
+
+/* The briefing on the night desk. */
+:is([data-skin="1"], [data-skin="3"]) .gx-comic-page {
+  background:
+    radial-gradient(80% 30% at 50% 0%, var(--sk-lamp), transparent 70%),
+    repeating-linear-gradient(0deg, var(--sk-grain) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--ui-bg), var(--sk-ink));
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-comic-kicker {
+  letter-spacing: 0.22em;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-comic-kicker::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  vertical-align: 1px;
+  content: "";
+  background: var(--ui-heat);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--sk-dot-glow);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-comic-title {
+  text-shadow:
+    3px 3px 0 var(--c-black),
+    0 0 30px var(--sk-lamp);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-comic-timer {
+  border-width: 2px;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 var(--c-paper),
+    inset 0 -3px 0 var(--sk-lip-acid),
+    4px 6px 0 var(--sk-ink),
+    0 10px 30px rgb(217 255 98 / 0.22);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-panel {
+  box-shadow:
+    0 0 0 1px var(--sk-hair-hi),
+    inset 0 1px 0 var(--sk-hair),
+    0 14px 34px var(--sk-shade);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-panel-speaker {
+  background:
+    radial-gradient(100% 80% at 0% 0%, var(--sk-lamp), transparent 60%),
+    linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-1));
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-speaker-tag b {
+  letter-spacing: -0.02em;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-speaker-tag span {
+  letter-spacing: 0.02em;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-judgment {
+  background: linear-gradient(180deg, var(--sk-hair), transparent 60%), var(--sk-ink);
+  border: 1px solid var(--ui-line-accent);
+  box-shadow: inset 4px 0 0 var(--c-acid);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-caption {
+  background: linear-gradient(180deg, var(--sk-paper-white), var(--c-cream));
+  box-shadow:
+    inset 0 -1px 0 var(--sk-paper-3),
+    0 6px 16px var(--sk-shade);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-panel-file li {
+  background: linear-gradient(180deg, var(--sk-paper-white), var(--sk-paper));
+  box-shadow: 0 4px 12px var(--sk-shade);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-panel-file li::before {
+  box-shadow:
+    0 0 0 1px var(--c-black),
+    0 0 8px var(--sk-dot-glow);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-file-tab {
+  border-width: 0;
+  border-radius: 4px;
+  letter-spacing: 0.18em;
+  box-shadow: inset 0 -2px 0 var(--sk-lip-acid);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-open-table {
+  border: 1px solid rgb(238 255 170);
+  border-radius: var(--ui-radius-md);
+  box-shadow:
+    inset 0 1px 0 var(--c-paper),
+    inset 0 -3px 0 var(--sk-lip-acid),
+    0 5px 0 var(--sk-lip-acid),
+    0 18px 40px rgb(217 255 98 / 0.28);
+  font-weight: 900;
+  transition:
+    transform 70ms var(--ui-ease),
+    box-shadow 70ms var(--ui-ease);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-open-table:hover {
+  transform: translateY(-1px);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-open-table:active {
+  transform: translateY(4px);
+  box-shadow: inset 0 2px 6px var(--sk-shade);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .gx-open-table:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 3px;
+}
+
+[data-skin="1"] .gx-comic-card {
+  background: linear-gradient(180deg, var(--sk-hair), transparent 50%), var(--ui-surface-2);
+  border-width: 1px;
+  box-shadow:
+    inset 0 1px 0 var(--sk-hair),
+    0 3px 0 var(--sk-shade-deep);
+}
+
+/* The start screen: the lamp on the art, the dot before the line, the key. */
+:is([data-skin="1"], [data-skin="3"]) .intro-kicker::before {
+  width: 8px;
+  height: 8px;
+  background: var(--ui-heat);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--sk-dot-glow);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .intro-kicker,
+:is([data-skin="1"], [data-skin="3"]) .intro .brand-mark {
+  background: linear-gradient(180deg, var(--sk-hair), transparent), var(--ui-glass-strong);
+  border-color: var(--sk-hair-hi);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .intro-launch button {
+  font-weight: 900;
+  background: linear-gradient(180deg, rgb(238 255 170), var(--c-acid) 48%, var(--c-acid-deep));
+  box-shadow:
+    inset 0 1px 0 var(--c-paper),
+    inset 0 -3px 0 var(--sk-lip-acid),
+    0 5px 0 var(--sk-lip-acid),
+    0 20px 46px rgb(217 255 98 / 0.3);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .intro-launch button:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: inset 0 2px 6px var(--sk-shade);
+}
+
+:is([data-skin="1"], [data-skin="3"]) .intro-stats dd {
+  font-weight: 900;
+}
+
+:is([data-skin="1"], [data-skin="3"]) .intro-stats div {
+  border-left: 2px solid var(--ui-heat);
+}
+
+/* =========================================================================
+   3: the night desk with paper on it. 1's room and keys; the hand is a row of
+   index cards, the faces are photographs, and the bust is a stamp.
+   ========================================================================= */
+
+/* Paper inks, for anything paper on the dark desk. */
+[data-skin="3"] .gauntlet-stage .gx-card,
+[data-skin="3"] .gx-comic-card {
+  --ui-text: var(--sk-paper-ink);
+  --ui-text-2: var(--sk-paper-ink-2);
+  --ui-text-3: var(--sk-paper-ink-3);
+  --ui-surface-1: var(--sk-paper-2);
+  --ui-line: var(--sk-paper-rule);
+  --c-danger-81: var(--sk-pencil);
+  --c-gx-hand: var(--sk-teal-ink);
+  --c-gx-ember: var(--sk-ember-ink);
+  --c-acid: var(--sk-stamp);
+}
+
+[data-skin="3"] .gauntlet-stage .gx-card {
+  padding-left: 20px;
+  background:
+    linear-gradient(90deg, transparent 0 11px, var(--sk-paper-margin) 11px 12px, transparent 12px),
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--sk-paper-line) 21px 22px) 0 6px,
+    linear-gradient(180deg, var(--sk-paper-white), var(--sk-paper));
+  border: 1px solid var(--sk-paper-white);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 -2px 0 var(--sk-paper-3),
+    0 3px 0 var(--sk-shade-deep),
+    0 14px 28px var(--sk-shade);
+}
+
+@media (hover: hover) {
+  [data-skin="3"] .gauntlet-stage .gx-card:not([aria-disabled="true"]):hover {
+    border-color: var(--c-paper);
+    box-shadow:
+      0 4px 0 var(--sk-shade-deep),
+      0 20px 36px var(--sk-shade-deep);
+  }
+}
+
+[data-skin="3"] .gauntlet-stage :is(.gx-card.selected, .gx-card.selected:hover) {
+  background:
+    linear-gradient(90deg, transparent 0 11px, var(--sk-paper-margin) 11px 12px, transparent 12px),
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--sk-paper-line) 21px 22px) 0 6px,
+    linear-gradient(180deg, var(--sk-paper-white), var(--sk-paper));
+  border-color: var(--c-acid);
+  box-shadow:
+    0 0 0 3px var(--c-acid),
+    0 0 40px rgb(217 255 98 / 0.4),
+    0 18px 34px var(--sk-shade-deep);
+}
+
+[data-skin="3"] .gauntlet-stage .gx-card.selected {
+  --c-acid: var(--sk-stamp);
+}
+
+[data-skin="3"] .gx-card-label {
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+[data-skin="3"] .gx-card-burn {
+  color: var(--sk-pencil);
+  background: var(--sk-pencil-soft);
+  border-color: rgb(176 38 30 / 0.4);
+  font-weight: 750;
+}
+
+[data-skin="3"] .gx-card-chips {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  box-shadow: none;
+}
+
+[data-skin="3"] .gx-card-type {
+  padding: 1px 7px;
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  border-color: var(--sk-paper-ink);
+  letter-spacing: 0.08em;
+}
+
+[data-skin="3"] .gx-card-type.is-on {
+  color: var(--c-gx-hand);
+  background: var(--sk-paper-white);
+}
+
+[data-skin="3"] .gx-card-preview .gain {
+  color: var(--sk-stamp);
+}
+
+/* A photograph clipped to the file: white border, a strip of tape. */
+[data-skin="3"] .gx-portrait {
+  border: 3px solid var(--sk-paper-white);
+  border-radius: 4px;
+  box-shadow:
+    0 6px 16px var(--sk-shade-deep),
+    0 0 0 1px var(--sk-shade);
+  transform: rotate(-3deg);
+}
+
+@media (min-height: 801px), (min-width: 481px) {
+  [data-skin="3"] .gx-scene {
+    grid-template-columns: 60px 1fr;
+  }
+
+  [data-skin="3"] .gx-portrait {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+[data-skin="3"] .gx-speaker-frame {
+  position: relative;
+  border: 5px solid var(--sk-paper-white);
+  box-shadow:
+    0 12px 26px var(--sk-shade-deep),
+    0 0 0 1px var(--sk-shade);
+}
+
+[data-skin="3"] .gx-speaker-frame::after {
+  position: absolute;
+  top: -2px;
+  left: 28%;
+  width: 44%;
+  height: 14px;
+  content: "";
+  background: rgb(255 248 220 / 0.55);
+  box-shadow: 0 1px 2px var(--sk-shade);
+}
+
+@media (max-width: 700px) {
+  [data-skin="3"] .gx-panel-speaker {
+    grid-template-columns: 116px 1fr;
+  }
+
+  [data-skin="3"] .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
+    grid-template-columns: 76px 1fr;
+  }
+}
+
+[data-skin="3"] .gx-comic-card {
+  background: linear-gradient(180deg, var(--sk-paper-white), var(--sk-paper));
+  border: 1px solid var(--sk-paper-white);
+  box-shadow: 0 3px 0 var(--sk-shade-deep);
+}
+
+[data-skin="3"] .gx-comic-card kbd {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+}
+
+[data-skin="3"] .gx-comic-card.selected {
+  box-shadow: 0 0 0 3px var(--sk-stamp);
+}
+
+[data-skin="3"] .gx-file-tab {
+  color: var(--sk-paper-white);
+  background: var(--ui-heat);
+  box-shadow: none;
+}
+
+/* The stamp: the word pressed on in red, a frame round it. */
+[data-skin="3"] .gx-slam-bust strong,
+[data-skin="2"] .gx-slam-bust strong {
+  padding: 0.06em 0.22em 0.1em;
+  border: 0.09em solid currentColor;
+  border-radius: 0.12em;
+  transform: rotate(-7deg);
+}
+
+[data-skin="3"] .gx-slam-bust strong {
+  color: var(--c-gx-heat);
+  background: rgb(6 9 10 / 0.72);
+  text-shadow: 0 0 40px var(--c-gx-heat-a55);
+  box-shadow:
+    0 0 60px var(--c-gx-heat-a55),
+    inset 0 0 30px var(--c-gx-heat-a18);
+}
+
+[data-skin="3"] .gx-reveal.is-bust .gx-reveal-verdict h2,
+[data-skin="2"] .gx-reveal.is-bust .gx-reveal-verdict h2 {
+  padding: 0.04em 0.24em 0.08em;
+  border: 0.08em solid currentColor;
+  border-radius: 0.1em;
+  transform: rotate(-4deg);
+}
+
+[data-skin="3"] .gx-reveal.is-bust .gx-reveal-verdict h2 {
+  text-shadow: 0 0 30px var(--c-gx-heat-a55);
+  box-shadow: 0 0 40px var(--c-gx-heat-a18);
+}
+
+/* =========================================================================
+   2: the audit ledger. The interface is paper (tokens.css turns the grounds
+   and inks); ink type, ruled lines, a red pencil, rubber stamps. The hand is
+   a column of ledger slips on a phone; the faces are photographs.
+   ========================================================================= */
+[data-skin="2"] body,
+[data-skin="2"] .game-shell {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, var(--sk-paper-line) 27px 28px),
+    linear-gradient(180deg, var(--sk-paper), var(--ui-bg));
+}
+
+[data-skin="2"] .game-shell::before {
+  display: none;
+}
+
+[data-skin="2"] .gx-hud {
+  padding: 10px 4px 10px;
+  background: transparent;
+  border: 0;
+  border-top: 4px double var(--sk-paper-ink);
+  border-bottom: 1px solid var(--sk-paper-ink);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-label {
+  color: var(--sk-pencil);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+[data-skin="2"] .gx-pot-value {
+  color: var(--sk-paper-ink);
+  font-size: clamp(2.5rem, 12vw, 3.25rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-shadow: none;
+}
+
+[data-skin="2"] .gx-chips,
+[data-skin="2"] .gx-card-chips {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-mult {
+  color: var(--sk-paper-white);
+  background: var(--sk-pencil);
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-clock {
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-stat {
+  background: transparent;
+  border-color: var(--sk-paper-rule-strong);
+  border-radius: 3px;
+}
+
+[data-skin="2"] .gx-gauge-track {
+  height: 24px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--sk-paper-rule) calc(10% - 1px) 10%),
+    var(--sk-paper-white);
+  border: 2px solid var(--sk-paper-ink);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-gauge-fill {
+  border-radius: 0;
+  background: linear-gradient(90deg, var(--sk-stamp), var(--sk-ember-ink) 60%, var(--sk-pencil));
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-gauge-band {
+  background: repeating-linear-gradient(-45deg, rgb(176 38 30 / 0.28) 0 5px, transparent 5px 10px);
+  border-left-color: var(--sk-pencil);
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-gauge-wall {
+  background: var(--sk-paper-ink);
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-gauge-read {
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+[data-skin="2"] .gx-scene::after {
+  background: linear-gradient(100deg, var(--sk-paper-a92), var(--sk-paper-a60) 60%, var(--sk-paper-a10) 92%);
+}
+
+[data-skin="2"] .gx-plate-backdrop {
+  filter: grayscale(1) contrast(0.8);
+  opacity: 0.35;
+}
+
+@media (min-height: 801px), (min-width: 481px) {
+  [data-skin="2"] .gx-scene {
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
+    padding: 6px 2px;
+  }
+
+  [data-skin="2"] .gx-portrait {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+[data-skin="2"] .gx-portrait {
+  border: 4px solid var(--sk-paper-white);
+  border-radius: 2px;
+  box-shadow: 0 6px 14px var(--sk-paper-shadow), 0 0 0 1px var(--sk-paper-rule);
+  transform: rotate(-2deg);
+}
+
+[data-skin="2"] .gx-question {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+[data-skin="2"] .gx-situation {
+  gap: 0;
+  border-block: 1px solid var(--sk-paper-ink);
+}
+
+[data-skin="2"] .gx-situation-card {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--sk-paper-rule-strong);
+  border-radius: 0;
+}
+
+[data-skin="2"] .gx-situation-card:first-child {
+  border-left: 0;
+}
+
+[data-skin="2"] .gx-situation-risk {
+  background: var(--sk-pencil-soft);
+  box-shadow: inset 0 3px 0 var(--sk-pencil);
+}
+
+[data-skin="2"] .gx-situation-card span {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+/* Slips: white, ruled, a red margin line, square corners. */
+[data-skin="2"] .gauntlet-stage .gx-card {
+  padding-left: 22px;
+  background:
+    linear-gradient(90deg, transparent 0 12px, var(--sk-paper-margin) 12px 13px, transparent 13px),
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--sk-paper-line) 21px 22px) 0 6px,
+    var(--sk-paper-white);
+  border: 1px solid var(--sk-paper-edge);
+  border-radius: 3px;
+  box-shadow:
+    0 2px 0 var(--sk-paper-rule),
+    0 10px 20px var(--sk-paper-shadow);
+}
+
+[data-skin="2"] .gx-card-label {
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+[data-skin="2"] .gauntlet-stage .gx-card:not([aria-disabled="true"]):active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--sk-paper-rule);
+}
+
+[data-skin="2"] .gauntlet-stage :is(.gx-card.selected, .gx-card.selected:hover) {
+  background:
+    linear-gradient(90deg, transparent 0 12px, var(--sk-paper-margin) 12px 13px, transparent 13px),
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--sk-paper-line) 21px 22px) 0 6px,
+    var(--sk-paper-white);
+  border-color: var(--sk-stamp);
+  box-shadow:
+    0 0 0 2px var(--sk-stamp),
+    6px 6px 0 var(--sk-stamp-soft),
+    0 14px 26px var(--sk-paper-shadow);
+  transform: translateY(-2px);
+}
+
+[data-skin="2"] .gx-card-burn {
+  color: var(--sk-pencil);
+  background: var(--sk-pencil-soft);
+  border-color: rgb(176 38 30 / 0.4);
+}
+
+[data-skin="2"] .gx-card-type {
+  padding: 1px 7px;
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  border-color: var(--sk-paper-ink);
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 719px) {
+  [data-skin="2"] .gx-hand {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  [data-skin="2"] .gauntlet-stage .gx-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 0;
+  }
+
+  [data-skin="2"] .gx-card-stats {
+    justify-content: flex-end;
+    max-width: 9.5rem;
+  }
+}
+
+/* The keys: rubber stamps, green for 확정, red for 밀어붙인다. */
+[data-skin="2"] .gx-actions {
+  background: linear-gradient(180deg, transparent, var(--sk-paper) 34%);
+}
+
+[data-skin="2"] .gx-actions button {
+  border-radius: 6px;
+  font-weight: 900;
+  transition: transform 70ms var(--ui-ease), box-shadow 70ms var(--ui-ease);
+}
+
+[data-skin="2"] .gx-cash {
+  color: var(--sk-paper-white);
+  background: var(--sk-stamp);
+  border: 2px solid var(--sk-paper-ink);
+  box-shadow: 0 5px 0 var(--sk-paper-ink);
+}
+
+[data-skin="2"] .gx-push {
+  color: var(--sk-paper-white);
+  background: var(--sk-pencil);
+  border: 2px solid var(--sk-paper-ink);
+  box-shadow: 0 5px 0 var(--sk-paper-ink);
+}
+
+[data-skin="2"] :is(.gx-cash, .gx-push):not(:disabled):active,
+[data-skin="2"] .gx-cash.is-holding {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 var(--sk-paper-ink);
+}
+
+[data-skin="2"] .gx-actions button small {
+  background: rgb(0 0 0 / 0.22);
+}
+
+[data-skin="2"] .gx-actions button:focus-visible {
+  outline: 3px solid var(--sk-teal-ink);
+  outline-offset: 3px;
+}
+
+[data-skin="2"] .gx-slam-bust {
+  background:
+    repeating-linear-gradient(-45deg, rgb(176 38 30 / 0.12) 0 18px, transparent 18px 36px),
+    var(--sk-paper-a60);
+}
+
+[data-skin="2"] .gx-slam-bust strong {
+  color: var(--sk-pencil);
+  text-shadow: none;
+  background: var(--sk-paper-a92);
+}
+
+[data-skin="2"] .gx-slam span {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  border-color: var(--sk-paper-ink);
+  backdrop-filter: none;
+}
+
+[data-skin="2"] .decision-reveal.gx-reveal,
+[data-skin="2"] .decision-reveal.gx-reveal.is-bust {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, var(--sk-paper-line) 27px 28px),
+    var(--sk-paper-white);
+  border: 2px solid var(--sk-paper-ink);
+  border-radius: 4px;
+  box-shadow: 10px 10px 0 var(--sk-paper-shadow);
+}
+
+[data-skin="2"] .gx-reveal-verdict h2 {
+  color: var(--sk-stamp);
+  text-shadow: none;
+}
+
+[data-skin="2"] .gx-reveal.is-bust .gx-reveal-verdict h2,
+[data-skin="2"] .gx-reveal.is-bust .gx-reveal-verdict svg {
+  color: var(--sk-pencil);
+  text-shadow: none;
+}
+
+[data-skin="2"] .gx-reveal-pot,
+[data-skin="2"] .gx-reveal-consequence {
+  background: var(--sk-paper);
+  border-color: var(--sk-paper-rule-strong);
+  border-radius: 2px;
+}
+
+[data-skin="2"] :is(.gx-reveal-gain b, .gx-reveal-loss b) {
+  font-size: 1.75rem;
+  font-weight: 900;
+}
+
+/* The briefing as a dossier page. */
+[data-skin="2"] .gx-comic {
+  background: var(--sk-veil);
+}
+
+[data-skin="2"] .gx-comic-page {
+  background:
+    linear-gradient(90deg, transparent 0 10px, var(--sk-paper-margin) 10px 11px, transparent 11px),
+    repeating-linear-gradient(180deg, transparent 0 27px, var(--sk-paper-line) 27px 28px),
+    var(--sk-paper);
+  border: 1px solid var(--sk-paper-ink);
+  border-radius: 4px;
+  box-shadow: 12px 12px 0 var(--sk-paper-shadow);
+}
+
+[data-skin="2"] .gx-comic-kicker {
+  color: var(--sk-pencil);
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+}
+
+[data-skin="2"] .gx-comic-title {
+  color: var(--sk-paper-ink);
+  font-style: normal;
+  text-shadow: none;
+  text-decoration: underline 4px var(--sk-pencil);
+  text-underline-offset: 7px;
+  transform: none;
+}
+
+[data-skin="2"] .gx-comic-top > .gx-plate-backdrop {
+  filter: grayscale(1);
+  opacity: 0.14;
+}
+
+[data-skin="2"] .gx-comic-timer {
+  color: var(--sk-pencil);
+  background: var(--sk-paper-a60);
+  border: 3px solid var(--sk-pencil);
+  border-radius: 6px;
+  box-shadow: none;
+  transform: rotate(-3deg);
+}
+
+[data-skin="2"] .gx-comic-timer i {
+  border-color: var(--sk-pencil);
+}
+
+[data-skin="2"] .gx-comic-timer.is-late {
+  color: var(--sk-paper-white);
+  background: var(--sk-pencil);
+}
+
+[data-skin="2"] .gx-panel {
+  background: transparent;
+  border-color: transparent;
+  border-top: 2px solid var(--sk-paper-ink);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-panel-speaker {
+  background: transparent;
+}
+
+[data-skin="2"] .gx-speaker-frame {
+  position: relative;
+  background: var(--sk-paper-3);
+  border: 6px solid var(--sk-paper-white);
+  box-shadow: 0 10px 22px var(--sk-paper-shadow), 0 0 0 1px var(--sk-paper-rule);
+}
+
+[data-skin="2"] .gx-speaker-frame::after {
+  position: absolute;
+  top: -2px;
+  left: 28%;
+  width: 44%;
+  height: 14px;
+  content: "";
+  background: rgb(255 248 200 / 0.7);
+  box-shadow: 0 1px 2px var(--sk-paper-shadow);
+}
+
+@media (max-width: 700px) {
+  [data-skin="2"] .gx-panel-speaker {
+    grid-template-columns: 124px 1fr;
+  }
+
+  [data-skin="2"] .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
+    grid-template-columns: 80px 1fr;
+  }
+
+  [data-skin="2"] .gx-comic-page {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+[data-skin="2"] .gx-speaker-tag b {
+  font-size: 1.375rem;
+}
+
+[data-skin="2"] .gx-judgment {
+  background: var(--sk-paper-white);
+  border: 2px solid var(--sk-paper-ink);
+  border-radius: 2px;
+  box-shadow: inset 5px 0 0 var(--sk-pencil);
+}
+
+[data-skin="2"] .gx-caption {
+  padding: 2px 4px 2px 12px;
+  background: transparent;
+  border: 0;
+  border-left: 2px solid var(--sk-paper-rule-strong);
+  border-radius: 0;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+[data-skin="2"] .gx-caption-lead {
+  border-left: 4px solid var(--c-amber-bar);
+}
+
+[data-skin="2"] .gx-caption-place {
+  border-left-width: 4px;
+  background: var(--sk-paper-white);
+}
+
+[data-skin="2"] .gx-panel-story {
+  background: transparent;
+}
+
+[data-skin="2"] .gx-panel-file {
+  background: transparent;
+}
+
+[data-skin="2"] .gx-file-tab {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+  border: 0;
+  font-family: var(--font-mono);
+}
+
+[data-skin="2"] .gx-panel-file li {
+  background: var(--sk-paper-white);
+  border: 1px solid var(--sk-paper-rule-strong);
+  border-radius: 2px;
+  transform: none;
+}
+
+[data-skin="2"] .gx-comic-actions {
+  background: var(--ui-glass-strong);
+  border-top: 2px solid var(--sk-paper-ink);
+}
+
+[data-skin="2"] .gx-comic-card {
+  background: var(--sk-paper-white);
+  border: 1px solid var(--sk-paper-edge);
+  border-radius: 3px;
+}
+
+[data-skin="2"] .gx-comic-card kbd {
+  color: var(--sk-paper-white);
+  background: var(--sk-paper-ink);
+}
+
+[data-skin="2"] .gx-open-table {
+  color: var(--sk-paper-white);
+  background: var(--sk-stamp);
+  border: 2px solid var(--sk-paper-ink);
+  border-radius: 6px;
+  box-shadow: 0 5px 0 var(--sk-paper-ink);
+  transition: transform 70ms var(--ui-ease), box-shadow 70ms var(--ui-ease);
+}
+
+[data-skin="2"] .gx-open-table:hover {
+  transform: translateY(-1px);
+}
+
+[data-skin="2"] .gx-open-table:active {
+  transform: translateY(5px);
+  box-shadow: none;
+}
+
+[data-skin="2"] .gx-open-table small {
+  opacity: 0.9;
+}
+
+/* The start screen: the photograph printed in the paper, the stamp for the key. */
+[data-skin="2"] .intro-shell,
+[data-skin="2"] .intro-visual {
+  background: var(--sk-paper);
+}
+
+[data-skin="2"] .intro-visual img {
+  filter: grayscale(1) sepia(0.25) contrast(1.05);
+  mix-blend-mode: multiply;
+}
+
+[data-skin="2"] .intro-hero-art::after {
+  background:
+    linear-gradient(0deg, var(--sk-paper), transparent 30%),
+    linear-gradient(90deg, var(--sk-paper), var(--sk-paper-a92) 30%, var(--sk-paper-a60) 55%, var(--sk-paper-a10) 80%);
+}
+
+[data-skin="2"] .intro-kicker,
+[data-skin="2"] .intro .brand-mark {
+  background: var(--sk-paper-white);
+  border-color: var(--sk-paper-ink);
+  border-radius: 3px;
+  backdrop-filter: none;
+}
+
+[data-skin="2"] .intro-kicker::before {
+  background: var(--sk-pencil);
+  box-shadow: none;
+}
+
+[data-skin="2"] .intro-launch button {
+  color: var(--sk-paper-white);
+  background: var(--sk-stamp);
+  border: 2px solid var(--sk-paper-ink);
+  border-radius: 6px;
+  box-shadow: 0 5px 0 var(--sk-paper-ink);
+  font-weight: 900;
+}
+
+[data-skin="2"] .intro-launch button:hover:not(:disabled) {
+  background: var(--sk-stamp);
+  box-shadow: 0 6px 0 var(--sk-paper-ink);
+}
+
+[data-skin="2"] .intro-launch button:active:not(:disabled) {
+  transform: translateY(5px);
+  box-shadow: none;
+}
+
+[data-skin="2"] .intro-stats div {
+  border-left: 2px solid var(--sk-pencil);
+}
+
+/* Only the ink of the wordmark on paper (its shape is title-wordmark's). */
+[data-skin="2"] .wordmark-line,
+[data-skin="2"] .wordmark-line-accent {
+  text-shadow: none;
+}
+
+[data-skin="2"] .wordmark-line::before,
+[data-skin="2"] .wordmark-line::after {
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+/* 2: the first table's rule box in blue ink on paper. */
+[data-skin="2"] .gx-panel.gx-carry {
+  background: var(--sk-paper-white);
+  border: 2px solid var(--sk-blue-ink);
+  border-radius: 2px;
+}
+
+[data-skin="2"] .gx-carry .gx-breach-kicker,
+[data-skin="2"] .gx-carry b {
+  color: var(--sk-blue-ink);
+}
+
+/* 1, bolder: lighter card faces under the lamp, and the speaker's photo
+   larger in a white frame with the red pin. */
+[data-skin="1"] .gauntlet-stage .gx-card {
+  background:
+    linear-gradient(180deg, var(--sk-shine), transparent 30%),
+    radial-gradient(130% 90% at 100% 0%, var(--sk-lamp), transparent 60%),
+    linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-1) 55%, var(--sk-ink));
+}
+
+[data-skin="1"] .gx-speaker-frame {
+  position: relative;
+  border: 3px solid var(--c-paper);
+  box-shadow:
+    0 0 0 1px var(--sk-ink),
+    0 14px 30px var(--sk-shade-deep),
+    0 0 40px var(--sk-lamp);
+}
+
+[data-skin="1"] .gx-speaker-frame::after {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 11px;
+  height: 11px;
+  content: "";
+  background: var(--ui-heat);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px var(--c-paper),
+    0 0 12px var(--sk-dot-glow);
+}
+
+@media (max-width: 700px) {
+  [data-skin="1"] .gx-panel-speaker {
+    grid-template-columns: 112px 1fr;
+  }
+
+  [data-skin="1"] .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
+    grid-template-columns: 72px 1fr;
+  }
+}
+
+[data-skin="1"] .gx-panel-story {
+  background:
+    radial-gradient(90% 40% at 50% 0%, var(--sk-lamp-soft), transparent 70%),
+    linear-gradient(180deg, var(--ui-surface-1), var(--sk-ink));
+}

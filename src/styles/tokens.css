@@ -368,6 +368,94 @@ html {
   --mood-edge: rgb(50 130 255 / 0.32);
 }
 
+/* ui-polish 시안 (2026-11-17, ?skin=1|2|3, src/styles/app/skins.css). One is
+   kept and the others deleted before the PR is ready.
+   1 night desk: the logo's ink, a desk lamp from above, keycap buttons.
+   2 ledger: an audit ledger on paper, ink type, red pencil, stamps.
+   3 night desk with paper: 1's room, 2's paper cards, photos and stamp. */
+:root {
+  --sk-ink: rgb(6 9 10);
+  --sk-lamp: rgb(255 226 178 / 0.2);
+  --sk-lamp-soft: rgb(255 226 178 / 0.05);
+  --sk-hair: rgb(255 255 255 / 0.1);
+  --sk-hair-hi: rgb(255 255 255 / 0.22);
+  --sk-shine: rgb(255 255 255 / 0.14);
+  --sk-shade: rgb(0 0 0 / 0.42);
+  --sk-shade-deep: rgb(0 0 0 / 0.72);
+  --sk-grain: rgb(255 255 255 / 0.022);
+  --sk-lip-acid: rgb(104 134 22);
+  --sk-lip-heat: rgb(70 6 10);
+  --sk-heat-mid: rgb(200 32 36);
+  --sk-chip-hi: rgb(186 230 255);
+  --sk-dot-glow: rgb(255 92 72 / 0.55);
+  /* Paper: the ledger's page and every paper thing on 3's dark desk. Ink on
+     paper 15:1, ink-2 9:1, pencil red 6.1:1, stamp green 7.6:1. */
+  --sk-paper: rgb(247 242 230);
+  --sk-paper-2: rgb(238 231 214);
+  --sk-paper-3: rgb(226 217 196);
+  --sk-paper-white: rgb(253 251 245);
+  --sk-paper-line: rgb(70 100 150 / 0.16);
+  --sk-paper-margin: rgb(214 70 60 / 0.5);
+  --sk-paper-shadow: rgb(70 50 20 / 0.22);
+  --sk-paper-a92: rgb(247 242 230 / 0.92);
+  --sk-paper-a60: rgb(247 242 230 / 0.6);
+  --sk-paper-a10: rgb(247 242 230 / 0.1);
+  --sk-paper-ink: rgb(22 24 26);
+  --sk-paper-ink-2: rgb(62 60 56);
+  --sk-paper-ink-3: rgb(88 84 76);
+  --sk-paper-rule: rgb(22 24 26 / 0.16);
+  --sk-paper-rule-strong: rgb(22 24 26 / 0.34);
+  --sk-paper-edge: rgb(22 24 26 / 0.62);
+  --sk-pencil: rgb(176 38 30);
+  --sk-pencil-soft: rgb(176 38 30 / 0.1);
+  --sk-stamp: rgb(22 96 62);
+  --sk-stamp-soft: rgb(22 96 62 / 0.12);
+  --sk-teal-ink: rgb(0 104 124);
+  --sk-blue-ink: rgb(20 82 160);
+  --sk-ember-ink: rgb(166 70 0);
+  --sk-gold-ink: rgb(132 88 0);
+  --sk-veil: rgb(40 30 12 / 0.55);
+}
+
+/* 2's page: the whole interface's grounds and inks turned to paper. Above the
+   moods (0,3,0 against their 0,2,0); the mood keeps no edge on paper. */
+:root[data-skin="2"][data-skin] {
+  color-scheme: light;
+  --ui-bg: rgb(233 226 210);
+  --ui-bg-raised: rgb(238 232 218);
+  --ui-surface-1: var(--sk-paper);
+  --ui-surface-2: rgb(242 236 222);
+  --ui-surface-3: var(--sk-paper-2);
+  --ui-surface-4: var(--sk-paper-3);
+  --ui-glass: rgb(247 242 230 / 0.82);
+  --ui-glass-strong: rgb(247 242 230 / 0.95);
+  --ui-line: var(--sk-paper-rule);
+  --ui-line-strong: var(--sk-paper-rule-strong);
+  --ui-line-field: var(--sk-paper-edge);
+  --ui-line-accent: rgb(176 38 30 / 0.5);
+  --ui-frame: var(--sk-paper-ink);
+  --ui-text: var(--sk-paper-ink);
+  --ui-text-2: var(--sk-paper-ink-2);
+  --ui-text-3: var(--sk-paper-ink-3);
+  --ui-accent: var(--sk-stamp);
+  --ui-accent-ink: var(--sk-paper-white);
+  --ui-accent-soft: var(--sk-stamp-soft);
+  --ui-accent-glow: rgb(22 96 62 / 0.2);
+  --ui-heat: var(--sk-pencil);
+  --c-acid: var(--sk-stamp);
+  --c-acid-deep: var(--sk-stamp);
+  --c-danger-81: var(--sk-pencil);
+  --c-gx-hand: var(--sk-teal-ink);
+  --c-gx-ember: var(--sk-ember-ink);
+  --c-gx-relic: var(--sk-gold-ink);
+  --c-gx-felt: var(--sk-paper-ink);
+  --c-gx-felt-raised: var(--sk-paper);
+  --c-gx-felt-card: var(--sk-paper-white);
+  --c-gx-text-dim: var(--sk-paper-ink-3);
+  --c-gx-shade: var(--sk-veil);
+  --mood-edge: transparent;
+}
+
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from
    1025px wide the root grows by 1/8, so every rem -- story, choices, dialogue,
    the result report, the intro, the ranking -- reads 2px larger per 16 (16 ->
