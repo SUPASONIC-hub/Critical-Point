@@ -83,7 +83,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   /* palette */
   --c-ink: rgb(24 32 31);
   --c-ink-deep: rgb(16 23 22);
@@ -92,10 +92,10 @@
   --c-line: rgb(216 222 215);
   --c-ink-muted: rgb(82 96 91);
   --c-line-soft: rgb(220 229 223);
-  --c-acid: rgb(217 255 98);
-  --c-acid-deep: rgb(192 234 75);
-  --c-sky: rgb(123 211 255);
-  --c-amber: rgb(255 206 115);
+  --c-acid: rgb(22 96 62);
+  --c-acid-deep: rgb(14 74 46);
+  --c-sky: rgb(20 82 160);
+  --c-amber: rgb(132 88 0);
   --c-focus-ring: rgb(138 180 255);
   --c-ink-raised: rgb(36 48 46);
   --c-teal-deep: rgb(44 74 70);
@@ -105,10 +105,10 @@
   --c-violet: rgb(108 101 173);
   --c-sage: rgb(117 167 121);
   --c-danger: rgb(167 67 50);
-  --c-coral: rgb(255 138 112);
+  --c-coral: rgb(176 52 36);
   --c-danger-deep: rgb(122 47 34);
   --c-blush: rgb(245 222 216);
-  --c-acid-dark: rgb(159 202 53);
+  --c-acid-dark: rgb(14 74 46);
   --c-teal: rgb(41 92 87);
   --c-black: rgb(0 0 0);
   --c-cream: rgb(247 241 227);
@@ -117,48 +117,49 @@
      family, lightness, and -aNN for the alpha when it is not opaque. A trailing
      -2 or -3 marks a near-identical neighbour that has not been merged, because
      merging it would change what renders. */
-  --c-danger-81: rgb(255 176 159);
-  --c-gray-68: rgb(169 176 170);
-  --c-green-70: rgb(156 203 180);
+  --c-danger-81: rgb(176 38 30);
+  --c-gray-68: rgb(88 84 76);
+  --c-green-70: rgb(22 96 62);
   --c-danger-14: rgb(45 30 28);
-  --c-danger-73-2: rgb(224 160 147);
-  --c-sky-77: rgb(169 161 232);
-  --c-sky-86: rgb(203 199 239);
-  --c-acid-72: rgb(184 230 138);
+  --c-danger-73-2: rgb(150 44 34);
+  --c-sky-77: rgb(70 56 150);
+  --c-sky-86: rgb(70 56 150);
+  --c-acid-72: rgb(22 96 62);
   --c-ink-08: rgb(21 21 21);
-  --c-sky-08-a94: rgb(12 18 31 / 0.9411764705882353);
-  --c-gray-61: rgb(139 152 173);
+  --c-sky-08-a94: rgb(247 242 230 / 0.96);
+  --c-gray-61: rgb(88 84 76);
   /* The gauntlet table. Felt for the ground, heat for the wall, chip blue for
      what a card pays, acid for the one control that banks it. */
-  --c-gx-felt: rgb(8 14 13);
-  --c-gx-felt-raised: rgb(17 28 25);
-  --c-gx-felt-card: rgb(24 38 34);
-  --c-gx-text-dim: rgb(163 180 174);
-  --c-gx-heat: rgb(255 56 56);
+  --c-gx-felt: rgb(253 251 245);
+  --c-gx-felt-raised: rgb(247 242 230);
+  --c-gx-felt-card: rgb(253 251 245);
+  --c-gx-text-dim: rgb(88 84 76);
+  --c-gx-heat: rgb(196 34 28);
   --c-gx-heat-deep: rgb(120 16 20);
-  --c-gx-heat-a55: rgb(255 56 56 / 0.55);
-  --c-gx-heat-a18: rgb(255 56 56 / 0.18);
-  --c-gx-ember: rgb(255 142 76);
-  --c-gx-chip: rgb(104 196 255);
-  --c-gx-band: rgb(255 56 56 / 0.28);
-  --c-gx-next: rgb(255 206 115 / 0.55);
-  --c-gx-shade: rgb(0 0 0 / 0.72);
-  --c-gx-hand: rgb(94 234 255);
-  --c-gx-hand-a45: rgb(94 234 255 / 0.45);
-  --c-gx-fever: rgb(255 92 214);
-  --c-gx-fever-a40: rgb(255 92 214 / 0.4);
-  --c-gx-relic: rgb(255 196 87);
-  --c-gx-relic-a30: rgb(255 196 87 / 0.3);
-  --c-gx-rare: rgb(190 146 255);
-  --c-gx-rare-a60: rgb(190 146 255 / 0.6);
+  --c-gx-heat-a55: rgb(196 34 28 / 0.55);
+  --c-gx-heat-a18: rgb(196 34 28 / 0.14);
+  --c-gx-ember: rgb(166 70 0);
+  --c-gx-chip: rgb(20 82 160);
+  --c-gx-band: rgb(196 34 28 / 0.26);
+  --c-gx-next: rgb(214 148 34 / 0.45);
+  --c-gx-shade: rgb(40 30 12 / 0.55);
+  --c-gx-hand: rgb(0 104 124);
+  --c-gx-hand-a45: rgb(0 104 124 / 0.4);
+  --c-gx-fever: rgb(160 30 120);
+  --c-gx-fever-a40: rgb(160 30 120 / 0.35);
+  --c-gx-relic: rgb(132 88 0);
+  --c-gx-relic-a30: rgb(132 88 0 / 0.28);
+  --c-gx-rare: rgb(100 60 170);
+  --c-gx-rare-a60: rgb(100 60 170 / 0.55);
 
   /* semantic aliases referenced by components */
   --color-line: var(--c-line);
   --color-muted: var(--c-ink-muted);
   --color-accent: var(--c-acid);
-  --color-white: var(--c-paper);
-  --color-white-soft: rgba(255, 255, 255, 0.68);
-  --color-overlay-line: rgba(255, 255, 255, 0.22);
+  /* Named for the night it began in: the ledger prints it in ink. */
+  --color-white: var(--ui-text);
+  --color-white-soft: rgb(62 60 56);
+  --color-overlay-line: rgb(22 24 26 / 0.28);
   --color-focus: var(--c-focus-ring);
   --font-body: 1rem;
   --font-label: 0.75rem;
@@ -192,16 +193,16 @@
      route-atlas meta), where --ui-text-3 would read 3.88 on the neutral one.
      The acid, chip, amber and sky inks stay above 5.6:1 everywhere; --ui-heat,
      used large, above 3.5; dread's rose accent above 5.7. */
-  --ui-bg: rgb(18 22 24);
-  --ui-bg-raised: rgb(22 27 29);
-  --ui-surface-1: rgb(26 32 34);
-  --ui-surface-2: rgb(32 39 41);
-  --ui-surface-3: rgb(41 50 52);
-  --ui-surface-4: rgb(52 63 65);
-  --ui-glass: rgb(28 35 37 / 0.72);
-  --ui-glass-strong: rgb(24 30 32 / 0.88);
-  --ui-line: rgb(255 255 255 / 0.08);
-  --ui-line-strong: rgb(255 255 255 / 0.16);
+  --ui-bg: rgb(233 226 210);
+  --ui-bg-raised: rgb(238 232 218);
+  --ui-surface-1: rgb(247 242 230);
+  --ui-surface-2: rgb(242 236 222);
+  --ui-surface-3: rgb(238 231 214);
+  --ui-surface-4: rgb(226 217 196);
+  --ui-glass: rgb(247 242 230 / 0.82);
+  --ui-glass-strong: rgb(247 242 230 / 0.95);
+  --ui-line: rgb(22 24 26 / 0.16);
+  --ui-line-strong: rgb(22 24 26 / 0.34);
   /* The edge of a form control. A field's fill is one surface step from the
      panel it sits on, so the border is the only thing that says where the
      field is, and WCAG 1.4.11 asks 3:1 of that. White at 0.4 reads 3.46:1
@@ -209,29 +210,29 @@
      against the darkest (--ui-bg-raised) in neutral; across the moods 3.46 to
      3.83 (the lowest is neutral's surface-3, the next bright's 3.49).
      --ui-line-strong is 1.5 to 1.7 and is not a control's edge. */
-  --ui-line-field: rgb(255 255 255 / 0.4);
-  --ui-line-accent: rgb(217 255 98 / 0.34);
+  --ui-line-field: rgb(22 24 26 / 0.62);
+  --ui-line-accent: rgb(176 38 30 / 0.5);
   /* The briefing page's frame; a mood other than neutral tints it. */
-  --ui-frame: rgb(242 246 243);
-  --ui-text: rgb(242 246 243);
-  --ui-text-2: rgb(190 203 197);
-  --ui-text-3: rgb(142 158 152);
+  --ui-frame: rgb(22 24 26);
+  --ui-text: rgb(22 24 26);
+  --ui-text-2: rgb(62 60 56);
+  --ui-text-3: rgb(88 84 76);
   --ui-accent: var(--c-acid);
-  --ui-accent-ink: rgb(12 16 8);
-  --ui-accent-soft: rgb(217 255 98 / 0.12);
-  --ui-accent-glow: rgb(217 255 98 / 0.32);
-  --ui-heat: rgb(255 92 72);
-  --ui-heat-soft: rgb(255 92 72 / 0.14);
-  --ui-chip: rgb(104 196 255);
-  --ui-chip-soft: rgb(104 196 255 / 0.14);
+  --ui-accent-ink: rgb(253 251 245);
+  --ui-accent-soft: rgb(22 96 62 / 0.12);
+  --ui-accent-glow: rgb(22 96 62 / 0.2);
+  --ui-heat: rgb(176 38 30);
+  --ui-heat-soft: rgb(176 38 30 / 0.1);
+  --ui-chip: rgb(20 82 160);
+  --ui-chip-soft: rgb(20 82 160 / 0.1);
   --ui-radius-xs: 8px;
   --ui-radius-sm: 12px;
   --ui-radius-md: 16px;
   --ui-radius-lg: 22px;
   --ui-radius-xl: 30px;
-  --ui-shadow-1: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px rgb(0 0 0 / 0.28);
-  --ui-shadow-2: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px rgb(0 0 0 / 0.42);
-  --ui-shadow-glow: 0 0 0 1px rgb(217 255 98 / 0.5), 0 12px 40px rgb(217 255 98 / 0.22);
+  --ui-shadow-1: 0 1px 0 rgb(22 24 26 / 0.06), 0 8px 20px rgb(70 50 20 / 0.14);
+  --ui-shadow-2: 0 2px 0 rgb(22 24 26 / 0.08), 0 18px 44px rgb(70 50 20 / 0.22);
+  --ui-shadow-glow: 0 0 0 2px var(--c-acid), 6px 6px 0 rgb(22 96 62 / 0.14);
   --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* The fast settle the table's heat bar and the cashed stake land with. */
@@ -284,176 +285,112 @@ html {
    and teal lines; the accent stays acid. Lowest text ratio 5.53:1
    (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="tense"] {
-  --ui-bg: rgb(4 14 16);
-  --ui-bg-raised: rgb(7 19 21);
-  --ui-surface-1: rgb(10 24 26);
-  --ui-surface-2: rgb(15 30 32);
-  --ui-surface-3: rgb(22 39 41);
-  --ui-surface-4: rgb(32 51 53);
-  --ui-glass: rgb(12 27 29 / 0.72);
-  --ui-glass-strong: rgb(8 21 23 / 0.88);
-  --ui-line: rgb(150 230 235 / 0.1);
-  --ui-line-strong: rgb(150 230 235 / 0.2);
-  --ui-frame: rgb(150 226 232);
-  --mood-edge: rgb(30 170 190 / 0.26);
+  --ui-bg: rgb(214 225 224);
+  --ui-bg-raised: rgb(221 231 230);
+  --ui-surface-1: rgb(240 245 244);
+  --ui-surface-2: rgb(233 240 239);
+  --ui-surface-3: rgb(225 234 233);
+  --ui-surface-4: rgb(210 222 221);
+  --ui-glass: rgb(240 245 244 / 0.82);
+  --ui-glass-strong: rgb(240 245 244 / 0.95);
+  --ui-line: rgb(0 60 70 / 0.18);
+  --ui-line-strong: rgb(0 60 70 / 0.36);
+  --ui-frame: rgb(0 84 100);
+  --mood-edge: rgb(0 110 130 / 0.16);
 }
 
 /* dread: an oxblood ground, a deep red edge, and the accent turned to a rose
    the accent ink still reads on (7.3:1); the heat fill comes up. Lowest text
    ratio 5.91:1 (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="dread"] {
-  --ui-bg: rgb(24 6 8);
-  --ui-bg-raised: rgb(29 9 11);
-  --ui-surface-1: rgb(34 12 14);
-  --ui-surface-2: rgb(41 16 18);
-  --ui-surface-3: rgb(51 22 24);
-  --ui-surface-4: rgb(63 30 32);
-  --ui-glass: rgb(36 13 15 / 0.72);
-  --ui-glass-strong: rgb(30 9 11 / 0.88);
-  --ui-line: rgb(255 140 130 / 0.1);
-  --ui-line-strong: rgb(255 140 130 / 0.2);
-  --ui-line-accent: rgb(255 120 100 / 0.4);
-  --ui-accent: rgb(255 120 100);
-  --ui-accent-soft: rgb(255 92 72 / 0.14);
-  --ui-accent-glow: rgb(255 92 72 / 0.36);
-  --ui-heat-soft: rgb(255 92 72 / 0.22);
-  --ui-shadow-glow: 0 0 0 1px rgb(255 120 100 / 0.5), 0 12px 40px rgb(255 92 72 / 0.24);
-  --ui-frame: rgb(255 120 104);
-  --mood-edge: rgb(190 16 28 / 0.4);
+  --ui-bg: rgb(236 214 210);
+  --ui-bg-raised: rgb(240 222 218);
+  --ui-surface-1: rgb(249 238 236);
+  --ui-surface-2: rgb(244 230 227);
+  --ui-surface-3: rgb(238 220 217);
+  --ui-surface-4: rgb(226 204 200);
+  --ui-glass: rgb(249 238 236 / 0.82);
+  --ui-glass-strong: rgb(249 238 236 / 0.95);
+  --ui-line: rgb(110 20 16 / 0.18);
+  --ui-line-strong: rgb(110 20 16 / 0.36);
+  --ui-line-accent: rgb(176 38 30 / 0.55);
+  --ui-accent: rgb(150 30 24);
+  --ui-accent-soft: rgb(176 38 30 / 0.12);
+  --ui-accent-glow: rgb(176 38 30 / 0.24);
+  --ui-heat-soft: rgb(176 38 30 / 0.16);
+  --ui-shadow-glow: 0 0 0 2px rgb(150 30 24), 6px 6px 0 rgb(176 38 30 / 0.14);
+  --ui-frame: rgb(150 30 24);
+  --mood-edge: rgb(176 38 30 / 0.2);
 }
 
 /* bright: a warm brown-amber ground, an amber edge and frame, and the accent
    turned amber (ink 12:1 on it). Lowest text ratio 4.65:1 (--ui-text-3 on
    --ui-surface-3). */
 :root[data-mood="bright"] {
-  --ui-bg: rgb(38 26 12);
-  --ui-bg-raised: rgb(43 30 15);
-  --ui-surface-1: rgb(48 34 18);
-  --ui-surface-2: rgb(54 39 22);
-  --ui-surface-3: rgb(62 46 27);
-  --ui-surface-4: rgb(74 56 35);
-  --ui-glass: rgb(50 36 19 / 0.72);
-  --ui-glass-strong: rgb(44 31 15 / 0.88);
-  --ui-line: rgb(255 210 150 / 0.1);
-  --ui-line-strong: rgb(255 210 150 / 0.2);
-  --ui-line-accent: rgb(255 196 92 / 0.4);
-  --ui-accent: rgb(255 196 92);
-  --ui-accent-soft: rgb(255 196 92 / 0.14);
-  --ui-accent-glow: rgb(255 196 92 / 0.36);
-  --ui-shadow-glow: 0 0 0 1px rgb(255 196 92 / 0.5), 0 12px 40px rgb(255 196 92 / 0.24);
-  --ui-frame: rgb(255 204 120);
-  --mood-edge: rgb(255 150 30 / 0.3);
+  --ui-bg: rgb(240 222 186);
+  --ui-bg-raised: rgb(244 229 197);
+  --ui-surface-1: rgb(251 243 224);
+  --ui-surface-2: rgb(247 236 212);
+  --ui-surface-3: rgb(242 228 199);
+  --ui-surface-4: rgb(232 214 178);
+  --ui-glass: rgb(251 243 224 / 0.82);
+  --ui-glass-strong: rgb(251 243 224 / 0.95);
+  --ui-line: rgb(110 70 0 / 0.18);
+  --ui-line-strong: rgb(110 70 0 / 0.36);
+  --ui-line-accent: rgb(132 88 0 / 0.5);
+  --ui-accent: rgb(122 80 0);
+  --ui-accent-soft: rgb(132 88 0 / 0.12);
+  --ui-accent-glow: rgb(132 88 0 / 0.24);
+  --ui-shadow-glow: 0 0 0 2px rgb(122 80 0), 6px 6px 0 rgb(132 88 0 / 0.14);
+  --ui-frame: rgb(122 80 0);
+  --mood-edge: rgb(200 130 0 / 0.2);
 }
 
 /* sorrow: a clear navy ground, a sky-blue edge and frame, and the accent
    turned sky (ink 11:1 on it). Lowest text ratio 5.12:1 (--ui-text-3 on
    --ui-surface-3). */
 :root[data-mood="sorrow"] {
-  --ui-bg: rgb(10 20 40);
-  --ui-bg-raised: rgb(13 24 45);
-  --ui-surface-1: rgb(16 28 51);
-  --ui-surface-2: rgb(21 34 58);
-  --ui-surface-3: rgb(28 42 68);
-  --ui-surface-4: rgb(38 53 80);
-  --ui-glass: rgb(18 30 54 / 0.72);
-  --ui-glass-strong: rgb(13 25 46 / 0.88);
-  --ui-line: rgb(160 200 255 / 0.1);
-  --ui-line-strong: rgb(160 200 255 / 0.2);
-  --ui-line-accent: rgb(130 200 255 / 0.4);
-  --ui-accent: rgb(130 200 255);
-  --ui-accent-soft: rgb(123 211 255 / 0.12);
-  --ui-accent-glow: rgb(123 211 255 / 0.32);
-  --ui-shadow-glow: 0 0 0 1px rgb(130 200 255 / 0.5), 0 12px 40px rgb(123 211 255 / 0.22);
-  --ui-frame: rgb(140 200 255);
-  --mood-edge: rgb(50 130 255 / 0.32);
+  --ui-bg: rgb(212 222 238);
+  --ui-bg-raised: rgb(220 229 243);
+  --ui-surface-1: rgb(240 244 250);
+  --ui-surface-2: rgb(232 238 247);
+  --ui-surface-3: rgb(222 231 243);
+  --ui-surface-4: rgb(206 218 236);
+  --ui-glass: rgb(240 244 250 / 0.82);
+  --ui-glass-strong: rgb(240 244 250 / 0.95);
+  --ui-line: rgb(20 50 110 / 0.18);
+  --ui-line-strong: rgb(20 50 110 / 0.36);
+  --ui-line-accent: rgb(20 82 160 / 0.5);
+  --ui-accent: rgb(20 82 160);
+  --ui-accent-soft: rgb(20 82 160 / 0.12);
+  --ui-accent-glow: rgb(20 82 160 / 0.24);
+  --ui-shadow-glow: 0 0 0 2px rgb(20 82 160), 6px 6px 0 rgb(20 82 160 / 0.14);
+  --ui-frame: rgb(20 82 160);
+  --mood-edge: rgb(20 82 160 / 0.18);
 }
 
-/* ui-polish 시안 (2026-11-17, ?skin=1|2|3, src/styles/app/skins.css). One is
-   kept and the others deleted before the PR is ready.
-   1 night desk: the logo's ink, a desk lamp from above, keycap buttons.
-   2 ledger: an audit ledger on paper, ink type, red pencil, stamps.
-   3 night desk with paper: 1's room, 2's paper cards, photos and stamp. */
+/* The ledger (2안 감사 장부, 2026-11-17): the interface is an audit ledger on
+   paper -- ink type, ruled lines, a red pencil, rubber stamps. The grounds and
+   inks above are the paper's; these are the ledger's own marks. Ink on the
+   paper reads 15:1, --ui-text-2 9:1, --ui-text-3 6:1, the pencil 6.1:1 and
+   the stamp green 7.6:1; the lowest, --ui-text-3 on a mood's --ui-surface-4,
+   is 5.4:1 (tense). */
 :root {
-  --sk-ink: rgb(6 9 10);
-  --sk-lamp: rgb(255 226 178 / 0.2);
-  --sk-lamp-soft: rgb(255 226 178 / 0.05);
-  --sk-hair: rgb(255 255 255 / 0.1);
-  --sk-hair-hi: rgb(255 255 255 / 0.22);
-  --sk-shine: rgb(255 255 255 / 0.14);
-  --sk-shade: rgb(0 0 0 / 0.42);
-  --sk-shade-deep: rgb(0 0 0 / 0.72);
-  --sk-grain: rgb(255 255 255 / 0.022);
-  --sk-lip-acid: rgb(104 134 22);
-  --sk-lip-heat: rgb(70 6 10);
-  --sk-heat-mid: rgb(200 32 36);
-  --sk-chip-hi: rgb(186 230 255);
-  --sk-dot-glow: rgb(255 92 72 / 0.55);
-  /* Paper: the ledger's page and every paper thing on 3's dark desk. Ink on
-     paper 15:1, ink-2 9:1, pencil red 6.1:1, stamp green 7.6:1. */
-  --sk-paper: rgb(247 242 230);
-  --sk-paper-2: rgb(238 231 214);
-  --sk-paper-3: rgb(226 217 196);
-  --sk-paper-white: rgb(253 251 245);
-  --sk-paper-line: rgb(70 100 150 / 0.16);
-  --sk-paper-margin: rgb(214 70 60 / 0.5);
-  --sk-paper-shadow: rgb(70 50 20 / 0.22);
-  --sk-paper-a92: rgb(247 242 230 / 0.92);
-  --sk-paper-a60: rgb(247 242 230 / 0.6);
-  --sk-paper-a10: rgb(247 242 230 / 0.1);
-  --sk-paper-ink: rgb(22 24 26);
-  --sk-paper-ink-2: rgb(62 60 56);
-  --sk-paper-ink-3: rgb(88 84 76);
-  --sk-paper-rule: rgb(22 24 26 / 0.16);
-  --sk-paper-rule-strong: rgb(22 24 26 / 0.34);
-  --sk-paper-edge: rgb(22 24 26 / 0.62);
-  --sk-pencil: rgb(176 38 30);
-  --sk-pencil-soft: rgb(176 38 30 / 0.1);
-  --sk-stamp: rgb(22 96 62);
-  --sk-stamp-soft: rgb(22 96 62 / 0.12);
-  --sk-teal-ink: rgb(0 104 124);
-  --sk-blue-ink: rgb(20 82 160);
-  --sk-ember-ink: rgb(166 70 0);
-  --sk-gold-ink: rgb(132 88 0);
-  --sk-veil: rgb(40 30 12 / 0.55);
-}
-
-/* 2's page: the whole interface's grounds and inks turned to paper. Above the
-   moods (0,3,0 against their 0,2,0); the mood keeps no edge on paper. */
-:root[data-skin="2"][data-skin] {
-  color-scheme: light;
-  --ui-bg: rgb(233 226 210);
-  --ui-bg-raised: rgb(238 232 218);
-  --ui-surface-1: var(--sk-paper);
-  --ui-surface-2: rgb(242 236 222);
-  --ui-surface-3: var(--sk-paper-2);
-  --ui-surface-4: var(--sk-paper-3);
-  --ui-glass: rgb(247 242 230 / 0.82);
-  --ui-glass-strong: rgb(247 242 230 / 0.95);
-  --ui-line: var(--sk-paper-rule);
-  --ui-line-strong: var(--sk-paper-rule-strong);
-  --ui-line-field: var(--sk-paper-edge);
-  --ui-line-accent: rgb(176 38 30 / 0.5);
-  --ui-frame: var(--sk-paper-ink);
-  --ui-text: var(--sk-paper-ink);
-  --ui-text-2: var(--sk-paper-ink-2);
-  --ui-text-3: var(--sk-paper-ink-3);
-  --ui-accent: var(--sk-stamp);
-  --ui-accent-ink: var(--sk-paper-white);
-  --ui-accent-soft: var(--sk-stamp-soft);
-  --ui-accent-glow: rgb(22 96 62 / 0.2);
-  --ui-heat: var(--sk-pencil);
-  --c-acid: var(--sk-stamp);
-  --c-acid-deep: var(--sk-stamp);
-  --c-danger-81: var(--sk-pencil);
-  --c-gx-hand: var(--sk-teal-ink);
-  --c-gx-ember: var(--sk-ember-ink);
-  --c-gx-relic: var(--sk-gold-ink);
-  --c-gx-felt: var(--sk-paper-ink);
-  --c-gx-felt-raised: var(--sk-paper);
-  --c-gx-felt-card: var(--sk-paper-white);
-  --c-gx-text-dim: var(--sk-paper-ink-3);
-  --c-gx-shade: var(--sk-veil);
-  --mood-edge: transparent;
+  --ledger-white: rgb(253 251 245);
+  --ledger-ink: rgb(22 24 26);
+  --ledger-rule: rgb(70 100 150 / 0.16);
+  --ledger-margin: rgb(214 70 60 / 0.5);
+  --ledger-shadow: rgb(70 50 20 / 0.2);
+  --ledger-paper-a92: rgb(247 242 230 / 0.92);
+  --ledger-paper-a60: rgb(247 242 230 / 0.6);
+  --ledger-paper-a10: rgb(247 242 230 / 0.1);
+  --ledger-pencil: rgb(176 38 30);
+  --ledger-pencil-soft: rgb(176 38 30 / 0.1);
+  --ledger-pencil-line: rgb(176 38 30 / 0.4);
+  --ledger-stamp-soft: rgb(22 96 62 / 0.14);
+  --ledger-tape: rgb(255 248 200 / 0.7);
+  /* The bands drawn behind ruled paper: one ruled line every 28px. */
+  --ledger-ruled: repeating-linear-gradient(180deg, transparent 0 27px, var(--ledger-rule) 27px 28px);
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from

@@ -16,17 +16,6 @@ if (readStoredValue(CLOUD_SAVE_ENABLED_KEY, "0") === "1") {
   import("./cloudSave.js").then(({ installCloudSync }) => installCloudSync()).catch(() => {});
 }
 
-// ui-polish 비교용 디자인 시안 (?skin=1|2|3). 시안을 고르면 PR 전에 지운다.
-try {
-  const skin = new URLSearchParams(location.search).get("skin") ?? sessionStorage.getItem("cp-skin");
-  if (skin && /^[123]$/.test(skin)) {
-    document.documentElement.dataset.skin = skin;
-    sessionStorage.setItem("cp-skin", skin);
-  }
-} catch {
-  // Storage blocked: the default design.
-}
-
 installChunkReload();
 // Before the first paint: a still intro must not start moving and then stop.
 applyAccessibilityToDocument();
