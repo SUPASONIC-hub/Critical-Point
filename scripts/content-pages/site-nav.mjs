@@ -76,8 +76,8 @@ export const menuPath = (kind, language) => `${folderOf(language)}/${kind}.html`
 /** The game in a language: `/`, `/en/`, `/ja/` (legal-pages.mjs `gamePath`). */
 export const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
-/** The section a page belongs to: a case's page is under the case files. */
-const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : kind);
+/** The section a page belongs to: a case's page is under the case files, the weekly calendar under the guide. */
+const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : kind === "weekly" ? "guide" : kind);
 
 function menuLinks(kind, language) {
   const words = MENU_LABELS[language];

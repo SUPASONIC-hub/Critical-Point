@@ -1,0 +1,112 @@
+name: Decision T
+
+# 결정 T 확인표 (11-23) in one run: the decision T draft's table (T1-T12)
+# filled in from the live database, each rule's number beside the unit it is
+# judged in -- finished seasons, or case records (N5) -- and what the draft's
+# rule says to do (scripts/report-decision-t.mjs). report-judgment.mjs's own
+# report (endings against the bot, score spread, prologue drop-off, decision T
+# gaps) follows it.
+#
+# By hand only. On 11-23 one command on the owner's PC dispatches it, waits
+# and downloads the sheet: `node scripts/report-decision-t.mjs --fetch`.
+#
+# Read only, aggregates only, as Funnel and Test Week: the same token and
+# `supabase db query --linked`, five SELECTs whose rows stay in files in the
+# runner that are never printed and are removed at the end. The artifact holds
+# the sheet's Markdown and JSON, never a row. Without the token the run says so
+# and reads nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "The ISO week the test-week rows and W case records are read for (YYYY-Www)"
+        required: false
+        default: "2026-W47"
+      board:
+        description: "The week's rule whose seasons are judged, or all"
+        required: false
+        default: "audit-cascade"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sheet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+      WEEK: ${{ inputs.week || '2026-W47' }}
+      BOARD: ${{ inputs.board || 'audit-cascade' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether an access token is configured
+        id: token
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped read
+        if: steps.token.outputs.configured != 'true'
+        run: |
+          echo "::warning title=Decision T was not read::SUPABASE_ACCESS_TOKEN is not configured, so this run asked the database nothing."
+      - uses: ./.github/actions/setup
+        if: steps.token.outputs.configured == 'true'
+        with:
+          browser: none
+      # The week and the board are checked by the scripts before any SQL is
+      # written (checkArgs: a week key, a rule of the catalogue or "all").
+      - name: Read the rows
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          TEST_WEEK: ${{ inputs.week || '2026-W47' }}
+          TEST_WEEK_RULE: ${{ inputs.board || 'audit-cascade' }}
+        run: |
+          set +e -uo pipefail
+          mkdir -p rows
+          query() {
+            npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f "$1" > "$2" 2> query.err
+            code=$?
+            if [ "$code" -ne 0 ]; then
+              echo "supabase db query exited $code on $1:"
+              node scripts/check-migration-drift.mjs --say-failure "$2" query.err
+              exit 1
+            fi
+          }
+          node scripts/report-decision-t.mjs --sql-counts --week "$WEEK" --board "$BOARD" > counts.sql || exit 1
+          node scripts/report-judgment.mjs --sql --week "$WEEK" --board "$BOARD" > seasons.sql || exit 1
+          node scripts/report-judgment.mjs --sql-gaps --week "$WEEK" --board "$BOARD" > gaps.sql || exit 1
+          node scripts/report-judgment.mjs --sql-funnel --week "$WEEK" --board "$BOARD" > funnel.sql || exit 1
+          node scripts/report-test-week.mjs --sql > test-week.sql || exit 1
+          for name in counts seasons gaps funnel test-week; do query "$name.sql" "rows/$name.json"; done
+          echo "Read the rows."
+      - name: Write the sheet
+        if: steps.token.outputs.configured == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p decision-t
+          node scripts/report-decision-t.mjs --from rows --week "$WEEK" --board "$BOARD" > decision-t/decision-t.md
+          node scripts/report-decision-t.mjs --from rows --week "$WEEK" --board "$BOARD" --json > decision-t/decision-t.json
+          cat decision-t/decision-t.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove the rows
+        if: always()
+        run: rm -rf rows query.err ./*.sql
+      - name: Upload the sheet
+        if: steps.token.outputs.configured == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: decision-t
+          path: decision-t
+          if-no-files-found: error
+          retention-days: 45
