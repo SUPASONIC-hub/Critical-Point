@@ -306,23 +306,3 @@ export function playRelicEquipCue() {
   });
 }
 
-/** A relic doing its job mid-window: a quick bright ping, a fourth apart. */
-export function playRelicProcCue() {
-  withRuntime(({ context, destination, multiplier }) => {
-    const now = context.currentTime;
-    for (const [offset, frequency] of [
-      [0, 1318.51],
-      [0.07, 1760],
-    ]) {
-      const start = now + offset;
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(frequency, start);
-      envelope(gain, start, 0.07 * multiplier, 0.002, 0.18);
-      oscillator.connect(gain).connect(destination);
-      oscillator.start(start);
-      oscillator.stop(start + 0.22);
-    }
-  });
-}
