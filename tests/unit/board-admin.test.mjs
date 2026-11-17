@@ -3,7 +3,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
+  ADMIN_LOG_SIZE,
   ADMIN_PAGE_SIZE,
+  ADMIN_QUEUE_SIZE,
   BOARD_ADMIN_EMAILS,
   adminRedirectUrl,
   boardAdmin,
@@ -18,9 +20,12 @@ import {
   sessionExpiring,
   stripAuthHash,
   toAdminPost,
+  toLogRow,
+  toQueuePost,
   toSession,
   writeSession,
 } from "../../src/boardAdmin.js";
+import { BOARD_REPORT_REASONS } from "../../src/boardReport.js";
 import { adminSheetAsked, adminSheetWanted, adminWanted, authStorageKey } from "../../src/boardAdminEntry.js";
 import { supabaseTarget } from "../../src/telemetry.js";
 
@@ -317,6 +322,63 @@ test("the admin bar's calls name the RPCs and their arguments", async () => {
   assert.deepEqual(calls.at(-1).body, { p_post_id: 9, p_hidden: true });
   assert.equal(await admin.remove(9), false);
   assert.deepEqual(calls.at(-1).body, { p_post_id: 9 });
+});
+
+test("the report queue and the admin log are read without a writer key", async () => {
+  const queued = {
+    id: "5",
+    nickname: "n",
+    body: "b",
+    created_at: null,
+    hidden: true,
+    auto_hidden_at: "2026-11-16T00:00:00Z",
+    kept_at: null,
+    report_count: 3,
+    same_writer_count: 1,
+    writer_count: 3,
+    reasons: ["abuse", "spam"],
+    first_report_at: "2026-11-15T00:00:00Z",
+    actor_key: "board:secret",
+  };
+  assert.deepEqual(toQueuePost(queued), { ...toAdminPost(queued), writers: 3, reasons: ["abuse", "spam"], firstReportAt: "2026-11-15T00:00:00Z" });
+  assert.deepEqual(toQueuePost({ id: 1, reasons: "spam" }), { ...toAdminPost({ id: 1 }), writers: 0, reasons: [], firstReportAt: null });
+  const logged = { id: "3", at: "2026-11-16T01:00:00Z", admin_email: "goeun.nam@gmail.com", action: "hide", post_id: "5", detail: { reports_deleted: 0 } };
+  assert.deepEqual(toLogRow(logged), { id: 3, at: "2026-11-16T01:00:00Z", email: "goeun.nam@gmail.com", action: "hide", postId: 5 });
+  assert.deepEqual(toLogRow({ id: 4, post_id: 6 }), { id: 4, at: null, email: "", action: "", postId: 6 });
+
+  const { admin, calls } = makeAdmin({
+    stored: storedSession(),
+    answers: {
+      "POST /rest/v1/rpc/admin_board_queue": [200, [queued]],
+      "POST /rest/v1/rpc/admin_board_queue_count": [200, 7],
+      "POST /rest/v1/rpc/admin_board_log": [200, [logged]],
+    },
+  });
+  assert.deepEqual(await admin.queue(), [toQueuePost(queued)]);
+  assert.deepEqual(calls.at(-1).body, { p_limit: ADMIN_QUEUE_SIZE });
+  assert.equal(await admin.queueCount(), 7);
+  assert.deepEqual(calls.at(-1).body, {});
+  assert.deepEqual(await admin.log(), [toLogRow(logged)]);
+  assert.deepEqual(calls.at(-1).body, { p_limit: ADMIN_LOG_SIZE });
+  assert.equal(ADMIN_QUEUE_SIZE, 50);
+  assert.equal(ADMIN_LOG_SIZE, 50);
+
+  const empty = makeAdmin({
+    stored: storedSession(),
+    answers: {
+      "POST /rest/v1/rpc/admin_board_queue": [200, null],
+      "POST /rest/v1/rpc/admin_board_queue_count": [200, null],
+      "POST /rest/v1/rpc/admin_board_log": [200, null],
+    },
+  });
+  assert.deepEqual(await empty.admin.queue(), []);
+  assert.equal(await empty.admin.queueCount(), 0);
+  assert.deepEqual(await empty.admin.log(), []);
+});
+
+test("the queue's reason words are the report button's", () => {
+  const source = readFileSync(new globalThis.URL("../../src/components/BoardAdmin.jsx", import.meta.url), "utf8");
+  for (const reason of BOARD_REPORT_REASONS) assert.match(source, new RegExp(`${reason.id}: "${reason.label}"`));
 });
 
 test("a refused token is refreshed once; a server error is passed on", async () => {

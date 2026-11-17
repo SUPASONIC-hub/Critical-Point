@@ -36,7 +36,7 @@ const languageOf = (file) => /^(en|ja)\//.exec(file)?.[1] ?? "ko";
 
 test("every content page is written in Korean, English and Japanese, and every case of the season has one", () => {
   assert.deepEqual(CASE_PAGES, CASE_SEQUENCE, "a page for each of the season's cases, in its order");
-  assert.equal(CONTENT_KINDS.length, CASE_SEQUENCE.length + 4);
+  assert.equal(CONTENT_KINDS.length, CASE_SEQUENCE.length + 5, "the guide, the case files, the cast, the making-of and the weekly calendar");
   for (const kind of CONTENT_KINDS) {
     for (const language of LANGUAGES) {
       const file = `${FOLDER[language]}${kind}.html`;

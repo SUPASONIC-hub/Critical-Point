@@ -126,6 +126,18 @@ jobs:
         run: |
           warning="$(node scripts/report-ops-health.mjs --inactivity "$(git log -1 --format=%cI)")"
           case "$warning" in *⚠*) echo "::warning title=Scheduled runs may stop::main has had no commit for 45+ days; GitHub turns scheduled workflows off at 60. Workflow Keepalive turns them back on monthly."; echo "$warning" >> "$GITHUB_STEP_SUMMARY";; esac
+      # Ops mode's calendar (N6, from 2026-12-01; scripts/ops-calendar.mjs):
+      # today's deploy day, the next quarter day a wipe may fall on, and the
+      # weekly rule calendar's booked weeks, with a warning under six. No
+      # database, no secret.
+      - name: Write the ops calendar
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/ops-calendar.mjs --summary >> "$GITHUB_STEP_SUMMARY"
+          low="$(node scripts/ops-calendar.mjs --calendar-warning)"
+          if [ -n "$low" ]; then echo "::warning title=Weekly rule calendar runs low::$low"; fi
       - name: Remove the rows
         if: always()
         run: rm -f rows.json query.err ops.json ops.err
