@@ -15,8 +15,9 @@
  *
  * The pictures: the key visual the game already ships (public/, with its 480
  * and 960 cuts), and copies in public/about/ of the README's own (docs/images/,
- * which the build does not ship) -- the lockup for a dark page (the plain
- * pages are dark only), the animation as is and the three phone screens at
+ * which the build does not ship) -- the lockup in ink for a light page (the
+ * plain pages are paper, scripts/legal-pages.mjs), the animation as is and
+ * the three phone screens at
  * 480px, twice the width they are shown at. Below the hero every picture loads
  * lazily. On a phone the key visual is a 4:3 cut over the analyst on the right
  * with the words under it, so the first screen is not sky.

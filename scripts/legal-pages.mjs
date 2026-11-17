@@ -708,10 +708,13 @@ main>h2,main>section>h2{padding-top:10px;border-top:4px double var(--text)}
  * written after the showcase's own style so it wins at the same weight: the key visual
  * becomes a photograph taped to the page above the logo (on a phone the 4:3 cut still
  * shows the analyst on the right), the cards ledger slips with a red margin, the
- * screens photographs on a band of darker paper between double rules.
+ * screens photographs on a band of darker paper between double rules. On a wide
+ * window the showcase lays the words over the picture on a dark fade; here the
+ * picture stays a photograph above them, so that layout and the fade are undone.
  */
 const SHOWCASE_PAPER_STYLE = `
 .sc-hero{position:relative;overflow:visible;padding:28px 16px 0;background:none}
+.sc-hero::after{content:none}
 .sc-hero::before{content:"";position:absolute;z-index:2;top:14px;left:calc(50% - 50px);width:100px;height:24px;background:var(--tape);box-shadow:0 1px 2px var(--shadow);transform:rotate(-2deg)}
 .sc-key{width:min(728px,100%);margin:0 auto;border:8px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 14px 30px var(--shadow-2);transform:rotate(-1deg)}
 .sc-hero-text{margin:0 auto;padding:28px 16px 32px;background:none}
@@ -725,7 +728,7 @@ const SHOWCASE_PAPER_STYLE = `
 .sc-shots figure:nth-child(odd) img{transform:rotate(-1.5deg)}
 .sc-shots figure:nth-child(even) img{transform:rotate(1.5deg)}
 .sc-quote{border-left:3px solid var(--pencil);border-radius:0;background:var(--surface)}
-@media (min-width:760px){.sc-hero{padding-top:36px}.sc-hero::before{top:22px}.sc-key{aspect-ratio:16/9;object-position:50% 60%}}
+@media (min-width:760px){.sc-hero{display:block;min-height:0;padding-top:36px}.sc-hero::before{top:22px}.sc-key{position:static;height:auto;aspect-ratio:16/9;object-position:50% 60%;opacity:1}}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
