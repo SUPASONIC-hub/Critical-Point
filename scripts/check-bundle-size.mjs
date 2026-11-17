@@ -357,7 +357,8 @@ const budgets = [
   // 296,033 / 88,293 -> 300,207 / 89,546 묶음 1113. Measured 300203 / 89542 (over budget only) in the e2e build, the plus 4.
   // 300,207 / 89,546 -> 300,667 / 89,754 다국적 인물 over main e43f7bf6. Measured 300663 / 89750 (over budget only) in the e2e build, the plus 4.
   // 300,667 / 89,754 -> 300,673 / 89,754 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured 300669 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 300_673, maxGzip: 89_754 },
+  // 300,673 / 89,754 -> 300,673 / 89,769 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured - / 89765 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 300_673, maxGzip: 89_769 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -682,7 +683,8 @@ const budgets = [
   // 207,552 / 75,601 -> 207,552 / 75,610 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured - / 75606 (over budget only) in the e2e build, the plus 4.
   // 207,552 / 75,610 -> 207,771 / 75,684 a5-edge-alert over main bd2bd589. Measured 207767 / 75680 (over budget only) in the e2e build, the plus 4.
   // 207,771 / 75,684 -> 208,749 / 76,072 on 2026-11-16, board-admin over main 83570151: src/boardAdminEntry.js (two string tests and one storage read that decide whether any admin code loads) and the shell's lazy sign-in sheet for ?admin. Measured 208745 / 76068 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 208_749, maxGzip: 76_072 },
+  // 208,749 / 76,072 -> 209,960 / 76,441 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 209956 / 76437 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 209_960, maxGzip: 76_441 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1836,6 +1838,12 @@ const budgets = [
   // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
   // 2,601 / 1,109 in the e2e build, the gzip plus 4. The v10 key retired (v11).
   { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
+  // N25 weekly reminder (#595, 2026-11-17): the settings toggle and the Web
+  // Push subscribe code, both loaded only when the settings panel opens.
+  // Measured 1,516 / 967 and 2,287 / 1,092 (the larger of the plain and e2e
+  // builds), the plus 4.
+  { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 971 },
+  { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_096 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -1955,7 +1963,8 @@ const budgets = [
   // 193,626 / 64,762 -> 193,797 / 64,818 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 193793 / 64814 (over budget only) in the e2e build, the plus 4.
   // 193,797 / 64,818 -> 194,601 / 65,105 묶음 B4+c2 over main 83570151 (#551 A5). Measured 194597 / 65101 (over budget only) in the e2e build, the plus 4.
   // 194,601 / 65,105 -> 194,641 / 65,117 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 194637 / 65113 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 194_641, maxGzip: 65_117 },
+  // 194,641 / 65,117 -> 195,404 / 65,370 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 195400 / 65366 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_404, maxGzip: 65_370 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2035,7 +2044,8 @@ const budgets = [
   // 161,518 / 57,831 -> 161,650 / 57,881 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 161646 / 57877 (over budget only) in the e2e build, the plus 4.
   // 161,650 / 57,881 -> 162,399 / 58,136 묶음 B4+c2 over main 83570151 (#551 A5). Measured 162395 / 58132 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,433 / 58,148 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 162429 / 58144 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_433, maxGzip: 58_148 },
+  // 162,433 / 58,148 -> 163,050 / 58,393 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 163046 / 58389 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_050, maxGzip: 58_393 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2472,7 +2482,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // 377,359 / 438,379 / 446,228 -> 377,748 / 438,772 / 446,622 on 2026-11-16, board-admin over main 83570151: the entry's admin check and sheet loader (index above). Measured 377,744 / 438,768 / 446,618 in the e2e build, the plus 4.
 // -> 377,738 / 439,018 / 446,897 board-admin over main 29120d32 (#555 묶음 B4+c2). Measured 377,734 / 439,014 / 446,893 in the e2e build, the plus 4.
 // -> 377,749 / 439,041 / 446,920 묶음 11-16a (#557 #558 #562 #561) over main bded5a33. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 377_749, en: 439_041, ja: 446_920 };
+// -> 378,117 / 439,653 / 447,540 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_117, en: 439_653, ja: 447_540 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2670,7 +2681,8 @@ function checkBudget(file, budget) {
 // -> 10,887 / 3,912 N1 결산 카드, the plus 4.
 // -> 10,885 / 3,904 번외 5, the plus 4.
 // -> 11,064 / 3,974 묶음 1113, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_064, maxGzip: 3_974 };
+// -> 12,564 / 4,458 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b, the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_564, maxGzip: 4_458 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
