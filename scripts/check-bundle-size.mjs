@@ -315,7 +315,8 @@ const budgets = [
   // 34,673 / 14,761 -> 34,867 / 14,850 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 34863 / 14846 (over budget only) in the e2e build, the plus 4.
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_900 },
+  // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_096, maxGzip: 14_920 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
