@@ -2088,7 +2088,8 @@ const budgets = [
   // 162,859 / 58,327 -> 163,100 / 58,463 번외 9 over main 705a809f. Measured 163096 / 58459 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,539 / 58,662 묶음 11-17 over main 705a809f. Measured 163535 / 58658 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 162,859 / 58,340 #587 영어 시작 화면 제목(장르·무료) 실측 +4. Measured - / 58336 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_340 },
+  // 162,859 / 58,340 -> 163,516 / 58,676 묶음 11-17 over main 705a809f. Measured 163512 / 58672 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_516, maxGzip: 58_676 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2751,7 +2752,8 @@ function checkBudget(file, budget) {
 // -> 11,172 / 4,002 묶음 11-16b 최종 (+#576 #578) over main 6fef686f, the plus 4.
 // -> 11,201 / 4,002 번외 9 over main 705a809f, the plus 4.
 // -> 11,201 / 4,002 묶음 11-17 over main 705a809f, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_201, maxGzip: 4_002 };
+// -> 11,201 / 4,012 묶음 11-17 over main 705a809f, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_201, maxGzip: 4_012 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
