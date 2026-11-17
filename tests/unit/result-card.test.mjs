@@ -661,9 +661,9 @@ function fakeStyleDocument(values) {
 test("the theme is read off the page's tokens when the card is drawn", () => {
   const theme = readResultCardTheme(
     fakeStyleDocument({
-      "--c-gx-felt": " rgb(8 14 13)",
-      "--c-gx-felt-raised": "rgb(17 28 25)",
-      "--c-paper": "rgb(255 255 255)",
+      "--ui-surface-1": " rgb(8 14 13)",
+      "--ledger-white": "rgb(17 28 25)",
+      "--ui-text": "rgb(255 255 255)",
       "--c-gx-text-dim": "rgb(163 180 174)",
       "--c-acid": "rgb(217 255 98)",
       "--c-gx-heat": "rgb(255 56 56)",
@@ -681,7 +681,7 @@ test("the theme is read off the page's tokens when the card is drawn", () => {
   });
   // The tokens the theme reads are tokens the stylesheet defines.
   const tokens = readFileSync(new URL("../../src/styles/tokens.css", import.meta.url), "utf8");
-  for (const token of ["--c-gx-felt", "--c-gx-felt-raised", "--c-paper", "--c-gx-text-dim", "--c-acid", "--c-gx-heat", "--font-sans"]) {
+  for (const token of ["--ui-surface-1", "--ledger-white", "--ui-text", "--c-gx-text-dim", "--c-acid", "--c-gx-heat", "--font-sans"]) {
     assert.match(tokens, new RegExp(`^\\s*${token}:`, "m"), token);
   }
   // A page that answers nothing still gives a legible card.
@@ -695,7 +695,7 @@ test("the theme is read off the page's tokens when the card is drawn", () => {
 function fakeCanvasDocument({ fonts, blob = new Blob(["png"], { type: "image/png" }), context = fakeContext(), throwOnBlob = false } = {}) {
   const canvases = [];
   const documentRef = {
-    ...fakeStyleDocument({ "--font-sans": '"Critical Point Sans", sans-serif', "--c-gx-felt": "rgb(8 14 13)" }),
+    ...fakeStyleDocument({ "--font-sans": '"Critical Point Sans", sans-serif', "--ui-surface-1": "rgb(8 14 13)" }),
     canvases,
     createElement(tag) {
       assert.equal(tag, "canvas");
