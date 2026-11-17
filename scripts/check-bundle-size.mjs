@@ -2062,7 +2062,8 @@ const budgets = [
   // 162,399 / 58,136 -> 162,405 / 58,143 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 162401 / 58139 (over budget only) in the e2e build, the plus 4.
   // 162,399 / 58,136 -> 162,918 / 58,372 번외 8 over main 29120d32. Measured 162914 / 58368 (over budget only) in the e2e build, the plus 4.
   // 162,433 / 58,148 -> 162,859 / 58,327 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 162855 / 58323 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_327 },
+  // 162,859 / 58,327 -> 162,859 / 58,340 #587 영어 시작 화면 제목(장르·무료) 실측 +4. Measured - / 58336 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_859, maxGzip: 58_340 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
