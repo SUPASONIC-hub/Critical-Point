@@ -183,3 +183,33 @@ test("지금 상황 듣기: asked, the table says the numbers it shows in one li
   // A second ask before the first is said replaces it with the newer numbers.
   assert.deepEqual(queueCalls(queue, [{ kind: "status", text: "newer" }]).map((call) => call.text)[0], "newer");
 });
+
+test("the stake clock is said when a tier moves it, and only on a board that has it (B5)", () => {
+  const board = { stakeClock: true, seconds: 45 };
+  const cool = facts({ win: tableWindow({ gauge: 40, schema: board }), remaining: 30 });
+  const hot = facts({ win: tableWindow({ gauge: 47, pushes: 1, schema: board }), remaining: 24.2 });
+  assert.equal(cool.windowSeconds, 45);
+  assert.equal(hot.windowSeconds, 40);
+  const cut = listTableCalls(cool, hot).find((call) => call.kind === "stakeClock");
+  assert.equal(cut?.text, "열기 47 · 시계 5초 줄었다 · 남은 25초");
+  // Two tiers at once say the whole cut.
+  const hotter = facts({ win: tableWindow({ gauge: 66, pushes: 1, schema: board }), remaining: 18 });
+  assert.equal(listTableCalls(cool, hotter).find((call) => call.kind === "stakeClock")?.text, "열기 66 · 시계 10초 줄었다 · 남은 18초");
+  // A cooling below a tier gives the seconds back, and says so.
+  const back = listTableCalls(hot, facts({ win: tableWindow({ gauge: 43, pushes: 1, schema: board }), remaining: 28 })).find((call) => call.kind === "stakeClock");
+  assert.equal(back?.text, "열기 43 · 시계 5초 돌아왔다 · 남은 28초");
+  // A push inside a tier moves nothing on the clock: no call.
+  assert.equal(listTableCalls(hot, facts({ win: tableWindow({ gauge: 55, pushes: 2, schema: board }), remaining: 22 })).some((call) => call.kind === "stakeClock"), false);
+  // A board from before the stake clock (or none at all) keeps a flat clock and stays silent.
+  const flat = { stakeClock: false, seconds: 45 };
+  const flatCalls = listTableCalls(facts({ win: tableWindow({ gauge: 40, schema: flat }) }), facts({ win: tableWindow({ gauge: 70, pushes: 1, schema: flat }) }));
+  assert.equal(flatCalls.some((call) => call.kind === "stakeClock"), false);
+  assert.equal(facts().windowSeconds, null);
+  // A closed window says nothing, the stake clock included.
+  assert.deepEqual(listTableCalls(cool, facts({ win: tableWindow({ gauge: 70, schema: board }), live: false })), []);
+});
+
+test("the stake clock's call waits behind the clock's own and ahead of the push", () => {
+  const queue = queueCalls([], [{ kind: "push", text: "p" }, { kind: "stakeClock", text: "s" }, { kind: "clock", text: "c" }]);
+  assert.deepEqual(queue.map((call) => call.kind), ["clock", "stakeClock", "push"]);
+});

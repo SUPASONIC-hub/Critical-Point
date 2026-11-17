@@ -471,8 +471,8 @@ open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토)
-and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금) and 6월 12일 (금) fit
-2026) and nothing else here.
+and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
+7월 11일 (토) and 7월 13일 (월) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -572,6 +572,20 @@ and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (�
 | 석재우 | Sunday's draft statement: 「외부 세력의 정교한 공격 ... 고객 피해는 없습니다」 |
 | The ransom | Monday 08:40, a notice on every 자금부 screen; the first folder locked is 「해외송금_2026_06」. 이민서's Friday-night copy on the KD데이터랩 side is untouched |
 | The endings | the first line of the 09:00 report (the money chased: 11억 2천만 back three weeks later, 72억 8천만 never answered / the cause: no money back, eleven leavers' permissions struck, the shared account left as it is -- as 사건 44 still finds it / the statement's line copied, 사건 37's echo). None names the trial, the raid or 윤상혁 |
+### 번외 8, 정상화 (side08)
+
+| Fact | Value |
+|---|---|
+| When | 2026-07-10 (금) 15:20 to 07-13 (월) 09:00: a week after 사건 34 closes (7월 3일), the morning before 사건 35's night of rain (7월 14일). The analyst is in KD캐피탈 위험관리부 under 채이안, as 사건 35 finds them |
+| Where | KD캐피탈 위험관리부 and 채권관리팀; 도담사출 in 안산 반월공단 (factory, office, container dormitory); 인천공항 departures on the Saturday night |
+| 도담사출 | invented (searched 2026-11-14): a plastic injection shop, 23 people, four injection machines leased from KD캐피탈 at 2,100만 원 a month. July's fee is late. Monday's 회수심의 takes the four machines and, under the lease's 12조, the 4,200만 원 delivery payment a customer owes the shop on 7월 15일 -- its last money |
+| The pension | the shop's KD은행 퇴직연금: no company payment for seven months (2025-12 to 2026-06), 3,640만 원 for the 23. The 납입 지연 notices went to the company only; 심재만 read all seven. The group's combined screen shows the line at KD캐피탈 and nobody there reads it |
+| 「정상화」 | 설경민 (채권관리팀 차장, 43) noted in January: 「리스료 우선 입금 약속, 회수 유예. 정상화.」 The lease was paid on the 5th, January to June, never late; the team was first in collection rate for the half |
+| 비노드 타파 (39) | from Nepal; 9 years 8 months at 도담사출 on machine 3; answers in Korean (said once, in the narration). Flies home 7월 11일 (토) 23:50. Saved 2,310만 원 (last company payment November 2025); his share of the missing seven months, 182만 원. Leaves a notebook of mould temperatures (「비 오는 날 3도」) for whoever runs the machine next. He refuses 심재만's envelope of 182만 원 at the gate |
+| 심재만 (61) | 도담사출 대표; paid the lease before the pension to keep the machines running, and says he knew. He and 설경민 speak only in the narration (indirect speech or 「」), as 번외 6's 기성철: no ordinary generated face was found for either yet |
+| 채이안 | 「위험이 누구 이름으로 적히는지 정하는」 department (사건 25's line): the opinion box is 400 characters, KD캐피탈's loss only; writing the payment behind the pension puts the analyst's name on a 4,200만 원 loss |
+| The endings | the first line of the opinion (the 4,200만 held two weeks behind the pension, the seven months paid on 7월 17일, the analyst's name on the expected loss / the cause written, the agenda passed, a line added to the collection rules three months later, the 3,640만 left to a wage claim / 「특이사항 없음」 left, the shop closed that month). None touches the flood of 사건 35 |
+
 ## Known and left alone
 
 - **"3년".** The 프롤로그 is dated 2022-23 and 사건 01 is some months before

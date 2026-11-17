@@ -13,7 +13,7 @@ import {
   VITALS_SAMPLE_RATE,
 } from "../../src/gameEvents.js";
 import { readInteractionToNextPaint, watchVitals } from "../../src/webVitals.js";
-import { readSharedHabitId, shareAddress, sharedHabitTitle, SHARE_SOURCE } from "../../src/shareLink.js";
+import { readSharedHabitId, shareAddress, sharedHabitTitle, SHARE_SOURCE, startPath } from "../../src/shareLink.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { JUDGEMENT_HABITS } from "../../src/judgementHabit.js";
 import { fill } from "../../src/locale.js";
@@ -206,6 +206,15 @@ test("the shared address marks the card and names the habit by its id", () => {
   assert.equal(shareAddress("https://a.example", "<b>x</b>"), "https://a.example/?from=card", "only an id's shape is ever written");
   assert.equal(shareAddress("", "moth"), "");
   assert.equal(shareAddress(undefined), "");
+});
+
+test("an English or Japanese card shares that language's own start page (유입 1)", () => {
+  assert.equal(shareAddress("https://a.example", "moth", "en"), "https://a.example/en/?from=card&h=moth");
+  assert.equal(shareAddress("https://a.example/", "", "ja"), "https://a.example/ja/?from=card");
+  assert.equal(shareAddress("https://a.example", "moth", "ko"), "https://a.example/?from=card&h=moth");
+  assert.equal(shareAddress("https://a.example", "moth", "xx"), "https://a.example/?from=card&h=moth", "a language that is not one of ours is the Korean page");
+  assert.equal(startPath("en"), "/en/");
+  assert.equal(startPath(), "/");
 });
 
 test("the start page reads back only an id-shaped habit from a card's address", () => {

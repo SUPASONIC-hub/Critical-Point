@@ -7,6 +7,7 @@ import { findAudit } from "./auditRisk.js";
 import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
 import { SCOUT_TRUST } from "./tableRules.js";
+import { decisionWindowSeconds } from "./stakeClock.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -38,6 +39,10 @@ import { fill } from "../locale.js";
  * - on a table that counts B2's links, the line its reading carries for the
  *   board that opens (`said`, cascadeRisk.js: a new link, or one due next);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
+ * - the stake clock (B5, honest form): when the heat crosses a stake tier and
+ *   the window's clock is cut by its seconds -- or a cooling gives them back --
+ *   the heat, the seconds it moved and the seconds left, once per crossing,
+ *   so a listener hears what a sighted player sees the clock do;
  * - that a press let the held 확정 go too soon (길게 눌러야 확정된다), or that a
  *   screen reader's tap armed it and a second one seals it (useHoldConfirm);
  * - what a look (SCOUT) bought: the narrower band, once, as the button is spent;
@@ -70,7 +75,7 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * lapse in seconds -- then the clock's calls before the push's and the
  * stance's: a listener out of time has the least of it to lose.
  */
-const KIND_ORDER = Object.freeze({ status: -1, hold: 0, clock: 1, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
+const KIND_ORDER = Object.freeze({ status: -1, hold: 0, clock: 1, stakeClock: 1.5, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -91,6 +96,21 @@ export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { 
 
 /** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
 export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax, trust: SCOUT_TRUST });
+
+/**
+ * The stake clock's move (B5): the heat that moved it, the seconds the
+ * window's clock lost (`cut` > 0) or got back (`cut` < 0), and the seconds it
+ * now shows. Only what the HUD's clock already shows, in words.
+ */
+export const describeStakeClock = ({ gauge, cut, remaining }) =>
+  fill(cut > 0 ? voice().stakeClockCut : voice().stakeClockBack, { gauge: Math.round(gauge), cut: Math.abs(cut), seconds: Math.max(0, Math.ceil(remaining)) });
+
+/**
+ * The window's whole clock at its heat, on a board that has the stake clock
+ * (`stakeClock: true`, every board dealt since 2026-11-05), else null: an
+ * older board's flat clock never moves, so it has nothing to say.
+ */
+export const readWindowSeconds = (win) => (win?.schema?.stakeClock === true ? decisionWindowSeconds(win.gauge, win.schema) : null);
 
 /**
  * The table as it stands, when asked (E3, 「지금 상황 듣기」): the heat,
@@ -130,6 +150,9 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
     clock: getClockCall({ ...clock, live, paused: false }),
     hold: getHoldCall(hold),
     scout: band?.scouted ? describeScout(band) : "",
+    gauge: win.gauge,
+    remaining: clock.remaining,
+    windowSeconds: readWindowSeconds(win),
   };
 }
 
@@ -145,6 +168,9 @@ export function listTableCalls(before, after) {
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
   if (after.scout && after.scout !== before.scout) calls.push({ kind: "scout", text: after.scout });
+  if (after.windowSeconds !== null && before.windowSeconds !== null && before.windowSeconds !== undefined && after.windowSeconds !== before.windowSeconds) {
+    calls.push({ kind: "stakeClock", text: describeStakeClock({ gauge: after.gauge, cut: before.windowSeconds - after.windowSeconds, remaining: after.remaining }) });
+  }
   if (after.pushes > before.pushes) calls.push({ kind: "push", text: after.push });
   // A push said the line it landed on; a crossing with no push is the clock's or a cooling press's.
   else if (after.zone && before.zone && after.zone !== before.zone) calls.push({ kind: "wall", text: after.wall });
