@@ -695,7 +695,8 @@ const budgets = [
   // 209,357 / 76,215 -> 210,480 / 76,738 타이틀 로고 11-16 (#581): SVG 워드마크·이름 변경. Measured 210476 / 76734 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 213,209 / 77,612 N22 draft over main 705a809f. Measured 213205 / 77608 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 213,609 / 77,800 N16 draft over main 705a809f. Measured 213605 / 77796 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 213_609, maxGzip: 77_800 },
+  // 209,357 / 76,215 -> 209,736 / 76,349 N19 draft over main 705a809f. Measured 209732 / 76345 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 209_736, maxGzip: 76_349 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1222,7 +1223,8 @@ const budgets = [
   // 215,606 / 41,786 -> 216,101 / 41,898 a5-edge-alert: 위기 가장자리 알림 (A5), the comfort switch and its edge frame. Measured 216097 / 41894 (over budget only) in the e2e build, the plus 4.
   // 216,101 / 41,898 -> 216,432 / 42,019 ui-quickwins over main 60dc8551: the card key unseen until asked for, hairline briefing panels, the HUD's small print. Measured 216428 / 42015 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 217,076 / 42,142 N22 draft over main 705a809f. Measured 217072 / 42138 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 217_076, maxGzip: 42_142 },
+  // 216,432 / 42,019 -> 217,173 / 42,091 N19 draft over main 705a809f. Measured 217169 / 42087 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 217_173, maxGzip: 42_091 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1988,7 +1990,8 @@ const budgets = [
   // 194,641 / 65,117 -> 195,067 / 65,336 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 195063 / 65332 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,247 / 65,422 N22 draft over main 705a809f. Measured 195243 / 65418 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,261 / 65,409 N23 draft over main 705a809f. Measured 195257 / 65405 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_261, maxGzip: 65_409 },
+  // 195,067 / 65,336 -> 195,244 / 65,390 N19 draft over main 705a809f. Measured 195240 / 65386 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 195_244, maxGzip: 65_390 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2074,7 +2077,8 @@ const budgets = [
   // 162,433 / 58,148 -> 162,859 / 58,327 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 162855 / 58323 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 162,991 / 58,398 N22 draft over main 705a809f. Measured 162987 / 58394 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,032 / 58,396 N23 draft over main 705a809f. Measured 163028 / 58392 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_032, maxGzip: 58_396 },
+  // 162,859 / 58,327 -> 162,990 / 58,376 N19 draft over main 705a809f. Measured 162986 / 58372 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 162_990, maxGzip: 58_376 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2526,7 +2530,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 379,550 / 441,118 / 449,054 N22 draft over main 705a809f. Measured first paint, the plus 4.
 // -> 379,608 / 441,101 / 449,020 N16 draft over main 705a809f. Measured first paint, the plus 4.
 // -> 378,025 / 439,588 / 447,511 N23 draft over main 705a809f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_588, ja: 447_511 };
+// -> 378,290 / 439,832 / 447,757 N19 draft over main 705a809f. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 378_290, en: 439_832, ja: 447_757 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

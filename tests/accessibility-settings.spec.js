@@ -506,7 +506,7 @@ test("story mode is the comfort panel's first switch, kept across a reload, and 
   await expect(toggle).not.toBeChecked();
   await expect(page.getByRole("region", { name: "편의 설정" }).getByRole("checkbox").first()).toHaveAccessibleName(/^스토리 모드/);
   await expect(page.locator(".accessibility-toggle").first().locator("small")).toHaveText(
-    "벽이 멀어지고, 벽에 닿은 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
+    "벽이 멀어지고, 벽에 닿은 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 시작 전에 켜면 첫 사건부터, 사건 중에 켜면 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
   );
   // The drawer of pledges: three cards, and a sentence that points to the switch.
   await expect(styles.getByRole("button")).toHaveCount(3);
@@ -555,6 +555,33 @@ test("the story switch is reached and flipped from the keyboard", async ({ page 
   await page.keyboard.press("Space");
   await expect(toggle).not.toBeChecked();
   expect((await storedSettings(page)).storyMode).toBe(false);
+});
+
+// N19 (2026-11-16): the start screen's second door. One press turns the
+// switch on and starts the season, and the season's first case is already a
+// story case -- the setting is read at the press, not from the next case.
+test("「이야기로 시작」 starts the first case in story mode and leaves the switch on", async ({ page }) => {
+  await page.goto("/");
+  const door = page.getByTestId("start-story-mode");
+  await expect(door).toHaveText("이야기로 시작쉬움 · 랭킹 밖");
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  expect((await storedSettings(page))?.storyMode ?? false).toBe(false);
+  await door.click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-stage")).toBeVisible();
+  expect((await storedSettings(page)).storyMode).toBe(true);
+  await expect.poll(async () => (await savedRun(page))?.dynamics?.story ?? null, { message: "the first case is stamped a story case" }).toBe(true);
+  expect((await savedRun(page)).currentCase).toBe(seasonCasesBase[0].id);
+});
+
+test("「프롤로그 시작」 leaves story mode off on a device that never turned it on", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("start-first-case").click();
+  await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
+  await dismissProtocolBreach(page);
+  await expect(page.getByTestId("gauntlet-stage")).toBeVisible();
+  await expect.poll(async () => (await savedRun(page))?.dynamics?.story ?? null).toBe(false);
 });
 
 test("a case opened in story mode stands its wall at 88 to 98 and runs its clock at half speed", async ({ page }) => {

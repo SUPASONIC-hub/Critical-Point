@@ -830,6 +830,38 @@ summary:focus-visible {
   outline-offset: 3px;
   border-radius: 4px;
 }
+/* N19: the second door (스토리 모드 from the first case) reads as a quiet line
+   beside the briefing link, not a second slab: the acid button stays the only
+   primary action on the stage. */
+.intro-launch button.intro-story-start {
+  min-height: 44px;
+  padding: 0 4px;
+  gap: 8px;
+  color: var(--ui-text);
+  background: none;
+  box-shadow: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 7px;
+}
+.intro-launch button.intro-story-start::after {
+  content: none;
+}
+.intro-launch button.intro-story-start small {
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.intro-launch button.intro-story-start:hover:not(:disabled),
+.intro-launch button.intro-story-start:focus-visible {
+  transform: none;
+  color: var(--ui-accent);
+  background: none;
+  box-shadow: none;
+  text-decoration-color: var(--ui-accent);
+}
 /* 기기 간 이어하기: one folded line under the primary action. */
 .cloud-save-panel {
   width: min(100%, 580px);
