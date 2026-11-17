@@ -28,6 +28,7 @@ import path from "node:path";
 import { CHECKS } from "./verify-static.mjs";
 import { importClosure, isTextOnlyChange, planChecks } from "./check-changed-rules.mjs";
 import { poolOptions, readScripts, runPool } from "./check-pool.mjs";
+import { CASE_DOCS, caseIdsOf } from "./case-kit.mjs";
 
 const root = process.cwd();
 const argv = process.argv.slice(2);
@@ -143,11 +144,23 @@ const tasks = [
   ...(actionlintTask ? [actionlintTask] : []),
 ];
 
+// check:case (N29): writing-a-case.md's checklist for the case files this
+// branch touched, and the case documents pasted twice. Warnings only: it runs
+// after the pool, prints, and never moves the exit code.
+const caseIds = caseIdsOf(files);
+const caseDocs = files.some((file) => CASE_DOCS.includes(file));
+const caseArgs = caseIds.length ? caseIds : caseDocs ? ["--docs-only"] : null;
+if (caseArgs) console.log(`\ncheck:case (warnings only, not counted): ${caseIds.length ? caseIds.join(", ") : "the case documents"}`);
+
 if (dryRun) {
-  console.log(`\n--dry-run: ${tasks.length} task(s) would run: ${tasks.map((task) => task.name).join(", ")}.`);
+  console.log(`\n--dry-run: ${tasks.length} task(s) would run: ${tasks.map((task) => task.name).join(", ")}${caseArgs ? ", then check:case (warnings only)" : ""}.`);
   process.exit(0);
 }
 console.log("");
 const { jobs, timeoutMs } = poolOptions(argv, tasks.length);
 const failed = await runPool(tasks, { root, jobs, timeoutMs, label: "check:changed" });
+if (caseArgs) {
+  console.log("");
+  spawnSync(process.execPath, ["scripts/check-case.mjs", ...caseArgs], { cwd: root, stdio: "inherit" });
+}
 process.exitCode = failed.length ? 1 : 0;
