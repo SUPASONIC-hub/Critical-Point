@@ -114,6 +114,8 @@ export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed
  * is where every device starts.
  */
 export const WEEKLY_REMINDER_KEY = "critical-point-weekly-reminder-v1";
+// What this device last told the server (state/weeklyReminderPush.js): endpoint, language and week, as JSON.
+export const WEEKLY_REMINDER_SYNC_KEY = "critical-point-weekly-reminder-sync-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

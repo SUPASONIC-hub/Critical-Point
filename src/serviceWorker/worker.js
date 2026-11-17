@@ -73,36 +73,29 @@ export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|cont
 export const LANGUAGE_START = /^\/(?:en|ja)\/(?:index\.html)?$/;
 
 /**
- * 주 1회 알림 (N25, state/weeklyReminder.js). The page hands over the weeks
- * to remind of in its own words (`plan`: week, startMs, title, body) and the
- * week it was last opened in (`seen`); the worker keeps them in a cache of
- * their own -- not named with CACHE_PREFIX, so a new release does not delete
- * it -- and remembers the last week it reminded of (`shown`). When the
- * browser wakes it (`periodicsync`, REMINDER_TAG) it shows at most one
- * notification, for the week it is in, unless the app was opened in that
- * week or it has reminded of that week already.
+ * 주 1회 알림 (N25, state/weeklyReminder.js): a Web Push message from the
+ * weekly sender (scripts/send-weekly-push.mjs), `{title, body, url}` already
+ * in the player's language. A push is always shown -- iOS takes the
+ * subscription back from a site whose pushes show nothing -- so a message
+ * without a usable title still shows the game's name. A tap opens the game:
+ * the open window if there is one, else the start page the message names.
  */
 export const REMINDER_TAG = "cp-weekly-rule";
-export const REMINDER_CACHE = "cp-weekly-reminder-v1";
-export const REMINDER_URL = "/__weekly-reminder.json";
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const START_PAGE = /^\/(?:(?:en|ja)\/)?$/;
 
-/** The plan entry to remind of at `now`, or null. Pure: the unit tests hand it a state. */
-export function dueReminder(state, now) {
-  const plan = Array.isArray(state?.plan) ? state.plan : [];
-  const entry = plan.find((item) => Number.isFinite(item?.startMs) && now >= item.startMs && now < item.startMs + WEEK_MS);
-  if (!entry || typeof entry.title !== "string" || !entry.title) return null;
-  if (entry.week === state.seen || entry.week === state.shown) return null;
-  return entry;
-}
-
-/** What a page's message makes of the kept state: its plan and week, and the week already reminded of. */
-export function nextReminderState(state, message) {
-  const plan = Array.isArray(message?.plan) ? message.plan.slice(0, 20) : [];
-  const seen = typeof message?.seen === "string" ? message.seen : null;
-  // Turned off (an empty plan and no week): nothing is kept, not even what was shown.
-  if (!plan.length && seen === null) return { plan: [], seen: null, shown: null };
-  return { plan, seen, shown: typeof state?.shown === "string" ? state.shown : null };
+/** What a push's data becomes on screen. Pure: the unit tests hand it data. */
+export function pushNotice(data) {
+  const title = typeof data?.title === "string" && data.title.trim() ? data.title.slice(0, 120) : "CRITICAL POINT";
+  return {
+    title,
+    options: {
+      body: typeof data?.body === "string" ? data.body.slice(0, 400) : "",
+      tag: REMINDER_TAG,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/favicon-32.png",
+      data: { url: typeof data?.url === "string" && START_PAGE.test(data.url) ? data.url : "/" },
+    },
+  };
 }
 
 export function cacheNameFor(release) {
@@ -310,36 +303,6 @@ export function installWorker(scope, config) {
     else if (strategy === "immutable") event.respondWith(answerImmutable(event.request, keep));
     else event.respondWith(answerRevalidated(event.request, keep));
   });
-  async function readReminder() {
-    try {
-      const cache = await scope.caches.open(REMINDER_CACHE);
-      const answer = await cache.match(REMINDER_URL);
-      return answer ? await answer.json() : null;
-    } catch {
-      return null;
-    }
-  }
-  async function writeReminder(state) {
-    const cache = await scope.caches.open(REMINDER_CACHE);
-    await cache.put(REMINDER_URL, new Response(JSON.stringify(state), { headers: { "content-type": "application/json" } }));
-  }
-
-  /** Shows the week's reminder if one is due (`dueReminder`). Resolves to whether it did. */
-  async function remind(now = Date.now()) {
-    const state = await readReminder();
-    const entry = dueReminder(state, now);
-    if (!entry || typeof scope.registration?.showNotification !== "function") return false;
-    await scope.registration.showNotification(entry.title, {
-      body: typeof entry.body === "string" ? entry.body : "",
-      tag: REMINDER_TAG,
-      icon: "/icons/icon-192.png",
-      badge: "/icons/favicon-32.png",
-      data: { url: "/" },
-    });
-    await writeReminder({ ...state, shown: entry.week });
-    return true;
-  }
-
   /** A tap on the reminder: the open app if there is one, a new window on the start page if not. */
   async function openApp(url) {
     const windows = await scope.clients.matchAll({ type: "window", includeUncontrolled: true });
@@ -348,8 +311,15 @@ export function installWorker(scope, config) {
     return scope.clients.openWindow?.(url);
   }
 
-  scope.addEventListener("periodicsync", (event) => {
-    if (event.tag === REMINDER_TAG) event.waitUntil(remind().catch(() => false));
+  scope.addEventListener("push", (event) => {
+    let data;
+    try {
+      data = event.data?.json() ?? null;
+    } catch {
+      data = { body: event.data?.text?.() ?? "" };
+    }
+    const { title, options } = pushNotice(data);
+    event.waitUntil(scope.registration.showNotification(title, options));
   });
   scope.addEventListener("notificationclick", (event) => {
     if (event.notification?.tag !== REMINDER_TAG) return;
@@ -357,14 +327,6 @@ export function installWorker(scope, config) {
     event.waitUntil(openApp(event.notification.data?.url ?? "/").catch(() => {}));
   });
   scope.addEventListener("message", (event) => {
-    if (event.data?.type === "reminder-plan") {
-      event.waitUntil(
-        readReminder()
-          .then((state) => writeReminder(nextReminderState(state, event.data)))
-          .catch(() => {}),
-      );
-      return;
-    }
     if (event.data?.type !== "warm") return;
     event.waitUntil(
       warm().then((complete) => {
@@ -373,5 +335,5 @@ export function installWorker(scope, config) {
     );
   });
 
-  return { install, activate, warm, remind };
+  return { install, activate, warm };
 }

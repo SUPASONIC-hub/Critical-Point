@@ -17,9 +17,9 @@ if (readStoredValue(CLOUD_SAVE_ENABLED_KEY, "0") === "1") {
 }
 
 // 주 1회 알림 (N25) is opt-in too: only a device that turned it on fetches the
-// code that hands the service worker this week's plan, after `load`.
+// code that hands its push subscription to the server again, after `load`.
 if (readStoredValue(WEEKLY_REMINDER_KEY, "0") === "1") {
-  const syncReminder = () => import("./state/weeklyReminderPlan.js").then(({ syncReminderOnOpen }) => syncReminderOnOpen()).catch(() => {});
+  const syncReminder = () => import("./state/weeklyReminderPush.js").then(({ refreshReminderOnOpen }) => refreshReminderOnOpen()).catch(() => {});
   if (document.readyState === "complete") syncReminder();
   else window.addEventListener("load", syncReminder, { once: true });
 }

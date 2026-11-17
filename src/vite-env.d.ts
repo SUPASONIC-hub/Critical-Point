@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   readonly VITE_SUPABASE_ANON_KEY?: string;
   readonly VITE_ENABLE_DEBUG_TOOLS?: string;
+  // 주 1회 알림 (N25): the Web Push public key; without it the switch is not offered.
+  readonly VITE_VAPID_PUBLIC_KEY?: string;
 }
 
 // Written by the bundler (`define` in vite.config.js); absent under Node.

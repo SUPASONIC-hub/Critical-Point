@@ -291,6 +291,8 @@ const RECHECK_SEEN = files.some((file) => file.endsWith("_ranking_recheck_seen.s
 // The hall of fame (D2, `*_hall_of_fame.sql`): its cases run once it is among the files.
 const HALL_OF_FAME = files.some((file) => file.endsWith("_hall_of_fame.sql"));
 const BOARD_ADMINS = files.some((file) => file.endsWith("_board_admins.sql"));
+// 주 1회 알림's push subscriptions (N25, `*_push_subscriptions.sql`): its cases run once it is among the files.
+const PUSH_SUBSCRIPTIONS = files.some((file) => file.endsWith("_push_subscriptions.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -432,6 +434,8 @@ const CLIENT_FUNCTIONS = {
     "scene_bust_rates", "scene_choice_rates",
     // The ranking policy calls it as anon: whether marked rows are hidden.
     ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
+    // 주 1회 알림 (N25): a device adds or removes its own push subscription, by its endpoint.
+    ...(PUSH_SUBSCRIPTIONS ? ["push_subscribe", "push_unsubscribe"] : []),
   ],
   // The board's two makers, signed in (20261118000000_board_admins.sql); each
   // refuses anyone `is_board_admin()` does not name.
@@ -3023,6 +3027,7 @@ const UPDATE_PROBE = {
   scene_choice_stats: "picks = picks",
   weekly_rules: "rule_id = rule_id",
   ...(HALL_OF_FAME ? { hall_of_fame: "score = score", hall_of_fame_boards: "checked_seasons = checked_seasons" } : {}),
+  ...(PUSH_SUBSCRIPTIONS ? { push_subscriptions: "language = language" } : {}),
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -3624,6 +3629,52 @@ if (BOARD_ADMINS) {
   await signIn("");
   await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[first, second]]);
   await db.query(`delete from public.board_admin_log`);
+}
+
+// ---- 주 1회 알림's push subscriptions (N25, *_push_subscriptions.sql)
+//
+// anon adds a subscription and refreshes it by its endpoint, removes it by
+// its endpoint, and can neither read the table nor reach it any other way; a
+// push service the table does not know, or a key that is not one, is
+// refused. The weekly sender's read and its after-run write
+// (scripts/send-weekly-push.mjs) run as the service role on this schema.
+if (PUSH_SUBSCRIPTIONS) {
+  const endpoint = "https://fcm.googleapis.com/fcm/send/grants-check:APA91b-x_y";
+  const p256dh = `B${"A".repeat(86)}`;
+  const auth = "QUJDREVGR0hJSktMTU5PUA";
+  const subscribe = (point, key = p256dh, secret = auth, language = "ko") =>
+    `select public.push_subscribe('${point}', '${key}', '${secret}', '${language}') as ok`;
+  const rows = async () => (await db.query(`select id, endpoint, language from public.push_subscriptions order by id`)).rows;
+
+  await allowed("subscribe to the weekly reminder", "anon", subscribe(endpoint));
+  await allowed("subscribe again in another language", "anon", subscribe(endpoint, p256dh, auth, "ja"));
+  const kept = await rows();
+  check(kept.length === 1 && kept[0].language === "ja", `two subscribes of one endpoint left ${JSON.stringify(kept)}; one row, in the second language.`);
+  await allowed("subscribe from Apple's push service", "anon", subscribe("https://web.push.apple.com/QGrants-check"));
+  await raises("subscribe an endpoint on no known push service", "anon", subscribe("https://evil.example/push"), [], /^23514 /);
+  await raises("subscribe a plain http endpoint", "anon", subscribe("http://fcm.googleapis.com/fcm/send/x"), [], /^23514 /);
+  await raises("subscribe with a key that is not one", "anon", subscribe(endpoint, "short"), [], /^23514 /);
+  await raises("subscribe in a language the game has not", "anon", subscribe(endpoint, p256dh, auth, "fr"), [], /invalid push subscription/);
+  await refused("read the push subscriptions", "anon", `select * from public.push_subscriptions`);
+  await refused("insert a push subscription directly", "anon", `insert into public.push_subscriptions (endpoint, p256dh, auth) values ('${endpoint}x', '${p256dh}', '${auth}')`);
+
+  const { subscriptionsQuery, afterSql } = await import("./send-weekly-push.mjs");
+  const crisis = Date.parse("2026-12-01T08:00:00+09:00");
+  const due = (await allowed("read the subscriptions to send to", "service_role", subscriptionsQuery(crisis)))?.rows ?? [];
+  check(due.length === 2, `the weekly sender's read found ${due.length} rows; the two subscriptions.`);
+  const [fcm, apple] = due.map((row) => Number(row.id));
+  // One statement a line; the CLI runs them as one file, PGlite's prepared statements one at a time.
+  for (const statement of afterSql({ sent: [fcm], gone: [apple] }, crisis).split("\n").filter(Boolean)) {
+    await allowed("mark the sent rows and delete the gone ones", "service_role", statement);
+  }
+  const again = (await allowed("read the subscriptions after a run", "service_role", subscriptionsQuery(crisis)))?.rows ?? [];
+  check(again.length === 0 && (await rows()).length === 1, `after a run the read found ${again.length} rows and the table holds ${(await rows()).length}; none to send again, one left.`);
+
+  const gone = await allowed("unsubscribe from the weekly reminder", "anon", `select public.push_unsubscribe('${endpoint}') as ok`);
+  check(gone?.rows[0]?.ok === true && (await rows()).length === 0, "push_unsubscribe left the subscription.");
+  const twice = await allowed("unsubscribe twice", "anon", `select public.push_unsubscribe('${endpoint}') as ok`);
+  check(twice?.rows[0]?.ok === false, "a second push_unsubscribe reported a row.");
+  await db.query(`delete from public.telemetry_rate_limits where actor_key like 'global:push-%' or actor_key like 'push-%'`);
 }
 
 // ---- retention runs as the service role and reaches every table

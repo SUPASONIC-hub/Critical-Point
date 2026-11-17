@@ -1,8 +1,8 @@
 /** src/copy/reminder.js in English: the weekly reminder's switch and its notification. */
 export default {
   label: "Weekly reminder · Rule of the Week",
-  text: "In a week with a rule, if you haven’t opened the game yet that week, you get one reminder. It starts off, and you can turn it off here any time. This setting stays on this device and is never sent to a server.",
+  text: "On the Monday morning of a week with a rule, you get one reminder of that week’s rule. It starts off, and you can turn it off here any time. Turning it on stores this browser’s notification address (its push subscription) on our server only to send the reminder; turning it off deletes it.",
   denied: "Notifications for this site are blocked in your browser. Allow them in the browser’s settings, then turn this on again.",
-  openOnly: "This device can’t check while the app is closed, so a reminder may come late or not at all.",
+  failed: "The reminder couldn’t be turned on. Check your connection and try again in a moment.",
   title: "Rule of the Week: {label}",
 };
