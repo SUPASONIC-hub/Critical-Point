@@ -571,7 +571,11 @@ test("「이야기로 시작」 starts the first case in story mode and leaves t
   await dismissProtocolBreach(page);
   await expect(page.getByTestId("gauntlet-stage")).toBeVisible();
   expect((await storedSettings(page)).storyMode).toBe(true);
-  await expect.poll(async () => (await savedRun(page))?.dynamics?.story ?? null, { message: "the first case is stamped a story case" }).toBe(true);
+  // The save 시작 writes is the shell's (shellStartSave.js): its table is
+  // null until the first hand is saved, and the runtime lays the opening
+  // table from the setting as it loads it. So the mark is read off the table
+  // the case is played on: the story wall.
+  await expect(page.locator(WALL_BAND), "the first case is played as a story case").toHaveText(FAR_WALL);
   expect((await savedRun(page)).currentCase).toBe(seasonCasesBase[0].id);
 });
 
@@ -581,7 +585,8 @@ test("「프롤로그 시작」 leaves story mode off on a device that never tur
   await expect(page.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
   await dismissProtocolBreach(page);
   await expect(page.getByTestId("gauntlet-stage")).toBeVisible();
-  await expect.poll(async () => (await savedRun(page))?.dynamics?.story ?? null).toBe(false);
+  await expect(page.locator(WALL_BAND)).toHaveText(/^벽 \d+–\d+(?: · |$)/);
+  await expect(page.locator(WALL_BAND)).not.toHaveText(FAR_WALL);
 });
 
 test("a case opened in story mode stands its wall at 88 to 98 and runs its clock at half speed", async ({ page }) => {
