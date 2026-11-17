@@ -1764,7 +1764,8 @@ const budgets = [
   // 5,054 / 2,504 -> 5,173 / 2,553 묶음 11-17 over main 705a809f. Measured 5169 / 2549 (over budget only) in the e2e build, the plus 4.
   // 5,054 / 2,504 -> 5,173 / 2,553 묶음 11-17 over main 705a809f. Measured 5169 / 2549 (over budget only) in the e2e build, the plus 4.
   // 5,054 / 2,504 -> 5,173 / 2,553 묶음 11-17 over main 705a809f. Measured 5169 / 2549 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_173, maxGzip: 2_553 },
+  // 5,173 / 2,553 -> 5,173 / 2,558 묶음 11-17 CI 수정 뒤 실측 +4 (ecc6b3a5). Measured - / 2554 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_173, maxGzip: 2_558 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
