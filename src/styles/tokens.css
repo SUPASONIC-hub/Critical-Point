@@ -96,7 +96,8 @@
   --c-acid-deep: rgb(14 74 46);
   --c-sky: rgb(20 82 160);
   --c-amber: rgb(132 88 0);
-  --c-focus-ring: rgb(138 180 255);
+  /* Blue ink: 6.6:1 on the paper, 3:1 asked of a focus ring. */
+  --c-focus-ring: rgb(20 82 160);
   --c-ink-raised: rgb(36 48 46);
   --c-teal-deep: rgb(44 74 70);
   --c-green-deep: rgb(29 78 63);
@@ -153,7 +154,7 @@
   --c-gx-rare-a60: rgb(100 60 170 / 0.55);
 
   /* semantic aliases referenced by components */
-  --color-line: var(--c-line);
+  --color-line: var(--ui-line-field);
   --color-muted: var(--c-ink-muted);
   --color-accent: var(--c-acid);
   /* Named for the night it began in: the ledger prints it in ink. */
