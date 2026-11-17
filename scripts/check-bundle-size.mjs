@@ -2714,7 +2714,8 @@ function checkBudget(file, budget) {
 // -> 11,151 / 3,997 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551, the plus 4.
 // -> 11,085 / 3,980 브랜드 로고 11-16: favicon.svg 링크·사전 캐시, the plus 4.
 // -> 11,172 / 4,002 묶음 11-16b 최종 (+#576 #578) over main 6fef686f, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_172, maxGzip: 4_002 };
+// -> 11,184 / 4,002 앱 아이콘 이름 -v2 11-17: 아이콘 링크·사전 캐시 이름이 길어짐, the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_184, maxGzip: 4_002 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
