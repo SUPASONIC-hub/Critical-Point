@@ -643,48 +643,89 @@ const TERMS_JA = `
 `;
 
 
+/**
+ * The plain pages' look (2026-11-18, 2안 「감사 장부」, with the game's own
+ * screens on branch ui-polish): an audit ledger. Cream paper ruled in faint
+ * blue with a red margin line, ink type, a red pencil for the small capitals
+ * over a heading, headings under a double rule, the button a rubber stamp in
+ * the game's green, and every picture a photograph taped to the page. The
+ * colours are the game's own (--sk-paper*, --sk-pencil, --sk-stamp in
+ * src/styles/tokens.css); each text colour clears 4.5:1 on both papers
+ * (tests/legal-pages.spec.js runs axe's color-contrast on every page). The
+ * pages keep the system faces, so they fetch no font.
+ */
 const PAGE_STYLE = `
-:root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
+:root{color-scheme:light;--bg:#f7f2e6;--surface:#fdfbf5;--surface-2:#eee7d6;--line:#16181a29;--line-strong:#16181a57;--text:#16181a;--text-2:#3e3c38;--accent:#16603e;--pencil:#b0261e;--rule:#46649629;--margin:#d6463c80;--tape:#fff8c8b3;--shadow:#4632141f;--shadow-2:#46321438;--mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
+html{background:var(--bg)}
+body{margin:0;background:linear-gradient(90deg,transparent max(7px,calc(50% - 397px)),var(--margin) 0 calc(max(7px,calc(50% - 397px)) + 1px),transparent 0),repeating-linear-gradient(180deg,transparent 0 27px,var(--rule) 27px 28px),var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
 header,main,footer{width:min(760px,100%);margin:0 auto;padding:0 16px}
 header{padding-top:24px}
 footer{margin-top:48px;padding-bottom:72px;font-size:.875rem}
-.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--bg)}
+.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--text);border-radius:3px;background:var(--surface)}
 .skip:focus{top:12px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+:focus-visible{outline:2px solid var(--pencil);outline-offset:3px;border-radius:2px}
 main:focus{outline:0}
-nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
+nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:4px double var(--text);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
-nav a[aria-current]{color:var(--text);text-decoration:none}
+nav a[aria-current]{color:var(--text);font-weight:700;text-decoration:underline 2px var(--pencil)}
 a{color:var(--accent);text-underline-offset:4px}
-h1{margin:32px 0 4px;font-size:clamp(1.625rem,5vw,2.25rem);line-height:1.2;letter-spacing:-.02em}
-h2{margin:36px 0 8px;font-size:1.1875rem;line-height:1.4}
+h1{margin:32px 0 4px;font-size:clamp(1.625rem,5vw,2.25rem);font-weight:900;line-height:1.2;letter-spacing:-.02em}
+h2{margin:36px 0 8px;font-size:1.1875rem;font-weight:800;line-height:1.4}
 h3{margin:22px 0 6px;font-size:1rem;line-height:1.5;color:var(--text)}
 p,li,dd{color:var(--text-2)}
 ul,ol{padding-left:1.4em}
 li{margin:4px 0}
+li::marker{color:var(--pencil)}
 li ul{margin:4px 0}
 dd{margin:0 0 4px}
-.effective{margin:0;color:var(--text-2);font-size:.875rem}
+.effective{margin:0;color:var(--text-2);font-size:.875rem;font-family:var(--mono)}
 strong{color:var(--text)}
 .credit{display:flex;align-items:center;gap:12px;margin-top:16px}
-.credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
+.credit img{flex:none;width:46px;height:46px;object-fit:cover;border:3px solid var(--surface);border-radius:2px;box-shadow:0 2px 6px var(--shadow-2);transform:rotate(-3deg)}
 .credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
-.credit dt{color:var(--text-2);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
+.credit dt{color:var(--pencil);font-family:var(--mono);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
 .credit dd{margin:0;color:var(--text);font-weight:700}
 .credit-mail{flex-basis:100%}
 .credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
 .credit-mail a{display:inline-flex;align-items:center;min-height:32px}
-.hero{margin:20px 0 8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.hero{margin:24px 0 8px}
+.photo{position:relative;margin:8px 4px 0;border:6px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 10px 22px var(--shadow-2);transform:rotate(-1deg)}
+.photo::before{content:"";position:absolute;z-index:1;top:-14px;left:calc(50% - 44px);width:88px;height:22px;background:var(--tape);box-shadow:0 1px 2px var(--shadow);transform:rotate(2deg)}
 .hero img{display:block;width:100%;height:auto;max-height:320px;aspect-ratio:16/9;object-fit:cover}
-.hero-text{position:relative;padding:20px}
-.hero img+.hero-text{margin-top:-72px;padding-top:40px;background:linear-gradient(to bottom,transparent,var(--surface) 64px)}
-.eyebrow{margin:0;color:var(--accent);font-size:.75rem;font-weight:700;letter-spacing:.16em}
-.hero h1{margin:6px 0 12px}
-.cta{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:999px;background:var(--accent);color:var(--bg);font-weight:700;text-decoration:none}
-.cta:hover{filter:brightness(1.08)}
-main>h2,main>section>h2{padding-left:12px;border-left:3px solid var(--accent)}
+.hero-text{padding:20px 0 4px}
+.eyebrow{margin:0;color:var(--pencil);font-family:var(--mono);font-size:.75rem;font-weight:800;letter-spacing:.14em}
+.hero h1{width:fit-content;max-width:100%;margin:6px 0 16px;padding-bottom:6px;border-bottom:4px solid var(--pencil)}
+.cta{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border:2px solid var(--text);border-radius:4px;background:var(--accent);box-shadow:0 4px 0 var(--text);color:var(--surface);font-weight:800;text-decoration:none;transition:transform .14s ease,box-shadow .14s ease}
+.cta:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--text)}
+.cta:active{transform:translateY(4px);box-shadow:none}
+main>h2,main>section>h2{padding-top:10px;border-top:4px double var(--text)}
+@media (prefers-reduced-motion:reduce){.cta{transition:none}.cta:hover,.cta:active{transform:none}}
+`;
+
+/**
+ * The ledger over the about page's showcase (scripts/content-pages/about-showcase.mjs),
+ * written after the showcase's own style so it wins at the same weight: the key visual
+ * becomes a photograph taped to the page above the logo (on a phone the 4:3 cut still
+ * shows the analyst on the right), the cards ledger slips with a red margin, the
+ * screens photographs on a band of darker paper between double rules.
+ */
+const SHOWCASE_PAPER_STYLE = `
+.sc-hero{position:relative;overflow:visible;padding:28px 16px 0;background:none}
+.sc-hero::before{content:"";position:absolute;z-index:2;top:14px;left:calc(50% - 50px);width:100px;height:24px;background:var(--tape);box-shadow:0 1px 2px var(--shadow);transform:rotate(-2deg)}
+.sc-key{width:min(728px,100%);margin:0 auto;border:8px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 14px 30px var(--shadow-2);transform:rotate(-1deg)}
+.sc-hero-text{margin:0 auto;padding:28px 16px 32px;background:none}
+.sc-hero h1{color:var(--pencil);font-family:var(--mono);font-weight:800}
+.sc-tagline,.sc-lede{color:var(--text)}
+.sc-cards li{padding-left:24px;border:1px solid var(--line-strong);border-radius:3px;background:linear-gradient(90deg,transparent 11px,var(--margin) 11px 12px,transparent 12px),var(--surface);box-shadow:2px 3px 0 var(--shadow)}
+.sc-band{background:var(--surface-2);border-top:4px double var(--text);border-bottom:4px double var(--text)}
+.sc-band h2{border-top:0}
+.sc-demo img,.sc-shots img{border:6px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 10px 22px var(--shadow-2)}
+.sc-demo img{transform:rotate(1deg)}
+.sc-shots figure:nth-child(odd) img{transform:rotate(-1.5deg)}
+.sc-shots figure:nth-child(even) img{transform:rotate(1.5deg)}
+.sc-quote{border-left:3px solid var(--pencil);border-radius:0;background:var(--surface)}
+@media (min-width:760px){.sc-hero{padding-top:36px}.sc-hero::before{top:22px}.sc-key{aspect-ratio:16/9;object-position:50% 60%}}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -734,7 +775,7 @@ const PLAY = { ko: "지금 무료로 플레이", en: "Play free now", ja: "無�
 function heroBlock({ kind, language, name }) {
   const art = heroArt(kind);
   const picture = art
-    ? `<img src="/${art}-960.webp" srcset="/${art}-480.webp 480w, /${art}-960.webp 960w" sizes="(max-width: 760px) 100vw, 728px" width="960" height="540" alt="" decoding="async" />
+    ? `<div class="photo"><img src="/${art}-960.webp" srcset="/${art}-480.webp 480w, /${art}-960.webp 960w" sizes="(max-width: 760px) 100vw, 728px" width="960" height="540" alt="" decoding="async" /></div>
 `
     : "";
   const start = language === "ko" ? "/" : `/${language}/`;
@@ -855,7 +896,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
 ${structuredData ? `${structuredData}
-` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}${hero ? SHOWCASE_PAPER_STYLE.trim().replace(/\n/g, "") : ""}</style>
 ${tags}</head>
 <body>
 <a class="skip" href="#main">${copy.skip}</a>
