@@ -15,7 +15,8 @@
  * the first time the case is opened. A release lists 번외 1 (side01, 2025년 12월
  * 20일 토요일), 번외 2 (side02, 2026년 1월 9일 금요일), 번외 3 (side03, 2025년 11월 8일 토요일), 번외
  * 4 (side04, 2025년 12월 11일 목요일), 번외 5 (side05, 2026년 2월 12일 목요일), 번외 6 (side06,
- * 2026년 5월 8일 금요일), 번외 7 (side07, 2026년 6월 12일 금요일) and 번외 8 (side08, 2026년 7월 10일 금요일) since their pull
+ * 2026년 5월 8일 금요일), 번외 7 (side07, 2026년 6월 12일 금요일), 번외 8 (side08, 2026년 7월 10일 금요일) and 번외 9 (side09,
+ * 2026년 8월 13일 목요일) since their pull
  * requests; the slot is hidden while the list is empty (설계안 질문 7 (1)).
  *
  * `side00` is the framework's placeholder, not a case: it exists so the slot,
@@ -45,6 +46,7 @@ export const SIDE_CASES = Object.freeze([
   { id: "side06", label: "번외 6", title: "보증금", load: () => import("./side06.js").then(({ side06 }) => localizeSidePack(side06)) },
   { id: "side07", label: "번외 7", title: "금요일 17시 58분", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
   { id: "side08", label: "번외 8", title: "정상화", load: () => import("./side08.js").then(({ side08 }) => localizeSidePack(side08)) },
+  { id: "side09", label: "번외 9", title: "92일", load: () => import("./side09.js").then(({ side09 }) => localizeSidePack(side09)) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => localizeSidePack(side00)) }]
     : []),
