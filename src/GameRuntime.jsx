@@ -869,7 +869,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     renderDecisionReveal,
     renderRecoveryNotice,
     renderSaveStatus,
-    renderErrorLogPanel,
+    renderErrorLogPanel, renderActProgress,
   } = useRuntimeRenderers({
     decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
     lastRecoveredError, started, pauseAfterRecovery: lifecycle.pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
@@ -940,7 +940,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     seasonGoals, delayedConsequences, showErrorLog, setShowErrorLog, operationsSnapshot,
   });
   if (isResult) {
-    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel };
+    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderActProgress };
     return (
       <LazyScreen quiet>
         <ResultScreen view={resultView} renderers={renderers} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} />

@@ -5,6 +5,7 @@ export default {
     case01: "End of the Prologue",
     case19: "End of Act 3 · Case 18",
     case37: "End of Act 6 · Case 36",
+    case08: "End of Act 1 · Case 07",
   },
   habit: "Your judging type so far",
   habitPending: "A judgment not yet named",

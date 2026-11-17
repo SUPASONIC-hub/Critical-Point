@@ -470,3 +470,36 @@ test("the buttons wait for the card, say when it could not be made, and a press 
   await expectCardFile(page, download);
   expect(await page.evaluate(() => window.__card.asked)).toBe(2);
 });
+
+// N23 (2026-11-16): the report of 사건 01 to 17 says where it stands in its act
+// and how far the next 중간 결산 is; 사건 07's, at the end of 1막, carries the N1
+// tally in its small form -- the three rows, no note and no share buttons.
+async function closeDebugCaseToReport(page, caseId, nodeId) {
+  await startDebugNode(page, caseId, nodeId);
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: 30_000 });
+}
+
+test("사건 03's report says 1막 · 3/7 and how far the 중간 결산 is, with no tally", async ({ page }) => {
+  test.setTimeout(120_000);
+  await closeDebugCaseToReport(page, "case03", "c3_aftershock");
+  await expect(page.getByTestId("act-progress")).toHaveText("1막 · 3/7 · 중간 결산까지 4사건");
+  await expect(page.getByTestId("act-tally")).toHaveCount(0);
+});
+
+test("사건 07's report closes 1막 with the small 중간 결산", async ({ page }) => {
+  test.setTimeout(120_000);
+  await closeDebugCaseToReport(page, "case07", "c7_aftershock");
+  await expect(page.getByTestId("act-progress")).toHaveText("1막 · 7/7 · 중간 결산은 아래에");
+  const tally = page.getByTestId("act-tally");
+  await expect(tally).toBeVisible();
+  await expect(tally.getByRole("heading")).toHaveText("중간 결산 · 1막 끝 · 사건 07");
+  await expect(tally.getByTestId("act-tally-habit")).not.toBeEmpty();
+  await expect(tally.getByTestId("act-tally-ending")).not.toBeEmpty();
+  await expect(tally.locator(".gx-tally-note")).toHaveCount(0);
+  await expect(tally.getByRole("button")).toHaveCount(0);
+  const results = await new AxeBuilder({ page }).include("[data-testid='act-tally']").analyze();
+  expect(results.violations).toEqual([]);
+});

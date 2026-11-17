@@ -5,6 +5,7 @@ import { ErrorLogPanel } from "../components/ErrorLogPanel.jsx";
 import { RecoveryNotice } from "../components/RecoveryNotice.jsx";
 import { SaveStatus } from "../components/SaveStatus.jsx";
 import { SceneMinutes } from "../components/SceneMinutes.jsx";
+import { ActProgress } from "../components/ActProgress.jsx";
 import { whenCaseReady } from "../state/caseArrival.js";
 
 function getSceneLineType(line) {
@@ -48,6 +49,8 @@ export function useRuntimeRenderers({
   return {
     renderSceneLines,
     renderSceneMinutes: (nodeId) => <SceneMinutes nodeId={nodeId} />,
+    // N23: the report's act line for 사건 01~17, and 사건 07's small 중간 결산 (ActProgress.jsx).
+    renderActProgress: (caseId) => <ActProgress caseId={caseId} />,
     renderDecisionReveal: () => <DecisionReveal view={decisionRevealView} />,
     renderRecoveryNotice: () => <RecoveryNotice view={recoveryNoticeView} />,
     renderSaveStatus: () => <SaveStatus view={saveStatusView} />,
