@@ -17,7 +17,7 @@
  * no more (설계안 질문 5 (1), the PR after the framework; state/sideMarks.js).
  * A run in progress stays on the device it was played on.
  */
-import { NEW_GAME_PLUS_KEY, readStoredValue, SIDE_CASES_KEY } from "./appConfig.js";
+import { readStoredValue, SIDE_CASES_KEY } from "./appConfig.js";
 import introCopy from "./copy/intro.js";
 import { fill } from "./locale.js";
 import { SIDE_CASES } from "./nodes/sidePacks.js";
@@ -51,17 +51,6 @@ export function isSideCaseOpen(sideCase, { newGamePlusUnlocked = false, caseResu
   if (isSideSlotOpen({ newGamePlusUnlocked, caseResults })) return true;
   if (record?.[sideCase.id]) return true;
   return Boolean(sideCase.unlockAfter) && Boolean(caseResults?.[sideCase.unlockAfter]);
-}
-
-/**
- * The side cases the season case `caseId` has just opened, for the one line on
- * its report (ResultScreen): those that follow it in the story and were not
- * already open another way (a closed finale, NEW GAME+, or played before).
- */
-export function sideCasesOpenedBy(caseId, { newGamePlusUnlocked = readStoredValue(NEW_GAME_PLUS_KEY, "false") === "true", caseResults = null, cases = SIDE_CASES, record = null } = {}) {
-  if (!caseId || isSideSlotOpen({ newGamePlusUnlocked, caseResults })) return [];
-  const marks = record ?? readSideRecord();
-  return cases.filter((sideCase) => sideCase.unlockAfter === caseId && !marks[sideCase.id]);
 }
 
 // A side case asked for from a case report: the start screen opens it when it

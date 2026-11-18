@@ -1,7 +1,8 @@
 import { ChevronRight } from "lucide-react";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
-import { requestSideCase, sideCasesOpenedBy } from "../sideCases.js";
+import { requestSideCase } from "../sideCases.js";
+import { sideCasesOpenedBy } from "../sideOpened.js";
 
 /**
  * 11-18 「현재 준비된 번외 스토리 전부 공개해줘. 스토리 흐름 순서에 맞게
@@ -10,7 +11,7 @@ import { requestSideCase, sideCasesOpenedBy } from "../sideCases.js";
  * the start screen, which opens the side case as it mounts
  * (sideCases.requestSideCase); the season stays where it was, as the
  * ranking button leaves it. Nothing is drawn when this case opened none, or
- * when every side case was open already (sideCases.sideCasesOpenedBy).
+ * when every side case was open already (sideOpened.sideCasesOpenedBy).
  */
 export function SideOpenedPanel({ caseId, caseResults, setStarted }) {
   const opened = sideCasesOpenedBy(caseId, { caseResults });

@@ -5,7 +5,8 @@
  * endings -- that opens at its place in the main story (2026-11-18 「현재
  * 준비된 번외 스토리 전부 공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): each
  * entry's `unlockAfter` is the season case whose in-world date comes just
- * before the side case's own (`date`), and the side case is open on a device
+ * before the side case's own (the dates below; tests/unit/side-cases.test.mjs
+ * holds the order), and the side case is open on a device
  * once that case is closed in the run, once a finale is closed (NEW GAME+), or
  * once the side case is in the device's side record (`isSideCaseOpen`,
  * src/sideCases.js). Nothing is placed before 프롤로그 01, so a new player
@@ -49,15 +50,15 @@ const sideFixtureListed =
   new URLSearchParams(globalThis.location?.search ?? "").get("side-fixture") === "1";
 
 export const SIDE_CASES = Object.freeze([
-  { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", date: "2025-12-20", unlockAfter: "case17", load: () => import("./side01.js").then(({ side01 }) => localizeSidePack(side01)) },
-  { id: "side02", label: "번외 2", title: "돌려줄 것", date: "2026-01-09", unlockAfter: "case18", load: () => import("./side02.js").then(({ side02 }) => localizeSidePack(side02)) },
-  { id: "side03", label: "번외 3", title: "보통의 밤", date: "2025-11-08", unlockAfter: "case14", load: () => import("./side03.js").then(({ side03 }) => localizeSidePack(side03)) },
-  { id: "side04", label: "번외 4", title: "연말 정산", date: "2025-12-11", unlockAfter: "case16", load: () => import("./side04.js").then(({ side04 }) => localizeSidePack(side04)) },
-  { id: "side05", label: "번외 5", title: "상장 전야", date: "2026-02-12", unlockAfter: "case21", load: () => import("./side05.js").then(({ side05 }) => localizeSidePack(side05)) },
-  { id: "side06", label: "번외 6", title: "보증금", date: "2026-05-08", unlockAfter: "case27", load: () => import("./side06.js").then(({ side06 }) => localizeSidePack(side06)) },
-  { id: "side07", label: "번외 7", title: "금요일 17시 58분", date: "2026-06-12", unlockAfter: "case31", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
-  { id: "side08", label: "번외 8", title: "정상화", date: "2026-07-10", unlockAfter: "case34", load: () => import("./side08.js").then(({ side08 }) => localizeSidePack(side08)) },
-  { id: "side09", label: "번외 9", title: "92일", date: "2026-08-13", unlockAfter: "case40", load: () => import("./side09.js").then(({ side09 }) => localizeSidePack(side09)) },
+  { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", unlockAfter: "case17", load: () => import("./side01.js").then(({ side01 }) => localizeSidePack(side01)) },
+  { id: "side02", label: "번외 2", title: "돌려줄 것", unlockAfter: "case18", load: () => import("./side02.js").then(({ side02 }) => localizeSidePack(side02)) },
+  { id: "side03", label: "번외 3", title: "보통의 밤", unlockAfter: "case14", load: () => import("./side03.js").then(({ side03 }) => localizeSidePack(side03)) },
+  { id: "side04", label: "번외 4", title: "연말 정산", unlockAfter: "case16", load: () => import("./side04.js").then(({ side04 }) => localizeSidePack(side04)) },
+  { id: "side05", label: "번외 5", title: "상장 전야", unlockAfter: "case21", load: () => import("./side05.js").then(({ side05 }) => localizeSidePack(side05)) },
+  { id: "side06", label: "번외 6", title: "보증금", unlockAfter: "case27", load: () => import("./side06.js").then(({ side06 }) => localizeSidePack(side06)) },
+  { id: "side07", label: "번외 7", title: "금요일 17시 58분", unlockAfter: "case31", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
+  { id: "side08", label: "번외 8", title: "정상화", unlockAfter: "case34", load: () => import("./side08.js").then(({ side08 }) => localizeSidePack(side08)) },
+  { id: "side09", label: "번외 9", title: "92일", unlockAfter: "case40", load: () => import("./side09.js").then(({ side09 }) => localizeSidePack(side09)) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => localizeSidePack(side00)) }]
     : []),

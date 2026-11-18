@@ -82,6 +82,7 @@ const { side08 } = await import("../../src/nodes/side08.js");
 const { side09 } = await import("../../src/nodes/side09.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
+const { sideCasesOpenedBy } = await import("../../src/sideOpened.js");
 const sideMarks = await import("../../src/state/sideMarks.js");
 const sideRun = await import("../../src/state/sideRun.js");
 const { checkSidePack } = await import("../../src/state/sidePackCheck.js");
@@ -166,14 +167,16 @@ const STORY_PLACES = {
 };
 
 test("11-18: each side case opens after the season case it follows in the story, never before 프롤로그 01", () => {
-  assert.deepEqual(Object.fromEntries(SIDE_CASES.map(({ id, date, unlockAfter }) => [id, { date, unlockAfter }])), STORY_PLACES);
+  // The dates are each case file's header (and sidePacks.js's); the entry carries only `unlockAfter`.
+  assert.deepEqual(Object.fromEntries(SIDE_CASES.map(({ id, unlockAfter }) => [id, unlockAfter])), Object.fromEntries(Object.entries(STORY_PLACES).map(([id, place]) => [id, place.unlockAfter])));
+  assert.deepEqual(Object.keys(STORY_PLACES).sort(), SIDE_CASES.map(({ id }) => id).sort());
   const order = (caseId) => gameCases.CASE_SEQUENCE.indexOf(caseId);
   for (const { id, unlockAfter } of SIDE_CASES) {
     assert.ok(order(unlockAfter) >= order("prologue01"), `${id} opens after ${unlockAfter}, which is not a season case at or after 프롤로그 01`);
     assert.ok(order(unlockAfter) < order("final"), `${id} opens before the finale`);
   }
   // The story's order: a later date never opens earlier.
-  const byDate = [...SIDE_CASES].sort((a, b) => a.date.localeCompare(b.date));
+  const byDate = Object.entries(STORY_PLACES).map(([id, place]) => ({ id, ...place })).sort((a, b) => a.date.localeCompare(b.date));
   for (let i = 1; i < byDate.length; i += 1) {
     assert.ok(order(byDate[i].unlockAfter) >= order(byDate[i - 1].unlockAfter), `${byDate[i].id} (${byDate[i].date}) opens before ${byDate[i - 1].id} (${byDate[i - 1].date})`);
   }
@@ -187,7 +190,7 @@ test("11-18: a new player has no side slot; closing each case opens exactly its 
     const before = closedUpTo(caseId);
     delete before[caseId];
     const expected = SIDE_CASES.filter(({ unlockAfter }) => unlockAfter === caseId).map(({ id }) => id);
-    const opened = sideCases.sideCasesOpenedBy(caseId, { newGamePlusUnlocked: false, caseResults: closedUpTo(caseId), record: {} }).map(({ id }) => id);
+    const opened = sideCasesOpenedBy(caseId, { newGamePlusUnlocked: false, caseResults: closedUpTo(caseId), record: {} }).map(({ id }) => id);
     if (caseId === "final") {
       // The finale opens everything at once and says nothing case by case.
       assert.deepEqual(opened, []);
@@ -211,10 +214,10 @@ test("11-18: a side case stays open once played (record) or once a finale is clo
   // A new run after an earlier one that played 번외 9: still listed.
   assert.deepEqual(sideCases.getSideSlot({ caseResults: {}, record: played }).cases.map(({ id }) => id), ["side09"]);
   assert.equal(sideCases.getSideSlot({ caseResults: {}, record: played }).book, `번외 1/${SIDE_CASES.length}`);
-  assert.deepEqual(sideCases.sideCasesOpenedBy("case40", { newGamePlusUnlocked: false, caseResults: { case40: {} }, record: played }), []);
+  assert.deepEqual(sideCasesOpenedBy("case40", { newGamePlusUnlocked: false, caseResults: { case40: {} }, record: played }), []);
   // NEW GAME+ or a closed finale: every case open, and no line on a report.
   assert.equal(sideCases.getSideSlot({ newGamePlusUnlocked: true, caseResults: {}, record: {} }).cases.length, SIDE_CASES.length);
-  assert.deepEqual(sideCases.sideCasesOpenedBy("case14", { newGamePlusUnlocked: true, caseResults: { case14: {} }, record: {} }), []);
+  assert.deepEqual(sideCasesOpenedBy("case14", { newGamePlusUnlocked: true, caseResults: { case14: {} }, record: {} }), []);
   assert.equal(sideCases.isSideCaseOpen(null), false);
 });
 
