@@ -59,7 +59,7 @@ import { fill } from "../locale.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
-const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
+const AUDIT_BAND_LOOK = { background: "rgb(22 96 62 / 0.1)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
 // The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
 const { stage: say, keys: keyWords } = tableCopy;
 /** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */

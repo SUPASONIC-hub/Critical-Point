@@ -321,7 +321,8 @@ const budgets = [
   // 34,673 / 14,761 -> 34,867 / 14,850 c2 후속 시장 충격 결과 줄 (bundle-b4c2 위). Measured 34863 / 14846 (over budget only) in the e2e build, the plus 4.
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_900 },
+  // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_905 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1541,7 +1542,8 @@ const budgets = [
   // 9,294 / 4,430 -> 9,313 / 4,442 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured 9309 / 4438 (over budget only) in the e2e build, the plus 4.
   // 9,313 / 4,442 -> 9,816 / 4,642 N32 친구 기록 넘기기 over main 705a809f. Measured 9812 / 4638 (over budget only) in the e2e build, the plus 4.
   // 9,313 / 4,442 -> 9,804 / 4,631 묶음 11-17 over main 705a809f. Measured 9800 / 4627 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_804, maxGzip: 4_631 },
+  // 9,804 / 4,631 -> 9,804 / 4,637 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 4633 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_804, maxGzip: 4_637 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -2600,7 +2602,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,324 / 439,917 / 447,836 N32 친구 기록 넘기기 over main 705a809f. Measured first paint, the plus 4.
 // -> 380,361 / 442,730 / 450,673 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
 // en 442,730 -> 442,743 and ja 450,673 -> 450,682 on 2026-11-18, d3-next: the locale chunks above. Measured 442,739 / 450,678 in the CI e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_361, en: 442_743, ja: 450_682 };
+// -> 380,437 / 442,806 / 450,750 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured first paint, the plus 4.
+// Bundle 11-18 (d3-next + 2안): both, re-measured below after the build.
+const FIRST_PAINT_BUDGETS = { ko: 380_437, en: 442_819, ja: 450_759 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

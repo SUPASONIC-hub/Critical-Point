@@ -3,9 +3,9 @@
 .debug-jump-panel {
   width: min(1120px, calc(100% - 32px));
   margin: 16px auto;
-  border: 1px solid rgba(255, 197, 90, 0.3);
-  background: linear-gradient(90deg, rgb(255 197 90 / 0.06), transparent 50%), var(--ui-surface-1);
-  color: var(--c-cream);
+  border: 1px solid rgb(132 88 0 / 0.24);
+  background: linear-gradient(90deg, rgb(132 88 0 / 0.05), transparent 50%), var(--ui-surface-1);
+  color: var(--ui-text);
   border-radius: var(--ui-radius-md);
   box-shadow: var(--ui-shadow-2);
   padding: 18px 20px;
@@ -38,7 +38,7 @@
 .recovery-notice p,
 .error-log-panel p {
   margin: 6px 0 0;
-  color: rgba(247, 241, 227, 0.78);
+  color: var(--ui-text-2);
 }
 .recovery-guidance,
 .error-recovery-hint {
@@ -55,7 +55,7 @@
 }
 .error-recovery-hint {
   margin-top: 14px;
-  color: rgba(247, 241, 227, 0.72);
+  color: var(--ui-text-2);
 }
 .recovery-actions,
 .error-log-actions,
@@ -72,7 +72,7 @@
   min-height: 40px;
   border: 1px solid var(--ui-line-strong);
   background: var(--ui-surface-3);
-  color: var(--c-cream);
+  color: var(--ui-text);
   border-radius: var(--ui-radius-xs);
   padding: 0 14px;
   font-weight: 600;
@@ -80,7 +80,7 @@
 .recovery-actions button:not(.ghost),
 .debug-jump-controls button {
   background: var(--c-amber);
-  color: var(--c-ink-08);
+  color: var(--ledger-white);
   border-color: var(--c-amber);
   font-weight: 800;
 }
@@ -92,7 +92,7 @@
 .save-slot-panel {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgb(22 24 26 / 0.08);
 }
 .telemetry-health {
   display: flex;
@@ -101,13 +101,13 @@
   gap: 8px 12px;
   margin: 12px 0 16px;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgb(22 24 26 / 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgb(22 24 26 / 0.04);
   font-size: 0.75rem;
 }
 .telemetry-health strong {
-  color: var(--c-paper);
+  color: var(--ui-text);
 }
 .telemetry-health span {
   color: var(--c-acid);
@@ -115,25 +115,25 @@
 }
 .telemetry-health small {
   flex-basis: 100%;
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--ui-text-2);
 }
 .error-log-list article {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgb(22 24 26 / 0.08);
   border-radius: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(22 24 26 / 0.03);
 }
 .error-replay-button {
   flex: 0 0 auto;
   min-height: 32px;
   padding: 0 10px;
-  color: var(--c-paper);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--ui-text);
+  background: rgb(22 24 26 / 0.06);
+  border: 1px solid rgb(22 24 26 / 0.15);
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 900;
@@ -154,7 +154,7 @@
   margin: 10px 0 0;
 }
 .error-log-details dt {
-  color: rgba(247, 241, 227, 0.72);
+  color: var(--ui-text-2);
   font-size: 0.6875rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -163,7 +163,7 @@
   max-height: 110px;
   margin: 0;
   overflow: auto;
-  color: rgba(247, 241, 227, 0.82);
+  color: var(--ui-text-2);
   font-family:
     ui-monospace,
     SFMono-Regular,
@@ -185,16 +185,16 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgb(22 24 26 / 0.08);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(22 24 26 / 0.03);
 }
 .save-slot-list strong,
 .save-slot-list small {
   display: block;
 }
 .save-slot-list small {
-  color: rgba(247, 241, 227, 0.68);
+  color: var(--ui-text-2);
 }
 .save-slot-actions {
   display: flex;
@@ -204,7 +204,7 @@
 .save-slot-actions button {
   min-height: 32px;
   padding: 0 10px;
-  color: var(--c-ink-08);
+  color: var(--ledger-white);
   background: var(--c-amber);
   border: 1px solid var(--c-amber);
   border-radius: 6px;
@@ -212,9 +212,9 @@
   font-weight: 900;
 }
 .save-slot-actions button.ghost {
-  color: var(--c-paper);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--ui-text);
+  background: rgb(22 24 26 / 0.06);
+  border-color: rgb(22 24 26 / 0.15);
 }
 .error-log-list strong {
   display: block;
@@ -222,10 +222,10 @@
 }
 .error-log-list small,
 .error-log-empty {
-  color: rgba(247, 241, 227, 0.68);
+  color: var(--ui-text-2);
 }
 .debug-jump-panel {
-  border-color: rgba(123, 211, 255, 0.32);
+  border-color: rgb(20 82 160 / 0.26);
 }
 .debug-jump-panel span {
   color: var(--c-sky);
@@ -273,7 +273,7 @@
   z-index: 10;
   width: min(360px, calc(100vw - 32px));
   padding: 12px;
-  border: 1px solid rgba(138, 180, 255, 0.45);
+  border: 1px solid var(--ui-line-strong);
   border-radius: 8px;
   background: var(--c-sky-08-a94);
   color: var(--color-white-soft);
@@ -292,7 +292,7 @@
 }
 .debug-overlay-heading {
   margin-bottom: 8px;
-  color: var(--color-focus);
+  color: var(--c-sky);
 }
 .debug-overlay .ghost {
   min-height: 30px;

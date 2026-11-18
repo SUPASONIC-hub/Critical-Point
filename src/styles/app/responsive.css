@@ -331,8 +331,7 @@
   .gauntlet-stage .gx-card {
     gap: 4px;
     min-height: 0;
-    padding: 6px 8px;
-    border-radius: 12px;
+    padding: 6px 8px 6px 22px;
   }
 
   .gx-card-label {

@@ -612,5 +612,6 @@ test("every rule that reads a frame-loop variable is on an element the loop writ
     }
   }
   // 18 since the beat went (2026-10-10): the ring, the reticle and the hit zone read nine more.
-  assert.ok(uses >= 16, `the scan has to find the readers it guards: ${uses}`);
+  // 15 since 2안 감사 장부 (2026-11-18): the paper skin drops the clock's and the beat's glows.
+  assert.ok(uses >= 15, `the scan has to find the readers it guards: ${uses}`);
 });

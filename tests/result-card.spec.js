@@ -160,7 +160,7 @@ async function readCardPixels(page, file) {
       // The corner is ground; (540, 141) is on the hairline under the top strip.
       corner: at(12, 12),
       hairline: at(540, 141),
-      ground: painted("--c-gx-felt"),
+      ground: painted("--ui-surface-1"),
       accent: painted("--c-acid"),
       heat: painted("--c-gx-heat"),
     };

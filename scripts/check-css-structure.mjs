@@ -379,7 +379,9 @@ const fileBudgets = {
   // 588 / 9768 -> 619 / 10135 on 2026-11-02, measured (plate-story, E and F):
   // the player's own figure in the hand's colour inside an outline, and the
   // result's copy of a case's last room with its three tones.
-  "plate.css": { lines: 619, bytes: 10135 },
+  // 619 / 10135 -> 625 / 10211 on 2026-11-17, measured (2안 감사 장부): the
+  // room printed grey and faint on the ledger's paper behind the question.
+  "plate.css": { lines: 625, bytes: 10211 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
