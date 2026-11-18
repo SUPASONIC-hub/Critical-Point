@@ -710,7 +710,8 @@ const budgets = [
   // 209,357 / 76,215 -> 210,072 / 76,509 N32 친구 기록 넘기기 over main 705a809f. Measured 210068 / 76505 (over budget only) in the e2e build, the plus 4.
   // 209,357 / 76,215 -> 217,060 / 79,190 묶음 11-17 over main 705a809f. Measured 217056 / 79186 (over budget only) in the e2e build, the plus 4.
   // 217,060 / 79,190 -> 217,596 / 79,364 번외 이야기 속 공개 (sides-in-story) over main 4d549334: each side case's `unlockAfter`, `isSideCaseOpen` and the report-to-start-screen hand-over (src/sideCases.js, IntroScreen), the result copy's side line. Measured 217592 / 79360 in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 217_596, maxGzip: 79_364 },
+  // -> gzip 79,196 묶음 11-18 over main 4d549334, measured 79,192 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 217_060, maxGzip: 79_196 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -727,7 +728,8 @@ const budgets = [
   // N12 (2026-11-12): the speed watcher (src/webVitals.js), fetched after `load`
   // by one page in twenty with Google's tag (gameEvents.startVitalsSample).
   // Measured 1,186 / 707 in the e2e build, the plus 4.
-  { pattern: /^webVitals-.*\.js$/, maxBytes: 1_190, maxGzip: 711 },
+  // -> gzip 716 묶음 11-18, measured 712 in CI verify-quick, the plus 4.
+  { pattern: /^webVitals-.*\.js$/, maxBytes: 1_190, maxGzip: 716 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -1325,7 +1327,8 @@ const budgets = [
   // 10,676 / 4,394 -> 12,339 / 5,108 N33 게시판 이번 주 질문 over main 705a809f. Measured 12335 / 5104 (over budget only) in the e2e build, the plus 4.
   // 10,676 / 4,394 -> 12,339 / 5,112 묶음 11-17 over main 705a809f. Measured 12335 / 5108 (over budget only) in the e2e build, the plus 4.
   // 10,676 / 4,394 -> 12,339 / 5,109 묶음 11-17 over main 705a809f. Measured 12335 / 5105 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 12_339, maxGzip: 5_109 },
+  // -> gzip 5,114 묶음 11-18, measured 5,110 in CI verify-quick, the plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 12_339, maxGzip: 5_114 },
   // The board's admin sheet and bar (src/components/BoardAdmin.jsx, src/boardAdmin.js, BoardAdmin.css), fetched only
   // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
   // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
@@ -2613,7 +2616,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // GameRuntime 164,457 / 61,343, RelicDraft 35,398 / 15,010, gauntletEngine 51,819 / 19,640, locale-ja-index
 // 197,789 / 66,322, locale-en-index 165,108 / 59,226 and en / ja first paint 442,821 / 450,777: measured in the e2e build, the plus 4.
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_535, en: 442_924, ja: 450_867 };
+// -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_500, en: 442_887, ja: 450_828 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
