@@ -156,7 +156,7 @@ const introCopy = {
     syncing: "{case} 판단 조건 동기화 중",
   },
   // E-11 번외 사건: the start screen's side slot (sideCases.getSideSlot), hidden
-  // until a finale is closed and a side case is written.
+  // until a side case is open on this device (11-18: at its place in the story).
   sideSlot: {
     label: "번외 사건",
     heading: "번외 사건 · 랭킹 밖 · {book}",

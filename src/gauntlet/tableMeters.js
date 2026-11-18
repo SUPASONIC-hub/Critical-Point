@@ -1,6 +1,6 @@
-import { GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
+import { decisionWindowSeconds, GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
-import { HEAT_DEBT_GAUGE, SCOUT_TRUST } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { readSafeLine } from "./tableAfterword.js";
 import { fill } from "../locale.js";
 import tableCopy from "../copy/table.js";
@@ -36,6 +36,19 @@ export function describeDanger({ gauge, nextHigh, wallMin }) {
   const zone = readDangerZone({ gauge, nextHigh, wallMin });
   if (zone !== "distance") return tableCopy.danger[zone];
   return fill(tableCopy.danger.distance, { distance: Math.max(0, Math.ceil(wallMin - nextHigh)) });
+}
+
+/**
+ * B5's next step (2026-11-18): the seconds the stake clock (stakeClock.js)
+ * takes if the next push lands at the top of its range, said before the push
+ * in the push's description and the folded briefing -- the clock is never
+ * faster than it reads, and now not later than it was told either. "" when no
+ * push can cross a tier, or on a board from before the stake clock.
+ */
+export function describeNextClock(win, nextHigh) {
+  if (win.schema?.stakeClock !== true) return "";
+  const cut = decisionWindowSeconds(win.gauge, win.schema) - decisionWindowSeconds(nextHigh, win.schema);
+  return cut > 0 ? fill(tableCopy.stage.nextClock, { cut }) : "";
 }
 
 /**
@@ -84,6 +97,9 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
     band,
     // B1: whether the run can pay for the look (SCOUT_TRUST of 믿음); the stage opens SCOUT on it, as the bots do.
     canPayScout: (Number(resources?.trust) || 0) >= SCOUT_TRUST,
+    // The second look (11-18): both looks' 믿음, since both are billed when the window settles.
+    canPayNarrow: (Number(resources?.trust) || 0) >= SCOUT_TRUST + SCOUT_NARROW_TRUST,
+    nextClock: describeNextClock(win, nextHigh),
     audit: reading,
     safe: readSafeLine(win, band.wallMin),
     // C-9: on a table that counts the audit, its line (40) and the band a cash

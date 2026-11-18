@@ -182,7 +182,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout, canPayNarrow, nextClock,
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -225,7 +225,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && !win.scouted && canPayScout;
+  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && canPayNarrow : canPayScout);
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -674,7 +674,7 @@ export function GauntletStage({
                 {scene.challenge && <li data-testid="brief-challenge">{fill(say.briefChallenge, { challenge: scene.challenge })}</li>}
                 <li>{fill(say.briefPot, { pot: formatMoney(run.runPot) })}</li>
                 <li>{fill(say.briefRules, { rules: currentRules })}</li>
-                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</li>
+                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
@@ -759,7 +759,7 @@ export function GauntletStage({
           <Flame size={18} aria-hidden="true" />
           <span>{say.push}</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
-          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</span>
+          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</span>
           {/* What the streak stands at, for the two buttons that act on it. */}
           {logic && <span id="gx-logic-detail" className="sr-only">{logic.spoken}</span>}
         </button>

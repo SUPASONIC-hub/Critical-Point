@@ -82,6 +82,7 @@ const { side08 } = await import("../../src/nodes/side08.js");
 const { side09 } = await import("../../src/nodes/side09.js");
 const { SIDE_CASES } = await import("../../src/nodes/sidePacks.js");
 const sideCases = await import("../../src/sideCases.js");
+const { sideCasesOpenedBy } = await import("../../src/sideOpened.js");
 const sideMarks = await import("../../src/state/sideMarks.js");
 const sideRun = await import("../../src/state/sideRun.js");
 const { checkSidePack } = await import("../../src/state/sidePackCheck.js");
@@ -135,7 +136,7 @@ test("2: the case helpers name a side case's scenes, code and aftershock", () =>
   assert.equal(gameCases.caseDisplayCode("prologue02"), "P2");
 });
 
-test("3: the slot opens on a closed finale (NEW GAME+ or caseResults.final) and shows only written cases", () => {
+test("3: a closed finale (NEW GAME+ or caseResults.final) opens every written case, a placeholder with no story place included", () => {
   const cases = [{ id: "side00", label: "번외 0", title: side00.title }];
   assert.equal(sideCases.isSideSlotOpen({}), false);
   assert.equal(sideCases.isSideSlotOpen({ newGamePlusUnlocked: false, caseResults: { case49: {} } }), false);
@@ -150,6 +151,83 @@ test("3: the slot opens on a closed finale (NEW GAME+ or caseResults.final) and 
   const closed = sideCases.getSideSlot({ caseResults: { final: {} }, cases, record: { side00: { closedAt: "2026-12-01T00:00:00.000Z", outcomeChoiceId: "s0_after_warm", inProgress: null } } });
   assert.equal(closed.book, "번외 1/1");
   assert.equal(closed.cases[0].closed, true);
+});
+
+// 11-18 「현재 준비된 번외 스토리 전부 공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」
+const STORY_PLACES = {
+  side03: { date: "2025-11-08", unlockAfter: "case14" },
+  side04: { date: "2025-12-11", unlockAfter: "case16" },
+  side01: { date: "2025-12-20", unlockAfter: "case17" },
+  side02: { date: "2026-01-09", unlockAfter: "case18" },
+  side05: { date: "2026-02-12", unlockAfter: "case21" },
+  side06: { date: "2026-05-08", unlockAfter: "case27" },
+  side07: { date: "2026-06-12", unlockAfter: "case31" },
+  side08: { date: "2026-07-10", unlockAfter: "case34" },
+  side09: { date: "2026-08-13", unlockAfter: "case40" },
+};
+
+test("11-18: each side case opens after the season case it follows in the story, never before 프롤로그 01", () => {
+  // The dates are each case file's header (and sidePacks.js's); the entry carries only `unlockAfter`.
+  assert.deepEqual(Object.fromEntries(SIDE_CASES.map(({ id, unlockAfter }) => [id, unlockAfter])), Object.fromEntries(Object.entries(STORY_PLACES).map(([id, place]) => [id, place.unlockAfter])));
+  assert.deepEqual(Object.keys(STORY_PLACES).sort(), SIDE_CASES.map(({ id }) => id).sort());
+  const order = (caseId) => gameCases.CASE_SEQUENCE.indexOf(caseId);
+  for (const { id, unlockAfter } of SIDE_CASES) {
+    assert.ok(order(unlockAfter) >= order("prologue01"), `${id} opens after ${unlockAfter}, which is not a season case at or after 프롤로그 01`);
+    assert.ok(order(unlockAfter) < order("final"), `${id} opens before the finale`);
+  }
+  // The story's order: a later date never opens earlier.
+  const byDate = Object.entries(STORY_PLACES).map(([id, place]) => ({ id, ...place })).sort((a, b) => a.date.localeCompare(b.date));
+  for (let i = 1; i < byDate.length; i += 1) {
+    assert.ok(order(byDate[i].unlockAfter) >= order(byDate[i - 1].unlockAfter), `${byDate[i].id} (${byDate[i].date}) opens before ${byDate[i - 1].id} (${byDate[i - 1].date})`);
+  }
+});
+
+test("11-18: a new player has no side slot; closing each case opens exactly its side cases", () => {
+  assert.equal(sideCases.getSideSlot({ caseResults: {}, record: {} }), null);
+  assert.equal(sideCases.getSideSlot({ caseResults: { prologue01: {} }, record: {} }), null);
+  const closedUpTo = (caseId) => Object.fromEntries(gameCases.CASE_SEQUENCE.slice(0, gameCases.CASE_SEQUENCE.indexOf(caseId) + 1).map((id) => [id, {}]));
+  for (const caseId of gameCases.CASE_SEQUENCE) {
+    const before = closedUpTo(caseId);
+    delete before[caseId];
+    const expected = SIDE_CASES.filter(({ unlockAfter }) => unlockAfter === caseId).map(({ id }) => id);
+    const opened = sideCasesOpenedBy(caseId, { newGamePlusUnlocked: false, caseResults: closedUpTo(caseId), record: {} }).map(({ id }) => id);
+    if (caseId === "final") {
+      // The finale opens everything at once and says nothing case by case.
+      assert.deepEqual(opened, []);
+      continue;
+    }
+    assert.deepEqual(opened, expected, `${caseId} opens ${expected.join(", ") || "none"}`);
+    const slotBefore = sideCases.getSideSlot({ caseResults: before, record: {} })?.cases.map(({ id }) => id) ?? [];
+    const slotAfter = sideCases.getSideSlot({ caseResults: closedUpTo(caseId), record: {} })?.cases.map(({ id }) => id) ?? [];
+    assert.deepEqual(slotAfter.filter((id) => !slotBefore.includes(id)), expected);
+  }
+  // 사건 14 closed: 번외 3 alone, and the book counts every written case.
+  const slot = sideCases.getSideSlot({ caseResults: closedUpTo("case14"), record: {} });
+  assert.deepEqual(slot.cases.map(({ id }) => id), ["side03"]);
+  assert.equal(slot.book, `번외 0/${SIDE_CASES.length}`);
+  // Up to 사건 40: all nine.
+  assert.equal(sideCases.getSideSlot({ caseResults: closedUpTo("case40"), record: {} }).cases.length, SIDE_CASES.length);
+});
+
+test("11-18: a side case stays open once played (record) or once a finale is closed, and then says nothing on a report", () => {
+  const played = { side09: { closedAt: "2026-11-18T00:00:00.000Z", outcomeChoiceId: "s9_after_warm", inProgress: null } };
+  // A new run after an earlier one that played 번외 9: still listed.
+  assert.deepEqual(sideCases.getSideSlot({ caseResults: {}, record: played }).cases.map(({ id }) => id), ["side09"]);
+  assert.equal(sideCases.getSideSlot({ caseResults: {}, record: played }).book, `번외 1/${SIDE_CASES.length}`);
+  assert.deepEqual(sideCasesOpenedBy("case40", { newGamePlusUnlocked: false, caseResults: { case40: {} }, record: played }), []);
+  // NEW GAME+ or a closed finale: every case open, and no line on a report.
+  assert.equal(sideCases.getSideSlot({ newGamePlusUnlocked: true, caseResults: {}, record: {} }).cases.length, SIDE_CASES.length);
+  assert.deepEqual(sideCasesOpenedBy("case14", { newGamePlusUnlocked: true, caseResults: { case14: {} }, record: {} }), []);
+  assert.equal(sideCases.isSideCaseOpen(null), false);
+});
+
+test("11-18: a report hands the start screen one side case to open, once", () => {
+  sideCases.requestSideCase("case14");
+  assert.equal(sideCases.peekRequestedSideCase(), null, "a season case is never handed over");
+  sideCases.requestSideCase("side03");
+  assert.equal(sideCases.peekRequestedSideCase(), "side03");
+  sideCases.requestSideCase(null);
+  assert.equal(sideCases.peekRequestedSideCase(), null);
 });
 
 test("the registry lists 번외 1, 2, 3, 4, 5, 6, 7, 8 and 9 in a release; the placeholder stays behind the debug build", async () => {
