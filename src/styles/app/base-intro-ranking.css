@@ -1829,7 +1829,7 @@ summary:focus-visible {
 }
 .intro .data-status.ready {
   color: var(--c-green-70);
-  background: rgb(34 99 71 / 0.35);
+  background: rgb(22 96 62 / 0.1);
 }
 .intro .data-status.local {
   color: var(--c-amber);

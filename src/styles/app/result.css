@@ -1941,20 +1941,22 @@
   line-height: 1.75;
 }
 
+/* 2안 (11-18): the moods are inks on paper, each over 4.8:1 on the paper, the
+   white sheet and the second surface. */
 .interlude-panel.mood-warm {
-  --interlude-tint: #f0b968;
+  --interlude-tint: #8a5a00;
 }
 .interlude-panel.mood-quiet {
-  --interlude-tint: #8fb8d8;
+  --interlude-tint: #2f5f86;
 }
 .interlude-panel.mood-wry {
-  --interlude-tint: #9fd6a8;
+  --interlude-tint: #2f6b3a;
 }
 .interlude-panel.mood-grief {
-  --interlude-tint: #d89ab0;
+  --interlude-tint: #8c3a58;
 }
 .interlude-panel.mood-still {
-  --interlude-tint: #a9a4c4;
+  --interlude-tint: #5b5585;
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
