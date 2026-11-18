@@ -101,6 +101,20 @@ export function getReframeTarget(caseId, fromNodeId) {
 }
 
 /**
+ * The cases where a bust costs the stake and not the scene (N21, the owner's
+ * answer of 2026-11-16, (1), for the reset of 11-30): 프롤로그 01 and 02,
+ * the first ten minutes, where a player who has just begun the story lost
+ * the next scene to their first bust. The caller asks before
+ * `getBlackoutSkip`, as it asks whether the run is a story run.
+ */
+export const SCENE_KEPT_CASES = Object.freeze(["prologue01", "prologue02"]);
+
+/** Whether a bust in `caseId` plays the next scene with the analyst in it (`SCENE_KEPT_CASES`). */
+export function keepsSceneOnBust(caseId) {
+  return SCENE_KEPT_CASES.includes(caseId);
+}
+
+/**
  * What a bust costs the story, not just the score. The room does not wait for
  * an analyst who blew up: the scene the card led to plays out without them,
  * and the table deals the one after it. Never onto a result -- a bust does not
@@ -111,7 +125,8 @@ export function getReframeTarget(caseId, fromNodeId) {
  * It used to follow the first card dealt, which the shuffled deal made a
  * different route on forty fork scenes, and it walked into gated detours.
  *
- * A story run is not skipped past anything (the caller does not ask): the
+ * A story run is not skipped past anything (the caller does not ask), nor is
+ * a run in 프롤로그 01 or 02 (`keepsSceneOnBust`, N21): the
  * mode is there so the story can be read, and a scene played without the
  * player is a scene they did not read. The bust still costs what a bust costs.
  *

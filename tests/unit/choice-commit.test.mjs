@@ -245,7 +245,8 @@ test("a commit that throws half way releases the table", () => {
 });
 
 test("a bust costs the bust, and the room plays the next scene without the analyst", () => {
-  const { context, did } = sceneContext("p1_start");
+  // From 프롤로그 03: in 01 and 02 a bust keeps the scene (N21, below).
+  const { context, did } = sceneContext("p3_start");
   const card = context.node.choices[0];
   const window = closedWindow("bust");
   assert.equal(window.status, "bust");
@@ -262,7 +263,7 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   for (const [key, value] of Object.entries(BUST_EFFECT)) {
     assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `the bust's own ${key} is on top of what the card cost`);
   }
-  // The card led to p1_counter; the room went on past it.
+  // The card led to p3_committee; the room went on past it.
   assert.equal(entry.skippedNodeId, card.next);
   assert.equal(entry.routeChangeKind, "blackout-skip");
   assert.notEqual(patch.nodeId, card.next);
@@ -270,6 +271,24 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   assert.equal(patch.decisionReveal.skippedTitle, nodes[card.next].title);
   assert.equal(patch.decisionReveal.skippedNodeId, card.next, "the reveal can open the scene's minutes");
   assert.equal(patch.gauntletRun.busts, 1);
+});
+
+test("in 프롤로그 01 and 02 a bust costs the bust and the pot, and the run plays the next scene (N21)", () => {
+  for (const nodeId of ["p1_start", "p2_start"]) {
+    const { context, did } = sceneContext(nodeId);
+    const card = context.node.choices[0];
+    mount(context).choose(card, closedWindow("bust", `unit-bust-${nodeId}`));
+    const [patch] = did.patches;
+    const [entry] = patch.log;
+    assert.equal(entry.threshold.state, "bust", nodeId);
+    for (const [key, value] of Object.entries(BUST_EFFECT)) {
+      assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `${nodeId}: the bust's own ${key} is still charged`);
+    }
+    assert.equal(patch.nodeId, card.next, `${nodeId}: the run goes where the card led`);
+    assert.equal(entry.skippedNodeId, undefined, nodeId);
+    assert.equal(entry.routeChangeKind, undefined, nodeId);
+    assert.equal(patch.decisionReveal.skippedTitle, null, nodeId);
+  }
 });
 
 test("a bust on the card that closes the case still closes it: a bust never skips onto, or past, a result", () => {
@@ -509,9 +528,10 @@ test("in a story run a bust costs the bust and the pot, and no scene is played w
   assert.equal(entry.environmentMode, "stable");
   assert.deepEqual(patch.gauntletRun.schema.mutations, []);
   assert.equal(patch.gauntletRun.story, true);
-  // The same bust at the table, for the difference.
-  const table = sceneContext("p1_start");
-  mount(table.context).choose(card, closedWindow("bust", "unit-bust-table"));
+  // The same bust at the table, for the difference: from 프롤로그 03, where a
+  // table run's bust skips the scene (in 01 and 02 it keeps it too, N21).
+  const table = sceneContext("p3_start");
+  mount(table.context).choose(table.context.node.choices[0], closedWindow("bust", "unit-bust-table"));
   assert.equal(table.did.patches[0].log[0].routeChangeKind, "blackout-skip");
 
   // 프롤로그 01 has no way to break a board in any run. In 사건 01, which has
