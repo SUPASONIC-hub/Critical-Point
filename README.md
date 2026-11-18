@@ -1024,7 +1024,7 @@ SYSTEM COLLAPSE입니다. 최고 열기가 아니라 피해와 무리수가 무�
 #### 데이터와 접근성
 
 - 브라우저 자동 저장, 완료 기록 JSON 내보내기, 로컬 랭킹은 서버 없이 동작합니다.
-- **장면 BUST 비율**(장면 페이지 사건 파일의 「이 장면에서 다른 분석관의 N%가 벽에 닿았습니다」)은 서버 스냅숏 `scene_bust_stats`를 `refresh_scene_bust_stats()`가 매시 41분에 데이터 수집에 동의한 기기의 사건 행에서 다시 세고, `scene_bust_rates()`가 창·런 50 이상인 장면만 답합니다. `season-final` 행, `run_id` 없는 행, 스토리 모드 창, NEW GAME+ 판이 다른 테이블로 치르는 사건(프롤로그 01~사건 02, 사건 행 `summary.newGamePlus`, 2026-11-06 마이그레이션)은 세지 않습니다.
+- **장면 BUST 비율**(장면 페이지 사건 파일의 「이 장면에서 다른 분석관의 N%가 벽에 닿았습니다. (판단 M번 기준)」, M은 비율을 센 창 수)은 서버 스냅숏 `scene_bust_stats`를 `refresh_scene_bust_stats()`가 매시 41분에 데이터 수집에 동의한 기기의 사건 행에서 다시 세고, `scene_bust_rates()`가 창·런 50 이상인 장면만 답합니다. `season-final` 행, `run_id` 없는 행, 스토리 모드 창, NEW GAME+ 판이 다른 테이블로 치르는 사건(프롤로그 01~사건 02, 사건 행 `summary.newGamePlus`, 2026-11-06 마이그레이션)은 세지 않습니다.
 - **언어** — 첫 화면 머리의 `한국어 · English · 日本語`에서 고르면 이 기기에 저장되고(`critical-point-locale-v1`) `?lang=en`·`?lang=ja`로 다시 열립니다.
   영어·일본어 시작 화면은 따로 `/en/`·`/ja/`에도 있습니다(2026-11-03). 빌드가 다 만든 `index.html`에서 제목·설명·카드·canonical·no-script 글만
   그 언어로 바꿔 `en/index.html`·`ja/index.html`을 쓰고(`localizedStartPage`, `scripts/site-pages.mjs`), 게임은 폴더의 언어로 열립니다

@@ -20,7 +20,9 @@ import W from "./copy/sceneRates.js";
 export const SCENE_TRACE_FLOOR = 50;
 
 export const SCENE_TRACE_COPY = {
-  line: (percent) => fill(W.trace, { percent }),
+  // The count the rate stands on goes with it (D3, 2026-11-18): 50 windows
+  // and 5,000 read differently. Grouped by thousands.
+  line: (percent, windows) => fill(W.trace, { percent, windows: Number(windows).toLocaleString("en-US") }),
 };
 
 /**
@@ -47,5 +49,5 @@ export function readSceneBustRate(data, caseId, nodeId) {
 export function getSceneTraceLine(data, caseId, nodeId, online = true) {
   if (online === false) return null;
   const rate = readSceneBustRate(data, caseId, nodeId);
-  return rate ? SCENE_TRACE_COPY.line(rate.percent) : null;
+  return rate ? SCENE_TRACE_COPY.line(rate.percent, rate.windows) : null;
 }
