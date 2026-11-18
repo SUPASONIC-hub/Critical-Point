@@ -14,6 +14,12 @@
 6. 끝난 뒤 적는 것
 7. 참고: 파일 위치
 
+**오늘 어느 칸인지**는 `npm run report:event-week`가 달력만 읽어 한 번에 보여 줍니다(이번 주·다음 주 규칙, 지난주 판
+탭이 닫히는 날, 달력의 마지막 줄과 남은 이벤트 주). 달력이 28일 안에 끝나면 다음 격주 자리와 고르기(D-14)·
+병합(D-7) 마감을 `주의:` 줄로 알립니다. `-- --at=2026-11-30`처럼 날짜(KST)를 주면 그날로 미리 봅니다. DB와
+네트워크는 쓰지 않고 판의 숫자·점수도 건드리지 않습니다. 매일 밤 Verify Ranking 요약(과 그 artifact)의 끝에도 같은
+줄이 붙습니다(`.github/workflows/verify-ranking.yml`의 「Add the event week line」, 실패해도 실행은 실패하지 않음).
+
 ---
 
 ## 1. 지금 돌아가는 것
@@ -32,8 +38,8 @@
 | `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
 | `audit-cascade` | AUDIT & CASCADE | W47 시험 주의 줄. 감사·연쇄는 RULES_MARK 3부터 판의 규칙(`tableUnlocks.js`)이라 이 규칙이 켜는 장치는 이제 없습니다. 달력과 서버 `weekly_rules`가 이 id를 들고 있고 그 주에 시작한 시즌이 도장을 지니므로 카탈로그에 남깁니다 |
-| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 2027-W19 한 주(마이그레이션 20261121000000, 초안·사용자 확인 전) |
-| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 2027-W25 한 주(마이그레이션 20261121000000, 초안·사용자 확인 전) |
+| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 2027-W19 한 주(마이그레이션 20261121000000, 11-16 병합) |
+| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 2027-W25 한 주(마이그레이션 20261121000000, 11-16 병합) |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
   고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`)에 있는 것만 켤 수 있습니다.
@@ -213,7 +219,8 @@ W48~W50이 세 주 이어집니다. W17~W25는 세 규칙의 차례를 이어 �
    (`gh run download … -n verify-ranking-summary`), 다음 이벤트 주의 병합 마감(D-7), 지난주 판 탭이 닫히는 날.
 4. **README** 「이번 주의 규칙」 문단: 지난 주의 서술을 지우고 다음 주들만 남깁니다(문단은 날짜를 그대로 두는
    기록이 아니라 지금 참인 것만 적는 곳입니다).
-5. 다음 달력 줄이 D-7 안에 있는지 봅니다. 비어 있으면 3-2로 돌아갑니다.
+5. 다음 달력 줄이 D-7 안에 있는지 봅니다(`npm run report:event-week`의 「남은 이벤트 주」·`주의:` 줄). 비어 있으면
+   3-2로 돌아갑니다.
 
 ---
 
@@ -231,5 +238,6 @@ W48~W50이 세 주 이어집니다. W17~W25는 세 규칙의 차례를 이어 �
 | 순위 판 고르기 | `src/state/useLeaderboard.js`, `src/screens/RankingScreen.jsx` |
 | 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql`, `20261115000000_weekly_rule_calendar_w05_w15.sql`, `20261116000000_weekly_rule_crisis_week.sql`, `20261121000000_weekly_rule_calendar_w17_w26.sql` |
 | 달력 비교, 주 판 재계산 | `scripts/check-grants.mjs` (`check:grants`), `scripts/verify-ranking-rows.mjs` (`verify:ranking`) |
+| 오늘의 이벤트 주 칸(달력만 읽음) | `scripts/report-event-week.mjs` (`report:event-week`) |
 | 시험 주 보고 | `.github/workflows/test-week.yml`, `scripts/report-test-week.mjs`, 저장소 변수 `TEST_WEEK_SIM_LINES` |
-| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/event-week-doc.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
+| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/event-week-doc.test.mjs`, `tests/unit/report-event-week.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |

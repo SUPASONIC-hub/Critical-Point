@@ -32,6 +32,7 @@
     "check:balance": "node scripts/check-balance.mjs",
     "check:pressure": "node scripts/report-gauntlet-loop.mjs",
     "check:endings": "node scripts/check-endings.mjs",
+    "report:event-week": "node scripts/report-event-week.mjs",
     "report:endings": "node scripts/check-endings.mjs --report",
     "report:judgment": "node scripts/report-judgment.mjs",
     "report:near-miss": "node scripts/report-near-miss.mjs",
