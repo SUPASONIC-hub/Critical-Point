@@ -60,4 +60,9 @@ export default {
   next: "次へ · {title}",
   caseResult: "事件の結果",
   nextHand: "次の勝負",
+  pulse: {
+    question: "ここまでどうでしたか？",
+    answers: { fun: "楽しい", hard: "難しい", long: "長い" },
+    thanks: "ありがとうございます。次の勝負へどうぞ。",
+  },
 };

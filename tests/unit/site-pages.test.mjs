@@ -116,8 +116,8 @@ test("each Korean page is at least 1,500 characters without spaces, and the tran
   for (const [file, html] of Object.entries(site)) {
     assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
     if (!file.startsWith("ja/") && !file.startsWith("en/")) continue;
-    // Korean only where a page names the Korean page, or quotes the language choice as the screen shows it.
-    const left = html.replace(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
+    // Korean only where a page names the Korean page (the menu, and the about page's language row), or quotes the language choice as the screen shows it.
+    const left = html.replaceAll(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
     assert.doesNotMatch(left, /[가-힣]/, `${file}: no Korean left untranslated`);
   }
   assert.ok(site["ja/faq.html"].includes("body{word-break:normal}"), "Japanese wraps between characters");

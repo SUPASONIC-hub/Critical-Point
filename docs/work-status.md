@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-16 (the state of `main` at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-17 (the state of `main` at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1429,8 +1429,10 @@ Still open, on purpose:
 45. The repository carries only what a build, a check or a deploy reads. The
     `Profile.jpg` / `!public/profile.jpg` pair in `.gitignore` stays, because
     Windows matches that name case-insensitively and the app's icon would go
-    with it: every file in `public/icons/` is cut from `public/profile.jpg`
-    (`npm run build:icons`), the favicon we chose. Text files are LF on every platform (`.gitattributes`,
+    with it: `public/profile.jpg` is the creators' picture in the studio
+    credit. Since #578 (2026-11-16) every file in `public/icons/` is drawn from
+    the game's GAUGE mark, `docs/images/brand/mark-dark.svg`
+    (`npm run build:icons`). Text files are LF on every platform (`.gitattributes`,
     `.editorconfig`): the byte budgets measured a different file on a Windows
     CRLF checkout than on the Linux runner.
 46. Every scene has a picture, and none of them is a file. `src/scenePlate.js`

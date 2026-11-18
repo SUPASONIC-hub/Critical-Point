@@ -60,4 +60,9 @@ export default {
   next: "Next · {title}",
   caseResult: "Case result",
   nextHand: "Next hand",
+  pulse: {
+    question: "How is it going so far?",
+    answers: { fun: "Fun", hard: "Hard", long: "Too long" },
+    thanks: "Thank you. On to the next hand.",
+  },
 };

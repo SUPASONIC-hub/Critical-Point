@@ -119,7 +119,8 @@ export const speakers = {
   "마리사 탄": "Marisa Tan",
   "육성빈": "Yuk Seongbin",
   "추영복": "Chu Yeongbok",
-  "비노드 타파": "Binod Thapa"
+  "비노드 타파": "Binod Thapa",
+  "아이굴 세리코바": "Aigul Serikova"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -160,7 +161,8 @@ export const roles = {
   "KD은행 디지털자산제휴팀 과장": "Manager, Digital Asset Partnerships, KD Bank",
   "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
   "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore",
-  "도담사출 3번 사출기 담당 · 네팔 · 9년 8개월 · 39세": "Operator of machine 3, Dodam Injection · from Nepal · 9 years 8 months · age 39"
+  "도담사출 3번 사출기 담당 · 네팔 · 9년 8개월 · 39세": "Operator of machine 3, Dodam Injection · from Nepal · 9 years 8 months · age 39",
+  "국진호의 아내 · 카자흐스탄 알마티 · 한국 21년 · 57세": "Wife of Guk Jinho · from Almaty, Kazakhstan · 21 years in Korea · age 57"
 };
 
 
@@ -782,6 +784,10 @@ export const copy = {
       "side08": {
         "label": "Side case 8",
         "title": "Back on Track"
+      },
+      "side09": {
+        "label": "Side case 9",
+        "title": "92 Days"
       }
     }
   }

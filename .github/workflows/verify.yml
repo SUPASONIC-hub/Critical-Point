@@ -168,7 +168,9 @@ jobs:
     # (tests/e2e-shards.json, scripts/e2e-shards.mjs): about ten minutes each.
     # The count here and the file's `shardCount` move together
     # (`npm run e2e:rebalance -- --shards=N`; a unit test holds them equal).
-    timeout-minutes: 30
+    # 45, not 30, since 2026-11-17: the 11-17 bundle's shards ran about 1.57x
+    # the main run's test times and were cut at 30 minutes twice (cause open).
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:

@@ -196,7 +196,9 @@ const fileBudgets = {
   // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
   // -> 3195 / 70696 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
   // 3195 / 70696 -> 3194 / 70687 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood: the glow alphas), measured.
-  "base-intro-ranking.css": { lines: 3194, bytes: 70687 },
+  // 3194 / 70687 -> 3221 / 71428 on 2026-11-16, measured (N19 draft over main 6fef686f): the start
+  // screen's second door, 「이야기로 시작」, drawn as a quiet underlined line beside the briefing link.
+  "base-intro-ranking.css": { lines: 3221, bytes: 71428 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -538,6 +540,10 @@ const fileBudgets = {
   // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
   // every line spent. Measured 41 / 808.
   "draft-spend.css": { lines: 41, bytes: 808 },
+  // New on 2026-11-16 (N22, draft over main 6fef686f): the one between-hands
+  // question of 프롤로그 01·02 on the reveal sheet (BetweenHandsPulse.jsx), in a
+  // file of its own so play.css's budget is not touched. Measured 41 / 765.
+  "pulse.css": { lines: 41, bytes: 765 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

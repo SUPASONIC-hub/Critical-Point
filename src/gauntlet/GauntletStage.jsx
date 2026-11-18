@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
-import { noteTableOpened } from "../gameEvents.js";
+import * as firstHour from "../gameEvents.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -234,9 +234,9 @@ export function GauntletStage({
   // is drawn into it until the player opens it.
   const [briefOpen, setBriefOpen] = useState(false);
 
-  // The report's chunk, asked for while a table is up and the browser is idle,
-  // so the case does not end on an empty page (state/retryableLazy.js).
-  useEffect(() => prefetchScreenWhenIdle("result"), []);
+  // The report's chunk, asked for while a table is up and the browser is idle, so the case does not end on
+  // an empty page (state/retryableLazy.js); and N16, 프롤로그 01·02's written scene as it comes on screen (gameEvents.js).
+  useEffect(() => (firstHour.noteSceneShown(scene.node.caseId, scene.nodeId), prefetchScreenWhenIdle("result")), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (draftOpen) playRelicDealCue(relicOffer.length);
@@ -375,7 +375,7 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
-    noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
+    firstHour.noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });

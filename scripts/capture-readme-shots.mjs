@@ -10,8 +10,13 @@
  * scripts/build-portrait.mjs; each file is checked against the 400 KB cap of
  * docs/readme-rules.md, and the quality steps down until it fits.
  *
- *   npm run capture:readme              all four
- *   npm run capture:readme -- table     only the named ones (title, table, briefing, result)
+ *   npm run capture:readme              all five
+ *   npm run capture:readme -- table     only the named ones (title, table, briefing, result, report)
+ *
+ * `report` is the season's closing report: a returning player's save with six
+ * cases closed (as tests/logic-report.spec.js seeds one) plays the finale's
+ * last scene and opens the record, and the phone shows its top -- the ending's
+ * name, the rank and the judgment DNA.
  *
  * Takes a browser and a dev server for about a minute: on the shared PC run it
  * through .claude/locked-run.ps1 like any other browser job.
@@ -21,10 +26,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import path from "node:path";
 
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 
 import { ACCESSIBILITY_SETTINGS_KEY, COLD_OPENING_SEEN_KEY } from "../src/appConfig.js";
-import { completeCurrentCase, startDebugNode } from "../tests/helpers/gameFlow.js";
+import { createCaseSummary } from "../src/gameLogic.js";
+import { completeCurrentCase, resumeSavedRun, startDebugNode } from "../tests/helpers/gameFlow.js";
+import { savedRunAt, seedSave } from "../tests/helpers/seededSave.js";
 
 const OUT_DIR = "docs/images";
 const MAX_BYTES = 400 * 1024;
@@ -45,6 +52,21 @@ async function settle(page) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   });
 }
+
+/** A case closed at the logic table with `logicRecord` (tests/logic-report.spec.js `closedCase`). */
+function closedCase(caseId, logicRecord) {
+  const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
+  return { ...summary, gauntlet: { logicStreak: 0, tableRules: 4 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+}
+
+const RECORDED_SEASON = {
+  case01: closedCase("case01", {}),
+  case02: closedCase("case02", { breaks: 1 }),
+  case03: closedCase("case03", { windows: 8, heat: 20, peak: 3, top: ["people", 5], grows: 3, switches: 1, busts: 4, best: 9 }),
+  case04: closedCase("case04", {}),
+  case05: closedCase("case05", { keeps: 2 }),
+  case06: closedCase("case06", { best: 4 }),
+};
 
 /** name -> { viewport, open(page) }. Each leaves the page on the screen to capture. */
 const SHOTS = {
@@ -81,6 +103,28 @@ const SHOTS = {
       await completeCurrentCase(page);
       await page.locator(".result-page").waitFor({ state: "visible" });
       await page.evaluate(() => window.scrollTo(0, 0));
+    },
+  },
+  report: {
+    viewport: PHONE,
+    open: async (page) => {
+      await seedSave(page, savedRunAt("final", "f_aftershock", { caseResults: RECORDED_SEASON }));
+      await page.goto("/");
+      await resumeSavedRun(page);
+      await completeCurrentCase(page);
+      const ending = page.locator(".ending-sequence");
+      await ending.waitFor({ state: "visible", timeout: 30_000 });
+      for (let twist = 0; twist < 3; twist += 1) {
+        await expect(ending).toHaveClass(/ending-step-0/);
+        await ending.locator("button").click();
+      }
+      await expect(page.locator(".ending-step-1")).toBeVisible();
+      await page.getByTestId("ending-next").click();
+      await expect(page.locator(".ending-step-2")).toBeVisible();
+      await page.locator(".ending-step-2 button").click();
+      await expect(page.locator(".ending-step-3")).toBeVisible();
+      // The record under the ending: its top is the ending's name, the rank and the judgment DNA.
+      await page.locator(".result-page").evaluate((report) => window.scrollTo(0, report.getBoundingClientRect().top + window.scrollY));
     },
   },
 };

@@ -36,7 +36,7 @@ export const GAME_GENRES = {
 const CURRENCY = { ko: "KRW", en: "USD", ja: "JPY" };
 
 /** The studio, in the page's language and without the word studio, with both creators. */
-export const studioOrganization = (language) => ({
+const studioOrganization = (language) => ({
   "@type": "Organization",
   name: studioName(language),
   member: CREATORS.map((creator) => ({ "@type": "Person", name: creator.name })),

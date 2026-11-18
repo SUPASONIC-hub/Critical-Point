@@ -764,3 +764,11 @@ test("the season before's picks change nothing the commit writes", async (t) => 
   assert.equal(JSON.stringify(withPicks), JSON.stringify(without));
   for (const entry of withPicks.log) assert.equal(Object.keys(entry).some((key) => /pick|past/i.test(key)), false);
 });
+
+test("the between-hands answer the table hands back drops an answer it does not know, and queues nothing", async () => {
+  const { context, did } = sceneContext("p1_start");
+  const { answerPulse } = mount(context);
+  assert.equal(await answerPulse({ caseId: context.currentCase, sceneNo: 2 }, "not-an-answer"), "dropped");
+  assert.equal(await answerPulse(null, "not-an-answer"), "dropped");
+  assert.equal(did.queued.length, 0);
+});

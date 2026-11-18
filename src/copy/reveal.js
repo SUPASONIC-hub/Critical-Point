@@ -70,6 +70,12 @@ const revealCopy = {
   next: "다음 · {title}",
   caseResult: "사건 결과",
   nextHand: "다음 판",
+  // N22: once a season, between two hands of 프롤로그 01·02.
+  pulse: {
+    question: "여기까지 어땠나요?",
+    answers: { fun: "재밌음", hard: "어려움", long: "길다" },
+    thanks: "고맙습니다. 다음 판으로 가세요.",
+  },
 };
 export default revealCopy;
 

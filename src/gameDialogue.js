@@ -270,6 +270,18 @@ export const characterProfiles = {
     voice: "또박또박한 한국어로 짧게 말하고, 마지막에 꼭 질문을 하나 남긴다.",
     line: "그럼 제 퇴직금도 기계랑 같이 가요?",
   },
+  // 번외 9 (src/nodes/side09.js): 아이굴 세리코바 answers in Korean (21 years
+  // here), said once in the narration. 위성규 speaks only in the narration.
+  "아이굴 세리코바": {
+    role: "국진호의 아내 · 카자흐스탄 알마티 · 한국 21년 · 57세",
+    stance: "약속 · 가족 · 남은 하루",
+    job: "남편이 남긴 탑차와 빚 사이에서, 석 달의 마지막 하루를 쓴다.",
+    appearance: "식품 공장 위생모 자국이 남은 이마, 남편의 탑차 열쇠, 빛바랜 혼인신고서 사본.",
+    thought: "그 사람은 넉 달만 더 내면 끝난다고 했다. 끝나지 않은 건 그 사람이 아니라 우리에게 온다.",
+    gesture: "아이굴 세리코바는 대답하기 전에 탑차 열쇠를 손바닥에 한 번 쥐었다가 놓는다.",
+    voice: "또렷한 한국어로 천천히 말하고, 모르는 말은 그 자리에서 되묻는다.",
+    line: "그 사람이 갚는다고 했으면 제가 갚아야죠.",
+  },
 };
 
 /**
