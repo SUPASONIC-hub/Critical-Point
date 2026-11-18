@@ -196,7 +196,8 @@ const budgets = [
   // 164,455 / 61,338 -> 164,455 / 61,350 묶음 11-18 over main 4d549334. Measured - / 61346 (over budget only) in the e2e build, the plus 4.
   // 164,426 / 61,325 -> 164,510 / 61,348 번외 이야기 속 공개 (sides-in-story) over main 4d549334: the report's side line (components/SideOpenedPanel.jsx, src/sideOpened.js). Measured 164506 / 61344 in the e2e build, the plus 4.
   // -> 164,570 / 61,390 묶음 11-18b over main 68cbc0f4, measured 164,566 / 61,386 in CI verify-quick, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_570, maxGzip: 61_390 },
+  // -> 164,690 / 61,414 n39-n40-n44 over main eb2d9aeb (N39's twelve scene cases, N40's sample date), measured 164,686 / 61,410 in CI verify-quick, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_690, maxGzip: 61_414 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -713,8 +714,8 @@ const budgets = [
   // 217,060 / 79,190 -> 217,596 / 79,364 번외 이야기 속 공개 (sides-in-story) over main 4d549334: each side case's `unlockAfter`, `isSideCaseOpen` and the report-to-start-screen hand-over (src/sideCases.js, IntroScreen), the result copy's side line. Measured 217592 / 79360 in the e2e build, the plus 4.
   // -> gzip 79,196 묶음 11-18 over main 4d549334, measured 79,192 in CI verify-quick, the plus 4.
   // -> 217,596 / 79,372 묶음 11-18b over main 68cbc0f4, measured 217,592 / 79,368 in CI verify-quick, the plus 4.
-  // -> gzip 79,379 n39-n40-n44 over main eb2d9aeb (N40's sample date in gameEvents.js), measured 79,375, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 217_596, maxGzip: 79_379 },
+  // -> 217,739 / 79,427 n39-n40-n44 over main eb2d9aeb (N40's sample date in gameEvents.js), measured 217,735 / 79,423 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 217_739, maxGzip: 79_427 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -2626,8 +2627,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
-// -> 380,677 / 443,199 / 451,173 n39-n40-n44, measured 380,676 / 443,195 / 451,169, the plus 4 (ko unchanged).
-const FIRST_PAINT_BUDGETS = { ko: 380_677, en: 443_199, ja: 451_173 };
+// -> 380,729 / 443,248 / 451,222 n39-n40-n44, measured 380,725 / 443,244 / 451,218 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_729, en: 443_248, ja: 451_222 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
