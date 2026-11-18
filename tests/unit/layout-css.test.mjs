@@ -187,7 +187,9 @@ test("a short phone gives a five-card hand under a rules line 20px without cutti
   // What they are taken from: the short phone's own hand, and the phone's card.
   const plainHand = px(short.match(/\n {2}\.gx-hand \{[^}]*\}/)?.[0] ?? "", "gap");
   const phoneCard = play.match(/@media \(max-width: 719px\) \{\s*\.gauntlet-stage \.gx-card \{[^}]*\}/)?.[0] ?? "";
-  const [, padBlock] = phoneCard.match(/padding: (\d+)px \d+px;/) ?? [];
+  // 2안 감사 장부 (11-18): the slip keeps 22px on its left for the ledger's margin
+  // rule, so the phone card's padding may name four sides; the block is the first.
+  const [, padBlock] = phoneCard.match(/padding: (\d+)px \d+px(?: (\d+)px \d+px)?;/) ?? [];
   const plainColumn = px(short.match(/\n {2}\.gx-read,\s*\.gx-table \{[^}]*\}/)?.[0] ?? "", "gap");
   assert.ok(plainHand && padBlock && plainColumn, "the rules they are taken from are where this reads them");
 
@@ -341,14 +343,17 @@ test("a phone draws the room behind the briefing's title, and its panel is the r
   assert.match(phone, /\.gx-comic-top > \.gx-plate-backdrop \{\s*display: block;\s*height: 100%;/);
   assert.match(phone, /\.gx-panel-splash > \.gx-plate,\s*\.gx-sfx \{\s*display: none;\s*\}/);
   assert.match(phone, /\.gx-caption-place \{\s*position: relative;\s*inset: auto;/, "the caption is in the flow, above the halftone");
-  // A face a reader can recognise at 96px, and the name larger beside it.
-  assert.match(phone, /\.gx-panel-speaker \{\s*grid-template-columns: 96px 1fr;\s*\}/);
-  assert.match(phone, /\.gx-speaker-tag b \{\s*font-size: 1\.375rem;\s*\}/);
+  // A face a reader can recognise: 124px since 2안 감사 장부 (11-17, portraits
+  // larger on paper), and the name larger beside it.
+  assert.match(phone, /\.gx-panel-speaker \{\s*grid-template-columns: 124px 1fr;\s*\}/);
+  // The name is 1.375rem at every width since 2안 (11-17), so the phone needs no rule of its own.
+  assert.match(briefing, /\n\.gx-speaker-tag b \{[^}]*font-size: 1\.375rem;/);
   const jsx = readFileSync(new globalThis.URL("../../src/gauntlet/SceneBriefing.jsx", import.meta.url), "utf8");
   const header = jsx.slice(jsx.indexOf('<header className={`gx-comic-top'), jsx.indexOf("</header>"));
   assert.match(header, /<ScenePlate node=\{node\} nodeId=\{nodeId\} variant="backdrop" \/>/);
   // The place caption keeps the sizes it always had.
-  assert.match(briefing, /\.gx-caption \{[^}]*border: 2px solid/);
+  // 2안 (11-17): the story box is a 2px rule on its left, not a 2px box.
+  assert.match(briefing, /\.gx-caption \{[^}]*border(?:-left)?: 2px solid/);
   assert.match(briefing, /\.gx-caption-place \{[^}]*padding: 6px 10px;[^}]*line-height: 1\.55;/);
   assert.match(briefing, /\.gx-caption-place b \{\s*font-size: 0\.8125rem;/);
   assert.match(briefing, /\.gx-caption-place span \{[^}]*font-size: 0\.75rem;/);
