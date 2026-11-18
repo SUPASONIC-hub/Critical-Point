@@ -5,7 +5,7 @@ import { ScenePlate } from "../components/ScenePlate.jsx";
 import * as endingCopy from "../endingCopy.js";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
-import { requestSideCase, sideCasesOpenedBy } from "../sideCases.js";
+import { SideOpenedPanel } from "../components/SideOpenedPanel.jsx";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -39,8 +39,6 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
   const observerEndingRecord = observerPattern.endingRecord;
   const judgmentProfile = { label: observerEndingRecord.label.replace(endingCopy.endingWords.sampleSuffix, endingCopy.endingWords.typeSuffix), text: observerPattern.arc.text };
   const seasonRecordNotice = endingCopy.getSeasonRecordNotice({ nextCaseId: nextCaseSignal?.caseId, ...view.telemetry });
-  // 11-18: the side cases this case opened at their place in the story (sideCases.sideCasesOpenedBy).
-  const openedSides = sideCasesOpenedBy(currentCase, { caseResults: view.score.caseResults });
   const finalVerdict = endingCopy.getFinalVerdict({ endingVariant, finalChoiceId: finalEndingEntry?.choiceId, endingSceneChoice: endingSceneProfile.choice });
   const endingTwists = [
     {
@@ -227,25 +225,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               </button>
             </section>
           )}
-          {/* 11-18: one line when this case opened a side case, with a way into
-              it through the start screen's slot; the next case stays above. */}
-          {openedSides.length > 0 && (
-            <section className="ending-epilogue-panel" aria-label={resultCopy.sideOpened.label} data-testid="side-opened">
-              <p>{fill(resultCopy.sideOpened.text, { names: openedSides.map((side) => fill(resultCopy.sideOpened.name, side)).join(", ") })}</p>
-              {openedSides.map((side) => (
-                <button
-                  key={side.id}
-                  type="button"
-                  className="ghost"
-                  data-testid={`side-opened-${side.id}`}
-                  onClick={() => { requestSideCase(side.id); setStarted(false); }}
-                >
-                  <ChevronRight size={16} />
-                  {fill(resultCopy.sideOpened.open, { name: side.label })}
-                </button>
-              ))}
-            </section>
-          )}
+          <SideOpenedPanel caseId={currentCase} caseResults={view.score.caseResults} setStarted={setStarted} />{/* 11-18: under the next case */}
           {currentCase === "final" && (
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label={resultCopy.endingVariantLabel}>
               <span>{endingVariant.label}</span>
