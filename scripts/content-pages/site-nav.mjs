@@ -115,24 +115,25 @@ ${menuLinks(kind, language).replace(/ aria-current="(?:page|true)"/g, "")}</nav>
  */
 export const MENU_STYLE = `
 nav a[aria-current=true]{color:var(--text)}
-.site-foot{padding:12px 0 0;border-top:1px solid var(--line);border-bottom:0}
+.site-foot{padding:12px 0 0;border-top:4px double var(--text);border-bottom:0}
 .site-foot+p{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
 .lede{font-size:1.0625rem;color:var(--text)}
 .meta{margin:4px 0 0;color:var(--text-2);font-size:.875rem}
 .case-list{list-style:none;padding:0}
-.case-list li{margin:0;padding:14px 0;border-top:1px solid var(--line)}
+.case-list li{margin:0;padding:14px 0;border-top:1px solid var(--line-strong)}
 .case-list a{font-weight:700}
 .case-list p{margin:4px 0 0}
 .cast{display:grid;gap:20px;padding:0;list-style:none}
 .cast li{display:flex;gap:14px;margin:0;align-items:flex-start}
-.cast img{flex:none;width:72px;height:72px;object-fit:cover;border-radius:12px;background:var(--surface)}
+.cast img{flex:none;width:80px;height:80px;object-fit:cover;border:4px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 6px 14px var(--shadow-2);transform:rotate(-2deg)}
+.cast li:nth-child(even) img{transform:rotate(2deg)}
 .cast p{margin:4px 0 0}
 .cast .line{color:var(--text);font-style:italic}
 @media (max-width:599px){.cast li{display:flow-root}.cast img{float:left;margin:4px 14px 4px 0}.cast h3{margin-top:8px}.cast p:not(.meta){clear:left}}
 .pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:36px;padding-top:12px;border-top:1px solid var(--line)}
 .pager a{display:inline-flex;align-items:center;min-height:44px}
 .note{font-size:.875rem}
-.spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.9375rem}
+.spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line-strong);border-left:3px solid var(--pencil);border-radius:3px;background:var(--surface);font-size:.9375rem}
 details{margin-top:4px}
 summary{cursor:pointer;color:var(--text-2);font-size:.875rem;padding:10px 0}
 `;
