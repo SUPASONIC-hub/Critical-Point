@@ -18,7 +18,7 @@ import {
 } from "./case-kit.mjs";
 
 /**
- * `npm run check:case -- [ids...] [--docs-only]`: writing-a-case.md's
+ * `npm run check:case -- [ids...] [--docs-only] [--summary | --json]`: writing-a-case.md's
  * checklist for one case, as warnings (N29, scripts/case-kit.mjs). Without
  * ids it reads every side case the release lists. It never fails: the exit
  * code is 0 whatever it finds, and check:changed runs it after its checks
@@ -123,16 +123,25 @@ for (const doc of CASE_DOCS) {
 const credits = read("docs/portrait-credits.md") ?? "";
 warn("docs/portrait-credits.md", "TODO", credits.split(/\r?\n/).filter((line) => line.startsWith("|") && /\bTODO\b/.test(line)).map((line) => line.slice(0, 60)));
 
-const units = [...new Set(warnings.map((entry) => entry.unit))];
-console.log(`check:case (경고만, 실패하지 않음): ${ids.length ? ids.join(", ") : "문서만"} — 경고 ${warnings.length}개`);
-for (const unit of units) {
-  const mine = warnings.filter((entry) => entry.unit === unit);
-  console.log(`  ${unit} (${mine.length})`);
-  const kinds = [...new Set(mine.map((entry) => entry.kind))];
-  for (const kind of kinds) {
-    const items = mine.filter((entry) => entry.kind === kind).map((entry) => entry.item);
-    const shown = items.slice(0, 8);
-    console.log(`    [${kind}] ${shown.join(" / ")}${items.length > shown.length ? ` / … +${items.length - shown.length}` : ""}`);
+// N47 (2026-11-18): `--json` is what report:season-ready reads, `--summary`
+// the one line a case that a side case PR gets (.github/workflows/case-check.yml).
+if (argv.includes("--json")) {
+  console.log(JSON.stringify({ ids, warnings }));
+} else if (argv.includes("--summary")) {
+  const { summaryLines } = await import("./season-ready.mjs");
+  console.log(summaryLines(ids, warnings).join("\n"));
+} else {
+  const units = [...new Set(warnings.map((entry) => entry.unit))];
+  console.log(`check:case (경고만, 실패하지 않음): ${ids.length ? ids.join(", ") : "문서만"} — 경고 ${warnings.length}개`);
+  for (const unit of units) {
+    const mine = warnings.filter((entry) => entry.unit === unit);
+    console.log(`  ${unit} (${mine.length})`);
+    const kinds = [...new Set(mine.map((entry) => entry.kind))];
+    for (const kind of kinds) {
+      const items = mine.filter((entry) => entry.kind === kind).map((entry) => entry.item);
+      const shown = items.slice(0, 8);
+      console.log(`    [${kind}] ${shown.join(" / ")}${items.length > shown.length ? ` / … +${items.length - shown.length}` : ""}`);
+    }
   }
 }
 process.exitCode = 0;
