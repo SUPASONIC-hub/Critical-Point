@@ -905,7 +905,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
-${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
+${alternates}${share}<link rel="icon" href="/icons/icon-192-v2.png" />
 ${structuredData ? `${structuredData}
 ` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}${hero ? SHOWCASE_PAPER_STYLE.trim().replace(/\n/g, "") : ""}</style>
 ${tags}</head>

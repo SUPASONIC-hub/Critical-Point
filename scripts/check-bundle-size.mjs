@@ -2815,7 +2815,9 @@ function checkBudget(file, budget) {
 // -> 11,237 / 4,022 묶음 11-17 over main 705a809f, the plus 4.
 // -> 11,207 / 4,025 N32 친구 기록 넘기기 over main 705a809f: the worker precaches the friendTarget chunk, the plus 4.
 // -> 11,272 / 4,044 묶음 11-17 over main 705a809f, the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_272, maxGzip: 4_044 };
+// -> 11,184 / 4,002 앱 아이콘 이름 -v2 11-17: 아이콘 링크·사전 캐시 이름이 길어짐, the plus 4.
+// Bundle 11-18 (아이콘 -v2 + 묶음 11-17): re-measured after the build.
+const WORKER_BUDGET = { maxBytes: 11_280, maxGzip: 4_048 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

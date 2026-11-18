@@ -13,7 +13,7 @@ import { chromium } from "@playwright/test";
  *
  * The browser is the renderer, as it is for the art variants: Playwright is
  * already a devDependency, so there is no image toolchain to install. The PNGs
- * are committed; `public/icons/favicon.svg` is the tile itself, for browsers
+ * are committed; `public/icons/favicon-<version>.svg` is the tile itself, for browsers
  * that take an SVG icon.
  */
 const BRAND = "docs/images/brand";
@@ -27,22 +27,29 @@ const bleed = (scale) => {
 };
 
 const OUT_DIR = "public/icons";
+/**
+ * Part of every icon's file name. Installed apps (Chrome, Android, desktop)
+ * refresh their icon only when the manifest names a new URL, so a redrawn icon
+ * takes the next version; index.html, the manifest and legal-pages.mjs follow.
+ */
+const ICON_VERSION = "v2";
+const named = (base, ext = "png") => `${base}-${ICON_VERSION}.${ext}`;
 const ICONS = [
   // The rounded tile, as the tab and an installed app's "any" icon show it.
-  { file: "favicon-32.png", size: 32, svg: TILE },
-  { file: "icon-192.png", size: 192, svg: TILE },
-  { file: "icon-512.png", size: 512, svg: TILE },
+  { file: named("favicon-32"), size: 32, svg: TILE },
+  { file: named("icon-192"), size: 192, svg: TILE },
+  { file: named("icon-512"), size: 512, svg: TILE },
   // iOS rounds the corners itself and paints transparency black: full bleed.
-  { file: "apple-touch-icon.png", size: 180, svg: bleed(1) },
+  { file: named("apple-touch-icon"), size: 180, svg: bleed(1) },
   // A maskable icon is cut to a circle of 80% by the platform: the mark sits
   // well inside that, on a ground that runs to the edges.
-  { file: "icon-maskable-512.png", size: 512, svg: bleed(0.8) },
+  { file: named("icon-maskable-512"), size: 512, svg: bleed(0.8) },
 ];
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
 mkdirSync(OUT_DIR, { recursive: true });
-copyFileSync(`${BRAND}/mark-dark.svg`, `${OUT_DIR}/favicon.svg`);
+copyFileSync(`${BRAND}/mark-dark.svg`, `${OUT_DIR}/${named("favicon", "svg")}`);
 
 for (const icon of ICONS) {
   const source = `data:image/svg+xml;base64,${Buffer.from(icon.svg).toString("base64")}`;
