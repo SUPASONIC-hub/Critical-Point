@@ -14,12 +14,15 @@ const actTallyCopy = {
     case01: "프롤로그 끝",
     case19: "3막 끝 · 사건 18",
     case37: "6막 끝 · 사건 36",
+    // N23: the small one on 사건 07's report.
+    case08: "1막 끝 · 사건 07",
   },
   // The corner of the picture, where the finale's says SEASON 01 · FINAL RECORD.
   corners: {
     case01: "PROLOGUE · MIDSEASON",
     case19: "ACT 3 · MIDSEASON",
     case37: "ACT 6 · MIDSEASON",
+    case08: "ACT 1 · MIDSEASON",
   },
   habit: "지금까지의 판단 유형",
   habitPending: "아직 이름 붙지 않은 판단",

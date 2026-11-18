@@ -13,8 +13,10 @@ import { easyResourceLabels } from "./playerLanguage.js";
  * Data only — no state, no behaviour — so screens can import it directly.
  */
 
-export const GAME_TITLE = "TRIGGERLAB: CRITICAL POINT";
-export const GAME_TITLE_READING = "트리거랩";
+// The product's name (2026-11-16: the legacy prefix TRIGGERLAB is gone from it).
+// 트리거랩 stays in the story: it is where the player works, not the game's name.
+export const GAME_TITLE = "CRITICAL POINT";
+export const GAME_TITLE_READING = "임계점";
 /**
  * The subtitle names the genre, because nothing else on the screen does.
  *

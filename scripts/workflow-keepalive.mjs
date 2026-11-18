@@ -17,7 +17,7 @@ import { pathToFileURL } from "node:url";
 
 import { describeInactivity, quietDays } from "./report-ops-health.mjs";
 
-export const INACTIVE = "disabled_inactivity";
+const INACTIVE = "disabled_inactivity";
 
 export function readWorkflows(parsed) {
   const list = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.workflows) ? parsed.workflows : [];

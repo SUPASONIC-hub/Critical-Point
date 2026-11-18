@@ -16,6 +16,9 @@ const resultCardCopy = {
   shared: "결과 카드를 공유했습니다.",
   failed: "카드를 만들지 못했습니다. 다시 눌러 주세요.",
   note: "카드에는 이름이 들어가지 않습니다.",
+  // N32: the season against the friend's record this device was sent (friendTarget.js); said here, not drawn on the card.
+  friendBeaten: "친구 기록 {score}점을 넘었습니다. 이번 시즌 최고 버스트 {mine}점.",
+  friendShort: "친구 기록 {score}점을 넘기까지 {gap}점 모자랐습니다. 이번 시즌 최고 버스트 {mine}점.",
 };
 export default resultCardCopy;
 

@@ -9,7 +9,7 @@ export default {
   toggles: {
     storyMode: {
       label: "Story Mode",
-      text: "The Wall moves further away, and a hand that hits the Wall doesn’t carry over to the next. Hitting the Wall doesn’t skip a scene. The clock runs 2× slower. Applies from the next case, and these runs don’t go on the public ranking.",
+      text: "The Wall moves further away, and a hand that hits the Wall doesn’t carry over to the next. Hitting the Wall doesn’t skip a scene. The clock runs 2× slower. Turned on before you start, it applies from the first case; during a case, from the next one. These runs don’t go on the public ranking.",
     },
     holdReadingClock: {
       label: "Turn off the reading clock",
@@ -29,7 +29,7 @@ export default {
     },
     crisisEdge: {
       label: "Crisis edge alert",
-      text: "As the table nears the wall, the screen edges glow softly. Cards and text stay clear.",
+      text: "As the table nears the Wall, the screen edges glow softly. Cards and text stay clear.",
     },
     letterKeys: {
       label: "Use single-key shortcuts",
@@ -47,7 +47,7 @@ export default {
   },
   textScale: {
     legend: "Text size",
-    text: "Enlarges the text on every screen. The pot, clock and timer figures stay the same. Saved on this device only.",
+    text: "Enlarges the text on every screen. The stake, clock and timer figures stay the same. Saved on this device only.",
     labels: ["Default", "Large", "Larger"],
   },
 };

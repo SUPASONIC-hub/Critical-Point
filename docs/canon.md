@@ -472,7 +472,7 @@ is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토)
 and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
-7월 11일 (토) and 7월 13일 (월) fit 2026) and nothing else here.
+7월 11일 (토), 7월 13일 (월), 5월 14일 (목), 8월 13일 (목), 8월 14일 (금) and 8월 18일 (화) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -585,6 +585,19 @@ and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (�
 | 심재만 (61) | 도담사출 대표; paid the lease before the pension to keep the machines running, and says he knew. He and 설경민 speak only in the narration (indirect speech or 「」), as 번외 6's 기성철: no ordinary generated face was found for either yet |
 | 채이안 | 「위험이 누구 이름으로 적히는지 정하는」 department (사건 25's line): the opinion box is 400 characters, KD캐피탈's loss only; writing the payment behind the pension puts the analyst's name on a 4,200만 원 loss |
 | The endings | the first line of the opinion (the 4,200만 held two weeks behind the pension, the seven months paid on 7월 17일, the analyst's name on the expected loss / the cause written, the agenda passed, a line added to the collection rules three months later, the 3,640만 left to a wage claim / 「특이사항 없음」 left, the shop closed that month). None touches the flood of 사건 35 |
+
+### 번외 9, 92일 (side09)
+
+| Fact | Value |
+|---|---|
+| When | 2026-08-13 (목) 16:10 to 08-14 (금) 17:50, the day before 광복절: after 사건 40 opens (the Saturday after the broadcast, 8월 8일) and before its third week (8월 17일); 사건 41's hearing is two weeks on. The analyst is in KD캐피탈 위험관리부 under 채이안, as 사건 41 finds them |
+| Where | KD캐피탈 위험관리부 and 고객채권부; 인천 남동구 (a 빌라's parking lot and living room, the 행정복지센터); 인천가정법원 민원실 |
+| 「유족 배려 안내」 | 고객채권부's monthly letter telling a dead customer's family what he owed, first line 「상속 채무 이행 안내」, due 9월 30일. Rule revised 2024-03 by 위성규 (상속채권파트장, 44): sent to customers 92 days after the death (the longest three months), 「장례 직후의 독촉은 유족에게 상처」. Collection rate on inherited debt 41% before, 68% after. August: 87 letters, list closed 8월 14일 18:00, sent 8월 18일 (화) |
+| 국진호 (61) | invented (searched 2026-11-16): a sole trader with a one-ton refrigerated truck out of 인천 연안부두; died at the wheel 5월 14일 (목). Owes KD캐피탈 6,370만 원 (3,960만 truck instalments + 2,410만 working capital); leaves the truck (1,800만) and 410만 in the bank. His three months end 8월 14일; the other 86 are past theirs. Had told his wife four more months would pay off the truck |
+| 아이굴 세리코바 (57) | his wife, from 알마티, 21 years in Korea (married 2005), a permanent resident who kept her name; answers in Korean (said once, in the narration). Her residence card reads 「세리코바」, the 2005 family register 「세리꼬바」. Lays 바우르사크 on the fortieth day. Files at 인천가정법원 on 8월 14일 16시 52분; the truck is not sold before |
+| 국하늘 (20) | their daughter, second year at university; does not speak. If the months had passed: the wife's share 3,822만, hers 2,548만 (3/5 and 2/5) |
+| 위성규 | speaks only in the narration (indirect speech or 「」), as 번외 8's 설경민; says the rule is for the bereaved. 상속인 enquiries before the letter get 안내 대본 7번 |
+| The endings | the first line of the 86 letters (the way out written on top, the analyst's name on the change, 39 houses file by November / the rule's numbers to audit, the letters sent as they were, the rule changed three months later to 14 days with a note, 위성규 up for a year-end commendation / 「상속 채무 이행 안내」 left, the first 50만 원 paid the next Wednesday). In each, her filing is accepted in September. None touches 사건 40's score or 41's hearing |
 
 ## Known and left alone
 

@@ -16,7 +16,7 @@
  * nothing of it.
  */
 
-export const MENU_LANGUAGES = ["ko", "en", "ja"];
+const MENU_LANGUAGES = ["ko", "en", "ja"];
 
 /** The pages the menu lists after the game, in its order. Each is `/<kind>.html`, `/en/<kind>.html`, `/ja/<kind>.html`. */
 export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "faq", "contact", "privacy", "terms"];
@@ -74,7 +74,7 @@ const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root, as legal-pages.mjs's `pagePath` writes it. */
 export const menuPath = (kind, language) => `${folderOf(language)}/${kind}.html`;
 /** The game in a language: `/`, `/en/`, `/ja/` (legal-pages.mjs `gamePath`). */
-export const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
+const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /** The section a page belongs to: a case's page is under the case files, the weekly calendar under the guide. */
 const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : kind === "weekly" ? "guide" : kind);

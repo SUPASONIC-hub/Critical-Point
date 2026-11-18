@@ -17,7 +17,7 @@ export default {
   tutorial: {
     read: { label: "Read the scene", text: "Read the situation, the speaker and the question. Reading time doesn’t count toward your score." },
     weigh: { label: "Stake a card", text: "Pick one card and stake it. Each card gains and costs something different." },
-    commit: { label: "Push and Commit", text: "The more you push, the higher the Heat and the multiplier. Commit before you hit the unseen Wall and the stake builds up; close the case and it goes to the vault." },
+    commit: { label: "Push and Commit", text: "The more you push, the higher the Heat and the multiplier. Commit before you hit the unseen Wall and the stake builds up; close the case and it goes to the Vault." },
     replay: { label: "Play again", text: "Different records open different authority and endings." },
   },
   goals: {

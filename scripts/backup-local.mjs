@@ -16,7 +16,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const DEFAULT_ROOT = "D:\\DevData\\critical-point-backup";
+const DEFAULT_ROOT = "D:\\DevData\\critical-point-backup";
 /** Rankings (season-final rows through the public view), the hall of fame and the cloud saves. */
 export const TABLES = ["public_rankings", "hall_of_fame_boards", "hall_of_fame", "cloud_saves"];
 export const PAGE = 1000;

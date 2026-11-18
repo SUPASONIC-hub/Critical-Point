@@ -119,5 +119,5 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   assert.match(en.spendNote, /KD Bank account/);
   assert.match(ja.spendNote, /KD銀行口座/);
   // The hint under the note (11-05, (1)): one more only when a slot is open, in the draft's own words (slot / 枠, vault / 金庫).
-  assert.deepEqual([ko.spendHint, en.spendHint, ja.spendHint], ["하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.", "One more only when a slot is open. Buy every time and the vault runs dry before the ending.", "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。"]);
+  assert.deepEqual([ko.spendHint, en.spendHint, ja.spendHint], ["하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.", "One more only when a slot is open. Buy every time and the Vault runs dry before the ending.", "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。"]);
 });

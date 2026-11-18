@@ -23,7 +23,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
 
-export const OG_WORDS = {
+const OG_WORDS = {
   ko: { name: "임계점", tagline: "판돈을 올릴수록, 벽이 가까워진다.", badge: "무료 · 설치 없이 브라우저에서 바로", genre: "기업·금융 미스터리" },
   en: { name: "", tagline: "Every push of the stake brings the Wall closer.", badge: "Free · plays in your browser, no install", genre: "Corporate & financial mystery" },
   ja: { name: "臨界点", tagline: "賭け金を上げるほど、壁が近づく。", badge: "無料・ブラウザですぐ遊べる", genre: "企業・金融ミステリー" },

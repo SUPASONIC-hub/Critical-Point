@@ -25,6 +25,8 @@ const habitsCopy = {
   cardLine: "당신의 심사 성향은 「{habit}」입니다.",
   // N3: the start page's line for a visit from a shared card (shareLink.js), the habit's name in its blank.
   friendLine: "친구의 결과: {habit}",
+  // N32: the goal under it when the address carries the friend's best burst (friendTarget.js).
+  friendTarget: "친구 기록 넘기기: 최고 버스트 {score}점을 넘어 보세요.",
 };
 export default habitsCopy;
 

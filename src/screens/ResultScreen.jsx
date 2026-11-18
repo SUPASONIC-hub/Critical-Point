@@ -191,7 +191,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               {caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}{caseOutcome.shock && <p data-testid="case-shock">{caseOutcome.shock}</p>}
               {seasonStanding.titleRise && <p data-testid="title-rise">{fill(resultCopy.titleRise, { title: seasonStanding.titleRise })}</p>}
               <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
-            </div>
+            {renderers.renderActProgress?.(currentCase)}</div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
               register is a hard read, and this is the one beat where the analyst
