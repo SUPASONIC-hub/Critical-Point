@@ -127,7 +127,9 @@ test("closing 사건 14 opens 번외 3 alone: one line on the report, and its bu
 
   await clickElement(page.getByTestId("side-opened-side03"), "open 번외 3 from the report");
   await expect(page.getByTestId("side-case-screen")).toHaveAttribute("data-side-node", "s3_start", { timeout: TRANSITION_TIMEOUT_MS });
-  await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
+  // Left mid-case by the header button, once the briefing has opened the table.
+  await dismissProtocolBreach(page);
+  await clickElement(page.getByTestId("side-case-leave"), "back to the start screen");
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   await expect(page.getByTestId("side-case-open-side03")).toBeVisible();
