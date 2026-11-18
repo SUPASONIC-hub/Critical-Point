@@ -15,6 +15,7 @@ import { side05 } from "../../src/nodes/side05.js";
 import { side06 } from "../../src/nodes/side06.js";
 import { side07 } from "../../src/nodes/side07.js";
 import { side08 } from "../../src/nodes/side08.js";
+import { side09 } from "../../src/nodes/side09.js";
 import { isSideCaseId } from "../../src/sideCases.js";
 import { checkSidePack } from "../../src/state/sidePackCheck.js";
 
@@ -29,7 +30,7 @@ const languages = SUPPORTED_LOCALES.map((locale) => locale.code).filter((code) =
 const marks = (text) => [...text].filter((character, at) => character === "'" && !(/[A-Za-z]/.test(text[at - 1] ?? "") && /[A-Za-z]/.test(text[at + 1] ?? ""))).length;
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-const RELEASED = [side01, side02, side03, side04, side05, side06, side07, side08];
+const RELEASED = [side01, side02, side03, side04, side05, side06, side07, side08, side09];
 
 test("every language answers each released side case's scenes and endings: none missing, none stale, no number lost", async () => {
   for (const lang of languages) {
@@ -61,14 +62,15 @@ test("every language names the side list's label and title in its dictionary; th
     "sidePacks.SIDE_CASES.side06.label", "sidePacks.SIDE_CASES.side06.title",
     "sidePacks.SIDE_CASES.side07.label", "sidePacks.SIDE_CASES.side07.title",
     "sidePacks.SIDE_CASES.side08.label", "sidePacks.SIDE_CASES.side08.title",
+    "sidePacks.SIDE_CASES.side09.label", "sidePacks.SIDE_CASES.side09.title",
   ]);
   const labels = { en: (n) => `Side case ${n}`, ja: (n) => `番外${n}` };
   for (const lang of languages) {
     const copy = flatten(await readLanguageCopy(root, lang));
     for (const path of sidePaths) assert.equal(typeof copy[path], "string", `${lang}: ${path}`);
-    for (const n of [1, 2, 3, 4, 5, 6, 7, 8]) assert.equal(copy[`sidePacks.SIDE_CASES.side0${n}.label`], labels[lang](n), `${lang}: the label in the case labels' form`);
+    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9]) assert.equal(copy[`sidePacks.SIDE_CASES.side0${n}.label`], labels[lang](n), `${lang}: the label in the case labels' form`);
   }
-  assert.deepEqual(SIDE_CASES.map((entry) => entry.label), ["번외 1", "번외 2", "번외 3", "번외 4", "번외 5", "번외 6", "번외 7", "번외 8"]);
+  assert.deepEqual(SIDE_CASES.map((entry) => entry.label), ["번외 1", "번외 2", "번외 3", "번외 4", "번외 5", "번외 6", "번외 7", "번외 8", "번외 9"]);
   for (const pack of RELEASED) assert.deepEqual(checkSidePack(pack), [], pack.id);
 });
 
@@ -100,6 +102,7 @@ test("on a Korean page a side pack arrives as it is; the overlay lays a language
   assert.equal(await SIDE_CASES[5].load(), side06);
   assert.equal(await SIDE_CASES[6].load(), side07);
   assert.equal(await SIDE_CASES[7].load(), side08);
+  assert.equal(await SIDE_CASES[8].load(), side09);
 
   const pack = clone(side01);
   const words = (await import(`${root}/src/locales/en/nodes/side01.js`)).default;

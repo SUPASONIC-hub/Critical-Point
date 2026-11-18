@@ -1,7 +1,7 @@
 import { buildLeaderboard } from "./ranking.js";
 import drawCopy from "./copy/resultCardDraw.js";
 import { fill } from "./locale.js";
-import { shareAddress } from "./shareLink.js";
+import { shareAddress, withSharedScore } from "./shareLink.js";
 
 /**
  * The result card as data: every string and number the season's card shows,
@@ -123,11 +123,13 @@ export function buildResultCardModel(input = {}) {
 /**
  * The line copied with the card. `origin` is the site's address, which the
  * line ends on marked as a shared card's (`/?from=card&h=<habit id>`,
- * shareLink.js); without one the line ends at the rank.
+ * shareLink.js), and the season's best burst after it (`&s=<score>`, N32,
+ * the number a friend who opens it is asked to beat); without one the line
+ * ends at the rank.
  */
 export function buildShareText(model, origin = "") {
   const card = model ?? buildResultCardModel();
-  const address = shareAddress(toText(origin), card.habitId);
+  const address = withSharedScore(shareAddress(toText(origin), card.habitId), card.bestBurst);
   const line = fill(drawCopy.shareLine, { mode: card.habitLine ? card.dnaTitle : card.modeTitle, ending: card.endingName, burst: card.bestBurst, points: RESULT_CARD_LABELS.points, rank: card.bestRank, share: card.share });
   return [line, card.habitLine, address].filter(Boolean).join(" ");
 }

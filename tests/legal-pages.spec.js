@@ -223,7 +223,7 @@ for (const language of ["ko", "en", "ja"]) {
 // read with no script as a crawler reads it, and the game in that language
 // once the script runs.
 for (const [language, start, title] of [
-  ["en", "Start the prologue", "Critical Point - Every 45 seconds, your judgment goes on the record"],
+  ["en", "Start the prologue", "Critical Point — Free Browser Mystery Game"],
   ["ja", "プロローグを始める", "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される"],
 ]) {
   test(`/${language}/ is the start page in its language, to a crawler and to a player`, async ({ page, request }) => {

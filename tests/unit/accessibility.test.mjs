@@ -199,7 +199,7 @@ test("the comfort panel's switches are settings the game has, and story mode is 
   // What the switch says it does, each clause being something the engine does
   // (tests/unit/story-mode.test.mjs): the far wall, no broken next board, no
   // skipped scene, the clock, when it starts, and the ranking.
-  for (const clause of ["벽이 멀어지고", "다음 판으로 넘어오지 않습니다", "장면을 건너뛰지 않습니다", "시계는 2배 느립니다", "다음 사건부터 적용되고", "공개 랭킹에는 오르지 않습니다"]) {
+  for (const clause of ["벽이 멀어지고", "다음 판으로 넘어오지 않습니다", "장면을 건너뛰지 않습니다", "시계는 2배 느립니다", "시작 전에 켜면 첫 사건부터", "다음 사건부터 적용되고", "공개 랭킹에는 오르지 않습니다"]) {
     assert.ok(list.includes(clause), `the description says: ${clause}`);
   }
 });
@@ -214,7 +214,12 @@ test("the play-style drawer holds the three pledges and points to the comfort pa
   assert.equal(more.length, 0, "one mapped pledge card and no other");
   assert.match(pledge, /setPlayStyle\(style\.id\)/);
   assert.match(pledge, /aria-pressed=\{playStyle === style\.id\}/);
-  assert.doesNotMatch(intro, /storyMode|setAccessibility|useAccessibility/, "the intro screen itself reads and sets no setting");
+  // N19 (2026-11-16): the one exception is the start screen's second door,
+  // which turns story mode on and starts; it reads nothing, and sets only that.
+  const writes = [...intro.matchAll(/setAccessibility\(([^)]*)\)/g)].map((match) => match[1]);
+  assert.deepEqual(writes, ["{ storyMode: true }"], "the intro sets one setting, from 「이야기로 시작」");
+  assert.doesNotMatch(intro, /useAccessibility|getAccessibility/, "the intro screen itself reads no setting");
+  assert.equal(intro.match(/data-testid="start-story-mode"/g)?.length, 1);
   // The drawer's note is the screen's copy table (src/copy/intro.js), printed by the drawer.
   const introWords = source("copy/intro.js");
   assert.ok(introWords.includes('note: "고른 방식은 내 다짐으로 기록됩니다. 판의 규칙을 바꾸는 스토리 모드는 편의 설정에 있습니다."'));

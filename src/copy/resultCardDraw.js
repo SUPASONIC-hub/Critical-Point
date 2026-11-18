@@ -9,7 +9,7 @@ import { localizeTables } from "../locale.js";
 const resultCardDrawCopy = {
   // The words the card prints that are the same for every season.
   labels: {
-    game: "TRIGGERLAB: CRITICAL POINT",
+    game: "CRITICAL POINT",
     season: "SEASON 01 · FINAL RECORD",
     dna: "판단 DNA",
     ending: "결말",

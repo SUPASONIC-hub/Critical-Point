@@ -8,4 +8,6 @@ export default {
   shared: "Shared the result card.",
   failed: "Couldn’t make the card. Please press again.",
   note: "Your name never appears on the card.",
+  friendBeaten: "You beat your friend’s {score} pts. Your Best Burst this season: {mine} pts.",
+  friendShort: "{gap} pts short of beating your friend’s {score} pts. Your Best Burst this season: {mine} pts.",
 };

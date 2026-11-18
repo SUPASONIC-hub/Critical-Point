@@ -879,9 +879,9 @@ test("staged: the introduction is drawn as a carried rule, with a border that is
   expect(intro.border, "every introduction is drawn alike").toBe(first.border);
 });
 
-test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a short one, a phone on its side and at a large type size", async ({ page }) => {
-  test.setTimeout(420_000);
-  await holdReadingClock(page);
+// One test a screen since 2026-11-18: the four in one test ran 4.2 minutes on
+// main and over its 7-minute limit on the 11-17 bundle's slower shards.
+{
   const SCREENS = [
     // Every phone docks 판 열기 alone since 2026-10-22 (D-3), so a 740px one
     // has the panel and the question on its first screen too.
@@ -896,6 +896,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
     { name: "390x844, 20px type", size: { width: 390, height: 844 }, rootFontSize: "20px" },
   ];
   for (const screen of SCREENS) {
+  test(`staged: 판 열기 stays docked and pressable over the introduction at ${screen.name}`, async ({ page }) => {
+    test.setTimeout(240_000);
+    await holdReadingClock(page);
     for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
       await openIntroPage(page, step.caseId, screen.size, { broken: step.caseId === "prologue02", rootFontSize: screen.rootFontSize });
       const where = `${step.caseId} @ ${screen.name}`;
@@ -920,8 +923,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
     // And it opens the table.
     await clickThroughMotion(page.getByTestId("open-table"), `판 열기 @ ${screen.name}`);
     await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  });
   }
-});
+}
 
 // The draft a case shows was offered as the case before it closed, so the
 // first one a plain run meets is the offer made at the close of 프롤로그 04.

@@ -56,11 +56,14 @@
     "check:node": "node scripts/check-node-version.mjs",
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
+    "check:case": "node scripts/check-case.mjs",
+    "new:case": "node scripts/new-case.mjs",
     "check:mood": "node scripts/check-mood.mjs",
     "check:locale": "node scripts/check-locale.mjs",
     "check:locale:strict": "node scripts/check-locale.mjs --strict",
     "check:doc-numbers": "node scripts/check-doc-numbers.mjs",
     "check:readme": "node scripts/check-readme.mjs",
+    "sitemap:dates": "node scripts/sitemap-dates.mjs",
     "capture:readme": "node scripts/capture-readme-shots.mjs",
     "check:types": "tsc -p jsconfig.json",
     "check:specs": "node scripts/run-e2e.mjs --list",
@@ -86,7 +89,7 @@
     "verify:full": "npm run verify && npm run test:e2e:full && npm run test:e2e:season"
   },
   "dependencies": {
-    "lucide-react": "^1.69.0",
+    "lucide-react": "^1.72.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

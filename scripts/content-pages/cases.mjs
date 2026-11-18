@@ -165,7 +165,7 @@ export const CASE_INDEX_DESCRIPTION = {
  * (user's decision 11-09, option 1): its page says so at the top, and the
  * index keeps its lines folded (`<details>`, in the HTML for a crawler).
  */
-export const FIRST_LATE_CASE = "case10";
+const FIRST_LATE_CASE = "case10";
 export const tellsEarlierCases = (caseId) => CASE_SEQUENCE.indexOf(caseId) >= CASE_SEQUENCE.indexOf(FIRST_LATE_CASE);
 
 export const caseGroup = (caseId) => (caseId.startsWith("prologue") ? "prologue" : caseId === "final" ? "final" : "main");

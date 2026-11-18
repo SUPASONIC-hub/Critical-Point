@@ -426,7 +426,8 @@ test("the question a second tab is asked has no structural accessibility violati
   await page.getByTestId("commit-push").click();
   const second = await context.newPage();
   await second.goto("/?debug=1");
-  await expect(second.getByRole("alertdialog")).toBeVisible();
+  // The second tab boots the runtime before it can ask: a first boot's 30 s, as elsewhere in the suite.
+  await expect(second.getByRole("alertdialog")).toBeVisible({ timeout: 30_000 });
   await expect(second.getByTestId("table-held-elsewhere")).toBeVisible();
   await waitForEntrance(second.getByTestId("table-held-elsewhere"));
   await expectNoA11yViolations(second);

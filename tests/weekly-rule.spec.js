@@ -1,7 +1,7 @@
 import { BACKEND_ORIGIN, expect, test } from "./helpers/network.js";
 
 import { NEAR_WALL_SHIFT, weekStartMs, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
-import { NEW_GAME_PLUS_KEY } from "../src/appConfig.js";
+import { LAST_VISIT_KEY, NEW_GAME_PLUS_KEY } from "../src/appConfig.js";
 import { WEEK_RULE_OFF_STORAGE_KEY, WEEK_RULE_ON_STORAGE_KEY } from "../src/state/weeklyRuleChoice.js";
 import { clickElement, dismissProtocolBreach, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
@@ -264,4 +264,37 @@ test("weekly rule ranking after the week: last week's board stays a week, after 
   await expect(page.locator(".ranking-row")).toHaveCount(3);
   await expect(page.locator(".ranking-row").first()).toContainText("TESTWK01");
   expect(asked.at(-1), "last week's board asks the server for that week's rows").toBe("eq.2026-W47");
+});
+
+/**
+ * N24 「지난번 이후」: a device back after three days or more reads one card on
+ * the start screen -- here this week's rule (the crisis week) -- that closes
+ * with one press, and its visit stamp is renewed. A device without a stamp
+ * (every other test here) reads no card.
+ */
+test("since last time: a return after four days reads this week's rule on one card, and it closes", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(page.getByTestId("since-last-card"), "a first visit is not a return").toHaveCount(0);
+  const stamped = JSON.parse(await page.evaluate((key) => localStorage.getItem(key), LAST_VISIT_KEY));
+  expect(stamped.at).toBeGreaterThan(Date.now() - 60_000);
+
+  const crisis = weekStartMs("2026-W49") + 27 * 60 * 60 * 1000;
+  await page.evaluate(({ key, at }) => localStorage.setItem(key, JSON.stringify({ at, sides: [] })), { key: LAST_VISIT_KEY, at: Date.now() - 4 * 24 * 60 * 60 * 1000 - 60_000 });
+  await page.addInitScript((ms) => {
+    globalThis.__weeklyRuleClock = ms;
+  }, crisis);
+  await page.reload();
+  const card = page.getByTestId("since-last-card");
+  await expect(card).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(card).toContainText("지난번 이후 · 4일 만입니다");
+  await expect(page.getByTestId("since-last-rule")).toHaveText("이번 주 규칙: 위기 주간");
+  await page.getByTestId("since-last-close").click();
+  await expect(card).toHaveCount(0);
+  const renewed = JSON.parse(await page.evaluate((key) => localStorage.getItem(key), LAST_VISIT_KEY));
+  expect(renewed.at).toBeGreaterThan(Date.now() - 60_000);
+
+  await page.reload();
+  await expect(page.getByTestId("start-first-case")).toBeVisible();
+  await expect(card, "the visit just now is the last one").toHaveCount(0);
 });
