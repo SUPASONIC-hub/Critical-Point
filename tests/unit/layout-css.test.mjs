@@ -67,7 +67,8 @@ test("a card's streak sign is printed at every width, on the line its tag alread
   assert.ok(read >= 3, "the tag's own rules are still where this reads them");
   // The phone's cut is still the name's other words, and only those.
   const phone = sheet("play").match(/@media \(max-width: 719px\) \{\s*\.gx-streak em \{[\s\S]*?\n\}/)?.[0] ?? "";
-  assert.match(phone, /\.gx-streak i,\s*\.gx-card-type i \{\s*font-size: 0;\s*\}/);
+  // With its letter-spacing at 0 too (2026-11-18): a tag's 0.08em is inherited as a length, 0.8px a hidden letter.
+  assert.match(phone, /\.gx-streak i,\s*\.gx-card-type i \{\s*font-size: 0;\s*(\/\*[\s\S]*?\*\/\s*)?letter-spacing: 0;\s*\}/);
   assert.doesNotMatch(phone, /gx-card-move/);
 
   // Out of the card's flow, so it adds no height to a card: the tag is
