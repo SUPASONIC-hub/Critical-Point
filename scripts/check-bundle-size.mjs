@@ -192,7 +192,8 @@ const budgets = [
   // 157,758 / 58,225 -> 164,408 / 61,280 묶음 11-17 over main 705a809f. Measured 164404 / 61276 (over budget only) in the e2e build, the plus 4.
   // 157,758 / 58,225 -> 164,405 / 61,292 묶음 11-17 over main 705a809f. Measured 164401 / 61288 (over budget only) in the e2e build, the plus 4.
   // 157,758 / 58,225 -> 164,426 / 61,325 묶음 11-17 over main 705a809f. Measured 164422 / 61321 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_426, maxGzip: 61_325 },
+  // 164,426 / 61,325 -> 164,455 / 61,338 d3-next over main 4d549334: the scene wall line carries its count (판단 N번 기준, src/copy/sceneRates.js). Measured 164451 / 61334 in the CI e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_455, maxGzip: 61_338 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1618,7 +1619,8 @@ const budgets = [
   // e72c415f: measured 989 / 615 in the e2e build, the gzip plus 4.
   // 989 / 619 -> 998 / 619 on 2026-11-02, locale-gaps (#393) over main 9be94346: the scene's wall line read from src/copy/sceneRates.js. Measured 994 raw (gzip under 619) in the e2e build, the plus 4.
   // 989 -> 990 raw on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 990 / 614.
-  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 998, maxGzip: 619 },
+  // 998 -> 1,055 raw on 2026-11-18, d3-next over main 4d549334: the line prints the window count grouped by thousands. Measured 1,051 raw (gzip under 619) in the CI e2e build, the plus 4.
+  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_055, maxGzip: 619 },
   // The other players' card share under the decision reveal (E-6, 2026-10-22):
   // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
   // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
@@ -2034,7 +2036,8 @@ const budgets = [
   // 195,067 / 65,336 -> 195,413 / 65,434 N32 친구 기록 넘기기 over main 705a809f. Measured 195409 / 65430 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 195,076 / 65,336 N31 draft over main 705a809f. Measured 195072 / - (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 197,425 / 66,217 묶음 11-17 over main 705a809f. Measured 197421 / 66213 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_425, maxGzip: 66_217 },
+  // 197,425 / 66,217 -> 197,452 / 66,232 d3-next over main 4d549334: the scene wall line's count in Japanese. Measured 197448 / 66228 in the CI e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_452, maxGzip: 66_232 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2131,7 +2134,8 @@ const budgets = [
   // 162,859 / 58,327 -> 163,134 / 58,425 N32 친구 기록 넘기기 over main 705a809f. Measured 163130 / 58421 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 162,867 / 58,327 N31 draft over main 705a809f. Measured 162863 / - (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 164,766 / 59,136 묶음 11-17 over main 705a809f. Measured 164762 / 59132 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 164_766, maxGzip: 59_136 },
+  // 164,766 / 59,136 -> 164,792 / 59,153 d3-next over main 4d549334: the scene wall line's count in English. Measured 164788 / 59149 in the CI e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 164_792, maxGzip: 59_153 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2595,7 +2599,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,102 / 442,396 / 450,302 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
 // -> 378,324 / 439,917 / 447,836 N32 친구 기록 넘기기 over main 705a809f. Measured first paint, the plus 4.
 // -> 380,361 / 442,730 / 450,673 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_361, en: 442_730, ja: 450_673 };
+// en 442,730 -> 442,743 and ja 450,673 -> 450,682 on 2026-11-18, d3-next: the locale chunks above. Measured 442,739 / 450,678 in the CI e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_361, en: 442_743, ja: 450_682 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
