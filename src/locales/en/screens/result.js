@@ -26,7 +26,12 @@ export default {
   titleRise: "Your record title is now {title}.",
   actProgress: "Act {act} · {pos}/{size} · mid-season tally in {left}",
   actProgressHere: "Act {act} · {pos}/{size} · mid-season tally below",
-  sideSlotOpened: { label: "Side cases", text: "Side cases are now open. You can start them from the start screen, and they’re off the rankings." },
+  sideOpened: {
+    label: "Side cases",
+    text: "A side case is now open: {names}. You can start it from the side cases on the start screen, and it’s off the rankings.",
+    name: "{label}, “{title}”",
+    open: "Open {name}",
+  },
   why: {
     title: "Why it turned out this way",
     subtitle: "Three things that decided this run",

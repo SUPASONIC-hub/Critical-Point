@@ -888,6 +888,24 @@ Still open, on purpose:
   (#505 sweep 411 + 150 min, #506 #507 cases 19-38 prose -19.4% / -22.9%,
   #508 noscript wording and Firefox help per language), #512 bundle 1111c: speaker balloon fix
   #511, C7 cases 39-final #510 (-11.2%).
+- Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
+  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
+  no longer wait for a closed finale. Each entry of `SIDE_CASES`
+  (`src/nodes/sidePacks.js`) has its in-world `date` and `unlockAfter`, the
+  season case whose date comes just before it, and opens once that case is
+  closed in the run, once a finale is closed (NEW GAME+), or once the side
+  case is in the device's side record (`isSideCaseOpen`, `src/sideCases.js`).
+  Order: 사건 14 → 번외 3 (2025-11-08), 16 → 번외 4 (12-11), 17 → 번외 1
+  (12-20), 18 → 번외 2 (2026-01-09), 21 → 번외 5 (02-12), 27 → 번외 6
+  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13).
+  Nothing opens before 프롤로그 01. The report of the case that opens one
+  carries one line, 「번외 사건이 열렸습니다: 번외 N 「제목」」, and a button
+  that goes to the start screen and opens it (`side-opened`); the finale's
+  old 「번외 사건 칸이 열렸습니다」 line is gone, since every case is open by
+  then. Side cases stay outside the season's score, ranking and rules mark.
+- Release rule (2026-11-18): new content is released as a "Season" on a date
+  the owner chooses, all at once; there is no fixed monthly schedule. The
+  plan of one side case a month (N11, N35) is dropped: what is ready is open.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`

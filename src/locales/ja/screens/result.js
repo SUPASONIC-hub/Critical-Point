@@ -26,7 +26,12 @@ export default {
   titleRise: "記録の称号が{title}になりました。",
   actProgress: "第{act}幕 · {pos}/{size} · 中間決算まであと{left}事件",
   actProgressHere: "第{act}幕 · {pos}/{size} · 中間決算は下に",
-  sideSlotOpened: { label: "番外事件", text: "番外事件の枠が開きました。最初の画面から開けます。ランキング対象外です。" },
+  sideOpened: {
+    label: "番外事件",
+    text: "番外事件が開きました：{names}。最初の画面の番外事件の枠から開けます。ランキング対象外です。",
+    name: "{label}「{title}」",
+    open: "{name}を開く",
+  },
   why: {
     title: "なぜこうなったか",
     subtitle: "この勝負を決めた三つのこと",
