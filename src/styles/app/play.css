@@ -1290,7 +1290,9 @@
   background:
     repeating-linear-gradient(180deg, transparent 0 21px, var(--ledger-rule) 21px 22px) 0 6px,
     var(--ledger-white);
-  border: 1px solid var(--ui-line-field);
+  /* --ui-text-3, not the field's 62% ink: on a mood's teal felt that came
+     to 2.94:1 (bundle 11-18 CI); this is about 4.3:1 there. */
+  border: 1px solid var(--ui-text-3);
   border-radius: 3px;
   /* The red margin line is a shadow, not a background stop: it is under no
      word, and the contrast reading takes every stop for a ground. */
@@ -2336,6 +2338,7 @@
   .gx-hud {
     gap: 5px 10px;
     padding: 7px 9px 6px;
+    border-top-width: 3px;
   }
 
   .gx-pot {
@@ -2449,6 +2452,7 @@
   .gx-scene {
     grid-template-columns: 72px 1fr;
     gap: 12px;
+    padding: 0 2px;
   }
 
   .gx-question {
@@ -2578,6 +2582,21 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+
+  /* 2안's ledger column (12px apart, 15px words) put a NEW GAME+ hand's last
+     slip 17px under the action bar at 360x740 (bundle 11-18): 6px apart, 14px. */
+  .gx-hand:not(.hand-5, .hand-6) {
+    gap: 6px;
+  }
+
+  .gx-hand .gx-card-label {
+    font-size: 0.875rem;
+    line-height: 1.25;
+  }
+
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    padding-block: 6px;
+  }
 }
 
 /* The air of the short phone, also on every phone 801 to 860 tall, which
@@ -2670,7 +2689,7 @@
   .gauntlet-stage .gx-card {
     gap: 6px;
     min-height: 0;
-    padding: 8px 9px 8px 22px;
+    padding: 8px 9px 8px 16px;
   }
 
   /* Up to four slips, the hand is a ledger's column: one slip a line, the
@@ -3545,6 +3564,8 @@
   .gx-streak i,
   .gx-card-type i {
     font-size: 0;
+    /* A tag's 0.08em spacing is inherited as a length (2안): 0 here too. */
+    letter-spacing: 0;
   }
 }
 
