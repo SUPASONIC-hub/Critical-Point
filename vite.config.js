@@ -435,6 +435,10 @@ function staticPages({ analytics, ads }) {
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
+        // Every page is drawn (and hashed for the sitemap) to answer one, so only the
+        // names they can have are: not each module and image the game asks for. The
+        // whole set per request made the 11-17 bundle's e2e run ~1.5x main's.
+        if (!Object.hasOwn(TYPES, pathname.split(".").pop())) return next();
         const file = files()[pathname.slice(1)];
         if (!file) return next();
         response.setHeader("Content-Type", TYPES[pathname.split(".").pop()]);
