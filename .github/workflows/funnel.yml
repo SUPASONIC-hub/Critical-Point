@@ -139,7 +139,12 @@ jobs:
         env:
           GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-        run: node scripts/report-ga4.mjs >> "$GITHUB_STEP_SUMMARY"
+        # Also kept as funnel-report/ga4.md in the uploaded summary (since
+        # 2026-11-18), so the section can be read from the artifact, not only
+        # from the run's page.
+        run: |
+          mkdir -p funnel-report
+          node scripts/report-ga4.mjs | tee funnel-report/ga4.md >> "$GITHUB_STEP_SUMMARY"
       # Ops mode's calendar (N6, from 2026-12-01; scripts/ops-calendar.mjs):
       # today's deploy day, the next quarter day a wipe may fall on, and the
       # weekly rule calendar's booked weeks, with a warning under six. No
@@ -167,7 +172,10 @@ jobs:
         env:
           GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-        run: node scripts/report-web-vitals.mjs 2>&1 >> "$GITHUB_STEP_SUMMARY"
+        # Kept as funnel-report/phone-speed.md too, beside ga4.md.
+        run: |
+          mkdir -p funnel-report
+          node scripts/report-web-vitals.mjs | tee funnel-report/phone-speed.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the summary
         if: steps.token.outputs.configured == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
