@@ -12,7 +12,7 @@ import W from "./copy/sceneRates.js";
  * `useSceneChoiceRates`'s.
  */
 
-/** Windows and runs a scene needs before anything is printed: D3's floor (SCENE_TRACE_FLOOR). */
+/** Windows and runs a scene needs before anything is printed: D3's first floor (the wall rate's is 20 since N44). */
 export const SCENE_CHOICE_FLOOR = 50;
 
 /** A share under this is the minority's: 「드문 선택」 (사용자 확인 후보). */

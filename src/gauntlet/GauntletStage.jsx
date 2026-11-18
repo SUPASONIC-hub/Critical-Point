@@ -235,7 +235,7 @@ export function GauntletStage({
   const [briefOpen, setBriefOpen] = useState(false);
 
   // The report's chunk, asked for while a table is up and the browser is idle, so the case does not end on
-  // an empty page (state/retryableLazy.js); and N16, 프롤로그 01·02's written scene as it comes on screen (gameEvents.js).
+  // an empty page (state/retryableLazy.js); and N16·N39, 프롤로그 01 ~ 사건 07's written scene as it comes on screen (gameEvents.js).
   useEffect(() => (firstHour.noteSceneShown(scene.node.caseId, scene.nodeId), prefetchScreenWhenIdle("result")), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
