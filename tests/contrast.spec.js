@@ -415,12 +415,12 @@ test("a long question on a phone stands on a fainter picture and stays readable"
   await startAt(page, "case05", "c5_final_redesign_route");
   // Polled: the table has only just taken the briefing's place.
   await expect.poll(lines, "the shortest question is one or two lines").toBeLessThanOrEqual(2);
-  await expect.poll(opacity, "a short question keeps the room as drawn").toBeCloseTo(0.78, 2);
+  await expect.poll(opacity, "a short question keeps the room as drawn").toBeCloseTo(0.35, 2);
 
   await startAt(page, "case02", "c2_trace");
   await expect.poll(lines, "the longest question is more than two lines").toBeGreaterThan(2);
-  await expect.poll(opacity, "the room behind a long question is fainter").toBeLessThanOrEqual(0.5);
-  expect(await opacity(), "and is still a room").toBeGreaterThanOrEqual(0.4);
+  await expect.poll(opacity, "the room behind a long question is fainter").toBeLessThan(0.35);
+  expect(await opacity(), "and is still a room").toBeGreaterThanOrEqual(0.2);
   // Read with the table's fold closed, as a player meets it. `expectReadable`
   // opens every drawer, and the open fold takes the question's row: the
   // question drops below the plate, and nothing of it is over the picture.
@@ -437,7 +437,7 @@ test("a long question on a phone stands on a fainter picture and stays readable"
   expect(painted.measured, "the lines over the plate were measured").toBeGreaterThan(0);
 
   await page.setViewportSize({ width: 1366, height: 768 });
-  await expect.poll(opacity, "a wide screen keeps the room as drawn").toBeCloseTo(0.78, 2);
+  await expect.poll(opacity, "a wide screen keeps the room as drawn").toBeCloseTo(0.35, 2);
 });
 
 test("the report and ending sequence stay readable", async ({ page }) => {
@@ -613,4 +613,35 @@ test("each card in the hand stands apart from the felt by its edge, at 3:1", asy
     expect(samples, `${card}: edge samples`).toBeGreaterThan(4);
     expect(low, `${card}: its edge against the felt (${where})`).toBeGreaterThanOrEqual(3);
   }
+});
+
+/**
+ * The screens around the game, read since the ledger (2안 감사 장부,
+ * 2026-11-17) turned every ground to paper: a colour picked for the night
+ * shift's ink could go unread on any of them, and none was read before. The
+ * ranking and the board as a deployment with no server shows them, the error
+ * log with its recovery slots, and the settings over a table.
+ */
+test("the ranking, the board, the error log and the settings stay readable", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto("/?debug=1");
+  await page.waitForSelector(".intro-shell");
+  for (const [opener, label] of [
+    [".intro-ranking-button:not(.intro-board-button):not([data-testid])", "ranking"],
+    [".intro-board-button", "board"],
+  ]) {
+    await page.locator(opener).click();
+    await expect(page.locator(".intro")).toHaveCount(0);
+    await expectReadable(page, label);
+    await page.keyboard.press("Escape");
+    await page.waitForSelector(".intro");
+  }
+  await page.getByTestId("open-error-log-from-header").click();
+  await page.getByTestId("error-log-panel").waitFor();
+  await expectReadable(page, "error log");
+
+  await startAt(page, "case01", "start");
+  await page.getByTestId("open-comfort-settings").click();
+  await page.locator(".comfort-dialog").waitFor();
+  await expectReadable(page, "settings");
 });

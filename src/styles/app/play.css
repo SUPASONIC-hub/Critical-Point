@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(4 7 8 / 0.72);
+  background: rgb(247 242 230 / 0.72);
   backdrop-filter: blur(10px) saturate(1.1);
   overflow: auto;
 }
@@ -176,25 +176,21 @@
   isolation: isolate;
   min-height: 100dvh;
   padding: 10px 12px calc(96px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(120% 60% at 50% 120%, var(--c-gx-heat-a18), transparent 62%),
-    radial-gradient(60% 45% at 0% 0%, rgb(94 234 255 / 0.05), transparent 70%),
-    radial-gradient(55% 40% at 100% 0%, rgb(217 255 98 / 0.04), transparent 70%), var(--ui-bg);
-  /* The felt fades with the scene's mood (tokens.css); reduced motion cuts it
+  background: linear-gradient(180deg, var(--ui-surface-1), var(--ui-bg));
+  /* The paper fades with the scene's mood (tokens.css); reduced motion cuts it
      (responsive.css). Its colour is the body's, --ui-text, and is not restated. */
   transition: background-color 0.6s;
 }
 
-/* A felt weave under everything, faded out toward the edges. */
+/* The ledger's ruled lines under everything, faded out toward the edges. */
 .game-shell::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1.4px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(90% 70% at 50% 40%, var(--c-black), transparent 85%);
+  background-image: var(--ledger-ruled);
+  mask-image: radial-gradient(100% 80% at 50% 40%, var(--c-black), transparent 95%);
 }
 
 /* The mood's edge (tokens.css --mood-edge, 2026-11-06): the screen's rim
@@ -373,15 +369,11 @@
     "signals signals";
   align-items: center;
   gap: 6px 12px;
-  padding: 9px 11px 8px;
-  border: 1px solid var(--ui-line-strong);
-  border-radius: var(--ui-radius-md);
-  background:
-    radial-gradient(110% 130% at 0% 0%, rgb(217 255 98 / 0.06), transparent 55%),
-    linear-gradient(180deg, var(--c-gx-felt-raised), var(--ui-surface-1));
-  box-shadow:
-    var(--ui-shadow-1),
-    inset 0 0 calc(var(--gx-heat, 0) * 48px) var(--c-gx-heat-a18);
+  /* A ledger's header: a double rule over it, a single one under it. */
+  padding: 10px 4px;
+  border-top: 4px double var(--ui-text);
+  border-bottom: 1px solid var(--ui-text);
+  box-shadow: inset 0 0 calc(var(--gx-heat, 0) * 48px) var(--c-gx-heat-a18);
 }
 
 .gx-pot {
@@ -395,8 +387,8 @@
 }
 
 .gx-label {
-  color: var(--ui-text-3);
-  font: 700 0.6875rem/1 var(--font-sans);
+  color: var(--ledger-pencil);
+  font: 800 0.6875rem/1 var(--font-sans);
   letter-spacing: 0.16em;
 }
 
@@ -412,10 +404,9 @@
 
 .gx-pot-value {
   color: var(--ui-text);
-  font: 800 clamp(2rem, 9vw, 2.625rem) / 1 var(--font-sans);
+  font: 900 clamp(2.5rem, 12vw, 3.25rem) / 1 var(--font-sans);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
-  text-shadow: 0 0 calc(10px + var(--gx-heat, 0) * 26px) var(--c-gx-heat-a55);
+  letter-spacing: -0.05em;
   transform: scale(calc(1 + var(--gx-beat, 0) * 0.03));
   transform-origin: left center;
 }
@@ -441,15 +432,13 @@
 }
 
 .gx-chips {
-  color: var(--c-ink-deep);
-  background: var(--c-gx-chip);
-  box-shadow: 0 0 14px rgb(104 196 255 / 0.28);
+  color: var(--ledger-white);
+  background: var(--ui-text);
 }
 
 .gx-mult {
-  color: var(--c-paper);
-  background: var(--c-gx-heat-deep);
-  box-shadow: inset 0 0 0 1px var(--c-gx-heat-a55);
+  color: var(--ledger-white);
+  background: var(--ledger-pencil);
 }
 
 .gx-logic-pill {
@@ -469,7 +458,6 @@
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  box-shadow: 0 0 18px rgb(217 255 98 / calc(0.06 + var(--gx-clock, 1) * 0.1));
 }
 
 .gx-clock::before {
@@ -490,7 +478,6 @@
 
 .gx-clock.is-late {
   --gx-ring: var(--c-gx-heat);
-  box-shadow: 0 0 calc(12px + var(--gx-beat, 0) * 16px) var(--c-gx-heat-a55);
 }
 
 .gx-clock.is-late b {
@@ -516,9 +503,8 @@
   padding: 2px 9px;
   overflow: hidden;
   color: var(--ui-text-3);
-  background: var(--ui-surface-2);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 3px;
   font-size: 0.6875rem;
   font-weight: 600;
   white-space: nowrap;
@@ -541,7 +527,7 @@
 
 .gx-bank .gx-at-risk,
 .gx-hud-audit.gx-at-risk {
-  border-color: rgb(255 142 76 / 0.4);
+  border-color: rgb(166 70 0 / 0.32);
 }
 
 .gx-bank .gx-at-risk b,
@@ -731,7 +717,7 @@
   background: linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-2));
   border-color: var(--gx-mode);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    inset 0 1px 0 rgb(22 24 26 / 0.04),
     0 0 4px var(--c-gx-hand-a45);
 }
 
@@ -803,7 +789,7 @@
   padding: 8px 11px;
   border: 1px solid var(--c-gx-heat-a55);
   border-radius: var(--ui-radius-sm);
-  background: linear-gradient(90deg, rgb(255 56 56 / 0.16), transparent 70%), var(--ui-surface-1);
+  background: linear-gradient(90deg, rgb(196 34 28 / 0.07), transparent 70%), var(--ui-surface-1);
   box-shadow:
     inset 3px 0 0 var(--c-gx-heat),
     0 0 calc(var(--gx-heat, 0) * 24px) var(--c-gx-heat-a18);
@@ -903,29 +889,22 @@
 
 .gx-gauge-track {
   position: relative;
-  height: 22px;
+  height: 24px;
   overflow: hidden;
   background:
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 calc(10% - 1px),
-      rgb(255 255 255 / 0.06) calc(10% - 1px) 10%
-    ),
-    var(--ui-surface-1);
-  border: 1px solid var(--ui-line-strong);
-  border-radius: var(--radius-pill);
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--ui-line) calc(10% - 1px) 10%),
+    var(--ledger-white);
+  border: 2px solid var(--ui-text);
+  border-radius: 3px;
   /* --gx-tier (GauntletFx, fxTier): 0, 1 within a push of the band, 2 in it. */
-  box-shadow:
-    inset 0 2px 8px rgb(0 0 0 / 0.55),
-    0 0 calc(var(--gx-tier, 0) * 7px) calc(var(--gx-tier, 0) * 1px) var(--c-gx-heat-a55);
+  box-shadow: 0 0 0 calc(var(--gx-tier, 0) * 2px) var(--c-gx-heat-a55);
 }
 
 .gx-gauge-band {
   position: absolute;
   inset: 0 auto 0 0;
-  background: repeating-linear-gradient(-45deg, var(--c-gx-band) 0 6px, transparent 6px 12px);
-  border-left: 2px solid var(--c-gx-heat);
-  box-shadow: inset 10px 0 18px -10px var(--c-gx-heat);
+  background: repeating-linear-gradient(-45deg, var(--c-gx-band) 0 5px, transparent 5px 10px);
+  border-left: 2px solid var(--ledger-pencil);
 }
 
 .gx-gauge-next {
@@ -944,11 +923,7 @@
   z-index: 1;
   transform: scaleX(0);
   transform-origin: left center;
-  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
-  background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember) 60%, var(--c-gx-heat));
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.4),
-    0 0 calc(6px + var(--gx-heat, 0) * 24px) var(--c-gx-heat);
+  background: linear-gradient(90deg, var(--c-acid), var(--c-gx-ember) 60%, var(--ledger-pencil));
   transition: transform 0.16s var(--ui-ease-out);
 }
 
@@ -958,8 +933,7 @@
   z-index: 3;
   width: 4px;
   margin-left: -2px;
-  background: var(--c-paper);
-  box-shadow: 0 0 12px var(--c-paper);
+  background: var(--ui-text);
 }
 
 .gx-gauge-seal {
@@ -967,7 +941,6 @@
   inset: 0 auto 0 0;
   z-index: 3;
   border-left: 2px solid var(--c-gx-chip);
-  box-shadow: 0 0 10px var(--c-gx-chip);
 }
 
 .gx-gauge-ticks {
@@ -996,7 +969,7 @@
   gap: 8px;
   padding-inline: 4px;
   color: var(--ui-text-2);
-  font: 600 0.75rem/1 var(--font-sans);
+  font: 700 0.75rem/1 var(--font-sans);
 }
 
 .gx-gauge-read b {
@@ -1060,11 +1033,11 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 10px;
+  grid-template-columns: 72px 1fr;
+  gap: 14px;
   align-items: start;
   overflow: hidden;
-  padding-inline: 2px;
+  padding: 6px 2px;
   border-radius: var(--ui-radius-sm);
 }
 
@@ -1077,12 +1050,16 @@
 }
 
 .gx-portrait {
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--ui-line-strong);
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px var(--ui-surface-1);
+  /* A photograph taped into the ledger. */
+  width: 72px;
+  height: 72px;
+  border: 4px solid var(--ledger-white);
+  border-radius: 2px;
+  box-shadow:
+    0 6px 14px var(--ledger-shadow),
+    0 0 0 1px var(--ui-line);
   object-fit: cover;
+  transform: rotate(-2deg);
 }
 
 /* Place and clock, above the speaker: which room the analyst is standing in and
@@ -1146,8 +1123,8 @@
   grid-column: 1 / -1;
   margin: 2px 0 0;
   color: var(--ui-text);
-  font-size: 0.9375rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 800;
   letter-spacing: -0.015em;
   line-height: 1.4;
 }
@@ -1232,7 +1209,7 @@
 .gx-situation {
   display: grid;
   grid-template-columns: 1.15fr 1fr 1fr;
-  gap: 6px;
+  border-block: 1px solid var(--ui-text);
 }
 
 .gx-situation-card {
@@ -1240,15 +1217,18 @@
   gap: 3px;
   min-width: 0;
   padding: 8px 10px;
-  background: linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-sm);
+  border-left: 1px solid var(--ui-line-strong);
+}
+
+.gx-situation-card:first-child {
+  border-left: 0;
 }
 
 .gx-situation-card span {
   color: var(--ui-text-3);
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1;
 }
 
@@ -1268,8 +1248,8 @@
 }
 
 .gx-situation-risk {
-  border-color: var(--c-gx-heat-a55);
-  box-shadow: inset 0 0 calc(8px + var(--gx-heat, 0) * 28px) var(--c-gx-heat-a18);
+  background: var(--ledger-pencil-soft);
+  box-shadow: inset 0 3px 0 var(--ledger-pencil);
 }
 
 /* The hand ------------------------------------------------------------------ */
@@ -1291,9 +1271,10 @@
   gap: 8px;
 }
 
-/* The card's edge is what tells one card from the felt (WCAG 1.4.11, 3:1
-   for a control's boundary): the card's fill is within a shade of the table,
-   so the edge carries it. --ui-line-strong (white at 16%) came to 1.5:1 over
+/* A card is a ledger slip: white, ruled, a red margin line, square corners
+   (2안 감사 장부, 2026-11-17). Its edge is what tells it from the paper
+   (WCAG 1.4.11, 3:1 for a control's boundary): the slip is a shade from the
+   page, so the edge carries it. --ui-line-strong (white at 16%) came to 1.5:1 over
    the felt; --ui-line-field (40%) is about 3.6:1 (the 2026-11-03 audit),
    the edge a text field already has. Hover is brighter still, a staged
    card keeps its acid edge and ring, and a face-down fractured card keeps
@@ -1304,14 +1285,21 @@
   align-content: space-between;
   gap: 8px;
   min-height: 104px;
-  padding: 11px 11px 10px;
+  padding: 11px 11px 10px 22px;
   color: var(--ui-text);
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 42%),
-    linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
-  border: 1px solid var(--ui-line-field);
-  border-radius: var(--ui-radius-md);
-  box-shadow: var(--ui-shadow-1);
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--ledger-rule) 21px 22px) 0 6px,
+    var(--ledger-white);
+  /* --ui-text-3, not the field's 62% ink: on a mood's teal felt that came
+     to 2.94:1 (bundle 11-18 CI); this is about 4.3:1 there. */
+  border: 1px solid var(--ui-text-3);
+  border-radius: 3px;
+  /* The red margin line is a shadow, not a background stop: it is under no
+     word, and the contrast reading takes every stop for a ground. */
+  box-shadow:
+    inset 13px 0 0 -12px var(--ledger-margin),
+    0 2px 0 var(--ui-line),
+    0 10px 20px var(--ledger-shadow);
   text-align: left;
   transition:
     transform var(--ui-dur) var(--ui-ease),
@@ -1319,12 +1307,12 @@
 }
 
 .gauntlet-stage .gx-card:focus-visible {
-  border-color: var(--ui-text-2);
+  border-color: var(--ui-text);
 }
 
 @media (hover: hover) {
   .gauntlet-stage .gx-card:not([aria-disabled="true"]):hover {
-    border-color: rgb(255 255 255 / 0.6);
+    border-color: var(--ui-text);
     box-shadow: var(--ui-shadow-2);
     transform: translateY(-2px);
   }
@@ -1332,19 +1320,25 @@
 
 .gauntlet-stage .gx-card.selected,
 .gauntlet-stage .gx-card.selected:hover {
-  background:
-    radial-gradient(120% 90% at 0% 0%, rgb(217 255 98 / 0.14), transparent 60%),
-    linear-gradient(160deg, var(--c-gx-felt-card), var(--ui-surface-1));
   border-color: var(--c-acid);
   box-shadow:
-    0 0 0 1px var(--c-acid),
-    0 14px 34px rgb(0 0 0 / 0.5),
-    0 0 30px rgb(217 255 98 / 0.18);
-  transform: translateY(-3px);
+    inset 13px 0 0 -12px var(--ledger-margin),
+    0 0 0 2px var(--c-acid),
+    6px 6px 0 var(--ledger-stamp-soft),
+    0 14px 26px var(--ledger-shadow);
+  transform: translateY(-2px);
 }
 
 .gauntlet-stage .gx-card[aria-disabled="true"] {
   cursor: not-allowed;
+}
+
+/* A slip pressed down onto the page. */
+.gauntlet-stage .gx-card:not([aria-disabled="true"]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 13px 0 0 -12px var(--ledger-margin),
+    0 1px 0 var(--ui-line);
 }
 
 .gx-card-key {
@@ -1360,7 +1354,7 @@
   background: var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: 6px;
-  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+  box-shadow: inset 0 -1px 0 rgb(22 24 26 / 0.04);
   font: 700 0.6875rem/1 var(--font-sans);
   /* Drawn but unseen until asked for (2026-11-16, UI quick wins): a 1-4 in
      every card's corner read as a feature-phone quiz. The card still names
@@ -1391,8 +1385,8 @@
 
 .gx-card-label {
   padding-right: 26px;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 800;
   letter-spacing: -0.015em;
   line-height: 1.38;
 }
@@ -1408,10 +1402,9 @@
 
 .gx-card-chips {
   padding: 4px 8px;
-  color: var(--c-ink-deep);
-  background: var(--c-gx-chip);
+  color: var(--ledger-white);
+  background: var(--ui-text);
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 14px rgb(104 196 255 / 0.25);
   font-size: 0.8125rem;
   font-weight: 800;
 }
@@ -1421,26 +1414,22 @@
   align-items: center;
   gap: 3px;
   padding: 3px 8px;
-  color: var(--c-danger-81);
-  background: rgb(52 20 22 / 0.92);
-  border: 1px solid rgb(255 56 56 / 0.28);
+  color: var(--ledger-pencil);
+  background: var(--ledger-pencil-wash);
+  border: 1px solid var(--ledger-pencil-line);
   border-radius: var(--radius-pill);
   font-weight: 650;
 }
 
 .gx-card-stats .gx-card-rule-tax,
 .gx-card-stats .gx-card-overclock {
-  padding: 3px 6px;
-  color: var(--c-gx-ember);
-  background: rgb(255 142 76 / 0.12);
-  border: 1px solid var(--c-gx-ember);
-  border-radius: var(--radius-pill);
-  font: 800 0.625rem/1.1 var(--font-sans);
+  color: var(--c-acid);
+  border-color: var(--c-acid);
 }
 
 .gx-card-stats .gx-card-overclock {
   color: var(--c-acid);
-  background: rgb(217 255 98 / 0.1);
+  background: rgb(22 96 62 / 0.06);
   border-color: var(--c-acid);
 }
 
@@ -1500,7 +1489,7 @@
 .gx-card-seal[data-testid="sealed-card-lock"] {
   justify-self: start;
   padding: 3px 8px;
-  background: rgb(104 196 255 / 0.1);
+  background: rgb(20 82 160 / 0.08);
   border: 1px solid var(--c-gx-chip);
   border-radius: var(--radius-pill);
   font-size: 0.625rem;
@@ -1535,7 +1524,7 @@
 
 .gx-situation-risk b,
 .gx-card-preview .cost {
-  color: var(--c-danger-81);
+  color: var(--c-danger-deep);
 }
 
 .gx-card-preview .gx-card-crack {
@@ -1562,7 +1551,7 @@
   max-width: 760px;
   margin: 0 auto;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, rgb(6 9 10 / 0.9) 30%);
+  background: linear-gradient(180deg, transparent, var(--ui-surface-1) 34%);
 }
 
 .gx-actions button {
@@ -1576,11 +1565,12 @@
   min-width: 0;
   min-height: 60px;
   padding: 6px 10px;
-  border-radius: var(--ui-radius-md);
-  font: 800 1.0625rem/1.1 var(--font-sans);
+  border-radius: 6px;
+  font: 900 1.0625rem/1.1 var(--font-sans);
   letter-spacing: -0.01em;
   transition:
-    transform var(--ui-dur-fast) var(--ui-ease),
+    transform 70ms var(--ui-ease),
+    box-shadow 70ms var(--ui-ease),
     filter var(--ui-dur-fast) linear;
 }
 
@@ -1590,7 +1580,8 @@
 
 .gx-actions button:not(:disabled):active,
 .gx-cash.is-holding {
-  transform: translateY(2px) scale(0.98);
+  transform: translateY(5px);
+  box-shadow: none;
 }
 
 .gx-actions button > span {
@@ -1601,8 +1592,8 @@
 }
 
 .gx-actions button small {
-  padding: 2px 7px;
-  background: rgb(0 0 0 / 0.28);
+  padding: 1px 6px;
+  border: 1px solid currentColor;
   border-radius: var(--radius-pill);
   font: 700 0.6875rem/1.3 var(--font-sans);
   font-variant-numeric: tabular-nums;
@@ -1620,23 +1611,20 @@
 }
 
 .gx-push {
-  color: var(--c-paper);
-  background: linear-gradient(180deg, rgb(168 28 32), var(--c-gx-heat-deep));
-  border: 1px solid var(--c-gx-heat);
+  color: var(--ledger-white);
+  background: var(--ledger-pencil);
+  border: 2px solid var(--ledger-ink);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.18),
-    0 10px 26px rgb(120 16 20 / 0.45),
-    0 0 calc(var(--gx-heat, 0) * 30px) var(--c-gx-heat-a55);
+    0 5px 0 var(--ledger-ink),
+    0 0 0 calc(var(--gx-heat, 0) * 4px) var(--c-gx-heat-a18);
 }
 
 .gx-focus {
   overflow: hidden;
   color: var(--c-gx-hand);
-  background: linear-gradient(180deg, var(--ui-surface-3), var(--ui-surface-2));
-  border: 1px solid var(--c-gx-hand);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.06),
-    inset 0 0 6px var(--c-gx-hand-a45);
+  background: var(--ledger-white);
+  border: 2px solid var(--c-gx-hand);
+  box-shadow: 0 5px 0 var(--c-gx-hand);
 }
 
 .gx-focus.focus-locked,
@@ -1646,17 +1634,20 @@
 }
 
 .gx-cash {
-  color: var(--ui-accent-ink);
-  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid) 55%, var(--c-acid-deep));
-  border: 1px solid var(--c-acid);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.5),
-    0 10px 30px rgb(217 255 98 / 0.22);
+  color: var(--ledger-white);
+  background: var(--c-acid);
+  border: 2px solid var(--ledger-ink);
+  box-shadow: 0 5px 0 var(--ledger-ink);
 }
 
 .gx-cash b {
   font: 800 1.125rem/1 var(--font-sans);
   font-variant-numeric: tabular-nums;
+}
+
+.gx-actions button:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 3px;
 }
 
 /* The big decisions' 확정 is held (holdConfirm.js, HoldGauge.jsx): a line
@@ -1826,8 +1817,9 @@
 
 /* The rules a board carries: the breach panel's shape without its alarm. */
 .gx-panel.gx-carry {
-  background: var(--ui-surface-2);
-  border-color: var(--c-gx-chip);
+  background: var(--ledger-white);
+  border: 2px solid var(--c-gx-chip);
+  border-radius: 2px;
 }
 
 .gx-carry .gx-breach-kicker {
@@ -1836,7 +1828,6 @@
 
 .gx-carry b {
   color: var(--c-gx-chip);
-  background: var(--ui-chip-soft);
 }
 
 .gx-slam {
@@ -1859,20 +1850,20 @@
 
 .gx-slam span {
   padding: 8px 14px;
-  color: var(--c-paper);
-  background: var(--ui-glass-strong);
-  border: 1px solid var(--ui-line-strong);
+  color: var(--ledger-white);
+  background: var(--ledger-ink);
   border-radius: var(--radius-pill);
   font-weight: 700;
-  backdrop-filter: blur(10px);
 }
 
 /* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
    smaller size and the paper colour it inherits are the look. The sheet is at
    its budget (check-css-structure.mjs), and the line is a line, not a pill. */
 .gx-slam-bust {
-  color: var(--c-paper);
-  background: var(--c-gx-heat-a18);
+  color: var(--ledger-pencil);
+  background:
+    repeating-linear-gradient(-45deg, var(--ledger-pencil-soft) 0 18px, transparent 18px 36px),
+    var(--ledger-paper-a60);
 }
 
 /* The bust flashes paper, burns to full heat and settles to an 18% wash. The
@@ -1905,13 +1896,16 @@
    the comfort setting with every animation on the stage (comfort.css). The
    keyframes, gx-break, are in result.css beside the collapse ending's. */
 .gx-slam-bust strong {
-  text-shadow: 0 0 40px var(--c-gx-heat);
+  padding: 0.06em 0.22em 0.1em;
+  background: var(--ledger-paper-a92);
+  border: 0.09em solid currentColor;
+  border-radius: 0.12em;
+  transform: rotate(-7deg);
   animation: gx-break 0.9s steps(1);
 }
 
 .gx-slam-cashed strong {
   color: var(--c-acid);
-  text-shadow: 0 0 36px var(--c-acid);
   animation: gx-cash-pop 0.5s var(--ui-ease-out) both;
 }
 
@@ -1962,28 +1956,18 @@
    A glass sheet over the table: the verdict big, then the ledger in rows. */
 .decision-reveal.gx-reveal {
   color: var(--ui-text);
-  background:
-    radial-gradient(90% 50% at 50% 0%, rgb(217 255 98 / 0.1), transparent 70%),
-    linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
-  border: 1px solid var(--ui-line-accent);
-  border-radius: var(--ui-radius-lg);
-  box-shadow:
-    var(--ui-shadow-2),
-    0 0 60px rgb(217 255 98 / 0.08);
+  background: var(--ledger-white);
+  border: 2px solid var(--ui-text);
+  border-radius: 4px;
+  box-shadow: 10px 10px 0 var(--ledger-shadow);
 }
 
 .decision-reveal.gx-reveal.is-bust {
-  background:
-    radial-gradient(90% 50% at 50% 0%, rgb(255 56 56 / 0.18), transparent 70%),
-    linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
-  border-color: var(--c-gx-heat-a55);
+  border-color: var(--ledger-pencil);
 }
 
 .gx-reveal.is-overdrive {
   border-color: var(--c-gx-ember);
-  box-shadow:
-    0 20px 70px var(--c-gx-shade),
-    0 0 46px rgb(217 255 98 / 0.2);
 }
 
 .gx-reveal-verdict {
@@ -1999,13 +1983,19 @@
   font: 900 clamp(3.25rem, 14vw, 5.75rem) / 0.95 var(--font-sans);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.05em;
-  text-shadow: 0 0 40px rgb(217 255 98 / 0.3);
 }
 
 .gx-reveal.is-bust .gx-reveal-verdict h2,
 .gx-reveal.is-bust .gx-reveal-verdict svg {
-  color: var(--c-gx-heat);
-  text-shadow: 0 0 40px var(--c-gx-heat-a55);
+  color: var(--ledger-pencil);
+}
+
+/* BUST, stamped. */
+.gx-reveal.is-bust .gx-reveal-verdict h2 {
+  padding: 0.04em 0.24em 0.08em;
+  border: 0.08em solid currentColor;
+  border-radius: 0.1em;
+  transform: rotate(-4deg);
 }
 
 .gx-reveal-verdict p {
@@ -2040,8 +2030,8 @@
   margin: 14px 0 10px;
   padding: 4px 12px;
   background: var(--ui-surface-1);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 2px;
   box-shadow: inset 3px 0 0 var(--c-gx-heat);
 }
 
@@ -2081,8 +2071,8 @@
   margin: 12px 0;
   padding: 12px 14px;
   background: var(--ui-surface-1);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 2px;
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
@@ -2093,8 +2083,8 @@
 
 .gx-reveal-gain b,
 .gx-reveal-loss b {
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: 1.75rem;
+  font-weight: 900;
 }
 
 .gx-reveal.is-cashed .gx-reveal-consequence span,
@@ -2125,12 +2115,12 @@
   gap: 4px;
   margin: 10px 0;
   padding: 10px 12px;
-  background: linear-gradient(90deg, var(--ui-surface-1), rgb(217 255 98 / 0.08));
+  background: linear-gradient(90deg, var(--ui-surface-1), rgb(22 96 62 / 0.05));
   border: 1px solid var(--c-acid);
   border-radius: var(--ui-radius-sm);
   box-shadow:
     inset 4px 0 0 var(--c-gx-ember),
-    0 0 24px rgb(217 255 98 / 0.16);
+    0 0 24px rgb(22 96 62 / 0.1);
 }
 
 .gx-reveal-overdrive span {
@@ -2193,7 +2183,7 @@
   gap: 8px;
   margin-top: 12px;
   padding: 12px 14px;
-  background: rgb(255 56 56 / 0.06);
+  background: rgb(196 34 28 / 0.05);
   border: 1px dashed var(--c-gx-heat-a55);
   border-radius: var(--ui-radius-sm);
 }
@@ -2239,9 +2229,9 @@
   min-height: 46px;
   padding: 0 20px;
   color: var(--ui-accent-ink);
-  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid));
+  background: linear-gradient(180deg, rgb(30 112 74), var(--c-acid));
   border-radius: var(--ui-radius-sm);
-  box-shadow: 0 10px 26px rgb(217 255 98 / 0.2);
+  box-shadow: 0 10px 26px rgb(22 96 62 / 0.12);
   font-weight: 800;
 }
 
@@ -2348,6 +2338,7 @@
   .gx-hud {
     gap: 5px 10px;
     padding: 7px 9px 6px;
+    border-top-width: 3px;
   }
 
   .gx-pot {
@@ -2455,18 +2446,13 @@
   }
 
   .gx-gauge-track {
-    height: 18px;
+    height: 22px;
   }
 
   .gx-scene {
-    grid-template-columns: 34px 1fr;
-    gap: 8px;
-  }
-
-  .gx-portrait {
-    width: 34px;
-    height: 34px;
-    box-shadow: none;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    padding: 0 2px;
   }
 
   .gx-question {
@@ -2596,6 +2582,21 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+
+  /* 2안's ledger column (12px apart, 15px words) put a NEW GAME+ hand's last
+     slip 17px under the action bar at 360x740 (bundle 11-18): 6px apart, 14px. */
+  .gx-hand:not(.hand-5, .hand-6) {
+    gap: 6px;
+  }
+
+  .gx-hand .gx-card-label {
+    font-size: 0.875rem;
+    line-height: 1.25;
+  }
+
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    padding-block: 6px;
+  }
 }
 
 /* The air of the short phone, also on every phone 801 to 860 tall, which
@@ -2688,8 +2689,25 @@
   .gauntlet-stage .gx-card {
     gap: 6px;
     min-height: 0;
-    padding: 8px 9px;
-    border-radius: 13px;
+    padding: 8px 9px 8px 16px;
+  }
+
+  /* Up to four slips, the hand is a ledger's column: one slip a line, the
+     words on the left and the amounts on the right. Five and six keep two
+     columns, so the hand stays above the dock. */
+  .gx-hand:not(.hand-5, .hand-6) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .gx-hand:not(.hand-5, .hand-6) .gx-card-stats {
+    justify-content: flex-end;
+    max-width: 9.5rem;
   }
 
   .gx-card-key {
@@ -2712,7 +2730,7 @@
     display: -webkit-box;
     overflow: hidden;
     padding-right: 20px;
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     line-height: 1.3;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -3186,7 +3204,7 @@
     background: var(--ui-surface-2);
     border: 1px solid var(--ui-line-strong);
     border-radius: 6px;
-    box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+    box-shadow: inset 0 -1px 0 rgb(22 24 26 / 0.04);
     font: 700 0.625rem/1 var(--font-sans);
   }
 
@@ -3255,8 +3273,8 @@
   }
 
   .gx-scene {
-    grid-template-columns: 48px 1fr;
-    gap: 12px;
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
     padding: 12px 14px;
     background: linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
     border: 1px solid var(--ui-line);
@@ -3264,8 +3282,8 @@
   }
 
   .gx-portrait {
-    width: 48px;
-    height: 48px;
+    width: 72px;
+    height: 72px;
   }
 
   .gx-question {
@@ -3353,13 +3371,13 @@
   }
 
   .gx-scene {
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: 56px 1fr;
     padding: 8px 12px;
   }
 
   .gx-portrait {
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
   }
 
   .gx-question {
@@ -3440,9 +3458,14 @@
   white-space: nowrap;
 }
 
-.gx-streak b,
-.gx-card-type.is-on {
+.gx-streak b {
   color: var(--c-gx-hand);
+}
+
+.gx-card-type.is-on {
+  color: var(--ledger-white);
+  background: var(--c-gx-hand);
+  border-color: var(--c-gx-hand);
 }
 
 .gx-streak em {
@@ -3451,13 +3474,14 @@
 }
 
 .gx-card-type {
-  padding: 0 4px;
-  color: var(--ui-text-2);
-  background: var(--ui-surface-1);
-  border: 1px solid;
-  border-radius: 5px;
+  padding: 1px 7px;
+  color: var(--ledger-white);
+  background: var(--ui-text);
+  border: 1px solid var(--ui-text);
+  border-radius: 2px;
   font-size: 0.625rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -3513,7 +3537,9 @@
 .gx-card-type.gx-card-link {
   right: 9px;
   left: auto;
-  color: var(--c-danger-81);
+  color: var(--ledger-white);
+  background: var(--ledger-pencil);
+  border-color: var(--ledger-pencil);
 }
 
 .gx-card-name ~ .gx-card-type.gx-card-link {
@@ -3538,6 +3564,8 @@
   .gx-streak i,
   .gx-card-type i {
     font-size: 0;
+    /* A tag's 0.08em spacing is inherited as a length (2안): 0 here too. */
+    letter-spacing: 0;
   }
 }
 

@@ -12,9 +12,14 @@ import { getSceneTraceLine, readSceneBustRate, SCENE_TRACE_COPY, SCENE_TRACE_FLO
 const ANSWER = { case01: { start: [64, 31], payday: [49, 80], board: [50, 0] }, case02: { c2_logs: [120, 100] } };
 
 test("a scene with enough windows prints the rate in the fixed words", () => {
-  assert.equal(getSceneTraceLine(ANSWER, "case01", "start"), "이 장면에서 다른 분석관의 31%가 벽에 닿았습니다.");
-  assert.equal(getSceneTraceLine(ANSWER, "case02", "c2_logs"), SCENE_TRACE_COPY.line(100));
-  assert.match(SCENE_TRACE_COPY.line(7), /벽에 닿았습니다\.$/, "the fixed term is 벽에 닿다");
+  assert.equal(getSceneTraceLine(ANSWER, "case01", "start"), "이 장면에서 다른 분석관의 31%가 벽에 닿았습니다. (판단 64번 기준)");
+  assert.equal(getSceneTraceLine(ANSWER, "case02", "c2_logs"), SCENE_TRACE_COPY.line(100, 120));
+  assert.match(SCENE_TRACE_COPY.line(7, 50), /벽에 닿았습니다\. /, "the fixed term is 벽에 닿다");
+});
+
+test("the line says how many windows the rate stands on, grouped by thousands", () => {
+  assert.match(getSceneTraceLine(ANSWER, "case01", "board"), /\(판단 50번 기준\)$/, "the floor itself prints as it is");
+  assert.match(getSceneTraceLine({ case01: { start: [12345, 9] } }, "case01", "start"), / 9%.*\(판단 12,345번 기준\)$/);
 });
 
 test("the floor is the ranking band's, and it is checked on the device as well", () => {

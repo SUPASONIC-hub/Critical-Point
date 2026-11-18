@@ -104,6 +104,8 @@ ID 없는 빌드에서는 아무것도 나가지 않습니다. 이름과 0 이�
 ## GA4 숫자를 funnel 요약에 (N17, `scripts/report-ga4.mjs`)
 
 Funnel 워크플로(매일 22:10 KST)가 GA4 Data API로 첫 시간 숫자를 읽어 Job Summary 끝에 「첫 시간 (GA4)」 절을 붙입니다.
+같은 내용은 내려받는 `funnel-summary` artifact에도 `ga4.md`로 남고, N28 폰 속도 줄은 `phone-speed.md`로 남습니다(2026-11-18부터,
+`gh run download <run> -n funnel-summary`로 확인).
 
 - 주별(최근 8주): 시작 누름(`cp_start_pressed`) → 첫 판(`cp_first_table_open`) → 프롤로그 01 끝(`cp_prologue01_done`)의 사용자 수와 앞 단계 대비 비율
 - 장면별(최근 28일): 프롤로그 01·02 장면마다 사용자 수와 그 사건 첫 장면 대비 비율(N16의 `cp_scene`, 맞춤 측정기준 `case_no`·`scene_no` 등록 뒤)

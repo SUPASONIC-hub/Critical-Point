@@ -364,7 +364,8 @@ const fileBudgets = {
   // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
   // 3160 / 61634 (E3) and 3153 / 61576 (main 4f927085, C-15) -> 3170 / 61863 on 2026-11-12, bundle 1112c (#520 #521) over main 4f927085, measured: both.
   // 3170 / 61863 -> 3195 / 62160 on 2026-11-16, ui-quickwins, measured: the card key unseen until a mouse hovers or a key focuses the hand, the run line and signals as small print.
-  "play.css": { lines: 3195, bytes: 62160 },
+  // 3195 -> 3203 lines on 2026-11-18, bundle 11-18, measured: 2안 on a short phone -- v1's scene air, a 3px double rule, a 16px slip margin, the ledger column 6px apart in 14px words, 6px inside a slip.
+  "play.css": { lines: 3208, bytes: 62160 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -379,7 +380,9 @@ const fileBudgets = {
   // 588 / 9768 -> 619 / 10135 on 2026-11-02, measured (plate-story, E and F):
   // the player's own figure in the hand's colour inside an outline, and the
   // result's copy of a case's last room with its three tones.
-  "plate.css": { lines: 619, bytes: 10135 },
+  // 619 / 10135 -> 625 / 10211 on 2026-11-17, measured (2안 감사 장부): the
+  // room printed grey and faint on the ledger's paper behind the question.
+  "plate.css": { lines: 625, bytes: 10211 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
@@ -476,7 +479,9 @@ const fileBudgets = {
   // scroll with the page on a phone (운영화면 문제 3 (1)).
   // -> 417 / 8165 on 2026-11-02, measured (money-feedback): a phone on its
   // side gives the purse line a 30px clock and 2px off the HUD's air.
-  "responsive.css": { lines: 417, bytes: 8165 },
+  // -> 418 / 8196 on 2026-11-18, measured (bundle 11-18): 2안's ledger on a
+  // phone on its side keeps v1's scene padding and a 3px double rule.
+  "responsive.css": { lines: 418, bytes: 8196 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about

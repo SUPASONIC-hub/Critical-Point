@@ -2,5 +2,5 @@
 export default {
   choice: "{percent}% of analysts picked the same card",
   rare: " · A rare choice",
-  trace: "{percent}% of other analysts hit the Wall in this scene.",
+  trace: "{percent}% of other analysts hit the Wall in this scene. (Out of {windows} calls)",
 };
