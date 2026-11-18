@@ -26,6 +26,10 @@ export default {
   titleRise: "記録の称号が{title}になりました。",
   actProgress: "第{act}幕 · {pos}/{size} · 中間決算まであと{left}事件",
   actProgressHere: "第{act}幕 · {pos}/{size} · 中間決算は下に",
+  leaveLine: {
+    label: "ひと休み",
+    text: "ここで休んでも保存されます · 次: {next}(約{minutes}分)",
+  },
   sideOpened: {
     label: "番外事件",
     text: "番外事件が開きました：{names}。最初の画面の番外事件の枠から開けます。ランキング対象外です。",

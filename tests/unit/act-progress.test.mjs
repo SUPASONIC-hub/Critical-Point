@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ACT_PROGRESS_CASES, MINI_TALLY_FOR, readActProgress, TALLY_AFTER_CASES } from "../../src/actProgress.js";
+import { ACT_PROGRESS_CASES, LEAVE_LINE_CASES, MINI_TALLY_FOR, readActProgress, readLeaveLine, TALLY_AFTER_CASES } from "../../src/actProgress.js";
 import { buildActTallyModel, MINI_TALLY_CASES } from "../../src/actTally.js";
-import { CASE_SEQUENCE } from "../../src/gameCases.js";
+import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../../src/gameCases.js";
+import { getNextCaseSignal } from "../../src/caseCopy.js";
 import { ACT_CARDS } from "../../src/gauntlet/actCardCopy.js";
 import { fill } from "../../src/locale.js";
 import resultKo from "../../src/copy/result.js";
@@ -62,5 +63,28 @@ test("the line is written in Korean, English and Japanese", () => {
   assert.equal(fill(resultJa.actProgress, values), "第1幕 · 3/7 · 中間決算まであと4事件");
   for (const copy of [resultKo, resultEn, resultJa]) {
     for (const key of ["actProgress", "actProgressHere"]) assert.doesNotMatch(fill(copy[key], values), /[{}]/, key);
+  }
+});
+
+test("N42: 프롤로그 05, 사건 03 and 사건 07 end on the leave line, and it names the next case", () => {
+  assert.deepEqual([...LEAVE_LINE_CASES], ["prologue05", "case03", "case07"]);
+  assert.deepEqual(readLeaveLine("prologue05", getNextCaseSignal("prologue05", []), TYPICAL_CASE_MINUTES), { next: "사건 01 - 72시간", minutes: 10 });
+  for (const caseId of LEAVE_LINE_CASES) {
+    const line = readLeaveLine(caseId, getNextCaseSignal(caseId, []), TYPICAL_CASE_MINUTES);
+    assert.match(line.next, /^사건 \d\d - /, caseId);
+  }
+  for (const caseId of ["prologue04", "case01", "case04", "case08", "final"]) {
+    assert.equal(readLeaveLine(caseId, getNextCaseSignal(caseId, []), TYPICAL_CASE_MINUTES), null, caseId);
+  }
+  assert.equal(readLeaveLine("case03", undefined, 10), null);
+  assert.equal(readLeaveLine("case03", {}, 10), null);
+});
+
+test("N42: the leave line is written in Korean, English and Japanese", () => {
+  const values = { next: "사건 04 - 치러야 할 값", minutes: 10 };
+  assert.equal(fill(resultKo.leaveLine.text, values), "쉬어도 저장됩니다 · 다음: 사건 04 - 치러야 할 값 (약 10분)");
+  for (const copy of [resultKo, resultEn, resultJa]) {
+    assert.ok(copy.leaveLine.label);
+    assert.doesNotMatch(fill(copy.leaveLine.text, values), /[{}]/);
   }
 });

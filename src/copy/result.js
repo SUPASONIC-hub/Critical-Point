@@ -42,6 +42,11 @@ const resultCopy = {
   // N23: where the report of 사건 01~17 stands in its act, and how far the next 중간 결산 is (actProgress.js).
   actProgress: "{act}막 · {pos}/{size} · 중간 결산까지 {left}사건",
   actProgressHere: "{act}막 · {pos}/{size} · 중간 결산은 아래에",
+  // N42, 11-18: the foot of 프롤로그 05, 사건 03 and 사건 07 (LeaveLine.jsx).
+  leaveLine: {
+    label: "쉬어 가기",
+    text: "쉬어도 저장됩니다 · 다음: {next} (약 {minutes}분)",
+  },
   // E-11, 11-18: the line on the report of the case a side case follows in the
   // story (sideCases.sideCasesOpenedBy), and its button into the start screen's slot.
   sideOpened: {
