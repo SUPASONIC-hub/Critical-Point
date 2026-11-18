@@ -2583,19 +2583,10 @@
     -webkit-line-clamp: 2;
   }
 
-  /* 2안's ledger column (12px apart, 15px words) put a NEW GAME+ hand's last
-     slip 17px under the action bar at 360x740 (bundle 11-18): 6px apart, 14px. */
-  .gx-hand:not(.hand-5, .hand-6) {
-    gap: 6px;
-  }
-
-  .gx-hand .gx-card-label {
-    font-size: 0.875rem;
-    line-height: 1.25;
-  }
-
-  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
-    padding-block: 6px;
+  /* English cards say more and wrap to two lines: one step smaller on a
+     short phone (E1d, 2026-11-18: c10/c12/c26/c27_route_system 16px late at 360x740). */
+  .gx-hand .gx-card-label:lang(en) {
+    font-size: 0.8125rem;
   }
 }
 
@@ -2608,6 +2599,22 @@
    2026-11-11). The short-phone block above, stretched to 860, hid the
    portrait on a Pixel 7 (412x839) too. */
 @media (max-width: 480px) and (max-height: 860px) {
+  /* 2안's ledger column (12px apart, 15px words) put a NEW GAME+ hand's last
+     slip 17px under the action bar at 360x740 and an English one 22px at
+     390x844 (bundle 11-18, E1d): 6px apart, 14px words, 6px inside a slip. */
+  .gx-hand:not(.hand-5, .hand-6) {
+    gap: 6px;
+  }
+
+  .gx-hand .gx-card-label {
+    font-size: 0.875rem;
+    line-height: 1.25;
+  }
+
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    padding-block: 6px;
+  }
+
   .gx-clock {
     width: 2.25rem;
     height: 2.25rem;
