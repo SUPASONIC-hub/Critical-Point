@@ -816,10 +816,10 @@ export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`
 export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /**
- * The picture a shared link shows, one per language (1200x675, 2026-11-16):
- * the start screen's key visual with the game's name, one line and 「free, in
- * the browser」 in that language over it (scripts/build-og-images.mjs writes
- * public/og-<lang>.jpg). Its alt is the start screen's own `heroAlt`
+ * The picture a shared link shows, one per language (1200x675, 2026-11-16;
+ * an audit-ledger page since 11-18): the game's name, one line and 「free, in
+ * the browser」 in that language beside the start screen's key visual taped on
+ * as a photo (scripts/build-og-images.mjs writes public/og-<lang>.jpg). Its alt is the start screen's own `heroAlt`
  * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
  * holds them to it).
  */
