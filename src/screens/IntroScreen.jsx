@@ -16,7 +16,7 @@ import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
-import { getSideSlot } from "../sideCases.js";
+import { getSideSlot, peekRequestedSideCase, requestSideCase } from "../sideCases.js";
 import { LazyScreen } from "../components/LazyScreen.jsx";
 import { loadedChunk } from "../state/chunkReload.js";
 import { retryableLazy } from "../state/retryableLazy.js";
@@ -174,7 +174,9 @@ export function IntroScreen({ view, renderers = {} }) {
   // The case the burst is opening, or null when there is none.
   const [openingBurst, setOpeningBurst] = useState(null);
   // E-11: the side case open in this screen's place, or null.
-  const [sideCaseId, setSideCaseId] = useState(null);
+  // A side case asked for from a case report opens as the start screen mounts (sideCases.requestSideCase).
+  const [sideCaseId, setSideCaseId] = useState(peekRequestedSideCase);
+  useEffect(() => requestSideCase(null), []);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");  const {
@@ -364,8 +366,8 @@ export function IntroScreen({ view, renderers = {} }) {
       </button>
     </div>
   );
-  // E-11 번외 사건: hidden until a finale is closed on this device and a side
-  // case is written (sideCases.getSideSlot). Read on each draw, so a case
+  // E-11 번외 사건: hidden until a side case is open on this device (11-18: at
+  // its place in the story) and written (sideCases.getSideSlot). Read on each draw, so a case
   // closed in the side screen is counted when the start screen comes back.
   const sideSlot = getSideSlot({ newGamePlusUnlocked, caseResults });
   if (sideCaseId) {
