@@ -193,7 +193,8 @@ const budgets = [
   // 157,758 / 58,225 -> 164,405 / 61,292 묶음 11-17 over main 705a809f. Measured 164401 / 61288 (over budget only) in the e2e build, the plus 4.
   // 157,758 / 58,225 -> 164,426 / 61,325 묶음 11-17 over main 705a809f. Measured 164422 / 61321 (over budget only) in the e2e build, the plus 4.
   // 164,426 / 61,325 -> 164,455 / 61,338 d3-next over main 4d549334: the scene wall line carries its count (판단 N번 기준, src/copy/sceneRates.js). Measured 164451 / 61334 in the CI e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_455, maxGzip: 61_338 },
+  // 164,455 / 61,338 -> 164,455 / 61,350 묶음 11-18 over main 4d549334. Measured - / 61346 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_455, maxGzip: 61_350 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -2603,8 +2604,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,361 / 442,730 / 450,673 묶음 11-17 over main 705a809f. Measured first paint, the plus 4.
 // en 442,730 -> 442,743 and ja 450,673 -> 450,682 on 2026-11-18, d3-next: the locale chunks above. Measured 442,739 / 450,678 in the CI e2e build, the plus 4.
 // -> 380,437 / 442,806 / 450,750 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured first paint, the plus 4.
-// Bundle 11-18 (d3-next + 2안): both, re-measured below after the build.
-const FIRST_PAINT_BUDGETS = { ko: 380_437, en: 442_819, ja: 450_759 };
+// -> 380,426 / 442,813 / 450,753 묶음 11-18 over main 4d549334 (2안 + D3 + 아이콘), the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_426, en: 442_813, ja: 450_753 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2816,8 +2817,8 @@ function checkBudget(file, budget) {
 // -> 11,207 / 4,025 N32 친구 기록 넘기기 over main 705a809f: the worker precaches the friendTarget chunk, the plus 4.
 // -> 11,272 / 4,044 묶음 11-17 over main 705a809f, the plus 4.
 // -> 11,184 / 4,002 앱 아이콘 이름 -v2 11-17: 아이콘 링크·사전 캐시 이름이 길어짐, the plus 4.
-// Bundle 11-18 (아이콘 -v2 + 묶음 11-17): re-measured after the build.
-const WORKER_BUDGET = { maxBytes: 11_280, maxGzip: 4_048 };
+// -> 11,284 / 4,049 묶음 11-18 over main 4d549334 (아이콘 -v2 + 2안), the plus 4.
+const WORKER_BUDGET = { maxBytes: 11_284, maxGzip: 4_049 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
