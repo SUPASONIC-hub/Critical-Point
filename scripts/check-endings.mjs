@@ -4,7 +4,7 @@ import { getEndingVariant, LOGIC_SLACK_STREAK, VAULT_SLACK_PER_CASE } from "../s
 import { AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
-import { SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
+import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
@@ -405,34 +405,40 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  */
 {
   const SCOUT_SEASONS = Number(process.env.ENDING_SCOUT_SEASONS) || POPULATION.length * 5;
-  const bots = Object.fromEntries(SCOUT_TIMINGS.map((scout) => [scout, createSeasonBot({ seed: 20261105, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).map(([name, base]) => [name, { ...base, board: "listens", scout }])) })]));
-  const rows = Object.fromEntries(SCOUT_TIMINGS.map((scout) => [scout, { endings: new Map(), looks: 0, trust: 0, busts: 0, moved: 0 }]));
+  // The narrowing hand (B1, 11-18) only with ENDING_SCOUT_NARROW=1: a fifth set of seasons took the CI run past
+  // verify:static's 300 s (277.7 s on main). Measured 11-18: 믿음 at the close 72.3 against 79.3, busts 23.6 against 17.1.
+  const TIMINGS = SCOUT_TIMINGS.filter((timing) => timing !== "narrow" || process.env.ENDING_SCOUT_NARROW === "1");
+  const bots = Object.fromEntries(TIMINGS.map((scout) => [scout, createSeasonBot({ seed: 20261105, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).map(([name, base]) => [name, { ...base, board: "listens", scout }])) })]));
+  const rows = Object.fromEntries(TIMINGS.map((scout) => [scout, { endings: new Map(), looks: 0, narrows: 0, trust: 0, busts: 0, moved: 0 }]));
   for (let index = 0; index < SCOUT_SEASONS; index += 1) {
     const archetype = POPULATION[index % POPULATION.length];
-    const seasons = Object.fromEntries(SCOUT_TIMINGS.map((scout) => {
+    const seasons = Object.fromEntries(TIMINGS.map((scout) => {
       bots[scout].reseed((20261105 + Math.imul(index + 1, 2654435761)) >>> 0);
       let looks = 0;
+      let narrows = 0;
       const season = bots[scout].playSeason(`scout:${index}`, archetype, false, ({ verdict }) => {
         if (verdict.scouted) looks += 1;
+        if (verdict.narrowed) narrows += 1;
       });
-      return [scout, { season, looks }];
+      return [scout, { season, looks, narrows }];
     }));
     const bare = seasons.never.season;
-    for (const scout of SCOUT_TIMINGS) {
-      const { season, looks } = seasons[scout];
+    for (const scout of TIMINGS) {
+      const { season, looks, narrows } = seasons[scout];
       const row = rows[scout];
       row.endings.set(season.ending.id, (row.endings.get(season.ending.id) ?? 0) + 1);
       row.looks += looks;
+      row.narrows += narrows;
       row.trust += season.final.resources.trust;
       row.busts += season.strain.seasonBusts;
       if (season.ending.id !== bare.ending.id) row.moved += 1;
     }
   }
   const per = (part) => ((100 * part) / SCOUT_SEASONS).toFixed(1);
-  console.log(`Scout spend and the ending (measured, ${SCOUT_SEASONS} population slots, each season played on the heartbeat once per timing of the look on one seed; a look costs 믿음 ${SCOUT_TRUST}):`);
-  for (const scout of SCOUT_TIMINGS) {
+  console.log(`Scout spend and the ending (measured, ${SCOUT_SEASONS} population slots, each season played on the heartbeat once per timing of the look on one seed; a look costs 믿음 ${SCOUT_TRUST}, the second (narrow) ${SCOUT_NARROW_TRUST} more):`);
+  for (const scout of TIMINGS) {
     const row = rows[scout];
-    console.log(`  ${scout.padEnd(6)} looks ${(row.looks / SCOUT_SEASONS).toFixed(1)} a season, 믿음 at the close ${(row.trust / SCOUT_SEASONS).toFixed(1)}, busts ${(row.busts / SCOUT_SEASONS).toFixed(1)} a season, ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
+    console.log(`  ${scout.padEnd(6)} looks ${(row.looks / SCOUT_SEASONS).toFixed(1)}${row.narrows ? ` + narrow ${(row.narrows / SCOUT_SEASONS).toFixed(1)}` : ""} a season, 믿음 at the close ${(row.trust / SCOUT_SEASONS).toFixed(1)}, busts ${(row.busts / SCOUT_SEASONS).toFixed(1)} a season, ending differs from never in ${per(row.moved)}%; ${EXPECTED.map((id) => `${id} ${per(row.endings.get(id) ?? 0)}%`).join(", ")}`);
   }
 }
 

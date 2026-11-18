@@ -194,7 +194,7 @@ const budgets = [
   // 157,758 / 58,225 -> 164,426 / 61,325 묶음 11-17 over main 705a809f. Measured 164422 / 61321 (over budget only) in the e2e build, the plus 4.
   // 164,426 / 61,325 -> 164,455 / 61,338 d3-next over main 4d549334: the scene wall line carries its count (판단 N번 기준, src/copy/sceneRates.js). Measured 164451 / 61334 in the CI e2e build, the plus 4.
   // 164,455 / 61,338 -> 164,455 / 61,350 묶음 11-18 over main 4d549334. Measured - / 61346 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_455, maxGzip: 61_350 },
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_457, maxGzip: 61_343 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -323,7 +323,7 @@ const budgets = [
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_033, maxGzip: 14_905 },
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_398, maxGzip: 15_010 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1495,7 +1495,7 @@ const budgets = [
   // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_385, maxGzip: 19_490 },
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_819, maxGzip: 19_640 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2040,7 +2040,7 @@ const budgets = [
   // 195,067 / 65,336 -> 195,076 / 65,336 N31 draft over main 705a809f. Measured 195072 / - (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 197,425 / 66,217 묶음 11-17 over main 705a809f. Measured 197421 / 66213 (over budget only) in the e2e build, the plus 4.
   // 197,425 / 66,217 -> 197,452 / 66,232 d3-next over main 4d549334: the scene wall line's count in Japanese. Measured 197448 / 66228 in the CI e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_452, maxGzip: 66_232 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_789, maxGzip: 66_322 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2138,7 +2138,7 @@ const budgets = [
   // 162,859 / 58,327 -> 162,867 / 58,327 N31 draft over main 705a809f. Measured 162863 / - (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 164,766 / 59,136 묶음 11-17 over main 705a809f. Measured 164762 / 59132 (over budget only) in the e2e build, the plus 4.
   // 164,766 / 59,136 -> 164,792 / 59,153 d3-next over main 4d549334: the scene wall line's count in English. Measured 164788 / 59149 in the CI e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 164_792, maxGzip: 59_153 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_108, maxGzip: 59_226 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2605,7 +2605,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // en 442,730 -> 442,743 and ja 450,673 -> 450,682 on 2026-11-18, d3-next: the locale chunks above. Measured 442,739 / 450,678 in the CI e2e build, the plus 4.
 // -> 380,437 / 442,806 / 450,750 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured first paint, the plus 4.
 // -> 380,426 / 442,813 / 450,753 묶음 11-18 over main 4d549334 (2안 + D3 + 아이콘), the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_426, en: 442_813, ja: 450_753 };
+// 11-18 b1-b5-next over main 4d549334: B1's second look (narrow 20 to 14, 믿음 2) and B5's next-push clock line raised
+// GameRuntime 164,457 / 61,343, RelicDraft 35,398 / 15,010, gauntletEngine 51,819 / 19,640, locale-ja-index
+// 197,789 / 66,322, locale-en-index 165,108 / 59,226 and en / ja first paint 442,821 / 450,777: measured in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_361, en: 442_821, ja: 450_777 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

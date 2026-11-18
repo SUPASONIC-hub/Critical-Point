@@ -159,6 +159,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     fractureRate: verdict.fractureRate,
     focusMultiplier: verdict.focus?.resourceMultiplier,
     scouted: verdict.scouted,
+    narrowed: verdict.narrowed === true,
   });
   return {
     ...route,

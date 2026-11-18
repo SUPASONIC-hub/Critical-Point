@@ -262,3 +262,30 @@ test("the bots play on the stake clock the engine deals", () => {
   }
   assert.ok(shortened > 0, "a bot that pushes to 50 plays windows whose clock the stake has cut");
 });
+
+/**
+ * B5's next step (2026-11-18): the cut is told before the push that makes it.
+ * The push's description and the folded briefing say "시계 최대 −N초" when the
+ * top of the next push's range crosses a stake tier, and nothing otherwise.
+ */
+test("the clock a push may cut is said before the push, and only when the push can cross a tier", async () => {
+  const { describeNextClock, readTableMeters } = await import("../../src/gauntlet/tableMeters.js");
+  const at = (gauge, schema = BASE_SCHEMA) => ({ ...createWindow({ schema, seed: "clock:next" }), gauge });
+  const [, second, third] = STAKE_LAYER_GAUGES;
+  assert.equal(describeNextClock(at(0), BASE_SCHEMA.stepMax), "", "far below a tier, nothing");
+  assert.equal(describeNextClock(at(second - 1), second + 1), ` · 시계 최대 −${STAKE_CLOCK_CUT}초`);
+  assert.equal(describeNextClock(at(second - 1), third + 1), ` · 시계 최대 −${STAKE_CLOCK_CUT * 2}초`, "two tiers at once, both cuts");
+  assert.equal(describeNextClock(at(second + 1), second + 5), "", "inside a tier, nothing");
+  assert.equal(describeNextClock(at(second - 1, normalizeSchema({})), second + 1), "", "a board from before the stake clock keeps its flat clock");
+  const win = at(second - 2);
+  const meters = readTableMeters({ win, schema: win.schema, selectedCard: null });
+  assert.equal(meters.nextClock, describeNextClock(win, meters.nextHigh));
+  assert.ok(meters.nextClock.includes(String(STAKE_CLOCK_CUT)));
+  // The three languages carry it, and the two lines that say the next push leave room for it.
+  for (const path of ["../../src/copy/table.js", "../../src/locales/en/screens/table.js", "../../src/locales/ja/screens/table.js"]) {
+    const { default: copy } = await import(path);
+    assert.match(copy.stage.nextClock, /\{cut\}/, path);
+    assert.match(copy.stage.briefNext, /\{high\}\{clock\}/, path);
+    assert.match(copy.stage.pushDetail, /\{high\}\{clock\}$/, path);
+  }
+});

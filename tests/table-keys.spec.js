@@ -134,7 +134,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
  * and the spent button stays where it was, aria-disabled, so the focus is not
  * dropped to the page (decision 11).
  */
-test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (and 믿음 1 at the settle), and the spent button keeps the focus", async ({ page }) => {
+test("R scouts the wall: the band narrows to 20, then to 14, the clock pays 3 seconds a look (and 믿음 1 then 2 at the settle), and the spent button keeps the focus", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
@@ -146,16 +146,28 @@ test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (
   await scout.focus();
   const before = await clockOf(page);
   await page.keyboard.press("r");
+  // B1's next step (11-18): with the 믿음 for it, the same button now offers the second look.
+  await expect(scout).toContainText("좁히기");
+  await expect(scout).toHaveAttribute("aria-disabled", "false");
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 좁히기, 14칸으로 · 믿음 2 · 시간 3초$/);
+  await expect(scout, "the button keeps the focus it had").toBeFocused();
+  const [first, last] = await bandOf();
+  expect(last - first, "the look narrows the band to 2 x SCOUT_REACH").toBeLessThanOrEqual(20);
+  expect(first).toBeGreaterThanOrEqual(low);
+  expect(last).toBeLessThanOrEqual(high);
+  expect(await clockOf(page), "the look costs three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  const once = await clockOf(page);
+  await page.keyboard.press("r");
   await expect(scout).toContainText("조회함");
   await expect(scout).toHaveAttribute("aria-disabled", "true");
   await expect(scout, "the spent button keeps the focus it had").toBeFocused();
   const [min, max] = await bandOf();
-  expect(max - min, "the look narrows the band to 2 x SCOUT_REACH").toBeLessThanOrEqual(20);
-  expect(min).toBeGreaterThanOrEqual(low);
-  expect(max).toBeLessThanOrEqual(high);
-  expect(await clockOf(page), "the look costs three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  expect(max - min, "the second look narrows it to 2 x SCOUT_NARROW_REACH").toBeLessThanOrEqual(14);
+  expect(min).toBeGreaterThanOrEqual(first);
+  expect(max).toBeLessThanOrEqual(last);
+  expect(await clockOf(page), "the second look costs three seconds too").toBeLessThanOrEqual(once - 3);
 
-  // Once a window: neither R nor the button spends it again.
+  // Twice a window at most: neither R nor the button spends a third.
   const after = await clockOf(page);
   await page.keyboard.press("r");
   // force: Playwright counts aria-disabled as not enabled, and the click is the point here.

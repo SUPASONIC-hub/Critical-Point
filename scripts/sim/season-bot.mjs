@@ -68,7 +68,7 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
-import { LOCK_PRESS_SECONDS, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
+import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
@@ -167,14 +167,20 @@ const SCOUT_EDGE = 3;
  * next push can reach the band on the table (the 현재 위험 line's 「닿을 수
  * 있다」); "never" not at all. Until the look is taken the hand plays the
  * heartbeat. A look costs SCOUT_TRUST of 믿음, so a hand with less does not
- * look (`playWindow`'s `trust`).
+ * look (`playWindow`'s `trust`). "narrow" looks as "always" does and takes
+ * the second look (B1, 11-18: SCOUT_NARROW_TRUST more, the band 20 to 14) the
+ * moment the next push can reach the band the first drew (`narrowDue`).
  */
-export const SCOUT_TIMINGS = Object.freeze(["never", "always", "late", "danger"]);
+export const SCOUT_TIMINGS = Object.freeze(["never", "always", "late", "danger", "narrow"]);
 export function scoutDue(timing, win) {
-  if (timing === "always") return true;
+  if (timing === "always" || timing === "narrow") return true;
   if (timing === "late") return win.pushes >= 2;
   if (timing === "danger") return win.gauge + win.schema.stepMax >= win.schema.wallMin;
   return false;
+}
+/** Whether a hand that narrows (`narrow`) takes its second look now: once it has looked, when the next push, `edge` past, reaches the band. */
+export function narrowDue(timing, win, edge = SCOUT_EDGE) {
+  return timing === "narrow" && win.scouted === true && win.narrowed !== true && win.gauge + win.schema.stepMax - edge >= getWindowBand(win).wallMin;
 }
 
 /**
@@ -426,6 +432,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     const scouts = policy.listens && rules.has("scout") && policy.scout !== "never" && trust >= SCOUT_TRUST;
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       if (scouts && !win.scouted && scoutDue(policy.scout, win)) win = scoutWindow(win, true, rules, reduce);
+      if (scouts && trust >= SCOUT_TRUST + SCOUT_NARROW_TRUST && narrowDue(policy.scout, win)) win = reduce(win, { type: "SCOUT" }, rules);
       if (win.status !== "live") break;
       const band = win.scouted ? getWindowBand(win) : null;
       const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
@@ -585,6 +592,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           fractureRate: verdict.fractureRate,
           focusMultiplier: verdict.focus?.resourceMultiplier,
           scouted: verdict.scouted,
+          narrowed: verdict.narrowed === true,
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
         const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
@@ -705,7 +713,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, narrows: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
 /**
  * The bust chain (improvement notes C-14, 2026-10-22): boards played right
  * after a bust in the same case, against the rest. `afterBust*` is every such
@@ -725,6 +733,7 @@ function see(seen, verdict) {
   count(seen.pushed, verdict.pushes);
   // B1: the windows that spent their look (each paid SCOUT_TRUST of 믿음, which a case player does not hold).
   if (verdict.scouted) seen.scouts += 1;
+  if (verdict.narrowed) seen.narrows += 1;
   // AUDIT_ON only: the closes the audit took its part of, that part, and what those closes moved before it.
   if (verdict.audit?.caught) {
     seen.audits += 1;
@@ -856,6 +865,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       for (let press = 0; press < 30 && win.status === "live"; press += 1) {
         // A timed look (B1, `scoutDue`): the first push before which the hand's own timing says so.
         if (typeof decide.scout === "function" && !win.scouted && decide.scout(win)) win = scoutWindow(win, true, rules, reduce);
+        // The second look (B1, 11-18): `decide.narrow(win)` says when, once the first is taken.
+        if (typeof decide.narrow === "function" && win.scouted && !win.narrowed && win.status === "live" && decide.narrow(win)) win = reduce(win, { type: "SCOUT" }, rules);
         if (win.status !== "live") break;
         // `audit` is the case's audit so far, for a hand that reads it (AUDIT_ON).
         if (!decide(win, run, audit)) break;

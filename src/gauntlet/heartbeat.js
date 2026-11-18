@@ -41,7 +41,7 @@ export const HESITATION_IDLE = Object.freeze({ key: "", since: 0 });
  */
 export function hesitationKey(win, hold = "") {
   if (!win?.selectedId) return "";
-  return [win.selectedId, win.pushes, Number(win.focusHits) || 0, win.scouted === true ? 1 : 0, win.focusMode ?? "", hold || "idle"].join("|");
+  return [win.selectedId, win.pushes, Number(win.focusHits) || 0, win.scouted === true ? (win.narrowed === true ? 2 : 1) : 0, win.focusMode ?? "", hold || "idle"].join("|");
 }
 
 /**
