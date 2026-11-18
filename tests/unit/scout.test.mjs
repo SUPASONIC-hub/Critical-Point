@@ -42,7 +42,10 @@ test("a look costs SCOUT_SECONDS of clock, once a window, and only where the cas
   assert.deepEqual(getWindowBand(fresh), { wallMin: fresh.schema.wallMin, wallMax: fresh.schema.wallMax, scouted: false });
   const looked = reduceWindow(fresh, { type: "SCOUT" }, ALL_RULES);
   assert.equal(looked.elapsed, SCOUT_SECONDS);
-  assert.equal(reduceWindow(looked, { type: "SCOUT" }, ALL_RULES), looked, "a second look is nothing");
+  // A second press narrows the band (B1, 11-18; scout-narrow.test.mjs); a third is nothing.
+  const narrowed = reduceWindow(looked, { type: "SCOUT" }, ALL_RULES);
+  assert.equal(narrowed.narrowed, true);
+  assert.equal(reduceWindow(narrowed, { type: "SCOUT" }, ALL_RULES), narrowed, "a third look is nothing");
   const before = rulesFor("prologue02", { staged: true });
   assert.equal(before.has("scout"), false);
   assert.equal(reduceWindow(fresh, { type: "SCOUT" }, before), fresh, "before the rule, the window is as it was");
@@ -83,12 +86,13 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   assert.match(scoutBand, /if \(!canScout && !band\.scouted\) return <span className="gx-band-label" aria-hidden="true">/);
   assert.match(scoutBand, /data-testid="commit-scout" onClick=\{onScout\} aria-disabled=\{!canScout\}/);
   // The name's words are the copy table's (src/copy/table.js), filled with the band and SCOUT's price (B1: 믿음 and the clock).
-  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{band\.scouted \? undefined : fill\(say\.scoutLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS \}\)\}/);
+  assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{label\}/);
+  assert.match(scoutBand, /\? fill\(say\.scoutLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS \}\)/);
   const { default: tableCopy } = await import("../../src/copy/table.js");
   assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초");
   // The stage opens SCOUT on the meters' `canPayScout`, read off the run's resources, and adds no import for it.
   assert.match(stage, /\} = readTableMeters\(\{ win, schema, selectedCard, run, audit: auditCount, resources \}\);/);
-  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && !win\.scouted && canPayScout;/);
+  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && canPayNarrow : canPayScout\);/);
   assert.ok(!stage.includes("SCOUT_TRUST"), "the price is the meters' to read, not the stage's");
 });
 
@@ -127,9 +131,9 @@ test("the verdict says whether the look was spent, and the settle prices it from
   assert.equal(resolveWindow({ run, window: reduceWindow(reduceWindow(fresh, { type: "SCOUT" }, before), { type: "CASH" }, before), card, rules: before }).verdict.scouted, false);
   // settleChoice.js and the season bot hand the verdict's mark to applyGauntletEffect; the log entry carries it.
   const settle = readFileSync(new URL("../../src/state/settleChoice.js", import.meta.url), "utf8");
-  assert.match(settle, /focusMultiplier: verdict\.focus\?\.resourceMultiplier,\n {4}scouted: verdict\.scouted,\n {2}\}\);/);
+  assert.match(settle, /focusMultiplier: verdict\.focus\?\.resourceMultiplier,\n {4}scouted: verdict\.scouted,\n/);
   const bot = readFileSync(new URL("../../scripts/sim/season-bot.mjs", import.meta.url), "utf8");
-  assert.match(bot, /focusMultiplier: verdict\.focus\?\.resourceMultiplier,\n {10}scouted: verdict\.scouted,\n {8}\}\);/);
+  assert.match(bot, /focusMultiplier: verdict\.focus\?\.resourceMultiplier,\n {10}scouted: verdict\.scouted,\n/);
   const commit = readFileSync(new URL("../../src/state/useChoiceCommit.js", import.meta.url), "utf8");
   assert.match(commit, /pushes: verdict\.pushes,\n(?:\s*\/\/.*\n)*\s*scouted: verdict\.scouted,/);
 });
@@ -207,7 +211,7 @@ test("the look's price is said in three languages, by the button's name and the 
 test("the bots look when their timing says, pay 믿음 for it, and a hand with none does not look", async () => {
   const { createSeasonBot, scoutDue, SCOUT_TIMINGS } = await import("../../scripts/sim/season-bot.mjs");
   const { STAGED } = await import("../../src/gauntlet/tableUnlocks.js");
-  assert.deepEqual([...SCOUT_TIMINGS], ["never", "always", "late", "danger"]);
+  assert.deepEqual([...SCOUT_TIMINGS], ["never", "always", "late", "danger", "narrow"]);
   const at = (pushes, gauge) => ({ pushes, gauge, schema: BASE_SCHEMA });
   assert.equal(scoutDue("always", at(0, 0)), true);
   assert.equal(scoutDue("late", at(1, 30)), false);

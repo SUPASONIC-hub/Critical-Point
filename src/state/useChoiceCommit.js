@@ -344,6 +344,8 @@ export function useChoiceCommit(context) {
         pushes: verdict.pushes,
         // B1: the look was spent (its 믿음 is in `effect`); the replay checker holds the record to it.
         scouted: verdict.scouted,
+        // The second look (B1, 11-18), only when spent: an entry without it had none.
+        ...(verdict.narrowed ? { narrowed: true } : {}),
         rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
