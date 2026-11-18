@@ -2622,7 +2622,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_677, en: 443_172, ja: 451_135 };
+// -> 380,682 / 443,178 / 451,140 N36 (CSS only), measured 380,678 / 443,174 / 451,136 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_682, en: 443_178, ja: 451_140 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
