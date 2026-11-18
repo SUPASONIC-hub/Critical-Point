@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { parse as parseYaml } from "yaml";
 
 const { describeEventWeek, parseKstDate, kstDate, CALENDAR_HORIZON_DAYS } = await import("../../scripts/report-event-week.mjs");
 const { WEEKLY_RULES } = await import("../../src/gauntlet/weeklyCalendar.js");
@@ -49,4 +51,17 @@ test("a calendar id the catalogue does not know is warned about", () => {
 test("the shipped calendar gives no warning on 2026-11-18, the day the report was added", () => {
   const last = WEEKLY_RULES[WEEKLY_RULES.length - 1];
   assert.ok(describeEventWeek(parseKstDate("2026-11-18")).warnings.length === 0, `calendar ends at ${last.week}`);
+});
+
+test("Verify Ranking adds the report to its summary with no secret, and a failure there fails nothing", () => {
+  const workflow = parseYaml(readFileSync(new URL("../../.github/workflows/verify-ranking.yml", import.meta.url), "utf8"));
+  const steps = workflow.jobs.verify.steps;
+  const at = steps.findIndex((step) => step.name === "Add the event week line");
+  assert.ok(at > 0, "the step is there");
+  const step = steps[at];
+  assert.equal(step["continue-on-error"], true);
+  assert.equal(step.env, undefined, "no secret, no env");
+  assert.match(step.run, /npm run --silent report:event-week .*\|\| true/);
+  assert.match(step.if, /always\(\)/);
+  assert.ok(at < steps.findIndex((other) => other.name === "Upload the summary"), "before the summary's artifact");
 });
