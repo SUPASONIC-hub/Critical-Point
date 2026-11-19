@@ -52,7 +52,7 @@ export default {
     },
     hearing: {
       title: "The Hearing",
-      text: "This Case, every hand has half the time, and every card’s chips are ×{hearingChips}.",
+      text: "This Case, every hand’s clock is {hearingCut}% shorter, and every card’s chips are ×{hearingChips}.",
       world: "A hearing over who owns the records. Little time to answer, and every word costs more.",
     },
   },

@@ -65,7 +65,7 @@ const weekRulesCopy = {
     },
     hearing: {
       title: "청문회",
-      text: "이번 사건은 판마다 시간이 절반이고, 모든 카드의 칩이 {hearingChips}배다.",
+      text: "이번 사건은 판마다 시간이 {hearingCut}% 짧고, 모든 카드의 칩이 {hearingChips}배다.",
       world: "기록의 주인을 다투는 청문회. 답할 시간은 짧고, 한마디의 값은 크다.",
     },
   },

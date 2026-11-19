@@ -109,21 +109,24 @@ const OLD_DROP_ORDER = Object.freeze([
 ]);
 /**
  * Under the next rules (G4, relicsNext.js) the same reading off the heartbeat
- * column, measured 2026-11-19 with RULES_NEXT=1.
+ * column, measured 2026-11-19 with RULES_NEXT=1: COLD BLOOD +2.4% (it pays
+ * the blind and the bust-heavy hands), ENCORE +3.6, METRONOME +3.9, CARBON
+ * COPY +4.0, STETHOSCOPE +4.9, AUDIT CONTACT +5.7, INSURANCE +8.6, KINETIC
+ * GRIP +9.7, FIELD NOTES +15.1, TESTIMONY +15.6, HEAT SINK +17.5, FRONT PAGE +18.9.
  */
 const NEXT_DROP_ORDER = Object.freeze([
+  "coldBlood",
   "encore",
-  "stethoscope",
   "metronome",
   "carbonCopy",
-  "coldBlood",
-  "insurance",
+  "stethoscope",
   "auditContact",
+  "insurance",
   "kineticGrip",
-  "frontPage",
   "fieldNote",
-  "heatSink",
   "testimony",
+  "heatSink",
+  "frontPage",
 ]);
 export const RELIC_DROP_ORDER = nextTableOn() ? NEXT_DROP_ORDER : OLD_DROP_ORDER;
 

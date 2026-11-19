@@ -114,7 +114,7 @@ test("acts 3, 5 and 7 each deal their twist, behind a case's own rule and never 
   assert.equal(scattered.wallMin, plain.wallMin - SCATTER_SPREAD);
   assert.equal(scattered.wallMax, Math.min(98, plain.wallMax + SCATTER_SPREAD));
   const hearing = engine.getTableSchema({ open: { caseId: "case38" } });
-  assert.equal(hearing.seconds, Math.max(12, Math.round(plain.seconds / 2)));
+  assert.equal(hearing.seconds, Math.max(12, Math.round(plain.seconds * 0.7)));
   assert.equal(hearing.chipsScale, plain.chipsScale * HEARING_CHIPS);
 });
 
@@ -127,5 +127,5 @@ test("each twist's panel line is in ko, en and ja, with its line in the story", 
     }
   }
   const rule = getCaseRule("case40", "hearing");
-  assert.ok(rule.world && /절반/.test(rule.text) && !/\{/.test(rule.text));
+  assert.ok(rule.world && /30% 짧고/.test(rule.text) && !/\{/.test(rule.text));
 });

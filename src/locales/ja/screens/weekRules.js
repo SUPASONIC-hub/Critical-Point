@@ -52,7 +52,7 @@ export default {
     },
     hearing: {
       title: "公聴会",
-      text: "この事件は盤ごとの時間が半分で、すべてのカードのチップが{hearingChips}倍。",
+      text: "この事件は盤ごとの時間が{hearingCut}%短く、すべてのカードのチップが{hearingChips}倍。",
       world: "記録の持ち主を争う公聴会。答える時間は短く、一言の値は大きい。",
     },
   },

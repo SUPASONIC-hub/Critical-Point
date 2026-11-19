@@ -14,7 +14,7 @@
  *   and every desk's wall stands somewhere else: the band `SCATTER_SPREAD`
  *   wider on both sides, the chips `SCATTER_CHIPS` times.
  * - 7막 「기록의 전쟁」 (사건 37-42): 청문회. The hearing over whose records they
- *   are: the clock `HEARING_CLOCK` of itself, the chips `HEARING_CHIPS` times.
+ *   are: the clock `HEARING_CLOCK` of itself (30% shorter), the chips `HEARING_CHIPS` times.
  *
  * Laid over the board the way N26's case rules are (gauntletEngine.js
  * `getTableSchema` via `caseRuleFor`), with the same rule: a case's own rule
@@ -29,7 +29,7 @@ export const MERGER_CHIPS = 1.5;
 export const MERGER_SHIFT = 4;
 export const SCATTER_SPREAD = 4;
 export const SCATTER_CHIPS = 1.15;
-export const HEARING_CLOCK = 0.5;
+export const HEARING_CLOCK = 0.7;
 export const HEARING_CHIPS = 1.25;
 
 /** The twist's numbers, in the catalogue's schema terms (weeklyRules.js `weekRuleOverlay`). */
