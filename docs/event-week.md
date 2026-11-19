@@ -245,3 +245,42 @@ W48~W50이 세 주 이어집니다. W17~W25는 세 규칙의 차례를 이어 �
 | 오늘의 이벤트 주 칸(달력만 읽음) | `scripts/report-event-week.mjs` (`report:event-week`) |
 | 시험 주 보고 | `.github/workflows/test-week.yml`, `scripts/report-test-week.mjs`, 저장소 변수 `TEST_WEEK_SIM_LINES` |
 | 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/event-week-doc.test.mjs`, `tests/unit/report-event-week.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
+
+---
+
+## 8. 주 1회 알림 (Web Push, N25)
+
+규칙이 있는 주의 **월요일 08:00 KST**(12:00에 한 번 더, 못 보낸 것만)에 알림을 켠 기기로 그 주의 규칙을 한 번
+보냅니다. 규칙 없는 주는 보내지 않습니다. 기본은 꺼짐이고, 홈 화면에 추가한 앱의 편의 설정 맨 아래에서 켭니다
+(iOS 16.4 이상 포함). 서버에 남는 것은 브라우저의 구독 주소(endpoint)와 키 둘, 언어뿐이고, 끄면 지웁니다.
+달력은 2장의 `MERGED_WEEKS` 그대로라, 달력에 주를 올리면 알림도 따라옵니다.
+
+**VAPID 키 만들기** (한 번, 아무 PC에서):
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+나온 Public Key와 Private Key를 아래 네 곳에 넣습니다. **Private Key는 GitHub Secrets에만** 둡니다.
+
+| 어디 | 이름 | 값 |
+| --- | --- | --- |
+| Render 대시보드 → 서비스 → Environment | `VITE_VAPID_PUBLIC_KEY` | Public Key (넣은 뒤 다시 배포해야 빌드에 들어감) |
+| GitHub → Settings → Secrets → Actions | `VAPID_PUBLIC_KEY` | Public Key (Render와 같은 값) |
+| 〃 | `VAPID_PRIVATE_KEY` | Private Key |
+| 〃 | `VAPID_SUBJECT` | `mailto:` + 지원 메일 주소 |
+
+`VITE_VAPID_PUBLIC_KEY`가 없는 빌드에서는 스위치가 보이지 않습니다. 키를 바꾸면 이미 켠 기기의 구독은 모두
+무효가 되므로(410으로 지워짐) 바꾸지 않습니다. DB 접근은 Funnel·Board Reports와 같은 `SUPABASE_ACCESS_TOKEN`을
+씁니다(새 키 없음).
+
+**확인**: Actions → Weekly Push → Run workflow(기본 dry run: 대상 수만 세고 보내지 않음). 실제로 보내려면
+`dry_run`을 끄고 실행합니다(이미 이번 주에 받은 기기에는 다시 보내지 않음). 로그와 Job Summary에는 수만 남습니다.
+
+| 무엇 | 파일 |
+| --- | --- |
+| 스위치, 구독 | `src/state/weeklyReminder.js`, `src/state/weeklyReminderPush.js`, `src/components/WeeklyReminderToggle.jsx`, `src/copy/reminder.js` |
+| 알림 표시·탭 | `src/serviceWorker/worker.js` (`push`, `notificationclick`, `pushNotice`) |
+| 서버 표·함수 | `supabase/migrations/20261129000000_push_subscriptions.sql` (`push_subscribe`, `push_unsubscribe`) |
+| 보내기 | `.github/workflows/weekly-push.yml`, `scripts/send-weekly-push.mjs` |
+| 테스트 | `tests/unit/weekly-reminder.test.mjs`, `scripts/check-grants.mjs` (`check:grants`) |

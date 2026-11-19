@@ -163,6 +163,8 @@
     "src/state/useTelemetryQueue.js": 95,
     "src/state/weeklyClock.js": 100,
     "src/state/weeklyRuleChoice.js": 100,
+    "src/state/weeklyReminder.js": 100,
+    "src/state/weeklyReminderPush.js": 100,
     "src/telemetry.js": 80,
     "src/threeScenes.js": 100,
     "src/verdictBranch.js": 100,

@@ -375,6 +375,7 @@ const budgets = [
   // 300,207 / 89,546 -> 300,667 / 89,754 다국적 인물 over main e43f7bf6. Measured 300663 / 89750 (over budget only) in the e2e build, the plus 4.
   // 300,667 / 89,754 -> 300,673 / 89,754 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured 300669 / - (over budget only) in the e2e build, the plus 4.
   // 300,673 / 89,754 -> 302,809 / 90,483 번외 8 over main 29120d32. Measured 302805 / 90479 (over budget only) in the e2e build, the plus 4.
+  // 300,673 / 89,754 -> 300,673 / 89,769 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured - / 89765 (over budget only) in the e2e build, the plus 4.
   { pattern: /^pastPicks-.*\.js$/, maxBytes: 302_809, maxGzip: 90_483 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
@@ -721,6 +722,7 @@ const budgets = [
   // -> 217,611 / 79,379 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line's Korean copy (copy/result.js). Measured locally, the plus 4.
   // -> 217,739 / 79,427 n39-n40-n44 over main eb2d9aeb (N40's sample date in gameEvents.js), measured 217,735 / 79,423 in CI verify-quick, the plus 4.
   // 217,739 / 79,427 -> 217,754 / 79,427 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 217750 / - (over budget only) in the e2e build, the plus 4.
+  // 208,749 / 76,072 -> 209,960 / 76,441 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 209956 / 76437 (over budget only) in the e2e build, the plus 4.
   { pattern: /^index-.*\.js$/, maxBytes: 217_754, maxGzip: 79_427 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
@@ -1928,6 +1930,12 @@ const budgets = [
   // 2,566 / 1,109 -> 2,601 / 1,113 on 2026-10-25, c3-c4-rules (C-3 and C-4, RULES_MARK 4) on #224 0c989ba7: measured
   // 2,601 / 1,109 in the e2e build, the gzip plus 4. The v10 key retired (v11).
   { pattern: /^personalBests-.*\.js$/, maxBytes: 2_601, maxGzip: 1_113 },
+  // N25 weekly reminder (#595, 2026-11-17): the settings toggle and the Web
+  // Push subscribe code, both loaded only when the settings panel opens.
+  // Measured 1,516 / 967 and 2,287 / 1,092 (the larger of the plain and e2e
+  // builds), the plus 4.
+  { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 971 },
+  { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_096 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -2070,7 +2078,8 @@ const budgets = [
   // 198,034 / 66,397 -> 198,146 / 66,459 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 198142 / 66455 (over budget only) in the e2e build, the plus 4.
   // -> 197,913 / 66,373 n37-followups, measured locally 197,909 / 66,369 in the e2e build, the plus 4: the back buttons' words in Japanese.
   // -> 198,016 / 66,399 n46-hall-progress, measured locally 198,012 / 66,395: ranking.hallProgress in Japanese, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_016, maxGzip: 66_399 },
+  // 194,641 / 65,117 -> 195,404 / 65,370 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 195400 / 65366 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_146, maxGzip: 66_459 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2175,7 +2184,8 @@ const budgets = [
   // 165,308 / 59,285 -> 165,428 / 59,336 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165424 / 59332 (over budget only) in the e2e build, the plus 4.
   // -> 165,242 / 59,279 n37-followups, measured locally 165,238 / 59,275 in the e2e build, the plus 4: the back buttons' words in English.
   // -> 165,314 / 59,299 n46-hall-progress, measured locally 165,310 / 59,295: ranking.hallProgress in English, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_314, maxGzip: 59_299 },
+  // 162,433 / 58,148 -> 163,050 / 58,393 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 163046 / 58389 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_428, maxGzip: 59_336 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2654,7 +2664,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,809 / 443,376 / 451,361 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured first paint, the plus 4.
 // -> 380,728 / 443,240 / 451,196 n37-followups, measured locally 380,724 / 443,236 / 451,192 in the e2e build, the plus 4.
 // -> 380,718 / 443,252 / 451,213 n46-hall-progress, measured locally 380,714 / 443,248 / 451,209, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_718, en: 443_252, ja: 451_213 };
+// -> 378,117 / 439,653 / 447,540 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_809, en: 443_376, ja: 451_361 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2867,7 +2878,8 @@ function checkBudget(file, budget) {
 // -> 11,272 / 4,044 묶음 11-17 over main 705a809f, the plus 4.
 // -> 11,184 / 4,002 앱 아이콘 이름 -v2 11-17: 아이콘 링크·사전 캐시 이름이 길어짐, the plus 4.
 // -> 11,284 / 4,049 묶음 11-18 over main 4d549334 (아이콘 -v2 + 2안), the plus 4.
-const WORKER_BUDGET = { maxBytes: 11_284, maxGzip: 4_049 };
+// -> 12,564 / 4,458 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b, the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_564, maxGzip: 4_458 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
