@@ -160,6 +160,8 @@ export function LogicLine({ logic }) {
         {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
       </span>
       {logic.note && <em>{logic.note}</em>}
+      {/* G1 눈에 띔 (the next rules): its points after the staked card and what a cash under the line risks; the sentence is the buttons' description. */}
+      {logic.exposure?.points > 0 && <em className="gx-exposure" data-testid="gauntlet-exposure">{fill(say.exposure, { points: logic.exposure.points })} · {fill(say.exposureChance, { heat: logic.exposure.heat, chance: logic.exposure.chance })}</em>}
     </span>
   );
 }
@@ -191,14 +193,14 @@ export function RelicChips({ relics, pulse }) {
  * page. Before the case has SCOUT the band is the plain label the meter
  * already reads out.
  */
-export function ScoutBand({ band, canScout, onScout, shortcut }) {
+export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCOUT_NARROW_TRUST }) {
   if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
   // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
   const narrows = band.scouted && canScout;
   const label = !band.scouted
     ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })
     : narrows
-      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_NARROW_TRUST, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
+      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
       : undefined;
   return (
     <button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}

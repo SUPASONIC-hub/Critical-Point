@@ -48,6 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
+import { RULES_NEXT_MARK, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -86,9 +87,16 @@ export function recheckCaseScore(row) {
   return { status: differs.length ? "mismatch" : "match", differs, expected: stats };
 }
 
-/** The rules a stored case was played under, from what its summary says of the run. */
-export function getRowRules(caseId, summary) {
-  return getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+/**
+ * The rules a stored case was played under, from what its summary says of the
+ * run and the RULES_MARK its row carries (`mark`): a row marked
+ * RULES_NEXT_MARK or later was played under the next rules (G1~G7,
+ * nextTableRules.js), an earlier one under the rules before them. With no
+ * mark, the rules this engine plays now.
+ */
+export function getRowRules(caseId, summary, mark = undefined) {
+  const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+  return mark === undefined || mark === null ? rules : withNextRules(rules, Number(mark) >= RULES_NEXT_MARK);
 }
 
 /**
@@ -177,7 +185,7 @@ export function readSeed(seed, { runId, windowIndex, nodeId }) {
  */
 export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules = null } = {}) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : [];
-  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary);
+  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary, row?.dynamics?.[RULES_MARK_KEY]);
   const counts = { match: 0, mismatch: 0, unreplayable: 0, abandoned: 0, unrecorded: 0 };
   const findings = [];
   const windows = log.filter((entry) => entry?.threshold);

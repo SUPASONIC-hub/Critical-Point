@@ -2618,3 +2618,24 @@
   font-size: 0.75rem;
   line-height: 1.45;
 }
+/* G6 결재 판: the case's last board, a wide card above the grid and a size up from it. */
+.pressure-ledger-sign {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  background: var(--ui-surface-3);
+  border: 2px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+}
+.pressure-ledger-sign b {
+  color: var(--ui-text);
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.pressure-ledger-sign span,
+.pressure-ledger-sign small {
+  color: var(--ui-text-3);
+}

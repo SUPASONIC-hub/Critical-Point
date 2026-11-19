@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { formatMoney, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
+import { EXPOSURE_HEAT, getCatchChance, getExposure, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
@@ -149,10 +150,10 @@ const MOVE_COPY = say.moves;
  * wide screen reads whole -- and `spoken` the sentence the push and confirm
  * buttons are described by.
  */
-export function readLogic({ logic, card, offered, relics = [] }) {
+export function readLogic({ logic, card, offered, relics = [], next = false, watched = true }) {
   const reach = hasRelic(relics, "metronome");
   const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
-  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt, halve: next });
   const moveOf = (candidate) => play(getLogicDirection(candidate)).move;
   const staked = card ? play(getLogicDirection(card)) : null;
   const now = staked?.logic ?? logic;
@@ -162,7 +163,10 @@ export function readLogic({ logic, card, offered, relics = [] }) {
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;
   const note = did ?? (open && !staked ? say.canSwitch : "");
+  // G1 눈에 띔 (the next rules): the points the hand holds now and after the staked card, and what they risk.
+  const exposure = next && watched ? readExposure(getExposure(logic.held), getExposure(now.held)) : null;
   return {
+    exposure,
     after: now.streak,
     bonus,
     move: staked?.move ?? null,
@@ -171,8 +175,20 @@ export function readLogic({ logic, card, offered, relics = [] }) {
     held,
     note,
     line: [fill(say.combo, { streak: now.streak }), hold, note].filter(Boolean).join(" · "),
-    spoken: `${fill(say.spoken, { streak: now.streak, bonus: bonus.toFixed(2), hold })}${did ? fill(say.spokenMove, { move: did }) : open && !staked ? say.spokenOpen : ""}`,
+    spoken: `${fill(say.spoken, { streak: now.streak, bonus: bonus.toFixed(2), hold })}${did ? fill(say.spokenMove, { move: did }) : open && !staked ? say.spokenOpen : ""}${exposure?.spoken ? ` ${exposure.spoken}` : ""}`,
   };
+}
+
+/**
+ * G1 눈에 띔 as the table says it: the points after the staked card (`after`)
+ * and before it (`before`), the chance a cash under EXPOSURE_HEAT is caught,
+ * and the sentence. Null when there is nothing to say: no points either side.
+ */
+export function readExposure(before, after) {
+  if (!before && !after) return null;
+  const chance = Math.round(getCatchChance(after) * 100);
+  const spoken = after > 0 ? fill(say.exposureSpoken, { points: after, heat: EXPOSURE_HEAT, chance }) : say.exposureCleared;
+  return { before, points: after, chance, heat: EXPOSURE_HEAT, cleared: before > 0 && after === 0, spoken };
 }
 
 /** What a card's tag adds for a screen reader: what picking it would do to the streak. */
@@ -362,12 +378,14 @@ function getOverdriveCopy({ streak, hot, cashMutations }) {
 export function useTableForecast({ schema, run, win, selectedCard, multiplier, caseId, offered }) {
   // The same frozen Set for a case from one render to the next, so it can key a memo.
   const rules = getTableRules(caseId, run);
+  const next = isNextOn(rules);
+  const watched = run?.story !== true && !run?.practice;
   const mutations = useMemo(() => describeMutations(schema), [schema]);
   const relics = run?.relics;
   const streakState = run?.logic;
   const logic = useMemo(
-    () => (rules.has("logic") && streakState ? readLogic({ logic: streakState, card: selectedCard, offered, relics }) : null),
-    [offered, relics, rules, selectedCard, streakState],
+    () => (rules.has("logic") && streakState ? readLogic({ logic: streakState, card: selectedCard, offered, relics, next, watched }) : null),
+    [next, offered, relics, rules, selectedCard, streakState, watched],
   );
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;

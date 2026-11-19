@@ -75,7 +75,9 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * lapse in seconds -- then the clock's calls before the push's and the
  * stance's: a listener out of time has the least of it to lose.
  */
-const KIND_ORDER = Object.freeze({ status: -1, hold: 0, clock: 1, stakeClock: 1.5, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
+// G1~G7 (the next rules): `lock` is LOCK refused with its reason, `breath` what 숨 고르기 did, `sign` the 결재 판's
+// opening line, `exposure` 눈에 띔 building or clearing with the staked card.
+const KIND_ORDER = Object.freeze({ status: -1, hold: 0, lock: 0.5, clock: 1, breath: 1.2, stakeClock: 1.5, bank: 2, act: 3, sign: 3.5, audit: 4, links: 5, stance: 6, exposure: 6.5, scout: 7, push: 8, wall: 9 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -164,11 +166,17 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, asked = 0, runPot = 0, pulse = "" }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "" }) {
   const carry = findStanceCarry(cashMutations);
   return {
     asked,
-    status: describeStatus({ gauge: win.gauge, dangerLine, runPot, remaining: clock.remaining, pulse }),
+    // G1: 눈에 띔, said with the status when asked and once whenever the staked card builds or clears it.
+    status: `${describeStatus({ gauge: win.gauge, dangerLine, runPot, remaining: clock.remaining, pulse })}${exposure ? ` ${exposure}` : ""}`,
+    exposure,
+    lockRefused,
+    lockReason,
+    breathed: win.breathed === true,
+    breathLine,
     live,
     pushes: win.pushes,
     push: describePush({ gauge: win.gauge, dangerLine }),
@@ -194,6 +202,10 @@ export function listTableCalls(before, after) {
   const calls = [];
   if (after.asked > before.asked) calls.push({ kind: "status", text: after.status });
   if (after.hold && after.hold !== before.hold) calls.push({ kind: "hold", text: after.hold });
+  // G3: a LOCK refused says why, every time it is pressed; G7: 숨 고르기 says what it did; G1: 눈에 띔 moving.
+  if (after.lockRefused > (before.lockRefused ?? 0) && after.lockReason) calls.push({ kind: "lock", text: after.lockReason });
+  if (after.breathed && !before.breathed && after.breathLine) calls.push({ kind: "breath", text: after.breathLine });
+  if (after.exposure && after.exposure !== before.exposure) calls.push({ kind: "exposure", text: after.exposure });
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
   if (after.scout && after.scout !== before.scout) calls.push({ kind: "scout", text: after.scout });
@@ -255,7 +267,7 @@ const SILENT = Object.freeze({ text: "", n: 0 });
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, audit = null, links, caseId = null, ...table }) {
+export function useTableVoice({ speaking, run, audit = null, links, caseId = null, opening = "", ...table }) {
   const facts = readTableFacts({ ...table, runPot: run.runPot });
   // Each line is a fresh node in the region (`n` keys it, TableNotices): a line
   // the same as the last -- 상황 듣기 asked twice on a table whose clock has not
@@ -270,6 +282,9 @@ export function useTableVoice({ speaking, run, audit = null, links, caseId = nul
   const auditRef = useRef(null);
   const linksRef = useRef(null);
   const linkLine = links?.said;
+  // G6: the 결재 판's line, said once when the table first speaks (the table is mounted afresh for every window).
+  const openingRef = useRef(undefined);
+  if (openingRef.current === undefined) openingRef.current = opening || null;
 
   // Once a window: the settlement, the act, the audit and the links' line
   // since the last table, kept until they can be said. `??=` because a
@@ -314,6 +329,10 @@ export function useTableVoice({ speaking, run, audit = null, links, caseId = nul
     if (linksRef.current) {
       calls.push({ kind: "links", text: linksRef.current });
       linksRef.current = null;
+    }
+    if (openingRef.current) {
+      calls.push({ kind: "sign", text: openingRef.current });
+      openingRef.current = null;
     }
     if (!calls.length) return;
     queueRef.current = queueCalls(queueRef.current, calls);

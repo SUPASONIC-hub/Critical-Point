@@ -1,3 +1,4 @@
+import { countNarrows } from "../gauntlet/nextTableRules.js";
 import { useEffect, useMemo } from "react";
 
 import { readSettledWindowSeeds } from "../appConfig.js";
@@ -146,7 +147,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // B2's links off the case's log (cascadeRisk.js): null in a case whose rules do not have them.
   const linkReading = useMemo(() => readLinks(gauntletRun, log, runId, caseRules), [caseRules, gauntletRun, log, runId]);
   // The two as one field of the play view, which has room for one (check:runtime-budget).
-  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading }), [auditCount, linkReading]);
+  // G2: the second looks the case has bought, which price the next one (nextTableRules.js).
+  const narrowCount = useMemo(() => countNarrows(log), [log]);
+  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading, narrows: narrowCount }), [auditCount, linkReading, narrowCount]);
   // The trace is session storage, not state, and only the debug overlay prints
   // it, so only a debug build reads it on render.
   const silentFailureCount = debugTools

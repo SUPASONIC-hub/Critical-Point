@@ -78,7 +78,7 @@ export function countNarrows(log = []) {
 
 /** STRIKE cashed at or past this heat may lift LOCK's pot to `STRIKE_HOT_CAP` (the hand's own cap) instead of LOCK_CAP. */
 export const STRIKE_HOT_GAUGE = 60;
-export const STRIKE_HOT_CAP = 1.6;
+export const STRIKE_HOT_CAP = 1.55;
 /** STEADY, a little weaker: its pot rate and the heat a press cools. */
 export const STEADY_NEXT = Object.freeze({ potRate: 0.55, relief: 1 });
 /** A charged EXPOSE cash adds no audit mark under AUDIT_HEAT, and is never caught (G1). */

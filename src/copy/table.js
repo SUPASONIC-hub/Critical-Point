@@ -21,6 +21,22 @@ const tableCopy = {
     // A marked board's label in pot's place (GauntletStage `getBoardMark`): C-10's act end, C-7's pass.
     markPeak: "고점 판",
     markBreather: "숨 고른 판",
+    // G1·G2·G3·G6·G7 (the next rules, nextTableRules.js): 눈에 띔, LOCK 닫힘, 결재 판, 숨 고르기.
+    markSign: "결재 판",
+    exposure: "눈에 띔 {points}",
+    exposureChance: "열기 {heat} 밑 확정 시 적발 {chance}%",
+    exposureSpoken: "눈에 띔 {points}: 열기 {heat} 밑에서 확정하면 {chance}% 확률로 적발되어 이번 판돈을 잃고 연속이 반으로 준다. 방향을 바꾸면 풀린다.",
+    exposureCleared: "이 카드로 방향을 바꾸면 눈에 띔이 풀리고, 연속은 반으로 준다.",
+    exposureShield: "EXPOSE 충전으로 이번 확정은 적발되지 않는다.",
+    caught: "눈에 띄어 적발: 이번 판돈 없음, 연속이 반으로.",
+    lockShut: "LOCK 닫힘",
+    lockShutReason: "지금은 못 누름 — 들고 온 연속이 이미 LOCK 상한 ×{cap}을 채워 더할 것이 없다.",
+    lockStrikeHot: " STRIKE로 열기 {heat} 이상에서 확정하면 상한이 ×{cap}.",
+    signOpen: "결재 판, 판돈 {chips}배, 벽 한 칸 보임: 벽은 {cell} 이상.",
+    signCell: "벽 ≥{cell}",
+    breath: "숨 고르기",
+    breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
+    breathDone: "숨을 골랐다. 열기 {from} → {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
@@ -173,6 +189,11 @@ const tableCopy = {
     potLost: "잃은 판돈",
     potBanked: "번 판돈 {pot}",
     relics: "장착한 도구",
+    // G6 결재 판 (the next rules): the case's last board, drawn larger than the rest.
+    sign: "결재 판",
+    signCash: "{multiplier}에 확정 · +{pot}",
+    signBust: "BUST · 판돈 {pot} 잃음",
+    signNote: "사건의 마지막 판, 판돈 {chips}배",
   },
   // tableReadout.js: the readouts the table, the reveal and the archive print.
   readout: {
