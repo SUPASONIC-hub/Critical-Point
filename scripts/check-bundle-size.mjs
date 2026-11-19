@@ -202,7 +202,8 @@ const budgets = [
   // -> gzip 61,694 묶음 11-19 머리 f340257e, measured 61,690 in CI verify-quick (CSS 해시 이름이 바뀐 만큼), the plus 4.
   // -> 164,643 / 61,417 n37-followups, measured locally 164,639 / 61,413 in the e2e build, the plus 4: the ranking over the result page (returnTo) and its keys held.
   // 164,643 / 61,417 -> 165,507 / 61,707 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 165503 / 61703 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_507, maxGzip: 61_707 },
+  // 165,507 / 61,707 -> 165,507 / 61,716 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured - / 61712 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_507, maxGzip: 61_716 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -332,7 +333,8 @@ const budgets = [
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
   // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_018 },
+  // 35,422 / 15,018 -> 35,508 / 15,073 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 35504 / 15069 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_508, maxGzip: 15_073 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1528,7 +1530,8 @@ const budgets = [
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,673 / 19,622 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 51669 / 19618 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_819, maxGzip: 19_640 },
+  // 51,819 / 19,640 -> 54,926 / 20,614 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 54922 / 20610 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 54_926, maxGzip: 20_614 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1717,7 +1720,8 @@ const budgets = [
   // 3,994 / 1,924 -> 4,391 / 2,073 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 4387 / 2069 (over budget only) in the e2e build, the plus 4.
   // 4,391 / 2,073 -> 4,391 / 2,078 board-admin over main 29120d32: only the names of the chunks it imports. Measured - / 2074 (over budget only) in the e2e build, the plus 4.
   // 4,391 / 2,078 -> 5,432 / 2,351 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 5428 / 2347 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 5_432, maxGzip: 2_351 },
+  // 5,432 / 2,351 -> 7,144 / 2,960 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 7140 / 2956 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 7_144, maxGzip: 2_960 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1765,7 +1769,8 @@ const budgets = [
   // 2,460 / 1,158 -> 2,304 / 1,114 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 2,304 / 1,110 in the e2e build, the gzip plus 4.
   // 2,304 / 1,114 -> 2,343 / 1,114 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 2339 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 2_343, maxGzip: 1_114 },
+  // 2,343 / 1,114 -> 2,348 / 1,114 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 2344 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 2_348, maxGzip: 1_114 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -2094,7 +2099,8 @@ const budgets = [
   // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
   // 198,169 / 66,469 -> 199,085 / 66,764 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 199081 / 66760 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 196,019 / 65,533 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 196015 / 65529 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 199_085, maxGzip: 66_764 },
+  // 199,085 / 66,764 -> 201,835 / 67,527 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 201831 / 67523 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 201_835, maxGzip: 67_527 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2204,7 +2210,8 @@ const budgets = [
   // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
   // 165,449 / 59,347 -> 166,222 / 59,627 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 166218 / 59623 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,717 / 58,506 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 163713 / 58502 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 166_222, maxGzip: 59_627 },
+  // 166,222 / 59,627 -> 168,602 / 60,280 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 168598 / 60276 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 168_602, maxGzip: 60_280 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2688,7 +2695,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
 // -> 381,530 / 444,390 / 452,389 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured first paint, the plus 4.
 // -> 378,025 / 439,699 / 447,637 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 444_390, ja: 452_389 };
+// -> 381,530 / 445,035 / 453,144 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_035, ja: 453_144 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
