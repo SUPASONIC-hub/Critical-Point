@@ -257,6 +257,7 @@ ${ANALYTICS_NOTICE.ko}
 <li>회원가입과 로그인이 없습니다. 이름, 이메일, 전화번호, 주소를 받지 않습니다.</li>
 <li>게임에서 정하는 분석관 이름은 이 기기에만 저장되고 서버로 보내지 않습니다.</li>
 <li>진행은 기본적으로 이 기기(브라우저 저장소)에만 저장됩니다. 서버로 가는 정보는 아래 2번의 네 가지뿐입니다.</li>
+<li>주 1회 알림을 직접 켜면(기본은 꺼짐) 그 알림을 보내는 데에만 이 브라우저의 푸시 구독 주소(endpoint와 키)를 우리 서버에 저장하고, 알림을 끄면 지웁니다.</li>
 <li>지금은 광고가 없고, 광고·분석용 쿠키나 외부 추적 도구를 쓰지 않습니다.</li>
 </ul>
 
@@ -340,6 +341,7 @@ ${ANALYTICS_NOTICE.en}
 <li>There is no sign-up or login. We do not collect your name, email address, phone number or postal address.</li>
 <li>The analyst name you choose stays on your device and is never sent to our servers.</li>
 <li>Your progress is saved on your device (browser storage) by default. Only the four kinds of data in section 2 ever reach a server.</li>
+<li>If you turn on the weekly reminder (off by default), we store your browser’s push subscription address (its endpoint and keys) on our server only to send that reminder, and delete it when you turn the reminder off.</li>
 <li>The game currently shows no ads and uses no advertising or analytics cookies or third-party trackers.</li>
 </ul>
 
@@ -422,6 +424,7 @@ ${ANALYTICS_NOTICE.ja}
 <li>会員登録やログインはありません。氏名、メールアドレス、電話番号、住所は取得しません。</li>
 <li>ゲーム内で決める分析官の名前はこの端末にのみ保存され、サーバーには送信しません。</li>
 <li>進行は原則としてこの端末(ブラウザのストレージ)にのみ保存されます。サーバーに送られる情報は、下記2の4種類だけです。</li>
+<li>週1回の通知をご自身でオンにした場合(初期設定はオフ)、その通知を送るためだけに、このブラウザのプッシュ購読アドレス(エンドポイントと鍵)を私たちのサーバーに保存し、通知をオフにすると削除します。</li>
 <li>現在、広告はなく、広告・分析用のCookieや外部のトラッキングツールも使用していません。</li>
 </ul>
 
