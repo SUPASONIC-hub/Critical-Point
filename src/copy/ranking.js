@@ -48,6 +48,8 @@ const rankingCopy = {
   hallBadge: "명예의 전당 · {board} {place}위",
   hallMainBoard: "본 판",
   hallProvisional: " (잠정)",
+  // N46: a board with no place yet, how far it is from its first three (hallOfFameProgress).
+  hallProgress: "명예의 전당 · {board}: 첫 세 자리는 {min}시즌이 모이면 열립니다 (지금 {count}/{min})",
 };
 export default rankingCopy;
 

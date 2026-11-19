@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, RotateCw } from "lucide-react";
-import { hallOfFameBadges } from "../hallOfFameBadges.js";
+import { HALL_OF_FAME_MIN_SEASONS, hallOfFameBadges, hallOfFameProgress } from "../hallOfFameBadges.js";
+import { isoWeekKey } from "../gauntlet/weeklyCalendar.js";
+import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getLeaderboardStatusCopy } from "../ranking.js";
 import { fetchHallOfFame } from "../telemetry.js";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -52,10 +54,17 @@ export function RankingScreen({
   // D2: the hall of fame's places, by run tag (public_hall_of_fame). A badge
   // on a completed season's row, the player's own included; a fetch that
   // fails, or a deployment with no server, shows none.
+  // N46: a board with no place yet says how far it is from its first three,
+  // read off the same rows (each board's checked_seasons); none on a failed fetch.
   const [hallBadges, setHallBadges] = useState(() => new Map());
+  const [hallProgress, setHallProgress] = useState(() => []);
   useEffect(() => {
     let cancelled = false;
-    fetchHallOfFame().then(({ rows }) => !cancelled && setHallBadges(hallOfFameBadges(rows, words)), () => {});
+    fetchHallOfFame().then(({ rows }) => {
+      if (cancelled) return;
+      setHallBadges(hallOfFameBadges(rows, words));
+      setHallProgress(hallOfFameProgress(rows, words, isoWeekKey(weeklyRuleNow())));
+    }, () => {});
     return () => {
       cancelled = true;
     };
@@ -111,6 +120,11 @@ export function RankingScreen({
                   "0명의 기록" beside the line that said it was still loading. */}
               <small>{statusCopy.loading ? words.loadingCount : fill(words.count, { count: leaderboard.length })}</small>
             </div>
+            {hallProgress.map((board) => (
+              <p className="ranking-hall-progress" data-testid="ranking-hall-progress" key={board.board}>
+                {fill(words.hallProgress, { board: board.label, count: board.count, min: HALL_OF_FAME_MIN_SEASONS })}
+              </p>
+            ))}
             <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
               {statusCopy.loading ? "" : fill(words.loaded, { count: leaderboard.length })}
             </p>

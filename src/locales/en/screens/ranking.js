@@ -34,4 +34,5 @@ export default {
   hallBadge: "Hall of Fame · {board} #{place}",
   hallMainBoard: "main ranking",
   hallProvisional: " (provisional)",
+  hallProgress: "Hall of Fame · {board}: the first three places open once {min} seasons are in (now {count}/{min})",
 };
