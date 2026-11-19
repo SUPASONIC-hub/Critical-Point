@@ -2593,3 +2593,29 @@
 .achievement-panel > span {
   color: var(--ui-text-3);
 }
+/* N42 (LeaveLine.jsx): the foot of 프롤로그 05, 사건 03 and 사건 07 -- one
+   quiet line that the season is saved, and 홈 화면에 추가 where offered. */
+.result-page > .leave-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px 0 4px;
+  color: var(--ui-text-2);
+  border-top: 1px solid var(--ui-line);
+}
+.leave-line p {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.leave-line button {
+  min-height: 44px;
+}
+.leave-line small {
+  flex: 1 1 100%;
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
