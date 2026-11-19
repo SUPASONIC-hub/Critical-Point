@@ -6,7 +6,7 @@ import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * Every written ending has to be reachable, and no one of them may be the
@@ -407,7 +407,10 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   const SCOUT_SEASONS = Number(process.env.ENDING_SCOUT_SEASONS) || POPULATION.length * 5;
   // The narrowing hand (B1, 11-18) only with ENDING_SCOUT_NARROW=1: a fifth set of seasons took the CI run past
   // verify:static's 300 s (277.7 s on main). Measured 11-18: 믿음 at the close 72.3 against 79.3, busts 23.6 against 17.1.
-  const TIMINGS = SCOUT_TIMINGS.filter((timing) => timing !== "narrow" || process.env.ENDING_SCOUT_NARROW === "1");
+  // ENDING_SCOUT_TIMINGS=never,always,narrow,narrowFirst plays exactly those (N43, 11-18); "never" is always played, as the baseline.
+  const asked = process.env.ENDING_SCOUT_TIMINGS?.split(",").map((timing) => timing.trim()).filter(Boolean);
+  for (const timing of asked ?? []) if (![...SCOUT_TIMINGS, ...SCOUT_EXTRA_TIMINGS].includes(timing)) throw new Error(`ENDING_SCOUT_TIMINGS: ${timing} is not one of ${[...SCOUT_TIMINGS, ...SCOUT_EXTRA_TIMINGS].join(", ")}`);
+  const TIMINGS = asked ? ["never", ...asked.filter((timing) => timing !== "never")] : SCOUT_TIMINGS.filter((timing) => timing !== "narrow" || process.env.ENDING_SCOUT_NARROW === "1");
   const bots = Object.fromEntries(TIMINGS.map((scout) => [scout, createSeasonBot({ seed: 20261105, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).map(([name, base]) => [name, { ...base, board: "listens", scout }])) })]));
   const rows = Object.fromEntries(TIMINGS.map((scout) => [scout, { endings: new Map(), looks: 0, narrows: 0, trust: 0, busts: 0, moved: 0 }]));
   for (let index = 0; index < SCOUT_SEASONS; index += 1) {
