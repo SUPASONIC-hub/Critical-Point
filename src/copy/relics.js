@@ -124,6 +124,8 @@ const relicsCopy = {
       name: "앙코르",
       text: "벽에 닿아 판돈을 잃어도 논리 콤보는 남는다.",
       proc: "벽에 닿고도 콤보가 살아남았다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "논리 콤보 {long} 이상에서 확정하면 판돈 +{pct}%.",
       unlock: "논리 콤보 {combo} 달성",
     },
     insurance: {

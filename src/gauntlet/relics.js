@@ -34,7 +34,7 @@ import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
 import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
 import { isNextOn } from "./nextTableRules.js";
-import { boostPercent, HOT_CASH_HEAT, LOW_CASH_HEAT, RELIC_BOOSTS, SIDE_STREAK } from "./relicsNext.js";
+import { boostPercent, HOT_CASH_HEAT, LONG_STREAK, LOW_CASH_HEAT, RELIC_BOOSTS, SIDE_STREAK } from "./relicsNext.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -93,7 +93,7 @@ function relic(id, { label, icon, softens = null, unlock = null }, values = {}) 
   // G4: under the next rules a tool says the condition that pays (relicsNext.js);
   // COLD BLOOD says what it does instead, since it does something else.
   const next = isNextOn();
-  const boost = Object.hasOwn(RELIC_BOOSTS, id) ? { pct: boostPercent(id), low: LOW_CASH_HEAT, hot: HOT_CASH_HEAT, side: SIDE_STREAK } : {};
+  const boost = Object.hasOwn(RELIC_BOOSTS, id) ? { pct: boostPercent(id), low: LOW_CASH_HEAT, hot: HOT_CASH_HEAT, side: SIDE_STREAK, long: LONG_STREAK } : {};
   const say = (line) => fill(line, { ...values, ...boost });
   const text = next && words.nextText ? say(words.nextText) : next && words.next ? `${say(words.text)} ${say(words.next)}` : say(words.text);
   return {

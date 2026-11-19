@@ -107,6 +107,8 @@ export default {
       name: "Encore",
       text: "Even when the Wall takes your stake, the Logic Combo stays.",
       proc: "The combo survived the Wall",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "Cash at a Logic Combo of {long} or more: stake +{pct}%.",
       unlock: "Reach Logic Combo {combo}",
     },
     insurance: {

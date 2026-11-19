@@ -43,6 +43,7 @@ test("every boost names a condition that a normal cash can meet, and none fires 
   assert.deepEqual(readRelicBoost(["coldBlood"], cash({ afterBust: true })).fired, ["coldBlood"]);
   assert.deepEqual(readRelicBoost(["metronome"], cash({ move: "switch" })).fired, ["metronome"]);
   assert.deepEqual(readRelicBoost(["fieldNote"], cash({ streak: 5 })).fired, ["fieldNote"]);
+  assert.deepEqual(readRelicBoost(["fieldNote", "encore"], cash({ streak: 8 })).fired, ["fieldNote", "encore"]);
   assert.deepEqual(readRelicBoost(["carbonCopy", "stethoscope", "frontPage"], cash({ mutations: ["blackout", "silence", "overclock"] })).fired, ["carbonCopy", "stethoscope", "frontPage"]);
   assert.deepEqual(readRelicBoost(["testimony"], cash({ clockLeft: 0.6 })).fired, ["testimony"]);
   assert.deepEqual(readRelicBoost(["kineticGrip"], cash({ focusMode: "strike", focusCharged: true })).fired, ["kineticGrip"]);

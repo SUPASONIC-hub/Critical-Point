@@ -107,6 +107,8 @@ export default {
       name: "アンコール",
       text: "壁に触れて賭け金を失っても、ロジックコンボは残る。",
       proc: "壁に触れてもコンボが生き残った",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "論理コンボ{long}以上で確定すると賭け金 +{pct}%。",
       unlock: "ロジックコンボ{combo}を達成",
     },
     insurance: {
