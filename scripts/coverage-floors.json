@@ -41,6 +41,7 @@
     "src/gauntlet/auditRisk.js": 100,
     "src/gauntlet/cascadeRisk.js": 100,
     "src/gauntlet/caseCastModel.js": 100,
+    "src/gauntlet/caseRules.js": 100,
     "src/gauntlet/draftSpend.js": 100,
     "src/gauntlet/edgeAlert.js": 100,
     "src/gauntlet/fxVariables.js": 100,

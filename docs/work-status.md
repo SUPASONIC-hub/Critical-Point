@@ -137,7 +137,7 @@ list of the files it touched.
 Still open, on purpose:
 
 - Season length -- one play passes about 521 scenes of the season and about 55
-  of the 프롤로그, of 1,129 written -- is an authoring decision, not a code
+  of the 프롤로그, of 1,130 written -- is an authoring decision, not a code
   problem.
 - "3년". The 프롤로그 is 2022-23 and 사건 01 is 2025, a little over two years
   on; the season says "3년 전" throughout and it is read as "the third year"
