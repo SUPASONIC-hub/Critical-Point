@@ -20,6 +20,27 @@
   justify-content: space-between;
   gap: 16px;
 }
+/* The recovery centre opens at the top of the page, under the fixed music pills
+   (and, from 861px, the language pills under them): on a 1366px screen they
+   covered its 「닫기」 (n37, 11-19). Its head keeps their corner clear the way the
+   game's head keeps 112px (play.css): the room they take from the viewport's
+   edge -- 16px, the labelled pills or the language row (206px), a 12px gap --
+   less what already lies between that edge and the head's last button: the
+   centring margin, the 20px padding and the border. Under 861px the language
+   row is not in the corner and that room would stack the five buttons four and
+   five rows deep, so the panel starts under the pills (38px) instead. A phone
+   (480px and under) hides the pills' labels and stacks the head, so its
+   buttons start under them already. */
+@media (min-width: 861px) {
+  .error-log-panel > .panel-title-row {
+    padding-right: max(0px, calc(240px - (100vw - min(1120px, 100vw - 32px)) / 2 - 21px));
+  }
+}
+@media (min-width: 481px) and (max-width: 860px) {
+  .error-log-panel {
+    margin-top: calc(max(16px, env(safe-area-inset-top)) + 46px);
+  }
+}
 .recovery-notice span,
 .debug-jump-panel span,
 .error-log-panel span {

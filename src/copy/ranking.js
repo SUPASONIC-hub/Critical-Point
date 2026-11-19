@@ -8,7 +8,10 @@ import { localizeTables } from "../locale.js";
  * src/copy/leaderboard.js.
  */
 const rankingCopy = {
-  back: "브리핑으로 돌아가기",
+  // Where the button goes back to: the first screen, or the case's result page
+  // when it was opened from there (RankingScreen `returnTo`).
+  back: "첫 화면으로 돌아가기",
+  backToResult: "결과로 돌아가기",
   title: "어디서 생각이 가장 크게 확장됐는가",
   intro: "버스트 점수와 랭크를 비교합니다. 시즌 기록은 사건 평균 점수입니다. 점수가 높다는 것은 정답을 맞혔다는 뜻이 아니라, 압박 속에서 생각 리듬, 관점 전환, 회복 판단, 구조 재설계가 함께 솟았다는 뜻입니다.",
   retry: "다시 불러오기",

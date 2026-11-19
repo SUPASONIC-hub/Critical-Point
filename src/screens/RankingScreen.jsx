@@ -12,6 +12,12 @@ import { formatMoney } from "../gameConstants.js";
 // Dates as the page's language writes them; a Korean page as it always has.
 const DATE_LOCALE = LANG === SOURCE_LOCALE ? "ko-KR" : LANG;
 
+/**
+ * `returnTo`: where the back button goes, and what it says. The ranking opens
+ * from the first screen and from a case's result page, and closes back onto
+ * the one it came from (n37, 11-19); until then the result page's button ended
+ * the run first, and the ranking closed onto the first screen.
+ */
 export function RankingScreen({
   Music,
   gameTitle,
@@ -23,6 +29,7 @@ export function RankingScreen({
   sessionCode,
   triggerLabels,
   onClose,
+  returnTo = "intro",
 }) {
   // The screen replaces the page under the player's hands, so it takes focus
   // itself: without this a keyboard or screen-reader user was left on <body>,
@@ -62,7 +69,7 @@ export function RankingScreen({
           <div className="topbar">
             <button className="ghost" type="button" onClick={() => onClose()}>
               <ArrowLeft size={16} />
-              {words.back}
+              {returnTo === "result" ? words.backToResult : words.back}
             </button>
             <span className="brand-mark">{gameTitle}</span>
           </div>

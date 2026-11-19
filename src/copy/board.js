@@ -11,7 +11,9 @@ import { BOARD_REPORT_FAILURES, BOARD_REPORT_REASONS } from "../boardReport.js";
  * src/copy/boardPost.js.
  */
 const boardCopy = {
-  back: "브리핑으로 돌아가기",
+  // Every way in is on the first screen (the intro's button, the since-last
+  // card, the admin sheet), so that is where the button goes back to.
+  back: "첫 화면으로 돌아가기",
   title: "남겨두고 가는 말",
   intro: "이름 하나와 짧은 글이면 충분합니다. 여기 적은 이름과 글은 다른 참가자에게 그대로 보입니다. 점수도 순위도 붙지 않습니다. 사건을 지나온 사람이 다음 사람에게 남기는 자리입니다.",
   posts: "{count}개의 글",

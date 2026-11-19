@@ -1,6 +1,6 @@
 /** The participant board in English (src/copy/board.js). */
 export default {
-  back: "Back to the briefing",
+  back: "Back to the title screen",
   title: "Words left behind",
   intro: "A name and a few lines are enough. The name and words you write here are shown to other participants as they are. No score, no ranking. This is where people who have been through the cases leave something for the next.",
   posts: "Posts: {count}",

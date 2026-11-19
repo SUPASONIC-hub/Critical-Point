@@ -48,11 +48,13 @@ export function useRuntimeChoiceShortcuts({
   saveCurrentGame,
   startCase,
   started,
+  screenOpen = false,
 }) {
   const hints = useShortcutHints();
   useEffect(() => {
     const handleShortcut = (event) => {
-      if (!started || decisionReveal || isAdvancing) return;
+      // 랭킹 opened over the result page: R and N are not that page's while it is hidden.
+      if (!started || decisionReveal || isAdvancing || screenOpen) return;
       // Ctrl/Cmd+R is the browser's reload and Ctrl+P its print dialog; a
       // modified key is never one of the game's.
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -79,6 +81,6 @@ export function useRuntimeChoiceShortcuts({
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [currentCase, decisionReveal, isAdvancing, isResult, nextCaseSignal, saveCurrentGame, startCase, started]);
+  }, [currentCase, decisionReveal, isAdvancing, isResult, nextCaseSignal, saveCurrentGame, screenOpen, startCase, started]);
   return hints;
 }

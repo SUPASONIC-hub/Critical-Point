@@ -566,3 +566,40 @@ test("a season with a story case is not sent to the public ranking, and this dev
   // (How that row is drawn is the test of the seeded ranking above: a page
   // loaded on this save opens on its ending, not on the intro's 랭킹 button.)
 });
+
+// n37 (11-19): the button said 「브리핑으로 돌아가기」 on every way in, and the
+// result page's 랭킹 ended the run first, so it closed onto the first screen.
+// Each screen now names the place it goes back to, and goes there.
+test("랭킹 and 게시판 opened from the first screen go back to it, and say so", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.waitForSelector(".intro");
+  for (const [opener, screen] of [["랭킹", ".ranking-page"], ["게시판", ".board-page"]]) {
+    await page.getByRole("button", { name: opener }).first().click();
+    await expect(page.locator(screen)).toBeVisible();
+    await expect(page.getByRole("button", { name: "브리핑으로 돌아가기" })).toHaveCount(0);
+    await page.getByRole("button", { name: "첫 화면으로 돌아가기" }).click();
+    await expect(page.locator(".intro")).toBeVisible();
+    await expect(page.locator(screen)).toHaveCount(0);
+  }
+});
+
+test("랭킹 opened from a case's result page goes back to that page", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  const result = page.locator(".result-page");
+  await expect(result).toBeVisible();
+  await result.locator(".top-actions").getByRole("button", { name: "랭킹" }).click();
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await expect(page.getByRole("button", { name: "첫 화면으로 돌아가기" })).toHaveCount(0);
+  // R is the result page's retry; it is hidden, so the key is not its.
+  await page.keyboard.press("r");
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await page.getByRole("button", { name: "결과로 돌아가기" }).click();
+  await expect(result).toBeVisible();
+  await expect(page.locator(".intro")).toHaveCount(0);
+});
