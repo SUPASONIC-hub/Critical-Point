@@ -121,6 +121,8 @@ function recheckResources(entry, index, card, breaks, unchecked) {
     focusMultiplier: threshold.focus?.resourceMultiplier,
     scouted: threshold.scouted === true,
     narrowed: threshold.narrowed === true,
+    // G2: the price the next rules charged this case's nth second look, as the entry logged it.
+    ...(Number.isFinite(threshold.narrowTrust) ? { narrowTrust: threshold.narrowTrust } : {}),
   });
   if (!sameEffect(price, priced)) breaks.push({ entry: index, field: "riskRewardEffect", expected: price, found: priced });
 }

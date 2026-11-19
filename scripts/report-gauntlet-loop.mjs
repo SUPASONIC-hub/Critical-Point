@@ -24,7 +24,7 @@ import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntl
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, narrowDue, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, narrowDue, NEXT_ON, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -74,7 +74,7 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * hold is printed as `week rule       would fail: ...` and the report goes on,
  * so every row of a candidate is there to read. Without it, as always.
  */
-const assert = WEEK_RULE
+const assert = WEEK_RULE || process.env.PRESSURE_SOFT
   ? new Proxy(strictAssert, {
       get: (target, name) => (...args) => {
         try {
@@ -236,6 +236,15 @@ const scoutRows = [0, 3, 6, 9].map((margin) =>
 const SCOUT_SEES_CAP = 0.8;
 /** How far past the first band's near end the next push reaches when a narrowing hand takes its second look (the season bot's SCOUT_EDGE). */
 const NARROW_TRIGGER = 3;
+/**
+ * G2 (the next rules): the 믿음 a case's looks may cost a narrowing hand --
+ * what the old narrow-every-board hand paid (26.3 a case, measured 11-18 and
+ * again 11-19). The second look's price now climbs within a case
+ * (`narrowTrustAt`), so a hand with unlimited 믿음 would buy a closer read than
+ * the cap allows; no season holds that much (41.7 a case, 2,000 a season).
+ * Under the old rules the budget never binds.
+ */
+const NARROW_TRUST_BUDGET = 26;
 const skipper = measure("bust to skip", (win) =>
   win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true,
 );
@@ -410,7 +419,7 @@ assert.ok(
     {
       row: bestOfRows([2, 3, 4].map((inner) => measure(`scout narrow, margin ${bestMargin} then ${inner}`, Object.assign(
         (win) => (win.narrowed ? win.gauge + win.schema.stepMax - inner < getWindowBand(win).wallMin : scoutOrListen(win)),
-        { scout: (win) => scoutDue("narrow", win), narrow: (win) => narrowDue("narrow", win, NARROW_TRIGGER) },
+        { scout: (win) => scoutDue("narrow", win), narrow: (win) => narrowDue("narrow", win, NARROW_TRIGGER), trustBudget: NARROW_TRUST_BUDGET },
       )))),
       when: "narrow",
     },
@@ -419,8 +428,9 @@ assert.ok(
   for (const { row, when } of timedRows) {
     const looks = row.seen.scouts / Math.max(1, CASES);
     const narrows = row.seen.narrows / Math.max(1, CASES);
+    const narrowTrust = row.seen.narrowTrust / Math.max(1, CASES);
     console.log(
-      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case${narrows ? ` + narrow ${narrows.toFixed(2)}` : ""}  믿음 ${(-(looks * SCOUT_TRUST + narrows * SCOUT_NARROW_TRUST)).toFixed(2)}/case  (scout/sees ${(row.meanVault / oracle.meanVault).toFixed(3)})`,
+      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case${narrows ? ` + narrow ${narrows.toFixed(2)}` : ""}  믿음 ${(-(looks * SCOUT_TRUST + narrowTrust)).toFixed(2)}/case${narrows ? ` (narrowed ${((row.seen.narrows / Math.max(1, row.seen.pushedBoards)) * 100).toFixed(1)}% of pushed boards)` : ""}  (scout/sees ${(row.meanVault / oracle.meanVault).toFixed(3)})`,
     );
   }
   for (const { row, when } of timedRows.slice(1)) {
