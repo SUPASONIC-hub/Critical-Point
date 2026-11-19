@@ -31,13 +31,13 @@ export const FAST_CASH_SHARE = 0.5;
  */
 export const RELIC_BOOSTS = Object.freeze({
   auditContact: Object.freeze({ boost: 1.6, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
-  heatSink: Object.freeze({ boost: 1.5, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
+  heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
   coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
   carbonCopy: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("blackout") }),
   testimony: Object.freeze({ boost: 1.1, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
-  frontPage: Object.freeze({ boost: 1.2, when: (cash) => cash.mutations.includes("overclock") }),
+  frontPage: Object.freeze({ boost: 1.15, when: (cash) => cash.mutations.includes("overclock") }),
   stethoscope: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("silence") }),
   kineticGrip: Object.freeze({ boost: 1.2, when: (cash) => cash.focusMode === "strike" && cash.focusCharged }),
 });
