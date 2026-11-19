@@ -32,7 +32,10 @@ test("the HUD's numbers are the engine's, read the way the stage read them", () 
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   assert.equal(meters.selectedChips, getCardChips(HAND[1], schema));
   assert.equal(meters.multiplier, getMultiplier(win.gauge));
-  assert.deepEqual(meters.focusBonus, getFocusBonus(win.focus, win.focusMode));
+  // Under the next rules (G3, on by default): STEADY's weaker profile, and `note`, what the LOCK button's description adds.
+  const { note, ...focusBonus } = meters.focusBonus;
+  assert.deepEqual(focusBonus, getFocusBonus(win.focus, win.focusMode, true));
+  assert.equal(typeof note, "string");
   assert.equal(meters.remaining, getRemainingSeconds(win));
   assert.equal(meters.bpm, getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, schema.sedated, win.elapsed / schema.seconds));
   assert.equal(meters.nextLow, nextLow);
