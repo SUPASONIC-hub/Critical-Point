@@ -1531,7 +1531,8 @@ const budgets = [
   // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,673 / 19,622 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 51669 / 19618 (over budget only) in the e2e build, the plus 4.
   // 51,819 / 19,640 -> 54,926 / 20,614 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 54922 / 20610 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 54_926, maxGzip: 20_614 },
+  // 54,926 / 20,614 -> 55,056 / 20,699 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 55052 / 20695 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 55_056, maxGzip: 20_699 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1721,7 +1722,8 @@ const budgets = [
   // 4,391 / 2,073 -> 4,391 / 2,078 board-admin over main 29120d32: only the names of the chunks it imports. Measured - / 2074 (over budget only) in the e2e build, the plus 4.
   // 4,391 / 2,078 -> 5,432 / 2,351 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 5428 / 2347 (over budget only) in the e2e build, the plus 4.
   // 5,432 / 2,351 -> 7,144 / 2,960 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 7140 / 2956 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 7_144, maxGzip: 2_960 },
+  // 7,144 / 2,960 -> 7,170 / 2,974 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 7166 / 2970 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 7_170, maxGzip: 2_974 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -2100,7 +2102,8 @@ const budgets = [
   // 198,169 / 66,469 -> 199,085 / 66,764 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 199081 / 66760 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 196,019 / 65,533 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 196015 / 65529 (over budget only) in the e2e build, the plus 4.
   // 199,085 / 66,764 -> 201,835 / 67,527 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 201831 / 67523 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 201_835, maxGzip: 67_527 },
+  // 201,835 / 67,527 -> 201,845 / 67,532 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 201841 / 67528 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 201_845, maxGzip: 67_532 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2211,7 +2214,8 @@ const budgets = [
   // 165,449 / 59,347 -> 166,222 / 59,627 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 166218 / 59623 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,717 / 58,506 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 163713 / 58502 (over budget only) in the e2e build, the plus 4.
   // 166,222 / 59,627 -> 168,602 / 60,280 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 168598 / 60276 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 168_602, maxGzip: 60_280 },
+  // 168,602 / 60,280 -> 168,619 / 60,289 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 168615 / 60285 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 168_619, maxGzip: 60_289 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2696,7 +2700,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,530 / 444,390 / 452,389 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured first paint, the plus 4.
 // -> 378,025 / 439,699 / 447,637 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured first paint, the plus 4.
 // -> 381,530 / 445,035 / 453,144 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_035, ja: 453_144 };
+// -> 381,530 / 445,046 / 453,150 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_046, ja: 453_150 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
