@@ -332,7 +332,7 @@ const budgets = [
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
   // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_018 },
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_023 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1528,7 +1528,7 @@ const budgets = [
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,673 / 19,622 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 51669 / 19618 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_673, maxGzip: 19_622 },
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 52_110, maxGzip: 19_765 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2094,7 +2094,7 @@ const budgets = [
   // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
   // 198,169 / 66,469 -> 199,085 / 66,764 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 199081 / 66760 (over budget only) in the e2e build, the plus 4.
   // 195,067 / 65,336 -> 196,019 / 65,533 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 196015 / 65529 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 196_019, maxGzip: 65_533 },
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 200_037, maxGzip: 66_980 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2204,7 +2204,7 @@ const budgets = [
   // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
   // 165,449 / 59,347 -> 166,222 / 59,627 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 166218 / 59623 (over budget only) in the e2e build, the plus 4.
   // 162,859 / 58,327 -> 163,717 / 58,506 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 163713 / 58502 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 163_717, maxGzip: 58_506 },
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 167_080, maxGzip: 59_809 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2688,7 +2688,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
 // -> 381,530 / 444,390 / 452,389 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured first paint, the plus 4.
 // -> 378,025 / 439,699 / 447,637 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 378_025, en: 439_699, ja: 447_637 };
+// 11-20 bundle (RULES_MARK 5 + N26 on main f179e31f): RelicDraft, gauntletEngine, en/ja index and first paint set to CI verify-quick measured + 4 (first paint 381,528 / 444,570 / 452,603).
+const FIRST_PAINT_BUDGETS = { ko: 381_532, en: 444_574, ja: 452_607 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
