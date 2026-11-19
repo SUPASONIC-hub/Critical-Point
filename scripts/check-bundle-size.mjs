@@ -199,7 +199,8 @@ const budgets = [
   // -> 165,312 / 61,659 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line on the report (components/LeaveLine.jsx). Measured locally, the plus 4.
   // -> 164,690 / 61,414 n39-n40-n44 over main eb2d9aeb (N39's twelve scene cases, N40's sample date), measured 164,686 / 61,410 in CI verify-quick, the plus 4.
   // 164,690 / 61,414 -> 165,432 / 61,684 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165428 / 61680 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_432, maxGzip: 61_684 },
+  // -> gzip 61,694 묶음 11-19 머리 f340257e, measured 61,690 in CI verify-quick (CSS 해시 이름이 바뀐 만큼), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_432, maxGzip: 61_694 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
