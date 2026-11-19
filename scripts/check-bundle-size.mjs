@@ -201,7 +201,8 @@ const budgets = [
   // 164,690 / 61,414 -> 165,432 / 61,684 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165428 / 61680 (over budget only) in the e2e build, the plus 4.
   // -> gzip 61,694 묶음 11-19 머리 f340257e, measured 61,690 in CI verify-quick (CSS 해시 이름이 바뀐 만큼), the plus 4.
   // -> 164,643 / 61,417 n37-followups, measured locally 164,639 / 61,413 in the e2e build, the plus 4: the ranking over the result page (returnTo) and its keys held.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_643, maxGzip: 61_417 },
+  // 164,643 / 61,417 -> 165,507 / 61,707 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 165503 / 61703 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_507, maxGzip: 61_707 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -725,7 +726,8 @@ const budgets = [
   // 217,739 / 79,427 -> 217,754 / 79,427 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 217750 / - (over budget only) in the e2e build, the plus 4.
   // 208,749 / 76,072 -> 209,960 / 76,441 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 209956 / 76437 (over budget only) in the e2e build, the plus 4.
   // -> 217,754 / 79,433 b5-open-clock-cue over main ec89d22b, measured locally - / 79,429 (the hook's import beside the voice), the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 217_754, maxGzip: 79_433 },
+  // 217,754 / 79,433 -> 218,967 / 79,833 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 218963 / 79829 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 218_967, maxGzip: 79_833 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1268,7 +1270,8 @@ const budgets = [
   // 216,858 / 42,041 -> 216,858 / 42,066 n37-followups, measured locally - / 42,062 (over budget only) in the e2e build, the plus 4: the recovery centre's head clear of the music pills.
   // 216,858 / 42,041 -> 216,858 / 42,049 n46-hall-progress, measured locally 42,045 gzip: the progress line's rule (.ranking-hall-progress), the plus 4.
   // -> 217,507 / 42,164 b5-open-clock-cue over main ec89d22b, measured locally 217,503 / 42,160, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 217_507, maxGzip: 42_164 },
+  // 217,507 / 42,164 -> 218,870 / 42,402 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 218866 / 42398 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 218_870, maxGzip: 42_402 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1388,7 +1391,8 @@ const budgets = [
   // 7,079 / 3,112 -> 7,251 / 3,201 on 2026-11-11, recheck-in-case over main 52027156. Measured 7247 / 3197 (over budget only) in the e2e build, the plus 4.
   // 7,251 / 3,201 -> 7,325 / 3,231 n37-followups, measured locally 7,321 / 3,227 in the e2e build, the plus 4: the back button says where it goes (returnTo).
   // 7,251 / 3,201 -> 8,192 / 3,565 n46-hall-progress, measured locally 8,188 / 3,561: the hall of fame's progress line (hallOfFameProgress, the week key it reads, ranking.hallProgress), the plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 8_192, maxGzip: 3_565 },
+  // 8,192 / 3,565 -> 8,278 / 3,602 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 8274 / 3598 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 8_278, maxGzip: 3_602 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -2085,7 +2089,8 @@ const budgets = [
   // -> 198,016 / 66,399 n46-hall-progress, measured locally 198,012 / 66,395: ranking.hallProgress in Japanese, the plus 4.
   // 194,641 / 65,117 -> 195,404 / 65,370 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 195400 / 65366 (over budget only) in the e2e build, the plus 4.
   // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_169, maxGzip: 66_469 },
+  // 198,169 / 66,469 -> 199,085 / 66,764 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 199081 / 66760 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 199_085, maxGzip: 66_764 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2193,7 +2198,8 @@ const budgets = [
   // -> 165,314 / 59,299 n46-hall-progress, measured locally 165,310 / 59,295: ranking.hallProgress in English, the plus 4.
   // 162,433 / 58,148 -> 163,050 / 58,393 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 163046 / 58389 (over budget only) in the e2e build, the plus 4.
   // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_449, maxGzip: 59_347 },
+  // 165,449 / 59,347 -> 166,222 / 59,627 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 166218 / 59623 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 166_222, maxGzip: 59_627 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2675,7 +2681,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,718 / 443,252 / 451,213 n46-hall-progress, measured locally 380,714 / 443,248 / 451,209, the plus 4.
 // -> 378,117 / 439,653 / 447,540 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured first paint, the plus 4.
 // -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_891, en: 443_467, ja: 451_451 };
+// -> 381,530 / 444,390 / 452,389 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 444_390, ja: 452_389 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2889,7 +2896,8 @@ function checkBudget(file, budget) {
 // -> 11,184 / 4,002 앱 아이콘 이름 -v2 11-17: 아이콘 링크·사전 캐시 이름이 길어짐, the plus 4.
 // -> 11,284 / 4,049 묶음 11-18 over main 4d549334 (아이콘 -v2 + 2안), the plus 4.
 // -> 12,564 / 4,458 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b, the plus 4.
-const WORKER_BUDGET = { maxBytes: 12_564, maxGzip: 4_458 };
+// -> 12,784 / 4,542 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today), the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_784, maxGzip: 4_542 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
