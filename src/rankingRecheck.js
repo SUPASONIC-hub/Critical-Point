@@ -48,6 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { nextTableOn } from "./gauntlet/nextTable.js";
+import { NEXT_RULE, RULES_NEXT_MARK } from "./gauntlet/nextTableRules.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
@@ -263,7 +264,7 @@ export function recheckRelicDraft(row, before = null) {
       if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned))) differs.push("reroll");
       const last = draft.reroll?.offer ?? draft.offer;
       if (draft.picked.some((id) => !last.includes(id)) || draft.picked.length > (draft.extra ? 2 : 1)) differs.push("picked");
-      if (numberOf(raw.cost) !== getRelicDraftCost(draft)) differs.push("cost");
+      if (numberOf(raw.cost) !== getRelicDraftCost(draft, rowRules(row))) differs.push("cost");
       if (draft.cost > 0 && (open?.story === true || open?.practice === true || entry.assistStory)) differs.push("spent");
       if (draft.cost > 0 && numberOf(open?.vault) !== null && draft.cost > open.vault) differs.push("vault");
       if (Array.isArray(open?.relics) && !sameIds(draft.owned, open.relics)) differs.push("owned");
@@ -273,6 +274,16 @@ export function recheckRelicDraft(row, before = null) {
     if (differs.length) findings.push({ index, differs });
   });
   return { drafts, findings };
+}
+
+/**
+ * The rules a row was played under, as far as the next rules go (G4): RULES_MARK
+ * RULES_NEXT_MARK or later plays them, an older row does not (nextTable.js).
+ */
+const NEXT_ROW = Object.freeze(new Set([NEXT_RULE]));
+const OLD_ROW = Object.freeze(new Set(["old"]));
+export function rowRules(row) {
+  return Number(row?.dynamics?.[RULES_MARK_KEY]) >= RULES_NEXT_MARK ? NEXT_ROW : OLD_ROW;
 }
 
 /** What a case row's drafts cost in all: the vault may be down by this much from the close before (chainRecheck.js). */
@@ -348,7 +359,7 @@ export function recheckRun(rows = []) {
   let recorded = false;
   // G4: under the next rules a season buys 「하나 더」 once (gauntletEngine.js `buyExtraRelic`).
   const extras = cases.reduce((sum, row) => sum + (Array.isArray(row.decision_log) ? row.decision_log : []).filter((entry) => entry?.relicDraft?.extra === true).length, 0);
-  if (nextTableOn() && extras > 1) marks.add(RELIC_DRAFT_MARK);
+  if (cases.length && nextTableOn(rowRules(cases[0])) && extras > 1) marks.add(RELIC_DRAFT_MARK);
   const report = cases.map((row, at) => {
     const score = recheckCaseScore(row);
     const windows = recheckCaseWindows(row);

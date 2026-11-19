@@ -1,5 +1,5 @@
 // G4 (tools) and G5 (act twists) under the next rules (src/gauntlet/nextTable.js).
-globalThis.__cpRulesNext = true;
+process.env.RULES_NEXT = "1";
 const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
@@ -11,6 +11,7 @@ const { ACT_TWIST_CASES, HEARING_CHIPS, MERGER_SHIFT, SCATTER_SPREAD } = await i
 const { getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
 const { rulesNextOn, RULES_NEXT_DEFAULT } = await import("../../src/gauntlet/rulesNext.js");
 const { nextTableOn } = await import("../../src/gauntlet/nextTable.js");
+const { NEXT_RULE, RULES_NEXT_MARK, withNextRules } = await import("../../src/gauntlet/nextTableRules.js");
 const { recheckRelicDraft, recheckRun } = await import("../../src/rankingRecheck.js");
 const en = (await import("../../src/locales/en/screens/relics.js")).default;
 const ja = (await import("../../src/locales/ja/screens/relics.js")).default;
@@ -20,10 +21,19 @@ const koWeek = (await import("../../src/copy/weekRules.js")).default;
 
 const cash = (over = {}) => ({ gauge: 60, pushes: 3, move: "grow", streak: 1, afterBust: false, mutations: [], clockLeft: 0.2, focusMode: "steady", focusCharged: false, ...over });
 
-test("the switch: rulesNext.js reads ?rules=next, and the test override wins", () => {
+test("the switch: a case's rules say it, \"old\" turns it off, and a set with neither follows the default", () => {
   assert.equal(rulesNextOn({ location: { search: "?rules=next" } }), true);
   assert.equal(rulesNextOn({ location: { search: "" } }), RULES_NEXT_DEFAULT);
   assert.equal(nextTableOn(), true);
+  assert.equal(nextTableOn(new Set()), true);
+  assert.equal(nextTableOn(new Set([NEXT_RULE])), true);
+  assert.equal(nextTableOn(new Set(["old"])), false);
+  // The old table by the case's rules: no boost, the old COLD BLOOD, the old price.
+  const old = new Set(["old", "blackout", "aftershock"]);
+  const board = engine.buildNextSchema({ outcome: "bust", cause: "push", gauge: 80, relics: ["coldBlood"], rules: old });
+  assert.ok(board.startGauge > 0);
+  assert.equal(engine.getRerollCost(old), 4000);
+  assert.equal(engine.getRerollCost(withNextRules(new Set(), true)), NEXT_REROLL_COST);
 });
 
 test("every boost names a condition that a normal cash can meet, and none fires on a plain cash", () => {
@@ -89,12 +99,18 @@ test("the reroll costs 1,500, and one more is once a season", () => {
 
 test("the server check prices a 1,500 reroll and marks a second one more in a season", () => {
   const draft = engine.rerollRelicOffer(draftRun()).relicDraft;
-  const row = { case_id: "case01", decision_log: [{ relicDraft: { ...draft, picked: [] } }], dynamics: {} };
+  const row = { case_id: "case01", decision_log: [{ relicDraft: { ...draft, picked: [] } }], dynamics: { [engine.RULES_MARK_KEY]: RULES_NEXT_MARK } };
   assert.deepEqual(recheckRelicDraft(row).findings, []);
   const pricedOld = { ...row, decision_log: [{ relicDraft: { ...draft, cost: 4000, picked: [] } }] };
   assert.equal(recheckRelicDraft(pricedOld).findings[0].differs.includes("cost"), true);
-  const extra = (caseId) => ({ case_id: caseId, decision_log: [{ relicDraft: { extra: true } }], dynamics: { [engine.RULES_MARK_KEY]: engine.RULES_MARK }, summary: {} });
-  assert.ok(recheckRun([extra("case01"), extra("case02")]).marks.includes("relic-draft"));
+  // A row from before RULES_MARK RULES_NEXT_MARK was priced at the old reroll.
+  const marked = (mark, cost) => ({ ...row, decision_log: [{ relicDraft: { ...draft, cost, picked: [] } }], dynamics: { [engine.RULES_MARK_KEY]: mark } });
+  assert.deepEqual(recheckRelicDraft(marked(RULES_NEXT_MARK, NEXT_REROLL_COST)).findings, []);
+  assert.deepEqual(recheckRelicDraft(marked(RULES_NEXT_MARK - 1, 4000)).findings, []);
+  if (engine.RULES_MARK >= RULES_NEXT_MARK) {
+    const extra = (caseId) => ({ case_id: caseId, decision_log: [{ relicDraft: { extra: true } }], dynamics: { [engine.RULES_MARK_KEY]: engine.RULES_MARK }, summary: {} });
+    assert.ok(recheckRun([extra("case01"), extra("case02")]).marks.includes("relic-draft"));
+  }
 });
 
 test("acts 3, 5 and 7 each deal their twist, behind a case's own rule and never beside a week's", () => {

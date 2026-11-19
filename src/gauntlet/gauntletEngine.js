@@ -48,6 +48,7 @@ import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHO
 import { settleAudit } from "./auditRisk.js";
 import { caseRuleFor } from "./caseRules.js";
 import { nextTableOn } from "./nextTable.js";
+import { NEXT_RULE } from "./nextTableRules.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
@@ -64,7 +65,9 @@ export { decisionWindowSeconds, stakeTier } from "./stakeClock.js";
  * The list itself is not imported: this module is in the chunk the start
  * screen loads to repair a save, and the list brings the prologues' copy.
  */
-const ALL_RULES = Object.freeze({ has: () => true });
+// Neither the next rules' mark nor the old one (nextTable.js): a table named by
+// no case follows the page's default, as the core rules' set does.
+const ALL_RULES = Object.freeze({ has: (id) => id !== "old" && id !== NEXT_RULE });
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
@@ -1201,7 +1204,7 @@ export function describeMutations(schema) {
  * rules once, never twice. HEAT SINK is applied where the debt is computed,
  * because it needs the heat the debt is taken from.
  */
-export function applyRelics(schema, relics = []) {
+export function applyRelics(schema, relics = [], rules = ALL_RULES) {
   const board = normalizeSchema(schema);
   const pending = normalizeRelicIds(relics).filter((id) => !board.relics.includes(id));
   if (!pending.length) return board;
@@ -1209,7 +1212,7 @@ export function applyRelics(schema, relics = []) {
   for (const id of pending) {
     if (id === "stethoscope") next.sedated = false;
     // G4: under the next rules COLD BLOOD waives AFTERSHOCK outright (relicsNext.js).
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = nextTableOn() ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = nextTableOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
@@ -1309,9 +1312,13 @@ export function normalizeRelicDraft(value) {
 export const getRerollSeed = (seed) => `${seed}:reroll:1`;
 
 /** What a draft of this shape costs: the reroll and the one more, each once. */
-/** The reroll's price on this table: NEXT_REROLL_COST under the next rules (G4), RELIC_REROLL_COST before. */
-export const getRerollCost = () => (nextTableOn() ? NEXT_REROLL_COST : RELIC_REROLL_COST);
-export const getRelicDraftCost = (draft) => (draft?.reroll ? getRerollCost() : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
+/**
+ * The reroll's price on this table: NEXT_REROLL_COST under the next rules (G4),
+ * RELIC_REROLL_COST before. `rules` is the case's set (nextTable.js); the
+ * recheck hands in the one its row was played under, the page none (its default).
+ */
+export const getRerollCost = (rules) => (nextTableOn(rules) ? NEXT_REROLL_COST : RELIC_REROLL_COST);
+export const getRelicDraftCost = (draft, rules) => (draft?.reroll ? getRerollCost(rules) : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
 
 /**
  * A closed case's offer and the draft record that goes with it: the three
@@ -1575,7 +1582,7 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     relicDraft: practice ? null : current.relicDraft,
     schema: rebooted
       ? current.schema
-      : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics), rules),
+      : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics, rules), rules),
   }, { caseId, resources, route, focusCarry: readFocusCarry(current) });
 }
 
@@ -1697,7 +1704,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * lean. With every rule, which is the default, this is the board it always was.
  */
 export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false }) {
-  if (caseClosed) return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics), rules);
+  if (caseClosed) return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     if (rules.has("blackout")) {
@@ -1752,7 +1759,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics), rules);
+  return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics, rules), rules);
 }
 
 const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0 });
@@ -1856,7 +1863,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // G4 (relicsNext.js): under the next rules a tool whose condition holds on
   // this cash multiplies its pot. The whole pot, so the streak's and LOCK's
   // shares below keep their proportions.
-  const boost = outcome === "cash" && nextTableOn()
+  const paysPot = outcome === "cash";
+  const boost = paysPot && nextTableOn(rules)
     ? readRelicBoost(relics, {
       gauge,
       pushes: Number(window?.pushes) || 0,
@@ -1869,11 +1877,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       focusCharged: focusCharge >= STANCE_CHARGE,
     })
     : { fired: [], factor: 1 };
-  const basePot = outcome === "cash" ? Math.round(chips * multiplier * boost.factor) : 0;
-  const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus * boost.factor) : 0;
+  const basePot = paysPot ? Math.round(chips * multiplier * boost.factor) : 0;
+  const pot = paysPot ? Math.round(chips * multiplier * handBonus * boost.factor) : 0;
   // The hand's share of the pot, told apart: what the streak earned, and what
   // LOCK added on top of it under the cap.
-  const logicPot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus * boost.factor)) - basePot : 0;
+  const logicPot = paysPot ? Math.min(pot, Math.round(chips * multiplier * earnedBonus * boost.factor)) - basePot : 0;
   const focusPot = pot - basePot - logicPot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.

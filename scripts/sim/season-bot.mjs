@@ -77,8 +77,7 @@ import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../sr
 import { createChoiceReaders } from "../../src/state/useDecision.js";
 
 // G4·G5 (2026-11-19): RULES_NEXT=0 plays the table before the next rules, 1 the
-// next ones; unset, whatever rulesNext.js says (src/gauntlet/nextTable.js).
-if (process.env.RULES_NEXT === "0" || process.env.RULES_NEXT === "1") globalThis.__cpRulesNext = process.env.RULES_NEXT === "1";
+// next ones; unset, whatever rulesNext.js says (nextTableRules.js `wantsNextRules`).
 
 // ---------------------------------------------------------------------------
 // The season player (check-endings.mjs).
