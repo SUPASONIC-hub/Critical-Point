@@ -325,7 +325,8 @@ const budgets = [
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_398, maxGzip: 15_010 },
+  // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_018 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1249,7 +1250,8 @@ const budgets = [
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_858, maxGzip: 42_041 },
+  // 216,858 / 42,041 -> 216,972 / 42,082 b5-open-clock-cue, measured locally 216,968 / 42,078: clock-cut.css (the stake clock's cut beside the clock), the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 216_972, maxGzip: 42_082 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2049,7 +2051,8 @@ const budgets = [
   // 197,425 / 66,217 -> 197,452 / 66,232 d3-next over main 4d549334: the scene wall line's count in Japanese. Measured 197448 / 66228 in the CI e2e build, the plus 4.
   // 197,425 / 66,217 -> 197,497 / 66,236 번외 이야기 속 공개 over main 4d549334: the report's side line in Japanese. Measured 197493 / 66232 in the e2e build, the plus 4.
   // -> 197,888 / 66,362 묶음 11-18b over main 68cbc0f4, measured 197,884 / 66,358 in CI verify-quick, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_888, maxGzip: 66_362 },
+  // -> 197,911 / 66,369 b5-open-clock-cue, measured locally 197,907 / 66,365: stage.clockCut in Japanese, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_911, maxGzip: 66_369 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2149,7 +2152,8 @@ const budgets = [
   // 164,766 / 59,136 -> 164,792 / 59,153 d3-next over main 4d549334: the scene wall line's count in English. Measured 164788 / 59149 in the CI e2e build, the plus 4.
   // 164,766 / 59,136 -> 164,834 / 59,153 번외 이야기 속 공개 over main 4d549334: the report's side line in English. Measured 164830 / 59149 in the e2e build, the plus 4.
   // -> 165,200 / 59,261 묶음 11-18b over main 68cbc0f4, measured 165,196 / 59,257 in CI verify-quick, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_200, maxGzip: 59_261 },
+  // -> 165,221 / 59,272 b5-open-clock-cue, measured locally 165,217 / 59,268: stage.clockCut in English, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_221, maxGzip: 59_272 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2622,7 +2626,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_677, en: 443_172, ja: 451_135 };
+// -> 380,740 / 443,246 / 451,205 b5-open-clock-cue, measured locally 380,736 / 443,242 / 451,201, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_740, en: 443_246, ja: 451_205 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

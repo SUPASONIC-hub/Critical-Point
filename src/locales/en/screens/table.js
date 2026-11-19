@@ -42,6 +42,7 @@ export default {
     briefRules: "Rules this hand: {rules}.",
     briefNext: "Next push: Heat {gauge} → {low}–{high}{clock}.",
     nextClock: " · the clock may lose up to {cut} seconds",
+    clockCut: "−{cut}s",
     situationLabel: "Current situation",
     risk: "Current risk",
     wallRange: "Wall {min}–{max}",

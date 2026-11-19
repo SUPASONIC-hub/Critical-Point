@@ -42,6 +42,7 @@ export default {
     briefRules: "この勝負のルール: {rules}。",
     briefNext: "次に押したときの予告: 熱 {gauge} → {low}–{high}{clock}。",
     nextClock: " · 時計は最大{cut}秒減る",
+    clockCut: "−{cut}秒",
     situationLabel: "現在の状況ボード",
     risk: "現在のリスク",
     wallRange: "壁 {min}–{max}",

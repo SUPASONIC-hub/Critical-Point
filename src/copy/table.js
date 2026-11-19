@@ -59,6 +59,8 @@ const tableCopy = {
     briefNext: "다음 밀기 예고: 열기 {gauge} → {low}–{high}{clock}.",
     // B5 (11-18): what the stake clock takes if the next push crosses a tier, said before the push (stakeClock.js).
     nextClock: " · 시계 최대 −{cut}초",
+    // B5 seen (N43, 3rd step): the seconds the stake clock just took, beside the clock for a moment, a push's cut or the creep's.
+    clockCut: "−{cut}초",
     situationLabel: "현재 상황판",
     risk: "현재 위험",
     wallRange: "벽 {min}–{max}",

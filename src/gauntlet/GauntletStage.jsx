@@ -25,6 +25,7 @@ import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeStakedDetail, formatMultiplier, formatMoney, joinRules, useTableForecast } from "./tableReadout.js";
 import { dangerZoneOf, readTableMeters } from "./tableMeters.js";
+import { useClockCut } from "./tableVoice.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTableTabTitle } from "./tableTabTitle.js";
@@ -186,6 +187,8 @@ export function GauntletStage({
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
+  // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
+  const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(
     () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
     [claimed, live, win.status],
@@ -560,6 +563,7 @@ export function GauntletStage({
             style={{ "--gx-clock": Math.max(0, Math.min(1, remaining / schema.seconds)) }}
           >
             <b>{Math.ceil(remaining)}</b>
+            {clockCut && <span className="gx-clock-cut" data-testid="gauntlet-clock-cut" aria-hidden="true" key={clockCut.key}>{clockCut.text}</span>}
           </div>
         </div>
 

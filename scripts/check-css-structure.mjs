@@ -547,6 +547,9 @@ const fileBudgets = {
   // question of 프롤로그 01·02 on the reveal sheet (BetweenHandsPulse.jsx), in a
   // file of its own so play.css's budget is not touched. Measured 41 / 765.
   "pulse.css": { lines: 41, bytes: 765 },
+  // New on 2026-11-19 (b5-open-clock-cue, measured locally): the stake clock's cut beside the clock for 0.8
+  // seconds, a push's or the creep's (B5, N43), in a file of its own so play.css's budget is not touched. Measured 34 / 639.
+  "clock-cut.css": { lines: 34, bytes: 639 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

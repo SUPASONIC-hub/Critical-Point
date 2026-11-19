@@ -551,6 +551,40 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
   await expect(page.getByTestId("gauntlet-stage")).not.toContainText(/%/);
 });
 
+// B5 seen (N43 ③, 11-18 「전부 1」): the clock's own creep across a stake
+// tier cuts the clock as a push does, and no push line had told it. The cut
+// is marked beside the clock, 「−5초」, for 0.8 seconds, then goes.
+test("the creep across a stake tier marks the clock's cut beside it for a moment", async ({ page }) => {
+  // Up to sixty quarter seconds of the page's clock, each drawn: 30 to 43 seconds here.
+  test.setTimeout(120_000);
+  await page.clock.install();
+  await openTable(page, "case01", "start");
+  const stage = page.getByTestId("gauntlet-stage");
+  const heat = async () => Number(await stage.getAttribute("data-gauge"));
+  const mark = page.getByTestId("gauntlet-clock-cut");
+  await page.locator(".choices .choice").first().click();
+  // Pushes that cannot reach the second tier (45) themselves: a step is 15 at most.
+  while ((await heat()) < 30) {
+    const before = await heat();
+    await page.getByTestId("commit-push").click();
+    await expect.poll(heat).toBeGreaterThan(before);
+  }
+  expect(await heat()).toBeLessThan(45);
+  await expect(mark).toHaveCount(0);
+  // The page's clock held still from here, so the 0.8 seconds pass only when
+  // this test moves them: a flowing clock let the mark come and go between
+  // two polls of a busy machine. The creep alone carries the heat across, a
+  // tenth of a second at a time, until the mark is up.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1_000));
+  for (let step = 0; step < 600 && !(await mark.count()) && (await heat()) < 50; step += 1) await page.clock.runFor(100);
+  expect(await heat()).toBeGreaterThanOrEqual(45);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(mark).toHaveText("−5초");
+  await expect(mark).toHaveAttribute("aria-hidden", "true");
+  await page.clock.runFor(1_000);
+  await expect(mark).toHaveCount(0);
+});
+
 test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
   await openTable(page, "case01", "start");
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
