@@ -10,12 +10,14 @@
 -- 1. `ranking_check_run_marks` is restated (check:grants asks the newest
 --    reset to: the older-table refusal lives in no other function the
 --    trigger calls). Word for word as 20261112000000 left it, but for the
---    mark: RULES_MARK 5 (src/gauntlet/gauntletEngine.js), so `>= 5` below.
+--    mark: RULES_MARK 6 (src/gauntlet/gauntletEngine.js), so `>= 6` below.
 --
 --    [SLOT RULES_MARK] Filled (2026-11-17): N26 (#591, n26-case-variants)
 --    deals 사건 09, 11, 14 and 16 a rule of their own in a season with no
 --    weekly rule, so the same play scores differently there and the mark goes
---    to 5 (the decision 「RULES_MARK 묶음 R에서 5로(채점 바뀜)」). A season
+--    to 5 (the decision 「RULES_MARK 묶음 R에서 5로(채점 바뀜)」). Changed
+--    2026-11-19 (the user's 「1」 twice): N26 and G1~G7 ship on 11-20 at 5,
+--    G5's other acts on 11-25 at 6, so this wipe asks for 6. A season
 --    begun at mark 4 before this and finished after it is refused, as at
 --    every mark before. scripts/check-grants.mjs reads the mark from the
 --    `>= N` of this file (SERVER_MARK); DB_MARKS in
@@ -57,7 +59,7 @@
 -- and the grants restated, a notice, and a delete that finds nothing the
 -- second time.
 
--- 1. The run marks the ranking asks for: RULES_MARK 5 (see [SLOT RULES_MARK]).
+-- 1. The run marks the ranking asks for: RULES_MARK 6 (see [SLOT RULES_MARK]).
 create or replace function public.ranking_check_run_marks(p_run_id text)
 returns void
 language plpgsql
@@ -104,7 +106,7 @@ begin
     where s.run_id = p_run_id
       and s.case_id = any(public.season_case_ids())
       and (case when jsonb_typeof(s.dynamics->'tableRules') = 'number'
-                then (s.dynamics->>'tableRules')::numeric >= 5 end) is not true
+                then (s.dynamics->>'tableRules')::numeric >= 6 end) is not true
   ) then
     raise exception 'older-table runs are not ranked';
   end if;
