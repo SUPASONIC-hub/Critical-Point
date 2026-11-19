@@ -1,6 +1,6 @@
 /** src/copy/board.js in Japanese: the participants' board and its report form. */
 export default {
-  back: "ブリーフィングに戻る",
+  back: "タイトル画面に戻る",
   title: "残していく言葉",
   intro: "名前ひとつと短い文があれば十分です。ここに書いた名前と文は、ほかの参加者にそのまま見えます。点数も順位も付きません。事件を通り抜けた人が、次の人に残していく場所です。",
   posts: "{count}件の投稿",

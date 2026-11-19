@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import { CREATOR_LINE, CREATORS, creatorMailLabel, studioName } from "../src/credits.js";
 import { DATA_RETENTION_DAYS, PLAYTEST_DATA_NOTICE, PRIVACY_PAGE_PATH, SITE_PAGES } from "../src/privacyText.js";
@@ -651,8 +653,13 @@ const TERMS_JA = `
  * the game's green, and every picture a photograph taped to the page. The
  * colours are the game's own (--sk-paper*, --sk-pencil, --sk-stamp in
  * src/styles/tokens.css); each text colour clears 4.5:1 on both papers
- * (tests/legal-pages.spec.js runs axe's color-contrast on every page). The
- * pages keep the system faces, so they fetch no font.
+ * (tests/legal-pages.spec.js runs axe's color-contrast on every page).
+ *
+ * The face (n37-followups, 2026-11-19, the user's choice 1): the Korean and
+ * English pages set the game's own Pretendard cut (`PAGE_FONT` below) over
+ * the system faces they had kept, where Windows drew the Hangul in Malgun
+ * Gothic, wide and loose beside the game. The Japanese pages keep the system
+ * faces, as the game's Japanese page does (src/locales/ja/index.js `style`).
  */
 const PAGE_STYLE = `
 :root{color-scheme:light;--bg:#f7f2e6;--surface:#fdfbf5;--surface-2:#eee7d6;--line:#16181a29;--line-strong:#16181a57;--text:#16181a;--text-2:#3e3c38;--accent:#16603e;--pencil:#b0261e;--rule:#46649629;--margin:#d6463c80;--tape:#fff8c8b3;--shadow:#4632141f;--shadow-2:#46321438;--mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace}
@@ -766,6 +773,78 @@ export const TITLE_TAIL = { ko: ` · ${GAME_NAME.ko}`, en: " — Critical Point,
  * pages carry the line; the Korean and English ones are as they were.
  */
 const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
+
+/**
+ * The game's two font files on the plain pages, declared as src/styles/tokens.css
+ * declares them: the first file whole, the second by unicode-range, so a syllable
+ * only the second file holds is drawn in the same face, not the system one. The
+ * first file alone left 273 of the Korean pages' 1,037 characters in Malgun
+ * Gothic, mid-word. The second file's range is the one tokens.css carries (which
+ * `npm run build:fonts` writes) narrowed to the characters the page itself has:
+ * the browser fetches the file for the same characters either way, and the whole
+ * range was 2 KB of gzip on every page.
+ *
+ * The addresses are the source files: the dev server serves them as they are, and
+ * the build (`staticPages`, vite.config.js) swaps each for the hashed file the
+ * game ships (`withShippedFonts`), the same bytes the start page preloads and the
+ * service worker keeps at install, so a player's device fetches nothing new.
+ *
+ * Not preloaded, and `swap`: the text paints at once in the system face and swaps
+ * when the file lands. A preload would put 131 KB in front of every first visit's
+ * paint, for pages that are only text.
+ */
+export const PAGE_FONT_SOURCES = ["/src/assets/fonts/pretendard-cp.woff2", "/src/assets/fonts/pretendard-cp-rest.woff2"];
+const FONT_REST_RANGE = /\/\* FONT_REST_RANGE start \*\/\s*unicode-range:\s*([^;]*);/.exec(
+  readFileSync(new URL("../src/styles/tokens.css", import.meta.url), "utf8"),
+)?.[1];
+if (!FONT_REST_RANGE) throw new Error("legal-pages: src/styles/tokens.css has no FONT_REST_RANGE unicode-range.");
+const FONT_REST_POINTS = new Set(
+  FONT_REST_RANGE.split(",").flatMap((entry) => {
+    const [from, to = from] = entry.trim().replace(/^U\+/i, "").split("-").map((hex) => parseInt(hex, 16));
+    return Array.from({ length: to - from + 1 }, (_, step) => from + step);
+  }),
+);
+/** The pages whose language the game draws in Pretendard; Japanese keeps the system faces. */
+const FONT_LANGUAGES = new Set(["ko", "en"]);
+const FONT_SLOT = "/*page-font*/";
+const fontFace = (src, range = "") =>
+  `@font-face{font-family:"Critical Point Sans";font-style:normal;font-weight:400 920;font-display:swap;src:url(${src}) format("woff2")${range && `;unicode-range:${range}`}}`;
+const hex = (point) => point.toString(16).toUpperCase();
+
+/** The code points of the page's text the second file holds, as a unicode-range ("" when none). */
+function restRangeOf(html) {
+  const text = html.replace(/<(style|script)\b[\s\S]*?<\/\1>/g, "").replace(/<[^>]*>/g, " ");
+  const points = [...new Set([...text].map((character) => character.codePointAt(0)))].filter((point) => FONT_REST_POINTS.has(point)).sort((a, b) => a - b);
+  const runs = [];
+  for (const point of points) {
+    const last = runs.at(-1);
+    if (last && point === last[1] + 1) last[1] = point;
+    else runs.push([point, point]);
+  }
+  return runs.map(([from, to]) => (from === to ? `U+${hex(from)}` : `U+${hex(from)}-${hex(to)}`)).join(",");
+}
+
+/** The page's font rules in its FONT_SLOT: the two faces and the body's family, or nothing for a language that keeps the system faces. */
+function withPageFont(html, language) {
+  if (!FONT_LANGUAGES.has(language)) return html.replace(FONT_SLOT, "");
+  const range = restRangeOf(html);
+  const faces = fontFace(PAGE_FONT_SOURCES[0]) + (range ? fontFace(PAGE_FONT_SOURCES[1], range) : "");
+  return html.replace(
+    FONT_SLOT,
+    `\n${faces}body{font-family:"Critical Point Sans",-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif}`,
+  );
+}
+
+/** A built page with each font source swapped for the file the build shipped (`shipped`: source path -> "/assets/...woff2"). */
+export function withShippedFonts(html, shipped) {
+  let out = String(html);
+  for (const source of PAGE_FONT_SOURCES) {
+    if (!out.includes(source)) continue;
+    if (!shipped[source]) throw new Error(`static pages: the build shipped no file for ${source}.`);
+    out = out.split(`url(${source})`).join(`url(${shipped[source]})`);
+  }
+  return out;
+}
 
 /**
  * The art each page's hero opens on (2026-11-16, 「wow」 pages): pictures the
@@ -897,7 +976,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
   const share = shareMetaLines({ language, url: pagePath(kind, language), title, description: summary })
     .map((line) => `${line}\n`)
     .join("");
-  return `<!doctype html>
+  const page = `<!doctype html>
 <html lang="${language}">
 <head>
 <meta charset="utf-8" />
@@ -907,7 +986,7 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <link rel="canonical" href="${pagePath(kind, language)}" />
 ${alternates}${share}<link rel="icon" href="/icons/icon-192-v2.png" />
 ${structuredData ? `${structuredData}
-` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}${hero ? SHOWCASE_PAPER_STYLE.trim().replace(/\n/g, "") : ""}</style>
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${FONT_SLOT}${style}${hero ? SHOWCASE_PAPER_STYLE.trim().replace(/\n/g, "") : ""}</style>
 ${tags}</head>
 <body>
 <a class="skip" href="#main">${copy.skip}</a>
@@ -925,6 +1004,7 @@ ${creditFor(kind, language)}
 </body>
 </html>
 `;
+  return withPageFont(page, language);
 }
 
 const AD_POLICY_LINKS = {

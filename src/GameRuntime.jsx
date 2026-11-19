@@ -551,7 +551,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     decisionReveal,
     isAdvancing,
     isResult,
-    nextCaseSignal,
+    nextCaseSignal, screenOpen: showRanking || showBoard,
     saveCurrentGame: saveCurrentGameEvent,
     startCase: openCaseEvent,
     started,
@@ -879,7 +879,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
   });
 
-  if (showRanking && !started) {
+  if (showRanking && (!started || isResult)) { // over a result page too, closing back onto it (RankingScreen returnTo)
     return (
       <LazyScreen quiet>
       <RankingScreen
@@ -892,7 +892,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         runId={runId}
         sessionCode={sessionCode}
         triggerLabels={triggerLabels}
-        onClose={() => setShowRanking(false)}
+        onClose={() => setShowRanking(false)} returnTo={started ? "result" : "intro"}
       />
       </LazyScreen>
     );
