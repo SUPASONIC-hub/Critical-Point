@@ -2591,6 +2591,14 @@
     font-size: 0.875rem;
     line-height: 1.25;
   }
+
+  /* A slip with no key on it (a touch phone draws none) gives the 20px kept
+     for the key back to its words: on Linux English slips ran to a third
+     line and put four-slip hands 13px, 37 with a card staked, under the bar
+     at 360x740 (E1f, 2026-11-19). */
+  .gx-hand .gx-card:not(:has(.gx-card-key)) .gx-card-label {
+    padding-right: 0;
+  }
 }
 
 /* The air of the short phone, also on every phone 801 to 860 tall, which
