@@ -2,15 +2,19 @@ import { rulesNextOn } from "./rulesNext.js";
 
 /**
  * G1·G2·G3·G6·G7 (2026-11-19, 「전부 1」): the numbers of the next table rules
- * and the one switch that carries them. The switch is a rule id in the case's
- * rule set (`NEXT_RULE`), so everything that already takes the case's rules --
- * the reducer, the settlement, the replay, the server's recheck -- reads it
- * the same way, and a row can be checked under the rules it was played under.
+ * and the switch that carries them. A rule set plays them unless it says
+ * otherwise: `OLD_RULE` in it plays the rules before them, `NEXT_RULE` the
+ * next ones, and a set with neither -- every case's own, as tableUnlocks.js
+ * deals them -- what this page plays (`wantsNextRules`). Everything that
+ * already takes the case's rules -- the reducer, the settlement, the replay,
+ * the server's recheck -- reads it the same way, so a row can be checked
+ * under the rules it was played under.
  *
  * Bot measurement behind each number: check:pressure (`RULES_NEXT=0` plays
  * the old rules beside it) and cp-archive/메모-20261119/gameplay/표-core.md.
  */
 export const NEXT_RULE = "next";
+export const OLD_RULE = "old";
 /**
  * The RULES_MARK a row played under these rules carries. The recheck plays a
  * row under them when its mark is this or later (rankingRecheck.js), so the
@@ -26,19 +30,29 @@ export function wantsNextRules(scope = globalThis) {
   return rulesNextOn(scope);
 }
 
-const withSets = new WeakMap();
-const withoutSets = new WeakMap();
-/** `rules` with the next rules on (`on`) or off; the same set back when it already says so. */
-export function withNextRules(rules, on = wantsNextRules()) {
-  if (!rules || typeof rules.has !== "function") return rules;
-  if (Boolean(rules.has(NEXT_RULE)) === Boolean(on)) return rules;
-  if (!(rules instanceof Set)) return on ? { has: (id) => id === NEXT_RULE || rules.has(id) } : { has: (id) => id !== NEXT_RULE && rules.has(id) };
-  const cache = on ? withSets : withoutSets;
-  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set(on ? [...rules, NEXT_RULE] : [...rules].filter((id) => id !== NEXT_RULE))));
-  return cache.get(rules);
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+export const nextByDefault = () => (nextByDefault.value ??= wantsNextRules());
+
+/** Whether `rules` plays the next rules. */
+export function isNextOn(rules) {
+  if (rules?.has?.(OLD_RULE)) return false;
+  if (rules?.has?.(NEXT_RULE)) return true;
+  return nextByDefault();
 }
 
-export const isNextOn = (rules) => Boolean(rules?.has?.(NEXT_RULE));
+const withSets = new WeakMap();
+const withoutSets = new WeakMap();
+/** `rules` playing the next rules (`on`) or the old ones; the same set back when it already does. */
+export function withNextRules(rules, on = nextByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isNextOn(rules) === Boolean(on)) return rules;
+  const mark = on ? NEXT_RULE : OLD_RULE;
+  const drop = on ? OLD_RULE : NEXT_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? withSets : withoutSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
 
 /* ------------------------------------------------- G1 눈에 띔 (exposure) */
 
@@ -57,6 +71,8 @@ export const EXPOSURE_HEAT = 50;
 
 /** 눈에 띔 after `held` windows in a row on one direction. */
 export const getExposure = (held) => Math.max(0, Math.trunc(Number(held) || 0) - EXPOSURE_FROM);
+/** The points past which the chance stops growing (the table shows the points out of it). */
+export const EXPOSURE_STEPS = Math.round(EXPOSURE_MAX / EXPOSURE_STEP);
 export const getCatchChance = (exposure) => Math.min(EXPOSURE_MAX, Math.max(0, Number(exposure) || 0) * EXPOSURE_STEP);
 
 /* ------------------------------------------------ G2 둘째 조회 값 사다리 */

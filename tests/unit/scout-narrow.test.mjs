@@ -121,7 +121,9 @@ test("the second look is named and said in three languages", async () => {
   assert.equal(describeScout({ wallMin: 72, wallMax: 82, narrowed: true }), `더 좁혔다(믿음 −${SCOUT_NARROW_TRUST}). 벽은 72에서 82 사이 어딘가`);
   assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), `조회했다. 믿음 ${SCOUT_TRUST}을 썼다. 벽은 70에서 90 사이 어딘가`);
   const notices = readFileSync(new URL("../../src/gauntlet/TableNotices.jsx", import.meta.url), "utf8");
-  assert.match(notices, /fill\(say\.narrowLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: SCOUT_NARROW_TRUST, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH \* 2 \}\)/);
+  assert.match(notices, /fill\(say\.narrowLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH \* 2 \}\)/);
+  // G2 (the next rules): the price on the name is this case's next second look's (`narrowTrust`, SCOUT_NARROW_TRUST by default).
+  assert.match(notices, /narrowTrust = SCOUT_NARROW_TRUST/);
 });
 
 test("the narrowing bot looks first, then narrows when its next push reaches the first band, and only with the 믿음", async () => {

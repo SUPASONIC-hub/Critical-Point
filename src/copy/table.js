@@ -24,8 +24,8 @@ const tableCopy = {
     // G1·G2·G3·G6·G7 (the next rules, nextTableRules.js): 눈에 띔, LOCK 닫힘, 결재 판, 숨 고르기.
     markSign: "결재 판",
     exposure: "눈에 띔 {points}",
-    exposureChance: "열기 {heat} 밑 확정 시 적발 {chance}%",
-    exposureSpoken: "눈에 띔 {points}: 열기 {heat} 밑에서 확정하면 {chance}% 확률로 적발되어 이번 판돈을 잃고 연속이 반으로 준다. 방향을 바꾸면 풀린다.",
+    exposureChance: "열기 {heat} 밑 확정은 적발 위험 {risk}/{most}",
+    exposureSpoken: "눈에 띔 {points}/{most}: 열기 {heat} 밑에서 확정하면 적발될 수 있고, 적발되면 이번 판돈을 잃고 연속이 반으로 준다. 쌓일수록 잘 걸린다. 방향을 바꾸면 풀린다.",
     exposureCleared: "이 카드로 방향을 바꾸면 눈에 띔이 풀리고, 연속은 반으로 준다.",
     exposureShield: "EXPOSE 충전으로 이번 확정은 적발되지 않는다.",
     caught: "눈에 띄어 적발: 이번 판돈 없음, 연속이 반으로.",

@@ -70,7 +70,7 @@ import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStr
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
-import { countNarrows, narrowTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { countNarrows, isNextOn, narrowTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
@@ -573,7 +573,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
-        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust, rules.has("next") ? narrowTrustAt(countNarrows(log)) : SCOUT_NARROW_TRUST);
+        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust, isNextOn(rules) ? narrowTrustAt(countNarrows(log)) : SCOUT_NARROW_TRUST);
         windows += 1;
         const responseTimeSec = Math.max(1, Math.round(window.elapsed));
         const reframe = choice.type === "reframe";
@@ -719,7 +719,6 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
 // The case players (report-gauntlet-loop.mjs).
 // ---------------------------------------------------------------------------
 
-const NEXT_RULE_ID = "next";
 const narrowTrustAtPrice = (count) => narrowTrustAt(count);
 
 export function handUnit(seed) {
@@ -911,7 +910,7 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
         // The second look (B1, 11-18): `decide.narrow(win)` says when, once the first is taken.
         if (typeof decide.narrow === "function" && win.scouted && !win.narrowed && win.status === "live" && decide.narrow(win, { narrows, windowIndex, last: windowIndex === WINDOWS_PER_CASE - 1 })) {
           // G2: a hand with a budget narrows only while the case's next price fits in it.
-          const price = rules.has(NEXT_RULE_ID) ? lookPrice() : SCOUT_NARROW_TRUST;
+          const price = isNextOn(rules) ? lookPrice() : SCOUT_NARROW_TRUST;
           if (!Number.isFinite(decide.trustBudget) || trustSpent + price <= decide.trustBudget) win = reduce(win, { type: "SCOUT" }, rules);
         }
         if (win.status !== "live") break;

@@ -646,8 +646,6 @@ export function GauntletStage({
               {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice} />
-            {/* G6: the 결재 판's shown cell: the nearest the wall can be. */}
-            {band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(say.signCell, { cell: band.shown })}</span>}
             {/* G7: 숨 고르기, on the board right after a BUST, before the first push. */}
             {canBreath && <button type="button" className="gx-scout" data-testid="commit-breathe" onClick={breathe}
               aria-label={fill(say.breathLabel, { seconds: BREATH_SECONDS, gauge: BREATH_GAUGE, wall: BREATH_WALL })}>{say.breath} −{BREATH_SECONDS}s</button>}

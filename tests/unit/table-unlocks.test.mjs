@@ -188,7 +188,8 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
 // B2's CASCADE has been a rule of the ladder since RULES_MARK 3 (프롤로그 04).
 test("every next-table mutation but REBOOT belongs to a rule", () => {
   // MARKET SHOCK is a week's device (weeklyRules.js), dealt by the week's stamp and no rule of the table.
-  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot" && id !== "shock").sort());
+  // 결재 판 (G6) is the case's last board, dealt by the next rules and no rule of the ladder.
+  assert.deepEqual(Object.keys(MUTATION_RULES).sort(), Object.keys(MUTATIONS).filter((id) => id !== "reboot" && id !== "shock" && id !== "sign").sort());
   for (const [mutation, rule] of Object.entries(MUTATION_RULES)) assert.ok(ALL_RULES.has(rule), `${mutation} -> ${rule}`);
 });
 

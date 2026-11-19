@@ -21,7 +21,6 @@
 import { LOCK_CAP, PEAK_CASES, PEAK_CHIPS, PEAK_MARK, PEAK_WALL, STANCE_CHARGE } from "./gauntletEngine.js";
 import { fill } from "../locale.js";
 import unlocksCopy from "../copy/unlocks.js";
-import { withNextRules } from "./nextTableRules.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -291,8 +290,7 @@ function findStep(caseId, { veteran = false, staged = STAGED } = {}) {
 export function rulesFor(caseId, options) {
   const step = findStep(caseId, options);
   const rules = options?.story === true ? step?.storyRules ?? STORY_RULES : step?.rules ?? ALL_RULES;
-  // G1~G7: the next rules ride in the case's set when this page plays them (nextTableRules.js).
-  return withNextRules(PEAK_CASES.includes(caseId) ? withPeak(rules) : rules);
+  return PEAK_CASES.includes(caseId) ? withPeak(rules) : rules;
 }
 
 /**

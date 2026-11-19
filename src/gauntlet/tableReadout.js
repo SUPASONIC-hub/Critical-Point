@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { formatMoney, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
-import { EXPOSURE_HEAT, getCatchChance, getExposure, isNextOn } from "./nextTableRules.js";
+import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
@@ -181,14 +181,15 @@ export function readLogic({ logic, card, offered, relics = [], next = false, wat
 
 /**
  * G1 눈에 띔 as the table says it: the points after the staked card (`after`)
- * and before it (`before`), the chance a cash under EXPOSURE_HEAT is caught,
- * and the sentence. Null when there is nothing to say: no points either side.
+ * and before it (`before`), out of EXPOSURE_STEPS (past which the chance a
+ * cash under EXPOSURE_HEAT is caught stops growing), and the sentence. Null when there is nothing to say: no points either side.
  */
 export function readExposure(before, after) {
   if (!before && !after) return null;
-  const chance = Math.round(getCatchChance(after) * 100);
-  const spoken = after > 0 ? fill(say.exposureSpoken, { points: after, heat: EXPOSURE_HEAT, chance }) : say.exposureCleared;
-  return { before, points: after, chance, heat: EXPOSURE_HEAT, cleared: before > 0 && after === 0, spoken };
+  // The step, never a percentage: the table prints no odds. `most` is where the chance stops growing.
+  const most = EXPOSURE_STEPS;
+  const spoken = after > 0 ? fill(say.exposureSpoken, { points: Math.min(after, most), most, heat: EXPOSURE_HEAT }) : say.exposureCleared;
+  return { before, points: Math.min(after, most), most, heat: EXPOSURE_HEAT, cleared: before > 0 && after === 0, spoken };
 }
 
 /** What a card's tag adds for a screen reader: what picking it would do to the streak. */

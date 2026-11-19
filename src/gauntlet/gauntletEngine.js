@@ -46,7 +46,7 @@ import {
 import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
-import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE, wantsNextRules } from "./nextTableRules.js";
+import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -62,9 +62,8 @@ export { decisionWindowSeconds, stakeTier } from "./stakeClock.js";
  * The list itself is not imported: this module is in the chunk the start
  * screen loads to repair a save, and the list brings the prologues' copy.
  */
-// The next rules (G1~G7, nextTableRules.js) are in it when this page plays them.
-const NEXT_BY_DEFAULT = wantsNextRules();
-const ALL_RULES = Object.freeze({ has: (id) => id !== NEXT_RULE || NEXT_BY_DEFAULT });
+// The next rules (G1~G7, nextTableRules.js): this stand-in names neither mark, so it plays what the page plays.
+const ALL_RULES = Object.freeze({ has: (id) => id !== NEXT_RULE && id !== OLD_RULE });
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
