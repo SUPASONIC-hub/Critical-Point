@@ -1,4 +1,5 @@
--- G4 (2026-11-19, 「전부 1」, 11-20 묶음): the reroll at the draft costs 1,500
+-- 11-20 묶음 (PR #629).
+-- G4 (2026-11-19, 「전부 1」): the reroll at the draft costs 1,500
 -- under the next rules (src/gauntlet/relicsNext.js `NEXT_REROLL_COST`), so a
 -- draft's cost can also be 1,500 (a reroll) or 13,500 (a reroll and one more).
 -- The four costs of before stay allowed: a row played before the switch still
