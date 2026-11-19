@@ -8,6 +8,8 @@ import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { decisionWindowSeconds } from "./stakeClock.js";
+import { getBoardMark, LOCK_CAP } from "./gauntletEngine.js";
+import { BREATH_GAUGE, BREATH_WALL, SIGN_CHIPS, SIGN_MARK } from "./nextTableRules.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
@@ -194,6 +196,26 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
 }
 
 /**
+ * G1~G7 (the next rules): what the voice says of them. 눈에 띔 as the staked
+ * card leaves it, LOCK's reason when a shut LOCK is pressed (`lockRefused`
+ * counts the presses), and what 숨 고르기 did once pressed.
+ */
+export function readNextLines({ win, logic = null, lockRefused = 0 }) {
+  const stage = tableCopy.stage;
+  return {
+    exposure: logic?.exposure?.spoken ?? "",
+    lockRefused,
+    lockReason: fill(stage.lockShutReason, { cap: LOCK_CAP }),
+    breathLine: win?.breathed ? fill(stage.breathDone, { gauge: BREATH_GAUGE, to: Math.round(win.gauge), wall: BREATH_WALL }) : "",
+  };
+}
+
+/** G6: the 결재 판's line, said once as its table opens: the stake and the cell it shows. */
+export function readSignOpening(win, band) {
+  return getBoardMark(win?.schema) === SIGN_MARK && band?.shown !== undefined ? fill(tableCopy.stage.signOpen, { chips: SIGN_CHIPS, cell: band.shown }) : "";
+}
+
+/**
  * The calls one change of facts makes, in the order they are to be said. A
  * closed window makes none: the slam has it.
  */
@@ -267,8 +289,9 @@ const SILENT = Object.freeze({ text: "", n: 0 });
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, audit = null, links, caseId = null, opening = "", ...table }) {
-  const facts = readTableFacts({ ...table, runPot: run.runPot });
+export function useTableVoice({ speaking, run, audit = null, links, caseId = null, logic = null, lockRefused = 0, ...table }) {
+  const facts = readTableFacts({ ...table, runPot: run.runPot, ...readNextLines({ win: table.win, logic, lockRefused }) });
+  const opening = readSignOpening(table.win, table.band);
   // Each line is a fresh node in the region (`n` keys it, TableNotices): a line
   // the same as the last -- 상황 듣기 asked twice on a table whose clock has not
   // started -- is still a change the reader announces.
