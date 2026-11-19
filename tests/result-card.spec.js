@@ -508,6 +508,23 @@ test("사건 03's report says 1막 · 3/7 and how far the 중간 결산 is, with
   await closeDebugCaseToReport(page, "case03", "c3_aftershock");
   await expect(page.getByTestId("act-progress")).toHaveText("1막 · 3/7 · 중간 결산까지 4사건");
   await expect(page.getByTestId("act-tally")).toHaveCount(0);
+  // N42 (2026-11-18): the foot of the report says the season is saved and what
+  // comes next; the install button only once the browser offers an install.
+  const leave = page.getByTestId("leave-line");
+  await expect(leave).toHaveText("쉬어도 저장됩니다 · 다음: 사건 04 - 치러야 할 대가 (약 10분)");
+  expect(await page.locator(".result-page > [data-testid='leave-line']:last-child").count()).toBe(1);
+  await expect(page.getByTestId("leave-line-install")).toHaveCount(0);
+  await page.evaluate(() => {
+    const event = new Event("beforeinstallprompt");
+    event.prompt = () => {
+      window.__installPrompted = true;
+      return Promise.resolve();
+    };
+    window.dispatchEvent(event);
+  });
+  await clickElement(page.getByTestId("leave-line-install"), "add to the home screen from the report");
+  expect(await page.evaluate(() => window.__installPrompted)).toBe(true);
+  await expect(page.getByTestId("leave-line-install")).toHaveCount(0);
 });
 
 test("사건 07's report closes 1막 with the small 중간 결산", async ({ page }) => {
@@ -521,6 +538,7 @@ test("사건 07's report closes 1막 with the small 중간 결산", async ({ pag
   await expect(tally.getByTestId("act-tally-ending")).not.toBeEmpty();
   await expect(tally.locator(".gx-tally-note")).toHaveCount(0);
   await expect(tally.getByRole("button")).toHaveCount(0);
-  const results = await new AxeBuilder({ page }).include("[data-testid='act-tally']").analyze();
+  await expect(page.getByTestId("leave-line")).toHaveText("쉬어도 저장됩니다 · 다음: 사건 08 - 돈의 흔적 (약 10분)");
+  const results = await new AxeBuilder({ page }).include("[data-testid='act-tally']").include("[data-testid='leave-line']").analyze();
   expect(results.violations).toEqual([]);
 });

@@ -58,6 +58,7 @@
     "check:grants": "node scripts/check-grants.mjs",
     "check:canon": "node scripts/check-canon.mjs",
     "check:case": "node scripts/check-case.mjs",
+    "report:season-ready": "node scripts/report-season-ready.mjs",
     "new:case": "node scripts/new-case.mjs",
     "check:mood": "node scripts/check-mood.mjs",
     "check:locale": "node scripts/check-locale.mjs",

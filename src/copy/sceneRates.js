@@ -12,6 +12,7 @@ const sceneRatesCopy = {
   choice: "같은 카드를 고른 분석관 {percent}%",
   rare: " · 드문 선택",
   trace: "이 장면에서 다른 분석관의 {percent}%가 벽에 닿았습니다. (판단 {windows}번 기준)",
+  collecting: "이 장면에서 벽에 닿은 다른 분석관의 기록은 모으는 중입니다. (판단 {windows}번)",
 };
 export default sceneRatesCopy;
 

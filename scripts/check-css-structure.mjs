@@ -365,7 +365,10 @@ const fileBudgets = {
   // 3160 / 61634 (E3) and 3153 / 61576 (main 4f927085, C-15) -> 3170 / 61863 on 2026-11-12, bundle 1112c (#520 #521) over main 4f927085, measured: both.
   // 3170 / 61863 -> 3195 / 62160 on 2026-11-16, ui-quickwins, measured: the card key unseen until a mouse hovers or a key focuses the hand, the run line and signals as small print.
   // 3195 -> 3203 lines on 2026-11-18, bundle 11-18, measured: 2안 on a short phone -- v1's scene air, a 3px double rule, a 16px slip margin, the ledger column 6px apart in 14px words, 6px inside a slip.
-  "play.css": { lines: 3208, bytes: 62160 },
+  // 3203 -> 3214 lines on 2026-11-18, n37-paper-coverage, measured: the BUST slam's third line on paper (N37), red on red stripes before.
+  // 3208 -> 3212 lines on 2026-11-18, n36-phone-fit (E1d): the ledger column's air on every phone up to 860 tall, English card words a step smaller on a short one.
+  // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
+  "play.css": { lines: 3219, bytes: 62160 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -509,7 +512,10 @@ const fileBudgets = {
   // 2512 -> 2523 lines on 2026-11-12, A2-1(1) 언어의 엔트로피: the collapse
   // ending's headline letters and their one keyframe, measured 2523 / 56485.
   // The bytes still fit.
-  "result.css": { lines: 2523, bytes: 57089 },
+  // 2523 -> 2545 lines on 2026-11-18, N42 떠나는 순간 한 줄 (draft): the quiet
+  // line at the foot of 프롤로그 05, 사건 03 and 사건 07 and its install
+  // button, four rules, measured 2545 / 56815. The bytes still fit.
+  "result.css": { lines: 2545, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.

@@ -3109,6 +3109,15 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
     JSON.stringify(counted) === JSON.stringify(expected),
     `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
+  // N44 (*_scene_bust_collecting): a scene under twenty windows and runs is
+  // answered with its count and no percent, which the page prints as 「모으는 중」.
+  if (readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_collecting.sql"))) {
+    const rates = (await allowed("read the scene wall rates under the floor", "anon", `select public.scene_bust_rates() as rates`))?.rows[0]?.rates ?? {};
+    check(
+      JSON.stringify(rates?.prologue01?.[NG_SCENE]) === JSON.stringify([1, null]),
+      `a scene of one window answers ${JSON.stringify(rates?.prologue01?.[NG_SCENE])}; expected [1, null] (the count, and no percent under twenty windows and runs).`,
+    );
+  }
   await db.query(`delete from public.playtest_sessions where session_code = 'SCENESEED'`);
   await db.query(`select public.refresh_scene_bust_stats()`);
 }
