@@ -45,11 +45,13 @@
 -- [SLOT N21] First BUST keeps the scene in prologue 01/02: a separate draft
 -- PR. Client only, no server change expected; same rule as N18.
 --
--- [SLOT DECISION-T] Outcomes of the 11-23 run (`node
--- scripts/report-decision-t.mjs --fetch`, #563) that bundle R adopts at the
--- case level (T-11 honour threshold 10 → 5 when no board passed 10, and the
--- rest of T1~T12). Fill in on 11-23..11-29; a statement that changes what
--- the server accepts goes here, above the delete, and is idempotent.
+-- [SLOT DECISION-T] Filled 2026-11-19 (the owner's answer Q4 (1)): no
+-- change. The run of `node scripts/report-decision-t.mjs --fetch` (#563) on
+-- 11-19 (run 44453002577) had 0 of 30 finished seasons, 87 of 150 case rows,
+-- 55 of 100 bust hands and 0 of 80 W47 audit-cascade rows, so none of T1~T12
+-- (T-11's honour threshold included) could be judged, and 11-23 would not
+-- have more. Nothing here changes what the server accepts; T is looked at
+-- again once players are many.
 --
 -- Every statement is idempotent: `create or replace` with every attribute
 -- and the grants restated, a notice, and a delete that finds nothing the

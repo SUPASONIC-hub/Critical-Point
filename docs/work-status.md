@@ -2346,11 +2346,10 @@ Manual steps after pushing the 2026-09-28 migrations:
 병합하지 않는다. 비움은 우선순위 70의 규칙대로 `season-final` 행만 지우고
 `final` 사건 행은 남긴다.
 
-1. **11-23(월) 결정 T**: `node scripts/report-decision-t.mjs --fetch`(#563)를 손으로
-   한 번 돌리고, 결과를 `..\cp-archive\메모-20261123\`에 남긴 뒤 질문 12개를 묻는다.
-2. **11-24~11-29 숫자 채움**: 답을 마이그레이션의 `[SLOT DECISION-T]`에 넣는다(서버가
-   받는 것을 바꾸는 문장만, 지우기 위에, 다시 돌려도 같은 결과). 사건 단위 판단도
-   여기서 정한다. RULES_MARK는 11-17에 5로 올렸다(`[SLOT RULES_MARK]` 채움):
+1. ~~11-23(월) 결정 T~~ → **11-19에 닫음**(사용자 Q4 (1)): `report-decision-t.mjs --fetch`
+   (run 44453002577)에서 끝난 시즌 0/30·사건 행 87/150·BUST 판 55/100·W47 0/80, 판단할
+   줄 0. 이용자가 적어 11-23에도 같으므로 「바꿈 없음」.
+2. ~~11-24~11-29 숫자 채움~~ → `[SLOT DECISION-T]`에 「바꿈 없음」을 적었다(서버 문장 없음). RULES_MARK는 11-17에 5로 올렸다(`[SLOT RULES_MARK]` 채움):
    N26(#591)이 주간 규칙 없는 시즌의 사건 09·11·14·16에 「이번 사건만」 규칙을
    깔아 채점이 바뀌기 때문이다. 마이그레이션은 `>= 5`를 요구하고, check:grants의
    `SERVER_MARK`는 그 파일의 `>= N`을 읽는다. verify-ranking-rows.mjs의 `DB_MARKS`는
