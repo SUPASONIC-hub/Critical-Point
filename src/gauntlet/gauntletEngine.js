@@ -1935,7 +1935,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // was caught (below EXPOSURE_HEAT, drawn from the seed). A charged EXPOSE cash
   // is never caught (G3), and a story run or a replay is not watched.
   const exposure = next && logicOn && current.story !== true && !current.practice ? getExposure(streak.logic.held) : 0;
-  const shielded = next && earnedStance(focusMode, focusCharge, focusHits, outcome) && focusMode === "expose";
+  // G4: AUDIT CONTACT (반재욱) looks away from 눈에 띔 too, so its low cash is never caught.
+  const shielded = next && ((earnedStance(focusMode, focusCharge, focusHits, outcome) && focusMode === "expose") || hasRelic(relics, "auditContact"));
   const catchChance = getCatchChance(exposure);
   const caught = outcome === "cash" && exposure > 0 && !shielded && gauge < EXPOSURE_HEAT && seededUnit(`exposure:${window?.seed ?? current.windowIndex}`) < catchChance;
   if (caught) streak.logic = { ...streak.logic, streak: Math.floor(streak.logic.streak / 2) };

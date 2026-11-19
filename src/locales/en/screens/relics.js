@@ -71,7 +71,7 @@ export default {
       text: "Ban Jaewook of Internal Audit looks away from one box. The audit catches you only when {limit} boxes fill.",
       proc: "Ban Jaewook looked away from one box",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "Even outside an audit week, push at least once and cash under Heat {low}: stake +{pct}%.",
+      next: "Push at least once and cash under Heat {low}: stake +{pct}%, and Noticed never gets you caught.",
     },
     carbonCopy: {
       name: "Lim Kyungsoo’s Copy",

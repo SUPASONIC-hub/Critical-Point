@@ -71,7 +71,7 @@ export default {
       text: "監査チームのパン・ジェウクが1マスは見逃してくれる。監査は{limit}マス埋まってはじめて摘発される。",
       proc: "パン・ジェウクが1マスを見逃した",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "監査週でなくても、一度以上押して熱{low}未満で確定すると賭け金 +{pct}%。",
+      next: "一度以上押して熱{low}未満で確定すると賭け金 +{pct}%、目立ちがあっても見逃される。",
     },
     carbonCopy: {
       name: "イム・ギョンスの写し",

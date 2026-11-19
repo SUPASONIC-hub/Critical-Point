@@ -88,7 +88,7 @@ const relicsCopy = {
       text: "감사팀 반재욱이 한 칸은 눈감아 준다. 감사는 {limit}칸이 차야 적발된다.",
       proc: "반재욱이 한 칸을 눈감았다",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "감사 주가 아니어도, 한 번 이상 밀고 열기 {low} 밑에서 확정하면 판돈 +{pct}%.",
+      next: "한 번 이상 밀고 열기 {low} 밑에서 확정하면 판돈 +{pct}%, 눈에 띔에도 잡히지 않는다.",
     },
     carbonCopy: {
       name: "임경수의 사본",

@@ -30,7 +30,7 @@ export const FAST_CASH_SHARE = 0.5;
  * `clockLeft` (share of the clock left), `focusMode`, `focusCharged`.
  */
 export const RELIC_BOOSTS = Object.freeze({
-  auditContact: Object.freeze({ boost: 1.6, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
+  auditContact: Object.freeze({ boost: 1.8, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
   heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
