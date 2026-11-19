@@ -47,6 +47,8 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { caseRuleFor } from "./caseRules.js";
+import { nextTableOn } from "./nextTable.js";
+import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -912,6 +914,8 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // log entry, and gone once that window settles.
   relicDraft: null,
   insuranceSpent: false,
+  // G4: the season has bought 「하나 더」 once; under the next rules that is its one.
+  extraBought: false,
   // Set while a case that already closed is being played again: the table
   // record as it stood when the replay opened. See `openCaseRun`.
   practice: null,
@@ -1058,6 +1062,7 @@ export function normalizeRunState(value) {
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
   run.relicDraft = normalizeRelicDraft(source.relicDraft);
   run.insuranceSpent = source.insuranceSpent === true;
+  run.extraBought = source.extraBought === true;
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
   run.story = source.story === true;
@@ -1203,7 +1208,8 @@ export function applyRelics(schema, relics = []) {
   const next = { ...board, mutations: [...board.mutations], relics: [...board.relics, ...pending] };
   for (const id of pending) {
     if (id === "stethoscope") next.sedated = false;
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = Math.min(next.startGauge, COLD_BLOOD_START);
+    // G4: under the next rules COLD BLOOD waives AFTERSHOCK outright (relicsNext.js).
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = nextTableOn() ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
@@ -1303,7 +1309,9 @@ export function normalizeRelicDraft(value) {
 export const getRerollSeed = (seed) => `${seed}:reroll:1`;
 
 /** What a draft of this shape costs: the reroll and the one more, each once. */
-export const getRelicDraftCost = (draft) => (draft?.reroll ? RELIC_REROLL_COST : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
+/** The reroll's price on this table: NEXT_REROLL_COST under the next rules (G4), RELIC_REROLL_COST before. */
+export const getRerollCost = () => (nextTableOn() ? NEXT_REROLL_COST : RELIC_REROLL_COST);
+export const getRelicDraftCost = (draft) => (draft?.reroll ? getRerollCost() : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
 
 /**
  * A closed case's offer and the draft record that goes with it: the three
@@ -1472,10 +1480,11 @@ function payFromVault(run, cost, draft) {
 export function rerollRelicOffer(run) {
   const current = normalizeRunState(run);
   const draft = current.relicDraft;
-  if (!canSpendAtDraft(current) || draft.reroll || draft.picked.length || current.vault < RELIC_REROLL_COST) return current;
+  const cost = getRerollCost();
+  if (!canSpendAtDraft(current) || draft.reroll || draft.picked.length || current.vault < cost) return current;
   const offer = drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned);
   if (!offer.length) return current;
-  return normalizeRunState({ ...payFromVault(current, RELIC_REROLL_COST, { ...draft, reroll: { offer } }), relicOffer: offer });
+  return normalizeRunState({ ...payFromVault(current, cost, { ...draft, reroll: { offer } }), relicOffer: offer });
 }
 
 /**
@@ -1488,7 +1497,9 @@ export function buyExtraRelic(run) {
   const current = normalizeRunState(run);
   const draft = current.relicDraft;
   if (!canSpendAtDraft(current) || draft.extra || draft.picked.length || current.relicOffer.length < 2 || current.vault < RELIC_EXTRA_COST) return current;
-  return normalizeRunState(payFromVault(current, RELIC_EXTRA_COST, { ...draft, extra: true }));
+  // G4: under the next rules one more is once a season (`extraBought`).
+  if (current.extraBought && nextTableOn()) return current;
+  return normalizeRunState({ ...payFromVault(current, RELIC_EXTRA_COST, { ...draft, extra: true }), extraBought: true });
 }
 
 /** What a practice run borrowed, handed back. */
@@ -1842,11 +1853,27 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const stanceMastery = current.practice || !rules.has("stance")
     ? current.stanceMastery
     : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
-  const basePot = outcome === "cash" ? Math.round(chips * multiplier) : 0;
-  const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus) : 0;
+  // G4 (relicsNext.js): under the next rules a tool whose condition holds on
+  // this cash multiplies its pot. The whole pot, so the streak's and LOCK's
+  // shares below keep their proportions.
+  const boost = outcome === "cash" && nextTableOn()
+    ? readRelicBoost(relics, {
+      gauge,
+      pushes: Number(window?.pushes) || 0,
+      move: streak.move,
+      streak: logicOn ? streak.logic.streak : 0,
+      afterBust: current.lastOutcome === "bust",
+      mutations: current.schema.mutations,
+      clockLeft: 1 - (Number(window?.elapsed) || 0) / Math.max(1, Number(window?.schema?.seconds) || current.schema.seconds),
+      focusMode,
+      focusCharged: focusCharge >= STANCE_CHARGE,
+    })
+    : { fired: [], factor: 1 };
+  const basePot = outcome === "cash" ? Math.round(chips * multiplier * boost.factor) : 0;
+  const pot = outcome === "cash" ? Math.round(chips * multiplier * handBonus * boost.factor) : 0;
   // The hand's share of the pot, told apart: what the streak earned, and what
   // LOCK added on top of it under the cap.
-  const logicPot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus)) - basePot : 0;
+  const logicPot = outcome === "cash" ? Math.min(pot, Math.round(chips * multiplier * earnedBonus * boost.factor)) - basePot : 0;
   const focusPot = pot - basePot - logicPot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
@@ -1922,6 +1949,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(clockKept ? ["testimony"] : []),
     ...(audited?.spared ? ["auditContact"] : []),
     ...nextMutations.map((mutation) => mutation.softenedBy).filter(Boolean),
+    ...boost.fired,
   ];
   // The draft this close deals (`openRelicDraft`); the one the run held before
   // this window was written onto its log entry (useChoiceCommit) and goes.
@@ -2033,6 +2061,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     relicOffer,
     relicDraft: drafted.relicDraft,
     insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
+    extraBought: current.extraBought,
     schema: nextSchema,
   };
   return { verdict, nextRun: normalizeRunState(practice ? endPractice(settled) : settled) };
@@ -2152,6 +2181,7 @@ export function carryTableRecordIntoRestore(restored, current) {
       relics: [...new Set([...restoredRun.relics, ...currentRun.relics])],
       relicOffer: [],
       insuranceSpent: restoredRun.insuranceSpent || currentRun.insuranceSpent,
+      extraBought: restoredRun.extraBought || currentRun.extraBought,
       schema: bustedSince ? currentRun.schema : restoredRun.schema,
       lastOutcome: bustedSince ? "bust" : restoredRun.lastOutcome,
       openSeed: null,
