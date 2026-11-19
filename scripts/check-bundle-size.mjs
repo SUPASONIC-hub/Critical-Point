@@ -196,7 +196,11 @@ const budgets = [
   // 164,455 / 61,338 -> 164,455 / 61,350 묶음 11-18 over main 4d549334. Measured - / 61346 (over budget only) in the e2e build, the plus 4.
   // 164,426 / 61,325 -> 164,510 / 61,348 번외 이야기 속 공개 (sides-in-story) over main 4d549334: the report's side line (components/SideOpenedPanel.jsx, src/sideOpened.js). Measured 164506 / 61344 in the e2e build, the plus 4.
   // -> 164,570 / 61,390 묶음 11-18b over main 68cbc0f4, measured 164,566 / 61,386 in CI verify-quick, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 164_570, maxGzip: 61_390 },
+  // -> 165,312 / 61,659 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line on the report (components/LeaveLine.jsx). Measured locally, the plus 4.
+  // -> 164,690 / 61,414 n39-n40-n44 over main eb2d9aeb (N39's twelve scene cases, N40's sample date), measured 164,686 / 61,410 in CI verify-quick, the plus 4.
+  // 164,690 / 61,414 -> 165,432 / 61,684 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165428 / 61680 (over budget only) in the e2e build, the plus 4.
+  // -> gzip 61,694 묶음 11-19 머리 f340257e, measured 61,690 in CI verify-quick (CSS 해시 이름이 바뀐 만큼), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_432, maxGzip: 61_694 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -714,7 +718,11 @@ const budgets = [
   // 217,060 / 79,190 -> 217,596 / 79,364 번외 이야기 속 공개 (sides-in-story) over main 4d549334: each side case's `unlockAfter`, `isSideCaseOpen` and the report-to-start-screen hand-over (src/sideCases.js, IntroScreen), the result copy's side line. Measured 217592 / 79360 in the e2e build, the plus 4.
   // -> gzip 79,196 묶음 11-18 over main 4d549334, measured 79,192 in CI verify-quick, the plus 4.
   // -> 217,596 / 79,372 묶음 11-18b over main 68cbc0f4, measured 217,592 / 79,368 in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 217_596, maxGzip: 79_372 },
+  // -> 217,611 / 79,379 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line's Korean copy (copy/result.js). Measured locally, the plus 4.
+  // -> 217,739 / 79,427 n39-n40-n44 over main eb2d9aeb (N40's sample date in gameEvents.js), measured 217,735 / 79,423 in CI verify-quick, the plus 4.
+  // 217,739 / 79,427 -> 217,754 / 79,427 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 217750 / - (over budget only) in the e2e build, the plus 4.
+  // -> 217,754 / 79,433 b5-open-clock-cue over main ec89d22b, measured locally - / 79,429 (the hook's import beside the voice), the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 217_754, maxGzip: 79_433 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1251,7 +1259,11 @@ const budgets = [
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,858 / 42,041 -> 216,972 / 42,082 b5-open-clock-cue, measured locally 216,968 / 42,078: clock-cut.css (the stake clock's cut beside the clock), the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_972, maxGzip: 42_082 },
+  // -> gzip 42,066 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: four rules for the leave line (result.css). Measured locally, the plus 4.
+  // 216,858 / 42,066 -> 216,995 / 42,084 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 216991 / 42080 (over budget only) in the e2e build, the plus 4.
+  // -> 217,011 / 42,084 묶음 11-19 + 손패 카드 최소 44px: CI 216,991 / 42,080 + local delta 16 / 2, the plus 4.
+  // -> 217,507 / 42,164 b5-open-clock-cue over main ec89d22b, measured locally 217,503 / 42,160, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 217_507, maxGzip: 42_164 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1632,7 +1644,8 @@ const budgets = [
   // 989 / 619 -> 998 / 619 on 2026-11-02, locale-gaps (#393) over main 9be94346: the scene's wall line read from src/copy/sceneRates.js. Measured 994 raw (gzip under 619) in the e2e build, the plus 4.
   // 989 -> 990 raw on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 990 / 614.
   // 998 -> 1,055 raw on 2026-11-18, d3-next over main 4d549334: the line prints the window count grouped by thousands. Measured 1,051 raw (gzip under 619) in the CI e2e build, the plus 4.
-  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_055, maxGzip: 619 },
+  // 1,055 / 619 -> 1,172 / 639 on 2026-11-18, n39-n40-n44 over main eb2d9aeb: N44's 「모으는 중 (판단 N번)」 under twenty windows. Measured 1,168 / 635, the plus 4.
+  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_172, maxGzip: 639 },
   // The other players' card share under the decision reveal (E-6, 2026-10-22):
   // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
   // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
@@ -2052,7 +2065,11 @@ const budgets = [
   // 197,425 / 66,217 -> 197,497 / 66,236 번외 이야기 속 공개 over main 4d549334: the report's side line in Japanese. Measured 197493 / 66232 in the e2e build, the plus 4.
   // -> 197,888 / 66,362 묶음 11-18b over main 68cbc0f4, measured 197,884 / 66,358 in CI verify-quick, the plus 4.
   // -> 197,911 / 66,369 b5-open-clock-cue, measured locally 197,907 / 66,365: stage.clockCut in Japanese, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_911, maxGzip: 66_369 },
+  // -> 198,000 / 66,414 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line in Japanese. Measured locally, the plus 4.
+  // -> 198,034 / 66,397 n39-n40-n44 over main eb2d9aeb: N44's collecting line in Japanese. Measured 198,030 / 66,393, the plus 4.
+  // 198,034 / 66,397 -> 198,146 / 66,459 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 198142 / 66455 (over budget only) in the e2e build, the plus 4.
+  // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_169, maxGzip: 66_469 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2153,7 +2170,11 @@ const budgets = [
   // 164,766 / 59,136 -> 164,834 / 59,153 번외 이야기 속 공개 over main 4d549334: the report's side line in English. Measured 164830 / 59149 in the e2e build, the plus 4.
   // -> 165,200 / 59,261 묶음 11-18b over main 68cbc0f4, measured 165,196 / 59,257 in CI verify-quick, the plus 4.
   // -> 165,221 / 59,272 b5-open-clock-cue, measured locally 165,217 / 59,268: stage.clockCut in English, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_221, maxGzip: 59_272 },
+  // -> 165,320 / 59,313 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line in English. Measured locally, the plus 4.
+  // -> 165,308 / 59,285 n39-n40-n44 over main eb2d9aeb: N44's collecting line in English. Measured 165,304 / 59,281, the plus 4.
+  // 165,308 / 59,285 -> 165,428 / 59,336 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165424 / 59332 (over budget only) in the e2e build, the plus 4.
+  // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_449, maxGzip: 59_347 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2627,7 +2648,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
 // -> 380,740 / 443,246 / 451,205 b5-open-clock-cue, measured locally 380,736 / 443,242 / 451,201, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_740, en: 443_246, ja: 451_205 };
+// -> 380,746 / 443,285 / 451,248 N42 떠나는 순간 한 줄 (draft), measured 380,742 / 443,281 / 451,244 locally, the plus 4.
+// -> 380,729 / 443,248 / 451,222 n39-n40-n44, measured 380,725 / 443,244 / 451,218 in CI verify-quick, the plus 4.
+// -> 380,682 / 443,178 / 451,140 N36 (CSS only), measured 380,678 / 443,174 / 451,136 in CI verify-quick, the plus 4.
+// -> 380,809 / 443,376 / 451,361 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured first paint, the plus 4.
+// -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_891, en: 443_467, ja: 451_451 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

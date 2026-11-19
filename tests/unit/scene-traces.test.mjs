@@ -9,7 +9,7 @@ import { getSceneTraceLine, readSceneBustRate, SCENE_TRACE_COPY, SCENE_TRACE_FLO
  * prints, the floor under which it prints nothing, and the answers it does
  * not trust. The shape is `scene_bust_rates()`'s: case, scene, [windows, percent].
  */
-const ANSWER = { case01: { start: [64, 31], payday: [49, 80], board: [50, 0] }, case02: { c2_logs: [120, 100] } };
+const ANSWER = { case01: { start: [64, 31], payday: [19, 80], board: [20, 0], thin: [7, null], fewRuns: [30, null] }, case02: { c2_logs: [120, 100] } };
 
 test("a scene with enough windows prints the rate in the fixed words", () => {
   assert.equal(getSceneTraceLine(ANSWER, "case01", "start"), "이 장면에서 다른 분석관의 31%가 벽에 닿았습니다. (판단 64번 기준)");
@@ -18,16 +18,25 @@ test("a scene with enough windows prints the rate in the fixed words", () => {
 });
 
 test("the line says how many windows the rate stands on, grouped by thousands", () => {
-  assert.match(getSceneTraceLine(ANSWER, "case01", "board"), /\(판단 50번 기준\)$/, "the floor itself prints as it is");
+  assert.match(getSceneTraceLine(ANSWER, "case01", "board"), /\(판단 20번 기준\)$/, "the floor itself prints as it is");
   assert.match(getSceneTraceLine({ case01: { start: [12345, 9] } }, "case01", "start"), / 9%.*\(판단 12,345번 기준\)$/);
 });
 
-test("the floor is the ranking band's, and it is checked on the device as well", () => {
-  assert.equal(SCENE_TRACE_FLOOR, 50);
-  const logic = readFileSync("src/logicReport.js", "utf8");
-  assert.match(logic, /LOGIC_RANK_FLOOR = 50;/, "the two floors are the same number");
-  assert.equal(readSceneBustRate(ANSWER, "case01", "payday"), null, "49 windows print nothing");
-  assert.deepEqual(readSceneBustRate(ANSWER, "case01", "board"), { windows: 50, percent: 0 }, "50 windows are enough");
+test("N44: under twenty windows the line says the record is being gathered, with the count and no percent", () => {
+  assert.equal(SCENE_TRACE_FLOOR, 20);
+  assert.equal(getSceneTraceLine(ANSWER, "case01", "thin"), "이 장면에서 벽에 닿은 다른 분석관의 기록은 모으는 중입니다. (판단 7번)");
+  assert.deepEqual(readSceneBustRate(ANSWER, "case01", "payday"), { windows: 19, percent: null }, "a percent sent under the floor is not printed");
+  assert.equal(getSceneTraceLine(ANSWER, "case01", "payday"), SCENE_TRACE_COPY.collecting(19));
+  assert.doesNotMatch(getSceneTraceLine(ANSWER, "case01", "payday"), /%/);
+  assert.deepEqual(readSceneBustRate(ANSWER, "case01", "board"), { windows: 20, percent: 0 }, "20 windows are enough");
+  assert.equal(getSceneTraceLine(ANSWER, "case01", "fewRuns"), SCENE_TRACE_COPY.collecting(30), "the server held the percent back (too few runs)");
+  assert.equal(getSceneTraceLine({ case01: { start: [1, null] } }, "case01", "start"), SCENE_TRACE_COPY.collecting(1));
+  assert.equal(getSceneTraceLine({ case01: { start: [0, null] } }, "case01", "start"), null, "no window, no line");
+});
+
+test("the server's floor is the device's: the migration sends a percent from twenty windows and runs", () => {
+  const sql = readFileSync("supabase/migrations/20261122000000_scene_bust_collecting.sql", "utf8");
+  assert.match(sql, /when t\.windows >= 20 and t\.runs >= 20 then/);
 });
 
 test("no answer, another scene or an answer out of shape prints nothing", () => {
@@ -35,7 +44,7 @@ test("no answer, another scene or an answer out of shape prints nothing", () => 
   assert.equal(getSceneTraceLine(ANSWER, "case03", "start"), null);
   assert.equal(getSceneTraceLine(ANSWER, "case01", "accounting"), null);
   assert.equal(getSceneTraceLine(ANSWER, undefined, "start"), null, "a scene with no case is never looked up");
-  for (const pair of [[64], [64, 31, 1], [64.5, 31], [64, 31.5], [64, -1], [64, 101], ["64", "31"], { 0: 64, 1: 31 }]) {
+  for (const pair of [[64], [64, 31, 1], [64.5, 31], [64, 31.5], [64, -1], [64, 101], ["64", "31"], { 0: 64, 1: 31 }, [null, null], [-3, null], [64, "31"]]) {
     assert.equal(getSceneTraceLine({ case01: { start: pair } }, "case01", "start"), null, JSON.stringify(pair));
   }
   assert.equal(getSceneTraceLine({ case01: { toString: [64, 31] } }, "case01", "constructor"), null, "only the answer's own keys");
@@ -86,7 +95,7 @@ test("no server, no answer, a refusal or a lost network prints nothing", async (
 
 test("no consented rows yet: the server's empty answer prints nothing for any scene", async () => {
   // scene_bust_rates() counts only the case rows sent with the research box
-  // ticked and answers {} until a scene has fifty windows from fifty runs.
+  // ticked and answers {} until a scene has its first window.
   const data = await fetchSceneBustRates(() => ({ data: {} }));
   for (const [caseId, nodeId] of [["case01", "start"], ["case02", "c2_logs"], ["final", "start"]]) {
     assert.equal(getSceneTraceLine(data, caseId, nodeId), null);

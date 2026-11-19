@@ -26,6 +26,10 @@ export default {
   titleRise: "Your record title is now {title}.",
   actProgress: "Act {act} · {pos}/{size} · mid-season tally in {left}",
   actProgressHere: "Act {act} · {pos}/{size} · mid-season tally below",
+  leaveLine: {
+    label: "Taking a break",
+    text: "Your progress is saved if you stop here · Next: {next} (about {minutes} min)",
+  },
   sideOpened: {
     label: "Side cases",
     text: "A side case is now open: {names}. You can start it from the side cases on the start screen, and it’s off the rankings.",

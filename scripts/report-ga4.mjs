@@ -4,16 +4,17 @@
  * next-improvements note). The database sees a case only when it closes, so a
  * player who leaves inside 프롤로그 01 or 02 is never in the funnel's rows;
  * Google Analytics has the start-screen press, the first table and the end of
- * 프롤로그 01 (#540, src/gameEvents.js) and, once N16 is on, each scene of
- * 프롤로그 01 and 02 (`cp_scene`, two whole numbers).
+ * 프롤로그 01 (#540, src/gameEvents.js) and each scene of 프롤로그 01 to
+ * 사건 07 (`cp_scene`, two whole numbers; N16 for 프롤로그 01·02, N39 the rest).
  *
  * This reads them through the GA4 Data API with a service account:
  *
  *   - by ISO week, the last 8: users who pressed start, opened the first
  *     table and closed 프롤로그 01, and each step's share of the one before;
- *   - over the last 28 days: users per scene of 프롤로그 01 and 02
- *     (`customEvent:case_no`, `customEvent:scene_no`), and each scene's share
- *     of the case's first. Until the two custom dimensions are registered in
+ *   - over the last 28 days: users per scene of 프롤로그 01 to 사건 07
+ *     (`customEvent:case_no`, `customEvent:scene_no`), each scene's share
+ *     of the case's first, and one line naming the scene most players left
+ *     after (N39: the smallest share kept by the scene that follows). Until the two custom dimensions are registered in
  *     GA4 (docs/analytics.md) the table says so instead.
  *
  * Totals and shares only, as the rest of the summary: GA4 reports no person,
@@ -33,7 +34,7 @@
 import { createSign } from "node:crypto";
 import { pathToFileURL } from "node:url";
 
-import { GAME_EVENTS } from "../src/gameEvents.js";
+import { GAME_EVENTS, SCENE_EVENT_CASES } from "../src/gameEvents.js";
 
 export const SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
 export const TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -88,7 +89,7 @@ export function weeklyRequest() {
   };
 }
 
-/** The scene report: users and events of each scene of 프롤로그 01 and 02. */
+/** The scene report: users and events of each scene of 프롤로그 01 to 사건 07. */
 export function sceneRequest() {
   return {
     dateRanges: [{ startDate: `${SCENE_DAYS}daysAgo`, endDate: "yesterday" }],
@@ -133,9 +134,34 @@ export function describeWeeks(rows) {
   return lines;
 }
 
-/** The scene table: each case's scenes in order, users and share of the case's first scene. */
+/** `case_no` back to the case's name: 1 to 5 are 프롤로그 01 to 05, 6 to 12 사건 01 to 07 (SCENE_EVENT_CASES). */
+export function caseLabel(caseNo) {
+  const caseId = Object.keys(SCENE_EVENT_CASES).find((id) => SCENE_EVENT_CASES[id] === caseNo);
+  const match = /^(prologue|case)(\d{2})$/.exec(caseId ?? "");
+  if (!match) return `case_no ${caseNo}`;
+  return `${match[1] === "prologue" ? "프롤로그" : "사건"} ${match[2]}`;
+}
+
+/**
+ * N39: the scene most players left after -- of every two scenes in a row
+ * (across a case's end too, as the season is played), the one whose next
+ * scene kept the smallest share of its users. Null when no step lost anyone.
+ */
+export function mostLeftScene(scenes) {
+  let worst = null;
+  for (let index = 1; index < scenes.length; index += 1) {
+    const before = scenes[index - 1];
+    const after = scenes[index];
+    if (before.users <= 0 || after.users >= before.users) continue;
+    const kept = after.users / before.users;
+    if (!worst || kept < worst.kept || (kept === worst.kept && before.users - after.users > worst.before.users - worst.after.users)) worst = { before, after, kept };
+  }
+  return worst;
+}
+
+/** The scene table: each case's scenes in order, users and share of the case's first scene, then the scene most left after. */
 export function describeScenes(rows) {
-  const lines = [`### 프롤로그 01·02 장면별 (GA4 사용자 수, 최근 ${SCENE_DAYS}일)`, ""];
+  const lines = [`### 프롤로그 01 ~ 사건 07 장면별 (GA4 사용자 수, 최근 ${SCENE_DAYS}일)`, ""];
   const scenes = rows
     .map(({ dims: [caseNo, sceneNo], users }) => ({ caseNo: Number(caseNo), sceneNo: Number(sceneNo), users }))
     .filter((row) => Number.isInteger(row.caseNo) && Number.isInteger(row.sceneNo) && row.caseNo > 0 && row.sceneNo > 0)
@@ -145,8 +171,16 @@ export function describeScenes(rows) {
   const first = new Map();
   for (const row of scenes) {
     if (!first.has(row.caseNo)) first.set(row.caseNo, row.users);
-    lines.push(`| 프롤로그 ${String(row.caseNo).padStart(2, "0")} | ${row.sceneNo} | ${row.users} | ${share(row.users, first.get(row.caseNo))} |`);
+    lines.push(`| ${caseLabel(row.caseNo)} | ${row.sceneNo} | ${row.users} | ${share(row.users, first.get(row.caseNo))} |`);
   }
+  const worst = mostLeftScene(scenes);
+  const name = (row) => `${caseLabel(row.caseNo)} 장면 ${row.sceneNo}`;
+  lines.push(
+    "",
+    worst
+      ? `**가장 많이 떠난 장면**: ${name(worst.before)} — 다음 장면(${name(worst.after)})까지 온 사용자가 직전 장면 대비 ${share(worst.after.users, worst.before.users)} (${worst.before.users} → ${worst.after.users}명)`
+      : "**가장 많이 떠난 장면**: 없음(어느 장면 다음에도 사용자가 줄지 않았습니다)",
+  );
   return lines;
 }
 

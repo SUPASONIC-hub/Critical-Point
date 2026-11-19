@@ -26,8 +26,9 @@ claimTabToken();
 installServiceWorker();
 // Before the intro renders: the browser's install offer can arrive first (state/installPrompt.js).
 installInstallPrompt();
-// N12: after `load`, one page in twenty with Google's tag fetches the speed
-// watcher (gameEvents.js startVitalsSample); the rest never download it.
+// N12·N40: after `load`, a sampled page with Google's tag (every page while
+// visits are few, then one in twenty) fetches the speed watcher
+// (gameEvents.js startVitalsSample); the rest never download it.
 if (document.readyState === "complete") startVitalsSample();
 else window.addEventListener("load", () => startVitalsSample(), { once: true });
 
