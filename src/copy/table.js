@@ -56,7 +56,9 @@ const tableCopy = {
     briefChallenge: "이 장면의 챌린지: {challenge}.",
     briefPot: "현재 판돈: {pot}. 벽에 닿으면 금고 밖 판돈은 사라진다.",
     briefRules: "이번 판 규칙: {rules}.",
-    briefNext: "다음 밀기 예고: 열기 {gauge} → {low}–{high}.",
+    briefNext: "다음 밀기 예고: 열기 {gauge} → {low}–{high}{clock}.",
+    // B5 (11-18): what the stake clock takes if the next push crosses a tier, said before the push (stakeClock.js).
+    nextClock: " · 시계 최대 −{cut}초",
     situationLabel: "현재 상황판",
     risk: "현재 위험",
     wallRange: "벽 {min}–{max}",
@@ -68,7 +70,7 @@ const tableCopy = {
     fail: "실패",
     handCount: "카드 {count}장",
     push: "밀어붙인다",
-    pushDetail: "열기 {gauge}, 다음 열기 {low}에서 {high}",
+    pushDetail: "열기 {gauge}, 다음 열기 {low}에서 {high}{clock}",
     lockCapped: "상한 도달",
     lockPrice: "−{seconds}초",
     steadyCold: "열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라",
@@ -118,6 +120,8 @@ const tableCopy = {
     scout: "조회",
     scouted: "조회함",
     scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초",
+    narrow: "좁히기",
+    narrowLabel: "벽 {min}–{max} · 좁히기, {width}칸으로 · 믿음 {trust} · 시간 {seconds}초",
     glossaryCard: "카드 {number}: {label} ({type})",
     glossaryMastery: "시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {goal}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {strike} · STEADY {steady} · EXPOSE {expose}).",
   },
@@ -237,9 +241,13 @@ const tableCopy = {
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
     scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
+    scoutNarrow: "더 좁혔다(믿음 −{trust}). 벽은 {min}에서 {max} 사이 어딘가",
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",
+    // The stake clock (B5): the heat crossed a tier and the clock moved by {cut} seconds.
+    stakeClockCut: "열기 {gauge} · 시계 {cut}초 줄었다 · 남은 {seconds}초",
+    stakeClockBack: "열기 {gauge} · 시계 {cut}초 돌아왔다 · 남은 {seconds}초",
     // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
     status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },

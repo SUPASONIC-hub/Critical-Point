@@ -643,39 +643,92 @@ const TERMS_JA = `
 `;
 
 
+/**
+ * The plain pages' look (2026-11-18, 2안 「감사 장부」, with the game's own
+ * screens on branch ui-polish): an audit ledger. Cream paper ruled in faint
+ * blue with a red margin line, ink type, a red pencil for the small capitals
+ * over a heading, headings under a double rule, the button a rubber stamp in
+ * the game's green, and every picture a photograph taped to the page. The
+ * colours are the game's own (--sk-paper*, --sk-pencil, --sk-stamp in
+ * src/styles/tokens.css); each text colour clears 4.5:1 on both papers
+ * (tests/legal-pages.spec.js runs axe's color-contrast on every page). The
+ * pages keep the system faces, so they fetch no font.
+ */
 const PAGE_STYLE = `
-:root{color-scheme:dark;--bg:#06090a;--surface:#0e1314;--line:#ffffff24;--text:#f2f6f3;--text-2:#becbc5;--accent:#d9ff62}
+:root{color-scheme:light;--bg:#f7f2e6;--surface:#fdfbf5;--surface-2:#eee7d6;--line:#16181a29;--line-strong:#16181a57;--text:#16181a;--text-2:#3e3c38;--accent:#16603e;--pencil:#b0261e;--rule:#46649629;--margin:#d6463c80;--tape:#fff8c8b3;--shadow:#4632141f;--shadow-2:#46321438;--mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
+html{background:var(--bg)}
+body{margin:0;background:linear-gradient(90deg,transparent max(7px,calc(50% - 397px)),var(--margin) 0 calc(max(7px,calc(50% - 397px)) + 1px),transparent 0),repeating-linear-gradient(180deg,transparent 0 27px,var(--rule) 27px 28px),var(--bg);color:var(--text);font:1rem/1.75 -apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}
 header,main,footer{width:min(760px,100%);margin:0 auto;padding:0 16px}
 header{padding-top:24px}
 footer{margin-top:48px;padding-bottom:72px;font-size:.875rem}
-.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--bg)}
+.skip{position:absolute;left:16px;top:-80px;z-index:1;padding:10px 14px;border:2px solid var(--text);border-radius:3px;background:var(--surface)}
 .skip:focus{top:12px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+:focus-visible{outline:2px solid var(--pencil);outline-offset:3px;border-radius:2px}
 main:focus{outline:0}
-nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:.875rem}
+nav{display:flex;flex-wrap:wrap;gap:4px 20px;padding-bottom:12px;border-bottom:4px double var(--text);font-size:.875rem}
 nav a{display:inline-flex;align-items:center;min-height:44px}
-nav a[aria-current]{color:var(--text);text-decoration:none}
+nav a[aria-current]{color:var(--text);font-weight:700;text-decoration:underline 2px var(--pencil)}
 a{color:var(--accent);text-underline-offset:4px}
-h1{margin:32px 0 4px;font-size:clamp(1.625rem,5vw,2.25rem);line-height:1.2;letter-spacing:-.02em}
-h2{margin:36px 0 8px;font-size:1.1875rem;line-height:1.4}
+h1{margin:32px 0 4px;font-size:clamp(1.625rem,5vw,2.25rem);font-weight:900;line-height:1.2;letter-spacing:-.02em}
+h2{margin:36px 0 8px;font-size:1.1875rem;font-weight:800;line-height:1.4}
 h3{margin:22px 0 6px;font-size:1rem;line-height:1.5;color:var(--text)}
 p,li,dd{color:var(--text-2)}
 ul,ol{padding-left:1.4em}
 li{margin:4px 0}
+li::marker{color:var(--pencil)}
 li ul{margin:4px 0}
 dd{margin:0 0 4px}
-.effective{margin:0;color:var(--text-2);font-size:.875rem}
+.effective{margin:0;color:var(--text-2);font-size:.875rem;font-family:var(--mono)}
 strong{color:var(--text)}
 .credit{display:flex;align-items:center;gap:12px;margin-top:16px}
-.credit img{flex:none;width:40px;height:40px;object-fit:cover;border-radius:50%}
+.credit img{flex:none;width:46px;height:46px;object-fit:cover;border:3px solid var(--surface);border-radius:2px;box-shadow:0 2px 6px var(--shadow-2);transform:rotate(-3deg)}
 .credit dl{display:flex;flex-wrap:wrap;gap:4px 20px;min-width:0;margin:0}
-.credit dt{color:var(--text-2);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
+.credit dt{color:var(--pencil);font-family:var(--mono);font-size:.6875rem;font-weight:700;letter-spacing:.16em}
 .credit dd{margin:0;color:var(--text);font-weight:700}
 .credit-mail{flex-basis:100%}
 .credit-mail dd{display:flex;flex-wrap:wrap;gap:0 16px;font-weight:400}
 .credit-mail a{display:inline-flex;align-items:center;min-height:32px}
+.hero{margin:24px 0 8px}
+.photo{position:relative;margin:8px 4px 0;border:6px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 10px 22px var(--shadow-2);transform:rotate(-1deg)}
+.photo::before{content:"";position:absolute;z-index:1;top:-14px;left:calc(50% - 44px);width:88px;height:22px;background:var(--tape);box-shadow:0 1px 2px var(--shadow);transform:rotate(2deg)}
+.hero img{display:block;width:100%;height:auto;max-height:320px;aspect-ratio:16/9;object-fit:cover}
+.hero-text{padding:20px 0 4px}
+.eyebrow{margin:0;color:var(--pencil);font-family:var(--mono);font-size:.75rem;font-weight:800;letter-spacing:.14em}
+.hero h1{width:fit-content;max-width:100%;margin:6px 0 16px;padding-bottom:6px;border-bottom:4px solid var(--pencil)}
+.cta{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border:2px solid var(--text);border-radius:4px;background:var(--accent);box-shadow:0 4px 0 var(--text);color:var(--surface);font-weight:800;text-decoration:none;transition:transform .14s ease,box-shadow .14s ease}
+.cta:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--text)}
+.cta:active{transform:translateY(4px);box-shadow:none}
+main>h2,main>section>h2{padding-top:10px;border-top:4px double var(--text)}
+@media (prefers-reduced-motion:reduce){.cta{transition:none}.cta:hover,.cta:active{transform:none}}
+`;
+
+/**
+ * The ledger over the about page's showcase (scripts/content-pages/about-showcase.mjs),
+ * written after the showcase's own style so it wins at the same weight: the key visual
+ * becomes a photograph taped to the page above the logo (on a phone the 4:3 cut still
+ * shows the analyst on the right), the cards ledger slips with a red margin, the
+ * screens photographs on a band of darker paper between double rules. On a wide
+ * window the showcase lays the words over the picture on a dark fade; here the
+ * picture stays a photograph above them, so that layout and the fade are undone.
+ */
+const SHOWCASE_PAPER_STYLE = `
+.sc-hero{position:relative;overflow:visible;padding:28px 16px 0;background:none}
+.sc-hero::after{content:none}
+.sc-hero::before{content:"";position:absolute;z-index:2;top:14px;left:calc(50% - 50px);width:100px;height:24px;background:var(--tape);box-shadow:0 1px 2px var(--shadow);transform:rotate(-2deg)}
+.sc-key{width:min(728px,100%);margin:0 auto;border:8px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 14px 30px var(--shadow-2);transform:rotate(-1deg)}
+.sc-hero-text{margin:0 auto;padding:28px 16px 32px;background:none}
+.sc-hero h1{color:var(--pencil);font-family:var(--mono);font-weight:800}
+.sc-tagline,.sc-lede{color:var(--text)}
+.sc-cards li{padding-left:24px;border:1px solid var(--line-strong);border-radius:3px;background:linear-gradient(90deg,transparent 11px,var(--margin) 11px 12px,transparent 12px),var(--surface);box-shadow:2px 3px 0 var(--shadow)}
+.sc-band{background:var(--surface-2);border-top:4px double var(--text);border-bottom:4px double var(--text)}
+.sc-band h2{border-top:0}
+.sc-demo img,.sc-shots img{border:6px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 10px 22px var(--shadow-2)}
+.sc-demo img{transform:rotate(1deg)}
+.sc-shots figure:nth-child(odd) img{transform:rotate(-1.5deg)}
+.sc-shots figure:nth-child(even) img{transform:rotate(1.5deg)}
+.sc-quote{border-left:3px solid var(--pencil);border-radius:0;background:var(--surface)}
+@media (min-width:760px){.sc-hero{display:block;min-height:0;padding-top:36px}.sc-hero::before{top:22px}.sc-key{position:static;height:auto;aspect-ratio:16/9;object-position:50% 60%;opacity:1}}
 `;
 
 /** The languages in the order each page's header links them: Korean at the root, the others in a folder of their code. */
@@ -700,11 +753,52 @@ export const COPY = {
 export const GAME_NAME = { ko: "임계점: CRITICAL POINT", en: "Critical Point", ja: "臨界点: CRITICAL POINT" };
 
 /**
+ * What a plain page's <title> (and its og:title and twitter:title) says after
+ * the page's own name. English leads with what the game is and that it is
+ * free, for a search result read in English (owner decision 2026-11-16 「1」);
+ * Korean and Japanese keep the game's name alone.
+ */
+export const TITLE_TAIL = { ko: ` · ${GAME_NAME.ko}`, en: " — Critical Point, free browser mystery game", ja: ` · ${GAME_NAME.ja}` };
+
+/**
  * Japanese puts no spaces between words, so `keep-all` would hold a sentence
  * together until `overflow-wrap: anywhere` cut it mid-line. Only the Japanese
  * pages carry the line; the Korean and English ones are as they were.
  */
 const STYLE_FOR = { ja: "\nbody{word-break:normal}" };
+
+/**
+ * The art each page's hero opens on (2026-11-16, 「wow」 pages): pictures the
+ * game already ships in public/, so the pages add no file. The policy and the
+ * terms keep a hero without a picture. A case page takes the five case scenes
+ * in turn.
+ */
+const HERO_ART = { about: "triggerlab-key-visual", guide: "scene-case02", faq: "scene-case03", contact: "ending-oversight-room", "cases/index": "scene-case01", characters: "scene-case04", making: "scene-case05" };
+export function heroArt(kind) {
+  if (HERO_ART[kind]) return HERO_ART[kind];
+  const n = /^cases\/(?:case|prologue)(\d+)$/.exec(kind)?.[1];
+  if (n) return `scene-case0${((Number(n) - 1) % 5) + 1}`;
+  return kind === "cases/final" ? "ending-final-archive" : null;
+}
+const PLAY = { ko: "지금 무료로 플레이", en: "Play free now", ja: "無料で今すぐ遊ぶ" };
+
+/** The hero over a page's heading: its picture (decorative, at the two widths the game cut), the game's name, the heading and a button into the game. The policy's date stays right under it, with any notice after the date. */
+function heroBlock({ kind, language, name }) {
+  const art = heroArt(kind);
+  const picture = art
+    ? `<div class="photo"><img src="/${art}-960.webp" srcset="/${art}-480.webp 480w, /${art}-960.webp 960w" sizes="(max-width: 760px) 100vw, 728px" width="960" height="540" alt="" decoding="async" /></div>
+`
+    : "";
+  const start = language === "ko" ? "/" : `/${language}/`;
+  return `<div class="hero">
+${picture}<div class="hero-text">
+<p class="eyebrow">${escapeHtml(GAME_NAME[language])}</p>
+<h1>${escapeHtml(name)}</h1>
+<a class="cta" href="${start}">${PLAY[language]}</a>
+</div>
+</div>
+`;
+}
 
 const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 
@@ -722,12 +816,16 @@ export const pagePath = (kind, language) => `${folderOf(language)}/${kind}.html`
 export const gamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /**
- * The picture a shared link shows (the start screen's key visual, 1200x675),
- * and what it shows in each language: the start screen's own `heroAlt`
+ * The picture a shared link shows, one per language (1200x675, 2026-11-16;
+ * an audit-ledger page since 11-18): the game's name, one line and 「free, in
+ * the browser」 in that language beside the start screen's key visual taped on
+ * as a photo (scripts/build-og-images.mjs writes public/og-<lang>.jpg). Its alt is the start screen's own `heroAlt`
  * (src/copy/intro.js and its two translations; tests/unit/site-pages.test.mjs
  * holds them to it).
  */
-export const SHARE_IMAGE = { path: "/triggerlab-key-visual.jpg", width: 1200, height: 675 };
+export const SHARE_IMAGE = { width: 1200, height: 675 };
+/** The share picture's address in `language`: `/og-ko.jpg`, `/og-en.jpg`, `/og-ja.jpg`. */
+export const shareImagePath = (language) => `/og-${language}.jpg`;
 export const SHARE_IMAGE_ALT = {
   ko: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
   en: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
@@ -753,7 +851,7 @@ export function shareMetaLines({ language, url, title, description }) {
     ...PAGE_LANGUAGES.filter((code) => code !== language).map((code) => meta("property", "og:locale:alternate", OG_LOCALE[code])),
     meta("property", "og:title", title),
     meta("property", "og:description", description),
-    meta("property", "og:image", SHARE_IMAGE.path),
+    meta("property", "og:image", shareImagePath(language)),
     meta("property", "og:image:type", "image/jpeg"),
     meta("property", "og:image:width", String(SHARE_IMAGE.width)),
     meta("property", "og:image:height", String(SHARE_IMAGE.height)),
@@ -761,7 +859,7 @@ export function shareMetaLines({ language, url, title, description }) {
     meta("name", "twitter:card", "summary_large_image"),
     meta("name", "twitter:title", title),
     meta("name", "twitter:description", description),
-    meta("name", "twitter:image", SHARE_IMAGE.path),
+    meta("name", "twitter:image", shareImagePath(language)),
     meta("name", "twitter:image:alt", SHARE_IMAGE_ALT[language]),
   ];
 }
@@ -775,7 +873,9 @@ export { escapeHtml };
  * the credit.
  * `effective` is the policy's date line, which only the two policies have;
  * `analytics` (scripts/analytics-config.mjs) puts Google's tag at the end of the head;
- * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs).
+ * `structuredData` is a JSON-LD tag for the head (scripts/structured-data.mjs);
+ * `hero({ name })` writes the page's own hero in place of the common one (the
+ * about page's showcase, scripts/content-pages/about-showcase.mjs).
  *
  * The landmarks (2026-11-09 audit): a skip link to the main text first, the
  * site menu in a <header>, the page in <main id="main">, and the foot's menu,
@@ -783,10 +883,10 @@ export { escapeHtml };
  * the foot sat inside <main>, so the page had no banner or contentinfo, and
  * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "" }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "", hero = null }) {
   const copy = COPY[language];
   const name = heading ?? copy[kind];
-  const title = `${name} · ${GAME_NAME[language]}`;
+  const title = `${name}${TITLE_TAIL[language]}`;
   const alternates = [
     ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
@@ -805,9 +905,9 @@ export function renderDocumentPage({ kind, language, body, description, effectiv
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(summary)}" />
 <link rel="canonical" href="${pagePath(kind, language)}" />
-${alternates}${share}<link rel="icon" href="/icons/icon-192.png" />
+${alternates}${share}<link rel="icon" href="/icons/icon-192-v2.png" />
 ${structuredData ? `${structuredData}
-` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}</style>
+` : ""}<style>${PAGE_STYLE.trim()}${MENU_STYLE.trimEnd()}${STYLE_FOR[language] ?? ""}${style}${hero ? SHOWCASE_PAPER_STYLE.trim().replace(/\n/g, "") : ""}</style>
 ${tags}</head>
 <body>
 <a class="skip" href="#main">${copy.skip}</a>
@@ -815,8 +915,7 @@ ${tags}</head>
 ${siteHeaderNav({ kind, language })}
 </header>
 <main id="main" tabindex="-1">
-<h1>${escapeHtml(name)}</h1>
-${dated}${body.trim()}
+${hero ? hero({ name }) : heroBlock({ kind, language, name })}${dated}${body.trim()}
 </main>
 <footer>
 ${siteFooterNav({ kind, language })}

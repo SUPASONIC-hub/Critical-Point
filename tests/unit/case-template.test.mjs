@@ -108,3 +108,17 @@ test("every npm script and repository path the guide names is still there (the n
   assert.ok(paths.size > 40);
   assert.deepEqual([...paths].filter((file) => !fs.existsSync(file)), [], "the guide points at files that moved or went away");
 });
+
+test("6-1's table names every warning check:case prints", () => {
+  const doc = read("docs/writing-a-case.md");
+  const chapter = doc.slice(doc.indexOf("### 6-1. "), doc.indexOf("## 7. "));
+  assert.ok(chapter.includes("npm run new:case") && chapter.includes("npm run check:case"));
+  const source = read("scripts/check-case.mjs");
+  const kinds = new Set();
+  for (const [, plain, perLang] of source.matchAll(/warn\([^,]+, (?:"([^"]+)"|`\$\{lang\} ([^`]+)`)/g)) {
+    if (plain) kinds.add(plain);
+    else for (const lang of ["en", "ja"]) kinds.add(`${lang} ${perLang}`);
+  }
+  assert.ok(kinds.size >= 10, [...kinds].join(", "));
+  assert.deepEqual([...kinds].filter((kind) => !chapter.includes(`\`[${kind}]\``)), [], "check:case prints a warning 6-1 does not explain");
+});

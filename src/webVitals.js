@@ -1,8 +1,9 @@
 import { GAME_EVENTS, sendGameEvent } from "./gameEvents.js";
 
 /**
- * N12: the start page's LCP and INP on real phones, from the one page load in
- * twenty gameEvents.startVitalsSample picks. The way the web-vitals library
+ * N12: the start page's LCP and INP on real phones, from the page loads
+ * gameEvents.startVitalsSample picks (N40: all of them while visits are few,
+ * then one in twenty). The way the web-vitals library
  * reads them, without the library: PerformanceObserver, `buffered` so what
  * happened before this chunk arrived (it is fetched after `load`) is still
  * read. LCP is the last candidate before the first press or key; INP is the

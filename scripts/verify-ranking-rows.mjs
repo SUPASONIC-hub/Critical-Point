@@ -121,7 +121,7 @@ export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK, RELIC_DRAFT
  * `unchecked` (the server's own check failed), the two an honest season can earn.
  * The switch is off until the checker has marked no honest season for 14 days.
  */
-export const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
+const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
 export const HIDE_MARKS = Object.freeze([...DB_MARKS, ...TRIGGER_HIDE_MARKS]);
 
 /** The marks of `result` (its checker marks and its row's trigger marks) the switch would hide it for. */

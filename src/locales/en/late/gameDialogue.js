@@ -735,6 +735,20 @@ export default {
       "gesture": "Marisa Tan says the other person’s name, then the point, and when she is done she puts a document on the screen.",
       "voice": "In English, short and straight. Given names before titles.",
       "line": "All we can see is the inside of the exchange. Where the money came from, the bank sees."
+    },
+    "비노드 타파": {
+      "appearance": "Oil-stained cotton gloves, a handwritten temperature chart, two bags packed to 23 kilograms.",
+      "thought": "For 9 years this machine knew my hands. Now I want to know if that money reaches my hands.",
+      "gesture": "Before he says a number, Binod Thapa takes off his gloves and lays them neatly on the machine.",
+      "voice": "Short, careful Korean, and he always leaves one question at the end.",
+      "line": "Then does my severance go with the machines too?"
+    },
+    "아이굴 세리코바": {
+      "appearance": "A forehead still marked by a food-factory hairnet, her husband’s truck key, a faded copy of their marriage registration.",
+      "thought": "He said four more months and it would be paid off. What isn’t paid off doesn’t come to him. It comes to us.",
+      "gesture": "Before she answers, Aigul Serikova closes the truck key in her palm once and lets it go.",
+      "voice": "Clear, unhurried Korean, and she asks about any word she doesn’t know right there.",
+      "line": "If he said he would pay it, then I should pay it."
     }
   },
 };

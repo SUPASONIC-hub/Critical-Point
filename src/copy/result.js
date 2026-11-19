@@ -39,8 +39,22 @@ const resultCopy = {
   // C1-1 (2026-11-12): the line under the outcome when this case raised the record
   // title (analystTitle.js getAnalystTitleRise). Every title ends in 관, so 이.
   titleRise: "기록 칭호가 {title}이 되었습니다.",
-  // E-11: the finale's one line, once a side case is written (SIDE_CASES).
-  sideSlotOpened: { label: "번외 사건", text: "번외 사건 칸이 열렸습니다. 시작 화면에서 열 수 있고, 랭킹 밖입니다." },
+  // N23: where the report of 사건 01~17 stands in its act, and how far the next 중간 결산 is (actProgress.js).
+  actProgress: "{act}막 · {pos}/{size} · 중간 결산까지 {left}사건",
+  actProgressHere: "{act}막 · {pos}/{size} · 중간 결산은 아래에",
+  // N42, 11-18: the foot of 프롤로그 05, 사건 03 and 사건 07 (LeaveLine.jsx).
+  leaveLine: {
+    label: "쉬어 가기",
+    text: "쉬어도 저장됩니다 · 다음: {next} (약 {minutes}분)",
+  },
+  // E-11, 11-18: the line on the report of the case a side case follows in the
+  // story (sideCases.sideCasesOpenedBy), and its button into the start screen's slot.
+  sideOpened: {
+    label: "번외 사건",
+    text: "번외 사건이 열렸습니다: {names}. 시작 화면의 번외 사건 칸에서 열 수 있고, 랭킹 밖입니다.",
+    name: "{label} 「{title}」",
+    open: "{name} 열기",
+  },
   why: {
     title: "왜 이렇게 됐나",
     subtitle: "이번 판을 결정한 세 가지",

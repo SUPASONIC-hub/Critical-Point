@@ -14,12 +14,15 @@ const actTallyCopy = {
     case01: "프롤로그 끝",
     case19: "3막 끝 · 사건 18",
     case37: "6막 끝 · 사건 36",
+    // N23: the small one on 사건 07's report.
+    case08: "1막 끝 · 사건 07",
   },
   // The corner of the picture, where the finale's says SEASON 01 · FINAL RECORD.
   corners: {
     case01: "PROLOGUE · MIDSEASON",
     case19: "ACT 3 · MIDSEASON",
     case37: "ACT 6 · MIDSEASON",
+    case08: "ACT 1 · MIDSEASON",
   },
   habit: "지금까지의 판단 유형",
   habitPending: "아직 이름 붙지 않은 판단",
@@ -36,7 +39,7 @@ const actTallyCopy = {
   nearLine: "한 걸음 옆: {ending}까지 {gaps}",
   // The makers' line under the three rows.
   note: "막이 바뀌는 자리에서 우리가 지금까지를 한 장에 묶었습니다. 점수와 결말은 아직 정해지지 않았습니다.",
-  shareLine: "트리거랩 시즌을 {end}까지 왔습니다. 판단 유형은 '{habit}', 가까운 결말은 '{ending}'.",
+  shareLine: "「임계점: CRITICAL POINT」 시즌을 {end}까지 왔습니다. 판단 유형은 '{habit}', 가까운 결말은 '{ending}'.",
   // The two buttons and what a press says (ResultCardShare.jsx, with these words).
   buttons: {
     shareLabel: "중간 결산 카드 공유",

@@ -15,6 +15,7 @@ import {
 import { CHARACTER_GROUPS, CHARACTERS_DESCRIPTION, CHARACTERS_INTRO } from "./characters-text.mjs";
 import { GUIDE_BODY, GUIDE_DESCRIPTION } from "./guide-text.mjs";
 import { MAKING_BODY, MAKING_DESCRIPTION } from "./making-text.mjs";
+import { WEEKLY_DESCRIPTION, weeklyBody } from "./weekly-text.mjs";
 import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../structured-data.mjs";
 
 /**
@@ -27,6 +28,7 @@ import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../struc
  *   /cases/index.html    the case files, and a page per case (./cases.mjs)
  *   /characters.html     the recurring cast as each is introduced (./characters-text.mjs)
  *   /making.html         how we made it, in our own plural voice (./making-text.mjs)
+ *   /weekly.html         the weekly rule calendar, every booked week and its rule (./weekly-text.mjs)
  *
  * Why: AdSense turned the site down on 2026-11-08 for low-value content.
  * These are the site's own words, readable with no script, and none of them
@@ -34,14 +36,15 @@ import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../struc
  * (tests/unit/content-pages.test.mjs).
  */
 
-/** The page kinds this module writes, in the menu's order: the guide, the case files, every case, the cast, the making-of. */
-export const CONTENT_KINDS = ["guide", "cases/index", ...CASE_PAGES.map(caseKind), "characters", "making"];
+/** The page kinds this module writes, in the menu's order: the guide, the case files, every case, the cast, the making-of; then the weekly calendar, linked from the guide rather than the menu. */
+export const CONTENT_KINDS = ["guide", "cases/index", ...CASE_PAGES.map(caseKind), "characters", "making", "weekly"];
 
 const HEADINGS = {
   guide: { ko: "게임 방법", en: "How to Play", ja: "遊び方" },
   "cases/index": { ko: CASE_WORDS.ko.index, en: CASE_WORDS.en.index, ja: CASE_WORDS.ja.index },
   characters: { ko: "등장인물", en: "Characters", ja: "登場人物" },
   making: { ko: "우리가 만든 이야기", en: "How We Made It", ja: "私たちの制作の話" },
+  weekly: { ko: "주간 규칙 달력", en: "Rule of the Week Calendar", ja: "今週のルール カレンダー" },
 };
 
 const paragraphs = (lines) => lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("\n");
@@ -163,6 +166,7 @@ function pageOf(kind, language) {
   if (kind === "guide") return { body: GUIDE_BODY[language], description: GUIDE_DESCRIPTION[language], heading: HEADINGS.guide[language] };
   if (kind === "cases/index") return { body: caseIndexBody(language), description: CASE_INDEX_DESCRIPTION[language], heading: HEADINGS[kind][language] };
   if (kind === "characters") return { body: charactersBody(language), description: CHARACTERS_DESCRIPTION[language], heading: HEADINGS.characters[language] };
+  if (kind === "weekly") return { body: weeklyBody(language, undefined, gamePath(language)), description: WEEKLY_DESCRIPTION[language], heading: HEADINGS.weekly[language] };
   if (kind === "making") return { body: makingBody(language), description: MAKING_DESCRIPTION[language], heading: HEADINGS.making[language] };
   const caseId = kind.slice("cases/".length);
   return { body: caseBody(caseId, language), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language) };

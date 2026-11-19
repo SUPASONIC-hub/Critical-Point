@@ -68,8 +68,12 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL (벽이 가깝다)</strong>: 벽 구간이 열기 4만큼 앞당겨집니다.</li>
 <li><strong>HEAVY FRACTURE (균열이 깊다)</strong>: FRACTURE가 1.75배로 청구합니다.</li>
 <li><strong>SHORT CLOCK (시간이 짧다)</strong>: 판마다 8초 짧고, 모든 카드의 칩이 1.25배입니다.</li>
+<li><strong>CRISIS WEEK (위기 주간)</strong>: 벽 구간이 열기 3만큼 앞당겨지고, 모든 카드의 칩이 1.2배입니다.</li>
+<li><strong>IDLE MONEY (묵힌 돈은 준다)</strong>: 사건이 닫힐 때마다 금고에 남아 있던 돈의 2%가 사라집니다. 도구를 고를 때 쓴 돈은 줄지 않습니다.</li>
+<li><strong>MARKET SHOCK (시장 충격)</strong>: 사건마다 한 번, 4번째 판에 벽 구간이 열기 4만큼 앞당겨지고, 그때까지 쌓은 판돈이 최대 20% 오르거나 내립니다.</li>
 </ul>
 <p>시즌은 시작한 주의 규칙을 끝까지 지니고, 따로 순위가 쌓입니다. 스토리 모드에는 붙지 않습니다.</p>
+<p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
 
 <h2>리포트와 버스트 점수</h2>
 <p>리포트는 사건마다 얼마나 벌었는지가 아니라 어떻게 판단했는지를 0~100점으로 매깁니다.</p>
@@ -178,8 +182,12 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL (The Wall is closer)</strong>: the Wall band stands 4 Heat earlier.</li>
 <li><strong>HEAVY FRACTURE (The cracks run deep)</strong>: FRACTURE charges ×1.75.</li>
 <li><strong>SHORT CLOCK (Time is short)</strong>: every hand has 8 seconds less, and every card’s chips are ×1.25.</li>
+<li><strong>CRISIS WEEK (Crisis week)</strong>: the Wall band stands 3 Heat earlier, and every card’s chips are ×1.2.</li>
+<li><strong>IDLE MONEY (Idle money shrinks)</strong>: each time a case closes, 2% of what sat in the Vault through it is gone. Money spent at the tool draft doesn’t shrink.</li>
+<li><strong>MARKET SHOCK (Market shock)</strong>: once in every case, on hand 4, the Wall band stands 4 Heat earlier and the stake stacked so far moves up or down by as much as 20%.</li>
 </ul>
 <p>A season keeps the rule of the week it started in until it ends, on a ranking of its own. Story Mode never gets one.</p>
+<p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
 
 <h2>The report and the Burst Score</h2>
 <p>The report scores each case from 0 to 100 on how you judged, not on how much you banked:</p>
@@ -288,8 +296,12 @@ export const GUIDE_BODY = {
 <li><strong>NEAR WALL（壁が近い）</strong>: 壁の区間が熱4だけ手前に立ちます。</li>
 <li><strong>HEAVY FRACTURE（ひびが深い）</strong>: FRACTUREが1.75倍で請求します。</li>
 <li><strong>SHORT CLOCK（時間が短い）</strong>: 勝負ごとに8秒短く、すべてのカードのチップが1.25倍です。</li>
+<li><strong>CRISIS WEEK（危機の週）</strong>: 壁の区間が熱3だけ手前に立ち、すべてのカードのチップが1.2倍です。</li>
+<li><strong>IDLE MONEY（寝かせた金は目減りする）</strong>: 事件が閉じるたびに、金庫に残っていた額の2%が消えます。道具選びで使った分は減りません。</li>
+<li><strong>MARKET SHOCK（市場ショック）</strong>: 事件ごとに一度、4回目の勝負で壁の区間が熱4だけ手前に立ち、それまで積んだ賭け金が最大20%上下します。</li>
 </ul>
 <p>シーズンは始めた週のルールを最後まで持ち続け、記録は別のランキングに積まれます。ストーリーモードには付きません。</p>
+<p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>
 
 <h2>レポートとバーストスコア</h2>
 <p>レポートは事件ごとに、いくら稼いだかではなく、どう判断したかを0〜100点で採点します。</p>
@@ -312,7 +324,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: 残りすべて。</li>
 </ul>
 <p>ストーリーモードで開いた事件があるシーズンは公開ランキングに載りません。</p>
-<p>2026年11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。殿堂の表はそのまま残り、最初の画面でも11月16日から同じお知らせが出ます。</p>
+<p>2026年11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。名誉の殿堂の表はそのまま残り、最初の画面でも11月16日から同じお知らせが出ます。</p>
 
 <h2>シーズンの終わり</h2>
 <p>結末は九つあり、シーズン全体を読んで決まります。読むのは、事件が閉じるたびの信頼、公正さ、現金の平均、事件あたりの平均の人的被害、BUSTした勝負の割合、見つけた隠れた記録の割合、卓を組み替えて隠れたルートを開いた割合、圧力がどれだけ高く続いたか、そして最後の事件の決定です。人的被害が事件あたり平均20以上、または勝負の20%以上でBUSTしつつ人的被害も平均10以上なら、シーズンは持ちこたえられなかったと読まれます。BUSTなしで高い倍率を守った、コンボをとても長く続けた、事件あたりの金庫をたっぷり積んだシーズンは、記録を求める結末の敷居が少し下がります。残りはご自身で見つけてください。</p>

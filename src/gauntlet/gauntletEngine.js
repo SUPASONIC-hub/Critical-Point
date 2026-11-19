@@ -28,6 +28,8 @@ import {
   PEAK_CASES,
   PEAK_CHIPS,
   PEAK_WALL,
+  SCOUT_NARROW_REACH,
+  SCOUT_NARROW_TRUST,
   SCOUT_REACH,
   SCOUT_SECONDS,
   SCOUT_TRUST,
@@ -362,14 +364,16 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
  * every cost, which is the entire shape of losing. `scouted` is whether the
  * window spent its look (B1): SCOUT_TRUST of 믿음 comes off after everything
  * else -- unmultiplied, unfractured, and on a bust like any other cost.
+ * `narrowed` is the second look (B1, 11-18): SCOUT_NARROW_TRUST more, billed the same way.
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false } = {}) {
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false, narrowed = false } = {}) {
   const fractured = applyFracture(effect, fracturedAxis, fractureRate);
   const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
   const priced = Object.fromEntries(
     Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? (outcome === "bust" ? 0 : roundAway(value * multiplier)) : value]),
   );
-  return scouted ? { ...priced, trust: (priced.trust ?? 0) - SCOUT_TRUST } : priced;
+  const looks = scouted ? SCOUT_TRUST + (narrowed ? SCOUT_NARROW_TRUST : 0) : 0;
+  return looks ? { ...priced, trust: (priced.trust ?? 0) - looks } : priced;
 }
 
 export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8, time: -4 });
@@ -554,8 +558,10 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     // the intro between leaving a window and cashing it, and the ranking's
     // "played with a slower clock" mark used to read the setting at the cash.
     timeScale: 1,
-    // SCOUT has been spent on this window (`getWindowBand`): once a window.
+    // SCOUT has been spent on this window (`getWindowBand`): once a window,
+    // and `narrowed` the second look that halves the band (B1, 11-18).
     scouted: false,
+    narrowed: false,
   };
   // A window the player put down on purpose -- saved and left, or hid the tab --
   // picks up exactly where it stood. The wall and the tell are dealt from the
@@ -596,6 +602,8 @@ function normalizeSuspendedWindow(value, windowIndex) {
   window.focusMode = normalizeFocusMode(source.focusMode);
   // The look is kept, never the band it drew: that is dealt from the seed again.
   window.scouted = source.scouted === true;
+  // The second look (B1, 11-18), kept only when spent: a save's shape is as it was otherwise.
+  if (window.scouted && source.narrowed === true) window.narrowed = true;
   // The presses so far, so the trail goes on after the resume (windowTrail.js);
   // without them the window leaves no replay record. A trail edited in the
   // save is the server checker's to find, not this one's.
@@ -623,6 +631,7 @@ function resumeWindow(window, resume) {
   restored.selectedId = typeof resume.selectedId === "string" ? resume.selectedId : null;
   restored.focusMode = normalizeFocusMode(resume.focusMode);
   restored.scouted = resume.scouted === true;
+  restored.narrowed = restored.scouted && resume.narrowed === true;
   return restored;
 }
 
@@ -760,6 +769,8 @@ function advanceClock(window, delta) {
  * band `2 * SCOUT_REACH` wide that holds the wall, cut to the board's. Where
  * the wall sits inside it is dealt from the seed, so the look narrows the risk
  * without printing the wall: the middle of the band is not the wall.
+ * A second look (`narrowed`, B1 11-18) draws a band `2 * SCOUT_NARROW_REACH`
+ * wide the same way, inside the first, so the first band never turns out wrong.
  */
 export function getWindowBand(window, reach = SCOUT_REACH) {
   const { wallMin, wallMax } = window.schema;
@@ -767,7 +778,13 @@ export function getWindowBand(window, reach = SCOUT_REACH) {
   // `reach` is the constant everywhere but the balance scripts' sweeps.
   const span = reach * 2;
   const low = window.wall - Math.floor(seededUnit(`scout:${window.seed}`) * (span + 1));
-  return { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
+  const first = { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
+  if (window.narrowed !== true) return first;
+  const narrow = SCOUT_NARROW_REACH * 2;
+  const from = Math.max(first.wallMin, window.wall - narrow);
+  const to = Math.max(from, Math.min(window.wall, first.wallMax - narrow));
+  const near = from + Math.floor(seededUnit(`narrow:${window.seed}`) * (to - from + 1));
+  return { wallMin: near, wallMax: Math.min(near + narrow, first.wallMax), scouted: true, narrowed: true };
 }
 
 export function reduceWindow(window, event = {}, rules = ALL_RULES) {
@@ -806,9 +823,10 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
     }
     case "SCOUT": {
       // One look a window, paid in clock like a LOCK press: no heat of its own,
-      // but the clock creeps heat while it is spent.
-      if (window.scouted === true || !rules.has("scout")) return window;
-      return advanceClock({ ...window, scouted: true }, SCOUT_SECONDS);
+      // but the clock creeps heat while it is spent. A second press narrows the
+      // band (B1, 11-18) for the same clock; its 믿음 is the stage's to gate.
+      if (window.narrowed === true || !rules.has("scout")) return window;
+      return advanceClock(window.scouted === true ? { ...window, narrowed: true } : { ...window, scouted: true }, SCOUT_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -1917,6 +1935,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     pushes: Number(window?.pushes) || 0,
     // B1: the look was spent on this window, so its 믿음 is billed (applyGauntletEffect) and the log says so.
     scouted: window?.scouted === true,
+    // The second look (B1, 11-18), written only when spent: SCOUT_NARROW_TRUST more.
+    ...(window?.scouted === true && window?.narrowed === true ? { narrowed: true } : {}),
     elapsed: round2(Number(window?.elapsed) || 0),
     chips,
     multiplier,

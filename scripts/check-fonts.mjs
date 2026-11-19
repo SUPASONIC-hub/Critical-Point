@@ -56,7 +56,8 @@ const MAX_FONT_BYTES = 131_832;
 // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
 // 82,688 -> 86,328 on 2026-11-13, 다국적 인물 (cast-global): the new names' syllables (뤼, 옌, 응, 즈 ...). Measured 86,324 plus 4.
 // 86,328 -> 87,100 on 2026-11-13, 다국적 인물 over main e43f7bf6: the new names' syllables plus 번외 4~7's. Measured 87,096 plus 4.
-const MAX_REST_FONT_BYTES = 87_100;
+// 87,100 -> 87,176 on 2026-11-17, N22 over main 705a809f: 땠 and the feedback line's syllables. Measured 87,172 plus 4.
+const MAX_REST_FONT_BYTES = 87_176;
 
 /**
  * Characters the source writes that Pretendard has no glyph for. `drawn` ones
@@ -68,6 +69,7 @@ const SYSTEM_FACE_CHARACTERS = {
   "臨": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "界": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
   "點": { drawn: true, where: "GameWordmark.jsx: the wordmark's 臨界點" },
+  "点": { drawn: true, where: "ja/screens/intro.js: the Japanese reading 臨界点 under the wordmark (a ja page)" },
   "故": { drawn: true, where: "case17.js: 고(故) 하윤재" },
   "日": { drawn: true, where: "locale.js: the language choice's 日本語" },
   "本": { drawn: true, where: "locale.js: the language choice's 日本語" },

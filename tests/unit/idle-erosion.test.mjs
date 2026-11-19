@@ -19,7 +19,7 @@ const cash = { status: "cashed", cause: "cash", gauge: 60, wall: 95, pushes: 2, 
 const bust = { status: "bust", cause: "push", gauge: 70, wall: 69, pushes: 4, seed: "erosion:bust" };
 const settle = (run, window, caseClosed = true) => resolveWindow({ run: normalizeRunState(run), window, card, caseClosed });
 
-test("IDLE MONEY is a catalogue device, booked in no week, with its words in three languages", async () => {
+test("IDLE MONEY is a catalogue device, booked in one week (2027-W19, 초안), with its words in three languages", async () => {
   const rule = WEEK_RULE_CATALOGUE["idle-erosion"];
   assert.equal(rule.label, "IDLE MONEY");
   assert.deepEqual([...rule.rules], ["erosion"]);
@@ -27,7 +27,7 @@ test("IDLE MONEY is a catalogue device, booked in no week, with its words in thr
   assert.ok(WEEK_RULE_DEVICES.includes("erosion"));
   assert.equal(weekRuleHasDevice("idle-erosion", "erosion"), true);
   assert.equal(weekRuleHasDevice("near-wall", "erosion"), false);
-  assert.deepEqual(WEEKLY_RULES.filter((entry) => entry.id === "idle-erosion"), [], "no week books it before the user picks its number");
+  assert.deepEqual(WEEKLY_RULES.filter((entry) => entry.id === "idle-erosion").map(({ week }) => week), ["2027-W19"], "one week, booked by 20261121000000");
   assert.equal(rule.title, "묵힌 돈은 준다");
   assert.ok(rule.text.includes(`${IDLE_EROSION_PERCENT}%`), rule.text);
   assert.ok(rule.world.length > 0 && rule.world.length <= 40);

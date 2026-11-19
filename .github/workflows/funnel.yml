@@ -126,9 +126,56 @@ jobs:
         run: |
           warning="$(node scripts/report-ops-health.mjs --inactivity "$(git log -1 --format=%cI)")"
           case "$warning" in *⚠*) echo "::warning title=Scheduled runs may stop::main has had no commit for 45+ days; GitHub turns scheduled workflows off at 60. Workflow Keepalive turns them back on monthly."; echo "$warning" >> "$GITHUB_STEP_SUMMARY";; esac
+      # The first hour as Google Analytics counts it (N17, scripts/report-ga4.mjs):
+      # by week, users who pressed start, opened the first table and closed
+      # prologue 01, and users per scene of prologues 01 and 02 (N16's cp_scene).
+      # Totals and shares only. Its own two secrets, a service account's JSON key
+      # with Viewer on the GA4 property and the property's number
+      # (docs/analytics.md); without them the section says it skipped. Plain
+      # node, no npm ci: the script imports nothing outside the repository.
+      - name: Read the first hour from GA4
+        if: ${{ !cancelled() }}
+        shell: bash
+        env:
+          GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        # Also kept as funnel-report/ga4.md in the uploaded summary (since
+        # 2026-11-18), so the section can be read from the artifact, not only
+        # from the run's page.
+        run: |
+          mkdir -p funnel-report
+          node scripts/report-ga4.mjs | tee funnel-report/ga4.md >> "$GITHUB_STEP_SUMMARY"
+      # Ops mode's calendar (N6, from 2026-12-01; scripts/ops-calendar.mjs):
+      # today's deploy day, the next quarter day a wipe may fall on, and the
+      # weekly rule calendar's booked weeks, with a warning under six. No
+      # database, no secret.
+      - name: Write the ops calendar
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/ops-calendar.mjs --summary >> "$GITHUB_STEP_SUMMARY"
+          low="$(node scripts/ops-calendar.mjs --calendar-warning)"
+          if [ -n "$low" ]; then echo "::warning title=Weekly rule calendar runs low::$low"; fi
       - name: Remove the rows
         if: always()
         run: rm -f rows.json query.err ops.json ops.err
+      # N28: the weekly phone speed line, p75 LCP and INP of the start page by
+      # device from the N12 events in Google Analytics (scripts/report-web-vitals.mjs,
+      # the Data API with N17's two secrets). Without them it says it read
+      # nothing; past 2.5 s or 200 ms it adds a warning. Never fails the run.
+      # Only Node's own modules, so it needs no setup step.
+      - name: Read phone speed
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        shell: bash
+        env:
+          GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        # Kept as funnel-report/phone-speed.md too, beside ga4.md.
+        run: |
+          mkdir -p funnel-report
+          node scripts/report-web-vitals.mjs | tee funnel-report/phone-speed.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the summary
         if: steps.token.outputs.configured == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
