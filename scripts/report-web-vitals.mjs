@@ -1,10 +1,12 @@
 import { pathToFileURL } from "node:url";
+import { VITALS_FULL_SAMPLE_UNTIL } from "../src/gameEvents.js";
 import { accessToken, readGa4Env, rowsOf, runReport } from "./ga4-data-api.mjs";
 
 /**
  * N28 (2차 개선점, 2026-11-16 「전부 1」): the weekly 「폰 속도」 line in the
- * Funnel summary. N12 (#547) sends the start page's LCP and INP from one page
- * load in twenty (`cp_lcp`, `cp_inp`, `value` = whole ms; src/webVitals.js);
+ * Funnel summary. N12 (#547) sends the start page's LCP and INP from the
+ * sampled page loads -- every one until VITALS_FULL_SAMPLE_UNTIL (N40), one in
+ * twenty after (`cp_lcp`, `cp_inp`, `value` = whole ms; src/webVitals.js);
  * nothing read them. This reads the last seven days and the seven before
  * from GA's Data API (scripts/ga4-data-api.mjs, the two secrets N17 uses)
  * and prints p75 per device category, with ⚠ past Google's "good" lines:
@@ -150,7 +152,7 @@ export function describeVitals(weeks) {
     "",
     `**${headline(current)}**`,
     "",
-    `시작 화면, 페이지 20개 중 1개 표본(N12). 값은 ${method}, 괄호는 표본 수. 기준: LCP ${LCP_GOOD_MS / 1000}s, INP ${INP_GOOD_MS}ms(넘으면 ⚠). 표본 ${THIN_SAMPLE}개 미만은 「적음」 — 4주 모인 뒤 판단.`,
+    `시작 화면, ${VITALS_FULL_SAMPLE_UNTIL} 전까지 모든 페이지·그 뒤 20개 중 1개 표본(N12·N40). 값은 ${method}, 괄호는 표본 수. 기준: LCP ${LCP_GOOD_MS / 1000}s, INP ${INP_GOOD_MS}ms(넘으면 ⚠). 표본 ${THIN_SAMPLE}개 미만은 「적음」 — 4주 모인 뒤 판단.`,
     "",
     "| 기간 | 기기 | LCP | INP |",
     "| --- | --- | --- | --- |",

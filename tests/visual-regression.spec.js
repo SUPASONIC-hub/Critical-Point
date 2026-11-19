@@ -3,7 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { completeCurrentCase, startDebugNode } from "./helpers/gameFlow.js";
 import { measureTable } from "./helpers/layout.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
-import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
+import { savedRunAt } from "./helpers/seededSave.js";
+import { ACCESSIBILITY_SETTINGS_KEY, NEW_GAME_PLUS_KEY } from "../src/appConfig.js";
 
 test.use({ colorScheme: "light" });
 
@@ -510,4 +511,75 @@ test("first briefing 390x844 visual baseline @visual", async ({ page }, testInfo
   await settleBriefing(sheet);
   await expectCaptureGeometry(sheet, testInfo, "briefing-p1-390x844.png");
   await expect(sheet).toHaveScreenshot("briefing-p1-390x844.png", BRIEFING_SHOT);
+});
+
+// N37 (2026-11-18): four screens 2안 「감사 장부」 reached without a picture of
+// their own -- the board, the comfort settings, the cold opening and the
+// side-case slot. Each is captured by its own panel at the phone width, so a
+// colour that slides back to the night shift fails here, not on a phone.
+const PANEL_SHOT = { animations: "disabled", caret: "hide", maxDiffPixels: 200 };
+
+async function openPhone(page) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+}
+
+test("board mobile visual baseline @visual", async ({ page }, testInfo) => {
+  await openPhone(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "게시판" }).first().click();
+  const board = page.locator(".board-page");
+  await expect(board).toBeVisible();
+  await stabilizeVisualPage(page);
+  await expectCaptureGeometry(board, testInfo, "board-mobile.png");
+  await expect(board).toHaveScreenshot("board-mobile.png", PANEL_SHOT);
+});
+
+test("comfort settings mobile visual baseline @visual", async ({ page }, testInfo) => {
+  await openPhone(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
+  });
+  await pinRunSeed(page);
+  await startDebugNode(page, "case05", "c5_voice");
+  await page.getByTestId("open-comfort-settings").click();
+  const dialog = page.locator(".comfort-dialog");
+  await expect(dialog).toBeVisible();
+  await stabilizeVisualPage(page);
+  await expectCaptureGeometry(dialog, testInfo, "comfort-settings-mobile.png");
+  await expect(dialog).toHaveScreenshot("comfort-settings-mobile.png", PANEL_SHOT);
+});
+
+test.describe("a device that has not seen the cold opening", () => {
+  test.use({ coldOpeningSeen: false });
+
+  test("cold opening mobile visual baseline @visual", async ({ page }, testInfo) => {
+    await openPhone(page);
+    await page.goto("/");
+    await page.getByTestId("start-first-case").click();
+    const panel = page.getByTestId("cold-opening").locator(".opening-burst-panel");
+    await expect(panel).toBeVisible();
+    await stabilizeVisualPage(page);
+    await expectCaptureGeometry(panel, testInfo, "cold-opening-mobile.png");
+    await expect(panel).toHaveScreenshot("cold-opening-mobile.png", PANEL_SHOT);
+  });
+});
+
+test("side case slot mobile visual baseline @visual", async ({ page }, testInfo) => {
+  await openPhone(page);
+  await page.addInitScript(
+    ({ saveKey, save, newGamePlusKey }) => {
+      if (sessionStorage.getItem("visual-side-seeded")) return;
+      sessionStorage.setItem("visual-side-seeded", "1");
+      localStorage.setItem(saveKey, JSON.stringify(save));
+      localStorage.setItem(newGamePlusKey, "true");
+    },
+    { saveKey: TEST_STORAGE_KEYS.save, save: savedRunAt("case12", "c12_start"), newGamePlusKey: NEW_GAME_PLUS_KEY },
+  );
+  await page.goto("/");
+  const slot = page.getByTestId("side-case-slot");
+  await expect(slot).toBeVisible();
+  await stabilizeVisualPage(page);
+  await expectCaptureGeometry(slot, testInfo, "side-case-slot-mobile.png");
+  await expect(slot).toHaveScreenshot("side-case-slot-mobile.png", PANEL_SHOT);
 });

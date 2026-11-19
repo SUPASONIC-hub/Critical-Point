@@ -1856,9 +1856,15 @@
   font-weight: 700;
 }
 
-/* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
-   smaller size and the paper colour it inherits are the look. The sheet is at
-   its budget (check-css-structure.mjs), and the line is a line, not a pill. */
+/* The slam's third line, `small` (A2, 2026-11-05). On the night shift it
+   inherited paper and read on the dark wash; on the ledger it inherited the
+   pencil red over red stripes (N37), so it sits on the paper the word does. */
+.gx-slam small {
+  padding: 2px 10px;
+  color: var(--ui-text);
+  background: var(--ledger-paper-a92);
+}
+
 .gx-slam-bust {
   color: var(--ledger-pencil);
   background:
@@ -2583,19 +2589,21 @@
     -webkit-line-clamp: 2;
   }
 
-  /* 2안's ledger column (12px apart, 15px words) put a NEW GAME+ hand's last
-     slip 17px under the action bar at 360x740 (bundle 11-18): 6px apart, 14px. */
-  .gx-hand:not(.hand-5, .hand-6) {
-    gap: 6px;
-  }
-
+  /* 14px words on a short phone (bundle 11-18). English and Japanese keep
+     their own 12px from the language blocks further down (same weight, later
+     in the file): a 13px English rule here outweighed them and put three-line
+     English slips 30px under the bar at 360x740 (E1e, 2026-11-18). */
   .gx-hand .gx-card-label {
     font-size: 0.875rem;
     line-height: 1.25;
   }
 
-  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
-    padding-block: 6px;
+  /* A slip with no key on it (a touch phone draws none) gives the 20px kept
+     for the key back to its words: on Linux English slips ran to a third
+     line and put four-slip hands 13px, 37 with a card staked, under the bar
+     at 360x740 (E1f, 2026-11-19). */
+  .gx-hand .gx-card:not(:has(.gx-card-key)) .gx-card-label {
+    padding-right: 0;
   }
 }
 
@@ -2608,6 +2616,24 @@
    2026-11-11). The short-phone block above, stretched to 860, hid the
    portrait on a Pixel 7 (412x839) too. */
 @media (max-width: 480px) and (max-height: 860px) {
+  /* 2안's ledger column (12px apart) put a NEW GAME+ hand's last slip 17px
+     under the action bar at 360x740 and an English one 22px at 390x844
+     (bundle 11-18, E1d): 6px apart and 6px inside a slip. The words keep
+     their size here; only the short phone below 800 makes them smaller.
+     `.gauntlet-stage` first: the 719px block's 12px column comes later in the
+     file with the same weight and kept the gap at 12 (E1e, measured
+     2026-11-19). */
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) {
+    gap: 6px;
+  }
+
+  /* 44px still: a one-line slip in 6px was 32 tall at 390x664, under the
+     finger's 44 (bundle 11-19, accessibility.spec). */
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    min-height: 44px;
+    padding-block: 6px;
+  }
+
   .gx-clock {
     width: 2.25rem;
     height: 2.25rem;

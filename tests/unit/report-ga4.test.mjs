@@ -4,7 +4,9 @@ import test from "node:test";
 
 import {
   API,
+  caseLabel,
   describeScenes,
+  mostLeftScene,
   describeWeeks,
   readRows,
   readSecrets,
@@ -82,8 +84,23 @@ test("the scene table orders the scenes and reads each against its case's first"
     "| 프롤로그 01 | 1 | 10 | 100% |",
     "| 프롤로그 01 | 2 | 7 | 70% |",
     "| 프롤로그 02 | 1 | 6 | 100% |",
+    "",
+    "**가장 많이 떠난 장면**: 프롤로그 01 장면 1 — 다음 장면(프롤로그 01 장면 2)까지 온 사용자가 직전 장면 대비 70% (10 → 7명)",
   ]);
   assert.match(describeScenes([]).join("\n"), /아직 `cp_scene` 이벤트가 없습니다/);
+});
+
+test("N39: 프롤로그 03 ~ 사건 07 are named by case_no, and the most-left line reads across a case's end", () => {
+  assert.equal(caseLabel(1), "프롤로그 01");
+  assert.equal(caseLabel(5), "프롤로그 05");
+  assert.equal(caseLabel(6), "사건 01");
+  assert.equal(caseLabel(12), "사건 07");
+  assert.equal(caseLabel(13), "case_no 13");
+  const lines = describeScenes(readRows(report([[["5", "5"], 10, 10], [["6", "1"], 4, 4], [["6", "2"], 4, 4], [["7", "1"], 3, 3]])));
+  assert.ok(lines.includes("| 사건 01 | 1 | 4 | 100% |"));
+  assert.equal(lines.at(-1), "**가장 많이 떠난 장면**: 프롤로그 05 장면 5 — 다음 장면(사건 01 장면 1)까지 온 사용자가 직전 장면 대비 40% (10 → 4명)");
+  assert.match(describeScenes(readRows(report([[["1", "1"], 3, 3], [["1", "2"], 3, 3]]))).at(-1), /없음/);
+  assert.equal(mostLeftScene([]), null);
 });
 
 /** A stand-in for Google's two endpoints. */

@@ -43,3 +43,23 @@ export function readActProgress(caseId) {
     left: tallyIndex - index,
   };
 }
+
+/**
+ * N42 떠나는 순간 한 줄 (owner's answer Q7 (1), 2026-11-18). The reports where
+ * players most often stop -- 프롤로그 05 (the prologue is done), 사건 03 and
+ * 사건 07 (the end of 1막) -- end on one quiet line that the season is saved
+ * and what comes next (LeaveLine.jsx), with the home-screen button where the
+ * browser offers one. Every run that stopped between 사건 01 and 07 did not
+ * come back (Funnel, 11-18).
+ */
+export const LEAVE_LINE_CASES = Object.freeze(["prologue05", "case03", "case07"]);
+
+/**
+ * `{ next, minutes }` for the line -- the next case's own title as the report's
+ * next-case panel prints it, and the typical length of a case -- or null for
+ * any other report, or one with no next case.
+ */
+export function readLeaveLine(caseId, nextCaseSignal, minutes) {
+  if (!LEAVE_LINE_CASES.includes(caseId) || !nextCaseSignal?.title) return null;
+  return { next: nextCaseSignal.title, minutes };
+}
