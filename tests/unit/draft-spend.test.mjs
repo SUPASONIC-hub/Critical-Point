@@ -94,7 +94,7 @@ test("a buy that cannot pay keeps its place, is aria-disabled and says why", () 
   assert.match(buy, /onClick=\{state\.open \? onPress : undefined\}/);
   assert.doesNotMatch(buy, /\sdisabled=/, "not `disabled`: it stays reachable and read");
   assert.match(draft, /\{spend && !swapFor && !spend\.second && \(/);
-  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">\{nextTableOn\(\) \? say\.spendHintNext : say\.spendHint\}<\/small>/);
+  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">{isNextOn\(\) \? say\.spendHintNext : say\.spendHint\}<\/small>/);
   // The buys' rules are a sheet of their own (relics.css was every line spent), imported right after the draft's.
   const css = read("src/styles/app/draft-spend.css");
   const order = read("src/styles/app.css");

@@ -4,7 +4,7 @@
  * check:pressure measured the tools of C-7 barely moving play: a heartbeat hand
  * banked 17,992 with none and 19,535 with the best (INSURANCE, +8.6%), and
  * AUDIT CONTACT did nothing outside the audit. Under the next rules
- * (nextTable.js) most tools keep what they did and add one condition that pays:
+ * (nextTableRules.js `isNextOn`) most tools keep what they did and add one condition that pays:
  * when the condition holds on a cash, the pot of that cash is multiplied by the
  * tool's `boost`. Each condition asks the player to play a certain way -- cash
  * early, push hot, keep one side, switch, cash fast, cash on a broken board --

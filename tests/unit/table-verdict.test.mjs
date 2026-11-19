@@ -126,6 +126,8 @@ const MUTATION_KINDS = {
   exposeMastery: "carry",
   // A week's device (MARKET SHOCK, weeklyRules.js): no decision broke the board.
   shock: "week",
+  // G6 결재 판: the case's last board, no one's penalty.
+  sign: "case",
   reboot: "reset",
 };
 

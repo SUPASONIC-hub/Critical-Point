@@ -1,4 +1,4 @@
-// G4 (tools) and G5 (act twists) under the next rules (src/gauntlet/nextTable.js).
+// G4 (tools) and G5 (act twists) under the next rules (src/gauntlet/nextTableRules.js).
 process.env.RULES_NEXT = "1";
 const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
@@ -10,8 +10,7 @@ const { caseRuleFor } = await import("../../src/gauntlet/caseRules.js");
 const { ACT_TWIST_CASES, HEARING_CHIPS, MERGER_SHIFT, SCATTER_SPREAD } = await import("../../src/gauntlet/actTwists.js");
 const { getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
 const { rulesNextOn, RULES_NEXT_DEFAULT } = await import("../../src/gauntlet/rulesNext.js");
-const { nextTableOn } = await import("../../src/gauntlet/nextTable.js");
-const { NEXT_RULE, RULES_NEXT_MARK, withNextRules } = await import("../../src/gauntlet/nextTableRules.js");
+const { isNextOn, NEXT_RULE, RULES_NEXT_MARK, withNextRules } = await import("../../src/gauntlet/nextTableRules.js");
 const { recheckRelicDraft, recheckRun } = await import("../../src/rankingRecheck.js");
 const en = (await import("../../src/locales/en/screens/relics.js")).default;
 const ja = (await import("../../src/locales/ja/screens/relics.js")).default;
@@ -24,10 +23,10 @@ const cash = (over = {}) => ({ gauge: 60, pushes: 3, move: "grow", streak: 1, af
 test("the switch: a case's rules say it, \"old\" turns it off, and a set with neither follows the default", () => {
   assert.equal(rulesNextOn({ location: { search: "?rules=next" } }), true);
   assert.equal(rulesNextOn({ location: { search: "" } }), RULES_NEXT_DEFAULT);
-  assert.equal(nextTableOn(), true);
-  assert.equal(nextTableOn(new Set()), true);
-  assert.equal(nextTableOn(new Set([NEXT_RULE])), true);
-  assert.equal(nextTableOn(new Set(["old"])), false);
+  assert.equal(isNextOn(), true);
+  assert.equal(isNextOn(new Set()), true);
+  assert.equal(isNextOn(new Set([NEXT_RULE])), true);
+  assert.equal(isNextOn(new Set(["old"])), false);
   // The old table by the case's rules: no boost, the old COLD BLOOD, the old price.
   const old = new Set(["old", "blackout", "aftershock"]);
   const board = engine.buildNextSchema({ outcome: "bust", cause: "push", gauge: 80, relics: ["coldBlood"], rules: old });

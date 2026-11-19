@@ -95,7 +95,7 @@ export const CLOCK_CUT_MS = 800;
  * what a cash now would make it (B3: the heat and the pushes, never the
  * wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard, run = null, audit, resources = null }) {
+export function readTableMeters({ narrowPrice = SCOUT_NARROW_TRUST, next = false, win, schema, selectedCard, run = null, audit, resources = null }) {
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
@@ -103,7 +103,7 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
   return {
     selectedChips: selectedCard ? getCardChips(selectedCard, schema) : 0,
     multiplier: getMultiplier(win.gauge),
-    focusBonus: getFocusBonus(win.focus, win.focusMode),
+    focusBonus: getFocusBonus(win.focus, win.focusMode, next),
     remaining: getRemainingSeconds(win),
     // A bust stops the heart (A2): the pulse reads "—" and the tick light is dark (fxVariables.js).
     // The urgency is read against the clock the stake leaves (`getWindowSeconds`), the one `remaining` counts down.
@@ -113,12 +113,14 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
     nextMultiplierLow: getMultiplier(nextLow),
     nextMultiplierHigh: getMultiplier(nextHigh),
     dangerLine: describeDanger({ gauge: win.gauge, nextHigh, wallMin: band.wallMin }),
-    belowRelief: win.gauge < getFocusModeProfile(win.focusMode).relief,
+    belowRelief: win.gauge < getFocusModeProfile(win.focusMode, next).relief,
     band,
     // B1: whether the run can pay for the look (SCOUT_TRUST of 믿음); the stage opens SCOUT on it, as the bots do.
     canPayScout: (Number(resources?.trust) || 0) >= SCOUT_TRUST,
     // The second look (11-18): both looks' 믿음, since both are billed when the window settles.
-    canPayNarrow: (Number(resources?.trust) || 0) >= SCOUT_TRUST + SCOUT_NARROW_TRUST,
+    // G2 (the next rules): the price climbs with the case's second looks (`narrowPrice`, nextTableRules.js narrowTrustAt).
+    canPayNarrow: (Number(resources?.trust) || 0) >= SCOUT_TRUST + narrowPrice,
+    narrowPrice,
     nextClock: describeNextClock(win, nextHigh),
     audit: reading,
     safe: readSafeLine(win, band.wallMin),

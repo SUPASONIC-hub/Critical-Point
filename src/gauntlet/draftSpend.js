@@ -1,5 +1,5 @@
 import { RELIC_EXTRA_COST, RELIC_REROLL_COST } from "./relics.js";
-import { nextTableOn } from "./nextTable.js";
+import { isNextOn } from "./nextTableRules.js";
 import { NEXT_REROLL_COST } from "./relicsNext.js";
 
 /**
@@ -27,7 +27,7 @@ export function readDraftSpend(run) {
   const vault = Math.max(0, Number(run?.vault) || 0);
   const picked = draft?.picked?.length ?? 0;
   const common = run?.practice ? "practice" : run?.story === true ? "story" : !draft ? "record" : null;
-  const next = nextTableOn();
+  const next = isNextOn();
   const rerollCost = next ? NEXT_REROLL_COST : RELIC_REROLL_COST;
   const reason = (bought, cost, extra) =>
     common ?? (bought ? "used" : extra && next && run?.extraBought === true ? "season" : picked ? "picked" : extra && offer.length < 2 ? "few" : vault < cost ? "short" : null);

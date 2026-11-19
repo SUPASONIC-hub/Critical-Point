@@ -47,9 +47,8 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { caseRuleFor } from "./caseRules.js";
-import { nextTableOn } from "./nextTable.js";
-import { NEXT_RULE } from "./nextTableRules.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
+import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -65,9 +64,8 @@ export { decisionWindowSeconds, stakeTier } from "./stakeClock.js";
  * The list itself is not imported: this module is in the chunk the start
  * screen loads to repair a save, and the list brings the prologues' copy.
  */
-// Neither the next rules' mark nor the old one (nextTable.js): a table named by
-// no case follows the page's default, as the core rules' set does.
-const ALL_RULES = Object.freeze({ has: (id) => id !== "old" && id !== NEXT_RULE });
+// The next rules (G1~G7, nextTableRules.js): this stand-in names neither mark, so it plays what the page plays.
+const ALL_RULES = Object.freeze({ has: (id) => id !== NEXT_RULE && id !== OLD_RULE });
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
@@ -306,6 +304,8 @@ export function normalizeSchema(value) {
   // and the wall stay what their rules made them.
   schema.sealBreak = clamp(Math.round(schema.sealBreak), 0, Math.min(SEAL_BREAK_GAUGE, Math.max(0, schema.wallMin - schema.stepMax)));
   schema.relics = normalizeRelicIds(source.relics);
+  // G3: LOCK shut on this board (the streak carried in already fills its cap); only ever written when true.
+  if (source.lockShut === true) schema.lockShut = true;
   return schema;
 }
 
@@ -372,13 +372,14 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
  * else -- unmultiplied, unfractured, and on a bust like any other cost.
  * `narrowed` is the second look (B1, 11-18): SCOUT_NARROW_TRUST more, billed the same way.
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false, narrowed = false } = {}) {
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false, narrowed = false, narrowTrust = SCOUT_NARROW_TRUST } = {}) {
   const fractured = applyFracture(effect, fracturedAxis, fractureRate);
   const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
   const priced = Object.fromEntries(
     Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? (outcome === "bust" ? 0 : roundAway(value * multiplier)) : value]),
   );
-  const looks = scouted ? SCOUT_TRUST + (narrowed ? SCOUT_NARROW_TRUST : 0) : 0;
+  // G2: under the next rules the second look's price climbs within a case (`narrowTrustAt`), and the verdict carries it.
+  const looks = scouted ? SCOUT_TRUST + (narrowed ? Math.max(0, Number(narrowTrust) || 0) : 0) : 0;
   return looks ? { ...priced, trust: (priced.trust ?? 0) - looks } : priced;
 }
 
@@ -419,17 +420,20 @@ function normalizeFocusMode(value) {
   return FOCUS_MODES.includes(value) ? value : "strike";
 }
 
-export function getFocusModeProfile(mode) {
-  return FOCUS_MODE_PROFILES[normalizeFocusMode(mode)];
+export function getFocusModeProfile(mode, next = false) {
+  const profile = FOCUS_MODE_PROFILES[normalizeFocusMode(mode)];
+  // G3: STEADY a little weaker under the next rules.
+  return next && profile === FOCUS_MODE_PROFILES.steady ? STEADY_PROFILE_NEXT : profile;
 }
+const STEADY_PROFILE_NEXT = Object.freeze({ ...FOCUS_MODE_PROFILES.steady, ...STEADY_NEXT });
 
 /**
  * One LOCK press: the charge it leaves and how far it cools the gauge: the
  * same for every press, and a little more for each press before it in the
  * window.
  */
-export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}) {
-  const profile = getFocusModeProfile(focusMode);
+export function scoreFocus({ focus = 0, focusCombo = 0, focusMode = "strike" } = {}, next = false) {
+  const profile = getFocusModeProfile(focusMode, next);
   const presses = Math.max(0, Math.trunc(Number(focusCombo) || 0)) + 1;
   const gained = Math.round((FOCUS_GAIN + Math.min(12, presses * 2)) * profile.gainScale);
   return { focus: clamp(Math.round(Number(focus) || 0) + gained, 0, FOCUS_MAX), focusCombo: presses, focusRelief: profile.relief };
@@ -460,14 +464,27 @@ export const LOCK_CAP = 1.5;
  * the pot that window's player saw does not shrink; every other window holds
  * none.
  */
-export function getHandBonus(groove, focus, mode = "strike", streak = 0) {
+export function getHandBonus(groove, focus, mode = "strike", streak = 0, { next = false, gauge = 0 } = {}) {
   const logic = Math.max(getLogicBonus(streak), getGrooveBonus(groove));
-  return round2(Math.min(HAND_CAP, Math.max(logic, Math.min(LOCK_CAP, logic * getFocusBonus(focus, mode).pot))));
+  return round2(Math.min(HAND_CAP, Math.max(logic, Math.min(getLockCap(mode, gauge, next), logic * getFocusBonus(focus, mode, next).pot))));
 }
 
-export function getFocusBonus(focus, mode = "strike") {
+/**
+ * How far LOCK may lift a pot: LOCK_CAP, and under the next rules (G3) STRIKE
+ * cashed at STRIKE_HOT_GAUGE or hotter may lift it to STRIKE_HOT_CAP.
+ */
+export function getLockCap(mode, gauge = 0, next = false) {
+  return next && normalizeFocusMode(mode) === "strike" && (Number(gauge) || 0) >= STRIKE_HOT_GAUGE ? STRIKE_HOT_CAP : LOCK_CAP;
+}
+
+/** G3: the streak a board is dealt with already fills LOCK's cap, so LOCK is shut on it (a rule, not a display). */
+export function isLockShutBy(streak) {
+  return getLogicBonus(streak) >= LOCK_CAP;
+}
+
+export function getFocusBonus(focus, mode = "strike", next = false) {
   const charge = clamp(Number(focus) || 0, 0, FOCUS_MAX) / FOCUS_MAX;
-  const profile = getFocusModeProfile(mode);
+  const profile = getFocusModeProfile(mode, next);
   return {
     mode: normalizeFocusMode(mode),
     label: profile.label,
@@ -610,6 +627,8 @@ function normalizeSuspendedWindow(value, windowIndex) {
   window.scouted = source.scouted === true;
   // The second look (B1, 11-18), kept only when spent: a save's shape is as it was otherwise.
   if (window.scouted && source.narrowed === true) window.narrowed = true;
+  // G7, only when pressed.
+  if (source.breathed === true) window.breathed = true;
   // The presses so far, so the trail goes on after the resume (windowTrail.js);
   // without them the window leaves no replay record. A trail edited in the
   // save is the server checker's to find, not this one's.
@@ -638,6 +657,12 @@ function resumeWindow(window, resume) {
   restored.focusMode = normalizeFocusMode(resume.focusMode);
   restored.scouted = resume.scouted === true;
   restored.narrowed = restored.scouted && resume.narrowed === true;
+  // G7: a window put down after 숨 고르기 keeps it, and the wall it moved back (the seed deals the wall again).
+  if (resume.breathed === true) {
+    restored.breathed = true;
+    restored.wall = Math.min(GAUGE_MAX, window.wall + BREATH_WALL);
+    restored.gauge = clamp(restored.gauge, 0, Math.max(0, restored.wall - 0.01));
+  }
   return restored;
 }
 
@@ -781,6 +806,24 @@ function advanceClock(window, delta) {
  * wide the same way, inside the first, so the first band never turns out wrong.
  */
 export function getWindowBand(window, reach = SCOUT_REACH) {
+  const band = readWindowBand(window, reach);
+  const shown = getSignCell(window);
+  // G6: the 결재 판 shows one cell of the wall's band, the nearest the wall can be.
+  return shown === null || shown <= band.wallMin ? (shown === null ? band : { ...band, shown }) : { ...band, wallMin: Math.min(shown, band.wallMax), shown };
+}
+
+/**
+ * G6 결재 판: the cell the board shows, drawn from the seed between the band's
+ * near end and the wall: the wall is at it or past it. Null on any other board.
+ */
+export function getSignCell(window) {
+  if (!window?.schema?.mutations?.includes?.(SIGN_MARK)) return null;
+  const { wallMin } = window.schema;
+  const wall = Number(window.wall) || wallMin;
+  return Math.max(wallMin, wall - Math.floor(seededUnit(`sign:${window.seed}`) * (Math.max(0, wall - wallMin) + 1)));
+}
+
+function readWindowBand(window, reach) {
   const { wallMin, wallMax } = window.schema;
   if (window.scouted !== true) return { wallMin, wallMax, scouted: false };
   // `reach` is the constant everywhere but the balance scripts' sweeps.
@@ -793,6 +836,12 @@ export function getWindowBand(window, reach = SCOUT_REACH) {
   const to = Math.max(from, Math.min(window.wall, first.wallMax - narrow));
   const near = from + Math.floor(seededUnit(`narrow:${window.seed}`) * (to - from + 1));
   return { wallMin: near, wallMax: Math.min(near + narrow, first.wallMax), scouted: true, narrowed: true };
+}
+
+/** G7: whether 숨 고르기 can still be pressed on this window. */
+export function canBreathe(window, rules = ALL_RULES) {
+  return Boolean(window) && window.status === "live" && isNextOn(rules) && window.breathed !== true && !(window.pushes > 0) && window.scouted !== true
+    && Array.isArray(window.schema?.mutations) && window.schema.mutations.includes("aftershock");
 }
 
 export function reduceWindow(window, event = {}, rules = ALL_RULES) {
@@ -817,7 +866,10 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
     }
     case "FOCUS": {
       if (!window.selectedId || !rules.has("lock")) return window;
-      const scored = scoreFocus(window);
+      const next = isNextOn(rules);
+      // G3: on a board whose carried streak fills LOCK's cap, a press would add nothing: refused.
+      if (next && window.schema.lockShut === true) return window;
+      const scored = scoreFocus(window, next);
       // The clock creeps heat while it is spent, so the press can run a window
       // out or into the wall the clock's own way ("timeout", "creep").
       return advanceClock({
@@ -835,6 +887,13 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       // band (B1, 11-18) for the same clock; its 믿음 is the stage's to gate.
       if (window.narrowed === true || !rules.has("scout")) return window;
       return advanceClock(window.scouted === true ? { ...window, narrowed: true } : { ...window, scouted: true }, SCOUT_SECONDS);
+    }
+    case "BREATHE": {
+      // G7 숨 고르기: once, on the board right after a BUST (its AFTERSHOCK), before
+      // the first push and the first look. BREATH_SECONDS of clock; the heat comes
+      // down BREATH_GAUGE and the wall goes back BREATH_WALL (AFTERSHOCK one step).
+      if (!canBreathe(window, rules)) return window;
+      return advanceClock({ ...window, breathed: true, gauge: Math.max(0, window.gauge - BREATH_GAUGE), wall: Math.min(GAUGE_MAX, window.wall + BREATH_WALL) }, BREATH_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -1147,6 +1206,8 @@ export const MUTATIONS = Object.freeze({
   // MARKET SHOCK, a week's device (weeklyRules.js): once a case, mid-case. Not a
   // penalty: no decision of the player's broke this board, the week did.
   shock: mutation("shock", { label: "MARKET SHOCK" }, { wall: MARKET_SHOCK_WALL, swing: MARKET_SHOCK_WOBBLE }),
+  // G6 결재 판 (the next rules): the case's last board. Not a penalty.
+  sign: mutation("sign", { label: "SIGN-OFF" }, { chips: SIGN_CHIPS }),
 });
 
 /**
@@ -1212,7 +1273,7 @@ export function applyRelics(schema, relics = [], rules = ALL_RULES) {
   for (const id of pending) {
     if (id === "stethoscope") next.sedated = false;
     // G4: under the next rules COLD BLOOD waives AFTERSHOCK outright (relicsNext.js).
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = nextTableOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = isNextOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
@@ -1282,7 +1343,7 @@ function applyBreather(schema) {
 /** The stage's mark for a board: "peak", "breather" or null (a breather on a peak board says breather: it is the news). */
 export function getBoardMark(schema) {
   const mutations = Array.isArray(schema?.mutations) ? schema.mutations : [];
-  return mutations.includes(BREATHER_MARK) ? BREATHER_MARK : mutations.includes(PEAK_MARK) ? PEAK_MARK : null;
+  return mutations.includes(SIGN_MARK) ? SIGN_MARK : mutations.includes(BREATHER_MARK) ? BREATHER_MARK : mutations.includes(PEAK_MARK) ? PEAK_MARK : null;
 }
 
 /**
@@ -1314,10 +1375,10 @@ export const getRerollSeed = (seed) => `${seed}:reroll:1`;
 /** What a draft of this shape costs: the reroll and the one more, each once. */
 /**
  * The reroll's price on this table: NEXT_REROLL_COST under the next rules (G4),
- * RELIC_REROLL_COST before. `rules` is the case's set (nextTable.js); the
+ * RELIC_REROLL_COST before. `rules` is the case's set (nextTableRules.js `isNextOn`); the
  * recheck hands in the one its row was played under, the page none (its default).
  */
-export const getRerollCost = (rules) => (nextTableOn(rules) ? NEXT_REROLL_COST : RELIC_REROLL_COST);
+export const getRerollCost = (rules) => (isNextOn(rules) ? NEXT_REROLL_COST : RELIC_REROLL_COST);
 export const getRelicDraftCost = (draft, rules) => (draft?.reroll ? getRerollCost(rules) : 0) + (draft?.extra ? RELIC_EXTRA_COST : 0);
 
 /**
@@ -1505,7 +1566,7 @@ export function buyExtraRelic(run) {
   const draft = current.relicDraft;
   if (!canSpendAtDraft(current) || draft.extra || draft.picked.length || current.relicOffer.length < 2 || current.vault < RELIC_EXTRA_COST) return current;
   // G4: under the next rules one more is once a season (`extraBought`).
-  if (current.extraBought && nextTableOn()) return current;
+  if (current.extraBought && isNextOn()) return current;
   return normalizeRunState({ ...payFromVault(current, RELIC_EXTRA_COST, { ...draft, extra: true }), extraBought: true });
 }
 
@@ -1580,10 +1641,19 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
     practice,
     relicOffer: practice ? [] : offer,
     relicDraft: practice ? null : current.relicDraft,
-    schema: rebooted
+    schema: applyLockShut(rebooted
       ? current.schema
-      : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics, rules), rules),
+      : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics, rules), rules), current.logic?.streak, rules),
   }, { caseId, resources, route, focusCarry: readFocusCarry(current) });
+}
+
+/** G3: a board dealt with a streak that fills LOCK's cap has LOCK shut (`lockShut`); otherwise the board has no such key. */
+function applyLockShut(schema, streak, rules) {
+  const shut = isNextOn(rules) && rules.has("lock") && rules.has("logic") && isLockShutBy(streak);
+  if (shut === (schema.lockShut === true)) return schema;
+  if (shut) return { ...schema, lockShut: true };
+  const { lockShut: _lockShut, ...open } = schema;
+  return open;
 }
 
 /** Builds the next board from what just happened. */
@@ -1614,6 +1684,8 @@ function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 
     next.sealBreak = Math.min(next.sealBreak, 10);
     next.chipsScale = Math.max(next.chipsScale, BASE_SCHEMA.chipsScale);
     next.mutations = next.mutations.filter((id) => id !== "coldFeet");
+    // G3 (the next rules): EXPOSE's carry pays too, a little under STRIKE WAKE and with no wider push.
+    if (isNextOn(rules)) next.chipsScale *= EXPOSE_CARRY_CHIPS;
     addMutation("exposedHand");
   }
   return next;
@@ -1703,8 +1775,8 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false }) {
-  if (caseClosed) return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules);
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false, sign = false, logicStreak = 0 }) {
+  if (caseClosed) return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
     if (rules.has("blackout")) {
@@ -1759,7 +1831,12 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.fracturedAxis = burnAxis;
     schema.mutations.push("fracture");
   }
-  return applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics, rules), rules);
+  // G6 결재 판: the case's last board, under the next rules. First on the list, so the board's label reads it.
+  if (sign && isNextOn(rules)) {
+    schema.chipsScale *= SIGN_CHIPS;
+    schema.mutations.unshift(SIGN_MARK);
+  }
+  return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
 }
 
 const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0 });
@@ -1819,7 +1896,7 @@ function readWindowUnder(window, rules) {
  * (`isShockDue` over the case's log, false under any week without it): the
  * pot stacked so far swings, and the board's wall comes closer.
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false, shock = false }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false, shock = false, sign = false, narrows = 0 }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -1833,7 +1910,9 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
-  const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode) : getFocusBonus(0, focusMode);
+  // G1~G7 (nextTableRules.js): what the next rules change in this settlement.
+  const next = isNextOn(rules);
+  const focusBonus = outcome === "cash" ? getFocusBonus(focusCharge, focusMode, next) : getFocusBonus(0, focusMode, next);
   // The streak after this window's card: its direction (사람 or 자리,
   // `getLogicDirection`, C-3). Without the rule the direction is false,
   // "not in play", and a card the room played is not the hand's pick (null:
@@ -1849,22 +1928,33 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     bustHolds: hasRelic(relics, "encore"),
     reach: hasRelic(relics, "metronome"),
     hold: hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD,
+    halve: next,
   });
+  const focusHits = Math.trunc(Number(window?.focusHits) || 0);
+  // G1 눈에 띔: the points this card's direction holds now, and whether this cash
+  // was caught (below EXPOSURE_HEAT, drawn from the seed). A charged EXPOSE cash
+  // is never caught (G3), and a story run or a replay is not watched.
+  const exposure = next && logicOn && current.story !== true && !current.practice ? getExposure(streak.logic.held) : 0;
+  const shielded = next && earnedStance(focusMode, focusCharge, focusHits, outcome) && focusMode === "expose";
+  const catchChance = getCatchChance(exposure);
+  const caught = outcome === "cash" && exposure > 0 && !shielded && gauge < EXPOSURE_HEAT && seededUnit(`exposure:${window?.seed ?? current.windowIndex}`) < catchChance;
+  if (caught) streak.logic = { ...streak.logic, streak: Math.floor(streak.logic.streak / 2) };
   // What the hand earned before LOCK: the streak this card made (or the groove
   // a window put down before 2026-10-10 still holds, see `getHandBonus`).
   const paidStreak = logicOn ? streak.logic.streak : 0;
-  const earnedBonus = outcome === "cash" ? getHandBonus(reachedGroove, 0, focusMode, paidStreak) : 1;
-  const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode, paidStreak) : 1;
-  const focusHits = Math.trunc(Number(window?.focusHits) || 0);
+  const handRule = { next, gauge };
+  const earnedBonus = outcome === "cash" ? getHandBonus(reachedGroove, 0, focusMode, paidStreak, handRule) : 1;
+  const handBonus = outcome === "cash" ? getHandBonus(reachedGroove, focusCharge, focusMode, paidStreak, handRule) : 1;
   // Practice builds no mastery, so it cannot be repeated into a stance relic either.
   const stanceMastery = current.practice || !rules.has("stance")
     ? current.stanceMastery
     : advanceStanceMastery(current.stanceMastery, { outcome, focusMode, focusCharge, focusHits });
+  // A caught board (G1) pays no pot: the cash still settles its card, and the streak was halved above.
+  const paysPot = outcome === "cash" && !caught;
   // G4 (relicsNext.js): under the next rules a tool whose condition holds on
   // this cash multiplies its pot. The whole pot, so the streak's and LOCK's
   // shares below keep their proportions.
-  const paysPot = outcome === "cash";
-  const boost = paysPot && nextTableOn(rules)
+  const boost = paysPot && isNextOn(rules)
     ? readRelicBoost(relics, {
       gauge,
       pushes: Number(window?.pushes) || 0,
@@ -1915,7 +2005,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const practice = caseClosed ? current.practice : null;
   // AUDIT, in a case whose rules have it (auditRisk.js): null, or this window's step
   // and on the close the part of the vault's share and the hand's it takes.
-  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter });
+  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter, shield: shielded });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
   // IDLE MONEY (B4): on a season's own close under the week that has it, the
   // vault held through the case shrinks before the case's pot is banked. Not
@@ -1947,6 +2037,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     rules: caseClosed ? nextRules : rules,
     cascade,
     shock: shocked,
+    sign: sign === true && !caseClosed,
+    logicStreak: logicOn ? streak.logic.streak : current.logic.streak,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
@@ -1975,7 +2067,15 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     // B1: the look was spent on this window, so its 믿음 is billed (applyGauntletEffect) and the log says so.
     scouted: window?.scouted === true,
     // The second look (B1, 11-18), written only when spent: SCOUT_NARROW_TRUST more.
-    ...(window?.scouted === true && window?.narrowed === true ? { narrowed: true } : {}),
+    ...(window?.scouted === true && window?.narrowed === true ? { narrowed: true, ...(next ? { narrowTrust: narrowTrustAt(narrows) } : {}) } : {}),
+    // G7: 숨 고르기 was pressed on this window.
+    ...(window?.breathed === true ? { breathed: true } : {}),
+    // G6: this window was the case's 결재 판, and the cell it showed.
+    ...(current.schema.mutations.includes(SIGN_MARK) ? { sign: true } : {}),
+    // G1: the 눈에 띔 this window's direction held, the chance a cash under the line was caught, and whether it was.
+    ...(exposure > 0 ? { exposure: { points: exposure, chance: catchChance, caught } } : {}),
+    // G3: a charged EXPOSE cash, which no audit mark or 눈에 띔 reaches.
+    ...(shielded ? { auditShield: true } : {}),
     elapsed: round2(Number(window?.elapsed) || 0),
     chips,
     multiplier,

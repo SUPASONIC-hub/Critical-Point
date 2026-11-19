@@ -948,11 +948,14 @@ test("a LOCK press charges what a GOOD one did, cools as its stance does and cos
   assert.ok(reduceWindow(cooled, { type: "FOCUS" }).gauge < 30, "a STEADY press still cools the gauge");
 });
 
+// These two hold the streak's arithmetic under the rules before G1 (`OLD_TABLE`): a change of direction
+// ends the streak. The next rules halve it; tests/unit/rules-next.test.mjs holds that.
+const OLD_TABLE = Object.freeze({ has: (id) => id !== "next" });
 test("the streak pays the pot from the third card of a type, and the heat multiplier is the heat's alone", () => {
   let run = RUN_INITIAL_STATE;
   const paid = [];
   for (let index = 0; index < 12; index += 1) {
-    const { verdict, nextRun } = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk") });
+    const { verdict, nextRun } = resolveWindow({ rules: OLD_TABLE, run, window: cashedAt(20), card: typed("a", "risk") });
     paid.push(verdict.logic.bonus);
     assert.equal(verdict.pot, Math.round(verdict.chips * verdict.multiplier * verdict.logic.bonus));
     assert.equal(verdict.logic.pot, verdict.pot - Math.round(verdict.chips * verdict.multiplier), "the streak's share is told apart");
@@ -960,12 +963,12 @@ test("the streak pays the pot from the third card of a type, and the heat multip
   }
   assert.deepEqual(paid.slice(0, 4), [1, 1, 1.06, 1.13], "two cards build, the third pays");
   assert.equal(paid.at(-1), HAND_CAP, "and it stops at the hand's cap, a streak of 10");
-  assert.equal(run.runHand, run.runPot - 12 * Math.round(resolveWindow({ run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
-  const broke = resolveWindow({ run, window: cashedAt(20), card: typed("b", "inference") });
+  assert.equal(run.runHand, run.runPot - 12 * Math.round(resolveWindow({ rules: OLD_TABLE, run: RUN_INITIAL_STATE, window: cashedAt(20), card: typed("a", "risk") }).verdict.pot), "the hand's share of the pot is kept apart");
+  const broke = resolveWindow({ rules: OLD_TABLE, run, window: cashedAt(20), card: typed("b", "inference") });
   assert.deepEqual([broke.verdict.logic.move, broke.verdict.logic.bonus, broke.nextRun.logic.streak], ["break", 1, 0]);
-  const bust = resolveWindow({ run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
+  const bust = resolveWindow({ rules: OLD_TABLE, run, window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
   assert.deepEqual([bust.nextRun.logic.streak, bust.nextRun.runHand, bust.nextRun.logic.best], [0, 0, 10], "a bust takes the streak with the pot, and the record stays");
-  const closed = resolveWindow({ run, window: cashedAt(20), card: typed("a", "risk"), caseClosed: true });
+  const closed = resolveWindow({ rules: OLD_TABLE, run, window: cashedAt(20), card: typed("a", "risk"), caseClosed: true });
   assert.equal(closed.nextRun.handVault, run.runHand + closed.verdict.logic.pot, "a closed case moves the hand's share into the vault with the pot");
   assert.deepEqual(normalizeRunState(JSON.parse(JSON.stringify(serializeRunState(closed.nextRun)))), closed.nextRun, "the streak survives a save");
 });
@@ -1211,7 +1214,7 @@ test("INSURANCE keeps a third of the pot once a case, and ENCORE keeps the logic
   assert.ok(again.verdict.relicProcs.includes("encore"));
   const none = resolveWindow({ run: normalizeRunState({ relics: ["encore"] }), window: { status: "bust", cause: "push", gauge: 60 }, card: typed("a", "risk") });
   assert.equal(none.verdict.relicProcs.includes("encore"), false, "with no streak to hold, it does not say it held one");
-  const changed = resolveWindow({ run: normalizeRunState({ relics: ["encore"], logic: streak }), window: cashedAt(20), card: typed("b", "inference") });
+  const changed = resolveWindow({ run: normalizeRunState({ relics: ["encore"], logic: streak }), window: cashedAt(20), card: typed("b", "inference"), rules: OLD_TABLE });
   assert.equal(changed.nextRun.logic.streak, 0, "it holds a bust, not a change of type");
   const second = resolveWindow({ run: first.nextRun, window: { status: "bust", cause: "push", gauge: 60 }, card: card("a", { capital: 9 }) });
   assert.equal(second.verdict.insuredPot, 0, "once a case");

@@ -9,7 +9,7 @@ import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
 import { formatMoney } from "./tableReadout.js";
 import { readDraftSpend } from "./draftSpend.js";
-import { nextTableOn } from "./nextTable.js";
+import { isNextOn } from "./nextTableRules.js";
 
 // The draft's words (src/copy/relics.js).
 const say = relicsCopy.draft;
@@ -128,7 +128,7 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
             <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
             <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
             <small className="gx-draft-note">{say.spendNote}</small>
-            <small className="gx-draft-note">{nextTableOn() ? say.spendHintNext : say.spendHint}</small>
+            <small className="gx-draft-note">{isNextOn() ? say.spendHintNext : say.spendHint}</small>
           </div>
         )}
         <div className="gx-draft-foot">

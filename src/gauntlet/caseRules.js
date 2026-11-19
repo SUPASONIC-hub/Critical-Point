@@ -36,7 +36,7 @@
  */
 
 import { ACT_TWIST_CASES } from "./actTwists.js";
-import { nextTableOn } from "./nextTable.js";
+import { isNextOn } from "./nextTableRules.js";
 
 /** The switch. Off, no case has a rule of its own: the table as it was before N26. */
 export const CASE_RULES_ON = true;
@@ -54,7 +54,7 @@ export const CASE_RULES = Object.freeze({
  * in a story run, in a season that carries a week's rule, and with the switch
  * off. `run` is the gauntlet's run (the save's `dynamics`).
  */
-export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = nextTableOn()) {
+export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = isNextOn()) {
   if (typeof caseId !== "string") return null;
   const own = on && Object.hasOwn(CASE_RULES, caseId) ? CASE_RULES[caseId] : null;
   // G5 (actTwists.js): under the next rules the act's twist, behind the case's own.

@@ -47,9 +47,8 @@ import { CASE_SEQUENCE } from "./gameCases.js";
 import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
-import { nextTableOn } from "./gauntlet/nextTable.js";
-import { NEXT_RULE, RULES_NEXT_MARK } from "./gauntlet/nextTableRules.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
+import { isNextOn, RULES_NEXT_MARK, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -88,9 +87,16 @@ export function recheckCaseScore(row) {
   return { status: differs.length ? "mismatch" : "match", differs, expected: stats };
 }
 
-/** The rules a stored case was played under, from what its summary says of the run. */
-export function getRowRules(caseId, summary) {
-  return getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+/**
+ * The rules a stored case was played under, from what its summary says of the
+ * run and the RULES_MARK its row carries (`mark`): a row marked
+ * RULES_NEXT_MARK or later was played under the next rules (G1~G7,
+ * nextTableRules.js), an earlier one under the rules before them. With no
+ * mark, the rules this engine plays now.
+ */
+export function getRowRules(caseId, summary, mark = undefined) {
+  const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+  return mark === undefined || mark === null ? rules : withNextRules(rules, Number(mark) >= RULES_NEXT_MARK);
 }
 
 /**
@@ -179,7 +185,7 @@ export function readSeed(seed, { runId, windowIndex, nodeId }) {
  */
 export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules = null } = {}) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : [];
-  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary);
+  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary, row?.dynamics?.[RULES_MARK_KEY]);
   const counts = { match: 0, mismatch: 0, unreplayable: 0, abandoned: 0, unrecorded: 0 };
   const findings = [];
   const windows = log.filter((entry) => entry?.threshold);
@@ -276,15 +282,8 @@ export function recheckRelicDraft(row, before = null) {
   return { drafts, findings };
 }
 
-/**
- * The rules a row was played under, as far as the next rules go (G4): RULES_MARK
- * RULES_NEXT_MARK or later plays them, an older row does not (nextTable.js).
- */
-const NEXT_ROW = Object.freeze(new Set([NEXT_RULE]));
-const OLD_ROW = Object.freeze(new Set(["old"]));
-export function rowRules(row) {
-  return Number(row?.dynamics?.[RULES_MARK_KEY]) >= RULES_NEXT_MARK ? NEXT_ROW : OLD_ROW;
-}
+/** The rules a case row was played under (`getRowRules`, by its RULES_MARK): what prices its draft (G4). */
+export const rowRules = (row) => getRowRules(row?.case_id, row?.summary, row?.dynamics?.[RULES_MARK_KEY]);
 
 /** What a case row's drafts cost in all: the vault may be down by this much from the close before (chainRecheck.js). */
 export function getRowDraftCost(row) {
@@ -359,7 +358,7 @@ export function recheckRun(rows = []) {
   let recorded = false;
   // G4: under the next rules a season buys 「하나 더」 once (gauntletEngine.js `buyExtraRelic`).
   const extras = cases.reduce((sum, row) => sum + (Array.isArray(row.decision_log) ? row.decision_log : []).filter((entry) => entry?.relicDraft?.extra === true).length, 0);
-  if (cases.length && nextTableOn(rowRules(cases[0])) && extras > 1) marks.add(RELIC_DRAFT_MARK);
+  if (cases.length && isNextOn(rowRules(cases[0])) && extras > 1) marks.add(RELIC_DRAFT_MARK);
   const report = cases.map((row, at) => {
     const score = recheckCaseScore(row);
     const windows = recheckCaseWindows(row);

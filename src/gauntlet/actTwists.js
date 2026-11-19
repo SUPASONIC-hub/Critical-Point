@@ -1,6 +1,6 @@
 /**
  * G5 (2026-11-19, 「전부 1」): one table twist for each of acts 3, 5 and 7
- * (B-11's acts, actCardCopy.js), under the next rules (nextTable.js).
+ * (B-11's acts, actCardCopy.js), under the next rules (nextTableRules.js `isNextOn`).
  *
  * After the prologue and 사건 01-03 bring in the rules, 사건 01-49 played with
  * the same numbers (the bot banked the same in every case), and N26
