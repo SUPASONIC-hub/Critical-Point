@@ -2218,21 +2218,28 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 4 (C-3 and C-4, the
- * user's answers of 2026-10-25: the logic streak held on the card's direction,
- * 사람 or 자리, and OVERCLOCK, the audit and the links opening one a case in
- * 사건 01 to 03). 3 was B3's audit and B2's links as rules of the table from
- * 프롤로그 04, 2 the day-ten table of 2026-10-20. Every run summary carries
- * it, so every case row carries it as `dynamics`, and the server ranks no
- * season with a case row below it (*_ranking_reset_rules_mark4_relic_draft.sql,
- * the one wipe of 2026-11-12, a draft until that evening; it folds the mark 3
- * and mark 4 drafts of 10-21 and 10-25 together; 20261020010000 asked for 2,
- * and the reset of 20261011010000 read `logicStreak` the same way). Raise the number,
- * never reuse it, when the table changes again. The migration,
- * telemetryBatch.js and check-grants.mjs name it too.
+ * The mark of a case closed at the table of RULES_MARK 5 (2026-11-20, the
+ * user's answer 「1」 of 11-19: G1 to G7, the next table rules of
+ * src/gauntlet/rulesNext.js, and N26, #591: 사건 09, 11, 14 and 16 deal a rule
+ * of their own for that case in a season with no weekly rule, so the same play
+ * scores differently). It ships before the wipe of 2026-11-30, which keeps its
+ * announced day: until then the server still ranks seasons from 4 up, and
+ * that wipe asks for 5 (*_ranking_reset_1130.sql).
+ * 4 was C-3 and C-4 (the user's answers of 2026-10-25: the logic streak held
+ * on the card's direction, 사람 or 자리, and OVERCLOCK, the audit and the
+ * links opening one a case in 사건 01 to 03), 3 B3's audit and B2's links as
+ * rules of the table from 프롤로그 04, 2 the day-ten table of 2026-10-20.
+ * Every run summary carries it, so every case row carries it as `dynamics`,
+ * and the server ranks no season with a case row below it
+ * (the one wipe of 2026-11-12, *_ranking_reset_rules_mark4_relic_draft.sql, asked for 4,
+ * 20261020010000 for 2, and the reset of 20261011010000 read `logicStreak`
+ * the same way). Raise the number, never reuse it, when the table changes
+ * again. The migration and check-grants.mjs name it too. The device's own
+ * ranking keeps its key (v12) at 5: the 11-30 notice promised the public
+ * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 4;
+export const RULES_MARK = 5;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
