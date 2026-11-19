@@ -20,6 +20,8 @@ name: Funnel
 # It also reads the two limits that hold for everyone together (new cloud-save
 # codes and telemetry bytes in a day, scripts/report-budgets.mjs), as Board
 # Reports does in the morning, and a scheduled run fails when one is at 80%.
+# The same failure carries the event weeks' three deadline days (N48,
+# scripts/report-event-week.mjs --alarm, docs/event-week.md).
 
 on:
   workflow_dispatch:
@@ -211,4 +213,36 @@ jobs:
         if: ${{ !cancelled() && steps.token.outputs.configured == 'true' && github.event_name == 'schedule' && steps.budgets.outputs.near != '0' && steps.budgets.outputs.near != '' }}
         run: |
           echo "::error title=A global limit is near::${{ steps.budgets.outputs.near }} limit(s) for everyone together are at 80% or more of the day. When one runs out, every player's request of that kind is refused until the day ends. Read the Job Summary; raise the value in private_settings (README section 6)."
+          exit 1
+      # N48 (F7 next, 2026-11-19): the event weeks' deadlines by the same road
+      # as the 80% alarm. scripts/report-event-week.mjs --alarm reads the
+      # calendar in the repository only (no secret, no query) and names a
+      # reason only on three days: the day the calendar first ends within 28
+      # days, the next slot's pick deadline (D-14) and its merge deadline
+      # (D-7). On those days a scheduled run fails, so the failed-run mail is
+      # the alarm; on every other day this adds nothing. Last, so a failure
+      # here skips no other step.
+      - name: Read the event week deadlines
+        id: eventweek
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/report-event-week.mjs --alarm > event-week-alarm.txt
+          if [ -s event-week-alarm.txt ]; then
+            {
+              echo "### 이벤트 주 마감 (N48, docs/event-week.md)"
+              echo
+              sed 's/^/- 알람: /' event-week-alarm.txt
+              echo
+              node scripts/report-event-week.mjs | tail -n +3
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Fail on an event week deadline
+        if: ${{ !cancelled() && github.event_name == 'schedule' && steps.eventweek.outputs.due == 'true' }}
+        shell: bash
+        run: |
+          while IFS= read -r reason; do echo "::error title=Event week deadline::$reason"; done < event-week-alarm.txt
+          echo "Read the Job Summary and docs/event-week.md 3-1 and 3-2: pick the next slot's rule and merge its calendar line."
           exit 1

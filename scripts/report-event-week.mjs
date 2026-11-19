@@ -7,9 +7,11 @@
  *
  *   npm run report:event-week                      지금(한국 시간)
  *   npm run report:event-week -- --at=2026-11-30   그날 0시(KST)로 미리 보기(dry-run)
+ *   npm run report:event-week -- --alarm           알람 날이면 그 까닭을 한 줄씩, 아니면 아무것도(N48)
  *
  * 줄은 마크다운 목록이라 Job Summary에 그대로 붙일 수 있습니다. 알릴 것이 있으면 `주의:` 줄이 붙지만 종료
- * 코드는 늘 0입니다(보고만 함).
+ * 코드는 늘 0입니다(보고만 함). `--alarm`도 종료 코드는 0이고, 실패로 끝내는 것은 Funnel 워크플로의 몫입니다
+ * (예산 80% 알람과 같은 길: 예약 실행이 실패하면 GitHub이 메일을 보냄).
  */
 import { pathToFileURL } from "node:url";
 
@@ -20,6 +22,11 @@ import { getWeekRule, nextWeekRuleAt, WEEKLY_NOTICE_DAYS, weekBoardsAt, weekRule
 export const CALENDAR_HORIZON_DAYS = 28;
 /** 이벤트 주는 대체로 격주(2장): 마지막 줄 다음 빈 자리는 2주 뒤로 봅니다. */
 const NEXT_SLOT_WEEKS = 2;
+/**
+ * 알람이 보는 「그날」은 실행 시각에서 12시간을 뺀 날(KST)입니다. Funnel은 22:10 KST 예약이지만 GitHub이 몇
+ * 시간 늦게 시작하기도 해서(10-24~11-02 Verify Ranking은 3~8시간 늦음), 자정을 넘긴 늦은 실행도 예약한 날로 셉니다.
+ */
+export const ALARM_DAY_SHIFT_HOURS = 12;
 
 /** KST 날짜 "YYYY-MM-DD"(그날 0시 KST)를 UTC 밀리초로. 아니면 null. */
 export function parseKstDate(text) {
@@ -95,12 +102,45 @@ export function describeEventWeek(ms, calendar = WEEKLY_RULES) {
   return { week, lines, warnings };
 }
 
+/**
+ * N48: 알람 메일을 보낼 날의 까닭들(없으면 빈 배열). `주의:` 줄은 달력이 28일 안에 끝나는 동안 매일 뜨므로,
+ * 메일은 세 날에만 갑니다 -- 28일 안에 처음 들어온 날, 다음 격주 자리를 고르는 마감(D-14), 병합 마감(D-7).
+ * 날짜는 달력의 마지막 줄(지난 줄이어도)에서 셉니다: D-14 마감은 바로 그 마지막 주의 첫날이라, 그날부터는
+ * `describeEventWeek`의 「앞으로의 이벤트 주」에 그 줄이 없습니다. 달력에 줄을 더하면 날짜도 따라 밀립니다.
+ */
+export function eventWeekAlarm(ms, calendar = WEEKLY_RULES) {
+  const now = Number(ms);
+  if (!Number.isFinite(now)) throw new Error("시각이 숫자가 아닙니다");
+  const starts = calendar.map((entry) => ({ ...entry, start: weekStartMs(entry.week) })).filter((entry) => entry.start !== null);
+  if (starts.length === 0) return [];
+  const end = starts.reduce((a, b) => (b.start > a.start ? b : a));
+  const day = kstDate(now - ALARM_DAY_SHIFT_HOURS * 3600 * 1000);
+  const slot = end.start + NEXT_SLOT_WEEKS * 7 * DAY_MS;
+  const slotName = `${isoWeekKey(slot)}(${kstDate(slot)})`;
+  const pick = kstDate(slot - 14 * DAY_MS);
+  const merge = kstDate(slot - WEEKLY_NOTICE_DAYS * DAY_MS);
+  const reasons = [];
+  if (day === kstDate(end.start - (CALENDAR_HORIZON_DAYS - 1) * DAY_MS)) {
+    reasons.push(`달력이 ${CALENDAR_HORIZON_DAYS}일 안에 끝납니다(마지막 줄 ${end.week} \`${end.id}\`): 다음 격주 자리 ${slotName}는 ${pick}까지 고르고 ${merge}까지 병합 (3-1·3-2)`);
+  }
+  if (day === pick) reasons.push(`오늘(${pick})이 다음 격주 자리 ${slotName}의 규칙을 고르는 마감(D-14)입니다 (3-1)`);
+  if (day === merge) reasons.push(`오늘(${merge})이 다음 격주 자리 ${slotName}의 병합 마감(D-7)입니다 -- 마이그레이션은 병합 직전에 묻기 (3-2)`);
+  return reasons;
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  const at = process.argv.slice(2).find((arg) => arg.startsWith("--at="))?.slice(5);
+  const args = process.argv.slice(2);
+  const at = args.find((arg) => arg.startsWith("--at="))?.slice(5);
   const ms = at === undefined ? Date.now() : parseKstDate(at);
   if (ms === null) {
     console.error("--at=YYYY-MM-DD (한국 날짜) 꼴이어야 합니다");
     process.exit(2);
   }
-  console.log(`### 이벤트 주 (docs/event-week.md)\n\n${describeEventWeek(ms).lines.join("\n")}`);
+  if (args.includes("--alarm")) {
+    // --at은 그날 0시라 12시간을 빼면 전날이 되므로, 미리 보기에서는 그날 22:10(Funnel 예약 시각)으로 봅니다.
+    const reasons = eventWeekAlarm(at === undefined ? ms : ms + (22 * 60 + 10) * 60 * 1000);
+    if (reasons.length) console.log(reasons.join("\n"));
+  } else {
+    console.log(`### 이벤트 주 (docs/event-week.md)\n\n${describeEventWeek(ms).lines.join("\n")}`);
+  }
 }
