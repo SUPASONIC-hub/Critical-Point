@@ -508,6 +508,23 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
    | `[읽기]` | 사건 파일을 불러오다 멈춤(문법 오류 같은 것). 오류의 첫 줄만 보여 줍니다 | 그 파일 |
    | `[중복]` | 이 문서·`docs/canon.md`·`docs/portrait-credits.md`에 여덟 줄 이상 두 번 붙은 덩어리나 같은 제목 | 그 문서 |
 
+6. **PR에서 경고 요약**(N47, 11-18): `src/nodes/side*.js`나 `src/locales/*/nodes/side*.js`를 고친 PR에는
+   **Case Check** 작업(`.github/workflows/case-check.yml`)이 `check:case --summary`를 돌려 사건마다 한 줄
+   (「side03: 경고 2개 (초상 1, en 키 1)」)을 PR 경고와 작업 요약에 남깁니다. 목록은 싣지 않고 요약만(긴 목록은
+   지나쳐 읽힘), 실패하지 않으며 병합을 막지 않습니다. 자세히는 위 5의 `npm run check:case -- sideNN`.
+7. **다음 Season 준비표**(N47): `npm run report:season-ready`는 읽기만 하는 표입니다. `src/nodes`의 번외
+   파일마다 공개 목록(`SIDE_CASES`)에 있는지(공개됨/대기), `check:case` 경고 수(초상 · en/ja · 기타), e2e
+   spec이 그 id를 부르는지, 준비(경고 0 + e2e 있음)를 한 줄씩 보여 주고, 표 아래에 판정 한 줄을 씁니다.
+
+   | 판정 | 뜻 |
+   | --- | --- |
+   | 「공개 가능 — sideNN 준비됨.」 | 대기 중인 번외가 모두 초록. Season 날을 고를 수 있음 |
+   | 「아직 — sideNN에 경고나 e2e 빠짐.」 | 대기 중인 번외 가운데 빨강이 있음 |
+   | 「새로 준비된 번외 없음」 | 모든 번외 파일이 이미 공개 목록에 있음 |
+
+   `CASE_SEQUENCE` 밖의 시즌 사건 파일(`caseNN.js`, `prologueNN.js`)이 있으면 그 이름도 마지막 줄에 나옵니다.
+   Season은 사용자가 날을 고르므로(11-18), 이 표가 그 근거입니다. 종료 코드는 늘 0입니다.
+
 ---
 
 ## 7. 검사가 지키는 규칙
