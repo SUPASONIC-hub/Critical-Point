@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs"; // the HUD read against the engine's old numbers (getFocusBonus)
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -32,7 +33,10 @@ test("the HUD's numbers are the engine's, read the way the stage read them", () 
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   assert.equal(meters.selectedChips, getCardChips(HAND[1], schema));
   assert.equal(meters.multiplier, getMultiplier(win.gauge));
-  assert.deepEqual(meters.focusBonus, getFocusBonus(win.focus, win.focusMode));
+  // `note` is the next rules' LOCK line (G3), empty on the old table this file holds (helpers/oldTable.mjs).
+  const { note, ...focusBonus } = meters.focusBonus;
+  assert.equal(note, "");
+  assert.deepEqual(focusBonus, getFocusBonus(win.focus, win.focusMode));
   assert.equal(meters.remaining, getRemainingSeconds(win));
   assert.equal(meters.bpm, getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, schema.sedated, win.elapsed / schema.seconds));
   assert.equal(meters.nextLow, nextLow);
