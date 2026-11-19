@@ -110,6 +110,14 @@ export const ACCESSIBILITY_SETTINGS_KEY = "critical-point-accessibility-v1";
 export const LOCALE_KEY = "critical-point-locale-v1";
 // "1" once the player closed the intro's 홈 화면에 추가 hint (src/state/installPrompt.js).
 export const INSTALL_HINT_DISMISSED_KEY = "critical-point-install-hint-dismissed-v1";
+/**
+ * 주 1회 알림 (N25, state/weeklyReminder.js): "1" once the player turned it on
+ * in the comfort settings of an installed copy; anything else is off, which
+ * is where every device starts.
+ */
+export const WEEKLY_REMINDER_KEY = "critical-point-weekly-reminder-v1";
+// What this device last told the server (state/weeklyReminderPush.js): endpoint, language and week, as JSON.
+export const WEEKLY_REMINDER_SYNC_KEY = "critical-point-weekly-reminder-sync-v1";
 // N24: when this device last opened the start screen and which side cases it listed then
 // (`{ at, sides }`, src/state/sinceLastVisit.js), for the 「지난번 이후」 card. Kept on the device only.
 export const LAST_VISIT_KEY = "critical-point-last-visit-v1";

@@ -130,7 +130,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 {letterKeys && <kbd className="shortcut-hint" aria-hidden="true">R</kbd>}
                 {resultCopy.replayCase}
               </button>
-              <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
+              <button type="button" className="ghost" onClick={() => setShowRanking(true)}>
                 <Trophy size={16} />
                 {resultCopy.ranking}
               </button>

@@ -112,6 +112,11 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # `actions: read` for N45's count only: the step lists this workflow's
+    # earlier runs and downloads their summary artifacts.
+    permissions:
+      contents: read
+      actions: read
     outputs:
       settled: ${{ steps.hall.outputs.settled }}
     env:
@@ -254,6 +259,30 @@ jobs:
         run: |
           rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err counts.sql counts.json hall.sql hall.json hall.err
           if [ -d rows ]; then rmdir rows; fi
+      # N45 (F1's hide switch, 2026-11-19): how many days in a row the nightly
+      # report would have hidden no season, out of the 14 the switch waits for
+      # (supabase/migrations/20261117000000_ranking_hide_switch.sql), and how
+      # many seasons those nights judged. Counted again each night from the
+      # earlier runs' summary artifacts (scripts/hide-switch-days.mjs): no
+      # state file, no write, no new secret. At 14 days with seasons judged it
+      # shows the one SQL line to turn the switch on. A failure here fails
+      # nothing.
+      - name: Count the days for the hide switch
+        if: always() && steps.token.outputs.configured == 'true'
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ranking-report hide-days
+          # This run is still in progress, so --status completed leaves it out.
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow verify-ranking.yml --status completed --limit 40 --json databaseId,createdAt > hide-days/runs.json || echo "[]" > hide-days/runs.json
+          for id in $(node -e 'for (const r of JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))) console.log(r.databaseId)' hide-days/runs.json); do
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" -n verify-ranking-summary -D "hide-days/$id" > /dev/null 2>&1 || true
+          done
+          node scripts/hide-switch-days.mjs hide-days/runs.json hide-days ranking-report/verify-ranking-summary.md > hide-days/line.md
+          cat hide-days/line.md | tee -a "$GITHUB_STEP_SUMMARY" >> ranking-report/verify-ranking-summary.md
+          rm -rf hide-days
       # F7: where the event weeks stand today (docs/event-week.md), at the
       # end of the summary. It reads the calendar in the repository only: no
       # secret, no query, no write. A failure here never fails the run.

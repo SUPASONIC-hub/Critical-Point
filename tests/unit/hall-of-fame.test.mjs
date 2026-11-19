@@ -26,8 +26,9 @@ import {
   readHallOfFameCounts,
   weekSettlesOn,
 } from "../../src/hallOfFame.js";
-import { hallOfFameBadges, hallOfFameBoardLabel } from "../../src/hallOfFameBadges.js";
+import { hallOfFameBadges, hallOfFameBoardLabel, hallOfFameProgress } from "../../src/hallOfFameBadges.js";
 import rankingWords from "../../src/copy/ranking.js";
+import { fill } from "../../src/locale.js";
 import { WINDOW_RECORD_KEY } from "../../src/rankingRecheck.js";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
 import { formatHallOfFamePick, formatHallOfFameThreshold, HALL_OF_FAME_T12_ALTERNATIVE, verifyRows } from "../../scripts/verify-ranking-rows.mjs";
@@ -256,6 +257,31 @@ test("the ranking screen's badges, by run tag", () => {
   assert.equal(hallOfFameBadges(null, rankingWords).size, 0);
   assert.equal(hallOfFameBadges([{ board: "table-3", place: 4, run_tag: "X" }, { board: {}, place: 1, run_tag: "Y" }, "junk"], rankingWords).size, 0);
   assert.equal(hallOfFameBoardLabel("table-3"), "본 판 (판 규칙 3)");
+});
+
+// N46: a board with no place yet says how far it is, the table's first; a
+// placed, settled, full or past week's board says nothing.
+test("the ranking screen's progress lines, a board below ten (N46)", () => {
+  const rows = [
+    { board: "2026-W49", place: null, run_tag: null, settled_on: null, checked_seasons: 4 },
+    { board: "table-4", place: null, run_tag: null, settled_on: null, checked_seasons: 3 },
+    { board: "table-3", place: null, run_tag: null, settled_on: "2026-11-30", checked_seasons: 6 },
+    { board: "2026-W48", place: null, run_tag: null, settled_on: null, checked_seasons: 2 },
+    { board: "table-5", place: 1, run_tag: "AAAA1111", settled_on: null, checked_seasons: 12 },
+    { board: "table-6", place: null, run_tag: null, settled_on: null, checked_seasons: 10 },
+    { board: "table-7", place: null, run_tag: null, settled_on: null, checked_seasons: "x" },
+    "junk",
+  ];
+  assert.deepEqual(hallOfFameProgress(rows, rankingWords, "2026-W49"), [
+    { board: "table-4", label: "본 판", count: 3 },
+    { board: "2026-W49", label: "2026-W49", count: 4 },
+  ]);
+  assert.deepEqual(hallOfFameProgress(rows, rankingWords).map((board) => board.board), ["table-4"]);
+  assert.deepEqual(hallOfFameProgress(null, rankingWords), []);
+  assert.equal(
+    fill(rankingWords.hallProgress, { board: "본 판", count: 3, min: 10 }),
+    "명예의 전당 · 본 판: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 3/10)",
+  );
 });
 
 test("the CLI prints the read, the page and the settle statement", () => {

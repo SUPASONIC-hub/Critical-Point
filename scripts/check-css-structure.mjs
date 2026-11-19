@@ -368,7 +368,8 @@ const fileBudgets = {
   // 3203 -> 3214 lines on 2026-11-18, n37-paper-coverage, measured: the BUST slam's third line on paper (N37), red on red stripes before.
   // 3208 -> 3212 lines on 2026-11-18, n36-phone-fit (E1d): the ledger column's air on every phone up to 860 tall, English card words a step smaller on a short one.
   // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
-  "play.css": { lines: 3219, bytes: 62160 },
+  // -> 3264 lines / 62512 bytes on 2026-11-19, 묶음 11-19b, measured: N36b 3안 (short phone: the staked slip in two lines, the lock reason full width, tighter pills).
+  "play.css": { lines: 3264, bytes: 62512 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -553,6 +554,9 @@ const fileBudgets = {
   // question of 프롤로그 01·02 on the reveal sheet (BetweenHandsPulse.jsx), in a
   // file of its own so play.css's budget is not touched. Measured 41 / 765.
   "pulse.css": { lines: 41, bytes: 765 },
+  // New on 2026-11-19 (b5-open-clock-cue, measured locally): the stake clock's cut beside the clock for 0.8
+  // seconds, a push's or the creep's (B5, N43), in a file of its own so play.css's budget is not touched. Measured 34 / 639.
+  "clock-cut.css": { lines: 34, bytes: 639 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

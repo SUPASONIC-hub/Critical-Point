@@ -458,16 +458,43 @@ test("a season in the hall of fame carries its place on the ranking, by run tag"
   await expect(row("HALLRUN1").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 1위 (잠정)", "명예의 전당 · 2026-W47 2위"]);
   await expect(row("HALLRUN2").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 2위 (잠정)"]);
   await expect(row("PLAINRUN").locator(".ranking-hall-badge")).toHaveCount(0);
-  // The read asks for the places only, and their four columns.
+  // The read asks for every board, with its count (N46), and no progress line
+  // while every board here has its places.
   expect(asked.length).toBeGreaterThan(0);
-  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on");
-  expect(decodeURIComponent(asked[0])).toContain("place=not.is.null");
+  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on,checked_seasons");
+  expect(decodeURIComponent(asked[0])).not.toContain("place=");
+  await expect(page.getByTestId("ranking-hall-progress")).toHaveCount(0);
   // The badge sits inside its row, on a phone too.
   await page.setViewportSize({ width: 360, height: 780 });
   const badge = row("HALLRUN1").locator(".ranking-hall-badge").first();
   const [badgeBox, rowBox] = [await badge.boundingBox(), await row("HALLRUN1").boundingBox()];
   expect(badgeBox.x).toBeGreaterThanOrEqual(rowBox.x);
   expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+});
+
+// N46: while a board keeps no place yet, the ranking says how far it is from
+// its first three, one line a board: the table's own and this week's (the
+// e2e build's weekly clock is pinned to 2026-W02); a past week's says nothing.
+test("a board with no place yet says how far it is from its first three (N46)", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/public_hall_of_fame**`, (route) => route.fulfill(json([
+    { board: "table-4", place: null, run_tag: null, settled_on: null, checked_seasons: 3 },
+    { board: "2026-W02", place: null, run_tag: null, settled_on: null, checked_seasons: 7 },
+    { board: "2026-W01", place: null, run_tag: null, settled_on: null, checked_seasons: 2 },
+  ])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  const lines = page.getByTestId("ranking-hall-progress");
+  await expect(lines).toHaveText([
+    "명예의 전당 · 본 판: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 3/10)",
+    "명예의 전당 · 2026-W02: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 7/10)",
+  ]);
+  // On a phone the line wraps inside the panel.
+  await page.setViewportSize({ width: 360, height: 740 });
+  const [lineBox, panelBox] = [await lines.first().boundingBox(), await page.locator(".ranking-table-panel").boundingBox()];
+  expect(lineBox.x).toBeGreaterThanOrEqual(panelBox.x);
+  expect(lineBox.x + lineBox.width).toBeLessThanOrEqual(panelBox.x + panelBox.width + 0.5);
 });
 
 /* ------------------------------------------------------------- story mode */
@@ -565,4 +592,41 @@ test("a season with a story case is not sent to the public ranking, and this dev
   expect(season.summary.assistTime).toBe(2);
   // (How that row is drawn is the test of the seeded ranking above: a page
   // loaded on this save opens on its ending, not on the intro's 랭킹 button.)
+});
+
+// n37 (11-19): the button said 「브리핑으로 돌아가기」 on every way in, and the
+// result page's 랭킹 ended the run first, so it closed onto the first screen.
+// Each screen now names the place it goes back to, and goes there.
+test("랭킹 and 게시판 opened from the first screen go back to it, and say so", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.waitForSelector(".intro");
+  for (const [opener, screen] of [["랭킹", ".ranking-page"], ["게시판", ".board-page"]]) {
+    await page.getByRole("button", { name: opener }).first().click();
+    await expect(page.locator(screen)).toBeVisible();
+    await expect(page.getByRole("button", { name: "브리핑으로 돌아가기" })).toHaveCount(0);
+    await page.getByRole("button", { name: "첫 화면으로 돌아가기" }).click();
+    await expect(page.locator(".intro")).toBeVisible();
+    await expect(page.locator(screen)).toHaveCount(0);
+  }
+});
+
+test("랭킹 opened from a case's result page goes back to that page", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  const result = page.locator(".result-page");
+  await expect(result).toBeVisible();
+  await result.locator(".top-actions").getByRole("button", { name: "랭킹" }).click();
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await expect(page.getByRole("button", { name: "첫 화면으로 돌아가기" })).toHaveCount(0);
+  // R is the result page's retry; it is hidden, so the key is not its.
+  await page.keyboard.press("r");
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await page.getByRole("button", { name: "결과로 돌아가기" }).click();
+  await expect(result).toBeVisible();
+  await expect(page.locator(".intro")).toHaveCount(0);
 });

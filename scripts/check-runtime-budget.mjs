@@ -256,10 +256,12 @@ const BUDGETS = {
   // KD은행 계좌, with a line saying why it sits there.
   // 863 -> 865 lines on 2026-11-13, measured (n2n3-firsthour): the import and the call that
   // count 프롤로그 01's first table opened for Google Analytics (N2, gameEvents.js).
+  // 865 -> 869 lines, 73 -> 74 names on 2026-11-19 (b5-open-clock-cue, measured locally): the stake
+  // clock's cut beside the clock (useClockCut, tableVoice.js), its call and its mark.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 865,
+    lines: 869,
     longestLine: 250,
-    importedNames: 73,
+    importedNames: 74,
     hooks: {},
   },
 };

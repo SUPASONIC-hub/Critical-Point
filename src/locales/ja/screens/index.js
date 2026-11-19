@@ -34,6 +34,7 @@ import observer from "./observer.js";
 import playReads from "./playReads.js";
 import ranking from "./ranking.js";
 import relics from "./relics.js";
+import reminder from "./reminder.js";
 import report from "./report.js";
 import reportLines from "./reportLines.js";
 import result from "./result.js";
@@ -52,4 +53,4 @@ import unlocks from "./unlocks.js";
 import weekRule from "./weekRule.js";
 import weekRules from "./weekRules.js";
 
-export default { actCard, actTally, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, farCallbacks, habits, header, intro, introPanels, judgment, leaderboard, loading, logicReport, music, mutations, notices, observer, playReads, ranking, relics, report, reportLines, result, resultCard, resultCardDraw, reveal, runLines, sceneRates, seasonEnd, seasonLines, sideCase, sinceLast, table, tabTitles, unlocks, weekRule, weekRules };
+export default { actCard, actTally, audit, board, boardPost, briefing, cascade, cloudSave, cloudSaveBody, cloudSaveStatus, comfort, confirm, edge, edgeNotices, ending, epilogue, farCallbacks, habits, header, intro, introPanels, judgment, leaderboard, loading, logicReport, music, mutations, notices, observer, playReads, ranking, relics, reminder, report, reportLines, result, resultCard, resultCardDraw, reveal, runLines, sceneRates, seasonEnd, seasonLines, sideCase, sinceLast, table, tabTitles, unlocks, weekRule, weekRules };

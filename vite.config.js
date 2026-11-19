@@ -9,6 +9,7 @@ import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/criti
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
 import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks, withoutHtmlComments } from "./scripts/site-pages.mjs";
 import { withStaticShell } from "./scripts/static-shell.mjs";
+import { PAGE_FONT_SOURCES, withShippedFonts } from "./scripts/legal-pages.mjs";
 import { adsTxt, insertAdSlots, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
@@ -445,8 +446,19 @@ function staticPages({ analytics, ads }) {
         response.end(file);
       });
     },
-    generateBundle() {
-      for (const [fileName, source] of Object.entries(files())) this.emitFile({ type: "asset", fileName, source });
+    generateBundle(_options, bundle) {
+      // The pages' two font files (PAGE_FONT_SOURCES, legal-pages.mjs) by the names the build gave them.
+      const shipped = {};
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset") continue;
+        for (const original of asset.originalFileNames ?? []) {
+          const source = `/${original.replace(/\\/g, "/")}`;
+          if (PAGE_FONT_SOURCES.includes(source)) shipped[source] = `/${asset.fileName}`;
+        }
+      }
+      for (const [fileName, source] of Object.entries(files())) {
+        this.emitFile({ type: "asset", fileName, source: fileName.endsWith(".html") ? withShippedFonts(source, shipped) : source });
+      }
     },
   };
 }

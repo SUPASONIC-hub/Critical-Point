@@ -172,15 +172,28 @@ const SCOUT_EDGE = 3;
  * moment the next push can reach the band the first drew (`narrowDue`).
  */
 export const SCOUT_TIMINGS = Object.freeze(["never", "always", "late", "danger", "narrow"]);
+/**
+ * N43 (11-18): timings played on request only (scout-narrow-report.mjs,
+ * check-endings.mjs's ENDING_SCOUT_TIMINGS), never in the default runs.
+ * "narrowFirst" looks and narrows before the first push on every board: the
+ * hand that buys the closest read whatever the board says.
+ */
+export const SCOUT_EXTRA_TIMINGS = Object.freeze(["narrowFirst"]);
 export function scoutDue(timing, win) {
-  if (timing === "always" || timing === "narrow") return true;
+  if (timing === "always" || timing === "narrow" || timing === "narrowFirst") return true;
   if (timing === "late") return win.pushes >= 2;
   if (timing === "danger") return win.gauge + win.schema.stepMax >= win.schema.wallMin;
   return false;
 }
-/** Whether a hand that narrows (`narrow`) takes its second look now: once it has looked, when the next push, `edge` past, reaches the band. */
+/**
+ * Whether a hand that narrows takes its second look now, once it has looked:
+ * `narrow` when the next push, `edge` past, reaches the band the first drew;
+ * `narrowFirst` at once, before the first push.
+ */
 export function narrowDue(timing, win, edge = SCOUT_EDGE) {
-  return timing === "narrow" && win.scouted === true && win.narrowed !== true && win.gauge + win.schema.stepMax - edge >= getWindowBand(win).wallMin;
+  if (win.scouted !== true || win.narrowed === true) return false;
+  if (timing === "narrowFirst") return true;
+  return timing === "narrow" && win.gauge + win.schema.stepMax - edge >= getWindowBand(win).wallMin;
 }
 
 /**
@@ -360,7 +373,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
       // every draw after it keeps its place in the stream.
       listens: ((drawn) => (base.board ? base.board === "listens" || base.board === "heartbeat" : drawn))(random() < 0.4),
       // When a listening hand takes its look (`scoutDue`, B1); "always" is how every hand looked before B1's price, and the heartbeat hand never looks.
-      scout: SCOUT_TIMINGS.includes(base.scout) ? base.scout : base.board === "heartbeat" ? "never" : "always",
+      scout: SCOUT_TIMINGS.includes(base.scout) || SCOUT_EXTRA_TIMINGS.includes(base.scout) ? base.scout : base.board === "heartbeat" ? "never" : "always",
       bpm: pick([95, 100, 105, 110]),
       reframe: pick([0, 0.15, 0.35, 0.6]),
       think: 2 + random() * 10,

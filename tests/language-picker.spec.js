@@ -45,7 +45,7 @@ test("the intro's language choice opens English, keeps it through a reload and r
   // The ranking screen's words too (src/copy/ranking.js, 영어판 3단계).
   await page.locator(".intro .top-actions").getByRole("button", { name: "Ranking" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Where did thinking stretch the furthest?" })).toBeVisible();
-  await page.getByRole("button", { name: "Back to the briefing" }).click();
+  await page.getByRole("button", { name: "Back to the title screen" }).click();
 
   await page.getByRole("navigation", { name: "언어 · Language" }).getByRole("button", { name: "한국어" }).click();
   await expect(page).not.toHaveURL(/lang=/);

@@ -939,6 +939,10 @@ Still open, on purpose:
   header) once the nightly report's "hide switch: hidden once on" lines have
   named no honest season for 14 days. `check:grants` holds the policy's list
   to `HIDE_MARKS`.
+  Since N45 (2026-11-19) the nightly summary counts those days itself:
+  「거짓 표시 0 연속 N일 / 14 (판정한 행 M)」 (`scripts/hide-switch-days.mjs`,
+  re-read from the earlier runs' summary artifacts), and at 14 days with
+  M above 0 it prints the SQL line in that place.
 - What the audits of 2026-10-06 and 2026-10-07 found and left is listed under
   "Looked at and left" at the end of this file.
 
