@@ -2634,7 +2634,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
 // -> 380,746 / 443,285 / 451,248 N42 떠나는 순간 한 줄 (draft), measured 380,742 / 443,281 / 451,244 locally, the plus 4.
 // -> 380,729 / 443,248 / 451,222 n39-n40-n44, measured 380,725 / 443,244 / 451,218 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_729, en: 443_248, ja: 451_222 };
+// -> 380,682 / 443,178 / 451,140 N36 (CSS only), measured 380,678 / 443,174 / 451,136 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_682, en: 443_178, ja: 451_140 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
