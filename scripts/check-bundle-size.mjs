@@ -202,7 +202,8 @@ const budgets = [
   // -> gzip 61,694 묶음 11-19 머리 f340257e, measured 61,690 in CI verify-quick (CSS 해시 이름이 바뀐 만큼), the plus 4.
   // -> 164,643 / 61,417 n37-followups, measured locally 164,639 / 61,413 in the e2e build, the plus 4: the ranking over the result page (returnTo) and its keys held.
   // 164,643 / 61,417 -> 165,507 / 61,707 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 165503 / 61703 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_507, maxGzip: 61_707 },
+  // 165,507 / 61,707 -> 165,734 / 61,769 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 165,730 / 61,765 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_734, maxGzip: 61_769 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -332,7 +333,8 @@ const budgets = [
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
   // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_018 },
+  // 35,422 / 15,018 -> 37,405 / 15,744 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 37,401 / 15,740 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_405, maxGzip: 15_744 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1527,7 +1529,8 @@ const budgets = [
   // 50,344 / 19,111 -> 51,160 / 19,410 market-shock over main 311a3dd8: MARKET SHOCK 주간 규칙(카탈로그만, ko/en/ja 규칙·판 규칙 문구, 엔진 SHOCK 판). Measured 51156 / 19406 (over budget only) in the e2e build, the plus 4.
   // 51,160 / 19,410 -> 51,385 / 19,490 묶음 B4+c2 over main bd2bd589: IDLE MONEY(2%)·MARKET SHOCK(벽 4/±20%) 카탈로그만. Measured 51381 / 19486 (over budget only) in the e2e build, the plus 4.
   // 51,385 / 19,490 -> 51,385 / 19,540 N24 draft over main 705a809f. Measured - / 19536 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 51_819, maxGzip: 19_640 },
+  // 51,819 / 19,640 -> 54,759 / 20,755 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 54,755 / 20,751 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 54_759, maxGzip: 20_755 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1850,7 +1853,8 @@ const budgets = [
   // audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3).
   // 2,285 / 1,207 -> 2,417 / 1,239 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the cases before the audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3). Measured 2,417 / 1,235, the gzip plus 4 in the e2e build.
   // 2,440 / 1,282 -> 2,572 / 1,314 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): AUDIT CONTACT's limit and the ladder's cases before the audit together. Measured 2,572 / 1,310 in the e2e build, the gzip plus 4, the raw the measurement.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_572, maxGzip: 1_314 },
+  // 2,572 / 1,314 -> 2,635 / 1,343 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 2,631 / 1,339 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_343 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -1879,7 +1883,8 @@ const budgets = [
   // 2026-10-21, the gzip plus 4.
   // 1,376 / 775 -> 1,195 / 680 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,195 / 676 in the e2e build, the gzip plus 4.
-  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_195, maxGzip: 680 },
+  // 1,195 / 680 -> 1,206 / 687 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 1,202 / 683 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 687 },
   // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
   // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
   // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
@@ -2090,7 +2095,8 @@ const budgets = [
   // 194,641 / 65,117 -> 195,404 / 65,370 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 195400 / 65366 (over budget only) in the e2e build, the plus 4.
   // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
   // 198,169 / 66,469 -> 199,085 / 66,764 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 199081 / 66760 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 199_085, maxGzip: 66_764 },
+  // 199,085 / 66,764 -> 200,701 / 67,333 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 200,697 / 67,329 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 200_701, maxGzip: 67_333 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2199,7 +2205,8 @@ const budgets = [
   // 162,433 / 58,148 -> 163,050 / 58,393 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 163046 / 58389 (over budget only) in the e2e build, the plus 4.
   // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
   // 165,449 / 59,347 -> 166,222 / 59,627 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 166218 / 59623 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 166_222, maxGzip: 59_627 },
+  // 166,222 / 59,627 -> 167,654 / 60,143 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 167,650 / 60,139 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 167_654, maxGzip: 60_143 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2682,7 +2689,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,117 / 439,653 / 447,540 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured first paint, the plus 4.
 // -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
 // -> 381,530 / 444,390 / 452,389 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 444_390, ja: 452_389 };
+// -> 381,530 / 444,906 / 452,957 gameplay-g-core over main 065d684d (G 규칙 낭독 줄 ko/en/ja). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 444_906, ja: 452_957 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
