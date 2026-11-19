@@ -21,7 +21,7 @@ export default {
     lockShutReason: "Can’t press now — the streak you carried in already fills LOCK’s ×{cap} cap, so it would add nothing.",
     lockStrikeHot: " STRIKE committed at Heat {heat} or more lifts the cap to ×{cap}.",
     signOpen: "Sign-off hand, stake ×{chips}, one Wall cell shown: the Wall is at {cell} or above.",
-    signCell: "Wall ≥{cell}",
+    signCell: "Wall from {cell}",
     breath: "Catch breath",
     breathLabel: "Catch breath: spend {seconds}s of clock, lower Heat by {gauge} and move the Wall back {wall}. Once, before the first push.",
     breathDone: "Breath caught. Heat {from} → {to}, the Wall moved back {wall}.",

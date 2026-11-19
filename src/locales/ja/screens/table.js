@@ -21,7 +21,7 @@ export default {
     lockShutReason: "いまは押せない — 持ち込んだ連続がすでにLOCKの上限×{cap}を満たしていて、足すものがない。",
     lockStrikeHot: " STRIKEで熱{heat}以上で確定すると上限は×{cap}。",
     signOpen: "決裁の勝負、賭け金{chips}倍、壁のマスが一つ見える:壁は{cell}以上。",
-    signCell: "壁 ≥{cell}",
+    signCell: "壁 {cell}から",
     breath: "息を整える",
     breathLabel: "息を整える:時計を{seconds}秒使い、熱を{gauge}下げ、壁を{wall}遠ざける。最初の押し込みの前に一度だけ。",
     breathDone: "息を整えた。熱{from} → {to}、壁が{wall}遠のいた。",

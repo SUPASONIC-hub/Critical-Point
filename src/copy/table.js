@@ -33,7 +33,7 @@ const tableCopy = {
     lockShutReason: "지금은 못 누름 — 들고 온 연속이 이미 LOCK 상한 ×{cap}을 채워 더할 것이 없다.",
     lockStrikeHot: " STRIKE로 열기 {heat} 이상에서 확정하면 상한이 ×{cap}.",
     signOpen: "결재 판, 판돈 {chips}배, 벽 한 칸 보임: 벽은 {cell} 이상.",
-    signCell: "벽 ≥{cell}",
+    signCell: "벽 {cell}부터",
     breath: "숨 고르기",
     breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
     breathDone: "숨을 골랐다. 열기 {from} → {to}, 벽이 {wall} 뒤로 갔다.",
