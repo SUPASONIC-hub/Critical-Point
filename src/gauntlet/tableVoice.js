@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatMoney } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
-import { dangerZoneOf } from "./tableMeters.js";
+import { CLOCK_CUT_MS, dangerZoneOf, describeClockCut } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
 import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
@@ -112,6 +112,34 @@ export const describeStakeClock = ({ gauge, cut, remaining }) =>
  * older board's flat clock never moves, so it has nothing to say.
  */
 export const readWindowSeconds = (win) => (win?.schema?.stakeClock === true ? decisionWindowSeconds(win.gauge, win.schema) : null);
+
+/**
+ * B5 seen (N43 step 3, 11-18 「전부 1」): what the mark beside the HUD's clock
+ * shows, { text, key } for CLOCK_CUT_MS after the stake clock shortened, else
+ * null. Read off the same whole clock as the voice's stake-clock line, so a
+ * push across a tier and the clock's own creep across one -- which no push
+ * line had told -- are shown alike. This window only (a new seed starts over)
+ * and only while it is live (a bust's heat is not a cut). Shown, not heard:
+ * the voice says it already, and nothing is played.
+ */
+export function useClockCut(win, seed) {
+  const live = win.status === "live";
+  const seconds = readWindowSeconds(win);
+  const seenRef = useRef({ seed, seconds });
+  const timerRef = useRef(null);
+  const [cut, setCut] = useState(null);
+  useEffect(() => {
+    const seen = seenRef.current;
+    seenRef.current = { seed, seconds };
+    const text = seen.seed === seed && live ? describeClockCut(seen.seconds, seconds) : "";
+    if (!text) return;
+    setCut((last) => ({ text, key: (last?.key ?? 0) + 1 }));
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setCut(null), CLOCK_CUT_MS);
+  }, [live, seed, seconds]);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
+  return cut;
+}
 
 /**
  * The table as it stands, when asked (E3, 「지금 상황 듣기」): the heat,

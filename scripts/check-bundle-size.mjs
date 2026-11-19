@@ -330,7 +330,8 @@ const budgets = [
   // 34,673 / 14,761 -> 34,843 / 14,810 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured 34839 / 14806 (over budget only) in the CI e2e build, the plus 4.
   // 34,867 / 14,850 -> 35,033 / 14,900 묶음 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575) over main 60dc8551. Measured 35029 / 14896 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_398, maxGzip: 15_010 },
+  // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_422, maxGzip: 15_018 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -723,7 +724,8 @@ const budgets = [
   // -> 217,739 / 79,427 n39-n40-n44 over main eb2d9aeb (N40's sample date in gameEvents.js), measured 217,735 / 79,423 in CI verify-quick, the plus 4.
   // 217,739 / 79,427 -> 217,754 / 79,427 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 217750 / - (over budget only) in the e2e build, the plus 4.
   // 208,749 / 76,072 -> 209,960 / 76,441 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 209956 / 76437 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 217_754, maxGzip: 79_427 },
+  // -> 217,754 / 79,433 b5-open-clock-cue over main ec89d22b, measured locally - / 79,429 (the hook's import beside the voice), the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 217_754, maxGzip: 79_433 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1259,12 +1261,14 @@ const budgets = [
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
+  // 216,858 / 42,041 -> 216,972 / 42,082 b5-open-clock-cue, measured locally 216,968 / 42,078: clock-cut.css (the stake clock's cut beside the clock), the plus 4.
   // -> gzip 42,066 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: four rules for the leave line (result.css). Measured locally, the plus 4.
   // 216,858 / 42,066 -> 216,995 / 42,084 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 216991 / 42080 (over budget only) in the e2e build, the plus 4.
   // -> 217,011 / 42,084 묶음 11-19 + 손패 카드 최소 44px: CI 216,991 / 42,080 + local delta 16 / 2, the plus 4.
   // 216,858 / 42,041 -> 216,858 / 42,066 n37-followups, measured locally - / 42,062 (over budget only) in the e2e build, the plus 4: the recovery centre's head clear of the music pills.
   // 216,858 / 42,041 -> 216,858 / 42,049 n46-hall-progress, measured locally 42,045 gzip: the progress line's rule (.ranking-hall-progress), the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_858, maxGzip: 42_049 },
+  // -> 217,507 / 42,164 b5-open-clock-cue over main ec89d22b, measured locally 217,503 / 42,160, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 217_507, maxGzip: 42_164 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2073,13 +2077,15 @@ const budgets = [
   // 197,425 / 66,217 -> 197,452 / 66,232 d3-next over main 4d549334: the scene wall line's count in Japanese. Measured 197448 / 66228 in the CI e2e build, the plus 4.
   // 197,425 / 66,217 -> 197,497 / 66,236 번외 이야기 속 공개 over main 4d549334: the report's side line in Japanese. Measured 197493 / 66232 in the e2e build, the plus 4.
   // -> 197,888 / 66,362 묶음 11-18b over main 68cbc0f4, measured 197,884 / 66,358 in CI verify-quick, the plus 4.
+  // -> 197,911 / 66,369 b5-open-clock-cue, measured locally 197,907 / 66,365: stage.clockCut in Japanese, the plus 4.
   // -> 198,000 / 66,414 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line in Japanese. Measured locally, the plus 4.
   // -> 198,034 / 66,397 n39-n40-n44 over main eb2d9aeb: N44's collecting line in Japanese. Measured 198,030 / 66,393, the plus 4.
   // 198,034 / 66,397 -> 198,146 / 66,459 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 198142 / 66455 (over budget only) in the e2e build, the plus 4.
   // -> 197,913 / 66,373 n37-followups, measured locally 197,909 / 66,369 in the e2e build, the plus 4: the back buttons' words in Japanese.
   // -> 198,016 / 66,399 n46-hall-progress, measured locally 198,012 / 66,395: ranking.hallProgress in Japanese, the plus 4.
   // 194,641 / 65,117 -> 195,404 / 65,370 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 195400 / 65366 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_146, maxGzip: 66_459 },
+  // -> 198,169 / 66,469 b5-open-clock-cue over main ec89d22b, measured locally 198,165 / 66,465, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_169, maxGzip: 66_469 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2179,13 +2185,15 @@ const budgets = [
   // 164,766 / 59,136 -> 164,792 / 59,153 d3-next over main 4d549334: the scene wall line's count in English. Measured 164788 / 59149 in the CI e2e build, the plus 4.
   // 164,766 / 59,136 -> 164,834 / 59,153 번외 이야기 속 공개 over main 4d549334: the report's side line in English. Measured 164830 / 59149 in the e2e build, the plus 4.
   // -> 165,200 / 59,261 묶음 11-18b over main 68cbc0f4, measured 165,196 / 59,257 in CI verify-quick, the plus 4.
+  // -> 165,221 / 59,272 b5-open-clock-cue, measured locally 165,217 / 59,268: stage.clockCut in English, the plus 4.
   // -> 165,320 / 59,313 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: the leave line in English. Measured locally, the plus 4.
   // -> 165,308 / 59,285 n39-n40-n44 over main eb2d9aeb: N44's collecting line in English. Measured 165,304 / 59,281, the plus 4.
   // 165,308 / 59,285 -> 165,428 / 59,336 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 165424 / 59332 (over budget only) in the e2e build, the plus 4.
   // -> 165,242 / 59,279 n37-followups, measured locally 165,238 / 59,275 in the e2e build, the plus 4: the back buttons' words in English.
   // -> 165,314 / 59,299 n46-hall-progress, measured locally 165,310 / 59,295: ranking.hallProgress in English, the plus 4.
   // 162,433 / 58,148 -> 163,050 / 58,393 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured 163046 / 58389 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_428, maxGzip: 59_336 },
+  // -> 165,449 / 59,347 b5-open-clock-cue over main ec89d22b, measured locally 165,445 / 59,343, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_449, maxGzip: 59_347 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2658,6 +2666,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
+// -> 380,740 / 443,246 / 451,205 b5-open-clock-cue, measured locally 380,736 / 443,242 / 451,201, the plus 4.
 // -> 380,746 / 443,285 / 451,248 N42 떠나는 순간 한 줄 (draft), measured 380,742 / 443,281 / 451,244 locally, the plus 4.
 // -> 380,729 / 443,248 / 451,222 n39-n40-n44, measured 380,725 / 443,244 / 451,218 in CI verify-quick, the plus 4.
 // -> 380,682 / 443,178 / 451,140 N36 (CSS only), measured 380,678 / 443,174 / 451,136 in CI verify-quick, the plus 4.
@@ -2665,7 +2674,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,728 / 443,240 / 451,196 n37-followups, measured locally 380,724 / 443,236 / 451,192 in the e2e build, the plus 4.
 // -> 380,718 / 443,252 / 451,213 n46-hall-progress, measured locally 380,714 / 443,248 / 451,209, the plus 4.
 // -> 378,117 / 439,653 / 447,540 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_809, en: 443_376, ja: 451_361 };
+// -> 380,891 / 443,467 / 451,451 b5-open-clock-cue over main ec89d22b, measured locally 380,887 / 443,463 / 451,447, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_891, en: 443_467, ja: 451_451 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

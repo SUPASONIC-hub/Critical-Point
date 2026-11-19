@@ -52,6 +52,26 @@ export function describeNextClock(win, nextHigh) {
 }
 
 /**
+ * B5 seen (N43 step 3, decided 「전부 1」 11-18): the seconds the stake clock just
+ * took, as the mark beside the HUD's clock shows them for `CLOCK_CUT_MS`.
+ * `before` and `after` are the window's whole clock at two renders
+ * (tableVoice.js `readWindowSeconds`, the same reading the voice's stake-clock
+ * line is made from), so a push that crosses a tier and the clock's creep
+ * that crosses one are shown alike -- the creep's cut had no word on screen
+ * (N43 measurement: about 6% of a season's windows). "" when the clock did
+ * not shorten, gave seconds back, or either reading is not a stake clock's.
+ * Only what the clock itself already shows; the rules are not touched.
+ */
+export function describeClockCut(before, after) {
+  if (typeof before !== "number" || typeof after !== "number") return "";
+  const cut = before - after;
+  return cut > 0 ? fill(tableCopy.stage.clockCut, { cut }) : "";
+}
+
+/** How long the clock's cut mark stays beside the clock (N43 step 3: 0.8 seconds). */
+export const CLOCK_CUT_MS = 800;
+
+/**
  * The numbers the table's HUD prints for this window, read off the window and
  * its board: the staked card's chips, the multiplier now and at both ends of
  * the next push's range, LOCK's charge, the clock, the heartbeat and the
