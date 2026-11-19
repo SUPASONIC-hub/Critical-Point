@@ -37,3 +37,41 @@ export function hallOfFameBadges(rows, words) {
   }
   return badges;
 }
+
+/**
+ * N46 (11-18 「1」): while a board keeps no place yet, how far it is from its
+ * first three, 「첫 세 자리는 10시즌이 모이면 열립니다 (지금 n/10)」, one line a
+ * board on the ranking screen in place of the bare 「표본 부족」 the daily log
+ * keeps. Read off the same view as the badges: each board's row carries the
+ * server's own count (`checked_seasons`, hall_of_fame_counts), places or not.
+ *
+ * Only boards still filling: not settled (a settled board never takes a
+ * place), below `HALL_OF_FAME_MIN_SEASONS`, with no place yet; and of the
+ * week boards only `week`'s own (the week the device's weekly clock is in),
+ * since a past week's board takes no more seasons while it waits 28 days to
+ * settle. The table's board comes first. Returns [{ board, label, count }],
+ * `label` the badge's words for the board (the table's own board, or a week's
+ * ISO name), `count` never above the threshold.
+ */
+export function hallOfFameProgress(rows, words, week = null) {
+  const boards = new Map();
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const count = Number(row?.checked_seasons);
+    if (typeof row?.board !== "string" || !Number.isInteger(count) || count < 0) continue;
+    const isTable = row.board.startsWith("table-");
+    if (!isTable && row.board !== week) continue;
+    const seen = boards.get(row.board);
+    const placed = Number(row.place) >= 1;
+    boards.set(row.board, {
+      board: row.board,
+      label: isTable ? words.hallMainBoard : row.board,
+      count: Math.max(seen?.count ?? 0, count),
+      closed: Boolean(seen?.closed || placed || row.settled_on),
+      isTable,
+    });
+  }
+  return [...boards.values()]
+    .filter((board) => !board.closed && board.count < HALL_OF_FAME_MIN_SEASONS)
+    .sort((a, b) => Number(b.isTable) - Number(a.isTable) || a.board.localeCompare(b.board))
+    .map(({ board, label, count }) => ({ board, label, count }));
+}

@@ -2541,6 +2541,17 @@ summary:focus-visible {
   font-weight: 700;
   vertical-align: middle;
 }
+/* N46: a board with no place yet, how far it is from its first three, one
+   line under the table's heading in the badge's accent outline. */
+.ranking-page .ranking-hall-progress {
+  margin: -8px 0 12px;
+  padding: 6px 10px;
+  color: var(--ui-text-2);
+  border-left: 2px solid var(--ui-line-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
 .ranking-row.season-complete {
   border-color: var(--ui-line-accent);
 }

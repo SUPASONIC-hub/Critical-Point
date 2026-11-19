@@ -1249,7 +1249,8 @@ const budgets = [
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_858, maxGzip: 42_041 },
+  // 216,858 / 42,041 -> 216,858 / 42,049 n46-hall-progress, measured locally 42,045 gzip: the progress line's rule (.ranking-hall-progress), the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 216_858, maxGzip: 42_049 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1367,7 +1368,8 @@ const budgets = [
   // 5,836 / 2,575 -> 6,670 / 2,992 on 2026-10-29, D2 hall of fame draft (#308) merged with #224 602ec69b, the 2nd stage: the badges (src/hallOfFameBadges.js, public_hall_of_fame read on mount, its words ranking.hallBadge, hallMainBoard, hallProvisional) and the footnote's second sentence (ranking.hallFootnote). Measured 6,670 / 2,988 in the e2e build, the gzip plus 4.
   // 5,912 / 2,535 -> 7,079 / 3,112 on 2026-11-05, rules-1105 (#379 = #224 #307 #316 #320 #308 over main 24af89d7): the lines above together. Measured 7,075 / 3,108 in the e2e build, the plus 4.
   // 7,079 / 3,112 -> 7,251 / 3,201 on 2026-11-11, recheck-in-case over main 52027156. Measured 7247 / 3197 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 7_251, maxGzip: 3_201 },
+  // 7,251 / 3,201 -> 8,192 / 3,565 n46-hall-progress, measured locally 8,188 / 3,561: the hall of fame's progress line (hallOfFameProgress, the week key it reads, ranking.hallProgress), the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 8_192, maxGzip: 3_565 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -2049,7 +2051,8 @@ const budgets = [
   // 197,425 / 66,217 -> 197,452 / 66,232 d3-next over main 4d549334: the scene wall line's count in Japanese. Measured 197448 / 66228 in the CI e2e build, the plus 4.
   // 197,425 / 66,217 -> 197,497 / 66,236 번외 이야기 속 공개 over main 4d549334: the report's side line in Japanese. Measured 197493 / 66232 in the e2e build, the plus 4.
   // -> 197,888 / 66,362 묶음 11-18b over main 68cbc0f4, measured 197,884 / 66,358 in CI verify-quick, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 197_888, maxGzip: 66_362 },
+  // -> 198,016 / 66,399 n46-hall-progress, measured locally 198,012 / 66,395: ranking.hallProgress in Japanese, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 198_016, maxGzip: 66_399 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2149,7 +2152,8 @@ const budgets = [
   // 164,766 / 59,136 -> 164,792 / 59,153 d3-next over main 4d549334: the scene wall line's count in English. Measured 164788 / 59149 in the CI e2e build, the plus 4.
   // 164,766 / 59,136 -> 164,834 / 59,153 번외 이야기 속 공개 over main 4d549334: the report's side line in English. Measured 164830 / 59149 in the e2e build, the plus 4.
   // -> 165,200 / 59,261 묶음 11-18b over main 68cbc0f4, measured 165,196 / 59,257 in CI verify-quick, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_200, maxGzip: 59_261 },
+  // -> 165,314 / 59,299 n46-hall-progress, measured locally 165,310 / 59,295: ranking.hallProgress in English, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 165_314, maxGzip: 59_299 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2622,7 +2626,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 380,535 / 442,924 / 450,867 번외 이야기 속 공개 (sides-in-story) over main 4d549334. Measured first paint, the plus 4.
 // -> 380,500 / 442,887 / 450,828 묶음 11-18, measured 380,496 / 442,883 / 450,824 in CI verify-quick, the plus 4.
 // -> 380,677 / 443,172 / 451,135 묶음 11-18b, measured 380,673 / 443,168 / 451,131 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 380_677, en: 443_172, ja: 451_135 };
+// -> 380,718 / 443,252 / 451,213 n46-hall-progress, measured locally 380,714 / 443,248 / 451,209, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 380_718, en: 443_252, ja: 451_213 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -458,16 +458,43 @@ test("a season in the hall of fame carries its place on the ranking, by run tag"
   await expect(row("HALLRUN1").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 1위 (잠정)", "명예의 전당 · 2026-W47 2위"]);
   await expect(row("HALLRUN2").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 2위 (잠정)"]);
   await expect(row("PLAINRUN").locator(".ranking-hall-badge")).toHaveCount(0);
-  // The read asks for the places only, and their four columns.
+  // The read asks for every board, with its count (N46), and no progress line
+  // while every board here has its places.
   expect(asked.length).toBeGreaterThan(0);
-  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on");
-  expect(decodeURIComponent(asked[0])).toContain("place=not.is.null");
+  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on,checked_seasons");
+  expect(decodeURIComponent(asked[0])).not.toContain("place=");
+  await expect(page.getByTestId("ranking-hall-progress")).toHaveCount(0);
   // The badge sits inside its row, on a phone too.
   await page.setViewportSize({ width: 360, height: 780 });
   const badge = row("HALLRUN1").locator(".ranking-hall-badge").first();
   const [badgeBox, rowBox] = [await badge.boundingBox(), await row("HALLRUN1").boundingBox()];
   expect(badgeBox.x).toBeGreaterThanOrEqual(rowBox.x);
   expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+});
+
+// N46: while a board keeps no place yet, the ranking says how far it is from
+// its first three, one line a board: the table's own and this week's (the
+// e2e build's weekly clock is pinned to 2026-W02); a past week's says nothing.
+test("a board with no place yet says how far it is from its first three (N46)", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/public_hall_of_fame**`, (route) => route.fulfill(json([
+    { board: "table-4", place: null, run_tag: null, settled_on: null, checked_seasons: 3 },
+    { board: "2026-W02", place: null, run_tag: null, settled_on: null, checked_seasons: 7 },
+    { board: "2026-W01", place: null, run_tag: null, settled_on: null, checked_seasons: 2 },
+  ])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  const lines = page.getByTestId("ranking-hall-progress");
+  await expect(lines).toHaveText([
+    "명예의 전당 · 본 판: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 3/10)",
+    "명예의 전당 · 2026-W02: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 7/10)",
+  ]);
+  // On a phone the line wraps inside the panel.
+  await page.setViewportSize({ width: 360, height: 740 });
+  const [lineBox, panelBox] = [await lines.first().boundingBox(), await page.locator(".ranking-table-panel").boundingBox()];
+  expect(lineBox.x).toBeGreaterThanOrEqual(panelBox.x);
+  expect(lineBox.x + lineBox.width).toBeLessThanOrEqual(panelBox.x + panelBox.width + 0.5);
 });
 
 /* ------------------------------------------------------------- story mode */

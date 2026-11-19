@@ -33,4 +33,5 @@ export default {
   hallBadge: "名誉の殿堂 · {board} {place}位",
   hallMainBoard: "通常ランキング",
   hallProvisional: "（暫定）",
+  hallProgress: "名誉の殿堂 · {board}：最初の3席は{min}シーズン集まると開きます（現在 {count}/{min}）",
 };

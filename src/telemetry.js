@@ -335,13 +335,15 @@ export async function fetchLeaderboard(limit = 100, week = null) {
 }
 
 /**
- * The hall of fame's places (D2, `public_hall_of_fame`): board, place, run tag
- * and whether the board is settled, for the ranking screen's badges
- * (src/hallOfFameBadges.js). A few hundred bytes at most.
+ * The hall of fame's boards (D2, `public_hall_of_fame`): board, place, run tag,
+ * whether the board is settled and its count of checked seasons, for the
+ * ranking screen's badges and, on a board with no place yet, its progress
+ * line (N46, src/hallOfFameBadges.js). A board below ten is one row with no
+ * place. A few hundred bytes at most.
  */
 export async function fetchHallOfFame() {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
-  const query = new URLSearchParams({ select: "board,place,run_tag,settled_on", place: "not.is.null" });
+  const query = new URLSearchParams({ select: "board,place,run_tag,settled_on,checked_seasons" });
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_hall_of_fame?${query.toString()}`, {
     headers: restHeaders(),
   });
