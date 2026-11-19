@@ -197,6 +197,9 @@ async function closeCaseOneIntoDraft(page) {
  */
 async function pressAt(page, locator) {
   await expect(locator).toBeVisible();
+  // A finger scrolls to what is below the fold first: the draft's cards say
+  // their condition too (G4), and at 1280x720 the pass button sits under them.
+  await locator.scrollIntoViewIfNeeded();
   const box = await locator.boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 }
