@@ -212,10 +212,12 @@ test("the table stands on its last frame for a quarter second before it greys, a
   const reduced = reducedMotionBlock(sheet("responsive"));
   assert.match(reduced, /transition-duration: 1ms !important;/);
   assert.match(reduced, /transition-delay: 0s !important;/);
-  // The line: plain text under the pot's pill, with no rule of its own (the
-  // sheet is at its budget; `small` and the inherited paper are the look), in
-  // the three languages.
-  assert.doesNotMatch(sheet("play"), /\.gx-slam small/);
+  // The line: small text under the pot's pill, in ink on the paper the word
+  // sits on -- inherited, it was the pencil red over the red stripes on the
+  // ledger (N37, 2026-11-18) -- in the three languages.
+  const line = sheet("play").match(/\.gx-slam small \{([^}]*)\}/)?.[1] ?? "";
+  assert.match(line, /color: var\(--ui-text\);/);
+  assert.match(line, /background: var\(--ledger-paper-a92\);/);
   assert.match(readFileSync("src/gauntlet/TableNotices.jsx", "utf8"), /<small>\{say\.slamStill\}<\/small>/);
   assert.match(readFileSync("src/copy/table.js", "utf8"), /slamStill: "심장이 멈춘 자리에서 벽이 드러났다\."/);
   assert.match(readFileSync("src/locales/en/screens/table.js", "utf8"), /slamStill: "The wall showed where the heartbeat stopped\."/);

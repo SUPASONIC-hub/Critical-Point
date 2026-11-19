@@ -1856,9 +1856,15 @@
   font-weight: 700;
 }
 
-/* The slam's third line, `small` (A2, 2026-11-05), takes no rule: the browser's
-   smaller size and the paper colour it inherits are the look. The sheet is at
-   its budget (check-css-structure.mjs), and the line is a line, not a pill. */
+/* The slam's third line, `small` (A2, 2026-11-05). On the night shift it
+   inherited paper and read on the dark wash; on the ledger it inherited the
+   pencil red over red stripes (N37), so it sits on the paper the word does. */
+.gx-slam small {
+  padding: 2px 10px;
+  color: var(--ui-text);
+  background: var(--ledger-paper-a92);
+}
+
 .gx-slam-bust {
   color: var(--ledger-pencil);
   background:
