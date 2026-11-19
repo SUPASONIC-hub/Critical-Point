@@ -914,8 +914,8 @@ export const RUN_INITIAL_STATE = Object.freeze({
   // log entry, and gone once that window settles.
   relicDraft: null,
   insuranceSpent: false,
-  // G4: the season has bought 「하나 더」 once; under the next rules that is its one.
-  extraBought: false,
+  // (G4: `extraBought`, true once the season has bought 「하나 더」 -- under the
+  // next rules its one. Left off the record until then, so a save is as it was.)
   // Set while a case that already closed is being played again: the table
   // record as it stood when the replay opened. See `openCaseRun`.
   practice: null,
@@ -1062,7 +1062,7 @@ export function normalizeRunState(value) {
   run.relicOffer = normalizeRelicIds(source.relicOffer, RELIC_OFFER_SIZE).filter((id) => !run.relics.includes(id));
   run.relicDraft = normalizeRelicDraft(source.relicDraft);
   run.insuranceSpent = source.insuranceSpent === true;
-  run.extraBought = source.extraBought === true;
+  if (source.extraBought === true) run.extraBought = true;
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
   run.story = source.story === true;
@@ -2061,7 +2061,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     relicOffer,
     relicDraft: drafted.relicDraft,
     insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
-    extraBought: current.extraBought,
+    ...(current.extraBought ? { extraBought: true } : null),
     schema: nextSchema,
   };
   return { verdict, nextRun: normalizeRunState(practice ? endPractice(settled) : settled) };
@@ -2181,7 +2181,7 @@ export function carryTableRecordIntoRestore(restored, current) {
       relics: [...new Set([...restoredRun.relics, ...currentRun.relics])],
       relicOffer: [],
       insuranceSpent: restoredRun.insuranceSpent || currentRun.insuranceSpent,
-      extraBought: restoredRun.extraBought || currentRun.extraBought,
+      ...(restoredRun.extraBought || currentRun.extraBought ? { extraBought: true } : null),
       schema: bustedSince ? currentRun.schema : restoredRun.schema,
       lastOutcome: bustedSince ? "bust" : restoredRun.lastOutcome,
       openSeed: null,

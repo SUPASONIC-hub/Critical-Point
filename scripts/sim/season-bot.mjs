@@ -68,6 +68,7 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
+import { nextTableOn } from "../../src/gauntlet/nextTable.js";
 import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
@@ -92,7 +93,7 @@ if (process.env.RULES_NEXT === "0" || process.env.RULES_NEXT === "1") globalThis
  * NOTES +1.8, METRONOME +2.8, HEAT SINK +3.4, STETHOSCOPE +4.0, TESTIMONY
  * +5.3, KINETIC GRIP +5.4, FRONT PAGE +6.5, INSURANCE +8.7.
  */
-export const RELIC_DROP_ORDER = Object.freeze([
+const OLD_DROP_ORDER = Object.freeze([
   "auditContact",
   "coldBlood",
   "carbonCopy",
@@ -106,6 +107,25 @@ export const RELIC_DROP_ORDER = Object.freeze([
   "frontPage",
   "insurance",
 ]);
+/**
+ * Under the next rules (G4, relicsNext.js) the same reading off the heartbeat
+ * column, measured 2026-11-19 with RULES_NEXT=1.
+ */
+const NEXT_DROP_ORDER = Object.freeze([
+  "encore",
+  "stethoscope",
+  "metronome",
+  "carbonCopy",
+  "coldBlood",
+  "insurance",
+  "auditContact",
+  "kineticGrip",
+  "frontPage",
+  "fieldNote",
+  "heatSink",
+  "testimony",
+]);
+export const RELIC_DROP_ORDER = nextTableOn() ? NEXT_DROP_ORDER : OLD_DROP_ORDER;
 
 /** The cases whose close the season player notes the tools held at (`relicsAt`): act 1's and act 4's last (B-11's acts). */
 export const RELICS_HELD_AT = Object.freeze(["case07", "case24"]);
@@ -134,7 +154,9 @@ export function spendsAt(spend, run) {
   const room = RELIC_SLOTS - run.relics.length;
   // "weak" (G4): rerolls only an offer with nothing in the stronger half of
   // RELIC_DROP_ORDER, and buys one more while two slots are free.
-  const weak = spend === "weak" && !run.relicOffer.some((id) => RELIC_DROP_ORDER.indexOf(id) >= RELIC_DROP_ORDER.length / 2);
+  const rank = (id) => RELIC_DROP_ORDER.indexOf(id);
+  const best = Math.max(...run.relicOffer.map(rank));
+  const weak = spend === "weak" && room > 0 && best < RELIC_DROP_ORDER.length / 2;
   return {
     reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1) || weak,
     extra: spend === "extra" || spend === "always" || ((spend === "early" || spend === "weak") && room >= 2),

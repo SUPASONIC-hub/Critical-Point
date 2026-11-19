@@ -15,9 +15,9 @@
  */
 
 /** AUDIT CONTACT: a cash under this heat, with at least one push, pays `boost`. */
-export const LOW_CASH_HEAT = 45;
+export const LOW_CASH_HEAT = 50;
 /** HEAT SINK: a cash at or over this heat pays `boost`. */
-export const HOT_CASH_HEAT = 70;
+export const HOT_CASH_HEAT = 75;
 /** FIELD NOTES: a streak of this many on one side pays `boost`. */
 export const SIDE_STREAK = 5;
 /** TESTIMONY: a cash with at least this share of the clock left pays `boost`. */
@@ -30,14 +30,14 @@ export const FAST_CASH_SHARE = 0.5;
  * `clockLeft` (share of the clock left), `focusMode`, `focusCharged`.
  */
 export const RELIC_BOOSTS = Object.freeze({
-  auditContact: Object.freeze({ boost: 1.5, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
-  heatSink: Object.freeze({ boost: 1.3, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
+  auditContact: Object.freeze({ boost: 1.6, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
+  heatSink: Object.freeze({ boost: 1.5, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
-  coldBlood: Object.freeze({ boost: 1.3, when: (cash) => cash.afterBust }),
+  coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
   carbonCopy: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("blackout") }),
-  testimony: Object.freeze({ boost: 1.2, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
-  frontPage: Object.freeze({ boost: 1.3, when: (cash) => cash.mutations.includes("overclock") }),
+  testimony: Object.freeze({ boost: 1.1, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
+  frontPage: Object.freeze({ boost: 1.2, when: (cash) => cash.mutations.includes("overclock") }),
   stethoscope: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("silence") }),
   kineticGrip: Object.freeze({ boost: 1.2, when: (cash) => cash.focusMode === "strike" && cash.focusCharged }),
 });

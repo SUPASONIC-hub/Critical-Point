@@ -47,6 +47,7 @@ import { CASE_SEQUENCE } from "./gameCases.js";
 import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
+import { nextTableOn } from "./gauntlet/nextTable.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
@@ -345,6 +346,9 @@ export function recheckRun(rows = []) {
   if (cases.some((row) => !isCurrentTable(row))) return { status: "unverified", marks: [], cases: [] };
   const marks = new Set();
   let recorded = false;
+  // G4: under the next rules a season buys 「하나 더」 once (gauntletEngine.js `buyExtraRelic`).
+  const extras = cases.reduce((sum, row) => sum + (Array.isArray(row.decision_log) ? row.decision_log : []).filter((entry) => entry?.relicDraft?.extra === true).length, 0);
+  if (nextTableOn() && extras > 1) marks.add(RELIC_DRAFT_MARK);
   const report = cases.map((row, at) => {
     const score = recheckCaseScore(row);
     const windows = recheckCaseWindows(row);

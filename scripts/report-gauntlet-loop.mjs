@@ -20,6 +20,8 @@ import {
   STANCE_CHARGE,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
+import { nextTableOn } from "../src/gauntlet/nextTable.js";
+import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_REROLL_COST, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
@@ -604,6 +606,24 @@ const inert = relicReport
 assert.deepEqual(inert, [], `relics the simulation never trips: ${inert.join(", ")}`);
 
 /**
+ * G4 (2026-11-19): under the next rules (relicsNext.js) a tool is a plan. The
+ * best and the worst tool for the heartbeat hand differ by RELIC_SPREAD_MIN or
+ * more, and at least RELIC_BESTS_MIN tools are each the best for one of the
+ * measured hands (blind, heartbeat, sees, skip): no one tool for everyone.
+ */
+const RELIC_SPREAD_MIN = 1.15;
+const RELIC_BESTS_MIN = 3;
+if (nextTableOn()) {
+  const singles = relicReport.filter((row) => row.relics.length === 1);
+  const byListen = [...singles].sort((left, right) => right.listen.meanVault - left.listen.meanVault);
+  const spread = byListen[0].listen.meanVault / byListen.at(-1).listen.meanVault;
+  const bests = Object.fromEntries(["blind", "listen", "sees", "skip"].map((key) => [key, singles.reduce((best, row) => (row[key].meanVault > best[key].meanVault ? row : best)).name]));
+  console.log(`relic spread     heartbeat best ${byListen[0].name} ${byListen[0].listen.meanVault} / worst ${byListen.at(-1).name} ${byListen.at(-1).listen.meanVault} = x${spread.toFixed(3)}; best by hand ${Object.entries(bests).map(([key, name]) => `${key} ${name}`).join(", ")}`);
+  assert.ok(spread >= RELIC_SPREAD_MIN, `the tools must matter: best ${byListen[0].name} against worst ${byListen.at(-1).name} is only x${spread.toFixed(3)}`);
+  assert.ok(new Set(Object.values(bests)).size >= RELIC_BESTS_MIN, `one tool is best for everyone: ${JSON.stringify(bests)}`);
+}
+
+/**
  * C9, the KD은행 계좌 at the draft (design-kd-spend-relic.md, decisions all 1):
  * a reroll for RELIC_REROLL_COST and one more relic for RELIC_EXTRA_COST, each
  * once a draft, out of the vault. The relic hand plays seasons of
@@ -678,7 +698,11 @@ assert.ok(
   spendingRows.skipBuys.meanVault < spendingRows.blind.meanVault * 0.25,
   `buying with what a skip saved must stay a loss: ${spendingRows.skipBuys.meanVault} against ${spendingRows.blind.meanVault} for best blind play`,
 );
-for (const key of ["reroll", "extra", "always", "early", "earlyBlind"]) {
+// G4: with the reroll at 1,500, rerolling a weak offer has to pay for itself.
+if (nextTableOn()) {
+  assert.ok(spendingRows.weak.meanVault > spendingRows.listen.meanVault, `rerolling a weak offer must beat never paying: ${spendingRows.weak.meanVault} against ${spendingRows.listen.meanVault}`);
+}
+for (const key of ["reroll", "extra", "always", "early", "weak", "earlyBlind"]) {
   const row = spendingRows[key];
   const bare = key === "earlyBlind" ? spendingRows.blind : spendingRows.listen;
   assert.ok(row.meanVault <= bare.meanVault * RELIC_LIFT_CAP, `paying at the draft is a win button: ${row.label} banks ${row.meanVault} against ${bare.meanVault}`);
@@ -699,7 +723,8 @@ for (const relic of ["encore", "metronome"]) {
     assert.equal(row.busts, bare.busts, `${row.label}: a relic that bends the streak must not move the wall`);
     assert.ok(row.meanVault >= bare.meanVault, `${row.label}: the relic must never cost the hand (${row.meanVault} against ${bare.meanVault})`);
     assert.ok(row.meanVault <= bare.meanVault * RELIC_LIFT_CAP, `${relic} is a win button for a hand that ${bare.label}: ${row.meanVault} against ${bare.meanVault}`);
-    assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap`);
+    // Under the next rules (G4) METRONOME's switch pays the tool's own boost, which is not the streak's.
+    if (!(nextTableOn() && Object.hasOwn(RELIC_BOOSTS, relic))) assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap`);
     return `${bare.label} ${bare.meanVault} -> ${row.meanVault} (pot bonus ${bare.meanBonus.toFixed(3)} -> ${row.meanBonus.toFixed(3)})`;
   });
   console.log(`logic + ${relic.padEnd(10)} ${lifts.join("; ")}`);

@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
@@ -93,7 +94,7 @@ test("a buy that cannot pay keeps its place, is aria-disabled and says why", () 
   assert.match(buy, /onClick=\{state\.open \? onPress : undefined\}/);
   assert.doesNotMatch(buy, /\sdisabled=/, "not `disabled`: it stays reachable and read");
   assert.match(draft, /\{spend && !swapFor && !spend\.second && \(/);
-  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">\{say\.spendHint\}<\/small>/);
+  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">\{nextTableOn\(\) \? say\.spendHintNext : say\.spendHint\}<\/small>/);
   // The buys' rules are a sheet of their own (relics.css was every line spent), imported right after the draft's.
   const css = read("src/styles/app/draft-spend.css");
   const order = read("src/styles/app.css");
@@ -106,7 +107,7 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   const ko = (await import("../../src/copy/relics.js")).default.draft;
   const en = (await import("../../src/locales/en/screens/relics.js")).default.draft;
   const ja = (await import("../../src/locales/ja/screens/relics.js")).default.draft;
-  const reasons = ["practice", "story", "record", "used", "picked", "few", "short"];
+  const reasons = ["practice", "story", "record", "used", "season", "picked", "few", "short"];
   for (const [lang, words] of Object.entries({ ko, en, ja })) {
     for (const key of ["reroll", "extra"]) assert.match(words[key], /\{cost\}/, `${lang} ${key}`);
     for (const key of ["spendNote", "spendHint", "secondTitle", "secondLede"]) assert.ok(words[key], `${lang} ${key}`);

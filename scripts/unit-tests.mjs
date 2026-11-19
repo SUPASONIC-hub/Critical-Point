@@ -1,3 +1,4 @@
+import "../tests/unit/helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { getEndingVariant, getSeasonStrain, isPeopleFirstEffect, LOGIC_SLACK_STREAK } from "../src/gameLogic.js";
 import { readFileSync } from "node:fs";
