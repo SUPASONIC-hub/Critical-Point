@@ -2583,16 +2583,13 @@
     -webkit-line-clamp: 2;
   }
 
-  /* 14px words on a short phone (bundle 11-18), English a step smaller: its
-     cards say more and wrap to two lines (E1d: c10/c12/c26/c27_route_system
-     16px late at 360x740). */
+  /* 14px words on a short phone (bundle 11-18). English and Japanese keep
+     their own 12px from the language blocks further down (same weight, later
+     in the file): a 13px English rule here outweighed them and put three-line
+     English slips 30px under the bar at 360x740 (E1e, 2026-11-18). */
   .gx-hand .gx-card-label {
     font-size: 0.875rem;
     line-height: 1.25;
-  }
-
-  .gx-hand .gx-card-label:lang(en) {
-    font-size: 0.8125rem;
   }
 }
 
@@ -2608,8 +2605,11 @@
   /* 2안's ledger column (12px apart) put a NEW GAME+ hand's last slip 17px
      under the action bar at 360x740 and an English one 22px at 390x844
      (bundle 11-18, E1d): 6px apart and 6px inside a slip. The words keep
-     their size here; only the short phone below 800 makes them smaller. */
-  .gx-hand:not(.hand-5, .hand-6) {
+     their size here; only the short phone below 800 makes them smaller.
+     `.gauntlet-stage` first: the 719px block's 12px column comes later in the
+     file with the same weight and kept the gap at 12 (E1e, measured
+     2026-11-19). */
+  .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) {
     gap: 6px;
   }
 
