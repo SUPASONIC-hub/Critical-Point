@@ -120,6 +120,7 @@ function recheckResources(entry, index, card, breaks, unchecked) {
     fractureRate: schema.fractureRate,
     focusMultiplier: threshold.focus?.resourceMultiplier,
     scouted: threshold.scouted === true,
+    narrowed: threshold.narrowed === true,
   });
   if (!sameEffect(price, priced)) breaks.push({ entry: index, field: "riskRewardEffect", expected: price, found: priced });
 }

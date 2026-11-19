@@ -296,7 +296,7 @@ test("the copied line has one shape for every ending and every 판단 DNA", () =
       const text = buildShareText(model, ORIGIN);
       assert.equal(
         text,
-        `「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '${ending.name}'. 최고 버스트 87점, A 랭크. ${ORIGIN}/?from=card`,
+        `「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다. 판단 DNA는 '${fingerprint.modeTitle}', 결말은 '${ending.name}'. 최고 버스트 87점, A 랭크. ${ORIGIN}/?from=card&s=87`,
       );
       assert.doesNotMatch(text, /undefined|NaN|null/);
       count += 1;
@@ -304,7 +304,8 @@ test("the copied line has one shape for every ending and every 판단 DNA", () =
   }
   assert.equal(count, 33);
   // An address that already ends in a slash is not given two.
-  assert.ok(buildShareText(modelOf(), `${ORIGIN}/`).endsWith(` ${ORIGIN}/?from=card`));
+  // N32: the season's best burst rides after the mark.
+  assert.match(buildShareText(modelOf(), `${ORIGIN}/`), /onrender\.com\/\?from=card&s=\d+$/);
   // Without an address the line ends at the rank.
   assert.ok(buildShareText(modelOf()).endsWith("B 랭크."));
 });
@@ -345,6 +346,8 @@ test("the copy the screen prints around the card is the agreed copy", () => {
     shared: "결과 카드를 공유했습니다.",
     failed: "카드를 만들지 못했습니다. 다시 눌러 주세요.",
     note: "카드에는 이름이 들어가지 않습니다.",
+    friendBeaten: "친구 기록 {score}점을 넘었습니다. 이번 시즌 최고 버스트 {mine}점.",
+    friendShort: "친구 기록 {score}점을 넘기까지 {gap}점 모자랐습니다. 이번 시즌 최고 버스트 {mine}점.",
   });
   assert.deepEqual(Object.keys(RESULT_CARD_STATUS).sort(), ["cancelled", "failed", "saved", "saved-uncopied", "shared"]);
   assert.equal(RESULT_CARD_STATUS.cancelled, "");
@@ -661,9 +664,9 @@ function fakeStyleDocument(values) {
 test("the theme is read off the page's tokens when the card is drawn", () => {
   const theme = readResultCardTheme(
     fakeStyleDocument({
-      "--c-gx-felt": " rgb(8 14 13)",
-      "--c-gx-felt-raised": "rgb(17 28 25)",
-      "--c-paper": "rgb(255 255 255)",
+      "--ui-surface-1": " rgb(8 14 13)",
+      "--ledger-white": "rgb(17 28 25)",
+      "--ui-text": "rgb(255 255 255)",
       "--c-gx-text-dim": "rgb(163 180 174)",
       "--c-acid": "rgb(217 255 98)",
       "--c-gx-heat": "rgb(255 56 56)",
@@ -681,7 +684,7 @@ test("the theme is read off the page's tokens when the card is drawn", () => {
   });
   // The tokens the theme reads are tokens the stylesheet defines.
   const tokens = readFileSync(new URL("../../src/styles/tokens.css", import.meta.url), "utf8");
-  for (const token of ["--c-gx-felt", "--c-gx-felt-raised", "--c-paper", "--c-gx-text-dim", "--c-acid", "--c-gx-heat", "--font-sans"]) {
+  for (const token of ["--ui-surface-1", "--ledger-white", "--ui-text", "--c-gx-text-dim", "--c-acid", "--c-gx-heat", "--font-sans"]) {
     assert.match(tokens, new RegExp(`^\\s*${token}:`, "m"), token);
   }
   // A page that answers nothing still gives a legible card.
@@ -695,7 +698,7 @@ test("the theme is read off the page's tokens when the card is drawn", () => {
 function fakeCanvasDocument({ fonts, blob = new Blob(["png"], { type: "image/png" }), context = fakeContext(), throwOnBlob = false } = {}) {
   const canvases = [];
   const documentRef = {
-    ...fakeStyleDocument({ "--font-sans": '"Critical Point Sans", sans-serif', "--c-gx-felt": "rgb(8 14 13)" }),
+    ...fakeStyleDocument({ "--font-sans": '"Critical Point Sans", sans-serif', "--ui-surface-1": "rgb(8 14 13)" }),
     canvases,
     createElement(tag) {
       assert.equal(tag, "canvas");

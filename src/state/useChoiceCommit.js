@@ -45,6 +45,7 @@ import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { fitCaseDynamics, validateTelemetryItem } from "./payloadSchemas.js";
 import { takeBriefingRead, takeReadingTally } from "./readingTally.js";
+import { markPulseAsked, pulseSceneNo, sendPulseAnswer, shouldAskPulse } from "./betweenHandsPulse.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -343,6 +344,8 @@ export function useChoiceCommit(context) {
         pushes: verdict.pushes,
         // B1: the look was spent (its 믿음 is in `effect`); the replay checker holds the record to it.
         scouted: verdict.scouted,
+        // The second look (B1, 11-18), only when spent: an entry without it had none.
+        ...(verdict.narrowed ? { narrowed: true } : {}),
         rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
@@ -458,6 +461,11 @@ export function useChoiceCommit(context) {
       closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };
     }
 
+    // N22: once a season, a sheet between two hands of 프롤로그 01·02 asks how it is going (betweenHandsPulse.js).
+    const askPulse = shouldAskPulse({
+      caseId: currentCase, caseClosed, consent: context.dataConsent, telemetryOn: telemetryEnabled,
+      veteran: gauntletRun?.veteran === true, replay: Boolean(caseResults[currentCase]), hands: nextLog.length, runId,
+    });
     const enteredAt = Date.now();
     // One patch: the run in memory and the save are both made from it.
     const written = applyRun({
@@ -508,8 +516,10 @@ export function useChoiceCommit(context) {
         caseRead: caseClosed ? describeCaseRead(nextLog) : null,
         // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
         scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
+        pulse: askPulse ? { caseId: currentCase, sceneNo: pulseSceneNo(currentCase, resolvedNodeId) } : null,
       },
     });
+    if (askPulse && !written?.stale && !written?.replay) markPulseAsked(runId);
     // Everything that leaves this tab's own state waits for the save to say
     // whose run this is. A tab another tab has moved past is refused by
     // `persist` and locks its table -- and it used to have sent the case row,
@@ -552,5 +562,14 @@ export function useChoiceCommit(context) {
     }
   }
 
-  return { choose, isAdvancing, releaseAdvance };
+  /** N22: the reveal's three buttons. Resolves to "sent", "queued" or "dropped". */
+  function answerPulse(pulse, answer) {
+    const { sessionId, sessionCode, activeCaseMeta, queueTelemetry } = context;
+    return sendPulseAnswer(
+      { sessionId, sessionCode, caseId: pulse?.caseId, caseLabel: activeCaseMeta?.label ?? pulse?.caseId, sceneNo: pulse?.sceneNo, answer },
+      { queueTelemetry },
+    );
+  }
+
+  return { choose, isAdvancing, releaseAdvance, answerPulse };
 }

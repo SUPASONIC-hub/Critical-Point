@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-16 (the state of `main` at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-17 (the state of `main` at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -888,6 +888,24 @@ Still open, on purpose:
   (#505 sweep 411 + 150 min, #506 #507 cases 19-38 prose -19.4% / -22.9%,
   #508 noscript wording and Firefox help per language), #512 bundle 1111c: speaker balloon fix
   #511, C7 cases 39-final #510 (-11.2%).
+- Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
+  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
+  no longer wait for a closed finale. Each entry of `SIDE_CASES`
+  (`src/nodes/sidePacks.js`) has its in-world `date` and `unlockAfter`, the
+  season case whose date comes just before it, and opens once that case is
+  closed in the run, once a finale is closed (NEW GAME+), or once the side
+  case is in the device's side record (`isSideCaseOpen`, `src/sideCases.js`).
+  Order: 사건 14 → 번외 3 (2025-11-08), 16 → 번외 4 (12-11), 17 → 번외 1
+  (12-20), 18 → 번외 2 (2026-01-09), 21 → 번외 5 (02-12), 27 → 번외 6
+  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13).
+  Nothing opens before 프롤로그 01. The report of the case that opens one
+  carries one line, 「번외 사건이 열렸습니다: 번외 N 「제목」」, and a button
+  that goes to the start screen and opens it (`side-opened`); the finale's
+  old 「번외 사건 칸이 열렸습니다」 line is gone, since every case is open by
+  then. Side cases stay outside the season's score, ranking and rules mark.
+- Release rule (2026-11-18): new content is released as a "Season" on a date
+  the owner chooses, all at once; there is no fixed monthly schedule. The
+  plan of one side case a month (N11, N35) is dropped: what is ready is open.
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -1429,8 +1447,10 @@ Still open, on purpose:
 45. The repository carries only what a build, a check or a deploy reads. The
     `Profile.jpg` / `!public/profile.jpg` pair in `.gitignore` stays, because
     Windows matches that name case-insensitively and the app's icon would go
-    with it: every file in `public/icons/` is cut from `public/profile.jpg`
-    (`npm run build:icons`), the favicon we chose. Text files are LF on every platform (`.gitattributes`,
+    with it: `public/profile.jpg` is the creators' picture in the studio
+    credit. Since #578 (2026-11-16) every file in `public/icons/` is drawn from
+    the game's GAUGE mark, `docs/images/brand/mark-dark.svg`
+    (`npm run build:icons`). Text files are LF on every platform (`.gitattributes`,
     `.editorconfig`): the byte budgets measured a different file on a Windows
     CRLF checkout than on the Linux runner.
 46. Every scene has a picture, and none of them is a file. `src/scenePlate.js`

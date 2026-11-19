@@ -5,7 +5,7 @@ import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatMoney, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
 import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicDirection, getLogicType } from "./logicStreak.js";
-import { SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
+import { SCOUT_NARROW_REACH, SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
@@ -193,10 +193,17 @@ export function RelicChips({ relics, pulse }) {
  */
 export function ScoutBand({ band, canScout, onScout, shortcut }) {
   if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
+  // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
+  const narrows = band.scouted && canScout;
+  const label = !band.scouted
+    ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })
+    : narrows
+      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_NARROW_TRUST, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
+      : undefined;
   return (
-    <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
-      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })}>
-      {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {band.scouted ? say.scouted : say.scout}
+    <button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
+      aria-keyshortcuts={shortcut} aria-label={label}>
+      {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {narrows ? say.narrow : band.scouted ? say.scouted : say.scout}
     </button>
   );
 }

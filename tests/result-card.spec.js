@@ -4,6 +4,8 @@ import path from "node:path";
 import { expect, test } from "./helpers/network.js";
 import { cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, resumeSavedRun, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
+import { FRIEND_TARGET_KEY } from "../src/appConfig.js";
+import { fill } from "../src/locale.js";
 import { savedRunAt, seedSave } from "./helpers/seededSave.js";
 import { getSeasonLogic } from "../src/gameLogic.js";
 import { RESULT_CARD_FILE_NAME, RESULT_CARD_HEIGHT, RESULT_CARD_WIDTH } from "../src/resultCard.js";
@@ -158,7 +160,7 @@ async function readCardPixels(page, file) {
       // The corner is ground; (540, 141) is on the hairline under the top strip.
       corner: at(12, 12),
       hairline: at(540, 141),
-      ground: painted("--c-gx-felt"),
+      ground: painted("--ui-surface-1"),
       accent: painted("--c-acid"),
       heat: painted("--c-gx-heat"),
     };
@@ -212,7 +214,7 @@ async function expectedShareLine(page) {
   const modeTitle = habit ? "[^']+" : await page.locator(".result-why-grid article").nth(1).locator("strong").innerText();
   const tail = habit ? ` ${habitCardLine(habit).replace(/[.「」]/g, "\\$&")}` : "";
   const origin = new URL(page.url()).origin;
-  const pattern = new RegExp(`^「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/\\?from=card${habit ? `&h=${habit.id}` : ""}$`);
+  const pattern = new RegExp(`^「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다\\. 판단 DNA는 '${modeTitle}', 결말은 '[^']+'\\. 최고 버스트 ${bestBurst}점, ${bestRank} 랭크\\.${tail} ${origin}/\\?from=card${habit ? `&h=${habit.id}` : ""}${bestBurst > 0 ? `&s=${bestBurst}` : ""}$`);
   return { pattern, bestBurst, bestRank, logicHold };
 }
 
@@ -251,6 +253,25 @@ test("결과 카드 저장 downloads a drawn 1080x1350 card and copies its line"
   if (habit) await expect(page.locator(".result-why-grid article").nth(1).locator("p").first()).toHaveText(habit.line);
 
   await keepScreenshots(page, testInfo, "buttons-after-save");
+});
+
+/**
+ * N32: a device that came from a friend's card keeps the friend's best burst
+ * (src/friendTarget.js); the ending says beside the buttons whether this
+ * season beat it. Said, not drawn: the card and its copied line are as before.
+ */
+test("a kept friend's record is measured against the season beside the card", async ({ page }) => {
+  test.setTimeout(120_000);
+  await withoutWebShare(page);
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, JSON.stringify({ habit: "moth", score: 1, at: Date.now() }));
+  }, FRIEND_TARGET_KEY);
+  await reachTheRecordByDebugJump(page);
+  await expectCardReady(page);
+  const { bestBurst } = await expectedShareLine(page);
+  const said = page.getByTestId("friend-target-result");
+  const standing = bestBurst > 1 ? fill(RESULT_CARD_COPY.friendBeaten, { score: 1, mine: bestBurst }) : fill(RESULT_CARD_COPY.friendShort, { score: 1, mine: bestBurst, gap: 2 - bestBurst });
+  await expect(said).toHaveText(standing);
 });
 
 // The way a returning player arrives, so the production build runs it too: no
@@ -469,4 +490,55 @@ test("the buttons wait for the card, say when it could not be made, and a press 
   await expect(status).toHaveText(RESULT_CARD_COPY.saved);
   await expectCardFile(page, download);
   expect(await page.evaluate(() => window.__card.asked)).toBe(2);
+});
+
+// N23 (2026-11-16): the report of 사건 01 to 17 says where it stands in its act
+// and how far the next 중간 결산 is; 사건 07's, at the end of 1막, carries the N1
+// tally in its small form -- the three rows, no note and no share buttons.
+async function closeDebugCaseToReport(page, caseId, nodeId) {
+  await startDebugNode(page, caseId, nodeId);
+  await completeCurrentCase(page);
+  const decisionNext = page.getByTestId("decision-next");
+  if (await decisionNext.isVisible()) await decisionNext.click();
+  await expect(page.locator(".result-page")).toBeVisible({ timeout: 30_000 });
+}
+
+test("사건 03's report says 1막 · 3/7 and how far the 중간 결산 is, with no tally", async ({ page }) => {
+  test.setTimeout(120_000);
+  await closeDebugCaseToReport(page, "case03", "c3_aftershock");
+  await expect(page.getByTestId("act-progress")).toHaveText("1막 · 3/7 · 중간 결산까지 4사건");
+  await expect(page.getByTestId("act-tally")).toHaveCount(0);
+  // N42 (2026-11-18): the foot of the report says the season is saved and what
+  // comes next; the install button only once the browser offers an install.
+  const leave = page.getByTestId("leave-line");
+  await expect(leave).toHaveText("쉬어도 저장됩니다 · 다음: 사건 04 - 치러야 할 대가 (약 10분)");
+  expect(await page.locator(".result-page > [data-testid='leave-line']:last-child").count()).toBe(1);
+  await expect(page.getByTestId("leave-line-install")).toHaveCount(0);
+  await page.evaluate(() => {
+    const event = new Event("beforeinstallprompt");
+    event.prompt = () => {
+      window.__installPrompted = true;
+      return Promise.resolve();
+    };
+    window.dispatchEvent(event);
+  });
+  await clickElement(page.getByTestId("leave-line-install"), "add to the home screen from the report");
+  expect(await page.evaluate(() => window.__installPrompted)).toBe(true);
+  await expect(page.getByTestId("leave-line-install")).toHaveCount(0);
+});
+
+test("사건 07's report closes 1막 with the small 중간 결산", async ({ page }) => {
+  test.setTimeout(120_000);
+  await closeDebugCaseToReport(page, "case07", "c7_aftershock");
+  await expect(page.getByTestId("act-progress")).toHaveText("1막 · 7/7 · 중간 결산은 아래에");
+  const tally = page.getByTestId("act-tally");
+  await expect(tally).toBeVisible();
+  await expect(tally.getByRole("heading")).toHaveText("중간 결산 · 1막 끝 · 사건 07");
+  await expect(tally.getByTestId("act-tally-habit")).not.toBeEmpty();
+  await expect(tally.getByTestId("act-tally-ending")).not.toBeEmpty();
+  await expect(tally.locator(".gx-tally-note")).toHaveCount(0);
+  await expect(tally.getByRole("button")).toHaveCount(0);
+  await expect(page.getByTestId("leave-line")).toHaveText("쉬어도 저장됩니다 · 다음: 사건 08 - 돈의 흔적 (약 10분)");
+  const results = await new AxeBuilder({ page }).include("[data-testid='act-tally']").include("[data-testid='leave-line']").analyze();
+  expect(results.violations).toEqual([]);
 });

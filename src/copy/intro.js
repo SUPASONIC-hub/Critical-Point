@@ -19,11 +19,13 @@ const introCopy = {
   pageTitle: "임계점: CRITICAL POINT - 판단이 깊어지는 순간",
   subtitle: "45초마다 당신의 판단 기준이 기록된다",
   // appCopy's GAME_TITLE_READING, for the same reason: the reading under the wordmark and on the case chip (2026-11-04: the English and Japanese pages printed the Korean).
-  titleReading: "트리거랩",
+  titleReading: "임계점",
   premise:
     "3년 전 당신은 대출 승인 문서에 혼자 반대 의견을 올렸습니다. 대출은 그대로 나갔고, 당신은 미국계 자본이 최대주주인 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫 파일에, 그때 그 대출번호가 그대로 남아 있습니다. 오래 붙잡은 조건은 다음 사건의 압력이 되어 돌아옵니다. 이야기는 그보다 조금 앞, 수습 마지막 과제에서 시작합니다.",
   startButton: "프롤로그 시작",
   briefingLink: "브리핑 먼저 보기",
+  // N19: the second door, with 스토리 모드 on from the first case (편의 설정's own words: easier, not ranked).
+  storyStart: { label: "이야기로 시작", hint: "쉬움 · 랭킹 밖" },
   ranking: "랭킹",
   board: "게시판",
   heroAlt: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
@@ -154,7 +156,7 @@ const introCopy = {
     syncing: "{case} 판단 조건 동기화 중",
   },
   // E-11 번외 사건: the start screen's side slot (sideCases.getSideSlot), hidden
-  // until a finale is closed and a side case is written.
+  // until a side case is open on this device (11-18: at its place in the story).
   sideSlot: {
     label: "번외 사건",
     heading: "번외 사건 · 랭킹 밖 · {book}",

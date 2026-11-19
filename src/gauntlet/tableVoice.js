@@ -6,7 +6,7 @@ import { dangerZoneOf } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
 import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
-import { SCOUT_TRUST } from "./tableRules.js";
+import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { decisionWindowSeconds } from "./stakeClock.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
@@ -95,7 +95,8 @@ export const describeWall = ({ gauge, dangerLine }) => fill(voice().wall, { gaug
 export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
 /** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
-export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax, trust: SCOUT_TRUST });
+export const describeScout = ({ wallMin, wallMax, narrowed }) =>
+  fill(narrowed ? voice().scoutNarrow : voice().scout, { min: wallMin, max: wallMax, trust: narrowed ? SCOUT_NARROW_TRUST : SCOUT_TRUST });
 
 /**
  * The stake clock's move (B5): the heat that moved it, the seconds the

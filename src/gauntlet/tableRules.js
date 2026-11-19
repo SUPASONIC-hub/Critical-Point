@@ -78,6 +78,16 @@ export const SCOUT_REACH = 10;
  * other cost. The stage and the bots do not look with less than this.
  */
 export const SCOUT_TRUST = 1;
+/**
+ * B1's next step (2026-11-18): a second look on the same window narrows the
+ * band it drew to `2 * SCOUT_NARROW_REACH` (20 to 14), still holding the wall
+ * at a seeded place inside it and inside the first band. It costs this much
+ * more 믿음 and the same clock (SCOUT_SECONDS): the closer the read, the
+ * dearer. Once a window, after the first look. Measured in check:pressure
+ * ("scout narrow") and check:endings ("Scout spend", `narrow`).
+ */
+export const SCOUT_NARROW_REACH = 7;
+export const SCOUT_NARROW_TRUST = 2;
 
 /** METRONOME: how many windows after the pressure rose a change of type still counts as a switch. */
 export const METRONOME_REACH = 2;

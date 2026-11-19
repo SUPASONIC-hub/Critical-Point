@@ -167,16 +167,12 @@
   animation-name: gx-relic-fade;
 }
 
-/* A still intro: the ticker, the drifting art, the wordmark's glitch copies,
+/* A still intro: the ticker, the drifting art,
    the dot's rings and the buttons' shine stop where they rest. */
 :root[data-still-intro] .intro-shell *,
 :root[data-still-intro] .intro-shell *::before,
 :root[data-still-intro] .intro-shell *::after {
   animation: none;
-}
-:root[data-still-intro] .wordmark-line::before,
-:root[data-still-intro] .wordmark-line::after {
-  display: none;
 }
 
 /* 이야기 글 크기 (D-5): the story's prose at 1.125 or 1.25 times its size --

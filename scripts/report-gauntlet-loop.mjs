@@ -20,11 +20,11 @@ import {
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_REROLL_COST, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
-import { SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
+import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
 import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, narrowDue, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -234,6 +234,8 @@ const scoutRows = [0, 3, 6, 9].map((margin) =>
 );
 /** The most a scouting hand may bank, as a share of a hand that sees the wall. */
 const SCOUT_SEES_CAP = 0.8;
+/** How far past the first band's near end the next push reaches when a narrowing hand takes its second look (the season bot's SCOUT_EDGE). */
+const NARROW_TRIGGER = 3;
 const skipper = measure("bust to skip", (win) =>
   win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true,
 );
@@ -398,18 +400,38 @@ assert.ok(
       row: measure(`scout at ${timing}, margin ${bestMargin}`, Object.assign((win) => scoutOrListen(win), { scout: (win) => scoutDue(timing, win) })),
       when: timing,
     })),
+    // B1's next step (11-18): look before push 1, and take the second look
+    // (SCOUT_NARROW_TRUST more, the band 20 to 14) when the next push, three
+    // past, reaches the first band -- the moment the first band stops
+    // answering -- then push while the next step stays this margin past the
+    // narrowed band's near end; the best of three margins. Measured 11-18:
+    // 14 is the narrowest band whose best hand stays under the cap (12 made
+    // 0.817 and 10 made 0.832 against a wall seen).
+    {
+      row: bestOfRows([2, 3, 4].map((inner) => measure(`scout narrow, margin ${bestMargin} then ${inner}`, Object.assign(
+        (win) => (win.narrowed ? win.gauge + win.schema.stepMax - inner < getWindowBand(win).wallMin : scoutOrListen(win)),
+        { scout: (win) => scoutDue("narrow", win), narrow: (win) => narrowDue("narrow", win, NARROW_TRIGGER) },
+      )))),
+      when: "narrow",
+    },
   ];
-  console.log(`scout            a look costs 믿음 ${SCOUT_TRUST} and the clock; when the heartbeat's best hand looks (never / before push 1 / before push 3 / when the next push reaches the band):`);
+  console.log(`scout            a look costs 믿음 ${SCOUT_TRUST} and the clock, the second (narrow, 20 to 14) 믿음 ${SCOUT_NARROW_TRUST} more; when the heartbeat's best hand looks (never / before push 1 / before push 3 / when the next push reaches the band / before push 1 and again when the next push reaches the first band):`);
   for (const { row, when } of timedRows) {
     const looks = row.seen.scouts / Math.max(1, CASES);
+    const narrows = row.seen.narrows / Math.max(1, CASES);
     console.log(
-      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case  믿음 ${(-looks * SCOUT_TRUST).toFixed(2)}/case`,
+      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case${narrows ? ` + narrow ${narrows.toFixed(2)}` : ""}  믿음 ${(-(looks * SCOUT_TRUST + narrows * SCOUT_NARROW_TRUST)).toFixed(2)}/case  (scout/sees ${(row.meanVault / oracle.meanVault).toFixed(3)})`,
     );
   }
   for (const { row, when } of timedRows.slice(1)) {
     assert.ok(row.meanVault > bestHeartbeat.meanVault, `a look at ${when} should still be worth more than the heartbeat: ${row.meanVault} against ${bestHeartbeat.meanVault}`);
     assert.ok(row.meanVault < oracle.meanVault * SCOUT_SEES_CAP, `a look at ${when} must not be an answer key: ${row.meanVault} against a wall-seeing ${oracle.meanVault}`);
   }
+  // The second look is information worth its 믿음: it banks more than one look before push 1 does.
+  const narrowRow = timedRows.find(({ when }) => when === "narrow").row;
+  const alwaysRow = timedRows.find(({ when }) => when === "always").row;
+  console.log(`scout            narrow best ${narrowRow.label}: ${narrowRow.meanVault} against one look ${alwaysRow.meanVault} (${((narrowRow.meanVault / alwaysRow.meanVault - 1) * 100).toFixed(1)}%)`);
+  assert.ok(narrowRow.meanVault > alwaysRow.meanVault, `the second look should be worth something: ${narrowRow.meanVault} against ${alwaysRow.meanVault}`);
 }
 assert.ok(skipper.meanWindows < WINDOWS_PER_CASE, "busting on purpose does shorten a case");
 assert.ok(

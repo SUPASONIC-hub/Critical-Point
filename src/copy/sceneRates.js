@@ -5,12 +5,14 @@ import { localizeTables } from "../locale.js";
  * be laid over them (src/locale.js, 다국어 틀): how many staked the same card
  * (sceneChoices.js, under the decision reveal, with 「드문 선택」 for the
  * minority's) and how many hit the wall here (sceneTraces.js, under the
- * scene's 사건 파일). The Korean is those modules', moved here unchanged.
+ * scene's 사건 파일, with the count of windows the rate stands on). The
+ * Korean is those modules', moved here.
  */
 const sceneRatesCopy = {
   choice: "같은 카드를 고른 분석관 {percent}%",
   rare: " · 드문 선택",
-  trace: "이 장면에서 다른 분석관의 {percent}%가 벽에 닿았습니다.",
+  trace: "이 장면에서 다른 분석관의 {percent}%가 벽에 닿았습니다. (판단 {windows}번 기준)",
+  collecting: "이 장면에서 벽에 닿은 다른 분석관의 기록은 모으는 중입니다. (판단 {windows}번)",
 };
 export default sceneRatesCopy;
 

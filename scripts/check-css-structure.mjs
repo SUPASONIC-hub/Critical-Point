@@ -196,7 +196,9 @@ const fileBudgets = {
   // start screen's credit takes a row for SUPASONIC's and ALICE's addresses.
   // -> 3195 / 70696 on 2026-11-05, rules-1105 (#224 #307 #316 #320 #308): 다섯 규칙의 CSS가 한 번에 들어와 사용자 결정으로 실측으로 올림, 다음 묶음부터는 내리기만.
   // 3195 / 70696 -> 3194 / 70687 on 2026-11-05, rules-1105 after merging main 4f2d39cb (#458 mood: the glow alphas), measured.
-  "base-intro-ranking.css": { lines: 3194, bytes: 70687 },
+  // 3194 / 70687 -> 3221 / 71428 on 2026-11-16, measured (N19 draft over main 6fef686f): the start
+  // screen's second door, 「이야기로 시작」, drawn as a quiet underlined line beside the briefing link.
+  "base-intro-ranking.css": { lines: 3221, bytes: 71428 },
   // play.css lost the most to the 2026-09-11 prune: the record-room pass removed
   // the identity strip, the repeated scene question and the status board, and
   // their rules stayed behind. It read 3290 / 72600 after that and moved back up
@@ -362,7 +364,11 @@ const fileBudgets = {
   // 3143 / 61347 -> 3160 / 61634 on 2026-11-12, e3-status, measured: 지금 상황 듣기 (E3) -- the heart in the gauge's row is a button (.gx-listen reset), pressed over 44 on a phone by its ::before.
   // 3160 / 61634 (E3) and 3153 / 61576 (main 4f927085, C-15) -> 3170 / 61863 on 2026-11-12, bundle 1112c (#520 #521) over main 4f927085, measured: both.
   // 3170 / 61863 -> 3195 / 62160 on 2026-11-16, ui-quickwins, measured: the card key unseen until a mouse hovers or a key focuses the hand, the run line and signals as small print.
-  "play.css": { lines: 3195, bytes: 62160 },
+  // 3195 -> 3203 lines on 2026-11-18, bundle 11-18, measured: 2안 on a short phone -- v1's scene air, a 3px double rule, a 16px slip margin, the ledger column 6px apart in 14px words, 6px inside a slip.
+  // 3203 -> 3214 lines on 2026-11-18, n37-paper-coverage, measured: the BUST slam's third line on paper (N37), red on red stripes before.
+  // 3208 -> 3212 lines on 2026-11-18, n36-phone-fit (E1d): the ledger column's air on every phone up to 860 tall, English card words a step smaller on a short one.
+  // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
+  "play.css": { lines: 3219, bytes: 62160 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -377,7 +383,9 @@ const fileBudgets = {
   // 588 / 9768 -> 619 / 10135 on 2026-11-02, measured (plate-story, E and F):
   // the player's own figure in the hand's colour inside an outline, and the
   // result's copy of a case's last room with its three tones.
-  "plate.css": { lines: 619, bytes: 10135 },
+  // 619 / 10135 -> 625 / 10211 on 2026-11-17, measured (2안 감사 장부): the
+  // room printed grey and faint on the ledger's paper behind the question.
+  "plate.css": { lines: 625, bytes: 10211 },
   // briefing.css arrived on 2026-09-21 with the graphic-novel briefing page in
   // front of each table, sized to the file.
   // 635 / 13200 -> 670 / 14000 later the same day for the glitch a broken
@@ -474,7 +482,9 @@ const fileBudgets = {
   // scroll with the page on a phone (운영화면 문제 3 (1)).
   // -> 417 / 8165 on 2026-11-02, measured (money-feedback): a phone on its
   // side gives the purse line a 30px clock and 2px off the HUD's air.
-  "responsive.css": { lines: 417, bytes: 8165 },
+  // -> 418 / 8196 on 2026-11-18, measured (bundle 11-18): 2안's ledger on a
+  // phone on its side keeps v1's scene padding and a 3px double rule.
+  "responsive.css": { lines: 418, bytes: 8196 },
   // 1225 / 25700 -> 1750 / 43100 on 2026-09-15: the result screen stopped
   // mixing white report cards into a dark page. The hero card and rank ring, the
   // tool dock, the lead row, the metric tile grid, and dark surfaces for about
@@ -502,7 +512,10 @@ const fileBudgets = {
   // 2512 -> 2523 lines on 2026-11-12, A2-1(1) 언어의 엔트로피: the collapse
   // ending's headline letters and their one keyframe, measured 2523 / 56485.
   // The bytes still fit.
-  "result.css": { lines: 2523, bytes: 57089 },
+  // 2523 -> 2545 lines on 2026-11-18, N42 떠나는 순간 한 줄 (draft): the quiet
+  // line at the foot of 프롤로그 05, 사건 03 and 사건 07 and its install
+  // button, four rules, measured 2545 / 56815. The bytes still fit.
+  "result.css": { lines: 2545, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
@@ -536,6 +549,10 @@ const fileBudgets = {
   // DraftBuy), in a file of their own beside relics.css, whose 473 / 9410 was
   // every line spent. Measured 41 / 808.
   "draft-spend.css": { lines: 41, bytes: 808 },
+  // New on 2026-11-16 (N22, draft over main 6fef686f): the one between-hands
+  // question of 프롤로그 01·02 on the reveal sheet (BetweenHandsPulse.jsx), in a
+  // file of its own so play.css's budget is not touched. Measured 41 / 765.
+  "pulse.css": { lines: 41, bytes: 765 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

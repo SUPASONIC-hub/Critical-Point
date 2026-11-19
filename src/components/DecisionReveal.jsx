@@ -9,6 +9,7 @@ import { Prose } from "./Prose.jsx";
 import { fill } from "../locale.js";
 import revealCopy from "../copy/reveal.js";
 import { SceneMinutes } from "./SceneMinutes.jsx";
+import { BetweenHandsPulse } from "./BetweenHandsPulse.jsx";
 import { noteRevealDetails } from "../state/readingTally.js";
 import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
@@ -101,7 +102,7 @@ function afterwordParts(text) {
 }
 
 export function DecisionReveal({ view }) {
-  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
+  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta, answerPulse } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
   // Where the lost scene went on: its place up to the first " · " (B-13), the
@@ -328,6 +329,9 @@ export function DecisionReveal({ view }) {
             {choiceShare}
           </p>
         )}
+
+        {/* N22: once a season, between two hands of 프롤로그 01·02 (state/betweenHandsPulse.js). */}
+        <BetweenHandsPulse key={decisionReveal.nextNode} pulse={decisionReveal.pulse ?? null} onAnswer={answerPulse} />
 
         <div className="decision-reveal-footer">
           <span>{fill(revealCopy.next, { title: decisionReveal.nextTitle })}</span>

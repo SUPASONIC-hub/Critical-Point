@@ -1,8 +1,10 @@
 /* The briefing page: the scene told as a graphic-novel page before the table
    opens. It is the one surface in front of the table besides the relic draft,
-   and like the draft it holds the table's clock while it is up. Ink-black
-   panels on a paper gutter, caption boxes, a speech balloon, a sound effect,
-   and a reading clock that opens the table when it runs out. */
+   and like the draft it holds the table's clock while it is up. Since the
+   ledger (2안 감사 장부, 2026-11-17) it is a dossier page: ruled paper with a
+   red margin, the story in ruled paragraphs, a taped photograph, a speech
+   balloon, a sound effect, and a reading clock stamped in red that opens the
+   table when it runs out. */
 
 .gx-comic {
   /* A darker amber for the callouts' bar: --c-amber is too light to see on cream. */
@@ -16,9 +18,7 @@
      sideways the notch is on a side. */
   padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
     max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  background:
-    radial-gradient(75% 70% at 50% 50%, transparent 35%, var(--mood-edge) 100%),
-    radial-gradient(80% 60% at 50% 40%, var(--c-gx-heat-a18), transparent 70%), var(--c-gx-shade);
+  background: radial-gradient(75% 70% at 50% 50%, transparent 35%, var(--mood-edge) 100%), var(--c-gx-shade);
   backdrop-filter: blur(10px) saturate(1.1);
   animation: gx-comic-fade var(--ui-dur) var(--ui-ease) both;
   transition: --mood-edge 0.6s;
@@ -33,13 +33,11 @@
   overflow: auto;
   padding: 18px 18px 0;
   background:
-    radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.05) 1px, transparent 1.4px) 0 0 / 7px 7px,
-    var(--ui-bg);
-  border: 3px solid var(--ui-frame);
-  border-radius: var(--ui-radius-md);
-  box-shadow:
-    10px 10px 0 var(--c-black),
-    var(--ui-shadow-2);
+    linear-gradient(90deg, transparent 0 10px, var(--ledger-margin) 10px 11px, transparent 11px),
+    var(--ledger-ruled), var(--ui-surface-1);
+  border: 1px solid var(--ui-frame);
+  border-radius: 4px;
+  box-shadow: 12px 12px 0 var(--ledger-shadow);
   outline: none;
   animation: gx-comic-page 0.42s var(--ui-ease-spring) both;
   transition:
@@ -48,7 +46,7 @@
 }
 
 .gx-comic-page.is-broken {
-  border-color: var(--c-gx-heat);
+  border-color: var(--ledger-pencil);
 }
 
 /* Title strip ---------------------------------------------------------------- */
@@ -84,9 +82,9 @@
 .gx-comic-kicker {
   grid-area: kicker;
   margin: 0;
-  color: var(--c-acid);
-  font: 800 0.6875rem/1.3 var(--font-sans);
-  letter-spacing: 0.16em;
+  color: var(--ledger-pencil);
+  font: 800 0.6875rem/1.3 var(--font-mono);
+  letter-spacing: 0.14em;
 }
 
 .gx-comic-title {
@@ -95,11 +93,11 @@
   color: var(--ui-text);
   font-size: clamp(1.625rem, 4.4vw, 2.875rem);
   font-weight: 900;
-  font-style: italic;
   letter-spacing: -0.03em;
   line-height: 1;
-  text-shadow: 3px 3px 0 var(--c-black);
-  transform: skewX(-6deg);
+  /* Underlined in red pencil. */
+  text-decoration: underline 4px var(--ledger-pencil);
+  text-underline-offset: 7px;
 }
 
 .gx-comic-timer {
@@ -110,11 +108,12 @@
   align-items: baseline;
   min-width: 150px;
   padding: 8px 12px 10px;
-  color: var(--ui-accent-ink);
-  background: var(--c-acid);
-  border: 3px solid var(--c-black);
-  box-shadow: 4px 4px 0 var(--c-black);
-  transform: rotate(2deg);
+  /* A rubber stamp in red. */
+  color: var(--ledger-pencil);
+  background: var(--ledger-paper-a60);
+  border: 3px solid var(--ledger-pencil);
+  border-radius: 6px;
+  transform: rotate(-3deg);
   text-align: left;
 }
 
@@ -133,24 +132,25 @@
 .gx-comic-timer i {
   grid-column: 1 / -1;
   margin-top: 6px;
-  border-top: 5px solid var(--c-black);
+  border-top: 5px solid var(--ledger-pencil);
   transform: scaleX(var(--read-left, 1));
   transform-origin: left;
 }
 
 .gx-comic-timer.is-late {
-  color: var(--c-paper);
-  background: var(--c-gx-heat);
+  color: var(--ledger-white);
+  background: var(--ledger-pencil);
   animation: gx-comic-throb 0.5s ease-in-out infinite alternate;
 }
 
 .gx-comic-timer.is-late i {
-  border-color: var(--c-paper);
+  border-color: var(--ledger-white);
 }
 
 .gx-comic-timer.is-held {
   color: var(--ui-text);
   background: var(--ui-surface-2);
+  border-color: var(--ui-text);
 }
 
 /* The room behind the title is a phone's (D-13); a wider page draws it in its panel. */
@@ -174,13 +174,10 @@
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  background: var(--ui-surface-2);
-  /* A hairline, not a frame (2026-11-16, UI quick wins): the white ring and
-     the black drop shadow stacked every panel inside another box. The 3px
-     border stays, unseen, so the measured page keeps its sizes. */
+  /* A section of the page under a ruled line, not a box (2안, 2026-11-17). The
+     3px border stays, mostly unseen, so the measured page keeps its sizes. */
   border: 3px solid transparent;
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px var(--ui-line-strong);
+  border-top: 3px solid var(--ui-text);
   animation: gx-panel-pop 0.46s var(--ui-ease-spring) both;
 }
 
@@ -213,14 +210,12 @@
 
 .gx-caption {
   margin: 0;
-  padding: 8px 11px;
-  color: var(--c-ink);
-  background: var(--c-cream);
-  border: 2px solid transparent;
-  border-radius: 8px;
-  font-size: 0.9375rem;
+  padding: 2px 4px 2px 12px;
+  color: var(--ui-text);
+  border-left: 2px solid var(--ui-line-strong);
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .gx-caption-place {
@@ -232,7 +227,7 @@
   max-width: 72%;
   padding: 6px 10px;
   padding-left: 8px;
-  background: var(--c-cream);
+  background: var(--ledger-white);
   border-left: 4px solid var(--c-amber-bar);
   line-height: 1.55;
   transform: rotate(-1.5deg);
@@ -292,8 +287,8 @@
   content: "";
   opacity: 0;
   box-shadow:
-    inset 3px 0 0 rgb(255 56 56 / 0.7),
-    inset -3px 0 0 rgb(80 220 255 / 0.6);
+    inset 3px 0 0 rgb(196 34 28 / 0.56),
+    inset -3px 0 0 rgb(20 82 160 / 0.48);
   pointer-events: none;
   animation: gx-splash-glitch 2.8s steps(1, end) infinite;
 }
@@ -331,25 +326,26 @@
 .gx-panel-speaker {
   grid-area: speaker;
   display: grid;
-  grid-template-columns: 112px 1fr;
+  grid-template-columns: 124px 1fr;
   grid-template-rows: auto 1fr;
-  gap: 10px 12px;
+  gap: 10px 14px;
   align-items: start;
   padding: 12px;
-  background:
-    radial-gradient(circle, rgb(255 255 255 / 0.08) 1.3px, transparent 1.7px) 0 0 / 7px 7px,
-    var(--ui-surface-3);
   animation-delay: 0.08s;
 }
 
 .gx-speaker-frame {
+  /* A photograph taped to the page. */
+  position: relative;
   grid-row: 1 / span 2;
   overflow: hidden;
   aspect-ratio: 1;
   background: var(--ui-surface-4);
-  border: 3px solid var(--c-black);
-  box-shadow: 0 0 0 2px var(--ui-text);
-  transform: rotate(-3deg);
+  border: 6px solid var(--ledger-white);
+  box-shadow:
+    0 10px 22px var(--ledger-shadow),
+    0 0 0 1px var(--ui-line);
+  transform: rotate(-2deg);
 }
 
 .gx-speaker-frame > * {
@@ -359,6 +355,17 @@
   object-fit: cover;
 }
 
+.gx-speaker-frame::after {
+  position: absolute;
+  top: -2px;
+  left: 28%;
+  width: 44%;
+  height: 14px;
+  content: "";
+  background: var(--ledger-tape);
+  box-shadow: 0 1px 2px var(--ledger-shadow);
+}
+
 .gx-speaker-tag {
   display: grid;
   gap: 2px;
@@ -366,7 +373,7 @@
 
 .gx-speaker-tag b {
   color: var(--ui-text);
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-weight: 900;
 }
 
@@ -385,8 +392,8 @@
   margin: 6px 0 0;
   padding: 10px 12px;
   color: var(--c-ink);
-  background: var(--c-paper);
-  border: 3px solid var(--c-black);
+  background: var(--ledger-white);
+  border: 2px solid var(--ledger-ink);
   border-radius: 18px;
   font-size: 0.9375rem;
   font-weight: 700;
@@ -396,14 +403,14 @@
 
 .gx-balloon:not(.is-lead)::before {
   position: absolute;
-  top: -11px;
+  top: -10px;
   left: 18px;
   width: 18px;
   height: 18px;
   content: "";
-  background: var(--c-paper);
-  border-top: 3px solid var(--c-black);
-  border-left: 3px solid var(--c-black);
+  background: var(--ledger-white);
+  border-top: 2px solid var(--ledger-ink);
+  border-left: 2px solid var(--ledger-ink);
   transform: rotate(45deg) skew(12deg, 12deg);
   /* Under the words: its corner reaches into the first line, and Android
      Chrome drew it over the first letter's top (운영 확인 고칠 점 1). */
@@ -421,9 +428,10 @@
   grid-column: 1 / -1;
   padding: 10px 12px;
   color: var(--ui-text);
-  background: var(--ui-surface-1);
-  border: 2px solid var(--ui-line-accent);
-  border-radius: var(--ui-radius-sm);
+  background: var(--ledger-white);
+  border: 2px solid var(--ui-text);
+  border-radius: 2px;
+  box-shadow: inset 5px 0 0 var(--ledger-pencil);
 }
 
 .gx-judgment p {
@@ -438,8 +446,8 @@
   margin-right: 6px;
   padding: 1px 7px;
   content: attr(data-who);
-  color: var(--c-cream);
-  background: var(--c-black);
+  color: var(--ledger-white);
+  background: var(--ledger-ink);
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 800;
@@ -454,7 +462,6 @@
   gap: 10px;
   align-content: start;
   padding: 14px;
-  background: var(--ui-surface-1);
   animation-delay: 0.16s;
 }
 
@@ -493,8 +500,6 @@
 .gx-panel-file {
   grid-area: file;
   padding: 14px 14px 16px;
-  background:
-    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 22px), var(--ui-surface-2);
   animation-delay: 0.24s;
 }
 
@@ -502,11 +507,9 @@
   display: inline-block;
   margin: 0 0 10px;
   padding: 3px 10px;
-  color: var(--ui-accent-ink);
-  background: var(--c-acid);
-  border: 2px solid var(--c-black);
-  font-size: 0.75rem;
-  font-weight: 900;
+  color: var(--ledger-white);
+  background: var(--ui-text);
+  font: 900 0.75rem/1.5 var(--font-mono);
   letter-spacing: 0.1em;
 }
 
@@ -522,20 +525,12 @@
   position: relative;
   padding: 8px 10px 8px 22px;
   color: var(--c-ink);
-  background: var(--c-paper-soft);
-  border: 2px solid transparent;
-  border-radius: 6px;
+  background: var(--ledger-white);
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 2px;
   font-size: 0.8125rem;
   font-weight: 700;
   line-height: 1.45;
-}
-
-.gx-panel-file li:nth-child(odd) {
-  transform: rotate(-0.8deg);
-}
-
-.gx-panel-file li:nth-child(even) {
-  transform: rotate(0.7deg);
 }
 
 .gx-panel-file li::before {
@@ -545,17 +540,17 @@
   width: 7px;
   height: 7px;
   content: "";
-  background: var(--c-gx-heat);
+  background: var(--ledger-pencil);
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 0 1px var(--c-black);
 }
 
 .gx-panel-breach {
   grid-area: breach;
   padding: 14px;
   background:
-    repeating-linear-gradient(135deg, var(--c-gx-heat-a18) 0 10px, transparent 10px 20px), var(--c-danger-14);
-  border-color: var(--c-gx-heat);
+    repeating-linear-gradient(135deg, var(--ledger-pencil-soft) 0 10px, transparent 10px 20px),
+    var(--ledger-white);
+  border: 2px solid var(--ledger-pencil);
   animation-delay: 0.3s;
 }
 
@@ -581,7 +576,7 @@
   margin: 0 -18px;
   padding: 12px 18px 16px;
   background: var(--ui-glass-strong);
-  border-top: 3px solid var(--c-black);
+  border-top: 2px solid var(--ui-text);
   backdrop-filter: blur(14px);
 }
 
@@ -607,9 +602,9 @@
   min-height: 40px;
   padding: 6px 12px 6px 6px;
   color: var(--ui-text);
-  background: var(--ui-surface-3);
-  border: 2px solid var(--ui-line-strong);
-  border-radius: var(--ui-radius-sm);
+  background: var(--ledger-white);
+  border: 1px solid var(--ui-line-field);
+  border-radius: 3px;
   font-size: 0.8125rem;
   font-weight: 700;
   text-align: left;
@@ -621,11 +616,12 @@
 .gx-comic-card:hover:not([aria-disabled="true"]),
 .gx-comic-card:focus-visible {
   border-color: var(--c-acid);
-  transform: translateY(-2px) rotate(-1deg);
+  transform: translateY(-2px);
 }
 
 .gx-comic-card.selected {
   border-color: var(--c-acid);
+  box-shadow: 0 0 0 2px var(--c-acid);
 }
 
 /* Locked, and still in the tab order: the card says 잠김 (GuardedButton). */
@@ -639,9 +635,9 @@
   place-items: center;
   min-width: 26px;
   height: 26px;
-  color: var(--ui-accent-ink);
+  color: var(--ledger-white);
   background: var(--ui-text);
-  border-radius: var(--ui-radius-xs);
+  border-radius: 3px;
   font: 900 0.8125rem/1 var(--font-sans);
 }
 
@@ -658,25 +654,33 @@
   min-width: 190px;
   min-height: 56px;
   padding: 0 20px;
-  color: var(--ui-accent-ink);
-  background: linear-gradient(180deg, rgb(232 255 150), var(--c-acid) 55%, var(--c-acid-deep));
-  border: 3px solid var(--c-black);
-  border-radius: var(--ui-radius-sm);
-  box-shadow: 5px 5px 0 var(--c-black);
+  /* The green stamp, on a lip of ink that a press takes away. */
+  color: var(--ledger-white);
+  background: var(--c-acid);
+  border: 2px solid var(--ledger-ink);
+  border-radius: 6px;
+  box-shadow: 0 5px 0 var(--ledger-ink);
   font-size: 1.0625rem;
   font-weight: 900;
-  transition: transform var(--ui-dur-fast) var(--ui-ease);
+  transition:
+    transform 70ms var(--ui-ease),
+    box-shadow 70ms var(--ui-ease);
 }
 
 .gx-open-table:hover,
 .gx-open-table:focus-visible {
-  transform: translate(-2px, -2px);
+  transform: translateY(-1px);
+}
+
+.gx-open-table:active {
+  transform: translateY(5px);
+  box-shadow: none;
 }
 
 .gx-open-table small {
   font-size: 0.75rem;
   font-weight: 700;
-  opacity: 0.72;
+  opacity: 0.9;
 }
 
 /* Phone: one column, the page fills the screen and scrolls under a docked
@@ -729,7 +733,8 @@
   .gx-comic-top > .gx-plate-backdrop {
     display: block;
     height: 100%;
-    opacity: 0.5;
+    filter: grayscale(1);
+    opacity: 0.14;
   }
 
   .gx-panel-splash {
@@ -751,7 +756,7 @@
 
   /* A face a reader can recognise, and a name that reads as one. */
   .gx-panel-speaker {
-    grid-template-columns: 96px 1fr;
+    grid-template-columns: 124px 1fr;
   }
 
   /* A case's first page that introduces a rule (프롤로그 01~05) keeps the
@@ -767,15 +772,11 @@
   }
 
   .gx-comic-page:has(.gx-carry) .gx-panel-speaker {
-    grid-template-columns: 60px 1fr;
+    grid-template-columns: 80px 1fr;
   }
 
   .gx-judgment {
     padding: 8px 10px;
-  }
-
-  .gx-speaker-tag b {
-    font-size: 1.375rem;
   }
 
   .gx-comic-hint {
@@ -830,12 +831,10 @@
   gap: 12px;
   width: min(560px, 100%);
   padding: 28px 22px 22px;
-  background: var(--ui-bg);
-  border: 3px solid var(--ui-frame);
-  border-radius: var(--ui-radius-md);
-  box-shadow:
-    10px 10px 0 var(--c-black),
-    var(--ui-shadow-2);
+  background: var(--ui-surface-1);
+  border: 2px solid var(--ui-frame);
+  border-radius: 4px;
+  box-shadow: 12px 12px 0 var(--ledger-shadow);
   outline: none;
   text-align: center;
   animation: gx-comic-page 0.42s var(--ui-ease-spring) both;
@@ -843,8 +842,8 @@
 
 .gx-act-kicker {
   margin: 0;
-  color: var(--c-acid);
-  font: 800 0.75rem/1.3 var(--font-sans);
+  color: var(--ledger-pencil);
+  font: 800 0.75rem/1.3 var(--font-mono);
   letter-spacing: 0.12em;
 }
 
@@ -878,10 +877,10 @@
   min-height: 48px;
   margin-top: 4px;
   overflow: hidden;
-  color: var(--ui-accent-ink);
+  color: var(--ledger-white);
   background: var(--c-acid);
-  border: 3px solid var(--c-black);
-  border-radius: var(--ui-radius-sm);
+  border: 2px solid var(--ledger-ink);
+  border-radius: 6px;
   font-size: 1rem;
   font-weight: 900;
 }
@@ -891,7 +890,7 @@
   position: absolute;
   inset: auto 0 0;
   height: 4px;
-  background: var(--c-black);
+  background: var(--ledger-white);
   transform-origin: left;
   animation: gx-act-wait var(--act-wait) linear both;
   content: "";
@@ -938,7 +937,7 @@
 }
 
 .gx-tally dt {
-  color: var(--ui-text-3);
+  color: var(--ui-text-2);
   font-size: 0.75rem;
 }
 

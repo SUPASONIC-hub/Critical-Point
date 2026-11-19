@@ -133,6 +133,10 @@ const SPEAKER_PORTRAITS = {
   // side, so a photograph of a real model (docs/portrait-credits.md). 설경민
   // and 심재만 speak only in the narration, as 번외 6's 기성철.
   "비노드 타파": "/portrait-binod-thapa.webp",
+  // 번외 9 (2026-11-16): the side case's one new speaker, a widow on its right
+  // side, so a photograph of a real model (docs/portrait-credits.md). 위성규
+  // speaks only in the narration, as 번외 8's 설경민.
+  "아이굴 세리코바": "/portrait-aigul-serikova.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */

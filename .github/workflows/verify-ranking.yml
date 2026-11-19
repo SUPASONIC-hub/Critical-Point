@@ -254,6 +254,16 @@ jobs:
         run: |
           rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err counts.sql counts.json hall.sql hall.json hall.err
           if [ -d rows ]; then rmdir rows; fi
+      # F7: where the event weeks stand today (docs/event-week.md), at the
+      # end of the summary. It reads the calendar in the repository only: no
+      # secret, no query, no write. A failure here never fails the run.
+      - name: Add the event week line
+        if: always() && steps.token.outputs.configured == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p ranking-report
+          npm run --silent report:event-week | tee -a "$GITHUB_STEP_SUMMARY" ranking-report/verify-ranking-summary.md || true
       # What the Job Summary says, as the run's artifact too (2026-11-03): the
       # summary cannot be read from the CLI or the API, and the W47 verdict
       # (11-23) reads it. Only the lines above (the redacted report) are in it.

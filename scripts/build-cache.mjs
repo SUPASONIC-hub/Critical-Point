@@ -26,7 +26,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const KEY_VERSION = 1;
+const KEY_VERSION = 1;
 
 // Names Vite exposes (VITE_), the prefixes vite.config.js loads with loadEnv,
 // and the variables it or its plugins read from process.env.
@@ -71,7 +71,7 @@ function git(args, cwd) {
 }
 
 /** `..\cp-build-cache` beside the main checkout, wherever this worktree is. */
-export function defaultCacheDir(root) {
+function defaultCacheDir(root) {
   if (process.env.CP_BUILD_CACHE) return path.resolve(process.env.CP_BUILD_CACHE);
   const common = git(["rev-parse", "--path-format=absolute", "--git-common-dir"], root);
   return path.join(path.dirname(path.dirname(common)), "cp-build-cache");

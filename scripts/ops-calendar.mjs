@@ -42,14 +42,14 @@ import {
 /** The first day of ops mode, KST. Before it every day is a deploy day. */
 export const OPS_MODE_START = "2026-12-01";
 /** Tuesday and Friday (Date#getUTCDay of the KST day). */
-export const DEPLOY_WEEKDAYS = Object.freeze([2, 5]);
-export const DEPLOY_CUTOFF = "18:50";
+const DEPLOY_WEEKDAYS = Object.freeze([2, 5]);
+const DEPLOY_CUTOFF = "18:50";
 /** The calendar is topped up below this many weeks... */
-export const CALENDAR_MIN_WEEKS = 6;
+const CALENDAR_MIN_WEEKS = 6;
 /** ...by this many. */
-export const CALENDAR_EXTEND_WEEKS = 12;
+const CALENDAR_EXTEND_WEEKS = 12;
 /** The first months of the quarters (0-based): a scheduled wipe is the first Monday of one. */
-export const QUARTER_MONTHS = Object.freeze([0, 3, 6, 9]);
+const QUARTER_MONTHS = Object.freeze([0, 3, 6, 9]);
 
 const WEEKDAY_KO = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -61,7 +61,7 @@ export function kstDay(ms) {
 }
 
 /** 00:00 KST of a "YYYY-MM-DD", in UTC milliseconds. */
-export function dayStartMs(day) {
+function dayStartMs(day) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(day ?? ""))) return null;
   const at = Date.parse(`${day}T00:00:00+09:00`);
   return Number.isFinite(at) && kstDay(at) === day ? at : null;
@@ -70,7 +70,7 @@ export function dayStartMs(day) {
 const weekdayOf = (day) => new Date(`${day}T00:00:00Z`).getUTCDay();
 const addDays = (day, days) => kstDay(dayStartMs(day) + days * DAY_MS);
 /** "12-04(금)". */
-export const shortDay = (day) => `${day.slice(5)}(${WEEKDAY_KO[weekdayOf(day)]})`;
+const shortDay = (day) => `${day.slice(5)}(${WEEKDAY_KO[weekdayOf(day)]})`;
 
 export function opsModeOn(ms) {
   const day = kstDay(ms);

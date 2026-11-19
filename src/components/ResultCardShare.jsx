@@ -4,6 +4,8 @@ import { copyText } from "../appConfig.js";
 import { getSeasonLogic } from "../gameLogic.js";
 import { buildResultCardModel, buildShareText, renderResultCardFile, shareOrSave } from "../resultCard.js";
 import { RESULT_CARD_COPY, RESULT_CARD_STATUS } from "../resultCardCopy.js";
+import { friendTargetStanding, keptFriendTarget } from "../friendTarget.js";
+import { fill } from "../locale.js";
 
 const IDLE_TIMEOUT_MS = 1500;
 
@@ -61,6 +63,13 @@ export default function ResultCardShare({ card, build = null, words = RESULT_CAR
   // The other card's builder and its failure line, kept as the season's input is.
   const builder = useRef({ build, failed: words.failed });
   const run = useRef(0);
+  // N32: the season's best burst against the friend's record this device was
+  // sent (friendTarget.js); the season's card only, said beside it, not drawn.
+  const [friendLine] = useState(() => {
+    if (!card) return "";
+    const standing = friendTargetStanding(keptFriendTarget(), buildResultCardModel(card).bestBurst);
+    return standing ? fill(standing.beaten ? RESULT_CARD_COPY.friendBeaten : RESULT_CARD_COPY.friendShort, standing) : "";
+  });
 
   /** Makes the card, and resolves to it only if this is still the latest attempt on a mounted screen. */
   async function make() {
@@ -132,6 +141,11 @@ export default function ResultCardShare({ card, build = null, words = RESULT_CAR
           {waiting ? words.making : said}
         </span>
       </small>
+      {friendLine && (
+        <p data-testid="friend-target-result">
+          <small>{friendLine}</small>
+        </p>
+      )}
     </>
   );
 }

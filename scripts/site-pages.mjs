@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { SUPPORT_CONTACT } from "../src/appConfig.js";
 import introCopy from "../src/copy/intro.js";
 import enIntro from "../src/locales/en/screens/intro.js";
@@ -9,6 +10,7 @@ import { localizeStaticShell } from "./static-shell.mjs";
 import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
 import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
+import { aboutShowcase } from "./content-pages/about-showcase.mjs";
 import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
   adStage,
@@ -559,10 +561,15 @@ export function renderSitePages({ analytics = null, ads = false } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
+      // The about page opens on the README's first screen over the key visual (scripts/content-pages/about-showcase.mjs), its text whole below.
+      const showcase = kind === "about" ? aboutShowcase(language) : null;
+      const body = siteBody(kind, language, { analytics, ads });
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: siteBody(kind, language, { analytics, ads }),
+        body: showcase ? withShowcase(body, showcase) : body,
+        hero: showcase?.hero ?? null,
+        style: showcase?.style ?? "",
         description: DESCRIPTION[kind][language],
         analytics,
         // The about page names the game as the start page does (scripts/structured-data.mjs).
@@ -571,6 +578,13 @@ export function renderSitePages({ analytics = null, ads = false } = {}) {
     }
   }
   return pages;
+}
+
+/** The showcase put into the about page's text, before its first `showcase.before` (its first paragraph). */
+function withShowcase(body, showcase) {
+  const at = body.indexOf(showcase.before);
+  if (at < 0) throw new Error(`site-pages: the about page has no ${showcase.before} to put the showcase before`);
+  return `${body.slice(0, at)}${showcase.body}${body.slice(at)}`;
 }
 
 /**
@@ -680,7 +694,7 @@ export const START_PAGE = {
  */
 export const startStructuredData = (language) => structuredDataTag(gameStructuredData({ language, description: START_PAGE[language].description }));
 
-const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #d9ff62; text-decoration: underline";
+const NOSCRIPT_LINK = "display: inline-block; padding: 8px 4px; color: #16603e; text-decoration: underline";
 const NOSCRIPT_LIST = "display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 0; padding: 0; list-style: none";
 
 /** The content pages the no-script text links, after the five: each section's first page. */
@@ -692,7 +706,9 @@ const NOSCRIPT_CONTENT = ["guide", "cases/index", "characters", "making"];
  * where each browser says how to turn it on, and the five plain pages -- the
  * text a reader, a crawler that runs no script, or an AdSense reviewer finds
  * at the address. Inline styles only (index.html says why). index.html holds
- * the Korean as this writes it, byte for byte.
+ * the Korean as this writes it, byte for byte. Its colours are the plain
+ * pages' paper (2026-11-18, scripts/legal-pages.mjs PAGE_STYLE): ink, the
+ * second ink and the link green, each over 6.7:1 on the paper.
  */
 export function startNoscript(language) {
   const copy = START_PAGE[language];
@@ -703,7 +719,7 @@ export function startNoscript(language) {
     ...NOSCRIPT_CONTENT.map((kind) => [MENU_LABELS[language][kind], pagePath(kind, language)]),
   ];
   return `<noscript>
-      <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #f2f6f3; background: #06090a; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
+      <div style="box-sizing: border-box; max-width: 34rem; margin: 0 auto; padding: 48px 16px; color: #16181a; background: #f7f2e6; font: 16px/1.6 sans-serif; text-align: center; word-break: keep-all; overflow-wrap: anywhere">
         <h1 style="margin: 0 0 12px; font-size: 24px; line-height: 1.3">${escapeHtml(GAME_NAME[language])}</h1>
         <p style="margin: 0 0 24px">${copy.intro.map(escapeHtml).join(" ")}</p>
         <p style="margin: 0 0 12px; font-weight: 700">
@@ -712,7 +728,7 @@ export function startNoscript(language) {
         <p style="margin: 0 0 24px">
           ${escapeHtml(copy.turnOn)}
         </p>
-        <p style="margin: 0 0 8px; color: #c9d3cd; font-size: 14px">${escapeHtml(copy.howTo)}</p>
+        <p style="margin: 0 0 8px; color: #3e3c38; font-size: 14px">${escapeHtml(copy.howTo)}</p>
         <ul style="${NOSCRIPT_LIST}">
 ${copy.help.map(item).join("")}        </ul>
         <ul style="${NOSCRIPT_LIST}; margin-top: 24px">
@@ -884,23 +900,69 @@ export function sitemapEntries() {
 }
 
 /**
- * /sitemap.xml, every entry dated `date` (the build's day, YYYY-MM-DD). The
- * addresses are absolute on `origin`; with none (a local or CI build) they
- * stay relative to the root, as every other address of such a build is.
+ * Each sitemap address's content, as a short hash: what lastmod is dated by
+ * (scripts/sitemap-dates.json, written by `npm run sitemap:dates -- --write`).
+ * A plain page is its whole page as a build without Google's tag or the ads
+ * writes it; a start page is its words (START_PAGE and its no-script text),
+ * since the rest of index.html is scripts and styles a release changes every
+ * week. Until 11-16 every entry carried the build's day, so each deploy told a
+ * crawler that all of them had changed (SEO 점검 11-03, 낮음 6).
  */
-export function sitemapXml({ origin = "", date }) {
+export function pageFingerprints() {
+  const hash = (text) => createHash("sha256").update(text).digest("hex").slice(0, 16);
+  const plain = renderStaticPages("");
+  const prints = {};
+  for (const { loc } of sitemapEntries()) {
+    const language = PAGE_LANGUAGES.find((code) => gamePath(code) === loc);
+    const text = language ? JSON.stringify([START_PAGE[language], startNoscript(language)]) : plain[loc.slice(1)];
+    if (text === undefined) throw new Error(`sitemap: no page is written at ${loc}`);
+    prints[loc] = hash(text);
+  }
+  return prints;
+}
+
+/**
+ * The day each address last changed: its entry in `dates` (`{ loc: { hash,
+ * date } }`) while the page still hashes the same, else `date`, the build's
+ * day -- a page changed since the file was written is dated as changed now.
+ */
+export function sitemapLastmods({ date, dates = {}, prints = pageFingerprints() }) {
+  return Object.fromEntries(Object.entries(prints).map(([loc, hash]) => [loc, dates[loc]?.hash === hash ? dates[loc].date : date]));
+}
+
+/**
+ * /sitemap.xml. Each entry is dated by `sitemapLastmods` when `dates` (the
+ * file's pages) is given, and by `date` (the build's day, YYYY-MM-DD) without
+ * it. The addresses are absolute on `origin`; with none (a local or CI build)
+ * they stay relative to the root, as every other address of such a build is.
+ */
+export function sitemapXml({ origin = "", date, dates = null }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) throw new Error(`sitemap date must be YYYY-MM-DD, got ${date}`);
+  const lastmod = dates ? sitemapLastmods({ date, dates }) : {};
   const at = (path) => escapeHtml(`${origin}${path}`);
   const urls = sitemapEntries().map(({ loc, alternates }) => {
     const links = [...Object.entries(alternates), ["x-default", alternates.ko]]
       .map(([code, path]) => `    <xhtml:link rel="alternate" hreflang="${code}" href="${at(path)}"/>\n`)
       .join("");
-    return `  <url>\n    <loc>${at(loc)}</loc>\n    <lastmod>${date}</lastmod>\n${links}  </url>\n`;
+    return `  <url>\n    <loc>${at(loc)}</loc>\n    <lastmod>${lastmod[loc] ?? date}</lastmod>\n${links}  </url>\n`;
   });
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join("")}</urlset>\n`;
 }
 
 /** The files a crawler reads, beside the pages: `{ "robots.txt": ..., "sitemap.xml": ... }`. */
-export function crawlerFiles({ origin = "", date }) {
-  return { "robots.txt": robotsTxt(origin), "sitemap.xml": sitemapXml({ origin, date }) };
+export function crawlerFiles({ origin = "", date, dates = null }) {
+  return { "robots.txt": robotsTxt(origin), "sitemap.xml": sitemapXml({ origin, date, dates }) };
+}
+
+const HTML_COMMENT = /(<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>)|[ \t]*<!--[\s\S]*?-->[ \t]*\r?\n?/g;
+
+/**
+ * A page without its HTML comments: index.html's notes to the next developer
+ * (why a link is root-relative, which font is preloaded...) were shipped to
+ * every reader of /, /en/ and /ja/ (discovery 11-14). Script and style blocks
+ * are left as they are. The build applies it to the finished index.html,
+ * before the English and Japanese start pages are written from it.
+ */
+export function withoutHtmlComments(html) {
+  return String(html).replace(HTML_COMMENT, (match, keep) => keep ?? "");
 }

@@ -6,6 +6,8 @@ import { useBoardReport } from "../state/useBoardReport.js";
 import words from "../copy/board.js";
 import { fill, LANG, SOURCE_LOCALE } from "../locale.js";
 import { adminWanted } from "../boardAdminEntry.js";
+import { weekQuestionId, weekQuestionText } from "../boardQuestions.js";
+import { weeklyRuleNow } from "../state/weeklyClock.js";
 
 // The makers' admin bar (components/BoardAdmin.jsx), fetched only on a page
 // that asked for it or holds a sign-in (boardAdminEntry.js): never a player's.
@@ -18,6 +20,26 @@ const DATE_LOCALE = LANG === SOURCE_LOCALE ? "ko-KR" : LANG;
 // here yet" is only true of a board that answered: it used to be printed
 // under BOARD OFFLINE as well, inviting a first post nobody could send.
 const BOARD_LIST_COPY = words.list;
+
+/**
+ * N33: 「이번 주 질문」, ours, pinned over the posts in the weeks that have one
+ * (boardQuestions.js), on the week's rule's clock. It borrows the status
+ * card's look rather than adding a style; a week with none draws nothing.
+ */
+function WeekQuestion() {
+  const [text] = useState(() => weekQuestionText(words.weekQuestion?.questions, weekQuestionId(weeklyRuleNow())));
+  if (!text) return null;
+  return (
+    <section className="board-status-bar board-week-question" aria-label={words.weekQuestion.label} data-testid="board-week-question">
+      <div>
+        <span lang="en">THIS WEEK&apos;S QUESTION</span>
+        <strong>{words.weekQuestion.label} · {words.weekQuestion.from}</strong>
+        <p>{text}</p>
+        <p><small>{words.weekQuestion.note}</small></p>
+      </div>
+    </section>
+  );
+}
 
 /**
  * 참가자 게시판.
@@ -104,6 +126,7 @@ export function BoardScreen({
               </button>
             )}
           </section>
+          <WeekQuestion />
           <section className="board-composer" aria-label={words.composer}>
             {/* The counter is the field's description, not part of its name:
                 inside the label it made the name "이름 0/24자 · 이 이름은

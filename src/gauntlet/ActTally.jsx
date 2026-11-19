@@ -28,12 +28,14 @@ const keep = (event) => {
   if (event.key !== "Tab") event.stopPropagation();
 };
 
-export default function ActTally({ caseId }) {
+// `compact` (N23, 사건 07's report): the heading and the three rows, without the
+// makers' note and the share buttons -- a smaller card on a page that has its own.
+export default function ActTally({ caseId, compact = false }) {
   const [model] = useState(() => buildActTallyModel(caseId, readSeason()));
   if (!model) return null;
   const build = (host, origin) => ({ model: toResultCardModel(model, host), text: buildActTallyShareText(model, origin) });
   return (
-    <section className="gx-tally" data-testid="act-tally" aria-labelledby="gx-tally-title" onClick={keep} onKeyDown={keep}>
+    <section className={compact ? "gx-tally gx-tally-compact" : "gx-tally"} data-testid="act-tally" aria-labelledby="gx-tally-title" onClick={keep} onKeyDown={keep}>
       <h3 id="gx-tally-title">{model.heading}</h3>
       <dl>
         <div>
@@ -57,8 +59,8 @@ export default function ActTally({ caseId }) {
           </dd>
         </div>
       </dl>
-      <p className="gx-tally-note">{actTallyCopy.note}</p>
-      <ResultCardShare build={build} words={actTallyCopy.buttons} />
+      {!compact && <p className="gx-tally-note">{actTallyCopy.note}</p>}
+      {!compact && <ResultCardShare build={build} words={actTallyCopy.buttons} />}
     </section>
   );
 }

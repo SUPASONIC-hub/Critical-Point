@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
-import { noteTableOpened } from "../gameEvents.js";
+import * as firstHour from "../gameEvents.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -59,7 +59,7 @@ import { fill } from "../locale.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
-const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
+const AUDIT_BAND_LOOK = { background: "rgb(22 96 62 / 0.1)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
 // The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
 const { stage: say, keys: keyWords } = tableCopy;
 /** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
@@ -182,7 +182,7 @@ export function GauntletStage({
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
   const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout,
+    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout, canPayNarrow, nextClock,
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
@@ -225,7 +225,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && !win.scouted && canPayScout;
+  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && canPayNarrow : canPayScout);
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -234,9 +234,9 @@ export function GauntletStage({
   // is drawn into it until the player opens it.
   const [briefOpen, setBriefOpen] = useState(false);
 
-  // The report's chunk, asked for while a table is up and the browser is idle,
-  // so the case does not end on an empty page (state/retryableLazy.js).
-  useEffect(() => prefetchScreenWhenIdle("result"), []);
+  // The report's chunk, asked for while a table is up and the browser is idle, so the case does not end on
+  // an empty page (state/retryableLazy.js); and N16·N39, 프롤로그 01 ~ 사건 07's written scene as it comes on screen (gameEvents.js).
+  useEffect(() => (firstHour.noteSceneShown(scene.node.caseId, scene.nodeId), prefetchScreenWhenIdle("result")), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (draftOpen) playRelicDealCue(relicOffer.length);
@@ -375,7 +375,7 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
-    noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
+    firstHour.noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       dispatch({ type: "SELECT", id: cardId });
@@ -674,7 +674,7 @@ export function GauntletStage({
                 {scene.challenge && <li data-testid="brief-challenge">{fill(say.briefChallenge, { challenge: scene.challenge })}</li>}
                 <li>{fill(say.briefPot, { pot: formatMoney(run.runPot) })}</li>
                 <li>{fill(say.briefRules, { rules: currentRules })}</li>
-                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</li>
+                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
@@ -759,7 +759,7 @@ export function GauntletStage({
           <Flame size={18} aria-hidden="true" />
           <span>{say.push}</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
-          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</span>
+          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</span>
           {/* What the streak stands at, for the two buttons that act on it. */}
           {logic && <span id="gx-logic-detail" className="sr-only">{logic.spoken}</span>}
         </button>
