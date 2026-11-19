@@ -1257,7 +1257,8 @@ const budgets = [
   // 216,432 / 42,019 -> 216,858 / 42,041 묶음 11-17 over main 705a809f. Measured 216854 / 42037 (over budget only) in the e2e build, the plus 4.
   // -> gzip 42,066 N42 떠나는 순간 한 줄 (draft) over main eb2d9aeb: four rules for the leave line (result.css). Measured locally, the plus 4.
   // 216,858 / 42,066 -> 216,995 / 42,084 묶음 11-19 over main 8bda693a (#614 #615 #616 #617 #619), measured in CI verify-quick. Measured 216991 / 42080 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 216_995, maxGzip: 42_084 },
+  // -> 217,011 / 42,084 묶음 11-19 + 손패 카드 최소 44px: CI 216,991 / 42,080 + local delta 16 / 2, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 217_011, maxGzip: 42_084 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.

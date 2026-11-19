@@ -2627,7 +2627,10 @@
     gap: 6px;
   }
 
+  /* 44px still: a one-line slip in 6px was 32 tall at 390x664, under the
+     finger's 44 (bundle 11-19, accessibility.spec). */
   .gauntlet-stage .gx-hand:not(.hand-5, .hand-6) > .gx-card {
+    min-height: 44px;
     padding-block: 6px;
   }
 

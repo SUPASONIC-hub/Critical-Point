@@ -367,8 +367,8 @@ const fileBudgets = {
   // 3195 -> 3203 lines on 2026-11-18, bundle 11-18, measured: 2안 on a short phone -- v1's scene air, a 3px double rule, a 16px slip margin, the ledger column 6px apart in 14px words, 6px inside a slip.
   // 3203 -> 3214 lines on 2026-11-18, n37-paper-coverage, measured: the BUST slam's third line on paper (N37), red on red stripes before.
   // 3208 -> 3212 lines on 2026-11-18, n36-phone-fit (E1d): the ledger column's air on every phone up to 860 tall, English card words a step smaller on a short one.
-  // -> 3218 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
-  "play.css": { lines: 3218, bytes: 62160 },
+  // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
+  "play.css": { lines: 3219, bytes: 62160 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
