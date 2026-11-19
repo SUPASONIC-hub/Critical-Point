@@ -204,6 +204,7 @@ const budgets = [
   // 164,643 / 61,417 -> 165,507 / 61,707 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 165503 / 61703 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,707 -> 165,507 / 61,716 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured - / 61712 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,716 -> 165,737 / 61,781 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 165733 / 61777 (over budget only) in the e2e build, the plus 4.
+  // 165,507 / 61,707 -> 165,734 / 61,769 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 165,730 / 61,765 (over budget only) in the e2e build, the plus 4.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_737, maxGzip: 61_781 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -336,6 +337,7 @@ const budgets = [
   // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
   // 35,422 / 15,018 -> 35,508 / 15,073 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 35504 / 15069 (over budget only) in the e2e build, the plus 4.
   // 35,508 / 15,073 -> 37,484 / 15,785 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 37480 / 15781 (over budget only) in the e2e build, the plus 4.
+  // 35,422 / 15,018 -> 37,405 / 15,744 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 37,401 / 15,740 (over budget only) in the e2e build, the plus 4.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_484, maxGzip: 15_785 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
@@ -1535,6 +1537,7 @@ const budgets = [
   // 51,819 / 19,640 -> 54,926 / 20,614 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 54922 / 20610 (over budget only) in the e2e build, the plus 4.
   // 54,926 / 20,614 -> 55,056 / 20,699 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 55052 / 20695 (over budget only) in the e2e build, the plus 4.
   // 55,056 / 20,699 -> 57,725 / 21,666 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 57721 / 21662 (over budget only) in the e2e build, the plus 4.
+  // 51,819 / 19,640 -> 54,759 / 20,755 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 54,755 / 20,751 (over budget only) in the e2e build, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_725, maxGzip: 21_666 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
@@ -1864,6 +1867,7 @@ const budgets = [
   // 2,285 / 1,207 -> 2,417 / 1,239 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the cases before the audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3). Measured 2,417 / 1,235, the gzip plus 4 in the e2e build.
   // 2,440 / 1,282 -> 2,572 / 1,314 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): AUDIT CONTACT's limit and the ladder's cases before the audit together. Measured 2,572 / 1,310 in the e2e build, the gzip plus 4, the raw the measurement.
   // 2,572 / 1,314 -> 2,635 / 1,343 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 2631 / 1339 (over budget only) in the e2e build, the plus 4.
+  // 2,572 / 1,314 -> 2,635 / 1,343 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 2,631 / 1,339 (over budget only) in the e2e build, the plus 4.
   { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_343 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
@@ -1894,6 +1898,7 @@ const budgets = [
   // 1,376 / 775 -> 1,195 / 680 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,195 / 676 in the e2e build, the gzip plus 4.
   // 1,195 / 680 -> 1,206 / 686 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 1202 / 682 (over budget only) in the e2e build, the plus 4.
+  // 1,195 / 680 -> 1,206 / 687 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 1,202 / 683 (over budget only) in the e2e build, the plus 4.
   { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 686 },
   // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
   // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
@@ -2109,6 +2114,7 @@ const budgets = [
   // 199,085 / 66,764 -> 201,835 / 67,527 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 201831 / 67523 (over budget only) in the e2e build, the plus 4.
   // 201,835 / 67,527 -> 201,845 / 67,532 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 201841 / 67528 (over budget only) in the e2e build, the plus 4.
   // 201,845 / 67,532 -> 203,461 / 68,093 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 203457 / 68089 (over budget only) in the e2e build, the plus 4.
+  // 199,085 / 66,764 -> 200,701 / 67,333 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 200,697 / 67,329 in the e2e build, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 203_461, maxGzip: 68_093 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
@@ -2222,6 +2228,7 @@ const budgets = [
   // 166,222 / 59,627 -> 168,602 / 60,280 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 168598 / 60276 (over budget only) in the e2e build, the plus 4.
   // 168,602 / 60,280 -> 168,619 / 60,289 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 168615 / 60285 (over budget only) in the e2e build, the plus 4.
   // 168,619 / 60,289 -> 170,051 / 60,807 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 170047 / 60803 (over budget only) in the e2e build, the plus 4.
+  // 166,222 / 59,627 -> 167,654 / 60,143 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 167,650 / 60,139 in the e2e build, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 170_051, maxGzip: 60_807 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
@@ -2709,6 +2716,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,530 / 445,035 / 453,144 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 445,046 / 453,150 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 445,565 / 453,713 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured first paint, the plus 4.
+// -> 381,530 / 444,906 / 452,957 gameplay-g-core over main 065d684d (G 규칙 낭독 줄 ko/en/ja). Measured first paint, the plus 4.
 const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_565, ja: 453_713 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],

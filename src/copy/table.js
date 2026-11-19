@@ -36,7 +36,7 @@ const tableCopy = {
     signCell: "벽 {cell}부터",
     breath: "숨 고르기",
     breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
-    breathDone: "숨을 골랐다. 열기 {from} → {to}, 벽이 {wall} 뒤로 갔다.",
+    breathDone: "숨을 골랐다. 열기 {gauge} 내려 {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
