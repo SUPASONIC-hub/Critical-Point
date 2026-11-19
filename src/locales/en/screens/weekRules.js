@@ -37,4 +37,23 @@ export default {
       title: "Audit and Cascade",
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",
     },
-  },};
+  },
+  caseRules: {
+    case09: {
+      text: "In this case every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much.",
+      world: "The liquidation agenda goes to a vote within 72 hours. Reports short, and priced high.",
+    },
+    case11: {
+      text: "In this case the Wall band stands {shift} Heat earlier. The same Heat hits the Wall sooner.",
+      world: "The parliamentary audit has been moved up a day.",
+    },
+    case14: {
+      text: "In this case FRACTURE bills a cracked resource at {rate} times.",
+      world: "These are books that bought bad loans at 92 won, so every crack gets a second look.",
+    },
+    case16: {
+      text: "In this case the Wall band stands {crisisShift} Heat earlier, and every card’s chips are worth {crisisChips} times as much.",
+      world: "The robot-lease filing shook the market, and head office asked for the numbers first.",
+    },
+  },
+};

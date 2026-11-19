@@ -47,6 +47,28 @@ const weekRulesCopy = {
       text: "이번 주는 감사와 연쇄가 함께 선다. {audit} {cascade} CASCADE 판의 확정은 감사에 세지 않는다.",
     },
   },
+  // 「이번 사건만」 (N26, gauntlet/caseRules.js): the four cases in 사건 08-17
+  // that play under one of the rules above for themselves, by case. The same
+  // numbers as the week's (`{blanks}` filled the same way); the line in the
+  // story is the case's own.
+  caseRules: {
+    case09: {
+      text: "이번 사건은 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",
+      world: "청산 안건이 72시간 안에 표결에 오른다. 보고는 짧게, 값은 비싸게.",
+    },
+    case11: {
+      text: "이번 사건은 벽 띠가 열기 {shift}만큼 앞당겨 선다. 같은 열기로 더 빨리 벽에 닿는다.",
+      world: "국정감사 일정이 하루 앞당겨졌다.",
+    },
+    case14: {
+      text: "이번 사건은 FRACTURE가 금 간 자원을 {rate}배로 청구한다.",
+      world: "부실 채권을 92원에 사 준 장부라, 금 간 곳은 한 번 더 들여다본다.",
+    },
+    case16: {
+      text: "이번 사건은 벽 띠가 열기 {crisisShift}만큼 앞당겨 서고, 모든 카드의 칩이 {crisisChips}배다.",
+      world: "로봇 리스 공시에 시장이 흔들리자 본사는 숫자부터 맞추라고 했다.",
+    },
+  },
 };
 export default weekRulesCopy;
 

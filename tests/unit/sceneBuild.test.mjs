@@ -8,7 +8,8 @@ import { finishSceneGraph, inferChoiceCognition } from "../../src/nodes/sceneBui
 import { getScenePlate } from "../../src/scenePlate.js";
 import { getRouteMarker } from "../../src/state/savedState.js";
 
-const KINDS = new Set(["briefing", "opening", "scene", "connective", "reaction", "branch", "route", "routeFinal", "evidence", "decision", "aftermath"]);
+// `turn` is 사건 12's 「반전」 alone (N26, gameData.js `turnScenes`).
+const KINDS = new Set(["briefing", "opening", "scene", "connective", "reaction", "turn", "branch", "route", "routeFinal", "evidence", "decision", "aftermath"]);
 
 test("every scene knows its case, its kind and whether it is a pressure beat", () => {
   for (const [nodeId, node] of Object.entries(nodes)) {

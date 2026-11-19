@@ -1,6 +1,7 @@
 /** src/copy/edge.js in Japanese: the week's panel, the reading clock's question and the comfort settings. */
 export default {
   weekRule: "今週のルール · このシーズンが終わるまで",
+  caseRule: "この事件だけ · この事件が閉じるまで",
   unfold: "前シーズンに読んだシーン · 開く",
   pastPick: {
     wildPicked: "前シーズンも組み替えた",

@@ -113,13 +113,17 @@ const connectiveScenes = CASE_PACKS.flatMap((pack) => pack.connectiveScenes);
 
 const reactionScenes = CASE_PACKS.flatMap((pack) => pack.reactionScenes);
 
+// 「반전」 (N26, 2026-11-16 Q3 (1)): one `turnScene` a case where the story turns over
+// (사건 12 alone), built like a reaction scene and placed last, so it may follow one.
+const turnScenes = CASE_PACKS.flatMap((pack) => (pack.turnScene ? [pack.turnScene] : []));
+
 // A phase is printed on the scene chip and in the mission strip, so it is
 // player-facing copy, not a pipeline label. These scenes were shipping as
 // "CONNECTIVE SCENE" -- the name of the function that builds them -- for the
 // same reason the reaction, branch and route-final families read as build
 // steps. They are all the same story beat: the part that happens outside the
 // meeting that was scheduled.
-const GENERATED_SCENE_PHASES = { connective: "OFF THE RECORD", reaction: "THE ROOM AFTER" };
+const GENERATED_SCENE_PHASES = { connective: "OFF THE RECORD", reaction: "THE ROOM AFTER", turn: "THE TURN" };
 const REACTION_MEMO_FALLBACK = ["다음 선택에 남은 비용", "다음 장면에서 다시 확인할 말"];
 
 function addGeneratedScene(kind, { id, after, next, title, speaker, text, memo, choices }) {
@@ -149,22 +153,18 @@ function addGeneratedScene(kind, { id, after, next, title, speaker, text, memo, 
   };
 }
 
-connectiveScenes.forEach((scene) => addGeneratedScene("connective", scene));
-
-// A connective scene is played right after the scene it follows.
-connectiveScenes.forEach(({ id, after }) => {
-  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
-  if (!order) throw new Error(`connective scene ${id} follows ${after}, which is in no case`);
-  order.splice(order.indexOf(after) + 1, 0, id);
-});
-
-reactionScenes.forEach((scene) => addGeneratedScene("reaction", scene));
-
-reactionScenes.forEach(({ id, after }) => {
-  const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
-  if (!order) throw new Error(`reaction scene ${id} follows ${after}, which is in no case`);
-  order.splice(order.indexOf(after) + 1, 0, id);
-});
+// A generated scene is played right after the scene it follows.
+function placeGeneratedScenes(kind, scenes) {
+  scenes.forEach((scene) => addGeneratedScene(kind, scene));
+  scenes.forEach(({ id, after }) => {
+    const order = Object.values(nodeOrders).find((candidate) => candidate.includes(after));
+    if (!order) throw new Error(`${kind} scene ${id} follows ${after}, which is in no case`);
+    order.splice(order.indexOf(after) + 1, 0, id);
+  });
+}
+placeGeneratedScenes("connective", connectiveScenes);
+placeGeneratedScenes("reaction", reactionScenes);
+placeGeneratedScenes("turn", turnScenes);
 
 // Each case has one authored detour. The second scene always rejoins the existing route.
 const authoredBranchScenes = {};

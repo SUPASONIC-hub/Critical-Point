@@ -119,11 +119,14 @@ const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
  * 2026-W47's line has. Read when asked, so a rule read after the page's
  * language arrived is in it.
  */
-function ruleWords(id) {
-  const { auditLine, cascadeLine, rules } = weekRulesCopy;
-  const { title, text, world } = rules[id];
+function ruleValues() {
+  const { auditLine, cascadeLine } = weekRulesCopy;
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine };
+  return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine };
+}
+function ruleWords(id) {
+  const { title, text, world } = weekRulesCopy.rules[id];
+  const values = ruleValues();
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -194,6 +197,20 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
 /** The catalogue entry for an id, or null. */
 export function getWeekRule(id) {
   return typeof id === "string" && Object.hasOwn(WEEK_RULE_CATALOGUE, id) ? { id, ...WEEK_RULE_CATALOGUE[id], ...ruleWords(id) } : null;
+}
+
+/**
+ * A case's own rule (caseRules.js, N26) as its briefing prints it: the
+ * catalogue's entry for `id`, with the line the case says in place of the
+ * week's (src/copy/weekRules.js `caseRules`, 「이번 사건은」 where a week says
+ * 「이번 주는」) and its line in the story. Null for a rule the catalogue does
+ * not have and for a case with no words.
+ */
+export function getCaseRule(caseId, id) {
+  const rule = getWeekRule(id);
+  const words = typeof caseId === "string" && Object.hasOwn(weekRulesCopy.caseRules ?? {}, caseId) ? weekRulesCopy.caseRules[caseId] : null;
+  if (!rule || !words) return null;
+  return { ...rule, title: words.title ?? rule.title, text: fill(words.text, ruleValues()), world: words.world };
 }
 
 /** What a saved stamp is: a known id, or null. */

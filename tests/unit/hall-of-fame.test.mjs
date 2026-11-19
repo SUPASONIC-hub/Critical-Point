@@ -101,9 +101,11 @@ test("a whole checked season with no mark may stand; every gap in what was check
   assert.deepEqual(quiet.marks, [], "the fixture's missing records are marked; it proves nothing about the hall of fame's own rule");
   assert.ok(firstWindows.length > 0);
   assert.match(hallOfFameRefusal(quiet, unrecorded), new RegExp(`^${firstWindows.length} windows without a record`));
-  // A case row missing: the chain was not read over the whole season.
+  // A case row missing: the chain was not read over the whole season -- or,
+  // the score no longer adding up, which the checker reads first (N26: the
+  // bot's season is dealt differently under 「이번 사건만」 and lands there).
   const gap = rows.filter((row) => row.case_id !== CASE_SEQUENCE[20]);
-  assert.match(hallOfFameRefusal(verifyRows(gap)[0], gap), /chain/);
+  assert.match(hallOfFameRefusal(verifyRows(gap)[0], gap), /chain|marked: score-off-log/);
   // A story case, an unfinished season, a run not checked.
   const story = structuredClone(rows);
   story[3].summary.assistStory = true;
