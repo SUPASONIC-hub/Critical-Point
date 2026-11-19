@@ -20,7 +20,7 @@ export const LOW_CASH_HEAT = 50;
 export const HOT_CASH_HEAT = 75;
 /** FIELD NOTES: a streak of this many on one side pays `boost`. */
 export const SIDE_STREAK = 5;
-/** ENCORE: a streak of this many pays `boost` (the streak it keeps through a bust is worth more). */
+/** ENCORE: a streak of this many pays `boost`. Small: the streak hands hold one this long on most cashes, and with G1 halving instead of ending the streak ENCORE already lifts them about 7% (at 1.3 it lifted a switching hand 39%, past RELIC_LIFT_CAP). */
 export const LONG_STREAK = 8;
 /** TESTIMONY: a cash with at least this share of the clock left pays `boost`. */
 export const FAST_CASH_SHARE = 0.5;
@@ -35,7 +35,7 @@ export const RELIC_BOOSTS = Object.freeze({
   auditContact: Object.freeze({ boost: 1.8, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
   heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
-  encore: Object.freeze({ boost: 1.3, when: (cash) => cash.streak >= LONG_STREAK }),
+  encore: Object.freeze({ boost: 1.15, when: (cash) => cash.streak >= LONG_STREAK }),
   metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
   coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
   carbonCopy: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("blackout") }),
