@@ -75,6 +75,10 @@ import { createInheritedChallenge, createSceneChallenge } from "../../src/viewMo
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
 import { createChoiceReaders } from "../../src/state/useDecision.js";
 
+// G4·G5 (2026-11-19): RULES_NEXT=0 plays the table before the next rules, 1 the
+// next ones; unset, whatever rulesNext.js says (src/gauntlet/nextTable.js).
+if (process.env.RULES_NEXT === "0" || process.env.RULES_NEXT === "1") globalThis.__cpRulesNext = process.env.RULES_NEXT === "1";
+
 // ---------------------------------------------------------------------------
 // The season player (check-endings.mjs).
 // ---------------------------------------------------------------------------
@@ -128,9 +132,12 @@ export function takeIntoSlots(run, taken, tools = null) {
  */
 export function spendsAt(spend, run) {
   const room = RELIC_SLOTS - run.relics.length;
+  // "weak" (G4): rerolls only an offer with nothing in the stronger half of
+  // RELIC_DROP_ORDER, and buys one more while two slots are free.
+  const weak = spend === "weak" && !run.relicOffer.some((id) => RELIC_DROP_ORDER.indexOf(id) >= RELIC_DROP_ORDER.length / 2);
   return {
-    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1),
-    extra: spend === "extra" || spend === "always" || (spend === "early" && room >= 2),
+    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1) || weak,
+    extra: spend === "extra" || spend === "always" || ((spend === "early" || spend === "weak") && room >= 2),
   };
 }
 

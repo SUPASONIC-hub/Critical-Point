@@ -27,12 +27,16 @@
  * board is ever dealt two rules at once. A story run has neither. NEW GAME+
  * has both, like the peak.
  *
- * A leaf module, like tableRules.js: no imports, so the PlayScreen chunk
+ * A leaf module, like tableRules.js: no imports but two leaves (the act
+ * twists and the next-rules switch), so the PlayScreen chunk
  * (tableStaging.js) can ask which case has a rule without the catalogue.
  *
  * Ships with the 11-30 reset (묶음 R): a rule on a board is a change of the
  * ranking's table, and the ranking only changes on a reset.
  */
+
+import { ACT_TWIST_CASES } from "./actTwists.js";
+import { nextTableOn } from "./nextTable.js";
 
 /** The switch. Off, no case has a rule of its own: the table as it was before N26. */
 export const CASE_RULES_ON = true;
@@ -50,8 +54,12 @@ export const CASE_RULES = Object.freeze({
  * in a story run, in a season that carries a week's rule, and with the switch
  * off. `run` is the gauntlet's run (the save's `dynamics`).
  */
-export function caseRuleFor(caseId, run, on = CASE_RULES_ON) {
-  if (!on || typeof caseId !== "string" || !Object.hasOwn(CASE_RULES, caseId)) return null;
+export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = nextTableOn()) {
+  if (typeof caseId !== "string") return null;
+  const own = on && Object.hasOwn(CASE_RULES, caseId) ? CASE_RULES[caseId] : null;
+  // G5 (actTwists.js): under the next rules the act's twist, behind the case's own.
+  const id = own ?? (next && Object.hasOwn(ACT_TWIST_CASES, caseId) ? ACT_TWIST_CASES[caseId] : null);
+  if (!id) return null;
   if (run?.story === true || (typeof run?.weekRule === "string" && run.weekRule)) return null;
-  return CASE_RULES[caseId];
+  return id;
 }

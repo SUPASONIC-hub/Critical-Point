@@ -8,6 +8,7 @@ import {
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
+  getRerollCost,
   getWindowBand,
   HAND_CAP,
   normalizeRunState,
@@ -629,12 +630,12 @@ function measureSpending(label, decide, spend) {
   let paid = 0;
   let rerolls = 0;
   let extras = 0;
-  let season = { vault: 0, relics: [], carried: undefined };
+  let season = { vault: 0, relics: [], carried: undefined, extraBought: false };
   for (let caseIndex = 0; caseIndex < SPEND_CASES; caseIndex += 1) {
-    if (caseIndex % SEASON_CASES === 0) season = { vault: 0, relics: [], carried: undefined };
+    if (caseIndex % SEASON_CASES === 0) season = { vault: 0, relics: [], carried: undefined, extraBought: false };
     const result = playHandCase(caseIndex, decide, season.relics, season.carried);
     season.carried = { stanceMastery: result.stanceMastery, logic: result.logic };
-    let run = normalizeRunState({ vault: season.vault + result.vault, relics: season.relics, ...openRelicDraft(`spend:${caseIndex}`, RELIC_IDS, season.relics) });
+    let run = normalizeRunState({ vault: season.vault + result.vault, relics: season.relics, extraBought: season.extraBought, ...openRelicDraft(`spend:${caseIndex}`, RELIC_IDS, season.relics) });
     if (run.relicOffer.length) {
       const pays = spendsAt(spend, run);
       if (pays.reroll) run = rerollRelicOffer(run);
@@ -646,6 +647,7 @@ function measureSpending(label, decide, spend) {
     }
     season.vault = run.vault;
     season.relics = run.relics;
+    season.extraBought = run.extraBought;
     if (caseIndex % SEASON_CASES === SEASON_CASES - 1) banked += season.vault;
   }
   const seasons = SPEND_CASES / SEASON_CASES;
@@ -661,12 +663,14 @@ const spendingRows = {
   // Pays only while the slots have room (the reroll with one free, one more
   // with two): where a relic is still worth buying, for reading 12,000.
   early: measureSpending(`${bestHeartbeatSoFar.label}, both while slots are free`, listening, "early"),
+  // G4: rerolls an offer with nothing strong in it, one more while two slots are free.
+  weak: measureSpending(`${bestHeartbeatSoFar.label}, rerolls a weak offer`, listening, "weak"),
   earlyBlind: measureSpending(`blind heat ${blindSpendTarget}, both while slots are free`, (win) => win.gauge < blindSpendTarget, "early"),
   sees: measureSpending("sees the wall, never pays", (win) => win.gauge + win.schema.stepMax < win.wall, "never"),
   skipBuys: measureSpending("bust to skip, both every draft", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "always"),
   skipNever: measureSpending("bust to skip, never pays", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "never"),
 };
-console.log(`draft spend      prices reroll ${RELIC_REROLL_COST}, one more ${RELIC_EXTRA_COST}; ${SPEND_CASES / SEASON_CASES} seasons of ${SEASON_CASES} cases, every relic unlocked`);
+console.log(`draft spend      prices reroll ${getRerollCost()}, one more ${RELIC_EXTRA_COST}; ${SPEND_CASES / SEASON_CASES} seasons of ${SEASON_CASES} cases, every relic unlocked`);
 for (const row of Object.values(spendingRows)) {
   console.log(`draft spend      ${row.label.padEnd(44)} vault ${String(row.meanVault).padStart(7)}  paid ${String(row.paidPerCase).padStart(5)}/case  before paying ${String(row.meanVault + row.paidPerCase).padStart(7)}  rerolls ${row.rerolls.toFixed(1)}/season  one more ${row.extras.toFixed(1)}/season`);
 }

@@ -38,6 +38,24 @@ export default {
       text: "今週は監査と連鎖が同時に立つ。{audit} {cascade} CASCADE勝負の確定は監査に数えない。",
     },
   },
+  // G5 (gauntlet/actTwists.js): the twist of acts 3, 5 and 7 under the next rules, by id.
+  actTwists: {
+    merger: {
+      title: "合併",
+      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯が熱{mergerShift}ぶん手前に立つ。",
+      world: "グループは「改革」と称して系列会社を合併する。賭けは大きく、壁は近くなる。",
+    },
+    scattered: {
+      title: "散らばった席",
+      text: "この事件は壁の帯が両側に熱{spread}ずつ広がり、すべてのカードのチップが{scatterChips}倍。",
+      world: "トリガーラボの人々があちこちに散り、席ごとに壁の立つ場所が違う。",
+    },
+    hearing: {
+      title: "公聴会",
+      text: "この事件は盤ごとの時間が半分で、すべてのカードのチップが{hearingChips}倍。",
+      world: "記録の持ち主を争う公聴会。答える時間は短く、一言の値は大きい。",
+    },
+  },
   caseRules: {
     case09: {
       text: "この事件は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。",
