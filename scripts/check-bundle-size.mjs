@@ -203,7 +203,8 @@ const budgets = [
   // -> 164,643 / 61,417 n37-followups, measured locally 164,639 / 61,413 in the e2e build, the plus 4: the ranking over the result page (returnTo) and its keys held.
   // 164,643 / 61,417 -> 165,507 / 61,707 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 165503 / 61703 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,707 -> 165,507 / 61,716 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured - / 61712 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_507, maxGzip: 61_716 },
+  // 165,507 / 61,716 -> 165,737 / 61,781 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 165733 / 61777 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_737, maxGzip: 61_781 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -334,7 +335,8 @@ const budgets = [
   // 35,033 / 14,900 -> 35,033 / 14,905 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 14901 (over budget only) in the e2e build, the plus 4.
   // -> 35,422 / 15,018 b5-open-clock-cue, measured locally 35,418 / 15,014: useClockCut beside the voice (tableVoice.js), the plus 4.
   // 35,422 / 15,018 -> 35,508 / 15,073 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 35504 / 15069 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 35_508, maxGzip: 15_073 },
+  // 35,508 / 15,073 -> 37,484 / 15,785 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 37480 / 15781 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_484, maxGzip: 15_785 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1532,7 +1534,8 @@ const budgets = [
   // 51,385 / 19,490 -> 51,673 / 19,622 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 51669 / 19618 (over budget only) in the e2e build, the plus 4.
   // 51,819 / 19,640 -> 54,926 / 20,614 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 54922 / 20610 (over budget only) in the e2e build, the plus 4.
   // 54,926 / 20,614 -> 55,056 / 20,699 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 55052 / 20695 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 55_056, maxGzip: 20_699 },
+  // 55,056 / 20,699 -> 57,725 / 21,666 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 57721 / 21662 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_725, maxGzip: 21_666 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1860,7 +1863,8 @@ const budgets = [
   // audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3).
   // 2,285 / 1,207 -> 2,417 / 1,239 on 2026-10-29, c3-c4-rules (C-3, C-4, RULES_MARK 4) merged with #224 602ec69b: the cases before the audit by the ladder each mark played (사건 02 at 4, 프롤로그 04 at 3). Measured 2,417 / 1,235, the gzip plus 4 in the e2e build.
   // 2,440 / 1,282 -> 2,572 / 1,314 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): AUDIT CONTACT's limit and the ladder's cases before the audit together. Measured 2,572 / 1,310 in the e2e build, the gzip plus 4, the raw the measurement.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_572, maxGzip: 1_314 },
+  // 2,572 / 1,314 -> 2,635 / 1,343 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 2631 / 1339 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_343 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -1889,7 +1893,8 @@ const budgets = [
   // 2026-10-21, the gzip plus 4.
   // 1,376 / 775 -> 1,195 / 680 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 1,195 / 676 in the e2e build, the gzip plus 4.
-  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_195, maxGzip: 680 },
+  // 1,195 / 680 -> 1,206 / 686 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 1202 / 682 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 686 },
   // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
   // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
   // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
@@ -2103,7 +2108,8 @@ const budgets = [
   // 195,067 / 65,336 -> 196,019 / 65,533 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 196015 / 65529 (over budget only) in the e2e build, the plus 4.
   // 199,085 / 66,764 -> 201,835 / 67,527 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 201831 / 67523 (over budget only) in the e2e build, the plus 4.
   // 201,835 / 67,527 -> 201,845 / 67,532 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 201841 / 67528 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 201_845, maxGzip: 67_532 },
+  // 201,845 / 67,532 -> 203,461 / 68,093 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 203457 / 68089 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 203_461, maxGzip: 68_093 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2215,7 +2221,8 @@ const budgets = [
   // 162,859 / 58,327 -> 163,717 / 58,506 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured 163713 / 58502 (over budget only) in the e2e build, the plus 4.
   // 166,222 / 59,627 -> 168,602 / 60,280 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 168598 / 60276 (over budget only) in the e2e build, the plus 4.
   // 168,602 / 60,280 -> 168,619 / 60,289 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 168615 / 60285 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 168_619, maxGzip: 60_289 },
+  // 168,619 / 60,289 -> 170,051 / 60,807 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 170047 / 60803 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 170_051, maxGzip: 60_807 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2701,7 +2708,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 378,025 / 439,699 / 447,637 N26 #591 (11-17, bundle R prework): case-only rules for cases 09/11/14/16 + case 12 turn scene. Measured first paint, the plus 4.
 // -> 381,530 / 445,035 / 453,144 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 445,046 / 453,150 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_046, ja: 453_150 };
+// -> 381,530 / 445,565 / 453,713 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_565, ja: 453_713 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
