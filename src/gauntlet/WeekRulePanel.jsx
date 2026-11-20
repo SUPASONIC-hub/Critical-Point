@@ -126,14 +126,15 @@ export function SignAsk({ run, onSign }) {
   if (!onSign || !asksToSign(run)) return null;
   const signed = readSignWay(run.open.signed);
   return (
-    <div className="gx-panel gx-panel-breach gx-carry" data-testid="sign-ask" role="group" aria-labelledby="gx-sign-ask" style={{ gridArea: "auto" }}>
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="sign-ask" role="group" aria-labelledby="gx-sign-ask" aria-describedby="gx-sign-name-wall" style={{ gridArea: "auto" }}>
       <p className="gx-breach-kicker">{edgeCopy.sign.kicker}</p>
       <p id="gx-sign-ask">{edgeCopy.sign.question}</p>
-      {/* G16 (RULES_MARK 7): the wall 「이름만」 moves in this case, drawn for it, before the choice. */}
-      <p data-testid="sign-name-wall">{fill(edgeCopy.sign.nameWall, { wall: getNameWall(run) })}</p>
+      {/* G16 (RULES_MARK 7): the wall 「이름만」 moves in this case, drawn for it, before the choice; the group and
+          「이름만」 are described by it, so a player who only tabs to the buttons hears it too. */}
+      <p id="gx-sign-name-wall" data-testid="sign-name-wall">{fill(edgeCopy.sign.nameWall, { wall: getNameWall(run) })}</p>
       <div className="gx-comic-cards">
         {["name", "terms"].map((way) => (
-          <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way} onClick={() => onSign(way)}>
+          <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way} aria-describedby={way === "name" ? "gx-sign-name-wall" : undefined} onClick={() => onSign(way)}>
             {signed === way && <span aria-hidden="true">✓ </span>}
             {edgeCopy.sign[way]}
           </button>

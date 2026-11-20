@@ -89,7 +89,7 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   assert.match(scoutBand, /aria-keyshortcuts=\{shortcut\} aria-label=\{label\}/);
   assert.match(scoutBand, /\? fill\(say\.scoutLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: scoutTrust, seconds: SCOUT_SECONDS \}\)/);
   const { default: tableCopy } = await import("../../src/copy/table.js");
-  assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초");
+  assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 믿음 {trust} · 시간 {seconds}초");
   // The stage opens SCOUT on the meters' `canPayScout`, read off the run's resources, and adds no import for it.
   assert.match(stage, /\} = readTableMeters\(\{ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene\.node\.caseId, narrowCount, scoutCount \}\);/);
   assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && win\.schema\?\.trained !== true && canPayNarrow : canPayScout\);/);
@@ -198,7 +198,7 @@ test("the look's price is said in three languages, by the button's name and the 
     assert.match(copy.voice.scout, /\{trust\}/, `${lang} voice.scout says the 믿음`);
     assert.match(copy.voice.scout, /\{min\}[\s\S]*\{max\}/, `${lang} voice.scout still says the band`);
   }
-  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), `조회했다. 믿음 ${SCOUT_TRUST}을 썼다. 벽은 70에서 90 사이 어딘가`);
+  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), `조회했다(믿음 −${SCOUT_TRUST}). 벽은 70에서 90 사이 어딘가`);
   // The prologue that opens SCOUT tells the price in every language (tableUnlocks.js writes the numbers out).
   const { default: unlocksKo } = await import("../../src/copy/unlocks.js");
   const { default: unlocksEn } = await import("../../src/locales/en/screens/unlocks.js");

@@ -173,3 +173,26 @@ test("RULES_MARK 7's words are in ko, en and ja, their numbers filled", () => {
   const sign = getActTwist("signedByName").text;
   assert.ok(sign.includes(`${SIGN_NAME_WALL_LOW}~${SIGN_NAME_WALL_HIGH}`), sign);
 });
+
+test("G13's climbing price says no particle on its number, in ko, en and ja (2, 4: never 「2과」 or 「2을」)", async () => {
+  const { describeScout } = await import("../../src/gauntlet/tableVoice.js");
+  const { default: koTable } = await import("../../src/copy/table.js");
+  const { fill } = await import("../../src/locale.js");
+  for (const trust of [1, 2, 3, 4]) {
+    const said = describeScout({ wallMin: 70, wallMax: 90 }, trust);
+    assert.ok(said.includes(`믿음 −${trust}`), said);
+    const label = fill(koTable.notices.scoutLabel, { min: 70, max: 90, trust, seconds: 3 });
+    assert.equal(label, `벽 70–90 · 조회, 믿음 ${trust} · 시간 3초`);
+  }
+  for (const text of [koTable.notices.scoutLabel, koTable.voice?.scout ?? ""]) assert.doesNotMatch(text, /\{trust\}[과와을를이가은는]/);
+});
+
+test("G16: the sign panel's drawn wall describes the group and 「이름만」, so tabbing to the buttons hears it", async () => {
+  const { readFileSync } = await import("node:fs");
+  const panel = readFileSync(new URL("../../src/gauntlet/WeekRulePanel.jsx", import.meta.url), "utf8");
+  const ask = panel.slice(panel.indexOf("export function SignAsk("), panel.indexOf("function SeasonEchoPanel("));
+  assert.match(ask, /role="group" aria-labelledby="gx-sign-ask" aria-describedby="gx-sign-name-wall"/);
+  assert.match(ask, /<p id="gx-sign-name-wall" data-testid="sign-name-wall">\{fill\(edgeCopy\.sign\.nameWall, \{ wall: getNameWall\(run\) \}\)\}<\/p>/);
+  assert.match(ask, /aria-describedby=\{way === "name" \? "gx-sign-name-wall" : undefined\}/);
+  for (const edge of [koEdge, enEdge, jaEdge]) assert.ok(edge.sign.nameWall.length > 0 && !/\{(?!wall\})/.test(edge.sign.nameWall));
+});
