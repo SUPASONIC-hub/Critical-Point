@@ -131,6 +131,7 @@ export function SignAsk({ run, onSign }) {
       <div className="gx-comic-cards">
         {["name", "terms"].map((way) => (
           <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way} onClick={() => onSign(way)}>
+            {signed === way && <span aria-hidden="true">✓ </span>}
             {edgeCopy.sign[way]}
           </button>
         ))}
