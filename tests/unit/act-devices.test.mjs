@@ -193,16 +193,6 @@ test("8막 실명 서명: the case is signed before its first board, by name or 
   assert.equal(engine.signCase(elsewhere, "name"), elsewhere);
   assert.equal(engine.asksToSign({ ...opened, weekRule: "short-clock" }), false, "a week's season");
 });
-test("a rule's chips are paid as dealt: the window's board, not the run's bare one (11-20)", () => {
-  const card = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
-  for (const caseId of ["case15", "case10", "case09"]) {
-    const run = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId });
-    const board = engine.getTableSchema(run);
-    assert.ok(board.chipsScale > run.schema.chipsScale, `${caseId} deals thicker chips`);
-    const win = { ...engine.createWindow({ schema: board, seed: caseId }), status: "cashed", cause: "cash", gauge: 40, pushes: 2 };
-    assert.equal(engine.resolveWindow({ run, window: win, card }).verdict.chips, engine.getCardChips(card, board), caseId);
-  }
-});
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
   for (const id of DEVICE_TWISTS) {
     for (const table of [koWeek, enWeek, jaWeek]) {

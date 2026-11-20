@@ -2001,10 +2001,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const cause = outcome === "cash" ? "cash" : (window?.cause === "abandon" && window?.closedAs) || window?.cause || "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
-  // The chips the window was dealt and showed (`getTableSchema`: a week's, a
-  // case's or an act's rule laid over the run's board), not the run's bare board,
-  // which paid MERGER's ×1.5 and every chipsFactor as ×1 (#636, 11-20 hotfix): under
-  // the next rules only, so a row played on the old table is rechecked as it was paid.
+  // Under the next rules (RULES_MARK 5) the chips are paid as the window was
+  // dealt and showed them (`getTableSchema`: a week's, a case's or an act's rule
+  // laid over the run's board). Before, the run's bare board paid MERGER's ×1.5
+  // and every chipsFactor as ×1; rows of the older marks are re-checked as they were.
+  // G5 2막 (`getPaidChips`): the case's twist may thin a cash at 60 and over.
   const chips = card ? getPaidChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema, gauge, getCaseTwist(current, rules)) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);

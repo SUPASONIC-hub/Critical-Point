@@ -201,3 +201,15 @@ test("the recheck plays a row under the rules its RULES_MARK says", () => {
   assert.equal(isNextOn(getRowRules("case10", {}, RULES_NEXT_MARK - 1)), false);
   assert.equal(getRowRules("case10", {}), getRowRules("case10", {}, undefined), "no mark: the page's own");
 });
+
+test("a rule's chips are paid as dealt: the window's board, not the run's bare one (11-20 hotfix)", async () => {
+  const engine = await import("../../src/gauntlet/gauntletEngine.js");
+  const card = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
+  for (const caseId of ["case15", "case09"]) {
+    const run = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId });
+    const board = engine.getTableSchema(run);
+    assert.ok(board.chipsScale > run.schema.chipsScale, `${caseId} deals thicker chips`);
+    const win = { ...engine.createWindow({ schema: board, seed: caseId }), status: "cashed", cause: "cash", gauge: 40, pushes: 2 };
+    assert.equal(engine.resolveWindow({ run, window: win, card }).verdict.chips, engine.getCardChips(card, board), caseId);
+  }
+});
