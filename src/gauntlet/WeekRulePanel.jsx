@@ -122,6 +122,9 @@ export function pastPick(picked, id, wild = 0) {
  * board of it played yet). Not choosing is 조건을 단다, pressed from the start.
  * In the reading-clock question's form (ReadingClockAsk.jsx), so it needs no CSS of its own.
  */
+// The touch target's floor (44px, WCAG 2.5.5), on every height: the comic card's own was 40 to 41px here (E1g).
+const SIGN_BUTTON = { minHeight: 44 };
+
 export function SignAsk({ run, onSign }) {
   if (!onSign || !asksToSign(run)) return null;
   const signed = readSignWay(run.open.signed);
@@ -134,7 +137,8 @@ export function SignAsk({ run, onSign }) {
       <p id="gx-sign-name-wall" data-testid="sign-name-wall">{fill(edgeCopy.sign.nameWall, { wall: getNameWall(run) })}</p>
       <div className="gx-comic-cards">
         {["name", "terms"].map((way) => (
-          <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way} aria-describedby={way === "name" ? "gx-sign-name-wall" : undefined} onClick={() => onSign(way)}>
+          <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way}
+            aria-describedby={way === "name" ? "gx-sign-name-wall" : undefined} onClick={() => onSign(way)} style={SIGN_BUTTON}>
             {signed === way && <span aria-hidden="true">✓ </span>}
             {edgeCopy.sign[way]}
           </button>

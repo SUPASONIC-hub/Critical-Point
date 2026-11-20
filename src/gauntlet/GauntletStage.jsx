@@ -188,8 +188,9 @@ export function GauntletStage({
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount, scoutCount }); // G1~G7, MARK 7 (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
-  // G17: one cash under the audit's line from its limit, the HUD says so in words (the count alone was missed).
-  const auditWarn = audit?.atRisk && audit.ifCash > 0 ? <small className="gx-audit-warn" data-testid="audit-warn"> {say.auditWarn}</small> : null;
+  // G17: one cash under the audit's line from its limit, the token's label says so in words (in place of 감사: E1g, a phrase beside it overflowed).
+  const auditWarned = audit?.atRisk && audit.ifCash > 0;
+  const auditLabel = auditWarned ? <small data-testid="audit-warn" style={{ whiteSpace: "nowrap" }}>{say.auditWarn}</small> : <small>{say.audit}</small>;
   // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
   const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(
@@ -536,8 +537,8 @@ export function GauntletStage({
               <b>{formatMoney(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>{auditWarn}</span></>}
+              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> {!auditWarned && <><small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit">{auditLabel} <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
@@ -564,7 +565,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>{auditWarn}</span>}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}>{auditLabel} <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"

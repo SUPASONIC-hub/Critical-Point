@@ -743,7 +743,8 @@ const budgets = [
   // 218,967 / 79,833 -> 218,967 / 79,843 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured - / 79839 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 222,467 / 81,110 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 222463 / 81106 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 218,967 / 79,838 hotfix rule chips (#636) over main f3815370. Measured - / 79834 (over budget only) in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 222_467, maxGzip: 81_110 },
+  // hotfix #644 (gauge row wraps whole items) over main. Measured - / 81113 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 222_467, maxGzip: 81_117 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1289,7 +1290,8 @@ const budgets = [
   // 217,507 / 42,164 -> 218,870 / 42,402 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 218866 / 42398 (over budget only) in the e2e build, the plus 4.
   // 218,870 / 42,402 -> 220,274 / 42,656 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 220270 / 42652 (over budget only) in the e2e build, the plus 4.
   // 220,274 / 42,656 -> 220,281 / 42,656 notes-batch2 (draft over adsense-notes 635e7b79): 실루엣's 엣 joins the second font file, so its @font-face unicode-range (tokens.css, critical CSS) gains one code point. Measured 220277 (over budget only) locally, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_281, maxGzip: 42_656 },
+  // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_346, maxGzip: 42_661 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2761,7 +2763,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
 // -> 384,610 / 449,801 / 458,281 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured first paint, the plus 4.
 // -> 384,610 / 449,939 / 458,431 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4 (first paint).
-const FIRST_PAINT_BUDGETS = { ko: 384_610, en: 449_939, ja: 458_431 };
+// -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
+// Both sides kept (mark7 follows g5-rest 54713815); the numbers are re-measured in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 384_614, en: 449_939, ja: 458_431 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
