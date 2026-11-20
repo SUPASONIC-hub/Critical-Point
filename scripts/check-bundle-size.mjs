@@ -1281,7 +1281,8 @@ const budgets = [
   // -> 217,507 / 42,164 b5-open-clock-cue over main ec89d22b, measured locally 217,503 / 42,160, the plus 4.
   // 217,507 / 42,164 -> 218,870 / 42,402 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 218866 / 42398 (over budget only) in the e2e build, the plus 4.
   // 218,870 / 42,402 -> 220,274 / 42,656 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 220270 / 42652 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_274, maxGzip: 42_656 },
+  // 220,274 / 42,656 -> 220,281 / 42,656 notes-batch2 (draft over adsense-notes 635e7b79): 실루엣's 엣 joins the second font file, so its @font-face unicode-range (tokens.css, critical CSS) gains one code point. Measured 220277 (over budget only) locally, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_281, maxGzip: 42_656 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
