@@ -90,7 +90,10 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
          ran (src/notes/noteIndex.js), so the list grows by date with no change
          to the code: taken out of the flow, its heading and link kept. */
       .home-reading-notes ul,
-      .home-reading-notes > p {
+      .home-reading-notes > p,
+      /* 오늘의 1면 (src/news/newsIndex.js) is a different article each day in
+         Seoul, and arrives as its own chunk: out of the flow the same way. */
+      .home-reading-story {
         display: none !important;
       }
       /* Debug-only chrome, taken out of the flow rather than blanked. The
