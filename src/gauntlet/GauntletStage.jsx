@@ -622,6 +622,8 @@ export function GauntletStage({
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
             {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
+            {/* G10: where the band stood before the case's rule pulled it closer (합병 and the like): the rule seen on the bar, not only in the panel. */}
+            {schema.wallMin < (run?.schema?.wallMin ?? 0) && <span className="gx-gauge-mark" data-testid="gauge-pulled" style={{ left: `${run.schema.wallMin}%` }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
