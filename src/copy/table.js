@@ -35,6 +35,8 @@ const tableCopy = {
     signOpen: "결재 판, 판돈 {chips}배, 벽 한 칸 보임: 벽은 {cell} 이상.",
     signCell: "벽 {cell}부터",
     breath: "숨 고르기",
+    // G15: beside 숨 고르기, where the BUST before this board went.
+    breathBust: "지난 판 {heat}에서 터짐",
     breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
     breathDone: "숨을 골랐다. 열기 {gauge} 내려 {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",
@@ -52,6 +54,8 @@ const tableCopy = {
     streak: "연속",
     best: "최고",
     audit: "감사",
+    // G17: beside the count, one cash under the line from its limit.
+    auditWarn: "낮게 끊으면 감사",
     links: "연결",
     lockCap: "상한",
     lockMultiplier: "배율",
@@ -93,9 +97,9 @@ const tableCopy = {
     lockPrice: "−{seconds}초",
     steadyCold: "열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라",
     lockDetail: "지금 충전 {charge}. 누를 때마다 자원 배율이 오르고 시간이 {seconds}초 줄어든다.",
-    lockAtCap: "칩 배율이 {cap}배에 닿아 이번 판에는 더하지 않는다",
-    lockUnderCap: "칩 배율은 LOCK으로 {cap}배까지만 오른다",
-    lockStance: ". {charge} 이상 충전해 확정하면 다음 판에서 치른다",
+    lockAtCap: "칩 배율이 {cap}배에 닿아 이번 판에는 더하지 않는다.",
+    lockUnderCap: "칩 배율은 LOCK으로 {cap}배까지만 오른다.",
+    lockStance: " {charge} 이상 충전해 확정하면 다음 판에서 치른다.",
     sealed: "봉인됨",
     pickCard: "카드를 고른다",
     commit: "확정",
@@ -137,7 +141,8 @@ const tableCopy = {
     relicsLabel: "장착한 도구",
     scout: "조회",
     scouted: "조회함",
-    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초",
+    // G13: {trust} climbs within a case (2, 3, ...), so no particle rides on the number.
+    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust} · 시간 {seconds}초",
     narrow: "좁히기",
     narrowLabel: "벽 {min}–{max} · 좁히기, {width}칸으로 · 믿음 {trust} · 시간 {seconds}초",
     glossaryCard: "카드 {number}: {label} ({type})",
@@ -169,6 +174,9 @@ const tableCopy = {
     mastery: "시즌 숙련 ",
     mastered: "완성",
     blocked: "판이 열려 있을 때만 자세를 바꿀 수 있다.",
+    // G5 6막 진술 고정: the recorded stance's line, and why the row is shut.
+    fixed: "조서에 남은 자세 · 사건 끝까지",
+    fixedBlocked: "이번 사건은 첫 확정의 자세가 조서에 남아, 사건이 끝날 때까지 바꿀 수 없다.",
     detail: "시즌 숙련: 충전한 채로 확정한 판",
   },
   ledger: {
@@ -263,7 +271,7 @@ const tableCopy = {
     push: "열기 {gauge} · {danger}",
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
-    scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
+    scout: "조회했다(믿음 −{trust}). 벽은 {min}에서 {max} 사이 어딘가",
     scoutNarrow: "더 좁혔다(믿음 −{trust}). 벽은 {min}에서 {max} 사이 어딘가",
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",

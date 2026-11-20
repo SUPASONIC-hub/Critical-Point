@@ -31,25 +31,46 @@ export const FAST_CASH_SHARE = 0.5;
  * `afterBust` (the window before was a bust), `mutations` (the board's),
  * `clockLeft` (share of the clock left), `focusMode`, `focusCharged`.
  */
+// G12 (11-20, 게임성 개선점 Q6 (1)): METRONOME 1.4 -> 1.7, CARBON COPY 1.5 -> 1.7, FRONT PAGE 1.15 -> 1.2 (the paper's 1.12
+// left the spread x1.128, under the x1.15 the report asks; 1.25 made it every hand's best),
+// COLD BLOOD's AFTERSHOCK-free board also stands its wall COLD_BLOOD_WALL further (gauntletEngine.js).
+export const COLD_BLOOD_WALL = 2;
 export const RELIC_BOOSTS = Object.freeze({
   auditContact: Object.freeze({ boost: 1.8, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
   heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   encore: Object.freeze({ boost: 1.15, when: (cash) => cash.streak >= LONG_STREAK }),
-  metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
+  metronome: Object.freeze({ boost: 1.7, when: (cash) => cash.move === "switch" }),
   coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
-  carbonCopy: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("blackout") }),
+  carbonCopy: Object.freeze({ boost: 1.7, when: (cash) => cash.mutations.includes("blackout") }),
   testimony: Object.freeze({ boost: 1.1, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
-  frontPage: Object.freeze({ boost: 1.15, when: (cash) => cash.mutations.includes("overclock") }),
+  frontPage: Object.freeze({ boost: 1.2, when: (cash) => cash.mutations.includes("overclock") }),
   stethoscope: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("silence") }),
   kineticGrip: Object.freeze({ boost: 1.2, when: (cash) => cash.focusMode === "strike" && cash.focusCharged }),
 });
 
-/** The tools whose condition held on this cash, and the product of their boosts. */
-export function readRelicBoost(relics, cash) {
+/**
+ * G11c (RULES_MARK 7, 2026-11-30): the most the tools' boosts may multiply one
+ * cash's pot together. They multiplied without end, so a season's end that held
+ * three tools whose conditions met (HEAT SINK, COLD BLOOD and FRONT PAGE on one
+ * hot board after a bust) paid ×3.68 and the vault of every tool ran ×2.17 the
+ * vault of none (게임성 개선점 G11).
+ */
+export const RELIC_BOOST_CAP = 1.6;
+
+/**
+ * The tools whose condition held on this cash, and the product of their boosts.
+ * Under RULES_MARK 7 (`cap`, RELIC_BOOST_CAP) two or more that held together pay
+ * no more than the cap, or than the biggest of them alone where that is more
+ * (AUDIT CONTACT ×1.8, COLD BLOOD ×2): a second tool never takes from the first.
+ * `capped` when the cap cut the product.
+ */
+export function readRelicBoost(relics, cash, cap = Infinity) {
   const held = Array.isArray(relics) ? relics : [];
   const fired = held.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && RELIC_BOOSTS[id].when(cash));
-  return { fired, factor: fired.reduce((product, id) => product * RELIC_BOOSTS[id].boost, 1) };
+  const product = fired.reduce((total, id) => total * RELIC_BOOSTS[id].boost, 1);
+  const most = fired.length > 1 ? Math.max(cap, ...fired.map((id) => RELIC_BOOSTS[id].boost)) : Infinity;
+  return product > most ? { fired, factor: most, capped: true } : { fired, factor: product };
 }
 
 /** What the draft costs under the next rules: the reroll 1,500 (was 4,000); one more stays 12,000, once a season. */

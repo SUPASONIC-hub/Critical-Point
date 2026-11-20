@@ -48,7 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
-import { isNextOn, RULES_NEXT_MARK, withNextRules } from "./gauntlet/nextTableRules.js";
+import { isNextOn, RULES_NEXT_MARK, RULES_SEVEN_MARK, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -91,12 +91,14 @@ export function recheckCaseScore(row) {
  * The rules a stored case was played under, from what its summary says of the
  * run and the RULES_MARK its row carries (`mark`): a row marked
  * RULES_NEXT_MARK or later was played under the next rules (G1~G7,
- * nextTableRules.js), an earlier one under the rules before them. With no
- * mark, the rules this engine plays now.
+ * nextTableRules.js), an earlier one under the rules before them; one marked
+ * RULES_SEVEN_MARK or later under RULES_MARK 7's too (G11b·c, G13, G16, G18),
+ * an earlier one without them. With no mark, the rules this engine plays now.
  */
 export function getRowRules(caseId, summary, mark = undefined) {
   const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
-  return mark === undefined || mark === null ? rules : withNextRules(rules, Number(mark) >= RULES_NEXT_MARK);
+  if (mark === undefined || mark === null) return rules;
+  return withMarkSeven(withNextRules(rules, Number(mark) >= RULES_NEXT_MARK), Number(mark) >= RULES_SEVEN_MARK);
 }
 
 /**

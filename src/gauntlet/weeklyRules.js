@@ -28,7 +28,11 @@
 
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 import weekRulesCopy from "../copy/weekRules.js";
-import { ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, MERGER_CHIPS, MERGER_SHIFT, SCATTER_CHIPS, SCATTER_SPREAD } from "./actTwists.js";
+import {
+  ALL_ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, LATE_BILL_CHIPS, MERGER_CHIPS, MERGER_SHIFT, PASSED_DOWN_HARM, SCATTER_CHIPS, SCATTER_SPREAD,
+  SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW,
+} from "./actTwists.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOCK_DRAG } from "./tableRules.js";
 import { fill } from "../locale.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -123,7 +127,10 @@ const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
 function ruleValues() {
   const { auditLine, cascadeLine } = weekRulesCopy;
   const audit = fill(auditLine, W47_AUDIT);
-  return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS };
+  return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS,
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js).
+    downShare: INSURANCE_SHARE, downHarm: PASSED_DOWN_HARM, billHeat: HEAT_DEBT_GAUGE, billChips: LATE_BILL_CHIPS,
+    trainedBelow: TRAINED_BELOW, trainedAbove: TRAINED_ABOVE, nameChips: SIGN_NAME_CHIPS, nameWall: SIGN_NAME_WALL, nameWallLow: SIGN_NAME_WALL_LOW, nameWallHigh: SIGN_NAME_WALL_HIGH, lockDrag: LOCK_DRAG, termsWall: SIGN_TERMS_WALL, termsChips: SIGN_TERMS_CHIPS };
 }
 function ruleWords(id) {
   const { title, text, world } = weekRulesCopy.rules[id];
@@ -222,9 +229,9 @@ export function getCaseRule(caseId, id) {
  * carry one, so `normalizeWeekRuleId` does not know it -- only a case's.
  */
 export function getActTwist(id) {
-  if (typeof id !== "string" || !Object.hasOwn(ACT_TWIST_RULES, id)) return null;
+  if (typeof id !== "string" || !Object.hasOwn(ALL_ACT_TWIST_RULES, id)) return null;
   const { title, text, world } = weekRulesCopy.actTwists[id];
-  return { id, ...ACT_TWIST_RULES[id], title, text: fill(text, ruleValues()), world };
+  return { id, ...ALL_ACT_TWIST_RULES[id], title, text: fill(text, ruleValues()), world };
 }
 
 /** What a saved stamp is: a known id, or null. */
@@ -281,11 +288,14 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, firstS
  * The numbers a rule moves on a board, before clamping: the caller hands the
  * result to `normalizeSchema` (the engine; this module does not import it).
  */
-export function weekRuleOverlay(id, schema) {
-  const rule = getWeekRule(id) ?? getActTwist(id);
-  if (!rule?.schema || !schema) return null;
+export function weekRuleOverlay(id, schema, moves = null) {
+  // `moves`: what the case chose under a twist that asks (G5 8막 실명 서명, actTwists.js `SIGN_WAYS`).
+  // The numbers only: no words are filled on this path, which every board dealt walks.
+  const own = (table) => (typeof id === "string" && Object.hasOwn(table, id) ? table[id].schema : undefined);
+  const numbers = moves ?? own(WEEK_RULE_CATALOGUE) ?? own(ALL_ACT_TWIST_RULES);
+  if (!numbers || !schema) return null;
   const overlay = {};
-  for (const [key, value] of Object.entries(rule.schema)) {
+  for (const [key, value] of Object.entries(numbers)) {
     if (key === "wallShift") {
       overlay.wallMin = Number(schema.wallMin) + value;
       overlay.wallMax = Number(schema.wallMax) + value;

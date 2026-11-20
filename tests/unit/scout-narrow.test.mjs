@@ -83,7 +83,7 @@ test("the table sells the second look only with both looks' 믿음", () => {
   assert.equal(meters(SCOUT_TRUST + SCOUT_NARROW_TRUST), true);
   assert.equal(meters(SCOUT_TRUST + SCOUT_NARROW_TRUST - 1), false);
   const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
-  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && canPayNarrow : canPayScout\);/);
+  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && win\.schema\?\.trained !== true && canPayNarrow : canPayScout\);/);
 });
 
 test("a narrowed window replays, and a log that says nothing of the second look is held to none", () => {
@@ -119,7 +119,7 @@ test("the second look is named and said in three languages", async () => {
     assert.match(copy.voice.scoutNarrow, /\{trust\}[\s\S]*\{min\}[\s\S]*\{max\}/, `${lang} voice.scoutNarrow`);
   }
   assert.equal(describeScout({ wallMin: 72, wallMax: 82, narrowed: true }), `더 좁혔다(믿음 −${SCOUT_NARROW_TRUST}). 벽은 72에서 82 사이 어딘가`);
-  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), `조회했다. 믿음 ${SCOUT_TRUST}을 썼다. 벽은 70에서 90 사이 어딘가`);
+  assert.equal(describeScout({ wallMin: 70, wallMax: 90 }), `조회했다(믿음 −${SCOUT_TRUST}). 벽은 70에서 90 사이 어딘가`);
   const notices = readFileSync(new URL("../../src/gauntlet/TableNotices.jsx", import.meta.url), "utf8");
   assert.match(notices, /fill\(say\.narrowLabel, \{ min: band\.wallMin, max: band\.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH \* 2 \}\)/);
   // G2 (the next rules): the price on the name is this case's next second look's (`narrowTrust`, SCOUT_NARROW_TRUST by default).

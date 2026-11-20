@@ -42,7 +42,7 @@ const relicsCopy = {
     // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
     spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
-    spendHintNext: "하나 더는 시즌에 한 번. 다시 뽑기는 싸다: 셋이 약하면 다시 뽑아라.",
+    spendHintNext: "하나 더는 시즌에 한 번. 다시 뽑기는 싸다: 셋이 약하면 다시 뽑아라. 한 판에 도구가 겹쳐도 판돈 배수는 합쳐 {cap}배까지다(혼자 더 큰 도구는 그 값).",
     secondTitle: "하나 더 고르기",
     secondLede: "산 도구 하나를 남은 두 개 중에서 고른다.",
     off: {
@@ -71,7 +71,7 @@ const relicsCopy = {
       text: "벽에 닿은 뒤의 AFTERSHOCK가 열기 {start}{particle} 아니라 {cold}에서 시작한다.",
       proc: "여진을 절반으로 식혔다",
       // G4: what it does under the next rules, in place of the line above.
-      nextText: "BUST 다음 판은 AFTERSHOCK 없이 열기 0에서 시작하고, 그 판에서 확정하면 판돈 +{pct}%.",
+      nextText: "BUST 다음 판은 AFTERSHOCK 없이 열기 0에서 시작하고 벽이 {wall} 물러서며, 그 판에서 확정하면 판돈 +{pct}%.",
       nextSoftens: "냉혈: AFTERSHOCK 면제",
       softens: "냉혈: 열기 {cold}에서 시작",
     },

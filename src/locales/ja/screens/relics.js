@@ -27,7 +27,7 @@ export default {
     spendNote: "押すとKD銀行口座からすぐ引かれ、取り消せない。",
     spendHint: "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
-    spendHintNext: "もう一つはシーズンに一度。引き直しは安い：弱い三つなら引き直そう。",
+    spendHintNext: "もう一つはシーズンに一度。引き直しは安い：弱い三つなら引き直そう。同じ勝負で道具が重なっても、賭け金の倍率は合わせて{cap}倍まで（一つでそれより大きい道具はその値）。",
     secondTitle: "もう一つ選ぶ",
     secondLede: "買った一つを、残る二つから選ぶ。",
     off: {
@@ -54,7 +54,7 @@ export default {
       text: "壁に触れたあとのAFTERSHOCKが、熱{start}ではなく{cold}から始まる。",
       proc: "余震を半分に冷ました",
       // G4: what it does under the next rules, in place of the line above.
-      nextText: "BUSTの次の盤はAFTERSHOCKなしで熱0から始まり、その盤で確定すると賭け金 +{pct}%。",
+      nextText: "BUSTの次の盤はAFTERSHOCKなしで熱0から始まり、壁が{wall}下がる。その盤で確定すると賭け金 +{pct}%。",
       nextSoftens: "冷血：AFTERSHOCK免除",
       softens: "冷血: 熱{cold}から開始",
     },

@@ -297,7 +297,7 @@ test("the CLI prints the read, the page and the settle statement", () => {
     const rows = dealtSeason("secret-run");
     writeFileSync(path.join(dir, "1.json"), JSON.stringify(rows));
     const sql = run(path.join(dir, "1.json"), "--hall-of-fame-sql").trim();
-    // The dealt season plays this engine's table (RULES_MARK 5 since G1~G7 and N26).
+    // The dealt season plays this engine's table (RULES_MARK 7 since the 11-30 wipe's G11b·c, G13, G16 and G18).
     assert.equal(sql, hallOfFameSql([{ board: `table-${RULES_MARK}`, places: [] }]));
     assert.match(run(path.join(dir, "1.json"), "--hall-of-fame"), new RegExp(`^본 판 \\(판 규칙 ${RULES_MARK}\\): 0 checked seasons; 표본 부족$`, "m"));
     assert.doesNotMatch(sql, /secret/);

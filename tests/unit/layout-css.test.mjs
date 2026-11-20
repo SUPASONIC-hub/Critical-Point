@@ -305,7 +305,7 @@ test("the LOCK button's sub-line is the charge and the price, without the stance
   // At LOCK's cap the line is 상한 도달 alone (C-6, 2026-10-22), shorter than the charge and the price.
   // The words are the copy table's (src/copy/table.js): 상한 도달, and the price as −N초.
   // G3: a shut LOCK says so first, in the same line.
-  assert.match(lock, /<small>\{lockShut \? say\.lockShut : lockCapped \? say\.lockCapped : <>\{Math\.round\(win\.focus\)\} · \{fill\(say\.lockPrice, \{ seconds: LOCK_PRESS_SECONDS \}\)\}<\/>\}<\/small>/);
+  assert.match(lock, /<small>\{lockShut \? say\.lockShut : lockCapped \? say\.lockCapped : <>\{Math\.round\(win\.focus\)\} · \{fill\(say\.lockPrice, \{ seconds: lockSeconds \}\)\}<\/>\}<\/small>/);
   const copy = source("copy/table.js");
   assert.match(copy, /lockCapped: "상한 도달",/);
   assert.match(copy, /lockPrice: "−\{seconds\}초",/);

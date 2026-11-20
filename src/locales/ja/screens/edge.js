@@ -18,6 +18,13 @@ export default {
     hold: "自分で開く方式に変える",
     keep: "時計に任せる",
   },
+  sign: {
+    kicker: "署名欄",
+    question: "この事件の署名欄にどう書く？選ばなければ条件をつける。",
+    name: "名前だけ書く",
+    terms: "条件をつける",
+    nameWall: "今回の署名欄は、名前だけ書けば壁の帯が{wall}手前に立つ。",
+  },
   comfort: {
     title: "快適設定",
     close: "閉じる",
