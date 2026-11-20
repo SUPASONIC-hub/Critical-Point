@@ -66,6 +66,9 @@ export default {
       text: "EXPOSE LOCKを重ねてチャージした結果。封印がより早く開き、さらに積み上がれば隠された勝負も隠れられない。",
     },
   },
+  lateBill: {
+    text: "高い倍率で確定した代償。今回の熱の4分の3を抱えて始まり、{seconds}秒を失う。",
+  },
   lifted: {
     blackout: {
       title: "壁が迫ってきた",

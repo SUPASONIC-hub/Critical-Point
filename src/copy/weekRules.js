@@ -76,7 +76,7 @@ const weekRulesCopy = {
     },
     lateBill: {
       title: "뒤늦은 청구서",
-      text: "이번 사건은 열기 {billHeat} 이상에서 확정하면 그 열기의 {billShare}분의 1을 안고 다음 판을 시작한다. 그 아래에서 확정하면 모든 카드의 칩이 {billChips}배다.",
+      text: "이번 사건은 열기 {billHeat} 이상에서 확정하면 그 열기의 4분의 3을 안고 다음 판을 시작한다. 그 아래에서 확정하면 모든 카드의 칩이 {billChips}배다.",
       world: "열흘을 혼자 버틴 값은 이긴 다음 날 청구된다.",
     },
     trainedWall: {

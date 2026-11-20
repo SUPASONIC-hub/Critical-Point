@@ -63,7 +63,7 @@ export default {
     },
     lateBill: {
       title: "遅れてきた請求書",
-      text: "この事件は熱{billHeat}以上で確定すると、その熱の{billShare}分の1を抱えて次の勝負が始まる。それより下で確定すると、すべてのカードのチップが{billChips}倍。",
+      text: "この事件は熱{billHeat}以上で確定すると、その熱の4分の3を抱えて次の勝負が始まる。それより下で確定すると、すべてのカードのチップが{billChips}倍。",
       world: "ひとりで耐えた十日分は、勝った翌日に請求される。",
     },
     trainedWall: {

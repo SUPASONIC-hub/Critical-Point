@@ -4,7 +4,7 @@ const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
@@ -70,7 +70,7 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   const cash = { outcome: "cash", gauge: 80, pushes: 2, streak: 0 };
   const billed = engine.buildNextSchema({ ...cash, twist: "lateBill" });
   const usual = engine.buildNextSchema(cash);
-  assert.equal(billed.startGauge, Math.round(80 / LATE_BILL_SHARE));
+  assert.equal(billed.startGauge, Math.min(Math.round(80 * LATE_BILL_KEEP), billed.wallMin - 8));
   assert.equal(usual.startGauge, Math.round(80 / 3));
   assert.equal(billed.seconds, usual.seconds, "the clock's cut is the debt's as before");
   assert.equal(billed.lateBill, true);
@@ -82,7 +82,7 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   assert.equal(engine.buildNextSchema({ ...cash, gauge: HEAT_DEBT_GAUGE - 1, twist: "lateBill" }).lateBill, undefined, "under the debt's line, no bill");
   const [debt] = engine.describeMutations(billed);
   assert.equal(debt.id, "heatDebt");
-  assert.match(debt.text, new RegExp(`${LATE_BILL_SHARE}분의 1`));
+  assert.match(debt.text, /4분의 3/);
   assert.match(debt.text, new RegExp(`${HEAT_DEBT_SECONDS}초`));
   assert.match(engine.describeMutations(usual)[0].text, /3분의 1/);
   // 11-20 (the user's 「1」): the thicker chips pay only a cash under the debt's line.
@@ -214,5 +214,5 @@ test("each device twist's panel line is in ko, en and ja, its numbers filled", (
     assert.doesNotMatch(rule.text, /\{|undefined|NaN/, id);
   }
   const bill = getCaseRule("case10", "lateBill");
-  assert.ok(bill.world && /열기 60 이상/.test(bill.text) && /2분의 1/.test(bill.text) && /1\.2배/.test(bill.text), bill.text);
+  assert.ok(bill.world && /열기 60 이상/.test(bill.text) && /4분의 3/.test(bill.text) && /1\.25배/.test(bill.text), bill.text);
 });

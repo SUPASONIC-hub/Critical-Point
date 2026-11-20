@@ -63,7 +63,7 @@ export default {
     },
     lateBill: {
       title: "The Late Bill",
-      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 1/{billShare} of that Heat. Commit under it and every card’s chips are ×{billChips}.",
+      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 3/4 of that Heat. Commit under it and every card’s chips are ×{billChips}.",
       world: "The ten days someone carried alone are billed the day after the win.",
     },
     trainedWall: {
