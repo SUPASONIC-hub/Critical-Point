@@ -794,6 +794,14 @@ export const copy = {
       "side09": {
         "label": "番外9",
         "title": "92日"
+      },
+      "side10": {
+        "label": "番外10",
+        "title": "挨拶もなく"
+      },
+      "side11": {
+        "label": "番外11",
+        "title": "ブイまで"
       }
     }
   }

@@ -470,8 +470,8 @@ The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
 open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
-`check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토)
-and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
+`check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토),
+12월 11일 (목), 9월 13일 (토), 9월 14일 (일) and 9월 15일 (월) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
 7월 11일 (토), 7월 13일 (월), 5월 14일 (목), 8월 13일 (목), 8월 14일 (금) and 8월 18일 (화) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
@@ -598,6 +598,27 @@ and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (�
 | 국하늘 (20) | their daughter, second year at university; does not speak. If the months had passed: the wife's share 3,822만, hers 2,548만 (3/5 and 2/5) |
 | 위성규 | speaks only in the narration (indirect speech or 「」), as 번외 8's 설경민; says the rule is for the bereaved. 상속인 enquiries before the letter get 안내 대본 7번 |
 | The endings | the first line of the 86 letters (the way out written on top, the analyst's name on the change, 39 houses file by November / the rule's numbers to audit, the letters sent as they were, the rule changed three months later to 14 days with a note, 위성규 up for a year-end commendation / 「상속 채무 이행 안내」 left, the first 50만 원 paid the next Wednesday). In each, her filing is accepted in September. None touches 사건 40's score or 41's hearing |
+
+### 번외 10, 인사 없이 (side10)
+
+| Fact | Value |
+|---|---|
+| When | 2025-09-13 (토) 21:00 to 09-14 (일) 07:30: two days after 사건 05's 원인 회의 (its 회의록 with seven blank signatures, 오진우's desk empty), before 사건 06's 위원회. 9월 15일 (월) 06:00 is when the automatic 배차 comes back |
+| Where | 온새 돌봄's 강서 거점 (the night 수동 배차), the houses on its hand list, and 트리거랩's 분석관실 |
+| 오진우 | spent the two nights in the passenger seat of a 요양보호사's car, visiting the houses his 가중치표 pushed back. Says he left without a word "할 말이 없어서". Nothing of a 사직서 (사건 06 has it) |
+| The 가중치표 | 민원 이력 없음 moves a house two places down, 연락 안 됨 three. Fourteen approval papers made it what it is (확인 전화 두 번 → 한 번, 연락 안 되는 집은 뒤로, 검토 6분), each by a different approver; 오진우's is the last box, the only name the press kept |
+| 변정순 (58) | 방문 요양보호사, 11 years with 온새. Her own notebook keeps a last column, 「말 안 하는 집」, a star a house, eleven years of them; before the system the 거점 ordered visits by it. "공책은 내 거예요" |
+| The houses | 312 dots, 271 visited by hand when the case opens, 41 left that night: an 82-year-old in a 반지하 with no 민원 and no phone, two days of medicine unopened; a 53-year-old former 플로우온 야간조 worker, 정리 last year, who called no one ("바쁜 데 많을 텐데") |
+| The endings | the first line of 오진우's one page for Monday (her column as a field in the 가중치표 -- a trial box 「현장 특이 사항」 appears at her 거점 that Friday / the fourteen approvers and the six minutes by name -- someone pencils '14' beside the blank signatures / nothing, and a lift home -- "이게 인사입니다"). In each the automatic 배차 comes back unchanged on Monday. None touches 사건 05 or 06 |
+
+### 번외 11, 부표까지 (side11)
+
+| Fact | Value |
+|---|---|
+| When | TODO YYYY-MM-DD (요), between which two of the season's days |
+| Where | TODO |
+| TODO person (age) | TODO what the case states for the first time |
+| The endings | TODO the first line of each of the three |
 
 ## Known and left alone
 

@@ -788,6 +788,14 @@ export const copy = {
       "side09": {
         "label": "Side case 9",
         "title": "92 Days"
+      },
+      "side10": {
+        "label": "Side case 10",
+        "title": "No Goodbye"
+      },
+      "side11": {
+        "label": "Side case 11",
+        "title": "To the Buoy"
       }
     }
   }

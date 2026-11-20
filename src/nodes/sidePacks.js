@@ -73,6 +73,8 @@ export const SIDE_CASES = Object.freeze([
   { id: "side07", label: "번외 7", title: "금요일 17시 58분", unlockAfter: "case31", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
   { id: "side08", label: "번외 8", title: "정상화", unlockAfter: "case34", load: () => import("./side08.js").then(({ side08 }) => localizeSidePack(side08)) },
   { id: "side09", label: "번외 9", title: "92일", unlockAfter: "case40", load: () => import("./side09.js").then(({ side09 }) => localizeSidePack(side09)) },
+  { id: "side10", label: "번외 10", title: "인사 없이", unlockAfter: "case05", opensAt: NEXT_SEASON.opensAt, load: () => import("./side10.js").then(({ side10 }) => localizeSidePack(side10)) },
+  { id: "side11", label: "번외 11", title: "부표까지", unlockAfter: "case42", opensAt: NEXT_SEASON.opensAt, load: () => import("./side11.js").then(({ side11 }) => localizeSidePack(side11)) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => localizeSidePack(side00)) }]
     : []),
