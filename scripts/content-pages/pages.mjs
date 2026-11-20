@@ -16,6 +16,9 @@ import { CHARACTER_GROUPS, CHARACTERS_DESCRIPTION, CHARACTERS_INTRO } from "./ch
 import { GUIDE_BODY, GUIDE_DESCRIPTION } from "./guide-text.mjs";
 import { MAKING_BODY, MAKING_DESCRIPTION } from "./making-text.mjs";
 import { WEEKLY_DESCRIPTION, weeklyBody } from "./weekly-text.mjs";
+import CASE_BACKGROUND from "./cases/background-ko.mjs";
+import { notesDay } from "./notes.mjs";
+import { notePath, publishedNotes } from "../../src/notes/noteIndex.js";
 import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../structured-data.mjs";
 
 /**
@@ -78,7 +81,45 @@ ${groups.join("\n")}
 <p class="note">${escapeHtml(words.fiction)}</p>`;
 }
 
-function caseBody(caseId, language) {
+/* ------------------------------------------------------- 배경 지식 (Korean) */
+
+const BACKGROUND_WORDS = {
+  heading: "배경 지식",
+  note: "배경 지식은 사건이 기대고 있는 금융·회사 개념을 우리가 일반적인 구조로 풀어 쓴 글입니다. 개별 상황에 대한 법률·투자 조언이 아닙니다.",
+};
+
+/** The box's own sheet: a ruled card under the case's question. */
+export const BACKGROUND_STYLE = ".background{margin:28px 0;padding:6px 18px 4px;border:1px solid var(--line-strong);border-left:4px solid var(--accent);border-radius:4px;background:var(--surface)}.background h2{margin-top:14px}";
+
+/**
+ * A Korean case page's 「배경 지식」 box (./cases/background-ko.mjs), or "" for
+ * a case or language without one. The term its note names is a link once the
+ * note is out by `day` and plain text before: a `<span>` in place of the
+ * `<a>`, so the page's words, and with them its sitemap date, stay the same
+ * the day the link appears.
+ */
+export function backgroundBox(caseId, language, day) {
+  const box = language === "ko" ? CASE_BACKGROUND[caseId] : null;
+  if (!box) return "";
+  const [slug, term] = box.note ?? [];
+  const out = slug ? publishedNotes(day).some((note) => note.slug === slug) : false;
+  let linked = false;
+  const lines = box.text.map((line) => {
+    const html = escapeHtml(line);
+    const word = term ? escapeHtml(term) : "";
+    if (!word || linked || !html.includes(word)) return `<p>${html}</p>`;
+    linked = true;
+    return `<p>${html.replace(word, () => (out ? link(notePath(slug), term) : `<span>${word}</span>`))}</p>`;
+  });
+  return `<section class="background" aria-labelledby="background">
+<h2 id="background">${escapeHtml(BACKGROUND_WORDS.heading)}: ${escapeHtml(box.title)}</h2>
+${lines.join("\n")}
+<p class="note">${escapeHtml(BACKGROUND_WORDS.note)}</p>
+</section>
+`;
+}
+
+function caseBody(caseId, language, day = notesDay()) {
   const words = CASE_WORDS[language];
   const text = CASE_TEXT[caseId][language];
   const rule = caseRule(caseId, language);
@@ -106,7 +147,7 @@ ${cast}
 </ul>
 <h2>${escapeHtml(words.question)}</h2>
 <p class="lede">${escapeHtml(text.question)}</p>
-<p>${link(gamePath(language), words.play)}</p>
+${backgroundBox(caseId, language, day)}<p>${link(gamePath(language), words.play)}</p>
 <p class="note">${escapeHtml(words.fiction)}</p>
 <div class="pager">
 ${pager}
@@ -162,14 +203,15 @@ const makingBody = (language) => `${MAKING_BODY[language].trim()}
 
 /* ----------------------------------------------------------------- the pages */
 
-function pageOf(kind, language) {
+function pageOf(kind, language, day) {
   if (kind === "guide") return { body: GUIDE_BODY[language], description: GUIDE_DESCRIPTION[language], heading: HEADINGS.guide[language] };
   if (kind === "cases/index") return { body: caseIndexBody(language), description: CASE_INDEX_DESCRIPTION[language], heading: HEADINGS[kind][language] };
   if (kind === "characters") return { body: charactersBody(language), description: CHARACTERS_DESCRIPTION[language], heading: HEADINGS.characters[language] };
   if (kind === "weekly") return { body: weeklyBody(language, undefined, gamePath(language)), description: WEEKLY_DESCRIPTION[language], heading: HEADINGS.weekly[language] };
   if (kind === "making") return { body: makingBody(language), description: MAKING_DESCRIPTION[language], heading: HEADINGS.making[language] };
   const caseId = kind.slice("cases/".length);
-  return { body: caseBody(caseId, language), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language) };
+  const style = CASE_BACKGROUND[caseId] && language === "ko" ? BACKGROUND_STYLE : "";
+  return { body: caseBody(caseId, language, day), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language), style };
 }
 
 /**
@@ -189,11 +231,11 @@ function trailOf(kind, language, heading) {
 }
 
 /** Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash. */
-export function renderContentPages({ analytics = null } = {}) {
+export function renderContentPages({ analytics = null, day = notesDay() } = {}) {
   const pages = {};
   for (const kind of CONTENT_KINDS) {
     for (const language of PAGE_LANGUAGES) {
-      const page = pageOf(kind, language);
+      const page = pageOf(kind, language, day);
       pages[pagePath(kind, language).slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, structuredData: trailOf(kind, language, page.heading) });
     }
   }
