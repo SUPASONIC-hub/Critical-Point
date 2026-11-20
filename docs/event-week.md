@@ -63,6 +63,13 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 끝낸 기기는 켜진 채 시작하고 「이번 주의 규칙 없이 시작(평소 순위로)」 상자로 끕니다(결정 27). 두 상자는
 기기 설정으로 남습니다(`src/state/weeklyRuleChoice.js`).
 
+**사건 규칙과 막 비틀기** (N26, G5, 2026-11-20 판 규칙 5) -- 주간 규칙과 같은 카탈로그를 사건 하나에만 쓰는 「이번
+사건만」 규칙이 있습니다(`gauntlet/caseRules.js`, 11-20 묶음): 사건 09 SHORT CLOCK, 11 NEAR WALL, 14 HEAVY FRACTURE, 16 CRISIS
+WEEK. 판 규칙 5부터는 3·5·7막의 막 비틀기(`gauntlet/actTwists.js`: 합병, 흩어진 자리, 청문회)도 같은 틀로 섭니다.
+사건 14·16은 사건 규칙이 막 비틀기보다 먼저입니다. **주간 규칙이 도장 찍힌 시즌과 이야기 모드에는 둘 다 없습니다**
+(`caseRuleFor`). 그래서 이벤트 주 순위는 주간 규칙만으로 겨루고, 이벤트 주를 고를 때 막 비틀기와 겹칠 걱정은 하지
+않아도 됩니다. 패널은 주간 규칙과 같은 `WeekRulePanel`에 「이번 사건만 · 이 사건이 닫힐 때까지」 머리로 나옵니다.
+
 **화면** --
 
 - 시작 화면 한 줄(`src/components/WeeklyRuleNotice.jsx` → `WeeklyRuleViews.jsx` → `gauntlet/weeklyRuleLine.js`):
