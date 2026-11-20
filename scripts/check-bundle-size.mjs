@@ -207,7 +207,8 @@ const budgets = [
   // 165,507 / 61,716 -> 165,737 / 61,781 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 165733 / 61777 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,707 -> 165,734 / 61,769 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 165,730 / 61,765 (over budget only) in the e2e build, the plus 4.
   // 165,737 / 61,781 -> 165,737 / 61,790 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 61786 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_737, maxGzip: 61_790 },
+  // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured - / 61793 in CI verify-quick, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 165_737, maxGzip: 61_797 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -740,7 +741,8 @@ const budgets = [
   // 222,467 / 81,110 -> 223,467 / 81,471 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 223463 / 81467 (over budget only) in the e2e build, the plus 4.
   // 223,467 / 81,471 -> 223,467 / 81,477 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured - / 81473 (over budget only) in the e2e build, the plus 4.
   // hotfix #644 (gauge row wraps whole items) over main. Measured - / 81113 in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 222_467, maxGzip: 81_117 },
+  // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 223463 / 81476 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 223_467, maxGzip: 81_480 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1289,7 +1291,8 @@ const budgets = [
   // 220,274 / 42,656 -> 220,608 / 42,715 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 220604 / 42711 (over budget only) in the e2e build, the plus 4.
   // 220,608 / 42,715 + notes-batch2's one code point -> 220,615 / 42,715 (merge of main e13e40cb into world-news; re-measured below if over).
   // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_346, maxGzip: 42_661 },
+  // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 220676 / 42720 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_680, maxGzip: 42_724 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2756,7 +2759,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 385,486 / 450,214 / 458,672 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured first paint, the plus 4.
 // -> 385,503 / 450,231 / 458,685 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured first paint, the plus 4.
 // -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 384_614, en: 449_124, ja: 457_593 };
+// -> 385,516 / 450,244 / 458,698 world-news #639 over main 1e0a57ab. Measured first paint 385,512 / 450,240 / 458,694 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 385_516, en: 450_244, ja: 458_698 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
