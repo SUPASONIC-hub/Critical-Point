@@ -47,7 +47,7 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
+import { LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -307,7 +307,7 @@ export function normalizeSchema(value) {
   schema.relics = normalizeRelicIds(source.relics);
   // G3: LOCK shut on this board (the streak carried in already fills its cap); only ever written when true.
   if (source.lockShut === true) schema.lockShut = true;
-  // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took 1/LATE_BILL_SHARE of the heat; only ever written when true.
+  // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took LATE_BILL_KEEP of the heat; only ever written when true.
   if (source.lateBill === true) schema.lateBill = true;
   // G5 4막 학습된 벽: the band stood around the last cash's heat (`getTrainedBand`); only ever written when true.
   if (source.trained === true) schema.trained = true;
@@ -1337,7 +1337,7 @@ export function describeMutations(schema) {
       // What is printed, and nothing else: a verdict carries these objects.
       const { label, title } = MUTATIONS[id];
       // G5 2막 뒤늦은 청구서: the debt's line says the share the case billed.
-      const text = id === "heatDebt" && board.lateBill ? fill(mutationsCopy.rules.heatDebt.text, { share: LATE_BILL_SHARE, seconds: HEAT_DEBT_SECONDS }) : MUTATIONS[id].text;
+      const text = id === "heatDebt" && board.lateBill ? fill(mutationsCopy.lateBill.text, { seconds: HEAT_DEBT_SECONDS }) : MUTATIONS[id].text;
       return { id, label, title, text, ...(lifted?.(board) ? { ...remainder, lifted: true } : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
     });
 }
@@ -1887,7 +1887,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       const sink = hasRelic(relics, "heatSink");
       // G5 2막 뒤늦은 청구서: the case's twist bills more of the heat; HEAT SINK still wins.
       const bill = !sink && twistHasDevice(twist, "lateBill");
-      schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : bill ? LATE_BILL_SHARE : HEAT_DEBT_SHARE));
+      schema.startGauge = Math.round(bill ? gauge * LATE_BILL_KEEP : gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
       if (bill) schema.lateBill = true;
       schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");
@@ -2001,10 +2001,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const cause = outcome === "cash" ? "cash" : (window?.cause === "abandon" && window?.closedAs) || window?.cause || "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
-  // The chips the window was dealt and showed (`getTableSchema`: a week's, a
-  // case's or an act's rule laid over the run's board), not the run's bare board,
-  // which paid MERGER's ×1.5 and every chipsFactor as ×1 (#636, 11-20 hotfix): under
-  // the next rules only, so a row played on the old table is rechecked as it was paid.
+  // Under the next rules (RULES_MARK 5) the chips are paid as the window was
+  // dealt and showed them (`getTableSchema`: a week's, a case's or an act's rule
+  // laid over the run's board). Before, the run's bare board paid MERGER's ×1.5
+  // and every chipsFactor as ×1; rows of the older marks are re-checked as they were.
+  // G5 2막 (`getPaidChips`): the case's twist may thin a cash at 60 and over.
   const chips = card ? getPaidChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema, gauge, getCaseTwist(current, rules)) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);

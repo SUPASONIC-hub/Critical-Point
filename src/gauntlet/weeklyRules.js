@@ -29,7 +29,7 @@
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 import weekRulesCopy from "../copy/weekRules.js";
 import {
-  ALL_ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, LATE_BILL_CHIPS, LATE_BILL_SHARE, MERGER_CHIPS, MERGER_SHIFT, PASSED_DOWN_HARM, SCATTER_CHIPS, SCATTER_SPREAD,
+  ALL_ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, LATE_BILL_CHIPS, MERGER_CHIPS, MERGER_SHIFT, PASSED_DOWN_HARM, SCATTER_CHIPS, SCATTER_SPREAD,
   SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW,
 } from "./actTwists.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
@@ -129,7 +129,7 @@ function ruleValues() {
   const audit = fill(auditLine, W47_AUDIT);
   return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS,
     // G5's acts 1, 2, 4, 6 and 8 (actTwists.js).
-    downShare: INSURANCE_SHARE, downHarm: PASSED_DOWN_HARM, billHeat: HEAT_DEBT_GAUGE, billShare: LATE_BILL_SHARE, billChips: LATE_BILL_CHIPS,
+    downShare: INSURANCE_SHARE, downHarm: PASSED_DOWN_HARM, billHeat: HEAT_DEBT_GAUGE, billChips: LATE_BILL_CHIPS,
     trainedBelow: TRAINED_BELOW, trainedAbove: TRAINED_ABOVE, nameChips: SIGN_NAME_CHIPS, nameWall: SIGN_NAME_WALL, termsWall: SIGN_TERMS_WALL, termsChips: SIGN_TERMS_CHIPS };
 }
 function ruleWords(id) {
