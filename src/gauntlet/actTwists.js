@@ -25,12 +25,14 @@
  * are src/copy/weekRules.js `actTwists` (weeklyRules.js `getActTwist`).
  */
 
-export const MERGER_CHIPS = 1.5;
-export const MERGER_SHIFT = 4;
+// G10·G11a (11-20, 게임성 개선점): 합병 벽 −4 -> −3, 칩 ×1.5 -> ×1.35; 흩어진 자리 칩 ×1.15 -> ×1; 청문회 칩 ×1.25 -> ×1.2
+// (막별 심박 손 금고를 막 평균 ±15% 안으로).
+export const MERGER_CHIPS = 1.35;
+export const MERGER_SHIFT = 3;
 export const SCATTER_SPREAD = 4;
-export const SCATTER_CHIPS = 1.15;
+export const SCATTER_CHIPS = 1;
 export const HEARING_CLOCK = 0.7;
-export const HEARING_CHIPS = 1.25;
+export const HEARING_CHIPS = 1.2;
 
 /** The twist's numbers, in the catalogue's schema terms (weeklyRules.js `weekRuleOverlay`). */
 export const ACT_TWIST_RULES = Object.freeze({
@@ -59,7 +61,7 @@ export const ACT_TWIST_CASES = Object.freeze({ ...span(13, 18, "merger"), ...spa
  *   still leaves 1/`INSURANCE_SHARE` of its stake, and that hand's 사람 피해
  *   rises `PASSED_DOWN_HARM`. A held insurance tool goes first.
  * - 2막 「집념의 값」 (사건 10): 뒤늦은 청구서. HEAT DEBT carries
- *   1/`LATE_BILL_SHARE` of the heat, not 1/3; a cash under it pays every card's
+ *   `LATE_BILL_KEEP` of the heat, not 1/3; a cash under it pays every card's
  *   chips `LATE_BILL_CHIPS` times (11-20, gauntletEngine.js `getPaidChips`).
  * - 4막 「설계자」 (사건 20, 22, 23): 학습된 벽. After a cash at heat X the
  *   next board's band is [X - `TRAINED_BELOW`, X + `TRAINED_ABOVE`] within its
@@ -77,8 +79,9 @@ export const ACT_TWIST_CASES = Object.freeze({ ...span(13, 18, "merger"), ...spa
  */
 
 export const PASSED_DOWN_HARM = 3;
-export const LATE_BILL_SHARE = 2;
-export const LATE_BILL_CHIPS = 1.2;
+// G8 (11-20, 게임성 개선점 Q2 (1)): the debt carries 3/4 of the heat (was 1/2), and the chips under the line ×1.25 (was ×1.2).
+export const LATE_BILL_KEEP = 0.75;
+export const LATE_BILL_CHIPS = 1.25;
 export const TRAINED_BELOW = 10;
 export const TRAINED_ABOVE = 18;
 export const TRAINED_MIN_WIDTH = 34;

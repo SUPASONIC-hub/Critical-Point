@@ -7,6 +7,7 @@ import {
   canBreathe,
   createWindow,
   getBoardMark,
+  getBreathGauge,
   getFocusBonus,
   getLockCap,
   getWindowBand,
@@ -21,6 +22,8 @@ import {
 import { countAudit } from "../../src/gauntlet/auditRisk.js";
 import {
   BREATH_GAUGE,
+  BREATH_HOT_FROM,
+  BREATH_HOT_GAUGE,
   BREATH_WALL,
   countNarrows,
   EXPOSURE_FROM,
@@ -182,7 +185,13 @@ test("G7: 숨 고르기, once, on the board after a BUST and before its first pu
   assert.equal(canBreathe(createWindow({ schema: BASE_SCHEMA, seed: "g7" }), NEXT), false, "a fresh board has nothing to ease");
   const breathed = reduceWindow(win, { type: "BREATHE" }, NEXT);
   assert.equal(breathed.breathed, true);
-  assert.equal(breathed.gauge, Math.max(0, win.gauge - BREATH_GAUGE));
+  // G15 (11-20): a BUST at BREATH_HOT_FROM or over is eased BREATH_HOT_GAUGE, one under it BREATH_GAUGE.
+  assert.equal(after.bustHeat, 70);
+  assert.equal(getBreathGauge(win.schema), BREATH_HOT_GAUGE);
+  assert.equal(breathed.gauge, Math.max(0, win.gauge - BREATH_HOT_GAUGE));
+  const cool = createWindow({ schema: buildNextSchema({ outcome: "bust", cause: "push", gauge: BREATH_HOT_FROM - 1, pushes: 3, streak: 0, rules: NEXT }), seed: "g7" });
+  assert.equal(reduceWindow(cool, { type: "BREATHE" }, NEXT).gauge, Math.max(0, cool.gauge - BREATH_GAUGE));
+  assert.equal(buildNextSchema({ outcome: "bust", cause: "push", gauge: 70, pushes: 3, streak: 0, rules: OLD }).bustHeat, undefined, "the old table writes none");
   assert.equal(breathed.wall, win.wall + BREATH_WALL);
   assert.equal(breathed.elapsed, 2);
   assert.equal(reduceWindow(breathed, { type: "BREATHE" }, NEXT), breathed, "once");
@@ -200,4 +209,16 @@ test("the recheck plays a row under the rules its RULES_MARK says", () => {
   assert.equal(isNextOn(getRowRules("case10", {}, RULES_NEXT_MARK)), true);
   assert.equal(isNextOn(getRowRules("case10", {}, RULES_NEXT_MARK - 1)), false);
   assert.equal(getRowRules("case10", {}), getRowRules("case10", {}, undefined), "no mark: the page's own");
+});
+
+test("a rule's chips are paid as dealt: the window's board, not the run's bare one (11-20 hotfix)", async () => {
+  const engine = await import("../../src/gauntlet/gauntletEngine.js");
+  const card = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
+  for (const caseId of ["case15", "case09"]) {
+    const run = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId });
+    const board = engine.getTableSchema(run);
+    assert.ok(board.chipsScale > run.schema.chipsScale, `${caseId} deals thicker chips`);
+    const win = { ...engine.createWindow({ schema: board, seed: caseId }), status: "cashed", cause: "cash", gauge: 40, pushes: 2 };
+    assert.equal(engine.resolveWindow({ run, window: win, card }).verdict.chips, engine.getCardChips(card, board), caseId);
+  }
 });

@@ -1,6 +1,7 @@
 /**
  * The site's menu, at the head and the foot of every plain page: the game,
- * the pages about it (the guide, the case files, the cast, how we made it)
+ * the pages about it (the guide, the case files, the cast, how we made it,
+ * the notes)
  * and the five that were there before them (about, FAQ, contact and the two
  * policies), in the page's language, and at the head the page in the other
  * two languages. `renderDocumentPage` (scripts/legal-pages.mjs) prints it;
@@ -19,7 +20,14 @@
 const MENU_LANGUAGES = ["ko", "en", "ja"];
 
 /** The pages the menu lists after the game, in its order. Each is `/<kind>.html`, `/en/<kind>.html`, `/ja/<kind>.html`. */
-export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "faq", "contact", "privacy", "terms"];
+export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "notes/index", "faq", "contact", "privacy", "terms"];
+
+/**
+ * The notes (/notes/, scripts/content-pages/notes.mjs) are written in Korean
+ * only (owner's decision 2026-11-20, Q3 「1」): every language's menu links the
+ * one Korean list, and says so in its own words.
+ */
+export const isKoreanOnly = (kind) => String(kind).startsWith("notes/");
 
 /** The menu's words. `game` opens the game in the page's language. */
 export const MENU_LABELS = {
@@ -32,6 +40,7 @@ export const MENU_LABELS = {
     "cases/index": "사건 파일",
     characters: "인물",
     making: "만든 이야기",
+    "notes/index": "노트",
     faq: "FAQ",
     contact: "문의",
     privacy: "개인정보",
@@ -47,6 +56,7 @@ export const MENU_LABELS = {
     "cases/index": "Case Files",
     characters: "Characters",
     making: "How We Made It",
+    "notes/index": "Notes (in Korean)",
     faq: "FAQ",
     contact: "Contact",
     privacy: "Privacy",
@@ -62,6 +72,7 @@ export const MENU_LABELS = {
     "cases/index": "事件ファイル",
     characters: "登場人物",
     making: "制作の話",
+    "notes/index": "ノート(韓国語)",
     faq: "よくある質問",
     contact: "お問い合わせ",
     privacy: "プライバシー",
@@ -72,26 +83,28 @@ export const MENU_LABELS = {
 
 const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root, as legal-pages.mjs's `pagePath` writes it. */
-export const menuPath = (kind, language) => `${folderOf(language)}/${kind}.html`;
+export const menuPath = (kind, language) => `${isKoreanOnly(kind) ? "" : folderOf(language)}/${kind}.html`;
 /** The game in a language: `/`, `/en/`, `/ja/` (legal-pages.mjs `gamePath`). */
 const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /** The section a page belongs to: a case's page is under the case files, the weekly calendar under the guide. */
-const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : kind === "weekly" ? "guide" : kind);
+const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : isKoreanOnly(kind) ? "notes/index" : kind === "weekly" ? "guide" : kind);
 
 function menuLinks(kind, language) {
   const words = MENU_LABELS[language];
   const section = sectionOf(kind);
   return MENU_KINDS.map((item) => {
     const current = item === kind ? ' aria-current="page"' : item === section ? ' aria-current="true"' : "";
-    return `<a href="${menuPath(item, language)}"${current}>${words[item]}</a>\n`;
+    const korean = isKoreanOnly(item) && language !== "ko" ? ' hreflang="ko"' : "";
+    return `<a href="${menuPath(item, language)}"${korean}${current}>${words[item]}</a>\n`;
   }).join("");
 }
 
 /** The head's menu: the game, every page in the page's language, and this page in the other two. */
 export function siteHeaderNav({ kind, language }) {
   const words = MENU_LABELS[language];
-  const switches = MENU_LANGUAGES.filter((code) => code !== language)
+  // A Korean-only page has no other language to switch to.
+  const switches = MENU_LANGUAGES.filter((code) => code !== language && !isKoreanOnly(kind))
     .map((other) => `<a href="${menuPath(kind, other)}" hreflang="${other}" lang="${other}">${MENU_LABELS[other].name}</a>\n`)
     .join("");
   return `<nav aria-label="${words.label}">

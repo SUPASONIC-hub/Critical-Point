@@ -66,6 +66,9 @@ export default {
       text: "The result of charging EXPOSE LOCK again and again. Seals open earlier, and with more, even a face-down hand can’t hide.",
     },
   },
+  lateBill: {
+    text: "The price of committing at a high multiplier. You start carrying 3/4 of this Heat, and lose {seconds} seconds.",
+  },
   lifted: {
     blackout: {
       title: "The Wall moved in",

@@ -8,10 +8,11 @@
  *   npm run sitemap:dates
  *   npm run sitemap:dates -- --write
  *
- * A page left stale is not an error: the build dates it by its own day
- * (`sitemapLastmods`, scripts/site-pages.mjs), as every page was dated until
- * 11-16. Writing the file after a page's words change makes the next deploys
- * keep that day instead of moving it each time.
+ * A page is hashed by its words (`pageFingerprints`, scripts/site-pages.mjs),
+ * not by the menu and markup every page shares. A page left stale would be
+ * dated by each build's day, which is how all 198 were by 11-19; since 11-20
+ * tests/unit/sitemap-dates.test.mjs fails until the file is written, so a pull
+ * request that changes a page's words runs this with `--write`.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

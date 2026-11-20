@@ -47,7 +47,7 @@ export default {
     },
     scattered: {
       title: "Scattered Desks",
-      text: "This Case, the Wall band is {spread} Heat wider on each side, and every card’s chips are ×{scatterChips}.",
+      text: "This Case, the Wall band is {spread} Heat wider on each side. The Wall could stand anywhere in a wider stretch.",
       world: "The lab’s people are scattered across the group, and at every desk the Wall stands somewhere else.",
     },
     hearing: {
@@ -63,7 +63,7 @@ export default {
     },
     lateBill: {
       title: "The Late Bill",
-      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 1/{billShare} of that Heat. Commit under it and every card’s chips are ×{billChips}.",
+      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 3/4 of that Heat. Commit under it and every card’s chips are ×{billChips}.",
       world: "The ten days someone carried alone are billed the day after the win.",
     },
     trainedWall: {

@@ -188,6 +188,8 @@ export function GauntletStage({
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount }); // G1~G7: the next rules' readings (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
+  // G17: one cash under the audit's line from its limit, the HUD says so in words (the count alone was missed).
+  const auditWarn = audit?.atRisk && audit.ifCash > 0 ? <small className="gx-audit-warn" data-testid="audit-warn"> {say.auditWarn}</small> : null;
   // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
   const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(
@@ -535,7 +537,7 @@ export function GauntletStage({
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
               {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>{auditWarn}</span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
@@ -562,7 +564,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b>{auditWarn}</span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
@@ -620,6 +622,8 @@ export function GauntletStage({
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
             {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
+            {/* G10: where the band stood before the case's rule pulled it closer (합병 and the like): the rule seen on the bar, not only in the panel. */}
+            {schema.wallMin < (run?.schema?.wallMin ?? 0) && <span className="gx-gauge-mark" data-testid="gauge-pulled" style={{ left: `${run.schema.wallMin}%` }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -630,7 +634,12 @@ export function GauntletStage({
             <span aria-hidden="true">
               {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice}
+              board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
+            {breathable && win.schema.bustHeat > 0 && (
+              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</span>
+            )}
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
               aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.

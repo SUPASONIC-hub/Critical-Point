@@ -30,6 +30,7 @@ export default {
     auditCaught: " 監査で発覚: 金庫へ行くはずの ",
     auditOf: " のうち",
     auditTaken: " を回収 · 金庫 ",
+    auditWhy: "なぜ: 監査ラインの下で確定した勝負が、監査の欄を上限まで埋めた。もう一度押してラインの上で確定すると欄は減る。",
     toVault: " 金庫へ移動 ",
     vault: " · 金庫",
     staked: "懸かっている賭け金 ",

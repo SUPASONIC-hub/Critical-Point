@@ -148,6 +148,33 @@ const introCopy = {
   },
   // A case card's status chip (introViewModel.js, getCaseStatusText).
   status: { playing: "진행 중", open: "시작 가능", complete: "완료됨", locked: "이전 사건 필요" },
+  // The reading section under the start screen (HomeReading.jsx, scripts/static-shell.mjs):
+  // what the game is, every kind of page on the site, and the newest notes. AdSense
+  // 2차 분석 (2026-11-20): the start page showed nothing a reader could read.
+  reading: {
+    title: "읽을거리",
+    intro: [
+      "임계점은 브라우저에서 바로 하는 무료 금융 미스터리 게임입니다. 당신은 3년 전 대출 한 건에 혼자 반대 의견을 썼다가 지하 분석실로 밀려난 분석관이 되어, 그 대출에서 시작된 쉰다섯 개의 사건을 차례로 맡습니다.",
+      "사건마다 장면을 읽고, 시간이 줄어드는 테이블에서 얼마나 걸지 정합니다. 걸수록 보상이 커지지만 보이지 않는 선을 넘으면 그 판을 잃고, 오래 붙든 조건은 다음 사건의 압박으로 돌아옵니다. 어려운 금융 용어는 처음 나올 때마다 괄호로 풀었고, 출퇴근길 같은 짧은 틈에 끊어서 하다가 다른 기기에서 이어 할 수 있습니다.",
+      "아래에서 게임 방법과 사건 파일, 인물 소개, 그리고 우리 두 사람이 직접 쓰는 노트를 읽을 수 있습니다.",
+    ],
+    menuLabel: "사이트 메뉴",
+    menuTitle: "사이트 안내",
+    items: {
+      guide: { label: "게임 방법", text: "테이블 규칙과 자원, 판돈과 BUST까지 한 쪽에" },
+      "cases/index": { label: "사건 파일", text: "프롤로그부터 최종 사건까지, 사건마다 첫 장면과 질문" },
+      characters: { label: "인물", text: "각자 처음 등장할 때의 모습으로 만나는 사람들" },
+      making: { label: "만든 이야기", text: "질문 하나가 쉰다섯 사건의 게임이 되기까지" },
+      "notes/index": { label: "노트", text: "금융 이야기와 설계 기록, 우리가 직접 쓰는 글" },
+      about: { label: "게임 소개", text: "어떤 게임인지 한눈에" },
+      faq: { label: "자주 묻는 질문", text: "저장, 랭킹, 언어, 데이터에 대한 질문" },
+      contact: { label: "문의", text: "버그 제보와 의견 보내기" },
+      policies: { label: "방침·약관", text: "개인정보 처리와 이용 조건" },
+    },
+    notesTitle: "최근 노트",
+    notesAll: "노트 전체 보기",
+    notesEmpty: "첫 노트를 준비하고 있습니다.",
+  },
   legal: { about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관" },
   opening: {
     firstCase: "첫 사건",

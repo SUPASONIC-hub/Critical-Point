@@ -47,9 +47,9 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
-import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
-import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
+import { COLD_BLOOD_WALL, NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
+import { BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -307,8 +307,10 @@ export function normalizeSchema(value) {
   schema.relics = normalizeRelicIds(source.relics);
   // G3: LOCK shut on this board (the streak carried in already fills its cap); only ever written when true.
   if (source.lockShut === true) schema.lockShut = true;
-  // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took 1/LATE_BILL_SHARE of the heat; only ever written when true.
+  // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took LATE_BILL_KEEP of the heat; only ever written when true.
   if (source.lateBill === true) schema.lateBill = true;
+  // G15: the heat the BUST before this board went at, under the next rules; only ever written when set.
+  if (Number.isFinite(source.bustHeat) && source.bustHeat > 0) schema.bustHeat = clamp(Math.round(source.bustHeat), 0, GAUGE_MAX);
   // G5 4막 학습된 벽: the band stood around the last cash's heat (`getTrainedBand`); only ever written when true.
   if (source.trained === true) schema.trained = true;
   // G5 6막 진술 고정: the stance the case's first cash put on record; only ever written when set.
@@ -917,6 +919,9 @@ function readWindowBand(window, reach) {
   return { wallMin: near, wallMax: Math.min(near + narrow, first.wallMax), scouted: true, narrowed: true };
 }
 
+/** G7·G15: how far 숨 고르기 cools a board: BREATH_HOT_GAUGE after a BUST at BREATH_HOT_FROM or over, BREATH_GAUGE otherwise. */
+export const getBreathGauge = (schema) => (Number(schema?.bustHeat) >= BREATH_HOT_FROM ? BREATH_HOT_GAUGE : BREATH_GAUGE);
+
 /** G7: whether 숨 고르기 can still be pressed on this window. */
 export function canBreathe(window, rules = ALL_RULES) {
   return Boolean(window) && window.status === "live" && isNextOn(rules) && window.breathed !== true && !(window.pushes > 0) && window.scouted !== true
@@ -973,7 +978,8 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       // the first push and the first look. BREATH_SECONDS of clock; the heat comes
       // down BREATH_GAUGE and the wall goes back BREATH_WALL (AFTERSHOCK one step).
       if (!canBreathe(window, rules)) return window;
-      return advanceClock({ ...window, breathed: true, gauge: Math.max(0, window.gauge - BREATH_GAUGE), wall: Math.min(GAUGE_MAX, window.wall + BREATH_WALL) }, BREATH_SECONDS);
+      // G15: after a BUST at BREATH_HOT_FROM or over (`bustHeat` on the board), the heat comes down BREATH_HOT_GAUGE.
+      return advanceClock({ ...window, breathed: true, gauge: Math.max(0, window.gauge - getBreathGauge(window.schema)), wall: Math.min(GAUGE_MAX, window.wall + BREATH_WALL) }, BREATH_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -1337,7 +1343,7 @@ export function describeMutations(schema) {
       // What is printed, and nothing else: a verdict carries these objects.
       const { label, title } = MUTATIONS[id];
       // G5 2막 뒤늦은 청구서: the debt's line says the share the case billed.
-      const text = id === "heatDebt" && board.lateBill ? fill(mutationsCopy.rules.heatDebt.text, { share: LATE_BILL_SHARE, seconds: HEAT_DEBT_SECONDS }) : MUTATIONS[id].text;
+      const text = id === "heatDebt" && board.lateBill ? fill(mutationsCopy.lateBill.text, { seconds: HEAT_DEBT_SECONDS }) : MUTATIONS[id].text;
       return { id, label, title, text, ...(lifted?.(board) ? { ...remainder, lifted: true } : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
     });
 }
@@ -1356,7 +1362,14 @@ export function applyRelics(schema, relics = [], rules = ALL_RULES) {
   for (const id of pending) {
     if (id === "stethoscope") next.sedated = false;
     // G4: under the next rules COLD BLOOD waives AFTERSHOCK outright (relicsNext.js).
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = isNextOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) {
+      next.startGauge = isNextOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+      // G12: and its wall stands COLD_BLOOD_WALL further.
+      if (isNextOn(rules)) {
+        next.wallMin += COLD_BLOOD_WALL;
+        next.wallMax += COLD_BLOOD_WALL;
+      }
+    }
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
@@ -1864,6 +1877,8 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   if (caseClosed) return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
+    // G15: where this BUST went, for 숨 고르기 on the board it deals (`getBreathGauge`).
+    if (isNextOn(rules) && rules.has("aftershock")) schema.bustHeat = Math.round(gauge);
     if (rules.has("blackout")) {
       schema.faceDown = true;
       schema.wallMin -= BLACKOUT_WALL_SHIFT;
@@ -1887,7 +1902,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       const sink = hasRelic(relics, "heatSink");
       // G5 2막 뒤늦은 청구서: the case's twist bills more of the heat; HEAT SINK still wins.
       const bill = !sink && twistHasDevice(twist, "lateBill");
-      schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : bill ? LATE_BILL_SHARE : HEAT_DEBT_SHARE));
+      schema.startGauge = Math.round(bill ? gauge * LATE_BILL_KEEP : gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
       if (bill) schema.lateBill = true;
       schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");
@@ -2001,10 +2016,12 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const cause = outcome === "cash" ? "cash" : (window?.cause === "abandon" && window?.closedAs) || window?.cause || "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
-  // The chips the window was dealt and showed (`getTableSchema`: a week's, a
-  // case's or an act's rule laid over the run's board), not the run's bare board:
-  // the bare board paid MERGER's ×1.5 and every chipsFactor as ×1.
-  const chips = card ? getPaidChips(card, window?.schema ?? current.schema, gauge, getCaseTwist(current, rules)) : 0;
+  // Under the next rules (RULES_MARK 5) the chips are paid as the window was
+  // dealt and showed them (`getTableSchema`: a week's, a case's or an act's rule
+  // laid over the run's board). Before, the run's bare board paid MERGER's ×1.5
+  // and every chipsFactor as ×1; rows of the older marks are re-checked as they were.
+  // G5 2막 (`getPaidChips`): the case's twist may thin a cash at 60 and over.
+  const chips = card ? getPaidChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema, gauge, getCaseTwist(current, rules)) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
@@ -2466,13 +2483,15 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 5 (2026-11-20, the
+ * The mark of a case closed at the table of RULES_MARK 6 (2026-11-25: G5's
+ * other acts, 1, 2, 4, 6 and 8, each a table twist of its own; the user's
+ * 「전부 1」 of 11-19). 5 was 2026-11-20, the
  * user's answer 「1」 of 11-19: G1 to G7, the next table rules of
  * src/gauntlet/rulesNext.js, and N26, #591: 사건 09, 11, 14 and 16 deal a rule
  * of their own for that case in a season with no weekly rule, so the same play
  * scores differently). It ships before the wipe of 2026-11-30, which keeps its
  * announced day: until then the server still ranks seasons from 4 up, and
- * that wipe asks for 5 (*_ranking_reset_1130.sql).
+ * that wipe asks for 6 (*_ranking_reset_1130.sql).
  * 4 was C-3 and C-4 (the user's answers of 2026-10-25: the logic streak held
  * on the card's direction, 사람 or 자리, and OVERCLOCK, the audit and the
  * links opening one a case in 사건 01 to 03), 3 B3's audit and B2's links as
@@ -2487,7 +2506,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 5;
+export const RULES_MARK = 6;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

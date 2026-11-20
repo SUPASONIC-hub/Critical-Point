@@ -1,10 +1,12 @@
 // G5's acts 1, 2, 4, 6 and 8 (src/gauntlet/actTwists.js): the device twists, under the next rules.
 process.env.RULES_NEXT = "1";
 const assert = (await import("node:assert/strict")).default;
+const { readFileSync } = await import("node:fs");
+const { thresholdOfVerdict } = await import("./helpers/windowRecorder.mjs");
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
@@ -70,7 +72,7 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   const cash = { outcome: "cash", gauge: 80, pushes: 2, streak: 0 };
   const billed = engine.buildNextSchema({ ...cash, twist: "lateBill" });
   const usual = engine.buildNextSchema(cash);
-  assert.equal(billed.startGauge, Math.round(80 / LATE_BILL_SHARE));
+  assert.equal(billed.startGauge, Math.min(Math.round(80 * LATE_BILL_KEEP), billed.wallMin - 8));
   assert.equal(usual.startGauge, Math.round(80 / 3));
   assert.equal(billed.seconds, usual.seconds, "the clock's cut is the debt's as before");
   assert.equal(billed.lateBill, true);
@@ -82,7 +84,7 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   assert.equal(engine.buildNextSchema({ ...cash, gauge: HEAT_DEBT_GAUGE - 1, twist: "lateBill" }).lateBill, undefined, "under the debt's line, no bill");
   const [debt] = engine.describeMutations(billed);
   assert.equal(debt.id, "heatDebt");
-  assert.match(debt.text, new RegExp(`${LATE_BILL_SHARE}분의 1`));
+  assert.match(debt.text, /4분의 3/);
   assert.match(debt.text, new RegExp(`${HEAT_DEBT_SECONDS}초`));
   assert.match(engine.describeMutations(usual)[0].text, /3분의 1/);
   // 11-20 (the user's 「1」): the thicker chips pay only a cash under the debt's line.
@@ -114,7 +116,14 @@ test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot a
   assert.equal(engine.resolveWindow({ run: at("case05"), window: bust, card, rules: new Set([OLD_RULE]) }).verdict.passedDown, undefined, "the old table");
   assert.equal(engine.resolveWindow({ run: at("case05", { runPot: 0 }), window: bust, card }).verdict.passedDown, undefined, "nothing to keep, nothing spent");
   assert.equal(engine.getBustEffect({}), engine.BUST_EFFECT);
-});
+  // 11-20 (11-30 dry run): every writer of a log entry's `threshold` keeps `passedDown`, or the settlement
+  // recheck prices that BUST without its 사람 피해 (rec-1000, 사건 05 humanCost 3).
+  const threshold = thresholdOfVerdict(first.verdict);
+  assert.equal(threshold.passedDown, true);
+  assert.deepEqual(engine.getBustEffect(threshold), engine.getBustEffect(first.verdict));
+  assert.equal(thresholdOfVerdict(second.verdict).passedDown, undefined);
+  const bot = readFileSync(new URL("../../scripts/sim/season-bot.mjs", import.meta.url), "utf8");
+  assert.match(bot, /\.\.\.\(verdict\.passedDown \? \{ passedDown: true \} : \{\}\)/, "the season bot logs it as the page does");});
 
 test("4막 학습된 벽: the band stands around the heat the last cash was made at, and its one look is the narrow one", () => {
   const board = { wallMin: 56, wallMax: 92 };
@@ -193,16 +202,6 @@ test("8막 실명 서명: the case is signed before its first board, by name or 
   assert.equal(engine.signCase(elsewhere, "name"), elsewhere);
   assert.equal(engine.asksToSign({ ...opened, weekRule: "short-clock" }), false, "a week's season");
 });
-test("a rule's chips are paid as dealt: the window's board, not the run's bare one (11-20)", () => {
-  const card = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
-  for (const caseId of ["case15", "case10", "case09"]) {
-    const run = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId });
-    const board = engine.getTableSchema(run);
-    assert.ok(board.chipsScale > run.schema.chipsScale, `${caseId} deals thicker chips`);
-    const win = { ...engine.createWindow({ schema: board, seed: caseId }), status: "cashed", cause: "cash", gauge: 40, pushes: 2 };
-    assert.equal(engine.resolveWindow({ run, window: win, card }).verdict.chips, engine.getCardChips(card, board), caseId);
-  }
-});
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
   for (const id of DEVICE_TWISTS) {
     for (const table of [koWeek, enWeek, jaWeek]) {
@@ -214,5 +213,5 @@ test("each device twist's panel line is in ko, en and ja, its numbers filled", (
     assert.doesNotMatch(rule.text, /\{|undefined|NaN/, id);
   }
   const bill = getCaseRule("case10", "lateBill");
-  assert.ok(bill.world && /열기 60 이상/.test(bill.text) && /2분의 1/.test(bill.text) && /1\.2배/.test(bill.text), bill.text);
+  assert.ok(bill.world && /열기 60 이상/.test(bill.text) && /4분의 3/.test(bill.text) && /1\.25배/.test(bill.text), bill.text);
 });

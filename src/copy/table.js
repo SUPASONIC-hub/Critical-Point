@@ -35,6 +35,8 @@ const tableCopy = {
     signOpen: "결재 판, 판돈 {chips}배, 벽 한 칸 보임: 벽은 {cell} 이상.",
     signCell: "벽 {cell}부터",
     breath: "숨 고르기",
+    // G15: beside 숨 고르기, where the BUST before this board went.
+    breathBust: "지난 판 {heat}에서 터짐",
     breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
     breathDone: "숨을 골랐다. 열기 {gauge} 내려 {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",
@@ -52,6 +54,8 @@ const tableCopy = {
     streak: "연속",
     best: "최고",
     audit: "감사",
+    // G17: beside the count, one cash under the line from its limit.
+    auditWarn: "이번에 낮게 끊으면 감사",
     links: "연결",
     lockCap: "상한",
     lockMultiplier: "배율",

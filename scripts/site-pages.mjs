@@ -10,6 +10,7 @@ import { localizeStaticShell } from "./static-shell.mjs";
 import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
 import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
+import { noteKinds, noteLastmod, notesDay, renderNotePages } from "./content-pages/notes.mjs";
 import { aboutShowcase } from "./content-pages/about-showcase.mjs";
 import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
@@ -866,13 +867,19 @@ export function withAbsoluteSiteLinks(html, origin) {
 }
 
 /**
- * Every plain page the build writes, the policy's six, these nine and the content pages (scripts/content-pages/pages.mjs), keyed by path from the root without its slash.
+ * Every plain page the build writes, the policy's six, these nine, the content pages (scripts/content-pages/pages.mjs) and the notes out by `day`
+ * (scripts/content-pages/notes.mjs; `notesDay`, today in Seoul, by default), keyed by path from the root without its slash.
  * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS, `adStage` in legal-pages.mjs) are the build's two switches: ANALYTICS_POLICY,
  * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS. The content pages say nothing of ads.
  */
-export function renderStaticPages(origin = "", { analytics = null, ads = false } = {}) {
+export function renderStaticPages(origin = "", { analytics = null, ads = false, day = notesDay() } = {}) {
   // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
-  const pages = { ...renderLegalPages({ analytics, ads }), ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }), ...renderContentPages({ analytics }) };
+  const pages = {
+    ...renderLegalPages({ analytics, ads }),
+    ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }),
+    ...renderContentPages({ analytics }),
+    ...renderNotePages({ analytics, day }),
+  };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
 
@@ -891,19 +898,44 @@ export function robotsTxt(origin = "") {
  * each language (`/`, `/en/`, `/ja/`, then `/about.html`, `/en/about.html`
  * ...). Every entry names its three languages and x-default (the Korean).
  * Until 11-03 the start page was one entry, its English and Japanese
- * `/?lang=` addresses named only as its alternates.
+ * `/?lang=` addresses named only as its alternates. Last, the notes out by
+ * `day`, in Korean only: each names itself as its one language and x-default.
  */
-export function sitemapEntries() {
+export function sitemapEntries(day = notesDay()) {
   const entries = (pathOf) =>
     PAGE_LANGUAGES.map((language) => ({ loc: pathOf(language), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pathOf(code)])) }));
-  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language)))];
+  const notes = noteKinds(day).map((kind) => ({ loc: pagePath(kind, "ko"), alternates: { ko: pagePath(kind, "ko") } }));
+  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language))), ...notes];
 }
+
+/** A note's address is dated by the note itself (src/notes/noteIndex.js), not by a hash. */
+const isNoteAddress = (loc) => loc.startsWith("/notes/");
+
+/**
+ * A plain page's `<main>`: the page without the head, the menu and the foot
+ * every page shares.
+ */
+export function mainOf(html) {
+  const main = /<main id="main"[^>]*>([\s\S]*?)<\/main>/.exec(String(html))?.[1];
+  if (main === undefined) throw new Error("sitemap: a plain page without <main id=\"main\">");
+  return main;
+}
+
+/**
+ * What markup says, for a hash: its words, tags out, spaces folded. Until
+ * 11-20 the whole page was hashed, so a change to the shared menu, the sheet
+ * or the hero's markup re-dated all 198 pages at once; nobody rewrote
+ * scripts/sitemap-dates.json after each such change, and every lastmod fell
+ * back to the build's day (AdSense 2차 분석, 11-20). A page is now dated by
+ * its words changing, and nothing else.
+ */
+export const wordsOf = (html) => String(html).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
 /**
  * Each sitemap address's content, as a short hash: what lastmod is dated by
  * (scripts/sitemap-dates.json, written by `npm run sitemap:dates -- --write`).
- * A plain page is its whole page as a build without Google's tag or the ads
- * writes it; a start page is its words (START_PAGE and its no-script text),
+ * A plain page is the words of its `<main>` as a build without Google's tag
+ * or the ads writes it (`mainOf`, `wordsOf`); a start page is its words (START_PAGE and its no-script text's),
  * since the rest of index.html is scripts and styles a release changes every
  * week. Until 11-16 every entry carried the build's day, so each deploy told a
  * crawler that all of them had changed (SEO 점검 11-03, 낮음 6).
@@ -913,10 +945,11 @@ export function pageFingerprints() {
   const plain = renderStaticPages("");
   const prints = {};
   for (const { loc } of sitemapEntries()) {
+    if (isNoteAddress(loc)) continue;
     const language = PAGE_LANGUAGES.find((code) => gamePath(code) === loc);
-    const text = language ? JSON.stringify([START_PAGE[language], startNoscript(language)]) : plain[loc.slice(1)];
-    if (text === undefined) throw new Error(`sitemap: no page is written at ${loc}`);
-    prints[loc] = hash(text);
+    const page = plain[loc.slice(1)];
+    if (!language && page === undefined) throw new Error(`sitemap: no page is written at ${loc}`);
+    prints[loc] = hash(language ? JSON.stringify([START_PAGE[language], wordsOf(startNoscript(language))]) : wordsOf(mainOf(page)));
   }
   return prints;
 }
@@ -925,9 +958,11 @@ export function pageFingerprints() {
  * The day each address last changed: its entry in `dates` (`{ loc: { hash,
  * date } }`) while the page still hashes the same, else `date`, the build's
  * day -- a page changed since the file was written is dated as changed now.
+ * A note is dated by its own day, and the notes list by its newest note's.
  */
-export function sitemapLastmods({ date, dates = {}, prints = pageFingerprints() }) {
-  return Object.fromEntries(Object.entries(prints).map(([loc, hash]) => [loc, dates[loc]?.hash === hash ? dates[loc].date : date]));
+export function sitemapLastmods({ date, dates = {}, prints = pageFingerprints(), notes = sitemapEntries(date).filter(({ loc }) => isNoteAddress(loc)) }) {
+  const noteDays = notes.map(({ loc }) => [loc, noteLastmod(loc.slice(1, -".html".length), date) ?? date]);
+  return { ...Object.fromEntries(Object.entries(prints).map(([loc, hash]) => [loc, dates[loc]?.hash === hash ? dates[loc].date : date])), ...Object.fromEntries(noteDays) };
 }
 
 /**
@@ -940,7 +975,7 @@ export function sitemapXml({ origin = "", date, dates = null }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) throw new Error(`sitemap date must be YYYY-MM-DD, got ${date}`);
   const lastmod = dates ? sitemapLastmods({ date, dates }) : {};
   const at = (path) => escapeHtml(`${origin}${path}`);
-  const urls = sitemapEntries().map(({ loc, alternates }) => {
+  const urls = sitemapEntries(date).map(({ loc, alternates }) => {
     const links = [...Object.entries(alternates), ["x-default", alternates.ko]]
       .map(([code, path]) => `    <xhtml:link rel="alternate" hreflang="${code}" href="${at(path)}"/>\n`)
       .join("");
