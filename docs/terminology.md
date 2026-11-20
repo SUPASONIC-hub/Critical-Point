@@ -62,6 +62,9 @@ what the copy actually says today.
 | LOCK 닫힘 | LOCK shut | LOCK停止 | 판 규칙 5 (G3) |
 | 이번 사건만 | This case only | この事件だけ | N26. 사건 09·11·14·16과 막 비틀기의 패널 |
 | 막 비틀기: 합병 / 흩어진 자리 / 청문회 | The Merger / Scattered Desks / The Hearing | 合併 / 散らばった席 / 公聴会 | 판 규칙 5 (G5). 3·5·7막 |
+| 막 비틀기: 떠넘겨진 손실 / 뒤늦은 청구서 / 학습된 벽 / 진술 고정 / 실명 서명 | Passed Down / The Late Bill / The Trained Wall / On the Record / Signed by Name | 押しつけられた損失 / 遅れてきた請求書 / 学習された壁 / 供述の固定 / 実名の署名 | 판 규칙 6 (G5). 1·2·4·6·8막 |
+| 서명란: 이름만 쓴다 / 조건을 단다 | The signature line: Name only / With conditions | 署名欄: 名前だけ書く / 条件をつける | 판 규칙 6 (G5 8막). 고르지 않으면 조건을 단다 |
+| 조서에 남은 자세 | On record until the Case ends | 調書に残った構え | 판 규칙 6 (G5 6막). 자세 줄의 고정 표시 |
 | 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
 
 ## People (prologue 01 to case 07)

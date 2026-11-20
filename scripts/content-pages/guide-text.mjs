@@ -1,4 +1,4 @@
-/** How-to-play guide body, Korean/English/Japanese (scripts/content-pages/pages.mjs renders it). Every rule and number read from src/gauntlet and src/copy on 2026-11-09; the table rules of RULES_MARK 5 (G1~G7, N26) added 2026-11-20. */
+/** How-to-play guide body, Korean/English/Japanese (scripts/content-pages/pages.mjs renders it). Every rule and number read from src/gauntlet and src/copy on 2026-11-09; the table rules of RULES_MARK 5 (G1~G7, N26) added 2026-11-20, and G5's acts 1, 2, 4, 6 and 8 (RULES_MARK 6, src/gauntlet/actTwists.js) on 2026-11-25. */
 
 export const GUIDE_DESCRIPTION = {
   ko: "임계점의 테이블 규칙을 실제 수치로 풀어 쓴 안내서입니다. 열기와 벽, 심박, 다음 판을 바꾸는 규칙, 논리 콤보, 도구, 버스트 점수와 리그를 설명합니다.",
@@ -80,6 +80,15 @@ export const GUIDE_BODY = {
 </ul>
 <p>시즌은 시작한 주의 규칙을 끝까지 지니고, 따로 순위가 쌓입니다. 스토리 모드에는 붙지 않습니다.</p>
 <p><strong>이번 사건만.</strong> 몇몇 사건은 그 사건 동안만 규칙이 하나 섭니다. 사건 09는 SHORT CLOCK, 11은 NEAR WALL, 14는 HEAVY FRACTURE, 16은 CRISIS WEEK입니다. 3막(사건 13~18)은 「합병」으로 칩 1.5배에 벽 구간이 열기 4 앞당겨지고, 5막(사건 25~30)은 「흩어진 자리」로 벽 구간이 양쪽으로 4씩 넓어지고 칩이 1.15배, 7막(사건 37~42)은 「청문회」로 판마다 시간이 30% 짧고 칩이 1.25배입니다. 사건 14·16은 그 사건의 규칙이 막의 규칙보다 먼저입니다. 이번 주의 규칙으로 시작한 시즌과 스토리 모드에는 이 규칙들이 없습니다.</p>
+<p><strong>나머지 막의 규칙.</strong> 우리는 1·2·4·6·8막에도 그 막의 이야기를 판의 규칙 하나로 옮겼습니다. 이 다섯은 판이 닫힐 때 내가 한 일을 읽으니, 이번 판만이 아니라 다음 판까지 생각하고 확정하십시오. 브리핑의 「이번 사건만」 패널에 그 사건의 규칙이 나옵니다.</p>
+<dl>
+<dt>떠넘겨진 손실 (1막, 사건 04~06)</dt><dd>판돈이 걸린 첫 BUST에도 판돈의 3분의 1이 남습니다. 대신 그 판의 사람 피해가 3 더 오릅니다. 보험을 들었다면 보험이 먼저 쓰이고, 둘을 합쳐 한 사건에 한 번만 지켜 줍니다.</dd>
+<dt>뒤늦은 청구서 (2막, 사건 10)</dt><dd>열기 60 이상에서 확정하면 HEAT DEBT가 열기의 3분의 1이 아니라 2분의 1을 안고 다음 판을 시작하게 합니다(방열판을 들었다면 방열판의 값). 60 밑에서 확정하면 모든 카드의 칩이 1.2배입니다. 크게 확정할지, 깨끗하게 챙길지를 고르는 사건입니다.</dd>
+<dt>학습된 벽 (4막, 사건 20·22·23)</dt><dd>판이 내가 확정한 열기를 배웁니다. 다음 판의 벽 구간은 그 열기보다 10 아래부터 18 위까지(폭은 34 이상)로 서되, 구간의 가운데가 원래 구간의 가운데보다 아래로 내려가지는 않습니다. 이렇게 선 판의 조회는 처음부터 14칸으로 좁히고, 한 번뿐입니다. BUST 다음 판은 평소 구간입니다.</dd>
+<dt>진술 고정 (6막, 사건 32~35)</dt><dd>사건에서 처음 확정한 자세가 사건 끝까지 남고 바꿀 수 없습니다. 대신 확정할 때마다 충전이 모자라도 그 자세가 다음 판으로 이어집니다. 시즌 숙련은 평소처럼 충전 70 이상의 확정만 셉니다.</dd>
+<dt>실명 서명 (8막, 사건 44·46·48·49)</dt><dd>첫 판 전에 브리핑에서 서명 방식을 고릅니다. 「이름만 쓴다」는 모든 카드의 칩이 1.25배이고 벽 구간이 2 앞당겨지며, 「조건을 단다」는 벽 구간이 3 물러서고 칩이 0.9배입니다. 고르지 않으면 조건을 단 것으로 칩니다.</dd>
+</dl>
+<p>이 다섯 규칙도 이번 주의 규칙으로 시작한 시즌과 스토리 모드에는 없습니다.</p>
 <p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
 
 <h2>리포트와 버스트 점수</h2>
@@ -201,6 +210,15 @@ export const GUIDE_BODY = {
 </ul>
 <p>A season keeps the rule of the week it started in until it ends, on a ranking of its own. Story Mode never gets one.</p>
 <p><strong>This case only.</strong> Some cases set a rule for themselves alone: Case 09 SHORT CLOCK, 11 NEAR WALL, 14 HEAVY FRACTURE and 16 CRISIS WEEK. Act 3 (Cases 13 to 18) is “The Merger”, chips ×1.5 with the Wall band 4 Heat earlier; Act 5 (Cases 25 to 30) is “Scattered Desks”, the Wall band 4 wider on each side with chips ×1.15; Act 7 (Cases 37 to 42) is “The Hearing”, 30% less time each hand with chips ×1.25. In Cases 14 and 16 the case’s own rule comes before the act’s. A season started with the Rule of the Week, and Story Mode, get none of these.</p>
+<p><strong>The other acts’ rules.</strong> We gave Acts 1, 2, 4, 6 and 8 a table rule of their own too, each taken from its act’s story. These five read what you did when a hand closes, so commit with the next hand in mind, not only this one. The briefing’s “This case only” panel shows the case’s rule.</p>
+<dl>
+<dt>Passed Down (Act 1, Cases 04 to 06)</dt><dd>The first BUST with a stake on it still leaves a third of the stake. In return, that hand’s Human cost goes up by 3 more. If you hold Insurance it goes first, and the two together save a case only once.</dd>
+<dt>The Late Bill (Act 2, Case 10)</dt><dd>Commit at Heat 60 or more and HEAT DEBT starts the next hand with half of that Heat, not a third (Heat Sink’s own share if you hold it). Commit under 60 and every card’s chips are ×1.2. The case asks whether you commit big or bank clean.</dd>
+<dt>The Trained Wall (Act 4, Cases 20, 22 and 23)</dt><dd>The table learns the Heat you commit at. On the next hand the Wall band stands from 10 below that Heat to 18 above it (at least 34 wide), but its middle never sits lower than the middle of its usual band. On such a hand, Scout narrows straight to 14 wide, once. The hand after a BUST has the usual band.</dd>
+<dt>On the Record (Act 6, Cases 32 to 35)</dt><dd>The Stance of the case’s first commit stays until the case ends and can’t change. In return, every commit carries that Stance into the next hand, even without a full charge. Season mastery still counts only commits with a charge of 70 or more.</dd>
+<dt>Signed by Name (Act 8, Cases 44, 46, 48 and 49)</dt><dd>Before the first hand, choose on the briefing how to sign. “Name only” makes every card’s chips ×1.25 and moves the Wall band 2 closer; “With conditions” moves the Wall band 3 further and makes chips ×0.9. Choose nothing and you sign with conditions.</dd>
+</dl>
+<p>A season started with the Rule of the Week, and Story Mode, get none of these five either.</p>
 <p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
 
 <h2>The report and the Burst Score</h2>
@@ -322,6 +340,15 @@ export const GUIDE_BODY = {
 </ul>
 <p>シーズンは始めた週のルールを最後まで持ち続け、記録は別のランキングに積まれます。ストーリーモードには付きません。</p>
 <p><strong>この事件だけ。</strong>いくつかの事件には、その事件のあいだだけのルールが一つ立ちます。事件09はSHORT CLOCK、11はNEAR WALL、14はHEAVY FRACTURE、16はCRISIS WEEKです。第3幕（事件13〜18）は「合併」でチップ1.5倍、壁の区間が熱4手前に、第5幕（事件25〜30）は「散らばった席」で壁の区間が両側に4ずつ広がりチップ1.15倍、第7幕（事件37〜42）は「公聴会」で勝負ごとの時間が30%短くチップ1.25倍です。事件14・16では事件のルールが幕のルールより先です。今週のルールで始めたシーズンとストーリーモードには、これらのルールはありません。</p>
+<p><strong>残りの幕のルール。</strong>私たちは第1・2・4・6・8幕にも、その幕の物語を勝負のルール一つに移しました。この五つは勝負が閉じるときにあなたがしたことを読むので、この勝負だけでなく次の勝負まで考えて確定してください。ブリーフィングの「この事件だけ」のパネルに、その事件のルールが出ます。</p>
+<dl>
+<dt>押しつけられた損失（第1幕、事件04〜06）</dt><dd>賭け金がかかった最初のBUSTでも、賭け金の3分の1が残ります。そのかわり、その勝負の人的被害がさらに3上がります。「保険」を持っていれば保険が先に使われ、二つ合わせて一つの事件で一度だけ守ってくれます。</dd>
+<dt>遅れてきた請求書（第2幕、事件10）</dt><dd>熱60以上で確定すると、HEAT DEBTが熱の3分の1ではなく2分の1を抱えて次の勝負を始めさせます（「放熱板」を持っていれば放熱板の値）。60未満で確定すると、すべてのカードのチップが1.2倍です。大きく確定するか、きれいに取るかを選ぶ事件です。</dd>
+<dt>学習された壁（第4幕、事件20・22・23）</dt><dd>卓があなたの確定した熱を学びます。次の勝負の壁の区間は、その熱の10下から18上まで（幅は34以上）に立ちますが、区間の真ん中がいつもの区間の真ん中より下に下がることはありません。こうして立った勝負の照会は、最初から14マスに絞り、一度だけです。BUSTの次の勝負はいつもの区間です。</dd>
+<dt>供述の固定（第6幕、事件32〜35）</dt><dd>事件で最初に確定した構えが事件の終わりまで残り、変えられません。そのかわり、確定するたびにチャージが足りなくても、その構えが次の勝負に続きます。シーズンの熟練は、いつもどおりチャージ70以上の確定だけを数えます。</dd>
+<dt>実名の署名（第8幕、事件44・46・48・49）</dt><dd>最初の勝負の前に、ブリーフィングで署名のしかたを選びます。「名前だけ書く」はすべてのカードのチップが1.25倍で壁の区間が2手前に立ち、「条件をつける」は壁の区間が3下がってチップが0.9倍です。選ばなければ、条件をつけたことになります。</dd>
+</dl>
+<p>この五つのルールも、今週のルールで始めたシーズンとストーリーモードにはありません。</p>
 <p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>
 
 <h2>レポートとバーストスコア</h2>
