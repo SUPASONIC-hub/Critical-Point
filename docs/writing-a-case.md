@@ -484,7 +484,11 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
    카드 셋이 `s1_result`로 가며, 그 카드 id마다 `outcomes`에 결말 하나(`title`, `text`)를 씁니다. 시작 자원은
    `startState.resources`에 직접 씁니다(시즌 자원을 읽지 않습니다).
 2. **목록**: `src/nodes/sidePacks.js`의 `SIDE_CASES`에 `{ id, label: "번외 1", title, load }` 한 줄. 목록이 비어
-   있으면 시작 화면의 칸이 보이지 않습니다.
+   있으면 시작 화면의 칸이 보이지 않습니다. 이야기 속 자리는 `unlockAfter`(그 날짜 바로 앞 시즌 사건)로 적고,
+   Season 날에 열 번외는 `opensAt: NEXT_SEASON.opensAt`을 더합니다. 배포는 그 앞의 화·금에 하고(운영 모드),
+   그 시각 전에는 번외 칸·결과 화면 줄·「지난번 이후」에 나오지 않으며, 7일 전부터 시작 화면에 예고 줄이 붙습니다.
+   테스트 빌드는 주간 시계가 2026-01-07에 고정이라, 그 번외의 e2e는 `__weeklyRuleClock`를 공개 시각 뒤로 옮깁니다
+   (`tests/side-case.spec.js`의 Season 칸).
 3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
    `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
 4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,

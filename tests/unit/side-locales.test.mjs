@@ -63,14 +63,16 @@ test("every language names the side list's label and title in its dictionary; th
     "sidePacks.SIDE_CASES.side07.label", "sidePacks.SIDE_CASES.side07.title",
     "sidePacks.SIDE_CASES.side08.label", "sidePacks.SIDE_CASES.side08.title",
     "sidePacks.SIDE_CASES.side09.label", "sidePacks.SIDE_CASES.side09.title",
+    "sidePacks.SIDE_CASES.side10.label", "sidePacks.SIDE_CASES.side10.title",
+    "sidePacks.SIDE_CASES.side11.label", "sidePacks.SIDE_CASES.side11.title",
   ]);
   const labels = { en: (n) => `Side case ${n}`, ja: (n) => `番外${n}` };
   for (const lang of languages) {
     const copy = flatten(await readLanguageCopy(root, lang));
     for (const path of sidePaths) assert.equal(typeof copy[path], "string", `${lang}: ${path}`);
-    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9]) assert.equal(copy[`sidePacks.SIDE_CASES.side0${n}.label`], labels[lang](n), `${lang}: the label in the case labels' form`);
+    for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) assert.equal(copy[`sidePacks.SIDE_CASES.side${String(n).padStart(2, "0")}.label`], labels[lang](n), `${lang}: the label in the case labels' form`);
   }
-  assert.deepEqual(SIDE_CASES.map((entry) => entry.label), ["번외 1", "번외 2", "번외 3", "번외 4", "번외 5", "번외 6", "번외 7", "번외 8", "번외 9"]);
+  assert.deepEqual(SIDE_CASES.map((entry) => entry.label), ["번외 1", "번외 2", "번외 3", "번외 4", "번외 5", "번외 6", "번외 7", "번외 8", "번외 9", "번외 10", "번외 11"]);
   for (const pack of RELEASED) assert.deepEqual(checkSidePack(pack), [], pack.id);
 });
 
