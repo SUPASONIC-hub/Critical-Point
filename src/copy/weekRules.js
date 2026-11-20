@@ -81,7 +81,7 @@ const weekRulesCopy = {
     },
     trainedWall: {
       title: "학습된 벽",
-      text: "이번 사건은 노아가 당신이 확정한 열기를 배운다. 확정한 다음 판의 벽 띠는 그 열기 −{trainedBelow}부터 +{trainedAbove} 사이로 좁혀 선다.",
+      text: "이번 사건은 노아가 당신이 확정한 열기를 배운다. 확정한 다음 판의 벽 띠는 그 열기 쪽으로 옮겨 서되, 원래 띠의 가운데 아래로는 내려가지 않는다.",
       world: "노아는 당신이 고른 것과 망설인 초를 배웠다.",
     },
     onRecord: {

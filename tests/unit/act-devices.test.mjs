@@ -112,19 +112,20 @@ test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot a
 
 test("4막 학습된 벽: the band stands around the heat the last cash was made at, and its one look is the narrow one", () => {
   const board = { wallMin: 56, wallMax: 92 };
-  assert.deepEqual(engine.getTrainedBand(80, board), { wallMin: 80 - TRAINED_BELOW, wallMax: 92 });
-  assert.deepEqual(engine.getTrainedBand(65, board), { wallMin: 65 - TRAINED_BELOW, wallMax: 65 + TRAINED_ABOVE });
-  assert.deepEqual(engine.getTrainedBand(45, board), { wallMin: 56, wallMax: 56 + TRAINED_MIN_WIDTH }, "a low cash: widened up");
-  assert.deepEqual(engine.getTrainedBand(98, board), { wallMin: 92 - TRAINED_MIN_WIDTH, wallMax: 92 }, "past the band: widened down");
+  const middle = (band) => (band.wallMin + band.wallMax) / 2;
+  assert.deepEqual(engine.getTrainedBand(98, board), { wallMin: 92 - TRAINED_MIN_WIDTH, wallMax: 92 }, "a high cash: the band's top end");
+  assert.ok(middle(engine.getTrainedBand(80, board)) > middle(board), "a high cash stands the band higher");
+  assert.ok(TRAINED_BELOW + TRAINED_ABOVE <= TRAINED_MIN_WIDTH, "the reach is the width's floor or under it");
   for (let heat = 0; heat <= 100; heat += 1) {
     const band = engine.getTrainedBand(heat, board);
     assert.ok(band.wallMin >= 56 && band.wallMax <= 92 && band.wallMax - band.wallMin >= TRAINED_MIN_WIDTH, `heat ${heat}`);
+    // 11-20: never centred under the board's own band, so a low cash does not drag the next board down.
+    assert.ok(middle(band) >= middle(board) - 0.5, `heat ${heat}: ${band.wallMin}-${band.wallMax}`);
   }
   const cash = { outcome: "cash", gauge: 65, pushes: 2, streak: 0, focusMode: "strike" };
   const trained = engine.buildNextSchema({ ...cash, twist: "trainedWall" });
   assert.equal(trained.trained, true);
-  assert.equal(trained.wallMin, 65 - TRAINED_BELOW);
-  assert.equal(trained.wallMax, 65 + TRAINED_ABOVE);
+  assert.deepEqual({ wallMin: trained.wallMin, wallMax: trained.wallMax }, engine.getTrainedBand(65, engine.BASE_SCHEMA));
   assert.equal(engine.normalizeSchema(trained).trained, true);
   assert.equal(engine.buildNextSchema({ ...cash, outcome: "bust", cause: "push" , twist: "trainedWall" }).trained, undefined, "a BUST's board as usual");
   assert.equal(engine.buildNextSchema({ ...cash, caseClosed: true, twist: "trainedWall" }).trained, undefined, "the next case's first board as usual");
@@ -185,6 +186,16 @@ test("8막 실명 서명: the case is signed before its first board, by name or 
   assert.equal(engine.asksToSign(elsewhere), false, "a rest case");
   assert.equal(engine.signCase(elsewhere, "name"), elsewhere);
   assert.equal(engine.asksToSign({ ...opened, weekRule: "short-clock" }), false, "a week's season");
+});
+test("a rule's chips are paid as dealt: the window's board, not the run's bare one (11-20)", () => {
+  const card = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
+  for (const caseId of ["case15", "case10", "case09"]) {
+    const run = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId });
+    const board = engine.getTableSchema(run);
+    assert.ok(board.chipsScale > run.schema.chipsScale, `${caseId} deals thicker chips`);
+    const win = { ...engine.createWindow({ schema: board, seed: caseId }), status: "cashed", cause: "cash", gauge: 40, pushes: 2 };
+    assert.equal(engine.resolveWindow({ run, window: win, card }).verdict.chips, engine.getCardChips(card, board), caseId);
+  }
 });
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
   for (const id of DEVICE_TWISTS) {

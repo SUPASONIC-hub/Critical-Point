@@ -1170,7 +1170,8 @@ function reportActTwists({ pct, listening, G_CASES }) {
   for (const row of act1) line("1막 떠넘김", row);
   for (const row of act1) assert.ok(row.on.meanVault >= row.off.meanVault, `G5 1막: a kept third can only add to the vault (${row.label})`);
   // 2막 뒤늦은 청구서 (사건 10): cash big at 60 and over and carry half, or clean at 40-59.
-  const act2 = [["heat 65 (big)", (win) => win.gauge < 65], ["heat 55 (clean)", (win) => win.gauge < 55], ["heartbeat", listening]].map(([label, decide]) => pair(label, decide, { caseId: "case10" }));
+  // The same listening hand, two habits (11-20): cash where the heartbeat says (often 60 and over), or stop before a push could reach 60.
+  const act2 = [["heartbeat (big)", listening], ["heartbeat (clean)", (win) => listening(win) && win.gauge + win.schema.stepMin < 60]].map(([label, decide]) => pair(label, decide, { caseId: "case10" }));
   for (const row of act2) line("2막 청구서", row);
   console.log(`next G5 2막 청구서 big ${act2[0].on.meanVault} against clean ${act2[1].on.meanVault} (${gap(act2[0].on, act2[1].on)} apart)`);
   // 4막 학습된 벽 (사건 22): the band stands around the last cash; how much more a hand banks.

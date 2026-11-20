@@ -68,7 +68,7 @@ export default {
     },
     trainedWall: {
       title: "学習された壁",
-      text: "この事件は、NOAHがあなたの確定した熱を学ぶ。確定した次の勝負の壁の帯は、その熱の−{trainedBelow}から+{trainedAbove}のあいだに狭まる。",
+      text: "この事件は、NOAHがあなたの確定した熱を学ぶ。確定した次の勝負の壁の帯は、その熱のほうへ動くが、いつもの帯の真ん中より下には下がらない。",
       world: "NOAHは、あなたが選んだものと迷った秒数を学んだ。",
     },
     onRecord: {

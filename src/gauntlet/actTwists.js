@@ -62,7 +62,8 @@ export const ACT_TWIST_CASES = Object.freeze({ ...span(13, 18, "merger"), ...spa
  *   1/`LATE_BILL_SHARE` of the heat, not 1/3; every card's chips `LATE_BILL_CHIPS` times.
  * - 4막 「설계자」 (사건 20, 22, 23): 학습된 벽. After a cash at heat X the
  *   next board's band is [X - `TRAINED_BELOW`, X + `TRAINED_ABOVE`] within its
- *   own, at least `TRAINED_MIN_WIDTH` wide.
+ *   own, at least `TRAINED_MIN_WIDTH` wide and never centred under its own
+ *   (11-20 「세 막 다시 맞춤」: 6 / 14 / 12 sent a careful hand down 60%).
  * - 6막 「조사」 (사건 32-35): 진술 고정. The stance the case's first cash
  *   was made in stays to the case's end, and every cash carries it.
  * - 8막 「서명」 (사건 44, 46, 48, 49): 실명 서명. Before the first board the
@@ -77,11 +78,11 @@ export const ACT_TWIST_CASES = Object.freeze({ ...span(13, 18, "merger"), ...spa
 export const PASSED_DOWN_HARM = 3;
 export const LATE_BILL_SHARE = 2;
 export const LATE_BILL_CHIPS = 1.2;
-export const TRAINED_BELOW = 6;
-export const TRAINED_ABOVE = 14;
-export const TRAINED_MIN_WIDTH = 12;
+export const TRAINED_BELOW = 10;
+export const TRAINED_ABOVE = 18;
+export const TRAINED_MIN_WIDTH = 34;
 export const SIGN_NAME_CHIPS = 1.25;
-export const SIGN_NAME_WALL = 3;
+export const SIGN_NAME_WALL = 2;
 export const SIGN_TERMS_WALL = 3;
 export const SIGN_TERMS_CHIPS = 0.9;
 

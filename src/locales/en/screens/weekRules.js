@@ -68,7 +68,7 @@ export default {
     },
     trainedWall: {
       title: "The Trained Wall",
-      text: "This Case, NOAH learns the Heat you commit at. On the next hand the Wall band narrows to between {trainedBelow} below and {trainedAbove} above that Heat.",
+      text: "This Case, NOAH learns the Heat you commit at. On the next hand the Wall band moves toward that Heat, but never below the middle of its usual band.",
       world: "NOAH learned what you chose, and the seconds you hesitated.",
     },
     onRecord: {
