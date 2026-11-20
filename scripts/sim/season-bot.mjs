@@ -685,6 +685,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             ...(verdict.narrowed ? { narrowed: true } : {}),
             // G13: the first looks the case has bought (`countScouts`), as useChoiceCommit logs them.
             ...(verdict.scouted ? { scouted: true } : {}),
+            // G5 1막 떠넘겨진 손실, as useChoiceCommit logs it: the replay prices the BUST off it (getBustEffect).
+            ...(verdict.passedDown ? { passedDown: true } : {}),
             focus: verdict.focus,
             logic: verdict.logic,
             // C-12's read, as useChoiceCommit logs it: the burst score's 판 읽기 axis sums it (C-1(1)).

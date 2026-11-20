@@ -1,6 +1,8 @@
 // G5's acts 1, 2, 4, 6 and 8 (src/gauntlet/actTwists.js): the device twists, under the next rules.
 process.env.RULES_NEXT = "1";
 const assert = (await import("node:assert/strict")).default;
+const { readFileSync } = await import("node:fs");
+const { thresholdOfVerdict } = await import("./helpers/windowRecorder.mjs");
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
@@ -114,7 +116,14 @@ test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot a
   assert.equal(engine.resolveWindow({ run: at("case05"), window: bust, card, rules: new Set([OLD_RULE]) }).verdict.passedDown, undefined, "the old table");
   assert.equal(engine.resolveWindow({ run: at("case05", { runPot: 0 }), window: bust, card }).verdict.passedDown, undefined, "nothing to keep, nothing spent");
   assert.equal(engine.getBustEffect({}), engine.BUST_EFFECT);
-});
+  // 11-20 (11-30 dry run): every writer of a log entry's `threshold` keeps `passedDown`, or the settlement
+  // recheck prices that BUST without its 사람 피해 (rec-1000, 사건 05 humanCost 3).
+  const threshold = thresholdOfVerdict(first.verdict);
+  assert.equal(threshold.passedDown, true);
+  assert.deepEqual(engine.getBustEffect(threshold), engine.getBustEffect(first.verdict));
+  assert.equal(thresholdOfVerdict(second.verdict).passedDown, undefined);
+  const bot = readFileSync(new URL("../../scripts/sim/season-bot.mjs", import.meta.url), "utf8");
+  assert.match(bot, /\.\.\.\(verdict\.passedDown \? \{ passedDown: true \} : \{\}\)/, "the season bot logs it as the page does");});
 
 test("4막 학습된 벽: the band stands around the heat the last cash was made at, and its one look is the narrow one", () => {
   const board = { wallMin: 56, wallMax: 92 };
