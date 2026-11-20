@@ -472,7 +472,7 @@ is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
 `check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토),
 12월 11일 (목), 9월 13일 (토), 9월 14일 (일) and 9월 15일 (월) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
-7월 11일 (토), 7월 13일 (월), 5월 14일 (목), 8월 13일 (목), 8월 14일 (금) and 8월 18일 (화) fit 2026) and nothing else here.
+7월 11일 (토), 7월 13일 (월), 5월 14일 (목), 8월 13일 (목), 8월 14일 (금), 8월 18일 (화) and 9월 5일 (토) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -615,10 +615,13 @@ season case has to keep. What each one states for the first time is below.
 
 | Fact | Value |
 |---|---|
-| When | TODO YYYY-MM-DD (요), between which two of the season's days |
-| Where | TODO |
-| TODO person (age) | TODO what the case states for the first time |
-| The endings | TODO the first line of each of the three |
+| When | 2026-09-05 (토) 05:40 to noon: the morning after 사건 42 (the 경포 불꽃축제 Friday at 물결스테이, 9월 4일), two days before 사건 43's 이사회 (9월 7일). It knows nothing of the vote |
+| Where | 경포 해변 and 물결스테이's 마당 |
+| The rematch | 오진우 lost to 한서윤 by 3초 to the buoy in 사건 42 and shouted 「재경기」; it is set for 06:00. The buoy is 80m out |
+| 염봉수 (66) | 수상안전요원 of 경포 해변, a retired 해양경찰, his thirty-first summer there. 입수 from 09:00, never past the buoy; "부표는 끝이 아니라 내가 볼 수 있다는 표시". He sets out the buoys every year |
+| The wait | 2시간 40분 more for two people on 대기발령 for five months. 한서윤 has tapped an 출근 카드 every morning since (사건 42); on a Saturday there is nowhere to tap. 오진우 paints the 감시탑 ladder, fourteen rungs, "다섯 달 만에 처음 받은 일" |
+| The swim | at 40m 한서윤 stops and floats on her back; 오진우 turns back to her and they touch the buoy together. 4분 11초 on the stopwatch, two minutes of stopping in it |
+| The endings | the line in 물결스테이's 방명록 beside 강태민's 「또 옴」 (the time to the second, 「동시」 / 「9시까지 아무도 재지 않기」, with 권도현's '쉰 시간 3시간 20분' and 염봉수's '이유 있는 사람들, 오늘은 무사' / nothing, the car to Seoul before lunch). Nothing of 사건 43's vote, the 조기 회수 text or 임경수 |
 
 ## Known and left alone
 
