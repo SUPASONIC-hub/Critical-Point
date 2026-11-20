@@ -907,8 +907,8 @@ Still open, on purpose:
   #590) with RULES_MARK 7 (local branch `gameplay-mark7`: G11c, G13, G16,
   G18), whose ranking wipe clears rows below mark 7 (`>= 7` kept). The
   world-news paper 「석간 원장」 is draft #639. GA4 still counts no
-  `cp_scene` event: the custom dimension has to be registered in the GA4
-  admin by the owner before the reports show it.
+  `cp_scene` event: the custom dimensions (`case_no`, `scene_no`, `value`)
+  are registered; no consenting device has played the first hour since.
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
   no longer wait for a closed finale. Each entry of `SIDE_CASES`
