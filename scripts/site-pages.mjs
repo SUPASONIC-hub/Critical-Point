@@ -11,6 +11,7 @@ import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
 import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
 import { noteKinds, noteLastmod, notesDay, renderNotePages } from "./content-pages/notes.mjs";
+import { NEWS_KINDS, renderNewsPages } from "./content-pages/news.mjs";
 import { aboutShowcase } from "./content-pages/about-showcase.mjs";
 import { gameStructuredData, structuredDataTag } from "./structured-data.mjs";
 import {
@@ -879,6 +880,7 @@ export function renderStaticPages(origin = "", { analytics = null, ads = false, 
     ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }),
     ...renderContentPages({ analytics }),
     ...renderNotePages({ analytics, day }),
+    ...renderNewsPages({ analytics }),
   };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }
@@ -900,12 +902,16 @@ export function robotsTxt(origin = "") {
  * Until 11-03 the start page was one entry, its English and Japanese
  * `/?lang=` addresses named only as its alternates. Last, the notes out by
  * `day`, in Korean only: each names itself as its one language and x-default.
+ * Then the world's newspaper, 석간 원장, Korean only the same way.
  */
 export function sitemapEntries(day = notesDay()) {
   const entries = (pathOf) =>
     PAGE_LANGUAGES.map((language) => ({ loc: pathOf(language), alternates: Object.fromEntries(PAGE_LANGUAGES.map((code) => [code, pathOf(code)])) }));
-  const notes = noteKinds(day).map((kind) => ({ loc: pagePath(kind, "ko"), alternates: { ko: pagePath(kind, "ko") } }));
-  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language))), ...notes];
+  const korean = (kind) => ({ loc: pagePath(kind, "ko"), alternates: { ko: pagePath(kind, "ko") } });
+  const notes = noteKinds(day).map(korean);
+  // The world's newspaper (scripts/content-pages/news.mjs): Korean only, every article at once, dated by its words like the content pages.
+  const news = NEWS_KINDS.map(korean);
+  return [...entries(gamePath), ...[...PAGE_KINDS, ...CONTENT_KINDS].flatMap((kind) => entries((language) => pagePath(kind, language))), ...notes, ...news];
 }
 
 /** A note's address is dated by the note itself (src/notes/noteIndex.js), not by a hash. */

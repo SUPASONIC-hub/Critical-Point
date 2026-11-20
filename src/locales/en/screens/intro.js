@@ -155,6 +155,9 @@ export default {
     notesTitle: "Latest notes (in Korean)",
     notesAll: "All notes",
     notesEmpty: "Our first note is on its way.",
+    frontTitle: "Today's front page (in Korean)",
+    frontNote: "A made-up article from the game's world, not about any real event, person or company",
+    frontAll: "All in-world articles",
   },
   legal: { about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use" },
   opening: {

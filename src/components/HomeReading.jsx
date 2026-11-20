@@ -1,11 +1,13 @@
 import { NOTES_INDEX_PATH, READING_EYEBROW, readingMenu } from "../homeReading.js";
+import { NEWS_INDEX_PATH, NEWS_PAPER } from "../news/newsIndex.js";
 
 /**
  * 읽을거리: the section under the start screen that a reader can read (src/homeReading.js
  * says why). `copy` is the intro's `reading`, `legal` its `legal`, `notes` the newest notes
- * the build wrote pages for (__CP_RECENT_NOTES__, vite.config.js; src/notes/noteIndex.js `recentNotes`).
+ * the build wrote pages for (__CP_RECENT_NOTES__, vite.config.js; src/notes/noteIndex.js `recentNotes`),
+ * `front` 오늘의 1면, the world newspaper's article for today in Seoul (src/news/newsIndex.js `todayFrontPage`).
  */
-export function HomeReading({ copy, legal, language, notes }) {
+export function HomeReading({ copy, legal, language, notes, front }) {
   const menu = readingMenu(copy, legal, language);
   return (
     <section className="home-reading" aria-labelledby="home-reading-title">
@@ -35,24 +37,40 @@ export function HomeReading({ copy, legal, language, notes }) {
           ))}
         </ul>
       </nav>
-      <div className="home-reading-notes">
-        <h3>{copy.notesTitle}</h3>
-        {notes.length ? (
-          <ul lang="ko">
-            {notes.map((note) => (
-              <li key={note.href}>
-                <a href={note.href}>{note.title}</a>
-                <time dateTime={note.day}>{note.date}</time>
-                <p>{note.summary}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>{copy.notesEmpty}</p>
-        )}
-        <a className="home-reading-all" href={NOTES_INDEX_PATH} hrefLang={language === "ko" ? undefined : "ko"}>
-          {copy.notesAll}
-        </a>
+      <div className="home-reading-press">
+        <div className="home-reading-front">
+          <h3>{copy.frontTitle}</h3>
+          <div className="home-reading-story" lang="ko">
+            <p className="home-reading-paper">
+              {NEWS_PAPER} · {front.section} · <time dateTime={front.day}>{front.date}</time>
+            </p>
+            <a href={front.href}>{front.title}</a>
+            <p>{front.summary}</p>
+          </div>
+          <p className="home-reading-fiction">{copy.frontNote}</p>
+          <a className="home-reading-all" href={NEWS_INDEX_PATH} hrefLang={language === "ko" ? undefined : "ko"}>
+            {copy.frontAll}
+          </a>
+        </div>
+        <div className="home-reading-notes">
+          <h3>{copy.notesTitle}</h3>
+          {notes.length ? (
+            <ul lang="ko">
+              {notes.map((note) => (
+                <li key={note.href}>
+                  <a href={note.href}>{note.title}</a>
+                  <time dateTime={note.day}>{note.date}</time>
+                  <p>{note.summary}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{copy.notesEmpty}</p>
+          )}
+          <a className="home-reading-all" href={NOTES_INDEX_PATH} hrefLang={language === "ko" ? undefined : "ko"}>
+            {copy.notesAll}
+          </a>
+        </div>
       </div>
     </section>
   );

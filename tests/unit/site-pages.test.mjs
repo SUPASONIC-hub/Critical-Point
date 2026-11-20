@@ -5,6 +5,7 @@ import test from "node:test";
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
 import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../../scripts/content-pages/news.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -47,7 +48,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length, "with the policy's six, the content pages and the notes out today (scripts/content-pages)");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length, "with the policy's six, the content pages, the notes out today and the world's newspaper (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -55,8 +56,8 @@ test("each page has its own title and description, a canonical link and every la
   const descriptions = new Set();
   const titles = new Set();
   for (const [file, html] of Object.entries(all)) {
-    // The notes are Korean only and name no other language (tests/unit/notes.test.mjs).
-    if (file.startsWith("notes/")) continue;
+    // The notes and the world's newspaper are Korean only and name no other language (tests/unit/notes.test.mjs, news.test.mjs).
+    if (file.startsWith("notes/") || file.startsWith("news/")) continue;
     const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
     const page = file.slice(FOLDER[language].length);
     assert.match(html, /^<!doctype html>/, file);
@@ -150,7 +151,7 @@ test("the pages say what the code holds: the season's length, a case's minutes, 
 test("the start screen's reading section links the five pages in the screen's language, among the site's nine kinds", () => {
   // 읽을거리 (HomeReading.jsx, src/homeReading.js) replaced the five-link foot on 2026-11-20; tests/unit/notes.test.mjs holds its rows.
   const intro = readFileSync("src/screens/IntroScreen.jsx", "utf8");
-  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} \/>/);
+  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} front=\{todayFrontPage\(\)\} \/>/);
   assert.match(readFileSync("vite.config.js", "utf8"), /__CP_RECENT_NOTES__: JSON\.stringify\(recentNotes\(notesDay\(\)\)\)/);
   for (const page of SITE_PAGES) assert.ok(READING_KINDS.includes(page) || ["privacy", "terms"].includes(page), page);
   for (const page of SITE_PAGES) {
@@ -165,8 +166,8 @@ test("the start screen's reading section links the five pages in the screen's la
 });
 
 test("the service worker keeps every page for offline reading, and leaves the crawler's files alone", () => {
-  // A note is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
-  for (const file of Object.keys(all)) if (!file.startsWith("notes/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
+  // A note or an article of the world's newspaper is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
+  for (const file of Object.keys(all)) if (!file.startsWith("notes/") && !file.startsWith("news/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
   assert.doesNotMatch("/robots.txt", DOCUMENT_PAGE);
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });

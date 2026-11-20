@@ -99,3 +99,40 @@
 .home-reading-all {
   margin-top: 8px;
 }
+/* 오늘의 1면 beside the newest notes: two plain columns where there is room,
+   one under the other on a phone. The article is a headline, a line of where
+   and when, and a summary on the same ground as the notes -- no card, no
+   tilt -- and the line that says it is made up stays in view under it. */
+.home-reading-press {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 28px;
+  align-items: start;
+}
+.home-reading-story {
+  padding: 12px 0;
+  border-top: 1px solid var(--ui-line);
+}
+.home-reading-paper {
+  margin: 0;
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+}
+.home-reading-story a {
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+.home-reading-story p:last-child {
+  margin: 4px 0 0;
+  color: var(--ui-text-2);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.home-reading-fiction {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--ui-line);
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}

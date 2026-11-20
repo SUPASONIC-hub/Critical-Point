@@ -7,6 +7,7 @@ import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { InstallHintSlot } from "../components/InstallHintSlot.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
 import { HomeReading } from "../components/HomeReading.jsx";
+import { todayFrontPage } from "../news/newsIndex.js";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -990,9 +991,10 @@ export function IntroScreen({ view, renderers = {} }) {
         </section>
         {/* 읽을거리: what the game is, the site's nine kinds of page in the
             page's language (the privacy policy and the terms among them, the
-            addresses a store listing names) and the newest notes -- text a
-            reader and a crawler find on the start page (src/homeReading.js). */}
-        <HomeReading copy={introCopy.reading} legal={introCopy.legal} language={LANG} notes={__CP_RECENT_NOTES__} />
+            addresses a store listing names), the newest notes and 오늘의 1면,
+            the world newspaper's article for today in Seoul -- text a reader
+            and a crawler find on the start page (src/homeReading.js). */}
+        <HomeReading copy={introCopy.reading} legal={introCopy.legal} language={LANG} notes={__CP_RECENT_NOTES__} front={todayFrontPage()} />
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
             burst itself is a picture of the same thing. */}
