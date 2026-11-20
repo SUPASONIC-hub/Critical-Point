@@ -24,6 +24,7 @@ import {
   LOGIC_CAP,
   LOGIC_HOLD,
   OVERCLOCK_CHIPS,
+  OVERCLOCK_STEP,
   OVERCLOCK_STREAK,
   PEAK_CASES,
   PEAK_CHIPS,
@@ -1803,8 +1804,8 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     }
     if (streak >= OVERCLOCK_STREAK && rules.has("overclock")) {
       schema.chipsScale *= OVERCLOCK_CHIPS;
-      schema.stepMin += 4;
-      schema.stepMax += 6;
+      schema.stepMin += OVERCLOCK_STEP[0];
+      schema.stepMax += OVERCLOCK_STEP[1];
       schema.mutations.push("overclock");
     }
     if (pushes === 0 && rules.has("coldFeet")) {
