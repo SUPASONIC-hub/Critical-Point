@@ -36,7 +36,7 @@ export default {
     streak: "Streak",
     best: "Best",
     audit: "Audit",
-    auditWarn: "Cash low now and you're audited",
+    auditWarn: "Low cash = audit",
     links: "Links",
     lockCap: "Cap",
     lockMultiplier: "Mult",

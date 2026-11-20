@@ -36,7 +36,7 @@ export default {
     streak: "連続",
     best: "最高",
     audit: "監査",
-    auditWarn: "いま低く確定すると監査",
+    auditWarn: "低く確定で監査",
     links: "連結",
     lockCap: "上限",
     lockMultiplier: "倍率",
