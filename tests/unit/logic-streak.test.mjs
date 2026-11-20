@@ -1,4 +1,10 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
+
+// The streak's arithmetic as it was before G1 (a change of direction ends it): this file plays the old
+// rules (nextTableRules.js reads RULES_NEXT once, at its first call). tests/unit/rules-next.test.mjs
+// holds the next rules: the halving, 눈에 띔 and the rest.
+process.env.RULES_NEXT = "0";
 import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 

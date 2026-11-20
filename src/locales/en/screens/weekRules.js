@@ -38,6 +38,24 @@ export default {
       text: "This week the audit and the cascade stand together. {audit} {cascade} A commit on a CASCADE hand doesn’t count toward the audit.",
     },
   },
+  // G5 (gauntlet/actTwists.js): the twist of acts 3, 5 and 7 under the next rules, by id.
+  actTwists: {
+    merger: {
+      title: "The Merger",
+      text: "This Case, every card’s chips are ×{mergerChips}, but the Wall band stands {mergerShift} Heat closer.",
+      world: "The group merges its companies and calls it reform. Bigger stakes, a nearer Wall.",
+    },
+    scattered: {
+      title: "Scattered Desks",
+      text: "This Case, the Wall band is {spread} Heat wider on each side, and every card’s chips are ×{scatterChips}.",
+      world: "The lab’s people are scattered across the group, and at every desk the Wall stands somewhere else.",
+    },
+    hearing: {
+      title: "The Hearing",
+      text: "This Case, every hand’s clock is {hearingCut}% shorter, and every card’s chips are ×{hearingChips}.",
+      world: "A hearing over who owns the records. Little time to answer, and every word costs more.",
+    },
+  },
   caseRules: {
     case09: {
       text: "In this case every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much.",

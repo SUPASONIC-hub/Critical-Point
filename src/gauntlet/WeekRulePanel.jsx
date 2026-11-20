@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { getCaseRule, getWeekRule } from "./weeklyRules.js";
-import { CASE_RULES } from "./caseRules.js";
+import { caseRuleFor } from "./caseRules.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import edgeCopy from "../copy/edge.js";
 
@@ -41,7 +41,7 @@ export function useWeekRulePanel(id, page = null, caseId = null) {
   const recall = page?.recall ?? null;
   return useMemo(() => {
     const week = getWeekRule(id);
-    const rule = week ?? (caseId ? getCaseRule(caseId, CASE_RULES[caseId]) : null);
+    const rule = week ?? (caseId ? getCaseRule(caseId, caseRuleFor(caseId, null)) : null);
     if (!rule && !echo && !recall) return NO_PANEL;
     // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
     const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;

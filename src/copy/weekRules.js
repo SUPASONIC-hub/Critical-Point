@@ -51,6 +51,24 @@ const weekRulesCopy = {
   // that play under one of the rules above for themselves, by case. The same
   // numbers as the week's (`{blanks}` filled the same way); the line in the
   // story is the case's own.
+  // G5 (gauntlet/actTwists.js): the twist of acts 3, 5 and 7 under the next rules, by id.
+  actTwists: {
+    merger: {
+      title: "합병",
+      text: "이번 사건은 모든 카드의 칩이 {mergerChips}배지만, 벽 띠가 열기 {mergerShift}만큼 앞당겨 선다.",
+      world: "그룹이 「개혁」이라며 계열사를 합친다. 판은 커지고 벽은 가까워진다.",
+    },
+    scattered: {
+      title: "흩어진 자리",
+      text: "이번 사건은 벽 띠가 양쪽으로 열기 {spread}씩 넓어지고, 모든 카드의 칩이 {scatterChips}배다.",
+      world: "트리거랩 사람들이 곳곳으로 흩어져, 자리마다 벽이 선 곳이 다르다.",
+    },
+    hearing: {
+      title: "청문회",
+      text: "이번 사건은 판마다 시간이 {hearingCut}% 짧고, 모든 카드의 칩이 {hearingChips}배다.",
+      world: "기록의 주인을 다투는 청문회. 답할 시간은 짧고, 한마디의 값은 크다.",
+    },
+  },
   caseRules: {
     case09: {
       text: "이번 사건은 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",

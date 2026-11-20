@@ -8,6 +8,7 @@ import { getLogicDirection, getLogicType } from "./logicStreak.js";
 import { SCOUT_NARROW_REACH, SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
+import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL } from "./nextTableRules.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
 import { MoneyBurst } from "./MoneyBurst.jsx";
 import { readBurst } from "./moneyFeedback.js";
@@ -160,6 +161,8 @@ export function LogicLine({ logic }) {
         {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
       </span>
       {logic.note && <em>{logic.note}</em>}
+      {/* G1 눈에 띔 (the next rules): its points after the staked card and what a cash under the line risks; the sentence is the buttons' description. */}
+      {logic.exposure?.points > 0 && <em className="gx-exposure" data-testid="gauntlet-exposure">{fill(say.exposure, { points: logic.exposure.points })} · {fill(say.exposureChance, { heat: logic.exposure.heat, risk: logic.exposure.points, most: logic.exposure.most })}</em>}
     </span>
   );
 }
@@ -191,20 +194,25 @@ export function RelicChips({ relics, pulse }) {
  * page. Before the case has SCOUT the band is the plain label the meter
  * already reads out.
  */
-export function ScoutBand({ band, canScout, onScout, shortcut }) {
-  if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
+export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCOUT_NARROW_TRUST, onBreathe = null }) {
+  // G6: the 결재 판's shown cell, the nearest the wall can be, beside the band (its line is said once by the voice);
+  // G7: 숨 고르기 on the board right after a BUST, before the first push, while it can be pressed (`onBreathe`).
+  const shown = <>{band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(tableCopy.stage.signCell, { cell: band.shown })}</span>}
+    {onBreathe && <button type="button" className="gx-scout" data-testid="commit-breathe" onClick={onBreathe}
+      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: BREATH_GAUGE, wall: BREATH_WALL })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}</>;
+  if (!canScout && !band.scouted) return <><span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>{shown}</>;
   // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
   const narrows = band.scouted && canScout;
   const label = !band.scouted
     ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })
     : narrows
-      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_NARROW_TRUST, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
+      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
       : undefined;
   return (
-    <button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
+    <><button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
       aria-keyshortcuts={shortcut} aria-label={label}>
       {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {narrows ? say.narrow : band.scouted ? say.scouted : say.scout}
-    </button>
+    </button>{shown}</>
   );
 }
 

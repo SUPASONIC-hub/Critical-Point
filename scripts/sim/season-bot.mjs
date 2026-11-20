@@ -70,10 +70,15 @@ import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStr
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
+import { countNarrows, isNextOn, narrowTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
+import { isSignScene } from "../../src/state/settleChoice.js";
 import { createChoiceReaders } from "../../src/state/useDecision.js";
+
+// G4·G5 (2026-11-19): RULES_NEXT=0 plays the table before the next rules, 1 the
+// next ones; unset, whatever rulesNext.js says (nextTableRules.js `wantsNextRules`).
 
 // ---------------------------------------------------------------------------
 // The season player (check-endings.mjs).
@@ -88,7 +93,7 @@ import { createChoiceReaders } from "../../src/state/useDecision.js";
  * NOTES +1.8, METRONOME +2.8, HEAT SINK +3.4, STETHOSCOPE +4.0, TESTIMONY
  * +5.3, KINETIC GRIP +5.4, FRONT PAGE +6.5, INSURANCE +8.7.
  */
-export const RELIC_DROP_ORDER = Object.freeze([
+const OLD_DROP_ORDER = Object.freeze([
   "auditContact",
   "coldBlood",
   "carbonCopy",
@@ -102,6 +107,28 @@ export const RELIC_DROP_ORDER = Object.freeze([
   "frontPage",
   "insurance",
 ]);
+/**
+ * Under the next rules (G4, relicsNext.js) the same reading off the heartbeat
+ * column, measured 2026-11-19 with RULES_NEXT=1: COLD BLOOD +2.4% (it pays
+ * the blind and the bust-heavy hands), ENCORE +3.6, METRONOME +3.9, CARBON
+ * COPY +4.0, STETHOSCOPE +4.9, AUDIT CONTACT +5.7, INSURANCE +8.6, KINETIC
+ * GRIP +9.7, FIELD NOTES +15.1, TESTIMONY +15.6, HEAT SINK +17.5, FRONT PAGE +18.9.
+ */
+const NEXT_DROP_ORDER = Object.freeze([
+  "coldBlood",
+  "encore",
+  "metronome",
+  "carbonCopy",
+  "stethoscope",
+  "auditContact",
+  "insurance",
+  "kineticGrip",
+  "fieldNote",
+  "testimony",
+  "heatSink",
+  "frontPage",
+]);
+export const RELIC_DROP_ORDER = isNextOn() ? NEXT_DROP_ORDER : OLD_DROP_ORDER;
 
 /** The cases whose close the season player notes the tools held at (`relicsAt`): act 1's and act 4's last (B-11's acts). */
 export const RELICS_HELD_AT = Object.freeze(["case07", "case24"]);
@@ -128,9 +155,14 @@ export function takeIntoSlots(run, taken, tools = null) {
  */
 export function spendsAt(spend, run) {
   const room = RELIC_SLOTS - run.relics.length;
+  // "weak" (G4): rerolls only an offer with nothing in the stronger half of
+  // RELIC_DROP_ORDER, and buys one more while two slots are free.
+  const rank = (id) => RELIC_DROP_ORDER.indexOf(id);
+  const best = Math.max(...run.relicOffer.map(rank));
+  const weak = spend === "weak" && room > 0 && best < RELIC_DROP_ORDER.length / 2;
   return {
-    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1),
-    extra: spend === "extra" || spend === "always" || (spend === "early" && room >= 2),
+    reroll: spend === "reroll" || spend === "always" || (spend === "early" && room >= 1) || weak,
+    extra: spend === "extra" || spend === "always" || ((spend === "early" || spend === "weak") && room >= 2),
   };
 }
 
@@ -223,8 +255,13 @@ export const LINK_VALUES = (() => {
  */
 export function playedRules(rules, { cascade = true } = {}) {
   const off = [...(AUDIT_ON ? [] : ["audit"]), ...(CASCADE_ON && cascade ? [] : ["cascade"])];
-  return off.some((rule) => rules.has(rule)) ? new Set([...rules].filter((rule) => !off.includes(rule))) : rules;
+  return withNextRules(off.some((rule) => rules.has(rule)) ? new Set([...rules].filter((rule) => !off.includes(rule))) : rules, NEXT_ON);
 }
+/**
+ * G1~G7 (nextTableRules.js): the next rules are played unless RULES_NEXT=0,
+ * which plays the old ones beside them for the tables (표-core.md).
+ */
+export const NEXT_ON = wantsNextRules();
 /** How much less a hand that reads the card's link mark likes a card that makes one (B2 design 3-3). */
 const LINK_AVOID = 40;
 /**
@@ -414,7 +451,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * SCOUT_TRUST of it (B1), and the table does not sell one to a hand that
    * cannot pay. Left out, the hand is taken to afford it.
    */
-  function playWindow(policy, run, windowSeed, rules, hand = null, trust = Infinity) {
+  function playWindow(policy, run, windowSeed, rules, hand = null, trust = Infinity, narrowPrice = SCOUT_NARROW_TRUST) {
     // The run's own board, and for a story run the same board with its far wall.
     let win = createWindow({ schema: getTableSchema(run), seed: windowSeed });
     win = reduce(win, { type: "SELECT", id: "card" }, rules);
@@ -445,7 +482,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     const scouts = policy.listens && rules.has("scout") && policy.scout !== "never" && trust >= SCOUT_TRUST;
     for (let press = 0; press < 30 && win.status === "live"; press += 1) {
       if (scouts && !win.scouted && scoutDue(policy.scout, win)) win = scoutWindow(win, true, rules, reduce);
-      if (scouts && trust >= SCOUT_TRUST + SCOUT_NARROW_TRUST && narrowDue(policy.scout, win)) win = reduce(win, { type: "SCOUT" }, rules);
+      if (scouts && trust >= SCOUT_TRUST + narrowPrice && narrowDue(policy.scout, win)) win = reduce(win, { type: "SCOUT" }, rules);
       if (win.status !== "live") break;
       const band = win.scouted ? getWindowBand(win) : null;
       const hears = getHeartbeatBpm(win.gauge, win.wall + win.tellOffset, win.schema.sedated) < policy.bpm;
@@ -566,7 +603,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
-        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust);
+        const window = playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust, isNextOn(rules) ? narrowTrustAt(countNarrows(log)) : SCOUT_NARROW_TRUST);
         windows += 1;
         const responseTimeSec = Math.max(1, Math.round(window.elapsed));
         const reframe = choice.type === "reframe";
@@ -584,7 +621,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         if (skip) skipped += 1;
         const nextNode = skip?.nodeId ?? plannedNode;
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
-        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, countCaseBoards(log), caseClosed) });
+        const { verdict, nextRun } = (tools?.settle ?? resolveWindow)({ run, window, card: choice, offered, caseClosed, offerRelics: caseId !== "final", rules, nextRules: caseClosed ? nextCaseRules : rules, audit, cascade: isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, countCaseBoards(log), caseClosed), sign: !caseClosed && isSignScene(caseId, nextNode), narrows: countNarrows(log) });
         audit = verdict.audit?.count ?? 0;
         eroded += verdict.eroded ?? 0;
         if (verdict.audit?.caught) {
@@ -606,6 +643,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           focusMultiplier: verdict.focus?.resourceMultiplier,
           scouted: verdict.scouted,
           narrowed: verdict.narrowed === true,
+          ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
         const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
@@ -640,6 +678,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             pot: verdict.pot,
             lostPot: verdict.lostPot,
             pushes: verdict.pushes,
+            // G2: the second looks the case has bought (`countNarrows`), as useChoiceCommit logs them.
+            ...(verdict.narrowed ? { narrowed: true } : {}),
             focus: verdict.focus,
             logic: verdict.logic,
             // C-12's read, as useChoiceCommit logs it: the burst score's 판 읽기 axis sums it (C-1(1)).
@@ -709,6 +749,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
 // The case players (report-gauntlet-loop.mjs).
 // ---------------------------------------------------------------------------
 
+const narrowTrustAtPrice = (count) => narrowTrustAt(count);
+
 export function handUnit(seed) {
   let value = 2166136261;
   for (const character of seed) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
@@ -726,7 +768,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, narrows: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, narrows: 0, pushedBoards: 0, narrowTrust: 0, caught: 0, exposedCashes: 0, signBoards: 0, signBusts: 0, signPot: 0, breaths: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
 /**
  * The bust chain (improvement notes C-14, 2026-10-22): boards played right
  * after a bust in the same case, against the rest. `afterBust*` is every such
@@ -747,6 +789,17 @@ function see(seen, verdict) {
   // B1: the windows that spent their look (each paid SCOUT_TRUST of 믿음, which a case player does not hold).
   if (verdict.scouted) seen.scouts += 1;
   if (verdict.narrowed) seen.narrows += 1;
+  // G1~G7 (the next rules): the second look's 믿음, the boards that pushed, 눈에 띔, 결재 판 and 숨 고르기.
+  if (verdict.narrowed) seen.narrowTrust += verdict.narrowTrust ?? SCOUT_NARROW_TRUST;
+  if (verdict.pushes > 0) seen.pushedBoards += 1;
+  if (verdict.exposure && verdict.outcome === "cash") seen.exposedCashes += 1;
+  if (verdict.exposure?.caught) seen.caught += 1;
+  if (verdict.sign) {
+    seen.signBoards += 1;
+    if (verdict.outcome === "bust") seen.signBusts += 1;
+    else seen.signPot += verdict.pot;
+  }
+  if (verdict.breathed) seen.breaths += 1;
   // AUDIT_ON only: the closes the audit took its part of, that part, and what those closes moved before it.
   if (verdict.audit?.caught) {
     seen.audits += 1;
@@ -841,6 +894,10 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
     let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules });
     let audit = 0;
+    // G2: the second looks this case has bought, and the 믿음 the hand may spend on looks in it (`decide.trustBudget`).
+    let narrows = 0;
+    let trustSpent = 0;
+    const lookPrice = () => narrowTrustAtPrice(narrows);
     const paid = { cashed: 0, bonus: 0, capped: 0 };
     let busts = 0;
     let midCaseBusts = 0;
@@ -862,6 +919,8 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       const staked = pickType ? directCard(card, pickType(offers, run.logic, seed)) : card;
       let win = createWindow({ schema: getTableSchema(run), seed });
       win = reduce(win, { type: "SELECT", id: card.id }, rules);
+      // G7: a hand that takes 숨 고르기 does so first, on the board after a bust.
+      if (decide.breathe) win = reduce(win, { type: "BREATHE" }, rules);
       if (lock) {
         win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.mode }, rules);
         let charge = win;
@@ -879,7 +938,11 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
         // A timed look (B1, `scoutDue`): the first push before which the hand's own timing says so.
         if (typeof decide.scout === "function" && !win.scouted && decide.scout(win)) win = scoutWindow(win, true, rules, reduce);
         // The second look (B1, 11-18): `decide.narrow(win)` says when, once the first is taken.
-        if (typeof decide.narrow === "function" && win.scouted && !win.narrowed && win.status === "live" && decide.narrow(win)) win = reduce(win, { type: "SCOUT" }, rules);
+        if (typeof decide.narrow === "function" && win.scouted && !win.narrowed && win.status === "live" && decide.narrow(win, { narrows, windowIndex, last: windowIndex === WINDOWS_PER_CASE - 1 })) {
+          // G2: a hand with a budget narrows only while the case's next price fits in it.
+          const price = isNextOn(rules) ? lookPrice() : SCOUT_NARROW_TRUST;
+          if (!Number.isFinite(decide.trustBudget) || trustSpent + price <= decide.trustBudget) win = reduce(win, { type: "SCOUT" }, rules);
+        }
         if (win.status !== "live") break;
         // `audit` is the case's audit so far, for a hand that reads it (AUDIT_ON).
         if (!decide(win, run, audit)) break;
@@ -889,8 +952,15 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       if (lock?.cashAs && win.status === "live") win = reduce(win, { type: "SET_FOCUS_MODE", mode: lock.cashAs }, rules);
       if (win.status === "live") win = reduce(win, { type: "CASH" }, rules);
       const caseClosed = windowIndex === WINDOWS_PER_CASE - 1;
-      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, played - 1, caseClosed) });
+      // G6: the board this one deals is the case's last (a bust skips one more, as below).
+      const nextIndex = windowIndex + 1 + (win.status === "bust" && !story && windowIndex < WINDOWS_PER_CASE - 2 ? 1 : 0);
+      const { verdict, nextRun } = resolveWindow({ run, window: win, card: staked, offered: offers ? [...new Set(offers.map((offer) => offer.type).filter((direction) => LOGIC_DIRECTIONS.includes(direction)))] : undefined, caseClosed, rules, audit, cascade: links && isLinkDue(run, linkLog, linkRun, rules), shock: isShockDue(run, played - 1, caseClosed), sign: nextIndex === WINDOWS_PER_CASE - 1, narrows });
       audit = verdict.audit?.count ?? 0;
+      if (verdict.scouted) trustSpent += SCOUT_TRUST;
+      if (verdict.narrowed) {
+        trustSpent += verdict.narrowTrust ?? SCOUT_NARROW_TRUST;
+        narrows += 1;
+      }
       see(seen, verdict);
       if (run.schema.mutations.includes("cascade")) {
         seen.cascadeBoards += 1;
@@ -956,10 +1026,11 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
       seen.linksLapsed += handed.capped + (last ? handed.links.length : 0);
       carried = { caseIndex, links: last ? [] : handed.links };
     }
-    return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen };
+    return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen, trustSpent };
   }
 
-  function playHandCase(caseIndex, decide, relics, { stanceMastery, logic } = {}, rules = ALL_RULES) {
+  function playHandCase(caseIndex, decide, relics, { stanceMastery, logic } = {}, handRules = ALL_RULES) {
+    const rules = withNextRules(handRules, NEXT_ON);
     let run = openCaseRun({ relics, stanceMastery, ...(logic ? { logic } : {}) }, { rules });
     let played = 0;
     for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
