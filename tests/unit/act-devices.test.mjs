@@ -85,6 +85,12 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   assert.match(debt.text, new RegExp(`${LATE_BILL_SHARE}분의 1`));
   assert.match(debt.text, new RegExp(`${HEAT_DEBT_SECONDS}초`));
   assert.match(engine.describeMutations(usual)[0].text, /3분의 1/);
+  // 11-20 (the user's 「1」): the thicker chips pay only a cash under the debt's line.
+  const chip = { id: "c", effect: { capital: 7, trust: 11, humanCost: 4 } };
+  const board10 = engine.getTableSchema({ open: { caseId: "case10" } });
+  assert.equal(engine.getPaidChips(chip, board10, HEAT_DEBT_GAUGE - 1, "lateBill"), engine.getCardChips(chip, board10));
+  assert.equal(engine.getPaidChips(chip, board10, HEAT_DEBT_GAUGE, "lateBill"), engine.getCardChips(chip, plain));
+  assert.equal(engine.getPaidChips(chip, board10, 80, null), engine.getCardChips(chip, board10), "no twist, the board's");
 });
 
 test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot and costs 사람 피해; the tool goes first, and never twice", () => {
