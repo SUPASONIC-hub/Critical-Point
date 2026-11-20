@@ -44,7 +44,7 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { nodes } from "./gameData.js";
 import { applyEffect, REFRAME_EFFECT } from "./gameLogic.js";
-import { applyGauntletEffect, BUST_EFFECT, normalizeSchema } from "./gauntlet/gauntletEngine.js";
+import { applyGauntletEffect, getBustEffect, normalizeSchema } from "./gauntlet/gauntletEngine.js";
 import { describeCaseOpening } from "./state/caseRoutes.js";
 import { routeChoice } from "./state/settleChoice.js";
 import { WINDOW_RECORD_KEY } from "./rankingRecheck.js";
@@ -100,7 +100,7 @@ function recheckResources(entry, index, card, breaks, unchecked) {
   if (!isObject(priced)) return;
   const busted = entry.threshold?.busted === true;
   const clue = isObject(entry.clueReward?.effect) ? entry.clueReward.effect : entry.clue ? CLUE_EFFECT : {};
-  const merged = mergeEffects(priced, busted ? {} : clue, busted ? BUST_EFFECT : {});
+  const merged = mergeEffects(priced, busted ? {} : clue, busted ? getBustEffect(entry.threshold) : {});
   if (!sameEffect(merged, effect)) {
     breaks.push({ entry: index, field: "effect", expected: merged, found: effect });
     return;

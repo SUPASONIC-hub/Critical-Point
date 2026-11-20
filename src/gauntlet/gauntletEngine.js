@@ -47,7 +47,7 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_SHARE, twistHasDevice } from "./actTwists.js";
+import { LATE_BILL_SHARE, PASSED_DOWN_HARM, twistHasDevice } from "./actTwists.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -387,6 +387,14 @@ export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, 
 }
 
 export const BUST_EFFECT = Object.freeze({ trust: -6, legitimacy: -6, fatigue: 8, time: -4 });
+const PASSED_DOWN_EFFECT = Object.freeze({ ...BUST_EFFECT, humanCost: PASSED_DOWN_HARM });
+
+/**
+ * What a BUST costs, read off its verdict or its log entry's `threshold`:
+ * `BUST_EFFECT`, and under G5 1막 떠넘겨진 손실 (`passedDown`, the case's twist
+ * kept part of the pot) 사람 피해 `PASSED_DOWN_HARM` on top.
+ */
+export const getBustEffect = (bust) => (bust?.passedDown === true ? PASSED_DOWN_EFFECT : BUST_EFFECT);
 
 /* ----------------------------------------------------------------- hand */
 
@@ -2003,7 +2011,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // INSURANCE, which is then not spent on that bust.
   const clockKept = outcome === "bust" && cause === "timeout" && hasRelic(relics, "testimony") && current.runPot > 0;
   const insured = !clockKept && outcome === "bust" && hasRelic(relics, "insurance") && !current.insuranceSpent && current.runPot > 0;
-  const keptShare = clockKept ? TESTIMONY_SHARE : insured ? INSURANCE_SHARE : 0;
+  // G5 1막 떠넘겨진 손실 (actTwists.js): the case's first BUST keeps INSURANCE's
+  // share, and the hand's 사람 피해 rises (`getBustEffect`). The tool goes first, and
+  // the two share the one spend: a case is never kept twice.
+  const passedDown = !clockKept && !insured && outcome === "bust" && !current.insuranceSpent && current.runPot > 0 && twistHasDevice(getCaseTwist(current, rules), "passedDown");
+  const keptShare = clockKept ? TESTIMONY_SHARE : insured || passedDown ? INSURANCE_SHARE : 0;
   const insuredPot = keptShare ? Math.floor(current.runPot / keptShare) : 0;
   const lostPot = outcome === "bust" ? current.runPot - insuredPot : 0;
   // A relic that bent the streak says so in the reveal: a bust that left a
@@ -2099,6 +2111,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(exposure > 0 ? { exposure: { points: exposure, chance: catchChance, caught } } : {}),
     // G3: a charged EXPOSE cash, which no audit mark or 눈에 띔 reaches.
     ...(shielded ? { auditShield: true } : {}),
+    // G5 1막: the case's twist kept a share of this BUST's pot, and 사람 피해 pays (`getBustEffect`).
+    ...(passedDown ? { passedDown: true } : {}),
     elapsed: round2(Number(window?.elapsed) || 0),
     chips,
     multiplier,
@@ -2191,7 +2205,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     relics,
     relicOffer,
     relicDraft: drafted.relicDraft,
-    insuranceSpent: !caseClosed && (current.insuranceSpent || insured),
+    insuranceSpent: !caseClosed && (current.insuranceSpent || insured || passedDown),
     ...(current.extraBought ? { extraBought: true } : null),
     schema: nextSchema,
   };

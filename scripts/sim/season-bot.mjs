@@ -43,7 +43,7 @@ import {
 import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
-  BUST_EFFECT,
+  getBustEffect,
   buyExtraRelic,
   createCaseClose,
   createRunSummary,
@@ -646,7 +646,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
-        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
+        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {});
         const resourcesAfter = applyEffect(resources, finalEffect);
         if (clue) discoveredClues = [...discoveredClues, clue];
         triggers = { ...triggers };

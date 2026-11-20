@@ -4,11 +4,11 @@ const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
-const { HEAT_DEBT_GAUGE, HEAT_DEBT_SECONDS, PEAK_CASES } = await import("../../src/gauntlet/tableRules.js");
+const { HEAT_DEBT_GAUGE, HEAT_DEBT_SECONDS, INSURANCE_SHARE, PEAK_CASES } = await import("../../src/gauntlet/tableRules.js");
 const { NEXT_RULE, OLD_RULE } = await import("../../src/gauntlet/nextTableRules.js");
 const koWeek = (await import("../../src/copy/weekRules.js")).default;
 const enWeek = (await import("../../src/locales/en/screens/weekRules.js")).default;
@@ -39,9 +39,10 @@ test("each device twist names one device the list allows, and its act's cases le
 });
 
 test("a device twist is dealt only once its engine part is in, behind a case's own rule and never beside a week's", () => {
-  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, ["lateBill"]);
-  assert.equal(actTwistFor("case04"), null, "act 1 is not built yet");
-  assert.equal(actTwistFor("case04", ["passedDown"]), "passedDown");
+  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, ["passedDown", "lateBill"]);
+  assert.equal(actTwistFor("case20"), null, "act 4 is not built yet");
+  assert.equal(actTwistFor("case20", ["trainedWall"]), "trainedWall");
+  assert.equal(actTwistFor("case05"), "passedDown");
   assert.equal(actTwistFor("case13"), "merger", "3, 5 and 7 as before");
   assert.equal(caseRuleFor("case10", {}), "lateBill");
   assert.equal(caseRuleFor("case10", { weekRule: "short-clock" }), null);
@@ -84,6 +85,29 @@ test("2막 뒤늦은 청구서: sharper HEAT DEBT, thicker chips, HEAT SINK stil
   assert.match(debt.text, new RegExp(`${LATE_BILL_SHARE}분의 1`));
   assert.match(debt.text, new RegExp(`${HEAT_DEBT_SECONDS}초`));
   assert.match(engine.describeMutations(usual)[0].text, /3분의 1/);
+});
+
+test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot and costs 사람 피해; the tool goes first, and never twice", () => {
+  const bust = { status: "bust", cause: "push", gauge: 70, wall: 66, pushes: 3, elapsed: 10, focus: 0, focusMode: "strike" };
+  const card = { id: "c", effect: { trust: 4 } };
+  const at = (caseId, extra = {}) => engine.normalizeRunState({ open: { caseId }, runPot: 900, runHand: 300, ...extra });
+  const first = engine.resolveWindow({ run: at("case05"), window: bust, card });
+  assert.equal(first.verdict.passedDown, true);
+  assert.equal(first.verdict.insuredPot, Math.floor(900 / INSURANCE_SHARE));
+  assert.equal(first.verdict.lostPot, 900 - Math.floor(900 / INSURANCE_SHARE));
+  assert.equal(first.nextRun.insuranceSpent, true);
+  assert.deepEqual(engine.getBustEffect(first.verdict), { ...engine.BUST_EFFECT, humanCost: PASSED_DOWN_HARM });
+  const second = engine.resolveWindow({ run: first.nextRun, window: bust, card });
+  assert.equal(second.verdict.passedDown, undefined, "once a case");
+  assert.equal(second.verdict.insuredPot, 0);
+  const tooled = engine.resolveWindow({ run: at("case05", { relics: ["insurance"] }), window: bust, card });
+  assert.equal(tooled.verdict.passedDown, undefined, "the insurance tool goes first, and costs no one");
+  assert.equal(tooled.verdict.insuredPot, Math.floor(900 / INSURANCE_SHARE));
+  assert.equal(engine.resolveWindow({ run: at("case07"), window: bust, card }).verdict.passedDown, undefined, "not the act's case");
+  assert.equal(engine.resolveWindow({ run: at("case05", { weekRule: "short-clock" }), window: bust, card }).verdict.passedDown, undefined, "a week's season");
+  assert.equal(engine.resolveWindow({ run: at("case05"), window: bust, card, rules: new Set([OLD_RULE]) }).verdict.passedDown, undefined, "the old table");
+  assert.equal(engine.resolveWindow({ run: at("case05", { runPot: 0 }), window: bust, card }).verdict.passedDown, undefined, "nothing to keep, nothing spent");
+  assert.equal(engine.getBustEffect({}), engine.BUST_EFFECT);
 });
 
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
