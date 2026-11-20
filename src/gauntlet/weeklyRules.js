@@ -290,7 +290,9 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, firstS
  */
 export function weekRuleOverlay(id, schema, moves = null) {
   // `moves`: what the case chose under a twist that asks (G5 8막 실명 서명, actTwists.js `SIGN_WAYS`).
-  const numbers = moves ?? getWeekRule(id)?.schema ?? getActTwist(id)?.schema;
+  // The numbers only: no words are filled on this path, which every board dealt walks.
+  const own = (table) => (typeof id === "string" && Object.hasOwn(table, id) ? table[id].schema : undefined);
+  const numbers = moves ?? own(WEEK_RULE_CATALOGUE) ?? own(ALL_ACT_TWIST_RULES);
   if (!numbers || !schema) return null;
   const overlay = {};
   for (const [key, value] of Object.entries(numbers)) {
