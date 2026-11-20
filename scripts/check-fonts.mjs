@@ -51,7 +51,8 @@ import {
 // 2026-11-03/04: 96,236 and then 129,424 / 85,744.) Measured 131,352 / 82,780 plus 4.
 // 131,356 -> 131,476 on 2026-11-11, bundle 1111 (#301 adds 냄 and 짧 to the start screen). Measured 131,472 plus 4.
 // 131,476 -> 131,832 on 2026-11-13, 다국적 인물 (cast-global): the start screen's one-month rename notice lists the old and new names (프리야 나이르, 레이철 탄 ...). Measured 131,828 plus 4.
-const MAX_FONT_BYTES = 131_832;
+// 131,832 -> 132,240 on 2026-11-20, adsense-notes (draft over main 065d684d): the start screen's reading section (읽을거리) brings its syllables into this file. Measured 132,236 plus 4.
+const MAX_FONT_BYTES = 132_240;
 // 82,784 -> 82,428 on 2026-11-11, bundle 1111 (냄 and 짧 left this file). Measured 82,424 plus 4.
 // 82,428 -> 82,688 on 2026-11-11, E-11 번외 1 (#314) over main 5c93b496: 갭 and 뿌 join this file. Measured 82,684 plus 4.
 // 82,688 -> 86,328 on 2026-11-13, 다국적 인물 (cast-global): the new names' syllables (뤼, 옌, 응, 즈 ...). Measured 86,324 plus 4.

@@ -557,6 +557,9 @@ const fileBudgets = {
   // New on 2026-11-19 (b5-open-clock-cue, measured locally): the stake clock's cut beside the clock for 0.8
   // seconds, a push's or the creep's (B5, N43), in a file of its own so play.css's budget is not touched. Measured 34 / 639.
   "clock-cut.css": { lines: 34, bytes: 639 },
+  // New on 2026-11-20 (adsense-notes, draft over main 065d684d): 읽을거리, the start screen's
+  // last section (HomeReading.jsx), in a file of its own; .intro-legal left base-intro-ranking.css with it. Measured.
+  "home-reading.css": { lines: 97, bytes: 1885 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

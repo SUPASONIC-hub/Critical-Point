@@ -4,6 +4,7 @@ import test from "node:test";
 
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
 import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
+import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -20,6 +21,7 @@ import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../../src/gameCases.js";
 import { DATA_RETENTION_DAYS, legalPagePath, SITE_PAGES } from "../../src/privacyText.js";
 import { DOCUMENT_PAGE } from "../../src/serviceWorker/worker.js";
+import { READING_KINDS } from "../../src/homeReading.js";
 
 /**
  * The about, FAQ and contact pages (scripts/site-pages.mjs), the policy's six
@@ -45,7 +47,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3, "with the policy's six and the content pages (scripts/content-pages)");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length, "with the policy's six, the content pages and the notes out today (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -53,6 +55,8 @@ test("each page has its own title and description, a canonical link and every la
   const descriptions = new Set();
   const titles = new Set();
   for (const [file, html] of Object.entries(all)) {
+    // The notes are Korean only and name no other language (tests/unit/notes.test.mjs).
+    if (file.startsWith("notes/")) continue;
     const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
     const page = file.slice(FOLDER[language].length);
     assert.match(html, /^<!doctype html>/, file);
@@ -143,9 +147,12 @@ test("the pages say what the code holds: the season's length, a case's minutes, 
   assert.match(decode(site["contact.html"]), /10일 안에 결과를 알려 드립니다/);
 });
 
-test("the start screen's foot links the five pages in the screen's language", () => {
+test("the start screen's reading section links the five pages in the screen's language, among the site's nine kinds", () => {
+  // 읽을거리 (HomeReading.jsx, src/homeReading.js) replaced the five-link foot on 2026-11-20; tests/unit/notes.test.mjs holds its rows.
   const intro = readFileSync("src/screens/IntroScreen.jsx", "utf8");
-  assert.match(intro, /SITE_PAGES\.map\(\(page\) => \(\s*<a key=\{page\} href=\{legalPagePath\(`\/\$\{page\}\.html`, LANG\)\}>\{introCopy\.legal\[page\]\}<\/a>/);
+  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} \/>/);
+  assert.match(readFileSync("vite.config.js", "utf8"), /__CP_RECENT_NOTES__: JSON\.stringify\(recentNotes\(notesDay\(\)\)\)/);
+  for (const page of SITE_PAGES) assert.ok(READING_KINDS.includes(page) || ["privacy", "terms"].includes(page), page);
   for (const page of SITE_PAGES) {
     for (const language of ["ko", "en", "ja"]) assert.ok(all[legalPagePath(`/${page}.html`, language).slice(1)], `${page} in ${language} is written`);
   }
@@ -158,7 +165,8 @@ test("the start screen's foot links the five pages in the screen's language", ()
 });
 
 test("the service worker keeps every page for offline reading, and leaves the crawler's files alone", () => {
-  for (const file of Object.keys(all)) assert.match(`/${file}`, DOCUMENT_PAGE, file);
+  // A note is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
+  for (const file of Object.keys(all)) if (!file.startsWith("notes/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
   assert.doesNotMatch("/robots.txt", DOCUMENT_PAGE);
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });

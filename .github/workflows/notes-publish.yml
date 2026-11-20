@@ -1,0 +1,60 @@
+name: Notes Publish
+
+# The notes (/notes/, scripts/content-pages/notes.mjs) go out a few a week, each
+# on its own day: a build writes only the notes whose day (`published` in
+# src/notes/noteIndex.js, KST) has come. A note dated for a day with no merge
+# would wait for the next deploy, so just after midnight in Seoul this asks
+# whether a note's day is today and, if one is, presses Deploy for the tip of
+# main: the same dispatch a person would make, held to the same gate (on main,
+# its push's Verify green; deploy.yml). Render's build then runs on the new day
+# and writes the note, its place in the list, the sitemap and the start
+# screen's 읽을거리. On every other day it does nothing.
+#
+# Why the notes are spread out: cp-archive/메모-20261120/adsense-2차-분석.md
+# (4-2), the owner's decision 2026-11-20 「전부 1」. No new secret: the run's
+# own GITHUB_TOKEN with `actions: write`, which a workflow_dispatch may be
+# started with.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 00:10 KST, every day.
+    - cron: "10 15 * * *"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Is a note's day today?
+        id: due
+        shell: bash
+        run: |
+          set -euo pipefail
+          due=$(node --input-type=module -e 'import { NOTES, seoulDay } from "./src/notes/noteIndex.js"; const today = seoulDay(); console.log(NOTES.filter((note) => note.published === today).map((note) => note.slug).join(" "));')
+          echo "notes=$due" >> "$GITHUB_OUTPUT"
+          if [ -n "$due" ]; then echo "Out today: $due" >> "$GITHUB_STEP_SUMMARY"; else echo "No note goes out today." >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Deploy the tip of main, so the build writes them
+        if: steps.due.outputs.notes != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha=$(git rev-parse HEAD)
+          gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main -f sha="$sha"
+          echo "Dispatched Deploy for $sha." >> "$GITHUB_STEP_SUMMARY"

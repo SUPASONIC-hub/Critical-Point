@@ -965,12 +965,13 @@ export { escapeHtml };
  * the foot sat inside <main>, so the page had no banner or contentinfo, and
  * nothing let a keyboard pass the menu's thirteen links.
  */
-export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "", hero = null }) {
+export function renderDocumentPage({ kind, language, body, description, effective = null, analytics = null, heading = null, style = "", structuredData = "", hero = null, languages = PAGE_LANGUAGES }) {
   const copy = COPY[language];
   const name = heading ?? copy[kind];
   const title = `${name}${TITLE_TAIL[language]}`;
+  // `languages`: the ones the page is written in. A note is Korean only (scripts/content-pages/notes.mjs) and names no other.
   const alternates = [
-    ...PAGE_LANGUAGES.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
+    ...languages.map((code) => `<link rel="alternate" hreflang="${code}" href="${pagePath(kind, code)}" />\n`),
     `<link rel="alternate" hreflang="x-default" href="${pagePath(kind, "ko")}" />\n`,
   ].join("");
   const dated = effective ? `<p class="effective">${copy.effective}: ${effective}</p>\n` : "";
