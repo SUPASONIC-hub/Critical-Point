@@ -6,6 +6,7 @@ import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { InstallHintSlot } from "../components/InstallHintSlot.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
+import { HomeReading } from "../components/HomeReading.jsx";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
@@ -26,7 +27,7 @@ import { setAccessibility } from "../state/accessibilitySettings.js";
 import { DEFAULT_PLAYER_NAME, getDeletionRequestText } from "../appConfig.js";
 import introPanelsCopy from "../copy/introPanels.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
+import { legalPagePath, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
@@ -987,15 +988,11 @@ export function IntroScreen({ view, renderers = {} }) {
             })}
           </div>
         </section>
-        {/* Plain links to the five pages beside the build (privacyText.js,
-            scripts/legal-pages.mjs and site-pages.mjs) in the page's
-            language: the addresses a store listing names, and the site's
-            text a crawler follows from the start page. */}
-        <footer className="intro-legal">
-          {SITE_PAGES.map((page) => (
-            <a key={page} href={legalPagePath(`/${page}.html`, LANG)}>{introCopy.legal[page]}</a>
-          ))}
-        </footer>
+        {/* 읽을거리: what the game is, the site's nine kinds of page in the
+            page's language (the privacy policy and the terms among them, the
+            addresses a store listing names) and the newest notes -- text a
+            reader and a crawler find on the start page (src/homeReading.js). */}
+        <HomeReading copy={introCopy.reading} legal={introCopy.legal} language={LANG} notes={__CP_RECENT_NOTES__} />
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
             burst itself is a picture of the same thing. */}

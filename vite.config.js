@@ -17,6 +17,8 @@ import { seasonData } from "./scripts/vite-season-data.mjs";
 import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 import { COLD_OPENING_ENABLED } from "./src/coldOpeningSwitch.js";
+import { notesDay } from "./scripts/content-pages/notes.mjs";
+import { recentNotes } from "./src/notes/noteIndex.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -428,7 +430,9 @@ function staticPages({ analytics, ads }) {
   const files = () => {
     const origin = siteOrigin();
     const dates = JSON.parse(readFileSync("scripts/sitemap-dates.json", "utf8")).pages;
-    return { ...renderStaticPages(origin, { analytics, ads }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10), dates }) };
+    // One day for the notes the pages, the sitemap and the start screen list (__CP_RECENT_NOTES__): today in Seoul.
+    const day = notesDay();
+    return { ...renderStaticPages(origin, { analytics, ads, day }), ...crawlerFiles({ origin, date: day, dates }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -819,6 +823,9 @@ export default defineConfig(({ command, mode }) => {
       // B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js): a constant, so a build
       // with the switch off has none of the page in it.
       __CP_COLD_OPENING__: JSON.stringify(COLD_OPENING_ENABLED),
+      // The newest notes out on the day the build ran (in Seoul): the ones this build
+      // wrote pages for, as the start screen's 읽을거리 lists them (HomeReading.jsx).
+      __CP_RECENT_NOTES__: JSON.stringify(recentNotes(notesDay())),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene

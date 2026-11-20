@@ -86,6 +86,13 @@ async function stabilizeVisualPage(page, { expectMasked = [] } = {}) {
       [data-testid="session-code"] {
         visibility: hidden !important;
       }
+      /* The start screen's newest notes are the ones out by the day the build
+         ran (src/notes/noteIndex.js), so the list grows by date with no change
+         to the code: taken out of the flow, its heading and link kept. */
+      .home-reading-notes ul,
+      .home-reading-notes > p {
+        display: none !important;
+      }
       /* Debug-only chrome, taken out of the flow rather than blanked. The
          ?debug=1 entry turns these buttons on in the harness
          (tests/helpers/gameFlow.js:27, src/appConfig.js:22) and nothing turns

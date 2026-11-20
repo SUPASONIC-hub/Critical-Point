@@ -48,6 +48,7 @@ const KOREAN_MODULES = {
   "src/hallOfFame.js": "the docs' Korean hall of fame (scripts/verify-ranking-rows.mjs), not a screen",
   "src/hallOfFameBadges.js": "hallOfFameBoardLabel, read only by the docs' hall of fame",
   "src/playerLanguage.js": "the shell's plain labels, laid over before the first paint",
+  "src/notes/noteIndex.js": "the notes' titles, summaries and dates: the notes are written in Korean only (owner's decision 2026-11-20, Q3), and every language's start screen lists them as Korean (lang=ko)",
   "src/privacyText.js": "patterns for Korean names and the labels src/copy/report.js lays over",
   "src/scenePlate.js": "Korean places and clocks a scene's plate is picked by (sourcePlace, sourceClock)",
   "src/seasonRules.js": "branch condition notes nothing prints",
