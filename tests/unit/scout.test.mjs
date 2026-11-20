@@ -92,7 +92,7 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초");
   // The stage opens SCOUT on the meters' `canPayScout`, read off the run's resources, and adds no import for it.
   assert.match(stage, /\} = readTableMeters\(\{ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene\.node\.caseId, narrowCount \}\);/);
-  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && canPayNarrow : canPayScout\);/);
+  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && win\.schema\?\.trained !== true && canPayNarrow : canPayScout\);/);
   assert.ok(!stage.includes("SCOUT_TRUST"), "the price is the meters' to read, not the stage's");
 });
 

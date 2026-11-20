@@ -228,7 +228,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && canPayNarrow : canPayScout);
+  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && win.schema?.trained !== true && canPayNarrow : canPayScout);
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -706,7 +706,7 @@ export function GauntletStage({
             </small>
           </article>
         </section>
-        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} onPick={setFocusMode} />}
+        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} fixed={Boolean(win.schema?.stanceLocked)} onPick={setFocusMode} />}
         </div>
 
         <div className="gx-hand-head" aria-hidden="true">

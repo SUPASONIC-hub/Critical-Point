@@ -169,6 +169,9 @@ const tableCopy = {
     mastery: "시즌 숙련 ",
     mastered: "완성",
     blocked: "판이 열려 있을 때만 자세를 바꿀 수 있다.",
+    // G5 6막 진술 고정: the recorded stance's line, and why the row is shut.
+    fixed: "조서에 남은 자세 · 사건 끝까지",
+    fixedBlocked: "이번 사건은 첫 확정의 자세가 조서에 남아, 사건이 끝날 때까지 바꿀 수 없다.",
     detail: "시즌 숙련: 충전한 채로 확정한 판",
   },
   ledger: {

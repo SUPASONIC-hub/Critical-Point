@@ -113,7 +113,7 @@ export const ACT_DEVICE_CASES = Object.freeze({
 });
 
 /** The device twists whose engine part is in: only these are dealt. */
-export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["passedDown", "lateBill"]);
+export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["passedDown", "lateBill", "trainedWall", "onRecord"]);
 
 /** Every twist, 3, 5 and 7 and the device ones, by id. */
 export const ALL_ACT_TWIST_RULES = Object.freeze({ ...ACT_TWIST_RULES, ...ACT_DEVICE_TWIST_RULES });

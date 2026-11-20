@@ -4,11 +4,11 @@ const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
-const { HEAT_DEBT_GAUGE, HEAT_DEBT_SECONDS, INSURANCE_SHARE, PEAK_CASES } = await import("../../src/gauntlet/tableRules.js");
+const { HEAT_DEBT_GAUGE, HEAT_DEBT_SECONDS, INSURANCE_SHARE, PEAK_CASES, SCOUT_NARROW_REACH } = await import("../../src/gauntlet/tableRules.js");
 const { NEXT_RULE, OLD_RULE } = await import("../../src/gauntlet/nextTableRules.js");
 const koWeek = (await import("../../src/copy/weekRules.js")).default;
 const enWeek = (await import("../../src/locales/en/screens/weekRules.js")).default;
@@ -39,9 +39,9 @@ test("each device twist names one device the list allows, and its act's cases le
 });
 
 test("a device twist is dealt only once its engine part is in, behind a case's own rule and never beside a week's", () => {
-  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, ["passedDown", "lateBill"]);
-  assert.equal(actTwistFor("case20"), null, "act 4 is not built yet");
-  assert.equal(actTwistFor("case20", ["trainedWall"]), "trainedWall");
+  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, ["passedDown", "lateBill", "trainedWall", "onRecord"]);
+  assert.equal(actTwistFor("case44"), null, "act 8 is not built yet");
+  assert.equal(actTwistFor("case44", ["signedByName"]), "signedByName");
   assert.equal(actTwistFor("case05"), "passedDown");
   assert.equal(actTwistFor("case13"), "merger", "3, 5 and 7 as before");
   assert.equal(caseRuleFor("case10", {}), "lateBill");
@@ -110,6 +110,55 @@ test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot a
   assert.equal(engine.getBustEffect({}), engine.BUST_EFFECT);
 });
 
+test("4막 학습된 벽: the band stands around the heat the last cash was made at, and its one look is the narrow one", () => {
+  const board = { wallMin: 56, wallMax: 92 };
+  assert.deepEqual(engine.getTrainedBand(80, board), { wallMin: 80 - TRAINED_BELOW, wallMax: 92 });
+  assert.deepEqual(engine.getTrainedBand(65, board), { wallMin: 65 - TRAINED_BELOW, wallMax: 65 + TRAINED_ABOVE });
+  assert.deepEqual(engine.getTrainedBand(45, board), { wallMin: 56, wallMax: 56 + TRAINED_MIN_WIDTH }, "a low cash: widened up");
+  assert.deepEqual(engine.getTrainedBand(98, board), { wallMin: 92 - TRAINED_MIN_WIDTH, wallMax: 92 }, "past the band: widened down");
+  for (let heat = 0; heat <= 100; heat += 1) {
+    const band = engine.getTrainedBand(heat, board);
+    assert.ok(band.wallMin >= 56 && band.wallMax <= 92 && band.wallMax - band.wallMin >= TRAINED_MIN_WIDTH, `heat ${heat}`);
+  }
+  const cash = { outcome: "cash", gauge: 65, pushes: 2, streak: 0, focusMode: "strike" };
+  const trained = engine.buildNextSchema({ ...cash, twist: "trainedWall" });
+  assert.equal(trained.trained, true);
+  assert.equal(trained.wallMin, 65 - TRAINED_BELOW);
+  assert.equal(trained.wallMax, 65 + TRAINED_ABOVE);
+  assert.equal(engine.normalizeSchema(trained).trained, true);
+  assert.equal(engine.buildNextSchema({ ...cash, outcome: "bust", cause: "push" , twist: "trainedWall" }).trained, undefined, "a BUST's board as usual");
+  assert.equal(engine.buildNextSchema({ ...cash, caseClosed: true, twist: "trainedWall" }).trained, undefined, "the next case's first board as usual");
+  assert.equal(engine.buildNextSchema(cash).trained, undefined);
+  // One look, already the narrow one; the second is refused.
+  let win = engine.createWindow({ schema: trained, seed: "trained" });
+  win = engine.reduceWindow(win, { type: "SCOUT" });
+  const band = engine.getWindowBand(win);
+  assert.equal(win.scouted, true);
+  assert.ok(band.wallMax - band.wallMin <= SCOUT_NARROW_REACH * 2 && band.wallMin <= win.wall && win.wall <= band.wallMax);
+  assert.equal(engine.reduceWindow(win, { type: "SCOUT" }), win);
+  assert.equal(caseRuleFor("case22", {}), "trainedWall");
+  assert.equal(caseRuleFor("case21", {}), null, "the season's quietest case");
+});
+test("6막 진술 고정: the case's first cash puts its stance on record, every cash carries it, and no board changes it", () => {
+  const cash = { outcome: "cash", gauge: 50, pushes: 2, streak: 0, focusMode: "steady", focusCharge: 0, focusHits: 0, twist: "onRecord" };
+  const recorded = engine.buildNextSchema(cash);
+  assert.equal(recorded.stanceLocked, "steady");
+  assert.ok(recorded.mutations.includes("steadyLine"), "carried without a charge");
+  assert.ok(!engine.buildNextSchema({ ...cash, twist: null }).mutations.includes("steadyLine"), "elsewhere the charge is still asked");
+  assert.equal(engine.buildNextSchema({ ...cash, twist: null }).stanceLocked, undefined);
+  assert.equal(engine.buildNextSchema({ ...cash, outcome: "bust", cause: "push", stanceLocked: "steady" }).stanceLocked, "steady", "a BUST keeps the record");
+  assert.equal(engine.buildNextSchema({ ...cash, outcome: "bust", cause: "push" }).stanceLocked, undefined, "a BUST before the first cash records nothing");
+  assert.equal(engine.buildNextSchema({ ...cash, caseClosed: true }).stanceLocked, undefined, "the next case starts free");
+  assert.equal(engine.buildNextSchema({ ...cash, rules: new Set(["lock"]) }).stanceLocked, undefined, "a table without stances");
+  let win = engine.createWindow({ schema: recorded, seed: "record" });
+  assert.equal(win.focusMode, "steady", "the board opens in the recorded stance");
+  assert.equal(engine.reduceWindow(win, { type: "SET_FOCUS_MODE", mode: "strike" }), win);
+  assert.equal(engine.normalizeSchema(recorded).stanceLocked, "steady");
+  assert.equal(engine.normalizeSchema({ stanceLocked: "nap" }).stanceLocked, undefined);
+  win = engine.createWindow({ schema: engine.buildNextSchema({ ...cash, twist: null }), seed: "free" });
+  assert.notEqual(engine.reduceWindow(win, { type: "SET_FOCUS_MODE", mode: "expose" }), win);
+  assert.equal(caseRuleFor("case34", {}), "onRecord");
+});
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
   for (const id of DEVICE_TWISTS) {
     for (const table of [koWeek, enWeek, jaWeek]) {

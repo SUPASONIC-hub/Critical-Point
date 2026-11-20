@@ -83,7 +83,7 @@ test("the table sells the second look only with both looks' 믿음", () => {
   assert.equal(meters(SCOUT_TRUST + SCOUT_NARROW_TRUST), true);
   assert.equal(meters(SCOUT_TRUST + SCOUT_NARROW_TRUST - 1), false);
   const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
-  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && canPayNarrow : canPayScout\);/);
+  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && win\.schema\?\.trained !== true && canPayNarrow : canPayScout\);/);
 });
 
 test("a narrowed window replays, and a log that says nothing of the second look is held to none", () => {

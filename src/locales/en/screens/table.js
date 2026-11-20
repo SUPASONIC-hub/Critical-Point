@@ -146,6 +146,8 @@ export default {
     mastery: "Season mastery ",
     mastered: "Mastered",
     blocked: "You can change Stance only while the hand is open.",
+    fixed: "On record until the Case ends",
+    fixedBlocked: "This Case, the Stance of your first commit is on record and can’t change until the Case ends.",
     detail: "Season mastery: hands Committed with a charge",
   },
   ledger: {

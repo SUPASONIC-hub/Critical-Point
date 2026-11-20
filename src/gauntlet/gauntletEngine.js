@@ -47,7 +47,7 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_SHARE, PASSED_DOWN_HARM, twistHasDevice } from "./actTwists.js";
+import { LATE_BILL_SHARE, PASSED_DOWN_HARM, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -309,6 +309,10 @@ export function normalizeSchema(value) {
   if (source.lockShut === true) schema.lockShut = true;
   // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took 1/LATE_BILL_SHARE of the heat; only ever written when true.
   if (source.lateBill === true) schema.lateBill = true;
+  // G5 4막 학습된 벽: the band stood around the last cash's heat (`getTrainedBand`); only ever written when true.
+  if (source.trained === true) schema.trained = true;
+  // G5 6막 진술 고정: the stance the case's first cash put on record; only ever written when set.
+  if (FOCUS_MODES.includes(source.stanceLocked)) schema.stanceLocked = source.stanceLocked;
   return schema;
 }
 
@@ -582,7 +586,8 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     status: "live",
     cause: null,
     focus: 0,
-    focusMode: "strike",
+    // G5 6막 진술 고정: a board dealt on record opens in the recorded stance.
+    focusMode: normalized.stanceLocked ?? "strike",
     focusCombo: 0,
     maxFocusCombo: 0,
     focusHits: 0,
@@ -714,6 +719,21 @@ export function getTableSchema(run) {
  */
 export function getCaseTwist(run, rules = ALL_RULES) {
   return run?.story === true ? null : caseRuleFor(run?.open?.caseId, run, CASE_RULES_ON, isNextOn(rules));
+}
+
+/**
+ * G5 4막 학습된 벽 (actTwists.js): the band a board stands at after a cash at
+ * heat `heat`, [heat - TRAINED_BELOW, heat + TRAINED_ABOVE] within the board's
+ * own; never narrower than TRAINED_MIN_WIDTH, widened up first, then down.
+ */
+export function getTrainedBand(heat, { wallMin, wallMax }) {
+  const at = clamp(Math.round(Number(heat) || 0), 0, GAUGE_MAX);
+  let low = Math.max(wallMin, at - TRAINED_BELOW);
+  let high = Math.min(wallMax, at + TRAINED_ABOVE);
+  if (high < low) [low, high] = at > wallMax ? [wallMax, wallMax] : [wallMin, wallMin];
+  if (high - low < TRAINED_MIN_WIDTH) high = Math.min(wallMax, low + TRAINED_MIN_WIDTH);
+  if (high - low < TRAINED_MIN_WIDTH) low = Math.max(wallMin, high - TRAINED_MIN_WIDTH);
+  return { wallMin: low, wallMax: high };
 }
 
 /** Whether the case open on `run` switches on the act twist's `device` (actTwists.js `ACT_DEVICES`). */
@@ -850,8 +870,9 @@ export function getSignCell(window) {
 function readWindowBand(window, reach) {
   const { wallMin, wallMax } = window.schema;
   if (window.scouted !== true) return { wallMin, wallMax, scouted: false };
-  // `reach` is the constant everywhere but the balance scripts' sweeps.
-  const span = reach * 2;
+  // `reach` is the constant everywhere but the balance scripts' sweeps. G5 4막
+  // 학습된 벽: the board already stands near the wall, so its one look is the narrow one.
+  const span = (window.schema.trained === true ? SCOUT_NARROW_REACH : reach) * 2;
   const low = window.wall - Math.floor(seededUnit(`scout:${window.seed}`) * (span + 1));
   const first = { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
   if (window.narrowed !== true) return first;
@@ -909,7 +930,8 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       // One look a window, paid in clock like a LOCK press: no heat of its own,
       // but the clock creeps heat while it is spent. A second press narrows the
       // band (B1, 11-18) for the same clock; its 믿음 is the stage's to gate.
-      if (window.narrowed === true || !rules.has("scout")) return window;
+      // G5 4막: a trained board's one look is already the narrow one (`readWindowBand`).
+      if (window.narrowed === true || !rules.has("scout") || (window.scouted === true && window.schema?.trained === true)) return window;
       return advanceClock(window.scouted === true ? { ...window, narrowed: true } : { ...window, scouted: true }, SCOUT_SECONDS);
     }
     case "BREATHE": {
@@ -923,7 +945,8 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       // A charge belongs to the stance that built it. Changing stance used to
       // keep it, so a hand cooled the gauge with STEADY locks and cashed them as
       // STRIKE: the relief of one stance and the payout and carry of another.
-      if (!rules.has("stance")) return window;
+      // G5 6막 진술 고정: the stance on record does not change until the case ends.
+      if (!rules.has("stance") || window.schema?.stanceLocked) return window;
       const focusMode = normalizeFocusMode(event.mode);
       if (focusMode === normalizeFocusMode(window.focusMode)) return window;
       return { ...window, focusMode, focus: 0, focusCombo: 0 };
@@ -1686,8 +1709,10 @@ function applyLockShut(schema, streak, rules) {
 /** A burn smaller than this is a scratch, not a fracture. */
 export const FRACTURE_MIN_BURN = 8;
 
-function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0 } = {}, rules = ALL_RULES) {
-  if (!rules.has("stance") || !earnedStance(focusMode, focusCharge, focusHits, outcome)) return schema;
+function applyFocusCarry(schema, { outcome, focusMode = "strike", focusCharge = 0, focusHits = 0, record = false } = {}, rules = ALL_RULES) {
+  // G5 6막 진술 고정 (`record`): every cash carries its stance, charged or not.
+  const carried = earnedStance(focusMode, focusCharge, focusHits, outcome) || (record && outcome === "cash" && FOCUS_MODES.includes(focusMode));
+  if (!rules.has("stance") || !carried) return schema;
   const next = { ...schema, mutations: [...schema.mutations] };
   const addMutation = (id) => {
     if (!next.mutations.includes(id)) next.mutations.push(id);
@@ -1801,7 +1826,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false, sign = false, logicStreak = 0, twist = null }) {
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false, sign = false, logicStreak = 0, twist = null, stanceLocked = null }) {
   if (caseClosed) return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -1821,6 +1846,9 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       schema.mutations.push("silence");
     }
   } else {
+    // G5 4막 학습된 벽: NOAH learned the heat this cash was made at; the band
+    // stands around it before anything else moves it.
+    if (twistHasDevice(twist, "trainedWall")) Object.assign(schema, getTrainedBand(gauge, schema), { trained: true });
     if (gauge >= HEAT_DEBT_GAUGE && rules.has("heatDebt")) {
       const sink = hasRelic(relics, "heatSink");
       // G5 2막 뒤늦은 청구서: the case's twist bills more of the heat; HEAT SINK still wins.
@@ -1865,7 +1893,11 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
     schema.chipsScale *= SIGN_CHIPS;
     schema.mutations.unshift(SIGN_MARK);
   }
-  return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits }, rules), stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
+  // G5 6막 진술 고정: the case's first cash puts its stance on record, and every board after it, BUST or cash, is dealt in it.
+  const record = rules.has("stance") && twistHasDevice(twist, "onRecord");
+  const onRecord = record ? (outcome === "cash" && FOCUS_MODES.includes(focusMode) ? focusMode : FOCUS_MODES.includes(stanceLocked) ? stanceLocked : null) : null;
+  if (onRecord) schema.stanceLocked = onRecord;
+  return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(applyFocusCarry(schema, { outcome, focusMode, focusCharge, focusHits, record }, rules), stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
 }
 
 const UNLOCKED = Object.freeze({ focus: 0, focusCombo: 0, maxFocusCombo: 0, focusHits: 0 });
@@ -2074,6 +2106,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     sign: sign === true && !caseClosed,
     logicStreak: logicOn ? streak.logic.streak : current.logic.streak,
     twist: caseClosed ? null : getCaseTwist(current, rules),
+    stanceLocked: current.schema.stanceLocked ?? null,
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [
