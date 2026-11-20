@@ -1,4 +1,4 @@
-import { canBreathe, getCaseTwist, getPaidChips, LOCK_CAP } from "./gauntletEngine.js";
+import { canBreathe, getCaseTwist, getLockPressSeconds, getPaidChips, LOCK_CAP } from "./gauntletEngine.js";
 import { isMarkSevenOn, isNextOn, narrowTrustAt, scoutTrustAt, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { getTableRules } from "./tableUnlocks.js";
 import { decisionWindowSeconds, GAUGE_MAX, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
@@ -134,6 +134,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
     next,
     narrowPrice,
     scoutPrice,
+    // G18 (RULES_MARK 7): what a LOCK press takes of this board's clock, as the button says it (one decimal).
+    lockSeconds: Math.round(getLockPressSeconds(win, getTableRules(caseId, run)) * 10) / 10,
     // G3: LOCK shut on this board (its carried streak fills LOCK's cap). G7: whether 숨 고르기 can still be pressed.
     lockShut,
     breathable: canBreathe(win, next ? undefined : getTableRules(caseId, run)),

@@ -19,7 +19,6 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
-  getLockPressSeconds,
   signCase,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
@@ -184,9 +183,9 @@ export function GauntletStage({
   // with it selected.
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
-  const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout, canPayNarrow, nextClock, next, narrowPrice, scoutPrice, lockShut, breathable,
-  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount, scoutCount }); // G1~G7: the next rules' readings (tableMeters.js).
+  const { selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
+    canPayScout, canPayNarrow, nextClock, next, narrowPrice, scoutPrice, lockSeconds, lockShut, breathable,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount, scoutCount }); // G1~G7, MARK 7 (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   // G17: one cash under the audit's line from its limit, the HUD says so in words (the count alone was missed).
@@ -229,8 +228,6 @@ export function GauntletStage({
   // LOCK, no stances. What the run already holds is drawn whatever the step:
   // relics or a broken board carried in by an older save.
   const lockOn = rules.has("lock");
-  // G18 (RULES_MARK 7): what a LOCK press takes of this board's clock, as the button says it (one decimal).
-  const lockSeconds = Math.round(getLockPressSeconds(win, rules) * 10) / 10;
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
