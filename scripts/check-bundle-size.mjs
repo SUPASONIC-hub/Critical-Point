@@ -738,7 +738,8 @@ const budgets = [
   // 218,967 / 79,833 -> 222,467 / 81,110 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 222463 / 81106 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 218,967 / 79,838 hotfix rule chips (#636) over main f3815370. Measured - / 79834 (over budget only) in CI verify-quick, the plus 4.
   // 222,467 / 81,110 -> 223,467 / 81,471 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 223463 / 81467 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 223_467, maxGzip: 81_471 },
+  // 223,467 / 81,471 -> 223,467 / 81,477 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured - / 81473 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 223_467, maxGzip: 81_477 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1976,11 +1977,12 @@ const budgets = [
   { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 971 },
   // 2,291 / 1,096 -> 2,291 / 1,101 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
   { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_101 },
-  // 석간 원장 (world-news, 2026-11-20): the thirty articles' titles and summaries
+  // 석간 원장 (world-news, 2026-11-20): the articles' titles and summaries
   // the start screen's 오늘의 1면 picks from, loaded once 읽을거리 is drawn
   // (HomeReading.jsx) so the first paint carries only the paper's name.
   // Measured 10,626 / 5,243, the plus 4.
-  { pattern: /^newsIndex-.*\.js$/, maxBytes: 10_630, maxGzip: 5_247 },
+  // 10,630 / 5,247 -> 20,403 / 9,012 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured 20399 / 9008 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^newsIndex-.*\.js$/, maxBytes: 20_403, maxGzip: 9_012 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -2748,7 +2750,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,536 / 445,591 / 453,735 hotfix rule chips (#636) over main f3815370. Measured first paint 381,532 / 445,587 / 453,731 in CI verify-quick, the plus 4.
 // -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
 // -> 385,486 / 450,214 / 458,672 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 385_486, en: 450_214, ja: 458_672 };
+// -> 385,503 / 450,231 / 458,685 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 385_503, en: 450_231, ja: 458_685 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -2964,7 +2967,8 @@ function checkBudget(file, budget) {
 // -> 12,564 / 4,458 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b, the plus 4.
 // -> 12,784 / 4,542 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today), the plus 4.
 // -> 12,816 / 4,547 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
-const WORKER_BUDGET = { maxBytes: 12_816, maxGzip: 4_547 };
+// -> 12,816 / 4,554 on 2026-11-20 (world-news 2차 30편: newsIndex 60편), the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_816, maxGzip: 4_554 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

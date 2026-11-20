@@ -4,7 +4,7 @@ import { NEWS_INDEX_PATH, NEWS_PAPER } from "../news/newsPaper.js";
 
 /**
  * 오늘의 1면 for today in Seoul (src/news/newsIndex.js `todayFrontPage`), or null
- * until its chunk arrives: the thirty articles stay out of the first paint, and
+ * until its chunk arrives: the articles (sixty) stay out of the first paint, and
  * the section is under the first screen. A chunk that fails leaves the paper's link.
  */
 function useTodayFront() {

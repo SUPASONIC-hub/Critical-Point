@@ -1,7 +1,7 @@
 /**
  * 석간 원장's name, its fiction line and its list's address: what the start
  * screen's reading section prints before the articles arrive. The articles
- * themselves (src/news/newsIndex.js, thirty titles and summaries) load as a
+ * themselves (src/news/newsIndex.js, sixty titles and summaries) load as a
  * chunk of their own once the section is drawn (HomeReading.jsx), so they cost
  * the first paint nothing; the section sits under the first screen.
  */

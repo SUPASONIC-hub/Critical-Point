@@ -34,16 +34,18 @@ import { findBannedWords } from "../../scripts/plain-language-rules.mjs";
  * articles in Korean, each saying above and below its words that it is
  * fiction, dated inside the world, linked to the case files it touches, and
  * telling no ending; and the start screen's 오늘의 1면, fixed by the day.
+ * Sixty since the second thirty (same day), so the front page turns over every
+ * two months rather than every month.
  */
 
 const pages = renderNewsPages();
 const textOf = (html) => html.replace(/<[^>]+>/g, "").replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 const body = (article) => textOf(markdownToHtml(articleSource(article.slug)));
 
-test("thirty articles, each with its words on disk, a date inside the world, a page of the paper and case files that exist", () => {
-  assert.equal(ARTICLES.length, 30);
-  assert.equal(new Set(ARTICLES.map((article) => article.slug)).size, 30);
-  assert.equal(new Set(ARTICLES.map((article) => article.title)).size, 30);
+test("sixty articles, each with its words on disk, a date inside the world, a page of the paper and case files that exist", () => {
+  assert.equal(ARTICLES.length, 60);
+  assert.equal(new Set(ARTICLES.map((article) => article.slug)).size, 60);
+  assert.equal(new Set(ARTICLES.map((article) => article.title)).size, 60);
   const cases = new Set(CASE_PAGES);
   for (const article of ARTICLES) {
     assert.match(article.slug, /^[a-z0-9-]+$/);
@@ -116,13 +118,13 @@ test("no article tells an ending or names a real newspaper", () => {
   }
 });
 
-test("오늘의 1면 is fixed by the day in Seoul: the same all day, the next one the next day, all thirty in thirty days", () => {
+test("오늘의 1면 is fixed by the day in Seoul: the same all day, the next one the next day, all sixty in sixty days", () => {
   assert.equal(dayNumber("1970-01-02"), 1);
   assert.throws(() => dayNumber("11-20"), /YYYY-MM-DD/);
   assert.deepEqual(frontPageFor("2026-11-20"), frontPageFor("2026-11-20"));
   assert.notEqual(frontPageFor("2026-11-20").href, frontPageFor("2026-11-21").href);
-  const month = Array.from({ length: 30 }, (_, at) => frontPageFor(new Date(Date.UTC(2026, 10, 1 + at)).toISOString().slice(0, 10)).href);
-  assert.equal(new Set(month).size, 30);
+  const days = Array.from({ length: 60 }, (_, at) => frontPageFor(new Date(Date.UTC(2026, 10, 1 + at)).toISOString().slice(0, 10)).href);
+  assert.equal(new Set(days).size, 60);
   assert.equal(frontPageFor("2026-11-20", []), null);
   const front = frontPageFor("2026-11-20");
   const article = FRONT_ORDER.find((item) => newsPath(item.slug) === front.href);
