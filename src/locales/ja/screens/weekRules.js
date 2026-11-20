@@ -15,7 +15,7 @@ export default {
     },
     "short-clock": {
       title: "時間が短い",
-      text: "今週は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。",
+      text: "今週は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。LOCKのチャージは時間を{lockDrag}倍使う。",
       world: "今週、取締役会は報告の時間を削り、報告書の値を上げた。",
     },
     "crisis-week": {
@@ -52,7 +52,7 @@ export default {
     },
     hearing: {
       title: "公聴会",
-      text: "この事件は盤ごとの時間が{hearingCut}%短く、すべてのカードのチップが{hearingChips}倍。",
+      text: "この事件は盤ごとの時間が{hearingCut}%短く、すべてのカードのチップが{hearingChips}倍。LOCKのチャージは時間を{lockDrag}倍使う。",
       world: "記録の持ち主を争う公聴会。答える時間は短く、一言の値は大きい。",
     },
     // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`).
@@ -78,13 +78,13 @@ export default {
     },
     signedByName: {
       title: "実名の署名",
-      text: "この事件は、最初の勝負の前に署名のしかたを選ぶ。名前だけ書けば、すべてのカードのチップが{nameChips}倍、壁の帯が{nameWall}手前に立つ。条件をつければ、壁の帯が{termsWall}下がり、チップが{termsChips}倍。",
+      text: "この事件は、最初の勝負の前に署名のしかたを選ぶ。名前だけ書けば、すべてのカードのチップが{nameChips}倍、壁の帯が事件ごとに{nameWallLow}から{nameWallHigh}手前に立つ（署名欄に今回の値）。条件をつければ、壁の帯が{termsWall}下がり、チップが{termsChips}倍。",
       world: "もう署名欄に空欄はない。名前の横に条件をつけられるだけだ。",
     },
   },
   caseRules: {
     case09: {
-      text: "この事件は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。",
+      text: "この事件は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。LOCKのチャージは時間を{lockDrag}倍使う。",
       world: "清算議案が72時間以内に採決に上がる。報告は短く、値は高く。",
     },
     case11: {

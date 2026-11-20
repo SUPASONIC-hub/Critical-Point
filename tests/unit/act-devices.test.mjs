@@ -4,7 +4,7 @@ const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
@@ -176,7 +176,8 @@ test("8막 실명 서명: the case is signed before its first board, by name or 
   const named = engine.signCase(opened, "name");
   assert.equal(named.open.signed, "name");
   const board = engine.getTableSchema(named);
-  assert.equal(board.wallMin, plain.wallMin - SIGN_NAME_WALL);
+  // G16 (RULES_MARK 7): by name, the wall the case drew (rules-mark7.test.mjs); SIGN_NAME_WALL on the table before.
+  assert.equal(board.wallMin, plain.wallMin - engine.getNameWall(named));
   assert.equal(board.chipsScale, plain.chipsScale * SIGN_NAME_CHIPS);
   assert.equal(engine.getTableSchema(named), board, "one board per saved board");
   assert.equal(engine.signCase(named, "terms").open.signed, "terms", "changed before the first board");

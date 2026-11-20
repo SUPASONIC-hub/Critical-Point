@@ -58,6 +58,7 @@ export function PlayScreen({ view, renderers, sceneTitleRef: titleRef, actions }
         run={gauntletRun}
         auditCount={tableRisk.audit}
         narrowCount={tableRisk.narrows ?? 0}
+        scoutCount={tableRisk.scouts ?? 0}
         links={tableRisk.links}
         cards={fixedChoices}
         reframeChoice={reframeChoice}

@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { getCaseRule, getWeekRule } from "./weeklyRules.js";
 import { caseRuleFor } from "./caseRules.js";
 import { readSignWay } from "./actTwists.js";
-import { asksToSign } from "./gauntletEngine.js";
+import { asksToSign, getNameWall } from "./gauntletEngine.js";
+import { fill } from "../locale.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import edgeCopy from "../copy/edge.js";
 
@@ -128,6 +129,8 @@ export function SignAsk({ run, onSign }) {
     <div className="gx-panel gx-panel-breach gx-carry" data-testid="sign-ask" role="group" aria-labelledby="gx-sign-ask" style={{ gridArea: "auto" }}>
       <p className="gx-breach-kicker">{edgeCopy.sign.kicker}</p>
       <p id="gx-sign-ask">{edgeCopy.sign.question}</p>
+      {/* G16 (RULES_MARK 7): the wall 「이름만」 moves in this case, drawn for it, before the choice. */}
+      <p data-testid="sign-name-wall">{fill(edgeCopy.sign.nameWall, { wall: getNameWall(run) })}</p>
       <div className="gx-comic-cards">
         {["name", "terms"].map((way) => (
           <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way} onClick={() => onSign(way)}>

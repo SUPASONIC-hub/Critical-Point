@@ -1,5 +1,5 @@
 import { canBreathe, getCaseTwist, getPaidChips, LOCK_CAP } from "./gauntletEngine.js";
-import { isNextOn, narrowTrustAt, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { isMarkSevenOn, isNextOn, narrowTrustAt, scoutTrustAt, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { getTableRules } from "./tableUnlocks.js";
 import { decisionWindowSeconds, GAUGE_MAX, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
@@ -98,10 +98,12 @@ export const CLOCK_CUT_MS = 800;
  * what a cash now would make it (B3: the heat and the pushes, never the
  * wall), and is null on every other table.
  */
-export function readTableMeters({ win, schema, selectedCard, run = null, audit, resources = null, caseId = null, narrowCount = 0 }) {
+export function readTableMeters({ win, schema, selectedCard, run = null, audit, resources = null, caseId = null, narrowCount = 0, scoutCount = 0 }) {
   // G1~G7 (nextTableRules.js): whether the case plays the next rules, and what they change on this table.
   const next = isNextOn(getTableRules(caseId, run));
   const narrowPrice = next ? narrowTrustAt(narrowCount) : SCOUT_NARROW_TRUST;
+  // G13 (RULES_MARK 7): the first look's price climbs with the case's first looks (`scoutTrustAt`).
+  const scoutPrice = isMarkSevenOn(getTableRules(caseId, run)) ? scoutTrustAt(scoutCount) : SCOUT_TRUST;
   const lockShut = next && schema.lockShut === true;
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
@@ -125,12 +127,13 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
     belowRelief: win.gauge < getFocusModeProfile(win.focusMode, next).relief,
     band,
     // B1: whether the run can pay for the look (SCOUT_TRUST of 믿음); the stage opens SCOUT on it, as the bots do.
-    canPayScout: (Number(resources?.trust) || 0) >= SCOUT_TRUST,
+    canPayScout: (Number(resources?.trust) || 0) >= scoutPrice,
     // The second look (11-18): both looks' 믿음, since both are billed when the window settles.
     // G2 (the next rules): the price climbs with the case's second looks (`narrowPrice`, nextTableRules.js narrowTrustAt).
-    canPayNarrow: (Number(resources?.trust) || 0) >= SCOUT_TRUST + narrowPrice,
+    canPayNarrow: (Number(resources?.trust) || 0) >= scoutPrice + narrowPrice,
     next,
     narrowPrice,
+    scoutPrice,
     // G3: LOCK shut on this board (its carried streak fills LOCK's cap). G7: whether 숨 고르기 can still be pressed.
     lockShut,
     breathable: canBreathe(win, next ? undefined : getTableRules(caseId, run)),

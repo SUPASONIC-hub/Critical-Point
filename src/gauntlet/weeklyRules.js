@@ -30,9 +30,9 @@ import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./
 import weekRulesCopy from "../copy/weekRules.js";
 import {
   ALL_ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, LATE_BILL_CHIPS, MERGER_CHIPS, MERGER_SHIFT, PASSED_DOWN_HARM, SCATTER_CHIPS, SCATTER_SPREAD,
-  SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW,
+  SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW,
 } from "./actTwists.js";
-import { HEAT_DEBT_GAUGE, INSURANCE_SHARE } from "./tableRules.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOCK_DRAG } from "./tableRules.js";
 import { fill } from "../locale.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -130,7 +130,7 @@ function ruleValues() {
   return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS,
     // G5's acts 1, 2, 4, 6 and 8 (actTwists.js).
     downShare: INSURANCE_SHARE, downHarm: PASSED_DOWN_HARM, billHeat: HEAT_DEBT_GAUGE, billChips: LATE_BILL_CHIPS,
-    trainedBelow: TRAINED_BELOW, trainedAbove: TRAINED_ABOVE, nameChips: SIGN_NAME_CHIPS, nameWall: SIGN_NAME_WALL, termsWall: SIGN_TERMS_WALL, termsChips: SIGN_TERMS_CHIPS };
+    trainedBelow: TRAINED_BELOW, trainedAbove: TRAINED_ABOVE, nameChips: SIGN_NAME_CHIPS, nameWall: SIGN_NAME_WALL, nameWallLow: SIGN_NAME_WALL_LOW, nameWallHigh: SIGN_NAME_WALL_HIGH, lockDrag: LOCK_DRAG, termsWall: SIGN_TERMS_WALL, termsChips: SIGN_TERMS_CHIPS };
 }
 function ruleWords(id) {
   const { title, text, world } = weekRulesCopy.rules[id];

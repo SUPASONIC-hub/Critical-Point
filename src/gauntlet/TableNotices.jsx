@@ -194,7 +194,7 @@ export function RelicChips({ relics, pulse }) {
  * page. Before the case has SCOUT the band is the plain label the meter
  * already reads out.
  */
-export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCOUT_NARROW_TRUST, onBreathe = null }) {
+export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCOUT_NARROW_TRUST, scoutTrust = SCOUT_TRUST, onBreathe = null }) {
   // G6: the 결재 판's shown cell, the nearest the wall can be, beside the band (its line is said once by the voice);
   // G7: 숨 고르기 on the board right after a BUST, before the first push, while it can be pressed (`onBreathe`).
   const shown = <>{band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(tableCopy.stage.signCell, { cell: band.shown })}</span>}
@@ -204,7 +204,7 @@ export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCO
   // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
   const narrows = band.scouted && canScout;
   const label = !band.scouted
-    ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })
+    ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: scoutTrust, seconds: SCOUT_SECONDS })
     : narrows
       ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
       : undefined;
