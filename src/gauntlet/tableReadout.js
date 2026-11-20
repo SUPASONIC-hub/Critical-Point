@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { formatMoney, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getCaseTwist, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
@@ -402,6 +402,8 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
   // the schedule `resolveWindow` applies (`getSeasonEscalation`), which a
   // practice window does not move along (`getEscalationWindow`).
   const windowIndex = getEscalationWindow(run) + (run?.practice ? 0 : 1);
+  // G5 (actTwists.js): the case's twist, which 2막's bills more of the debt.
+  const twist = getCaseTwist(run, rules);
 
   const cashMutations = useMemo(
     () =>
@@ -420,8 +422,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
         stanceMastery,
         windowIndex,
         rules,
+        twist,
       })),
-    [focusMode, fractureAxis, hot, indebted, pushed, relics, rules, stanceEarned, stanceMastery, streak, windowIndex],
+    [focusMode, fractureAxis, hot, indebted, pushed, relics, rules, stanceEarned, stanceMastery, streak, twist, windowIndex],
   );
   const bustMutations = useMemo(
     () =>

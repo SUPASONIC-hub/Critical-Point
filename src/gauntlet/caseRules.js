@@ -35,7 +35,7 @@
  * ranking's table, and the ranking only changes on a reset.
  */
 
-import { ACT_TWIST_CASES } from "./actTwists.js";
+import { actTwistFor, twistHasDevice } from "./actTwists.js";
 import { isNextOn } from "./nextTableRules.js";
 
 /** The switch. Off, no case has a rule of its own: the table as it was before N26. */
@@ -58,8 +58,17 @@ export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = isNextOn()) 
   if (typeof caseId !== "string") return null;
   const own = on && Object.hasOwn(CASE_RULES, caseId) ? CASE_RULES[caseId] : null;
   // G5 (actTwists.js): under the next rules the act's twist, behind the case's own.
-  const id = own ?? (next && Object.hasOwn(ACT_TWIST_CASES, caseId) ? ACT_TWIST_CASES[caseId] : null);
+  const id = own ?? (next ? actTwistFor(caseId) : null);
   if (!id) return null;
   if (run?.story === true || (typeof run?.weekRule === "string" && run.weekRule)) return null;
   return id;
+}
+
+/**
+ * Whether the case's rule switches on an act twist's `device` (actTwists.js,
+ * G5's acts 1, 2, 4, 6 and 8): the engine's one question for each of them.
+ * False wherever `caseRuleFor` deals nothing.
+ */
+export function caseDeviceOn(caseId, run, device, next = isNextOn()) {
+  return twistHasDevice(caseRuleFor(caseId, run, CASE_RULES_ON, next), device);
 }

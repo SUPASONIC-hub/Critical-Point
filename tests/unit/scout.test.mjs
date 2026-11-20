@@ -79,7 +79,7 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   }
   const stage = readFileSync(new URL("../../src/gauntlet/GauntletStage.jsx", import.meta.url), "utf8");
   assert.ok(!stage.includes("getWindowBand") && !stage.includes("gx-band-label"), "the stage draws no band of its own");
-  assert.match(stage, /<ScoutBand band=\{band\} canScout=\{canScout\} onScout=\{scout\} shortcut=\{canScout \? keys\("R"\) : undefined\} narrowTrust=\{narrowPrice\} onBreathe=\{!paused && !locked && breathable \? \(\) => dispatch\(\{ type: "BREATHE" \}\) : null\} \/>/);
+  assert.match(stage, /<ScoutBand band=\{band\} canScout=\{canScout\} onScout=\{scout\} shortcut=\{canScout \? keys\("R"\) : undefined\} narrowTrust=\{narrowPrice\}\s+board=\{win\.schema\} onBreathe=\{!paused && !locked && breathable \? \(\) => dispatch\(\{ type: "BREATHE" \}\) : null\} \/>/);
   const notices = readFileSync(new URL("../../src/gauntlet/TableNotices.jsx", import.meta.url), "utf8");
   const scoutBand = notices.slice(notices.indexOf("export function ScoutBand("), notices.indexOf("export function TableGlossary("));
   // Before the case has SCOUT, the plain label; after, the button, which stays put once spent.
@@ -92,7 +92,7 @@ test("the stage reads the band it draws off the meters, and SCOUT's button is Sc
   assert.equal(tableCopy.notices.scoutLabel, "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초");
   // The stage opens SCOUT on the meters' `canPayScout`, read off the run's resources, and adds no import for it.
   assert.match(stage, /\} = readTableMeters\(\{ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene\.node\.caseId, narrowCount \}\);/);
-  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && canPayNarrow : canPayScout\);/);
+  assert.match(stage, /const canScout = scoutOn && live && !paused && !locked && \(win\.scouted \? !win\.narrowed && win\.schema\?\.trained !== true && canPayNarrow : canPayScout\);/);
   assert.ok(!stage.includes("SCOUT_TRUST"), "the price is the meters' to read, not the stage's");
 });
 
