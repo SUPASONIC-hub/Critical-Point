@@ -262,11 +262,11 @@ const BUDGETS = {
   // clock's cut beside the clock (useClockCut, tableVoice.js), its call and its mark.
   // 869 -> 876 lines, 74 -> 76 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the briefing's
   // signature line (WeekRulePanel.jsx SignAsk) and the board dealt again under the way chosen (signCase).
-  // 876 -> 883 on 2026-11-20 (G15, G17, G10): the scout band's line broken in two for the board 숨 고르기 reads (ScoutBand `board`) and the line under the row
+  // 876 -> 885 on 2026-11-20 (G15, G17, G10): the scout band's line broken in two for the board 숨 고르기 reads (ScoutBand `board`) and the line under the row
   // saying where the BUST before went,
   // the HUD's audit warning in words (`auditWarn`), and G10's mark where a rule pulled the band from (`gauge-pulled`).
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 883,
+    lines: 885,
     longestLine: 250,
     importedNames: 76,
     hooks: {},
