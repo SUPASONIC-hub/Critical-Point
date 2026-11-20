@@ -158,3 +158,12 @@ test("the site menu, the sitemap and the build carry the paper, in Korean only",
   const built = Object.keys(renderStaticPages("", { day: "2026-11-20" }));
   for (const kind of NEWS_KINDS) assert.ok(built.includes(`${kind}.html`), kind);
 });
+
+test("the start screen's bundle carries the paper's name and link, and loads the articles as a chunk of their own", async () => {
+  const { readFileSync } = await import("node:fs");
+  const reading = readFileSync("src/components/HomeReading.jsx", "utf8");
+  assert.match(reading, /from "\.\.\/news\/newsPaper\.js"/);
+  assert.match(reading, /import\("\.\.\/news\/newsIndex\.js"\)/);
+  assert.doesNotMatch(reading, /from "\.\.\/news\/newsIndex\.js"/);
+  assert.doesNotMatch(readFileSync("src/screens/IntroScreen.jsx", "utf8"), /news\/newsIndex/);
+});

@@ -559,7 +559,8 @@ const fileBudgets = {
   "clock-cut.css": { lines: 34, bytes: 639 },
   // New on 2026-11-20 (adsense-notes, draft over main 065d684d): 읽을거리, the start screen's
   // last section (HomeReading.jsx), in a file of its own; .intro-legal left base-intro-ranking.css with it. Measured.
-  "home-reading.css": { lines: 97, bytes: 1885 },
+  // 97 / 1885 -> 114 / 2274 on 2026-11-20 (world-news): 오늘의 1면 beside the notes, sharing their rules. Measured.
+  "home-reading.css": { lines: 114, bytes: 2274 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

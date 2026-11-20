@@ -1971,6 +1971,11 @@ const budgets = [
   // builds), the plus 4.
   { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 971 },
   { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_096 },
+  // 석간 원장 (world-news, 2026-11-20): the thirty articles' titles and summaries
+  // the start screen's 오늘의 1면 picks from, loaded once 읽을거리 is drawn
+  // (HomeReading.jsx) so the first paint carries only the paper's name.
+  // Measured 10,626 / 5,243, the plus 4.
+  { pattern: /^newsIndex-.*\.js$/, maxBytes: 10_630, maxGzip: 5_247 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is

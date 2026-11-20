@@ -15,12 +15,10 @@
  * two scenes), and none names a real company, person or newspaper.
  */
 
-/** The paper's name and what it says about itself, Korean only like its articles. */
-export const NEWS_PAPER = "석간 원장";
-export const NEWS_PAPER_LINE = "게임 「임계점」 세계 속의 가상 경제 석간";
+import { newsPath } from "./newsPaper.js";
 
-/** The line every article page prints above and below its words. */
-export const NEWS_DISCLAIMER = "게임 속 가상 기사입니다 — 실제 사건·인물·회사와 관계없습니다";
+// The paper's name, fiction line and addresses live in ./newsPaper.js, which the first paint carries.
+export { NEWS_DISCLAIMER, NEWS_INDEX_PATH, NEWS_PAPER, NEWS_PAPER_LINE, newsPath } from "./newsPaper.js";
 
 /** Each article: `slug`, `day` (inside the world), `section` (지면), `title`, `summary` and `cases`, the case files it touches. */
 export const ARTICLES = [
@@ -265,10 +263,6 @@ export const ARTICLES = [
     cases: ["case38", "case12"],
   },
 ];
-
-/** An article's address: `/news/<slug>.html`. The list is `/news/index.html`. */
-export const newsPath = (slug) => `/news/${slug}.html`;
-export const NEWS_INDEX_PATH = "/news/index.html";
 
 /** `2025년 6월 2일` */
 export function worldDate(day) {

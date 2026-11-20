@@ -151,7 +151,7 @@ test("the pages say what the code holds: the season's length, a case's minutes, 
 test("the start screen's reading section links the five pages in the screen's language, among the site's nine kinds", () => {
   // 읽을거리 (HomeReading.jsx, src/homeReading.js) replaced the five-link foot on 2026-11-20; tests/unit/notes.test.mjs holds its rows.
   const intro = readFileSync("src/screens/IntroScreen.jsx", "utf8");
-  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} front=\{todayFrontPage\(\)\} \/>/);
+  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} \/>/);
   assert.match(readFileSync("vite.config.js", "utf8"), /__CP_RECENT_NOTES__: JSON\.stringify\(recentNotes\(notesDay\(\)\)\)/);
   for (const page of SITE_PAGES) assert.ok(READING_KINDS.includes(page) || ["privacy", "terms"].includes(page), page);
   for (const page of SITE_PAGES) {

@@ -48,6 +48,7 @@ const KOREAN_MODULES = {
   "src/hallOfFame.js": "the docs' Korean hall of fame (scripts/verify-ranking-rows.mjs), not a screen",
   "src/hallOfFameBadges.js": "hallOfFameBoardLabel, read only by the docs' hall of fame",
   "src/playerLanguage.js": "the shell's plain labels, laid over before the first paint",
+  "src/news/newsPaper.js": "석간 원장's name and fiction line, Korean like its articles (src/news/newsIndex.js)",
   "src/news/newsIndex.js": "석간 원장, the world's newspaper: its articles' titles, summaries and pages, Korean only like the notes (owner's decision 2026-11-20 「1」), shown as Korean (lang=ko) on every start screen",
   "src/notes/noteIndex.js": "the notes' titles, summaries and dates: the notes are written in Korean only (owner's decision 2026-11-20, Q3), and every language's start screen lists them as Korean (lang=ko)",
   "src/privacyText.js": "patterns for Korean names and the labels src/copy/report.js lays over",
