@@ -28,6 +28,9 @@
  * requests; the slot is hidden while none is open (설계안 질문 7 (1)). In
  * story order they open after 사건 14 (번외 3), 16 (번외 4), 17 (번외 1), 18
  * (번외 2), 21 (번외 5), 27 (번외 6), 31 (번외 7), 34 (번외 8) and 40 (번외 9).
+ * The first Season (2026-12-14) adds 번외 10 (side10, 2025년 9월 13일 토요일)
+ * after 사건 05 and 번외 11 (side11, 2026년 9월 5일 토요일) after 사건 42, both
+ * shut until `NEXT_SEASON.opensAt`.
  * New content is released as a "Season" on a date the owner chooses, all at
  * once; there is no fixed monthly schedule (docs/work-status.md).
  *

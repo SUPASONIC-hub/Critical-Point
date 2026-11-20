@@ -749,6 +749,20 @@ export default {
       "gesture": "Before she answers, Aigul Serikova closes the truck key in her palm once and lets it go.",
       "voice": "Clear, unhurried Korean, and she asks about any word she doesn’t know right there.",
       "line": "If he said he would pay it, then I should pay it."
+    },
+    "변정순": {
+      "appearance": "Work trousers worn through at the knees, a marker cap between her teeth, a notebook with 11 years of stars.",
+      "thought": "The houses that say they’re fine are the least fine. The table doesn’t know that, and I do.",
+      "gesture": "When Byeon Jeongsun walks into a house, she opens the medicine bag in the sink before she answers anyone.",
+      "voice": "Fast and blunt, half casual and half polite, and she ends on the next thing to do.",
+      "line": "The ones who say they’re fine are the least fine."
+    },
+    "염봉수": {
+      "appearance": "A whistle round his neck, a cap faded by salt, old paint on the back of his hand.",
+      "thought": "The buoy isn’t the end. It only marks how far my eyes reach.",
+      "gesture": "Before Yeom Bongsu answers, he reties the flag rope once.",
+      "voice": "Short, half casual and half polite, and he always puts one reason after a rule.",
+      "line": "The ones with a reason are the most at risk."
     }
   },
 };

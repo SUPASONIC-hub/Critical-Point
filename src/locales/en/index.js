@@ -120,7 +120,9 @@ export const speakers = {
   "육성빈": "Yuk Seongbin",
   "추영복": "Chu Yeongbok",
   "비노드 타파": "Binod Thapa",
-  "아이굴 세리코바": "Aigul Serikova"
+  "아이굴 세리코바": "Aigul Serikova",
+  "변정순": "Byeon Jeongsun",
+  "염봉수": "Yeom Bongsu"
 };
 
 /** A speaker's role as the briefing prints it, by its Korean (the profile keeps the Korean). The roles of 프롤로그 01-05 and 사건 01-10. */
@@ -162,7 +164,9 @@ export const roles = {
   "공덕동 철물점 사장 · 64세": "Owner of a hardware store in Gongdeok-dong · age 64",
   "카노바 그룹 지역 컴플라이언스 책임자 · 싱가포르": "Regional Head of Compliance, Kanova Group · Singapore",
   "도담사출 3번 사출기 담당 · 네팔 · 9년 8개월 · 39세": "Operator of machine 3, Dodam Injection · from Nepal · 9 years 8 months · age 39",
-  "국진호의 아내 · 카자흐스탄 알마티 · 한국 21년 · 57세": "Wife of Guk Jinho · from Almaty, Kazakhstan · 21 years in Korea · age 57"
+  "국진호의 아내 · 카자흐스탄 알마티 · 한국 21년 · 57세": "Wife of Guk Jinho · from Almaty, Kazakhstan · 21 years in Korea · age 57",
+  "온새 돌봄 강서 거점 방문 요양보호사 · 11년 · 58세": "Home care worker, Onsae Care Gangseo hub · 11 years · age 58",
+  "경포 해변 수상안전요원 · 은퇴 해양경찰 · 서른한 번째 여름 · 66세": "Lifeguard, Gyeongpo Beach · retired coast guard · 31st summer · age 66"
 };
 
 
