@@ -63,7 +63,7 @@ export const GUIDE_BODY = {
 
 <h2>도구</h2>
 <p>프롤로그 05부터 사건이 닫히면 다음 사건의 첫 테이블에서 드래프트가 열립니다. 시계가 멈춘 동안 도구 세 개 가운데 하나를 고릅니다. 도구는 다섯 개까지 들고, 다 차면 하나를 내려놓습니다. 아무것도 고르지 않으면 「숨 고르기」가 되어 첫 판의 시간이 10초 늘고 벽이 3 멀어집니다. 고르기 전에 금고에서 1,500을 내면 「다시 뽑기」를 드래프트마다 한 번, 12,000을 내면 「하나 더」를 시즌에 한 번 할 수 있습니다. 다시 뽑기는 싸니 셋이 약하면 다시 뽑으십시오.</p>
-<p>도구마다 조건이 있고, 조건이 맞은 확정은 판돈이 크게 오릅니다. 「방열판」은 열기 75 이상에서 확정하면 +60%, 「감사실 연줄」은 한 번 이상 밀고 열기 50 밑에서 확정하면 +80%(눈에 띔에도 적발되지 않음), 「냉혈」은 BUST 다음 판을 AFTERSHOCK 없이 열기 0에서 시작하게 하고 그 판의 확정을 +100%로 만듭니다. 「도윤하의 현장 메모」는 같은 쪽 콤보 5 이상에서 +25%, 「메트로놈」은 방향을 바꾼 판에서 +40%입니다. 그러니 내 플레이에 맞는 조건을 고르십시오. 조건을 채워야 풀리는 도구도 있습니다. 논리 콤보 8을 달성하면 BUST해도 콤보가 남는 「앙코르」(콤보 8 이상 확정 +30%)가, 판돈 5,000 이상을 벽에 잃으면 사건마다 한 번 판돈의 3분의 1을 지키는 「보험」이 풀립니다.</p>
+<p>도구마다 조건이 있고, 조건이 맞은 확정은 판돈이 크게 오릅니다. 「방열판」은 열기 75 이상에서 확정하면 +60%, 「감사실 연줄」은 한 번 이상 밀고 열기 50 밑에서 확정하면 +80%(눈에 띔에도 적발되지 않음), 「냉혈」은 BUST 다음 판을 AFTERSHOCK 없이 열기 0에서 시작하게 하고 그 판의 확정을 +100%로 만듭니다. 「도윤하의 현장 메모」는 같은 쪽 콤보 5 이상에서 +25%, 「메트로놈」은 방향을 바꾼 판에서 +40%입니다. 그러니 내 플레이에 맞는 조건을 고르십시오. 조건을 채워야 풀리는 도구도 있습니다. 논리 콤보 8을 달성하면 BUST해도 콤보가 남는 「앙코르」(콤보 8 이상 확정 +15%)가, 판돈 5,000 이상을 벽에 잃으면 사건마다 한 번 판돈의 3분의 1을 지키는 「보험」이 풀립니다.</p>
 
 <h2>여섯 가지 자원</h2>
 <p>남은 시간, 현금, 믿음, 공정함은 높을수록 좋고, 사람 피해와 피로는 오를수록 손해입니다. 사건은 남은 시간 72, 현금 100, 믿음 50, 공정함 50, 사람 피해 0, 피로 10에서 출발하되 앞 사건의 결과만큼 달라집니다. S 랭크 뒤에는 믿음 +4와 공정함 +3, C 랭크 뒤에는 공정함 −2와 피로 +4를 안고 시작하고, 시즌 후반의 사건일수록 더 지친 채 열립니다. 카드의 이득은 열기에 따라 커져 열기 60에서 1.9배, 100에서 2.5배가 되지만, 비용은 커지지 않습니다.</p>
@@ -184,7 +184,7 @@ export const GUIDE_BODY = {
 
 <h2>Tools</h2>
 <p>From Prologue 05, each closed case is followed by a draft at the next case’s first table: pick one of three tools while the clock waits. You carry up to five, and when you are full you put one down. Pick nothing to “catch your breath”: the first hand gets 10 more seconds and the Wall moves 3 farther. Before you pick, “Reroll” costs 1,500 from the Vault, once per draft, and “One more” costs 12,000, once a Season. Rerolls are cheap: reroll a weak three.</p>
-<p>Each tool has a condition, and a commit that meets it raises the stake a lot. “Heat Sink” pays +60% on a commit at Heat 75 or more; “Audit Contact” +80% when you push at least once and commit under Heat 50 (and Noticed never gets you caught); “Cold Blood” starts the hand after a BUST at Heat 0 with no AFTERSHOCK and pays +100% on that hand. “Do Yoonha’s Field Notes” pays +25% at a same-side combo of 5 or more, and “Metronome” +40% on a hand where you switched sides. So pick the condition that fits how you play. Some tools unlock through feats: a Logic Combo of 8 opens “Encore”, which keeps your combo through a BUST (+30% on a commit at combo 8 or more), and losing a stake of 5,000 or more to the Wall opens “Insurance”, which saves a third of the stake once per case.</p>
+<p>Each tool has a condition, and a commit that meets it raises the stake a lot. “Heat Sink” pays +60% on a commit at Heat 75 or more; “Audit Contact” +80% when you push at least once and commit under Heat 50 (and Noticed never gets you caught); “Cold Blood” starts the hand after a BUST at Heat 0 with no AFTERSHOCK and pays +100% on that hand. “Do Yoonha’s Field Notes” pays +25% at a same-side combo of 5 or more, and “Metronome” +40% on a hand where you switched sides. So pick the condition that fits how you play. Some tools unlock through feats: a Logic Combo of 8 opens “Encore”, which keeps your combo through a BUST (+15% on a commit at combo 8 or more), and losing a stake of 5,000 or more to the Wall opens “Insurance”, which saves a third of the stake once per case.</p>
 
 <h2>The six resources</h2>
 <p>Time left, Cash, Trust and Fairness are better high; Human cost and Fatigue hurt as they rise. A case starts from Time left 72, Cash 100, Trust 50, Fairness 50, Human cost 0 and Fatigue 10, shifted by your last case: after an S rank you start with Trust +4 and Fairness +3, after a C with Fairness −2 and Fatigue +4, and cases late in the season open more worn down. A card’s gains grow with Heat, ×1.9 at 60 and ×2.5 at 100, but its costs never do.</p>
@@ -305,7 +305,7 @@ export const GUIDE_BODY = {
 
 <h2>ツール</h2>
 <p>プロローグ05から、事件が閉じると次の事件の最初のテーブルでドラフトが開きます。時計が止まっているあいだに、ツール三つのうち一つを選びます。ツールは五つまで持て、いっぱいになったら一つを置きます。何も選ばなければ「ひと息つく」になり、最初の勝負の時間が10秒延び、壁が3遠ざかります。選ぶ前に、金庫から1,500を払えば「引き直し」がドラフトごとに一回、12,000を払えば「もう一つ」がシーズンに一度できます。引き直しは安いので、三つが弱ければ引き直しましょう。</p>
-<p>ツールにはそれぞれ条件があり、条件を満たした確定は賭け金が大きく上がります。「放熱板」は熱75以上で確定すると+60%、「監査室のつて」は一度以上押して熱50未満で確定すると+80%（目立ちがあっても見逃される）、「冷血」はBUSTの次の勝負をAFTERSHOCKなしに熱0から始めさせ、その勝負の確定を+100%にします。「ト・ユナの現場メモ」は同じ側のコンボ5以上で+25%、「メトロノーム」は向きを変えた勝負で+40%です。自分の遊び方に合う条件を選びましょう。条件を満たしてはじめて解放されるツールもあります。ロジックコンボ8を達成するとBUSTしてもコンボが残る「アンコール」（コンボ8以上の確定で+30%）が、賭け金5,000以上を壁に失うと事件ごとに一回賭け金の3分の1を守る「保険」が解放されます。</p>
+<p>ツールにはそれぞれ条件があり、条件を満たした確定は賭け金が大きく上がります。「放熱板」は熱75以上で確定すると+60%、「監査室のつて」は一度以上押して熱50未満で確定すると+80%（目立ちがあっても見逃される）、「冷血」はBUSTの次の勝負をAFTERSHOCKなしに熱0から始めさせ、その勝負の確定を+100%にします。「ト・ユナの現場メモ」は同じ側のコンボ5以上で+25%、「メトロノーム」は向きを変えた勝負で+40%です。自分の遊び方に合う条件を選びましょう。条件を満たしてはじめて解放されるツールもあります。ロジックコンボ8を達成するとBUSTしてもコンボが残る「アンコール」（コンボ8以上の確定で+15%）が、賭け金5,000以上を壁に失うと事件ごとに一回賭け金の3分の1を守る「保険」が解放されます。</p>
 
 <h2>六つのリソース</h2>
 <p>残り時間、現金、信頼、公正さは高いほど良く、人的被害と疲労は上がるほど損です。事件は残り時間72、現金100、信頼50、公正さ50、人的被害0、疲労10から出発し、前の事件の結果の分だけ変わります。Sランクのあとは信頼+4と公正さ+3、Cランクのあとは公正さ−2と疲労+4を抱えて始まり、シーズンの後半の事件ほど疲れた状態で開きます。カードの利益は熱に応じて大きくなり、熱60で1.9倍、100で2.5倍になりますが、コストは大きくなりません。</p>
