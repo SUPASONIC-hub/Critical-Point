@@ -31,16 +31,20 @@ export const FAST_CASH_SHARE = 0.5;
  * `afterBust` (the window before was a bust), `mutations` (the board's),
  * `clockLeft` (share of the clock left), `focusMode`, `focusCharged`.
  */
+// G12 (11-20, 게임성 개선점 Q6 (1)): METRONOME 1.4 -> 1.7, CARBON COPY 1.5 -> 1.7, FRONT PAGE 1.15 -> 1.2 (the paper's 1.12
+// left the spread x1.128, under the x1.15 the report asks; 1.25 made it every hand's best),
+// COLD BLOOD's AFTERSHOCK-free board also stands its wall COLD_BLOOD_WALL further (gauntletEngine.js).
+export const COLD_BLOOD_WALL = 2;
 export const RELIC_BOOSTS = Object.freeze({
   auditContact: Object.freeze({ boost: 1.8, when: (cash) => cash.pushes > 0 && cash.gauge < LOW_CASH_HEAT }),
   heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   encore: Object.freeze({ boost: 1.15, when: (cash) => cash.streak >= LONG_STREAK }),
-  metronome: Object.freeze({ boost: 1.4, when: (cash) => cash.move === "switch" }),
+  metronome: Object.freeze({ boost: 1.7, when: (cash) => cash.move === "switch" }),
   coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
-  carbonCopy: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("blackout") }),
+  carbonCopy: Object.freeze({ boost: 1.7, when: (cash) => cash.mutations.includes("blackout") }),
   testimony: Object.freeze({ boost: 1.1, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
-  frontPage: Object.freeze({ boost: 1.15, when: (cash) => cash.mutations.includes("overclock") }),
+  frontPage: Object.freeze({ boost: 1.2, when: (cash) => cash.mutations.includes("overclock") }),
   stethoscope: Object.freeze({ boost: 1.5, when: (cash) => cash.mutations.includes("silence") }),
   kineticGrip: Object.freeze({ boost: 1.2, when: (cash) => cash.focusMode === "strike" && cash.focusCharged }),
 });

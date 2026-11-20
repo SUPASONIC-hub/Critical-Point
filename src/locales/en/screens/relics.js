@@ -54,7 +54,7 @@ export default {
       text: "After you hit the Wall, AFTERSHOCK starts at Heat {cold}, not {start}.",
       proc: "Cooled the aftershock by half",
       // G4: what it does under the next rules, in place of the line above.
-      nextText: "The hand after a BUST has no AFTERSHOCK and starts at Heat 0; cash on it: stake +{pct}%.",
+      nextText: "The hand after a BUST has no AFTERSHOCK, starts at Heat 0 and its Wall stands {wall} further; cash on it: stake +{pct}%.",
       nextSoftens: "Cold Blood: no AFTERSHOCK",
       softens: "Cold Blood: starts at Heat {cold}",
     },
