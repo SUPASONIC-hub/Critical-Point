@@ -288,11 +288,12 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, firstS
  * The numbers a rule moves on a board, before clamping: the caller hands the
  * result to `normalizeSchema` (the engine; this module does not import it).
  */
-export function weekRuleOverlay(id, schema) {
-  const rule = getWeekRule(id) ?? getActTwist(id);
-  if (!rule?.schema || !schema) return null;
+export function weekRuleOverlay(id, schema, moves = null) {
+  // `moves`: what the case chose under a twist that asks (G5 8막 실명 서명, actTwists.js `SIGN_WAYS`).
+  const numbers = moves ?? getWeekRule(id)?.schema ?? getActTwist(id)?.schema;
+  if (!numbers || !schema) return null;
   const overlay = {};
-  for (const [key, value] of Object.entries(rule.schema)) {
+  for (const [key, value] of Object.entries(numbers)) {
     if (key === "wallShift") {
       overlay.wallMin = Number(schema.wallMin) + value;
       overlay.wallMax = Number(schema.wallMax) + value;

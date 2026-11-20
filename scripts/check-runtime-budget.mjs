@@ -177,10 +177,12 @@ const BUDGETS = {
   // language is written again in the page's (AppContent, isStaleBook); the
   // export and its line of why. Measured 970 / 96.
   // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
+  // 971 -> 976 lines, 96 -> 97 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the case's way
+  // to sign written on the run (signRun, gauntletEngine's signCase), beside the draft's two answers.
   "src/GameRuntime.jsx": {
-    lines: 971,
+    lines: 976,
     longestLine: 190,
-    importedNames: 96,
+    importedNames: 97,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -258,10 +260,12 @@ const BUDGETS = {
   // count 프롤로그 01's first table opened for Google Analytics (N2, gameEvents.js).
   // 865 -> 869 lines, 73 -> 74 names on 2026-11-19 (b5-open-clock-cue, measured locally): the stake
   // clock's cut beside the clock (useClockCut, tableVoice.js), its call and its mark.
+  // 869 -> 876 lines, 74 -> 76 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the briefing's
+  // signature line (WeekRulePanel.jsx SignAsk) and the board dealt again under the way chosen (signCase).
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 869,
+    lines: 876,
     longestLine: 250,
-    importedNames: 74,
+    importedNames: 76,
     hooks: {},
   },
 };

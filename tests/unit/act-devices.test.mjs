@@ -4,7 +4,7 @@ const assert = (await import("node:assert/strict")).default;
 const { test } = await import("node:test");
 const engine = await import("../../src/gauntlet/gauntletEngine.js");
 const {
-  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
+  ACT_DEVICE_CASES, ACT_DEVICE_TWIST_RULES, ACT_DEVICE_TWISTS_DEALT, ACT_DEVICES, ACT_TWIST_CASES, actTwistFor, LATE_BILL_CHIPS, LATE_BILL_SHARE, PASSED_DOWN_HARM, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice,
 } = await import("../../src/gauntlet/actTwists.js");
 const { caseDeviceOn, caseRuleFor, CASE_RULES } = await import("../../src/gauntlet/caseRules.js");
 const { getActTwist, getCaseRule } = await import("../../src/gauntlet/weeklyRules.js");
@@ -39,9 +39,9 @@ test("each device twist names one device the list allows, and its act's cases le
 });
 
 test("a device twist is dealt only once its engine part is in, behind a case's own rule and never beside a week's", () => {
-  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, ["passedDown", "lateBill", "trainedWall", "onRecord"]);
-  assert.equal(actTwistFor("case44"), null, "act 8 is not built yet");
-  assert.equal(actTwistFor("case44", ["signedByName"]), "signedByName");
+  assert.deepEqual(ACT_DEVICE_TWISTS_DEALT, DEVICE_TWISTS, "all five are built");
+  assert.equal(actTwistFor("case44", []), null, "a twist not built is not dealt");
+  assert.equal(actTwistFor("case44"), "signedByName");
   assert.equal(actTwistFor("case05"), "passedDown");
   assert.equal(actTwistFor("case13"), "merger", "3, 5 and 7 as before");
   assert.equal(caseRuleFor("case10", {}), "lateBill");
@@ -158,6 +158,33 @@ test("6막 진술 고정: the case's first cash puts its stance on record, every
   win = engine.createWindow({ schema: engine.buildNextSchema({ ...cash, twist: null }), seed: "free" });
   assert.notEqual(engine.reduceWindow(win, { type: "SET_FOCUS_MODE", mode: "expose" }), win);
   assert.equal(caseRuleFor("case34", {}), "onRecord");
+});
+test("8막 실명 서명: the case is signed before its first board, by name or with conditions, and not choosing is conditions", () => {
+  const opened = engine.stampCaseOpen(engine.normalizeRunState({ windowIndex: 7 }), { caseId: "case46" });
+  const plain = engine.getTableSchema({ schema: opened.schema });
+  assert.equal(engine.asksToSign(opened), true);
+  const terms = engine.getTableSchema(opened);
+  assert.equal(terms.wallMin, plain.wallMin + SIGN_TERMS_WALL);
+  assert.equal(terms.chipsScale, plain.chipsScale * SIGN_TERMS_CHIPS);
+  const named = engine.signCase(opened, "name");
+  assert.equal(named.open.signed, "name");
+  const board = engine.getTableSchema(named);
+  assert.equal(board.wallMin, plain.wallMin - SIGN_NAME_WALL);
+  assert.equal(board.chipsScale, plain.chipsScale * SIGN_NAME_CHIPS);
+  assert.equal(engine.getTableSchema(named), board, "one board per saved board");
+  assert.equal(engine.signCase(named, "terms").open.signed, "terms", "changed before the first board");
+  assert.equal(engine.signCase(opened, "blank"), opened);
+  assert.equal(engine.normalizeCaseOpen(named.open).signed, "name");
+  assert.equal(engine.normalizeCaseOpen(opened.open).signed, undefined);
+  assert.equal(engine.normalizeRunState(named).open.signed, "name", "a save keeps it");
+  // Once a board of the case is played, the line is signed.
+  const played = { ...named, windowIndex: named.windowIndex + 1 };
+  assert.equal(engine.asksToSign(played), false);
+  assert.equal(engine.signCase(played, "terms"), played);
+  const elsewhere = engine.stampCaseOpen(engine.normalizeRunState({}), { caseId: "case45" });
+  assert.equal(engine.asksToSign(elsewhere), false, "a rest case");
+  assert.equal(engine.signCase(elsewhere, "name"), elsewhere);
+  assert.equal(engine.asksToSign({ ...opened, weekRule: "short-clock" }), false, "a week's season");
 });
 test("each device twist's panel line is in ko, en and ja, its numbers filled", () => {
   for (const id of DEVICE_TWISTS) {

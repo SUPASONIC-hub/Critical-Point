@@ -47,7 +47,7 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_SHARE, PASSED_DOWN_HARM, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
+import { LATE_BILL_SHARE, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -706,7 +706,11 @@ export function getTableSchema(run) {
   const schema = run?.schema ?? BASE_SCHEMA;
   // A case with a rule of its own (caseRules.js, N26) is dealt it the way a
   // week's is, and only in a season without one: never two rules on a board.
-  if (run?.story !== true) return getWeekBoard(schema, run?.weekRule || caseRuleFor(run?.open?.caseId, run));
+  if (run?.story !== true) {
+    const rule = run?.weekRule || caseRuleFor(run?.open?.caseId, run);
+    // G5 8막 실명 서명: the board moves the way the case was signed.
+    return getWeekBoard(schema, rule, twistHasDevice(rule, "signedByName") ? readSignWay(run?.open?.signed) : null);
+  }
   if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
   return storyBoards.get(schema);
 }
@@ -740,17 +744,33 @@ export function getTrainedBand(heat, { wallMin, wallMax }) {
 export const tableDeviceOn = (run, device, rules = ALL_RULES) => twistHasDevice(getCaseTwist(run, rules), device);
 
 /**
+ * G5 8막 실명 서명: whether the case open on `run` still asks how to sign: its
+ * twist asks, and no window of the case has been played yet.
+ */
+export function asksToSign(run) {
+  const state = run && typeof run === "object" ? run : null;
+  return Boolean(state?.open) && tableDeviceOn(state, "signedByName") && Number(state.windowIndex) === Number(state.open.windowIndex);
+}
+
+/** `run` with its case signed `way` (`name` or `terms`), written on the case's open snapshot; the same run when it does not ask. */
+export function signCase(run, way) {
+  if (!asksToSign(run) || !Object.hasOwn(SIGN_WAYS, way)) return run;
+  return { ...run, open: { ...run.open, signed: way } };
+}
+
+/**
  * The week's rule, laid over the board at the deal as the story wall is and
  * for the same reasons. A story case deals the story wall and no week's rule.
  * Only the numbers `normalizeSchema` clamps move, and they are clamped here,
  * so the rule cannot push a board past its ends.
  */
 const weekBoards = new Map();
-function getWeekBoard(schema, weekRule) {
-  const overlay = weekRuleOverlay(weekRule, schema);
+function getWeekBoard(schema, weekRule, way = null) {
+  const overlay = weekRuleOverlay(weekRule, schema, way ? SIGN_WAYS[way] : null);
   if (!overlay) return schema;
-  if (!weekBoards.has(weekRule)) weekBoards.set(weekRule, new WeakMap());
-  const boards = weekBoards.get(weekRule);
+  const key = way ? `${weekRule}:${way}` : weekRule;
+  if (!weekBoards.has(key)) weekBoards.set(key, new WeakMap());
+  const boards = weekBoards.get(key);
   if (!boards.has(schema)) {
     const clamped = normalizeSchema({ ...schema, ...overlay });
     const moved = { ...schema };
@@ -2582,6 +2602,8 @@ export function normalizeCaseOpen(value) {
     // F1 step 2: null in a snapshot from a build before them (read as not checked).
     focusCarry: normalizeFocusCarry(value.focusCarry),
     openingRoute: normalizeOpeningRoute(value.openingRoute),
+    // G5 8막 실명 서명: how the case was signed, written only once chosen.
+    ...(Object.hasOwn(SIGN_WAYS, value.signed ?? "") ? { signed: value.signed } : {}),
   };
 }
 

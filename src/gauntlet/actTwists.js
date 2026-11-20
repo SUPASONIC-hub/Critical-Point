@@ -85,6 +85,14 @@ export const SIGN_NAME_WALL = 3;
 export const SIGN_TERMS_WALL = 3;
 export const SIGN_TERMS_CHIPS = 0.9;
 
+/** 8막 실명 서명: the two ways to sign, as the board's numbers move (weeklyRules.js `weekRuleOverlay`). Not choosing is `terms`. */
+export const SIGN_WAYS = Object.freeze({
+  name: Object.freeze({ wallShift: -SIGN_NAME_WALL, chipsFactor: SIGN_NAME_CHIPS }),
+  terms: Object.freeze({ wallShift: SIGN_TERMS_WALL, chipsFactor: SIGN_TERMS_CHIPS }),
+});
+
+/** The way a case was signed (its open snapshot's `signed`): `name` when chosen, `terms` otherwise. */
+export const readSignWay = (signed) => (signed === "name" ? "name" : "terms");
 /** The devices an act's twist may switch on; one a twist names outside it is not on. */
 export const ACT_DEVICES = Object.freeze(["passedDown", "lateBill", "trainedWall", "onRecord", "signedByName"]);
 
@@ -113,7 +121,7 @@ export const ACT_DEVICE_CASES = Object.freeze({
 });
 
 /** The device twists whose engine part is in: only these are dealt. */
-export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["passedDown", "lateBill", "trainedWall", "onRecord"]);
+export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["passedDown", "lateBill", "trainedWall", "onRecord", "signedByName"]);
 
 /** Every twist, 3, 5 and 7 and the device ones, by id. */
 export const ALL_ACT_TWIST_RULES = Object.freeze({ ...ACT_TWIST_RULES, ...ACT_DEVICE_TWIST_RULES });

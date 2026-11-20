@@ -19,6 +19,7 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
+  signCase,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { HoldGauge } from "./HoldGauge.jsx";
@@ -56,7 +57,7 @@ import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
-
+import { SignAsk } from "./WeekRulePanel.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
@@ -90,7 +91,7 @@ export function GauntletStage({
   onResolve,
   onTouch,
   onPickRelic,
-  onSpendAtDraft = null,
+  onSpendAtDraft = null, onSign = null,
   onSuspendable = null,
   staleSave = false,
   onReload,
@@ -366,6 +367,12 @@ export function GauntletStage({
     }
     setSwapFor(null);
     onPickRelic(relicId, dropId);
+  }
+
+  /** G5 8막 실명 서명: the case signed before its first board, which is dealt again under the way chosen (signCase). */
+  function signWay(way) {
+    dispatch({ type: "REDEAL", schema: getTableSchema(signCase(run, way)) });
+    onSign(way);
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
@@ -839,7 +846,7 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
-          reading={trackReading}
+          reading={trackReading} signAsk={<SignAsk run={run} onSign={onSign && signWay} />}
         />
       )}
 
