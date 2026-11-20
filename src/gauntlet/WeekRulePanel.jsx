@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { getWeekRule } from "./weeklyRules.js";
+import { getCaseRule, getWeekRule } from "./weeklyRules.js";
+import { caseRuleFor } from "./caseRules.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import edgeCopy from "../copy/edge.js";
 
@@ -14,6 +15,11 @@ import edgeCopy from "../copy/edge.js";
  * and the page draws it no later. Which page carries it is tableStaging's
  * `getBriefingWeekRuleId`; this reads the rule of the id that answered, and
  * nothing for an id the catalogue does not have.
+ *
+ * A case's own rule (「이번 사건만」, caseRules.js, N26) is the same panel
+ * under its own kicker, on the page tableStaging's `getBriefingCaseRuleCase`
+ * names. A season with a week's rule has no case rule, so the two never
+ * share a page.
  */
 
 const NO_PANEL = Object.freeze([Object.freeze([]), null]);
@@ -30,11 +36,12 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
  * SceneBriefing for the same reason the week's rule is: the PlayScreen chunk
  * had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id, page = null) {
+export function useWeekRulePanel(id, page = null, caseId = null) {
   const echo = page?.echo ?? null;
   const recall = page?.recall ?? null;
   return useMemo(() => {
-    const rule = getWeekRule(id);
+    const week = getWeekRule(id);
+    const rule = week ?? (caseId ? getCaseRule(caseId, caseRuleFor(caseId, null)) : null);
     if (!rule && !echo && !recall) return NO_PANEL;
     // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
     const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
@@ -48,10 +55,10 @@ export function useWeekRulePanel(id, page = null) {
           </p>
         )}
         {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
-        {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
+        {rule && <WeekRulePanel key="week-rule" rules={[rule]} kicker={week ? edgeCopy.weekRule : edgeCopy.caseRule} />}
       </>,
     ];
-  }, [id, echo, recall]);
+  }, [id, echo, recall, caseId]);
 }
 
 /**
@@ -129,10 +136,10 @@ function SeasonEchoPanel({ echo }) {
  * that softens it, which a week's rule never has. `gridArea` undoes the
  * breach panel's named area, which the page has not.
  */
-function WeekRulePanel({ rules }) {
+function WeekRulePanel({ rules, kicker }) {
   return (
     <div className="gx-panel gx-panel-breach gx-carry" data-testid="week-rule-panel" style={{ gridArea: "auto" }}>
-      <p className="gx-breach-kicker">{edgeCopy.weekRule}</p>
+      <p className="gx-breach-kicker">{kicker}</p>
       <ul>
         {rules.map((rule) => (
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>

@@ -69,6 +69,11 @@ const mutationsCopy = {
       title: "시장이 흔들렸다",
       text: "이번 주의 시장 충격. 이 판은 벽이 {wall} 가까워지고, 쌓은 판돈은 방금 최대 {swing}%까지 오르내렸다.",
     },
+    // G6 결재 판 (the next rules): a case's last board.
+    sign: {
+      title: "결재 판",
+      text: "사건의 마지막 판. 판돈이 {chips}배이고, 벽이 있을 수 있는 가장 가까운 칸 하나가 보인다.",
+    },
     exposeMastery: {
       title: "시즌이 판을 읽는 법을 익혔다",
       text: "EXPOSE LOCK을 거듭 충전한 결과. 봉인이 더 일찍 열리고, 더 쌓이면 가려진 판도 숨지 못한다.",

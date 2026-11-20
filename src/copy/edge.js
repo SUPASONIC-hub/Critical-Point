@@ -9,6 +9,8 @@ import { localizeTables } from "../locale.js";
 const edgeCopy = {
   // WeekRulePanel.jsx
   weekRule: "이번 주의 규칙 · 이 시즌이 끝날 때까지",
+  // 「이번 사건만」 (N26, gauntlet/caseRules.js): the same panel, for a case's own rule.
+  caseRule: "이번 사건만 · 이 사건이 닫힐 때까지",
   unfold: "지난 시즌에 읽은 장면 · 펼치기",
   pastPick: {
     // The wild card's burn line in the hand: picked the season before, and not.

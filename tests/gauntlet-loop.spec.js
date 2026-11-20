@@ -197,6 +197,9 @@ async function closeCaseOneIntoDraft(page) {
  */
 async function pressAt(page, locator) {
   await expect(locator).toBeVisible();
+  // A finger scrolls to what is below the fold first: the draft's cards say
+  // their condition too (G4), and at 1280x720 the pass button sits under them.
+  await locator.scrollIntoViewIfNeeded();
   const box = await locator.boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 }
@@ -246,11 +249,10 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await page.setViewportSize(viewport);
     await closeCaseOneIntoDraft(page);
     const draft = page.getByTestId("relic-draft");
-    // With what the close banked, neither buy can pay: both stay, off, with the reason.
-    for (const id of ["relic-reroll", "relic-extra"]) {
-      await expect(draft.getByTestId(id)).toHaveAttribute("aria-disabled", "true");
-      await expect(draft.getByTestId(id)).toHaveAccessibleDescription("잔액 부족");
-    }
+    // With what the close banked, one more (12,000) cannot pay: it stays, off, with the reason.
+    // (The reroll is 1,500 under the next rules (G4), which a case01 close may already hold.)
+    await expect(draft.getByTestId("relic-extra")).toHaveAttribute("aria-disabled", "true");
+    await expect(draft.getByTestId("relic-extra")).toHaveAccessibleDescription("잔액 부족");
     const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
     // Seeded on the reload itself, before the app reads the save: the page going
     // away writes the run it holds (useWindowSuspension's pagehide save), and a
@@ -267,10 +269,10 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await draft.getByTestId("relic-reroll").click();
     await expect(draft.getByTestId("relic-reroll")).toHaveAccessibleDescription("이번 사건에 사용함");
     const rerolled = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-    expect(rerolled.dynamics.vault).toBe(26000);
+    expect(rerolled.dynamics.vault).toBe(28500);
     expect(rerolled.dynamics.relicDraft.reroll.offer).toEqual(rerolled.dynamics.relicOffer);
     expect(rerolled.dynamics.relicOffer).not.toEqual(first);
-    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −$4,000");
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −$1,500");
 
     await page.keyboard.press("b");
     await expect(draft.getByTestId("relic-spend")).toBeVisible();
@@ -282,8 +284,8 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await draft.getByTestId("relic-option").first().click();
     await expect(draft).toHaveCount(0);
     const done = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-    expect(done.dynamics.vault).toBe(30000 - 4000 - 12000);
-    expect(done.dynamics.seasonSpent).toBe(16000);
+    expect(done.dynamics.vault).toBe(30000 - 1500 - 12000);
+    expect(done.dynamics.seasonSpent).toBe(13500);
     expect(done.dynamics.relics).toHaveLength(2);
     expect(done.dynamics.relicDraft.picked).toEqual(done.dynamics.relics);
     // Nothing on the page is wider than the screen while the draft was up (360px: the two buys side by side).

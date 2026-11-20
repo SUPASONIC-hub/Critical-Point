@@ -93,6 +93,8 @@ export function auditStep({ busted = false, gauge = 0, pushes = 0, cascade = fal
 const isCascadeBoard = (schema) => Boolean(schema?.mutations?.includes("cascade"));
 
 export const addAudit = (count, step) => Math.max(0, (Number(count) || 0) + step);
+/** G3 (the next rules): a charged EXPOSE cash adds no mark; it still takes the relief of a hot one. */
+const shieldStep = (step, shield) => (shield && step > 0 ? 0 : step);
 
 /**
  * The audit a case's decision log stands at. An entry with no window (no
@@ -107,7 +109,7 @@ export function countAudit(log = []) {
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
-    count = addAudit(count, auditStep({ busted: threshold.busted === true || threshold.state === "bust", gauge: threshold.gauge, pushes: threshold.pushes, cascade }));
+    count = addAudit(count, shieldStep(auditStep({ busted: threshold.busted === true || threshold.state === "bust", gauge: threshold.gauge, pushes: threshold.pushes, cascade }), threshold.auditShield === true));
     // No other board rule's id has "cascade" in it.
     cascade = String(entry.environmentMode).includes("cascade");
   }
@@ -136,9 +138,9 @@ export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
  * audit; else the count after this window (`count` is the case's before it)
  * and, when the window closes a case that pays (`closed`), the judgement.
  */
-export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand }) {
+export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false }) {
   if (!isAuditOn(run, rules)) return null;
-  const after = addAudit(count, auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }));
+  const after = addAudit(count, shieldStep(auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }), shield));
   return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit: getAuditLimit(run.relics) }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 

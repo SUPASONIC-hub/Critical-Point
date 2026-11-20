@@ -28,6 +28,7 @@
 
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 import weekRulesCopy from "../copy/weekRules.js";
+import { ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, MERGER_CHIPS, MERGER_SHIFT, SCATTER_CHIPS, SCATTER_SPREAD } from "./actTwists.js";
 import { fill } from "../locale.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -119,11 +120,14 @@ const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
  * 2026-W47's line has. Read when asked, so a rule read after the page's
  * language arrived is in it.
  */
-function ruleWords(id) {
-  const { auditLine, cascadeLine, rules } = weekRulesCopy;
-  const { title, text, world } = rules[id];
+function ruleValues() {
+  const { auditLine, cascadeLine } = weekRulesCopy;
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine };
+  return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS };
+}
+function ruleWords(id) {
+  const { title, text, world } = weekRulesCopy.rules[id];
+  const values = ruleValues();
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -196,6 +200,33 @@ export function getWeekRule(id) {
   return typeof id === "string" && Object.hasOwn(WEEK_RULE_CATALOGUE, id) ? { id, ...WEEK_RULE_CATALOGUE[id], ...ruleWords(id) } : null;
 }
 
+/**
+ * A case's own rule (caseRules.js, N26) as its briefing prints it: the
+ * catalogue's entry for `id`, with the line the case says in place of the
+ * week's (src/copy/weekRules.js `caseRules`, 「이번 사건은」 where a week says
+ * 「이번 주는」) and its line in the story. Null for a rule the catalogue does
+ * not have and for a case with no words.
+ */
+export function getCaseRule(caseId, id) {
+  const twist = getActTwist(id);
+  const rule = getWeekRule(id) ?? twist;
+  // An act's twist (G5) says its own line in every case of the act.
+  const words = typeof caseId === "string" && Object.hasOwn(weekRulesCopy.caseRules ?? {}, caseId) ? weekRulesCopy.caseRules[caseId] : twist && typeof caseId === "string" ? weekRulesCopy.actTwists[id] : null;
+  if (!rule || !words) return null;
+  return { ...rule, title: words.title ?? rule.title, text: fill(words.text, ruleValues()), world: words.world };
+}
+
+/**
+ * An act's twist (actTwists.js, G5) as a catalogue entry: its numbers and its
+ * words (src/copy/weekRules.js `actTwists`). Not a week's rule -- no week can
+ * carry one, so `normalizeWeekRuleId` does not know it -- only a case's.
+ */
+export function getActTwist(id) {
+  if (typeof id !== "string" || !Object.hasOwn(ACT_TWIST_RULES, id)) return null;
+  const { title, text, world } = weekRulesCopy.actTwists[id];
+  return { id, ...ACT_TWIST_RULES[id], title, text: fill(text, ruleValues()), world };
+}
+
 /** What a saved stamp is: a known id, or null. */
 export function normalizeWeekRuleId(value) {
   return getWeekRule(value) ? value : null;
@@ -251,15 +282,22 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, firstS
  * result to `normalizeSchema` (the engine; this module does not import it).
  */
 export function weekRuleOverlay(id, schema) {
-  const rule = getWeekRule(id);
+  const rule = getWeekRule(id) ?? getActTwist(id);
   if (!rule?.schema || !schema) return null;
   const overlay = {};
   for (const [key, value] of Object.entries(rule.schema)) {
     if (key === "wallShift") {
       overlay.wallMin = Number(schema.wallMin) + value;
       overlay.wallMax = Number(schema.wallMax) + value;
+    } else if (key === "wallSpread") {
+      // G5's 흩어진 자리: the band wider on both sides.
+      overlay.wallMin = Number(schema.wallMin) - value;
+      overlay.wallMax = Number(schema.wallMax) + value;
     } else if (key === "secondsShift") {
       overlay.seconds = Number(schema.seconds) + value;
+    } else if (key === "secondsFactor") {
+      // G5's 청문회: the clock a share of itself.
+      overlay.seconds = Number(schema.seconds) * value;
     } else if (key === "chipsFactor") {
       overlay.chipsScale = Number(schema.chipsScale) * value;
     } else {

@@ -7,6 +7,11 @@ import { objectParticle } from "../playerLanguage.js";
 import { MONEY_READ_AS } from "../gameConstants.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
+import { SIGN_CHIPS } from "./nextTableRules.js";
+
+// G6: the 결재 판's card, the whole row and its figure a size up.
+const SIGN_ROW = { gridTemplateColumns: "minmax(0, 1fr)", marginBottom: 8 };
+const SIGN_FIGURE = { fontSize: "1.75rem" };
 
 // The record's words (src/copy/table.js).
 const say = tableCopy.ledger;
@@ -28,12 +33,26 @@ export function GauntletLedger({ log = [], summary = null, caseId = null }) {
       ? say.clean
       : say.unplayed;
   const audit = describeAuditLedger(log, summary, caseId);
+  // G6: the case's 결재 판, the last board, drawn larger than the rest.
+  const sign = log.findLast((entry) => entry?.threshold?.sign === true)?.threshold ?? null;
   return (
     <section className="pressure-ledger" aria-label={say.title}>
       <div className="panel-title-row">
         <h2>{say.title}</h2>
         <span>{say.subtitle}</span>
       </div>
+      {sign && (
+        // The grid's own card, one to the row and a size up: no rule of its own in result.css.
+        <div className="pressure-ledger-grid" style={SIGN_ROW}>
+        <article data-testid="ledger-sign">
+          <span>{say.sign}</span>
+          <b className={sign.busted ? "cost" : "gain"} style={SIGN_FIGURE}>
+            {sign.busted ? fill(say.signBust, { pot: formatMoney(Number(sign.lostPot) || 0) }) : fill(say.signCash, { multiplier: formatMultiplier(Number(sign.potMultiplier) || 1), pot: formatMoney(Number(sign.pot) || 0) })}
+          </b>
+          <small>{fill(say.signNote, { chips: SIGN_CHIPS })}</small>
+        </article>
+        </div>
+      )}
       <div className="pressure-ledger-grid">
         <article>
           <span>{say.vault}</span>

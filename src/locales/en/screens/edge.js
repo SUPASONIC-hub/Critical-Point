@@ -1,6 +1,7 @@
 /** src/copy/edge.js in English: the week's panel, the reading clock's question and the comfort settings. */
 export default {
   weekRule: "Rule of the Week · until this season ends",
+  caseRule: "This case only · until this case closes",
   unfold: "Read last season · Show",
   pastPick: {
     wildPicked: "Reframed last season too",
