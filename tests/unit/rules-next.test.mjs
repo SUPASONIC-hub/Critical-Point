@@ -7,6 +7,7 @@ import {
   canBreathe,
   createWindow,
   getBoardMark,
+  getFocusBonus,
   getLockCap,
   getWindowBand,
   LOCK_CAP,
@@ -40,6 +41,7 @@ import {
 } from "../../src/gauntlet/nextTableRules.js";
 import { RULES_NEXT_DEFAULT, rulesNextOn } from "../../src/gauntlet/rulesNext.js";
 import { readExposure } from "../../src/gauntlet/tableReadout.js";
+import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { compareReplay } from "../../src/gauntlet/windowReplay.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
@@ -141,6 +143,13 @@ test("G3: LOCK is shut where the carried streak fills its cap, STRIKE pays more 
   assert.equal(next.lockShut, true);
   // EXPOSE's shield, read back off the log.
   assert.equal(countAudit([{ threshold: { gauge: 20, pushes: 2 } }, { threshold: { gauge: 20, pushes: 2, auditShield: true } }]), 1);
+  // The HUD under them (on by default): STEADY's weaker profile, and `note`, what the LOCK button's description adds.
+  // table-meters.test.mjs holds the same readout on the old table.
+  const hud = { gauge: 30, wall: 70, tellOffset: 4, focus: 40, focusMode: "steady", elapsed: 12, schema: { ...BASE_SCHEMA, seconds: 45 } };
+  const { note, ...focusBonus } = readTableMeters({ win: hud, schema: hud.schema, selectedCard: null }).focusBonus;
+  assert.deepEqual(focusBonus, getFocusBonus(hud.focus, hud.focusMode, true));
+  assert.equal(typeof note, "string");
+  assert.ok(note.length > 0, "STRIKE's hotter cap is said on the button");
 });
 
 test("G6: the case's last board is its 결재 판: the stake ×1.5, one cell of the band shown", () => {

@@ -34,6 +34,7 @@ test("the HUD's numbers are the engine's, read the way the stage read them", () 
   assert.equal(meters.selectedChips, getCardChips(HAND[1], schema));
   assert.equal(meters.multiplier, getMultiplier(win.gauge));
   // `note` is the next rules' LOCK line (G3), empty on the old table this file holds (helpers/oldTable.mjs).
+  // The same readout under the next rules (on by default) is held in rules-next.test.mjs (G3).
   const { note, ...focusBonus } = meters.focusBonus;
   assert.equal(note, "");
   assert.deepEqual(focusBonus, getFocusBonus(win.focus, win.focusMode));
