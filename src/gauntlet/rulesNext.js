@@ -1,5 +1,5 @@
-// G1~G7 (2026-11-19): the next table rules. Off by default; ?rules=next turns them on for a trial
-// on this device (no ranking or telemetry rows are sent). 묶음 R (11-30) flips RULES_NEXT_DEFAULT.
+// G1~G7 (2026-11-19): the next table rules, on by default since bundle 11-20 (#628, RULES_MARK 5).
+// With RULES_NEXT_DEFAULT false, ?rules=next would turn them on for a trial on this device.
 export const RULES_NEXT_DEFAULT = true;
 export function rulesNextOn(scope = globalThis) {
   if (RULES_NEXT_DEFAULT) return true;

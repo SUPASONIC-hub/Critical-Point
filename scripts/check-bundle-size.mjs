@@ -739,7 +739,8 @@ const budgets = [
   // 218,967 / 79,833 -> 218,967 / 79,838 hotfix rule chips (#636) over main f3815370. Measured - / 79834 (over budget only) in CI verify-quick, the plus 4.
   // 222,467 / 81,110 -> 223,467 / 81,471 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 223463 / 81467 (over budget only) in the e2e build, the plus 4.
   // 223,467 / 81,471 -> 223,467 / 81,477 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured - / 81473 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 223_467, maxGzip: 81_477 },
+  // hotfix #644 (gauge row wraps whole items) over main. Measured - / 81113 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 222_467, maxGzip: 81_117 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1287,7 +1288,8 @@ const budgets = [
   // 220,274 / 42,656 -> 220,281 / 42,656 notes-batch2 (draft over adsense-notes 635e7b79): 실루엣's 엣 joins the second font file, so its @font-face unicode-range (tokens.css, critical CSS) gains one code point. Measured 220277 (over budget only) locally, the plus 4.
   // 220,274 / 42,656 -> 220,608 / 42,715 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 220604 / 42711 (over budget only) in the e2e build, the plus 4.
   // 220,608 / 42,715 + notes-batch2's one code point -> 220,615 / 42,715 (merge of main e13e40cb into world-news; re-measured below if over).
-  { pattern: /^index-.*\.css$/, maxBytes: 220_615, maxGzip: 42_715 },
+  // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_346, maxGzip: 42_661 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2753,7 +2755,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
 // -> 385,486 / 450,214 / 458,672 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured first paint, the plus 4.
 // -> 385,503 / 450,231 / 458,685 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 385_503, en: 450_231, ja: 458_685 };
+// -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 384_614, en: 449_124, ja: 457_593 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

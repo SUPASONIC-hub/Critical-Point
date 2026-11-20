@@ -369,7 +369,8 @@ const fileBudgets = {
   // 3208 -> 3212 lines on 2026-11-18, n36-phone-fit (E1d): the ledger column's air on every phone up to 860 tall, English card words a step smaller on a short one.
   // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
   // -> 3264 lines / 62512 bytes on 2026-11-19, 묶음 11-19b, measured: N36b 3안 (short phone: the staked slip in two lines, the lock reason full width, tighter pills).
-  "play.css": { lines: 3264, bytes: 62512 },
+  // -> 3270 lines / 62596 bytes on 2026-11-20, hotfix #644 (E1g): the gauge read row wraps whole items, each nowrap. Measured.
+  "play.css": { lines: 3270, bytes: 62596 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
