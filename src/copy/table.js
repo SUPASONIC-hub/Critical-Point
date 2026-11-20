@@ -95,7 +95,7 @@ const tableCopy = {
     lockDetail: "지금 충전 {charge}. 누를 때마다 자원 배율이 오르고 시간이 {seconds}초 줄어든다.",
     lockAtCap: "칩 배율이 {cap}배에 닿아 이번 판에는 더하지 않는다",
     lockUnderCap: "칩 배율은 LOCK으로 {cap}배까지만 오른다",
-    lockStance: ". {charge} 이상 충전해 확정하면 다음 판에서 치른다",
+    lockStance: ". {charge} 이상 충전해 확정하면 다음 판에서 치른다.",
     sealed: "봉인됨",
     pickCard: "카드를 고른다",
     commit: "확정",

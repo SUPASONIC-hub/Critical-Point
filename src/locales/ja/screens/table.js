@@ -76,7 +76,7 @@ export default {
     lockDetail: "いまのチャージ {charge}。押すたびにリソース倍率が上がり、時間が{seconds}秒減る。",
     lockAtCap: "チップ倍率が{cap}倍に達したので、この勝負には加わらない",
     lockUnderCap: "チップ倍率はLOCKで{cap}倍までしか上がらない",
-    lockStance: "。{charge}以上チャージして確定すると、次の勝負で精算される",
+    lockStance: "。{charge}以上チャージして確定すると、次の勝負で精算される。",
     sealed: "封印済み",
     pickCard: "カードを選ぶ",
     commit: "確定",

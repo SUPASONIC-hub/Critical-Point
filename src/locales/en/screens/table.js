@@ -76,7 +76,7 @@ export default {
     lockDetail: "Charge {charge}. Each press raises the resource multiplier and costs {seconds} seconds.",
     lockAtCap: "The chip multiplier has reached ×{cap}, so LOCK adds nothing more this hand",
     lockUnderCap: "LOCK raises the chip multiplier only up to ×{cap}",
-    lockStance: ". Commit with a charge of {charge} or more and your Stance shapes the next hand",
+    lockStance: ". Commit with a charge of {charge} or more and your Stance shapes the next hand.",
     sealed: "Sealed",
     pickCard: "Pick a card",
     commit: "Commit",
