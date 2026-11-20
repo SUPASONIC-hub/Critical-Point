@@ -60,6 +60,7 @@ import {
   HAND_CAP,
   isShockDue,
   openCaseRun,
+  signCase,
   reduceWindow,
   rerollRelicOffer,
   resolveWindow,
@@ -889,10 +890,12 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * season far along, say. The rules a story run plays under are the caller's to
    * pass, as everywhere here.
    */
-  function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
+  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules });
+    // G5's act twists (actTwists.js): caseId plays every board as that case's, sign signs it first (8막).
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules, ...(caseId ? { caseId } : {}) });
+    if (sign) run = signCase(run, sign);
     let audit = 0;
     // G2: the second looks this case has bought, and the 믿음 the hand may spend on looks in it (`decide.trustBudget`).
     let narrows = 0;
