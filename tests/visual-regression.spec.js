@@ -440,7 +440,9 @@ test("intro fits a phone reading budget", { tag: "@prod" }, async ({ page }) => 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
-  const pageHeight = await page.evaluate(() => document.body.scrollHeight);
+  // 읽을거리 (HomeReading.jsx, 2026-11-20) is the site's reading under the game's
+  // door, not part of it: the budget is the intro's, taken without that section.
+  const pageHeight = await page.evaluate(() => document.body.scrollHeight - (document.querySelector(".home-reading")?.getBoundingClientRect().height ?? 0));
   expect(pageHeight).toBeLessThan(844 * 4);
 });
 
