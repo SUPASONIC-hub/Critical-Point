@@ -1158,6 +1158,7 @@ if (CASCADE_ON) {
  * beside the same hand on a plain case. Printed for the record of each act's
  * two good answers (cp-archive 메모-20261119 G5-나머지-막-설계.md); the only
  * assertions are what the twist itself must do -- the numbers are the user's
+ * (played only with `node scripts/report-gauntlet-loop.mjs --compare`)
  * (「전부 1」), and a gap is reported, not tuned here.
  */
 function reportActTwists({ pct, listening, G_CASES }) {
@@ -1284,7 +1285,8 @@ if (NEXT_ON) {
   for (const { name, off, on } of breathRows.slice(0, 2)) assert.ok(afterBust(on) < afterBust(off), `G7: 숨 고르기 should help a ${name} hand after a bust`);
   const beat = breathRows[2];
   assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < 0.02, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
-  reportActTwists({ pct, listening, G_CASES });
+  // Only on `--compare`: 22 more measures of 500 cases, kept out of the default run under CI's 480-second cap.
+  if (process.argv.includes("--compare")) reportActTwists({ pct, listening, G_CASES });
 }
 
 // WEEK_RULE (season-bot.mjs): every case above was played under that week's rule.
