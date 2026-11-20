@@ -735,7 +735,8 @@ const budgets = [
   // -> 217,754 / 79,433 b5-open-clock-cue over main ec89d22b, measured locally - / 79,429 (the hook's import beside the voice), the plus 4.
   // 217,754 / 79,433 -> 218,967 / 79,833 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 218963 / 79829 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 222,467 / 81,110 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 222463 / 81106 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 222_467, maxGzip: 81_110 },
+  // 218,967 / 79,833 -> 218,967 / 79,838 hotfix rule chips (#636) over main f3815370. Measured - / 79834 (over budget only) in CI verify-quick, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 218_967, maxGzip: 79_838 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1543,7 +1544,8 @@ const budgets = [
   // 55,056 / 20,699 -> 57,725 / 21,666 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 57721 / 21662 (over budget only) in the e2e build, the plus 4.
   // 51,819 / 19,640 -> 54,759 / 20,755 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 54,755 / 20,751 (over budget only) in the e2e build, the plus 4.
   // 57,725 / 21,666 -> 57,902 / 21,716 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 57898 / 21712 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_902, maxGzip: 21_716 },
+  // 57,902 / 21,716 -> 57,927 / 21,728 hotfix rule chips (#636) over main f3815370. Measured 57923 / 21724 (over budget only) in CI verify-quick, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_927, maxGzip: 21_728 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2729,7 +2731,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,530 / 445,565 / 453,713 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 444,906 / 452,957 gameplay-g-core over main 065d684d (G 규칙 낭독 줄 ko/en/ja). Measured first paint, the plus 4.
 // -> 381,530 / 445,585 / 453,730 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_585, ja: 453_730 };
+// -> 381,536 / 445,591 / 453,735 hotfix rule chips (#636) over main f3815370. Measured first paint 381,532 / 445,587 / 453,731 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_536, en: 445_591, ja: 453_735 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

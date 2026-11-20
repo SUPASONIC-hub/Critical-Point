@@ -1906,7 +1906,11 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const cause = outcome === "cash" ? "cash" : (window?.cause === "abandon" && window?.closedAs) || window?.cause || "push";
   const gauge = clamp(Number(window?.gauge) || 0, 0, GAUGE_MAX);
   const multiplier = outcome === "cash" ? getMultiplier(gauge) : 0;
-  const chips = card ? getCardChips(card, current.schema) : 0;
+  // Under the next rules (RULES_MARK 5) the chips are paid as the window was
+  // dealt and showed them (`getTableSchema`: a week's, a case's or an act's rule
+  // laid over the run's board). Before, the run's bare board paid MERGER's ×1.5
+  // and every chipsFactor as ×1; rows of the older marks are re-checked as they were.
+  const chips = card ? getCardChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
