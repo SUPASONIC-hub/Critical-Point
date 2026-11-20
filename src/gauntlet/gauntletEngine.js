@@ -2483,13 +2483,15 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 5 (2026-11-20, the
+ * The mark of a case closed at the table of RULES_MARK 6 (2026-11-25: G5's
+ * other acts, 1, 2, 4, 6 and 8, each a table twist of its own; the user's
+ * 「전부 1」 of 11-19). 5 was 2026-11-20, the
  * user's answer 「1」 of 11-19: G1 to G7, the next table rules of
  * src/gauntlet/rulesNext.js, and N26, #591: 사건 09, 11, 14 and 16 deal a rule
  * of their own for that case in a season with no weekly rule, so the same play
  * scores differently). It ships before the wipe of 2026-11-30, which keeps its
  * announced day: until then the server still ranks seasons from 4 up, and
- * that wipe asks for 5 (*_ranking_reset_1130.sql).
+ * that wipe asks for 6 (*_ranking_reset_1130.sql).
  * 4 was C-3 and C-4 (the user's answers of 2026-10-25: the logic streak held
  * on the card's direction, 사람 or 자리, and OVERCLOCK, the audit and the
  * links opening one a case in 사건 01 to 03), 3 B3's audit and B2's links as
@@ -2504,7 +2506,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 5;
+export const RULES_MARK = 6;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
