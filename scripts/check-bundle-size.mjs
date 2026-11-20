@@ -1804,7 +1804,8 @@ const budgets = [
   // 2,348 / 1,114 -> 3,005 / 1,265 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 3001 / 1261 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,265 -> 3,005 / 1,270 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured - / 1266 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,270 -> 3,110 / 1,308 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 3106 / 1304 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_110, maxGzip: 1_308 },
+  // 3,110 / 1,308 -> 3,258 / 1,358 gameplay-mark7 over g5-rest 54713815 (G13 조사, G16 서명란 설명 묶음, 서명 버튼 44px). Measured in CI verify-quick (#640 ef87e037), the plus 4. Measured 3254 / 1354 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_258, maxGzip: 1_358 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
