@@ -39,7 +39,7 @@ event week deadline」으로 실패해 예산 80% 알람과 같은 실패 메일
 | --- | --- | --- |
 | `near-wall` | NEAR WALL | 벽 띠를 열기 4만큼 앞당김(`wallShift`) |
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
-| `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
+| `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`). 판 규칙 7부터 LOCK 한 번이 시계 1.15배(`LOCK_DRAG`, 판의 `lockDrag`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
 | `audit-cascade` | AUDIT & CASCADE | W47 시험 주의 줄. 감사·연쇄는 RULES_MARK 3부터 판의 규칙(`tableUnlocks.js`)이라 이 규칙이 켜는 장치는 이제 없습니다. 달력과 서버 `weekly_rules`가 이 id를 들고 있고 그 주에 시작한 시즌이 도장을 지니므로 카탈로그에 남깁니다 |
 | `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 2027-W19 한 주(마이그레이션 20261121000000, 11-16 병합) |
@@ -48,6 +48,11 @@ event week deadline」으로 실패해 예산 80% 알람과 같은 실패 메일
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
   고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`)에 있는 것만 켤 수 있습니다.
   감사·연쇄는 판의 규칙이 되어 목록에서 빠졌습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다 지킵니다.
+- 판 규칙 7(2026-11-30)의 LOCK 시계 1.15배(G18)는 카탈로그의 숫자가 아니라 판에 붙는 표시(`lockDrag`)입니다.
+  `getWeekBoard`가 `LOCK_DRAG_RULES`(`short-clock`, `hearing`)의 판에 붙이므로, SHORT CLOCK 주의 시즌과 사건 09,
+  7막 청문회에서 섭니다. 같은 판 규칙 7의 첫 조회 사다리(G13)와 도구 겹침 상한 ×1.6(G11c)은 주간 규칙 시즌에도
+  그대로 서고, 8막 서명란의 값(G16)은 막 비틀기라 주간 규칙 시즌에는 없습니다. 주간 안내 페이지의 SHORT CLOCK
+  문장은 `{lockDrag}` 빈칸으로 같은 상수를 읽습니다(`scripts/content-pages/weekly-text.mjs`).
 - 규칙의 말(제목·본문·이야기 속 한 줄 `world`)은 `src/copy/weekRules.js`, 시작 화면·순위 화면의 줄과 상자 문구는
   `src/copy/weekRule.js`이고, 영어·일본어는 `src/locales/<lang>/screens/weekRules.js`·`weekRule.js`에 같은
   키로 있습니다. 숫자는 `{shift}` 같은 빈칸으로 들어가 상수 하나를 고치면 세 언어가 따라옵니다.

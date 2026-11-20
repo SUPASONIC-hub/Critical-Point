@@ -63,6 +63,8 @@ what the copy actually says today.
 | 이번 사건만 | This case only | この事件だけ | N26. 사건 09·11·14·16과 막 비틀기의 패널 |
 | 막 비틀기: 합병 / 흩어진 자리 / 청문회 | The Merger / Scattered Desks / The Hearing | 合併 / 散らばった席 / 公聴会 | 판 규칙 5 (G5). 3·5·7막 |
 | 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
+| 판돈 배수는 합쳐 ×1.6까지 (도구 겹침) | pay ×1.6 at most together | 合わせて1.6倍まで | 판 규칙 7 (G11c). 드래프트 안내 줄. 혼자 더 큰 도구는 그 값 |
+| 이번 서명란 (「이름만」의 벽 값) | this signature line | 今回の署名欄 | 판 규칙 7 (G16). 사건마다 1~3, 사건 49는 3 |
 
 ## People (prologue 01 to case 07)
 
