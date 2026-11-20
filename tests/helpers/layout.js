@@ -9,12 +9,14 @@ import { readJsonStorage, TEST_STORAGE_KEYS, writeJsonStorage } from "./storage.
  * height of 860) joined on 2026-11-11: the 391-480px rules (#493 #500) had no
  * sweep of their own, so a 411px regression showed only in a hand-run probe.
  */
-export const LAYOUT_VIEWPORTS = Object.freeze({
+const ALL_VIEWPORTS = Object.freeze({
   phone: { width: 390, height: 844 },
   "small phone": { width: 360, height: 740 },
   "wide phone": { width: 411, height: 846 },
   laptop: { width: 1366, height: 768 },
 });
+// throwaway probe: LAYOUT_SIZES picks the sizes walked
+export const LAYOUT_VIEWPORTS = Object.freeze(process.env.LAYOUT_SIZES ? Object.fromEntries(process.env.LAYOUT_SIZES.split(",").map((entry) => { const [name, size] = entry.split("="); const [width, height] = size.split("x").map(Number); return [name, { width, height }]; })) : ALL_VIEWPORTS);
 
 /** Where the hand ends against the top of the fixed action bar, and whether anything is wider than the screen. */
 export async function measureTable(page) {

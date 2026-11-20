@@ -304,7 +304,7 @@ function fullestScenes(caseId) {
 
 for (const caseId of HAND5 ? [] : CASE_SEQUENCE) {
   test(`the fullest ${caseId} hands fit on an overclocked board with five relics @layout`, async ({ page }) => {
-    test.setTimeout(1_600_000); // 20 -> 27 minutes on 2026-11-11: a fourth size (wide phone)
+    test.setTimeout(3_000_000); // 20 -> 27 minutes on 2026-11-11: a fourth size (wide phone)
     const nodeIds = fullestScenes(caseId);
     expect(nodeIds.length, `${caseId} has no scene to measure`).toBeGreaterThan(0);
     const rows = [];

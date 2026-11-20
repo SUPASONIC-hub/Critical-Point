@@ -1,0 +1,39 @@
+name: Layout probe E1g sweep main
+
+# Throwaway (2026-11-20 19:00+): main, E1f sweep en/ja x 4 sizes x 2 shards = 16 jobs, limit 120 min. Deleted with its branch.
+on:
+  push:
+    branches: [probe-e1g-sweep]
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: sweep ${{ matrix.lang }} ${{ matrix.size }} ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [en, ja]
+        size: ["phone=390x844", "small phone=360x740", "wide phone=411x846", "laptop=1366x768"]
+        shard: ["1/2", "2/2"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: sudo apt-get install -y fonts-noto-cjk
+      - run: mkdir -p layout-report
+      - name: Measure
+        env:
+          LAYOUT_REPORT_DIR: layout-report
+          LAYOUT_LANG: ${{ matrix.lang }}
+          LAYOUT_SIZES: ${{ matrix.size }}
+        run: node scripts/run-e2e.mjs tests/layout-sweep.spec.js --project=mobile-chromium --workers=3 --fully-parallel --retries=0 --shard=${{ matrix.shard }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: e1g-sweep-${{ matrix.lang }}-${{ strategy.job-index }}
+          path: layout-report
+          if-no-files-found: ignore
+          retention-days: 3
