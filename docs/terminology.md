@@ -56,6 +56,13 @@ what the copy actually says today.
 | 도구 드래프트 / 도감 | Tool Draft / Tool Index | ツール / ツール図鑑 | |
 | 분석관 (the player) | the analyst / Analyst | 分析官 | |
 | 사건 파일 | Case File | 事件ファイル | |
+| 눈에 띔 | Noticed | 目立ち | 판 규칙 5 (G1). 같은 방향 다섯 번째부터 쌓임, 적발은 「적발」 / caught / 摘発 |
+| 결재 판 | Sign-off hand | 決裁の勝負 | 판 규칙 5 (G6). 사건의 마지막 판 |
+| 숨 고르기 (판 위 버튼) | Catch breath | 息を整える | 판 규칙 5 (G7). ko는 드래프트를 넘기는 「숨 고르기」(en catch your breath, ja ひと息つく)와 같은 말 |
+| LOCK 닫힘 | LOCK shut | LOCK停止 | 판 규칙 5 (G3) |
+| 이번 사건만 | This case only | この事件だけ | N26. 사건 09·11·14·16과 막 비틀기의 패널 |
+| 막 비틀기: 합병 / 흩어진 자리 / 청문회 | The Merger / Scattered Desks / The Hearing | 合併 / 散らばった席 / 公聴会 | 판 규칙 5 (G5). 3·5·7막 |
+| 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
 
 ## People (prologue 01 to case 07)
 

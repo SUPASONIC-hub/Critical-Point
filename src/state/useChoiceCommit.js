@@ -346,6 +346,13 @@ export function useChoiceCommit(context) {
         scouted: verdict.scouted,
         // The second look (B1, 11-18), only when spent: an entry without it had none.
         ...(verdict.narrowed ? { narrowed: true } : {}),
+        // G1~G7 (the next rules), each only when it happened: the second look's price, a charged EXPOSE cash
+        // (no audit mark), 숨 고르기, the 결재 판 and 눈에 띔.
+        ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
+        ...(verdict.auditShield ? { auditShield: true } : {}),
+        ...(verdict.breathed ? { breathed: true } : {}),
+        ...(verdict.sign ? { sign: true } : {}),
+        ...(verdict.exposure ? { exposure: verdict.exposure } : {}),
         rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,

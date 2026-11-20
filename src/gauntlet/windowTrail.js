@@ -29,6 +29,8 @@ export const EVENT_CODES = Object.freeze({
   FOCUS: "F",
   SET_FOCUS_MODE: "M",
   SCOUT: "L",
+  // G7 숨 고르기 (the next rules).
+  BREATHE: "B",
   CASH: "C",
 });
 

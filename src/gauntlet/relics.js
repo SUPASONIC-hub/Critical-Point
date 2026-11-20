@@ -33,6 +33,8 @@ import { formatMoney } from "../gameConstants.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
 import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
+import { isNextOn } from "./nextTableRules.js";
+import { boostPercent, HOT_CASH_HEAT, LONG_STREAK, LOW_CASH_HEAT, RELIC_BOOSTS, SIDE_STREAK } from "./relicsNext.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -70,6 +72,7 @@ export const RELIC_SLOTS = 5;
  * reads what is left. Neither moves the pot, the wall or the gauge.
  */
 export const RELIC_REROLL_COST = 4000;
+// Under the next rules (G4) the reroll is relicsNext.js `NEXT_REROLL_COST` and one more is once a season.
 export const RELIC_EXTRA_COST = 12000;
 /** The logic streak that unlocks ENCORE: the streak at which the pot's bonus is full. */
 const ENCORE_UNLOCK_COMBO = 8;
@@ -87,14 +90,19 @@ const relicWords = relicsCopy.relics;
  */
 function relic(id, { label, icon, softens = null, unlock = null }, values = {}) {
   const words = relicWords[id];
-  const say = (line) => fill(line, values);
+  // G4: under the next rules a tool says the condition that pays (relicsNext.js);
+  // COLD BLOOD says what it does instead, since it does something else.
+  const next = isNextOn();
+  const boost = Object.hasOwn(RELIC_BOOSTS, id) ? { pct: boostPercent(id), low: LOW_CASH_HEAT, hot: HOT_CASH_HEAT, side: SIDE_STREAK, long: LONG_STREAK } : {};
+  const say = (line) => fill(line, { ...values, ...boost });
+  const text = next && words.nextText ? say(words.nextText) : next && words.next ? `${say(words.text)} ${say(words.next)}` : say(words.text);
   return {
     label,
     name: words.name,
     icon,
-    text: say(words.text),
+    text,
     proc: say(words.proc),
-    ...(softens ? { softens: { mutation: softens, text: say(words.softens) } } : {}),
+    ...(softens ? { softens: { mutation: softens, text: say(next && words.nextSoftens ? words.nextSoftens : words.softens) } } : {}),
     unlock: unlock ? { id: unlock, text: say(words.unlock) } : null,
   };
 }

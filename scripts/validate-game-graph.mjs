@@ -571,7 +571,9 @@ const PACK_KEYS = [
 // `writtenRoutes` is 사건 02 alone: its routes are scenes, not a plan.
 // `openingLines` is what a start card says in one opening alone; most cards
 // say the same thing in all of them.
-const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody", "writtenRoutes", "openingLines"];
+// `turnScene` is the one scene a case may write where its story turns over
+// (N26, gameData.js `turnScenes`): 사건 12's. Held to a reaction scene's checks.
+const OPTIONAL_PACK_KEYS = ["characterOverrides", "characterProfiles", "routeBody", "writtenRoutes", "openingLines", "turnScene"];
 /**
  * 사건 01-11 were written before the shape below was fixed, into tables the
  * whole season shared. They are packs now, held to everything a pack's tables
@@ -619,16 +621,18 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   const hasOpenings = CASE_SEQUENCE.indexOf(pack.id) > 0;
   const connectiveIds = pack.connectiveScenes.map((scene) => scene.id);
   const reactionIds = pack.reactionScenes.map((scene) => scene.id);
+  const turnScenes = pack.turnScene ? [pack.turnScene] : [];
+  const turnIds = turnScenes.map((scene) => scene.id);
   const openingIds = Object.values(pack.openingRoutes);
   const sceneIds = early
     ? Object.keys(nodes).filter((sceneId) => nodes[sceneId].caseId === pack.id)
     : [
-        ...Object.keys(pack.nodes), ...Object.keys(pack.aftermath), ...connectiveIds, ...reactionIds, ...Object.keys(pack.branchScenes),
+        ...Object.keys(pack.nodes), ...Object.keys(pack.aftermath), ...connectiveIds, ...reactionIds, ...turnIds, ...Object.keys(pack.branchScenes),
         pack.routePlan.system.route, pack.routePlan.system.final,
         ...Object.values(pack.routePlan.choices).flatMap((route) => [route.route, route.final]),
         pack.evidencePlan.node, ...openingIds,
       ];
-  const expectedScenes = hasOpenings ? 20 : 17;
+  const expectedScenes = (hasOpenings ? 20 : 17) + turnIds.length;
   if (!early) {
     if (sceneIds.length !== expectedScenes) fail(`writes ${sceneIds.length} scenes, not ${expectedScenes}`);
     if (Object.keys(pack.nodes).length !== 5) fail(`authors ${Object.keys(pack.nodes).length} scenes, not 5`);
@@ -647,7 +651,7 @@ AUTHORED_CASE_PACKS.forEach((pack, packIndex) => {
   // reply, so one cannot be edited out from under the others. Its way of
   // thinking is read from the label (sceneBuild.js) unless the card names one:
   // then it names exactly one, weighed as the reading would weigh it.
-  for (const [family, scenes] of [["connectiveScenes", pack.connectiveScenes], ["reactionScenes", pack.reactionScenes]]) {
+  for (const [family, scenes] of [["connectiveScenes", pack.connectiveScenes], ["reactionScenes", pack.reactionScenes], ["turnScene", turnScenes]]) {
     for (const scene of scenes) {
       for (const field of ["id", "after", "next", "title", "speaker", "text"]) {
         if (typeof scene[field] !== "string" || !scene[field]) fail(`${family}: ${scene.id ?? "a scene"} has no ${field}`);

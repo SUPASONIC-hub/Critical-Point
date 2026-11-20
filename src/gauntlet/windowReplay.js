@@ -121,6 +121,8 @@ export function compareReplay(threshold, window, { tolerance = REPLAY_GAUGE_TOLE
   if (threshold.scouted !== undefined && Boolean(threshold.scouted) !== (window.scouted === true)) differs.push("scout");
   // The second look (11-18) is written only when spent, and no log before it could have one.
   if (threshold.scouted !== undefined && Boolean(threshold.narrowed) !== (window.narrowed === true)) differs.push("narrow");
+  // G7 숨 고르기 (the next rules) is written only when pressed.
+  if (Boolean(threshold.breathed) !== (window.breathed === true)) differs.push("breath");
   // The log writes the gauge rounded to a whole point (resolveWindow), so it
   // may sit half a point either side. A window that ran out of time took the
   // heat of the whole last tick, the part past the bell too (advanceClock),

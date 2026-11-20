@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -20,6 +21,8 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_REROLL_COST, RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { STAGED } from "../../src/gauntlet/tableUnlocks.js";
+import { RULES_MARK_KEY } from "../../src/gauntlet/gauntletEngine.js";
+import { RULES_NEXT_MARK } from "../../src/gauntlet/nextTableRules.js";
 import { getRowDraftCost, recheckRelicDraft, recheckRun, RELIC_DRAFT_MARK } from "../../src/rankingRecheck.js";
 import { DB_MARKS, marksSql } from "../../scripts/verify-ranking-rows.mjs";
 import { createSeasonBot } from "../../scripts/sim/season-bot.mjs";
@@ -174,7 +177,11 @@ test("the close deals the draft, the next window settles it away, and a save kee
 /** One season's case rows, as the server stores them, from a bot that pays at every draft. */
 function spendingRows(seed, spend) {
   const season = createSeasonBot({ seed, staged: STAGED, spend }).playSeason(0, "money");
-  return CASE_SEQUENCE.map((caseId) => ({ run_id: `spend-${seed}`, case_id: caseId, dynamics: season.caseDynamics[caseId], decision_log: season.caseLogs[caseId] }));
+  // This file plays the old table (helpers/oldTable.mjs), so its rows carry the
+  // mark before the next rules: from RULES_MARK 5 a row is priced as the next
+  // table's (getRowRules), which this bot did not play.
+  const mark = { [RULES_MARK_KEY]: RULES_NEXT_MARK - 1 };
+  return CASE_SEQUENCE.map((caseId) => ({ run_id: `spend-${seed}`, case_id: caseId, dynamics: { ...season.caseDynamics[caseId], ...mark }, decision_log: season.caseLogs[caseId] }));
 }
 
 const spent = spendingRows(20261104, "always");

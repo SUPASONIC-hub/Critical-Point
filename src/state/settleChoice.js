@@ -1,6 +1,7 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
-import { getBranchDetourBypass } from "../gameData.js";
+import { getBranchDetourBypass, nodes } from "../gameData.js";
+import { countNarrows } from "../gauntlet/nextTableRules.js";
 import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
@@ -64,6 +65,17 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
   if (!caseClosed) return { rules, nextRules: rules };
   const nextCaseId = run?.practice ? null : CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) + 1];
   return { rules, nextRules: getTableRules(nextCaseId, run, staged) };
+}
+
+/**
+ * G6 결재 판: whether the scene `nodeId` is its case's last decision -- every
+ * card on it (the wild one aside) closes the case -- so the board dealt for it
+ * is the case's 결재 판. A scene not loaded, or with no cards, is not one.
+ */
+export function isSignScene(caseId, nodeId) {
+  const result = CASE_RESULT_NODES[caseId];
+  const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice?.type !== "reframe");
+  return Boolean(result) && choices.length > 0 && choices.every((choice) => choice.next === result);
 }
 
 /**
@@ -150,6 +162,9 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     cascade: isLinkDue(run, log, runId, settlementRules.rules),
     // MARKET SHOCK, under the week that has it: whether the next board is the case's shock board, off the case's log.
     shock: isShockDue(run, countCaseBoards(log), route.caseClosed),
+    // G6: the board this decision deals is the case's last (the 결재 판); G2: the second looks the case has bought.
+    sign: !route.caseClosed && isSignScene(caseId, route.nextNode),
+    narrows: countNarrows(log),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -160,6 +175,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     focusMultiplier: verdict.focus?.resourceMultiplier,
     scouted: verdict.scouted,
     narrowed: verdict.narrowed === true,
+    ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
   });
   return {
     ...route,
