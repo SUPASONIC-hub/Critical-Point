@@ -47,7 +47,7 @@ export default {
     },
     scattered: {
       title: "散らばった席",
-      text: "この事件は壁の帯が両側に熱{spread}ずつ広がり、すべてのカードのチップが{scatterChips}倍。",
+      text: "この事件は壁の帯が両側に熱{spread}ずつ広がる。壁がどこに立つか、より広く見なければならない。",
       world: "トリガーラボの人々があちこちに散り、席ごとに壁の立つ場所が違う。",
     },
     hearing: {

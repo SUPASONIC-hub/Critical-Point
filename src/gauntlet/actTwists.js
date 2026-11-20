@@ -25,12 +25,14 @@
  * are src/copy/weekRules.js `actTwists` (weeklyRules.js `getActTwist`).
  */
 
-export const MERGER_CHIPS = 1.5;
-export const MERGER_SHIFT = 4;
+// G10·G11a (11-20, 게임성 개선점): 합병 벽 −4 -> −3, 칩 ×1.5 -> ×1.35; 흩어진 자리 칩 ×1.15 -> ×1; 청문회 칩 ×1.25 -> ×1.2
+// (막별 심박 손 금고를 막 평균 ±15% 안으로).
+export const MERGER_CHIPS = 1.35;
+export const MERGER_SHIFT = 3;
 export const SCATTER_SPREAD = 4;
-export const SCATTER_CHIPS = 1.15;
+export const SCATTER_CHIPS = 1;
 export const HEARING_CLOCK = 0.7;
-export const HEARING_CHIPS = 1.25;
+export const HEARING_CHIPS = 1.2;
 
 /** The twist's numbers, in the catalogue's schema terms (weeklyRules.js `weekRuleOverlay`). */
 export const ACT_TWIST_RULES = Object.freeze({

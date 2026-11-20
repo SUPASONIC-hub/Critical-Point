@@ -47,7 +47,7 @@ export default {
     },
     scattered: {
       title: "Scattered Desks",
-      text: "This Case, the Wall band is {spread} Heat wider on each side, and every card’s chips are ×{scatterChips}.",
+      text: "This Case, the Wall band is {spread} Heat wider on each side. The Wall could stand anywhere in a wider stretch.",
       world: "The lab’s people are scattered across the group, and at every desk the Wall stands somewhere else.",
     },
     hearing: {

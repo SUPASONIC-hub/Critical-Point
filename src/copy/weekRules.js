@@ -60,7 +60,7 @@ const weekRulesCopy = {
     },
     scattered: {
       title: "흩어진 자리",
-      text: "이번 사건은 벽 띠가 양쪽으로 열기 {spread}씩 넓어지고, 모든 카드의 칩이 {scatterChips}배다.",
+      text: "이번 사건은 벽 띠가 양쪽으로 열기 {spread}씩 넓어진다. 벽이 어디 설지 더 넓게 봐야 한다.",
       world: "트리거랩 사람들이 곳곳으로 흩어져, 자리마다 벽이 선 곳이 다르다.",
     },
     hearing: {
