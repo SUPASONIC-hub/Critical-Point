@@ -878,7 +878,7 @@ export function renderStaticPages(origin = "", { analytics = null, ads = false, 
   const pages = {
     ...renderLegalPages({ analytics, ads }),
     ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }),
-    ...renderContentPages({ analytics }),
+    ...renderContentPages({ analytics, day }),
     ...renderNotePages({ analytics, day }),
     ...renderNewsPages({ analytics }),
   };

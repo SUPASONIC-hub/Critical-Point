@@ -1258,6 +1258,7 @@ c5d1 엑
 c5d4 엔
 c5d8 엘
 c5e0 엠
+c5e3 엣
 c5ec 여
 c5ed 역
 c5ee 엮
