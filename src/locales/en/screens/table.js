@@ -23,7 +23,7 @@ export default {
     signOpen: "Sign-off hand, stake ×{chips}, one Wall cell shown: the Wall is at {cell} or above.",
     signCell: "Wall from {cell}",
     breath: "Catch breath",
-    breathBust: "Last hand went BUST at {heat}",
+    breathBust: "Last BUST at {heat}",
     breathLabel: "Catch breath: spend {seconds}s of clock, lower Heat by {gauge} and move the Wall back {wall}. Once, before the first push.",
     breathDone: "Breath caught. Heat down {gauge} to {to}, the Wall moved back {wall}.",
     combo: "Combo",

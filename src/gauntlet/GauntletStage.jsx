@@ -636,6 +636,10 @@ export function GauntletStage({
             </span>
             <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice}
               board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
+            {breathable && win.schema.bustHeat > 0 && (
+              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</span>
+            )}
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
               aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
@@ -654,10 +658,6 @@ export function GauntletStage({
               {say.bpm} <b>{schema.sedated ? say.sedated : bpm}</b>
             </span>
           </div>
-          {/* G15: where the BUST before this board went, under the row while 숨 고르기 can be pressed (in the row it squeezed a 412px phone). */}
-          {breathable && win.schema.bustHeat > 0 && (
-            <p className="gx-breath-bust" data-testid="breath-bust" style={{ margin: "2px 4px 0", color: "var(--c-danger-81)", font: "700 0.75rem/1.2 var(--font-sans)" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</p>
-          )}
         </div>
 
         <header className="gx-scene">
