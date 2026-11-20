@@ -199,9 +199,7 @@ export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCO
   // G7: 숨 고르기 on the board right after a BUST, before the first push, while it can be pressed (`onBreathe`).
   const shown = <>{band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(tableCopy.stage.signCell, { cell: band.shown })}</span>}
     {onBreathe && <button type="button" className="gx-scout" data-testid="commit-breathe" onClick={onBreathe}
-      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: getBreathGauge(board), wall: BREATH_WALL })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}
-    {/* G15: where the BUST before this board went, beside 숨 고르기. */}
-    {onBreathe && board?.bustHeat > 0 && <span className="gx-band-label" data-testid="breath-bust">{fill(tableCopy.stage.breathBust, { heat: board.bustHeat })}</span>}</>;
+      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: getBreathGauge(board), wall: BREATH_WALL })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}</>;
   if (!canScout && !band.scouted) return <><span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>{shown}</>;
   // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
   const narrows = band.scouted && canScout;

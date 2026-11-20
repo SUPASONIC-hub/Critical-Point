@@ -654,6 +654,8 @@ export function GauntletStage({
               {say.bpm} <b>{schema.sedated ? say.sedated : bpm}</b>
             </span>
           </div>
+          {/* G15: where the BUST before this board went, under the row while 숨 고르기 can be pressed (in the row it squeezed a 412px phone). */}
+          {breathable && win.schema.bustHeat > 0 && <p className="gx-band-label" data-testid="breath-bust" style={{ margin: "2px 4px 0", font: "700 0.75rem/1.2 var(--font-sans)" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</p>}
         </div>
 
         <header className="gx-scene">
