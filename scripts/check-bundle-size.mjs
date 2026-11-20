@@ -1538,7 +1538,8 @@ const budgets = [
   // 54,926 / 20,614 -> 55,056 / 20,699 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 55052 / 20695 (over budget only) in the e2e build, the plus 4.
   // 55,056 / 20,699 -> 57,725 / 21,666 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 57721 / 21662 (over budget only) in the e2e build, the plus 4.
   // 51,819 / 19,640 -> 54,759 / 20,755 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 54,755 / 20,751 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_725, maxGzip: 21_666 },
+  // 57,725 / 21,666 -> 57,902 / 21,716 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 57898 / 21712 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 57_902, maxGzip: 21_716 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2115,7 +2116,8 @@ const budgets = [
   // 201,835 / 67,527 -> 201,845 / 67,532 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 201841 / 67528 (over budget only) in the e2e build, the plus 4.
   // 201,845 / 67,532 -> 203,461 / 68,093 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 203457 / 68089 (over budget only) in the e2e build, the plus 4.
   // 199,085 / 66,764 -> 200,701 / 67,333 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 200,697 / 67,329 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 203_461, maxGzip: 68_093 },
+  // 203,461 / 68,093 -> 203,560 / 68,103 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 203556 / 68099 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 203_560, maxGzip: 68_103 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2229,7 +2231,8 @@ const budgets = [
   // 168,602 / 60,280 -> 168,619 / 60,289 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 168615 / 60285 (over budget only) in the e2e build, the plus 4.
   // 168,619 / 60,289 -> 170,051 / 60,807 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 170047 / 60803 (over budget only) in the e2e build, the plus 4.
   // 166,222 / 59,627 -> 167,654 / 60,143 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 167,650 / 60,139 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 170_051, maxGzip: 60_807 },
+  // 170,051 / 60,807 -> 170,126 / 60,820 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 170122 / 60816 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 170_126, maxGzip: 60_820 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2717,7 +2720,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,530 / 445,046 / 453,150 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 445,565 / 453,713 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured first paint, the plus 4.
 // -> 381,530 / 444,906 / 452,957 gameplay-g-core over main 065d684d (G 규칙 낭독 줄 ko/en/ja). Measured first paint, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_565, ja: 453_713 };
+// -> 381,530 / 445,585 / 453,730 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured first paint, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 381_530, en: 445_585, ja: 453_730 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
