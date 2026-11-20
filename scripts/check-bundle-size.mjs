@@ -2124,7 +2124,8 @@ const budgets = [
   // 201,845 / 67,532 -> 203,461 / 68,093 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 203457 / 68089 (over budget only) in the e2e build, the plus 4.
   // 199,085 / 66,764 -> 200,701 / 67,333 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 200,697 / 67,329 in the e2e build, the plus 4.
   // 203,461 / 68,093 -> 203,560 / 68,103 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 203556 / 68099 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 203_560, maxGzip: 68_103 },
+  // 203,560 / 68,103 -> 205,604 / 68,826 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 205600 / 68822 in CI verify-quick, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 205_604, maxGzip: 68_826 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2240,7 +2241,8 @@ const budgets = [
   // 168,619 / 60,289 -> 170,051 / 60,807 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 170047 / 60803 (over budget only) in the e2e build, the plus 4.
   // 166,222 / 59,627 -> 167,654 / 60,143 gameplay-g-core over main 065d684d (G 규칙 표 글귀), measured 167,650 / 60,139 in the e2e build, the plus 4.
   // 170,051 / 60,807 -> 170,126 / 60,820 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 170122 / 60816 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 170_126, maxGzip: 60_820 },
+  // 170,126 / 60,820 -> 171,838 / 61,420 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 171834 / 61416 in CI verify-quick, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 171_838, maxGzip: 61_420 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2732,7 +2734,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,530 / 444,906 / 452,957 gameplay-g-core over main 065d684d (G 규칙 낭독 줄 ko/en/ja). Measured first paint, the plus 4.
 // -> 381,530 / 445,585 / 453,730 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured first paint, the plus 4.
 // -> 381,536 / 445,591 / 453,735 hotfix rule chips (#636) over main f3815370. Measured first paint 381,532 / 445,587 / 453,731 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 381_536, en: 445_591, ja: 453_735 };
+// -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 384_603, en: 449_112, ja: 457_581 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
