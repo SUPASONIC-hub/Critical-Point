@@ -48,8 +48,8 @@ import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHO
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
 import { LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
-import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
-import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { COLD_BLOOD_WALL, NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
+import { BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -309,6 +309,8 @@ export function normalizeSchema(value) {
   if (source.lockShut === true) schema.lockShut = true;
   // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took LATE_BILL_KEEP of the heat; only ever written when true.
   if (source.lateBill === true) schema.lateBill = true;
+  // G15: the heat the BUST before this board went at, under the next rules; only ever written when set.
+  if (Number.isFinite(source.bustHeat) && source.bustHeat > 0) schema.bustHeat = clamp(Math.round(source.bustHeat), 0, GAUGE_MAX);
   // G5 4막 학습된 벽: the band stood around the last cash's heat (`getTrainedBand`); only ever written when true.
   if (source.trained === true) schema.trained = true;
   // G5 6막 진술 고정: the stance the case's first cash put on record; only ever written when set.
@@ -917,6 +919,9 @@ function readWindowBand(window, reach) {
   return { wallMin: near, wallMax: Math.min(near + narrow, first.wallMax), scouted: true, narrowed: true };
 }
 
+/** G7·G15: how far 숨 고르기 cools a board: BREATH_HOT_GAUGE after a BUST at BREATH_HOT_FROM or over, BREATH_GAUGE otherwise. */
+export const getBreathGauge = (schema) => (Number(schema?.bustHeat) >= BREATH_HOT_FROM ? BREATH_HOT_GAUGE : BREATH_GAUGE);
+
 /** G7: whether 숨 고르기 can still be pressed on this window. */
 export function canBreathe(window, rules = ALL_RULES) {
   return Boolean(window) && window.status === "live" && isNextOn(rules) && window.breathed !== true && !(window.pushes > 0) && window.scouted !== true
@@ -973,7 +978,8 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
       // the first push and the first look. BREATH_SECONDS of clock; the heat comes
       // down BREATH_GAUGE and the wall goes back BREATH_WALL (AFTERSHOCK one step).
       if (!canBreathe(window, rules)) return window;
-      return advanceClock({ ...window, breathed: true, gauge: Math.max(0, window.gauge - BREATH_GAUGE), wall: Math.min(GAUGE_MAX, window.wall + BREATH_WALL) }, BREATH_SECONDS);
+      // G15: after a BUST at BREATH_HOT_FROM or over (`bustHeat` on the board), the heat comes down BREATH_HOT_GAUGE.
+      return advanceClock({ ...window, breathed: true, gauge: Math.max(0, window.gauge - getBreathGauge(window.schema)), wall: Math.min(GAUGE_MAX, window.wall + BREATH_WALL) }, BREATH_SECONDS);
     }
     case "SET_FOCUS_MODE": {
       // A charge belongs to the stance that built it. Changing stance used to
@@ -1356,7 +1362,14 @@ export function applyRelics(schema, relics = [], rules = ALL_RULES) {
   for (const id of pending) {
     if (id === "stethoscope") next.sedated = false;
     // G4: under the next rules COLD BLOOD waives AFTERSHOCK outright (relicsNext.js).
-    if (id === "coldBlood" && next.mutations.includes("aftershock")) next.startGauge = isNextOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+    if (id === "coldBlood" && next.mutations.includes("aftershock")) {
+      next.startGauge = isNextOn(rules) ? BASE_SCHEMA.startGauge : Math.min(next.startGauge, COLD_BLOOD_START);
+      // G12: and its wall stands COLD_BLOOD_WALL further.
+      if (isNextOn(rules)) {
+        next.wallMin += COLD_BLOOD_WALL;
+        next.wallMax += COLD_BLOOD_WALL;
+      }
+    }
     if (id === "kineticGrip") {
       if (next.mutations.includes("strikeMastery")) {
         next.stepMin = Math.max(BASE_SCHEMA.stepMin, next.stepMin - 1);
@@ -1864,6 +1877,8 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   if (caseClosed) return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
+    // G15: where this BUST went, for 숨 고르기 on the board it deals (`getBreathGauge`).
+    if (isNextOn(rules) && rules.has("aftershock")) schema.bustHeat = Math.round(gauge);
     if (rules.has("blackout")) {
       schema.faceDown = true;
       schema.wallMin -= BLACKOUT_WALL_SHIFT;

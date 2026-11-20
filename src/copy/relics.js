@@ -71,7 +71,7 @@ const relicsCopy = {
       text: "벽에 닿은 뒤의 AFTERSHOCK가 열기 {start}{particle} 아니라 {cold}에서 시작한다.",
       proc: "여진을 절반으로 식혔다",
       // G4: what it does under the next rules, in place of the line above.
-      nextText: "BUST 다음 판은 AFTERSHOCK 없이 열기 0에서 시작하고, 그 판에서 확정하면 판돈 +{pct}%.",
+      nextText: "BUST 다음 판은 AFTERSHOCK 없이 열기 0에서 시작하고 벽이 {wall} 물러서며, 그 판에서 확정하면 판돈 +{pct}%.",
       nextSoftens: "냉혈: AFTERSHOCK 면제",
       softens: "냉혈: 열기 {cold}에서 시작",
     },
