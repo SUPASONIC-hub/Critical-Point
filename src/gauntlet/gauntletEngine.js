@@ -46,7 +46,8 @@ import {
 import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
-import { caseRuleFor } from "./caseRules.js";
+import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
+import { LATE_BILL_SHARE, twistHasDevice } from "./actTwists.js";
 import { NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
 import { BREATH_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
@@ -306,6 +307,8 @@ export function normalizeSchema(value) {
   schema.relics = normalizeRelicIds(source.relics);
   // G3: LOCK shut on this board (the streak carried in already fills its cap); only ever written when true.
   if (source.lockShut === true) schema.lockShut = true;
+  // G5 2막 뒤늦은 청구서 (actTwists.js): HEAT DEBT took 1/LATE_BILL_SHARE of the heat; only ever written when true.
+  if (source.lateBill === true) schema.lateBill = true;
   return schema;
 }
 
@@ -694,6 +697,19 @@ export function getTableSchema(run) {
   if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
   return storyBoards.get(schema);
 }
+
+/**
+ * The act twist (actTwists.js, G5) the case open on `run` plays, or null: the
+ * id `caseRuleFor` deals, read under the case's `rules` so the replay and the
+ * server's recheck ask the same. What the settle and the next board ask a
+ * twist's device of (`twistHasDevice`).
+ */
+export function getCaseTwist(run, rules = ALL_RULES) {
+  return run?.story === true ? null : caseRuleFor(run?.open?.caseId, run, CASE_RULES_ON, isNextOn(rules));
+}
+
+/** Whether the case open on `run` switches on the act twist's `device` (actTwists.js `ACT_DEVICES`). */
+export const tableDeviceOn = (run, device, rules = ALL_RULES) => twistHasDevice(getCaseTwist(run, rules), device);
 
 /**
  * The week's rule, laid over the board at the deal as the story wall is and
@@ -1254,7 +1270,9 @@ export function describeMutations(schema) {
     .map((id) => {
       const { lifted, ...remainder } = LIFTED_MUTATIONS[id] ?? {};
       // What is printed, and nothing else: a verdict carries these objects.
-      const { label, title, text } = MUTATIONS[id];
+      const { label, title } = MUTATIONS[id];
+      // G5 2막 뒤늦은 청구서: the debt's line says the share the case billed.
+      const text = id === "heatDebt" && board.lateBill ? fill(mutationsCopy.rules.heatDebt.text, { share: LATE_BILL_SHARE, seconds: HEAT_DEBT_SECONDS }) : MUTATIONS[id].text;
       return { id, label, title, text, ...(lifted?.(board) ? { ...remainder, lifted: true } : null), axis: id === "fracture" ? fracturedAxis : null, softenedBy: getSofteningRelic(id, relics) };
     });
 }
@@ -1775,7 +1793,7 @@ function applySeasonEscalation(schema, windowIndex) {
  * whatever the rules say -- they are held, not dealt -- and so is the season's
  * lean. With every rule, which is the default, this is the board it always was.
  */
-export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false, sign = false, logicStreak = 0 }) {
+export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxis, caseClosed, relics = [], focusMode = "strike", focusCharge = 0, focusHits = 0, stanceMastery = EMPTY_STANCE_MASTERY, windowIndex = 0, rules = ALL_RULES, cascade = false, shock = false, sign = false, logicStreak = 0, twist = null }) {
   if (caseClosed) return applyLockShut(applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery({ ...BASE_SCHEMA, mutations: ["reboot"] }, stanceMastery, rules), windowIndex), relics, rules), rules), logicStreak, rules);
   const schema = { ...BASE_SCHEMA, mutations: [] };
   if (outcome === "bust") {
@@ -1797,7 +1815,10 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   } else {
     if (gauge >= HEAT_DEBT_GAUGE && rules.has("heatDebt")) {
       const sink = hasRelic(relics, "heatSink");
-      schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
+      // G5 2막 뒤늦은 청구서: the case's twist bills more of the heat; HEAT SINK still wins.
+      const bill = !sink && twistHasDevice(twist, "lateBill");
+      schema.startGauge = Math.round(gauge / (sink ? HEAT_SINK_SHARE : bill ? LATE_BILL_SHARE : HEAT_DEBT_SHARE));
+      if (bill) schema.lateBill = true;
       schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");
     }
@@ -2040,6 +2061,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     shock: shocked,
     sign: sign === true && !caseClosed,
     logicStreak: logicOn ? streak.logic.streak : current.logic.streak,
+    twist: caseClosed ? null : getCaseTwist(current, rules),
   });
   const nextMutations = describeMutations(nextSchema);
   const relicProcs = [

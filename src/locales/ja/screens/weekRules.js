@@ -55,6 +55,32 @@ export default {
       text: "この事件は盤ごとの時間が{hearingCut}%短く、すべてのカードのチップが{hearingChips}倍。",
       world: "記録の持ち主を争う公聴会。答える時間は短く、一言の値は大きい。",
     },
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`).
+    passedDown: {
+      title: "押しつけられた損失",
+      text: "この事件は、最初のBUSTでも賭け金の{downShare}分の1が残る。そのかわり、その勝負の人的被害が{downHarm}上がる。",
+      world: "銀行が前倒しした返済は、ケアの時間へ、配車表へと降りていく。",
+    },
+    lateBill: {
+      title: "遅れてきた請求書",
+      text: "この事件は熱{billHeat}以上で確定すると、その熱の{billShare}分の1を抱えて次の勝負が始まる。かわりに、すべてのカードのチップが{billChips}倍。",
+      world: "ひとりで耐えた十日分は、勝った翌日に請求される。",
+    },
+    trainedWall: {
+      title: "学習された壁",
+      text: "この事件は、NOAHがあなたの確定した熱を学ぶ。確定した次の勝負の壁の帯は、その熱の−{trainedBelow}から+{trainedAbove}のあいだに狭まる。",
+      world: "NOAHは、あなたが選んだものと迷った秒数を学んだ。",
+    },
+    onRecord: {
+      title: "供述の固定",
+      text: "この事件は、最初の勝負で確定した構えを事件の終わりまで変えられない。そのかわり、確定するたびにチャージが足りなくても、その構えが次の勝負に残る。",
+      world: "一度した供述は調書に残り、次の質問はその行から始まる。",
+    },
+    signedByName: {
+      title: "実名の署名",
+      text: "この事件は、最初の勝負の前に署名のしかたを選ぶ。名前だけ書けば、すべてのカードのチップが{nameChips}倍、壁の帯が{nameWall}手前に立つ。条件をつければ、壁の帯が{termsWall}下がり、チップが{termsChips}倍。",
+      world: "もう署名欄に空欄はない。名前の横に条件をつけられるだけだ。",
+    },
   },
   caseRules: {
     case09: {

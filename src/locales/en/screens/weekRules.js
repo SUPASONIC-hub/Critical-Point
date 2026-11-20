@@ -55,6 +55,32 @@ export default {
       text: "This Case, every hand’s clock is {hearingCut}% shorter, and every card’s chips are ×{hearingChips}.",
       world: "A hearing over who owns the records. Little time to answer, and every word costs more.",
     },
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`).
+    passedDown: {
+      title: "Passed Down",
+      text: "This Case, your first BUST still leaves 1/{downShare} of your stake. That hand’s Human cost goes up by {downHarm}.",
+      world: "The repayment the bank pulled forward runs down into care hours and dispatch rosters.",
+    },
+    lateBill: {
+      title: "The Late Bill",
+      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 1/{billShare} of that Heat. Every card’s chips are ×{billChips}.",
+      world: "The ten days someone carried alone are billed the day after the win.",
+    },
+    trainedWall: {
+      title: "The Trained Wall",
+      text: "This Case, NOAH learns the Heat you commit at. On the next hand the Wall band narrows to between {trainedBelow} below and {trainedAbove} above that Heat.",
+      world: "NOAH learned what you chose, and the seconds you hesitated.",
+    },
+    onRecord: {
+      title: "On the Record",
+      text: "This Case, the Stance you commit with on the first hand can’t change until the Case ends. In return, every commit carries that Stance into the next hand, even without a full charge.",
+      world: "What you said once stays in the record, and the next question starts from that line.",
+    },
+    signedByName: {
+      title: "Signed by Name",
+      text: "This Case, you choose how to sign before the first hand. Name only: every card’s chips ×{nameChips}, and the Wall band stands {nameWall} closer. With conditions: the Wall band stands {termsWall} further, and chips ×{termsChips}.",
+      world: "There are no blank boxes now. You can only add conditions beside your name.",
+    },
   },
   caseRules: {
     case09: {

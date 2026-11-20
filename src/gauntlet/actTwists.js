@@ -19,7 +19,7 @@
  * Laid over the board the way N26's case rules are (gauntletEngine.js
  * `getTableSchema` via `caseRuleFor`), with the same rule: a case's own rule
  * (사건 14, 16) stands in front of the act's, and a season with a week's rule
- * plays only the week's. Acts 1, 2, 4, 6 and 8 have none yet (January).
+ * plays only the week's. Acts 1, 2, 4, 6 and 8 have theirs below (RULES_MARK 6).
  *
  * A leaf module, like caseRules.js: the entries are numbers only; their words
  * are src/copy/weekRules.js `actTwists` (weeklyRules.js `getActTwist`).
@@ -43,3 +43,91 @@ const span = (from, to, id) => Object.fromEntries(Array.from({ length: to - from
 
 /** The cases each twist is dealt in: the act's six. */
 export const ACT_TWIST_CASES = Object.freeze({ ...span(13, 18, "merger"), ...span(25, 30, "scattered"), ...span(37, 42, "hearing") });
+
+/* ---------------------------------------------- acts 1, 2, 4, 6 and 8 */
+
+/**
+ * G5's other acts (2026-11-25, RULES_MARK 6; the user's 「전부 1」 of 11-19,
+ * cp-archive/메모-20261119/gameplay/G5-나머지-막-설계.md). Unlike 3, 5 and 7,
+ * each of these reads something when a board closes, so a board's numbers
+ * alone cannot carry it: each names a device (`devices`), and the engine asks
+ * `twistHasDevice` for the one it means, the way it asks a week's rule
+ * (weeklyRules.js `weekRuleHasDevice`). A twist may move the board's numbers
+ * as well (`schema`, laid over the board as the others are).
+ *
+ * - 1막 「사슬의 시작」 (사건 04-06): 떠넘겨진 손실. The case's first BUST
+ *   still leaves 1/`INSURANCE_SHARE` of its stake, and that hand's 사람 피해
+ *   rises `PASSED_DOWN_HARM`. A held insurance tool goes first.
+ * - 2막 「집념의 값」 (사건 10): 뒤늦은 청구서. HEAT DEBT carries
+ *   1/`LATE_BILL_SHARE` of the heat, not 1/3; every card's chips `LATE_BILL_CHIPS` times.
+ * - 4막 「설계자」 (사건 20, 22, 23): 학습된 벽. After a cash at heat X the
+ *   next board's band is [X - `TRAINED_BELOW`, X + `TRAINED_ABOVE`] within its
+ *   own, at least `TRAINED_MIN_WIDTH` wide.
+ * - 6막 「조사」 (사건 32-35): 진술 고정. The stance the case's first cash
+ *   was made in stays to the case's end, and every cash carries it.
+ * - 8막 「서명」 (사건 44, 46, 48, 49): 실명 서명. Before the first board the
+ *   player signs by name only (chips `SIGN_NAME_CHIPS` times, the band
+ *   `SIGN_NAME_WALL` closer) or with conditions (the band `SIGN_TERMS_WALL`
+ *   further, chips `SIGN_TERMS_CHIPS` times); not choosing is conditions.
+ *
+ * Built one at a time: a twist is dealt only once its engine part is in
+ * (`ACT_DEVICE_TWISTS_DEALT`), so no briefing promises what the table does not do.
+ */
+
+export const PASSED_DOWN_HARM = 3;
+export const LATE_BILL_SHARE = 2;
+export const LATE_BILL_CHIPS = 1.2;
+export const TRAINED_BELOW = 6;
+export const TRAINED_ABOVE = 14;
+export const TRAINED_MIN_WIDTH = 12;
+export const SIGN_NAME_CHIPS = 1.25;
+export const SIGN_NAME_WALL = 3;
+export const SIGN_TERMS_WALL = 3;
+export const SIGN_TERMS_CHIPS = 0.9;
+
+/** The devices an act's twist may switch on; one a twist names outside it is not on. */
+export const ACT_DEVICES = Object.freeze(["passedDown", "lateBill", "trainedWall", "onRecord", "signedByName"]);
+
+/** The device twists' entries, in the same terms as `ACT_TWIST_RULES`. */
+export const ACT_DEVICE_TWIST_RULES = Object.freeze({
+  passedDown: Object.freeze({ label: "PASSED DOWN", act: 1, devices: Object.freeze(["passedDown"]) }),
+  lateBill: Object.freeze({ label: "LATE BILL", act: 2, devices: Object.freeze(["lateBill"]), schema: Object.freeze({ chipsFactor: LATE_BILL_CHIPS }) }),
+  trainedWall: Object.freeze({ label: "TRAINED WALL", act: 4, devices: Object.freeze(["trainedWall"]) }),
+  onRecord: Object.freeze({ label: "ON RECORD", act: 6, devices: Object.freeze(["onRecord"]) }),
+  signedByName: Object.freeze({ label: "SIGNED BY NAME", act: 8, devices: Object.freeze(["signedByName"]) }),
+});
+
+const cases = (ids, id) => Object.fromEntries(ids.map((n) => [`case${String(n).padStart(2, "0")}`, id]));
+
+/**
+ * The cases each device twist is dealt in. Not an act's first case (a quiet
+ * table) or its last (a peak), not 사건 01-03 (the ladder), not the rest cases
+ * (42, 45, 47), and not 사건 21, written as the season's quietest.
+ */
+export const ACT_DEVICE_CASES = Object.freeze({
+  ...cases([4, 5, 6], "passedDown"),
+  ...cases([10], "lateBill"),
+  ...cases([20, 22, 23], "trainedWall"),
+  ...cases([32, 33, 34, 35], "onRecord"),
+  ...cases([44, 46, 48, 49], "signedByName"),
+});
+
+/** The device twists whose engine part is in: only these are dealt. */
+export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["lateBill"]);
+
+/** Every twist, 3, 5 and 7 and the device ones, by id. */
+export const ALL_ACT_TWIST_RULES = Object.freeze({ ...ACT_TWIST_RULES, ...ACT_DEVICE_TWIST_RULES });
+
+/** The act's twist a case is dealt under the next rules, or null. */
+export function actTwistFor(caseId, dealt = ACT_DEVICE_TWISTS_DEALT) {
+  if (typeof caseId !== "string") return null;
+  if (Object.hasOwn(ACT_TWIST_CASES, caseId)) return ACT_TWIST_CASES[caseId];
+  const id = Object.hasOwn(ACT_DEVICE_CASES, caseId) ? ACT_DEVICE_CASES[caseId] : null;
+  return id && dealt.includes(id) ? id : null;
+}
+
+/** Whether the twist `id` switches on `device`, which has to be one `ACT_DEVICES` allows. */
+export function twistHasDevice(id, device) {
+  if (!ACT_DEVICES.includes(device) || typeof id !== "string" || !Object.hasOwn(ACT_DEVICE_TWIST_RULES, id)) return false;
+  return ACT_DEVICE_TWIST_RULES[id].devices.includes(device);
+}
