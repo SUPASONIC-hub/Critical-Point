@@ -1190,3 +1190,28 @@ test("the runtime hands the side screen the side run and the scene readers", asy
   assert.equal(sideCaseKit.getSpeakerPortrait(side00.nodes.s0_start.speaker), "/portrait-ban-jaeuk.webp");
   assert.equal(typeof sideCaseKit.getSpeakerRole(side00.nodes.s0_start), "string");
 });
+
+test("Season 12-14: a side case with opensAt stays shut until then, and the start screen says so a week before", () => {
+  const { NEXT_SEASON, releasedSides, seasonNoticeAt, getSideSlot } = sideCases;
+  assert.equal(NEXT_SEASON.opensAt, Date.parse("2026-12-14T00:00:00+09:00"));
+  const day = 24 * 60 * 60 * 1000;
+  const old = { id: "side01", label: "번외 1", title: "a", unlockAfter: "case17" };
+  const fresh = { id: "side10", label: "번외 10", title: "b", unlockAfter: "case05", opensAt: NEXT_SEASON.opensAt };
+  const cases = [old, fresh];
+  // Today's release names no Season side case: nothing is held back and no line shows.
+  assert.deepEqual(releasedSides(sideCases.SIDE_CASES, 0), sideCases.SIDE_CASES);
+  assert.equal(seasonNoticeAt(NEXT_SEASON.opensAt), null);
+  // The gate, on the weekly clock.
+  assert.deepEqual(releasedSides(cases, NEXT_SEASON.opensAt - 1), [old]);
+  assert.deepEqual(releasedSides(cases, NEXT_SEASON.opensAt), cases);
+  const closed = { case05: { score: 1 }, case17: { score: 1 } };
+  assert.deepEqual(getSideSlot({ caseResults: closed, cases: releasedSides(cases, NEXT_SEASON.opensAt - 1), record: {} }).cases.map(({ id }) => id), ["side01"]);
+  assert.deepEqual(sideCasesOpenedBy("case05", { caseResults: { case05: { score: 1 } }, cases: releasedSides(cases, NEXT_SEASON.opensAt - 1), record: {} }), []);
+  // The line: from noticeDays before to the end of the first day.
+  const at = (ms) => seasonNoticeAt(ms, { cases });
+  assert.equal(at(NEXT_SEASON.opensAt - NEXT_SEASON.noticeDays * day - 1), null);
+  assert.deepEqual(at(NEXT_SEASON.opensAt - NEXT_SEASON.noticeDays * day), { count: 1, today: false });
+  assert.deepEqual(at(NEXT_SEASON.opensAt + day - 1), { count: 1, today: true });
+  assert.equal(at(NEXT_SEASON.opensAt + day), null);
+  assert.equal(at(Number.NaN), null);
+});

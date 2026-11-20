@@ -49,6 +49,20 @@ const sideFixtureListed =
   __CP_DEBUG_BUILD__ &&
   new URLSearchParams(globalThis.location?.search ?? "").get("side-fixture") === "1";
 
+/**
+ * The next Season (2026-11-20 owner's answer: the first December Season opens
+ * 2026-12-14, Monday, 00:00 KST). A side case written for it carries
+ * `opensAt: NEXT_SEASON.opensAt`: the release ships it ahead (ops mode merges
+ * on Tuesday and Friday only, docs/ops-mode.md), and the start screen keeps it
+ * shut until that moment on the weekly clock (`releasedSides`,
+ * src/sideCases.js), with a notice line from `noticeDays` before
+ * (`seasonNoticeAt`). A Season is content and a release date, never a rule
+ * number: no CASE_SEQUENCE, ranking or RULES_MARK change rides on it. While no
+ * entry names it, nothing shows. A test build holds the weekly clock on
+ * 2026-01-07, so its e2e spec moves `__weeklyRuleClock` past `opensAt`.
+ */
+export const NEXT_SEASON = Object.freeze({ id: "2026-12", opensAt: Date.parse("2026-12-14T00:00:00+09:00"), noticeDays: 7 });
+
 export const SIDE_CASES = Object.freeze([
   { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", unlockAfter: "case17", load: () => import("./side01.js").then(({ side01 }) => localizeSidePack(side01)) },
   { id: "side02", label: "번외 2", title: "돌려줄 것", unlockAfter: "case18", load: () => import("./side02.js").then(({ side02 }) => localizeSidePack(side02)) },

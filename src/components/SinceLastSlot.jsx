@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SIDE_CASES } from "../sideCases.js";
+import { releasedSides } from "../sideCases.js";
 import { loadedChunk, quietImport } from "../state/chunkReload.js";
 import { takeVisit } from "../state/sinceLastVisit.js";
 
@@ -15,7 +15,7 @@ let card = null;
 let closed = false;
 
 export function SinceLastSlot({ view }) {
-  const [visit] = useState(() => takeVisit({ sides: SIDE_CASES.map((sideCase) => sideCase.id) }));
+  const [visit] = useState(() => takeVisit({ sides: releasedSides().map((sideCase) => sideCase.id) }));
   const [loaded, setLoaded] = useState(card);
   const [shut, setShut] = useState(closed);
   const due = Boolean(visit?.due) && !shut;
