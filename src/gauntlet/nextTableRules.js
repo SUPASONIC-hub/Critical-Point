@@ -31,7 +31,8 @@ export function wantsNextRules(scope = globalThis) {
 }
 
 /** What a rule set that names neither plays: this page's (or script's) choice, read once. */
-export const nextByDefault = () => (nextByDefault.value ??= wantsNextRules());
+let nextChoice;
+export const nextByDefault = () => (nextChoice ??= wantsNextRules());
 
 /** Whether `rules` plays the next rules. */
 export function isNextOn(rules) {
@@ -141,7 +142,8 @@ export function wantsMarkSeven(scope = globalThis) {
 }
 
 /** What a rule set that names neither plays: this page's (or script's) choice, read once. */
-export const sevenByDefault = () => (sevenByDefault.value ??= wantsMarkSeven());
+let sevenChoice;
+export const sevenByDefault = () => (sevenChoice ??= wantsMarkSeven());
 
 /** Whether `rules` plays RULES_MARK 7's rules (and so the next rules too). */
 export function isMarkSevenOn(rules) {
@@ -201,7 +203,8 @@ export function wantsMarkEight(scope = globalThis) {
 }
 
 /** What a rule set that names neither plays: this page's (or script's) choice, read once. */
-export const eightByDefault = () => (eightByDefault.value ??= wantsMarkEight());
+let eightChoice;
+export const eightByDefault = () => (eightChoice ??= wantsMarkEight());
 
 /** Whether `rules` plays RULES_MARK 8's rules (and so 7's too). */
 export function isMarkEightOn(rules) {
@@ -235,7 +238,8 @@ export const BREATH_HOT_WALL = 5;
  */
 export const NARROW_REACH_EIGHT = 5;
 /** The page's trial switch (rulesNext.js), read once. */
-export const trialByDefault = () => (trialByDefault.value ??= rulesTrialOn());
+let trialChoice;
+export const trialByDefault = () => (trialChoice ??= rulesTrialOn());
 
 /** G23 여는 판돈: 크게 연다 pays every card this much in the case, and the band's near end stands here. */
 export const OPEN_BIG_CHIPS = 1.2;
