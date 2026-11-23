@@ -63,7 +63,7 @@ export function nearestEnding(input = {}) {
   const lacks = {
     "human-record": { reframes: share(reframes, cases, GATE.recordReframeRate), clues: share(clues, cases, GATE.recordClueRate), trust: atLeast(trust, GATE.recordTrust) },
     "evidence-reform": { clues: recordClues, legitimacy: atLeast(legitimacy, GATE.reformLegitimacy) },
-    "open-oversight": { clues: recordClues, legitimacy: atLeast(legitimacy, oversightBar), trust: atLeast(trust, GATE.oversightTrust) },
+    "open-oversight": { clues: recordClues, legitimacy: atLeast(legitimacy, oversightBar), trust: atLeast(trust, GATE.oversightTrust - (slack ? gates.trust : 0)) },
     "cold-justice": { legitimacy: atLeast(legitimacy, GATE.coldLegitimacy), coldGap: atLeast(legitimacy - trust, GATE.coldGap) },
     "profitable-silence": { capital: atLeast(capital, GATE.silenceCapital), trustOver: under(trust, GATE.silenceTrust) },
     "field-pact": { pactGap: atLeast(trust - legitimacy, GATE.pactGap) },

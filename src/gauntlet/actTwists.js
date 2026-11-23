@@ -90,12 +90,6 @@ export const PASSED_DOWN_HARM = 3;
 // G8 (11-20, 게임성 개선점 Q2 (1)): the debt carries 3/4 of the heat (was 1/2), and the chips under the line ×1.25 (was ×1.2).
 export const LATE_BILL_KEEP = 0.75;
 export const LATE_BILL_CHIPS = 1.25;
-/**
- * G19 (RULES_MARK 8): a cash at this heat or over carries all of it into the next board, not LATE_BILL_KEEP.
- * Measured 11-23: normalizeSchema caps a board's start at its wall's low end - 8 (48 on a plain board), and 3/4 of
- * 66 is already past it, so on a plain board this deals what 7 dealt. The user's to decide (PR notes).
- */
-export const LATE_BILL_FULL_FROM = 66;
 export const TRAINED_BELOW = 10;
 export const TRAINED_ABOVE = 18;
 export const TRAINED_MIN_WIDTH = 34;

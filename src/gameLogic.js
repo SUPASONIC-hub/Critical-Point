@@ -704,7 +704,7 @@ export function getEndingVariant({
   // As burning closes the record endings, answering 개혁 opens the one named for it: EVIDENCE REFORM before
   // OPEN OVERSIGHT, which took nearly every reform season (5.3% of 600, 2026-11-05, note C2). The gates are the same.
   if (finale === "control" && reform) return ENDINGS["evidence-reform"];
-  if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY - (slack ? slackGates.oversight : 0) && trust >= OVERSIGHT_TRUST) return ENDINGS["open-oversight"];
+  if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY - (slack ? slackGates.oversight : 0) && trust >= OVERSIGHT_TRUST - (slack ? slackGates.trust : 0)) return ENDINGS["open-oversight"];
   if (cold) return ENDINGS["cold-justice"];
   if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS["profitable-silence"];

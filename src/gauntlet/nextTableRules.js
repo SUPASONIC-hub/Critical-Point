@@ -232,18 +232,16 @@ export function withMarkEight(rules, on = eightByDefault()) {
 export const METRONOME_HOLD = 6;
 /** G22: 숨 고르기 after a BUST at BREATH_HOT_FROM or over moves the wall this far instead of BREATH_WALL. */
 export const BREATH_HOT_WALL = 5;
-/**
- * G24: the second look's band is twice this wide on the trial (20 to 10 cells). Off by default: at 10 the best
- * narrowing hand reads 0.821 of a wall seen, over check:pressure's 0.8 cap, so the width is the user's to decide.
- */
-export const NARROW_REACH_EIGHT = 5;
+/** The page's trial switch comes next: G27's leak and G25's refining, neither of which is the table's yet. */
 /** The page's trial switch (rulesNext.js), read once. */
 let trialChoice;
 export const trialByDefault = () => (trialChoice ??= rulesTrialOn());
+/** G25 도구 다듬기: on the trial only. Three prices and shares moved the hand -0.2 to +0.1% against a +3% target. */
+export const isRefineOn = () => isMarkEightOn() && trialByDefault();
 
-/** G23 여는 판돈: 크게 연다 pays every card this much in the case, and the band's near end stands here. */
+/** G23 여는 판돈: 크게 연다 pays every card this much in the case, and the band's near end stands here (a board already nearer keeps its own). */
 export const OPEN_BIG_CHIPS = 1.2;
-export const OPEN_BIG_WALL = 30;
+export const OPEN_BIG_WALL = 48;
 export const OPEN_WAYS = Object.freeze(["normal", "big"]);
 /** The cases that ask: 사건 08 to 42 (the first hour plays as it does, and 8막 has its signature in the same place). */
 export function isOpeningCase(caseId) {

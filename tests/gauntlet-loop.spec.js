@@ -257,39 +257,6 @@ test("a case from 사건 08 asks how to open, inside a 360px phone, and opening 
   await page.getByTestId("open-table").click();
   await expect(page.locator(".gx-band-label").first()).toContainText("30");
 });
-// G25 (RULES_MARK 8): 도구 다듬기 lists the held tools inside the draft's width on the narrowest phone, and pays once.
-test("the draft refines a held tool, inside a 360px phone's width, and pays out of the vault @once", async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 740 });
-  await closeCaseOneIntoDraft(page);
-  const draft = page.getByTestId("relic-draft");
-  await expect(draft.getByTestId("relic-refine")).toHaveAccessibleDescription("다듬을 도구가 없음");
-  const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-  const held = ["frontPage", "heatSink", "testimony", "fieldNote", "kineticGrip"].filter((id) => !saved.dynamics.relicOffer.includes(id)).slice(0, 4);
-  await page.addInitScript(({ key, value }) => {
-    if (sessionStorage.getItem("e2e-refine-seeded")) return;
-    sessionStorage.setItem("e2e-refine-seeded", "1");
-    localStorage.setItem(key, value);
-  }, { key: TEST_STORAGE_KEYS.save, value: JSON.stringify({ ...saved, dynamics: { ...saved.dynamics, vault: 30000, relics: held } }) });
-  await page.reload();
-  await expect(draft).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  await draft.getByTestId("relic-refine").click();
-  const options = draft.getByTestId("relic-refine-option");
-  await expect(options).toHaveCount(held.length);
-  const spend = await draft.getByTestId("relic-spend").boundingBox();
-  for (const box of await options.evaluateAll((buttons) => buttons.map((button) => { const { left, right, height } = button.getBoundingClientRect(); return { left, right, height }; }))) {
-    expect(box.left).toBeGreaterThanOrEqual(spend.x - 1);
-    expect(box.right).toBeLessThanOrEqual(spend.x + spend.width + 1);
-    expect(box.height).toBeGreaterThanOrEqual(44);
-  }
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await options.first().click();
-  await expect(draft.getByTestId("relic-refine")).toHaveAccessibleDescription("이번 사건에 사용함");
-  await expect(options).toHaveCount(0);
-  const paid = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-  expect(paid.dynamics.vault).toBe(22000);
-  expect(paid.dynamics.refined).toEqual([held[0]]);
-  expect(paid.dynamics.relicDraft.refine).toBe(held[0]);
-});
 // C9 (11-30): the KD은행 계좌 pays at the draft. The vault a fresh case01
 // close leaves is too small for either buy, so the save is given one and
 // reloaded on the draft, which a reload keeps.

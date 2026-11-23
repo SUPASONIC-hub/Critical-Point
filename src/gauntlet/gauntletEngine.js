@@ -49,9 +49,9 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_CHIPS, LATE_BILL_FULL_FROM, LATE_BILL_KEEP, MERGER_EIGHT, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
+import { LATE_BILL_CHIPS, LATE_BILL_KEEP, MERGER_EIGHT, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { COLD_BLOOD_WALL, listRefinable, NEXT_REROLL_COST, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP } from "./relicsNext.js";
-import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isOpeningCase, METRONOME_HOLD, NARROW_REACH_EIGHT, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -291,8 +291,7 @@ export function normalizeSchema(value) {
     ? source.mutations.filter((id) => typeof id === "string").slice(0, 8)
     : [];
   schema.seconds = clamp(Math.round(schema.seconds), 12, 60);
-  // G23: a case opened big stands its band's near end under the floor every other board keeps.
-  schema.wallMin = clamp(Math.round(schema.wallMin), source.openBig === true ? OPEN_BIG_WALL : WALL_FLOOR, 96);
+  schema.wallMin = clamp(Math.round(schema.wallMin), WALL_FLOOR, 96);
   schema.wallMax = clamp(Math.round(schema.wallMax), schema.wallMin, 98);
   schema.stepMin = clamp(Math.round(schema.stepMin), 1, 30);
   schema.stepMax = clamp(Math.round(schema.stepMax), schema.stepMin, 40);
@@ -979,9 +978,6 @@ export function getSignCell(window) {
   return Math.max(wallMin, wall - Math.floor(seededUnit(`sign:${window.seed}`) * (Math.max(0, wall - wallMin) + 1)));
 }
 
-/** How far the second look reaches each way: G24's narrower band on the trial, SCOUT_NARROW_REACH otherwise. */
-export const getNarrowReach = () => (isMarkEightOn() && trialByDefault() ? NARROW_REACH_EIGHT : SCOUT_NARROW_REACH);
-
 function readWindowBand(window, reach) {
   const { wallMin, wallMax } = window.schema;
   if (window.scouted !== true) return { wallMin, wallMax, scouted: false };
@@ -992,7 +988,7 @@ function readWindowBand(window, reach) {
   const first = { wallMin: clamp(low, wallMin, wallMax), wallMax: clamp(low + span, wallMin, wallMax), scouted: true };
   if (window.narrowed !== true) return first;
   // G24 (RULES_MARK 8): what the page shows; the wall is the seed's either way, so no replay reads this width.
-  const narrow = getNarrowReach() * 2;
+  const narrow = SCOUT_NARROW_REACH * 2;
   const from = Math.max(first.wallMin, window.wall - narrow);
   const to = Math.max(from, Math.min(window.wall, first.wallMax - narrow));
   const near = from + Math.floor(seededUnit(`narrow:${window.seed}`) * (to - from + 1));
@@ -1782,7 +1778,7 @@ export function buyExtraRelic(run) {
 export function refineRelic(run, id) {
   const current = normalizeRunState(run);
   const draft = current.relicDraft;
-  if (!isMarkEightOn() || !canSpendAtDraft(current) || draft.refine || draft.picked.length || current.vault < REFINE_COST) return current;
+  if (!isRefineOn() || !canSpendAtDraft(current) || draft.refine || draft.picked.length || current.vault < REFINE_COST) return current;
   if (!listRefinable(current.relics, current.refined ?? []).includes(id)) return current;
   return normalizeRunState({ ...payFromVault(current, REFINE_COST, { ...draft, refine: id }), refined: [...(current.refined ?? []), id] });
 }
@@ -2025,9 +2021,7 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
       const sink = hasRelic(relics, "heatSink");
       // G5 2막 뒤늦은 청구서: the case's twist bills more of the heat; HEAT SINK still wins.
       const bill = !sink && twistHasDevice(twist, "lateBill");
-      // G19 (RULES_MARK 8): a cash at LATE_BILL_FULL_FROM or over carries all of its heat.
-      const billed = isMarkEightOn(rules) && gauge >= LATE_BILL_FULL_FROM ? 1 : LATE_BILL_KEEP;
-      schema.startGauge = Math.round(bill ? gauge * billed : gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
+      schema.startGauge = Math.round(bill ? gauge * LATE_BILL_KEEP : gauge / (sink ? HEAT_SINK_SHARE : HEAT_DEBT_SHARE));
       if (bill) schema.lateBill = true;
       schema.seconds -= sink ? HEAT_SINK_SECONDS : HEAT_DEBT_SECONDS;
       schema.mutations.push("heatDebt");

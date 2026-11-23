@@ -6,21 +6,16 @@ import {
   buildNextSchema,
   createWindow,
   getBreathWall,
-  getNarrowReach,
-  getRelicDraftCost,
   getTableSchema,
   normalizeCaseOpen,
-  normalizeRelicDraft,
   normalizeRunState,
-  openRelicDraft,
   reduceWindow,
-  refineRelic,
   RULES_MARK,
   signCase,
   stampCaseOpen,
 } from "../../src/gauntlet/gauntletEngine.js";
-import { BREATH_HOT_WALL, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, isMarkEightOn, isOpeningCase, OPEN_BIG_CHIPS, OPEN_BIG_WALL, RULES_EIGHT_MARK, withMarkEight, withMarkSeven, withNextRules } from "../../src/gauntlet/nextTableRules.js";
-import { getRefinedBoost, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP, RELIC_BOOSTS } from "../../src/gauntlet/relicsNext.js";
+import { BREATH_HOT_WALL, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, isMarkEightOn, isOpeningCase, isRefineOn, OPEN_BIG_CHIPS, OPEN_BIG_WALL, RULES_EIGHT_MARK, withMarkEight, withMarkSeven, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { readRelicBoost } from "../../src/gauntlet/relicsNext.js";
 import { rulesTrialOn } from "../../src/gauntlet/rulesNext.js";
 import { readDraftSpend } from "../../src/gauntlet/draftSpend.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
@@ -39,14 +34,6 @@ test("RULES_MARK 8: the engine's mark, on by default, and a row of 5 to 7 played
   assert.equal(isMarkEightOn(withNextRules(ALL_RULES, false)), false);
   for (const mark of [5, 6, 7]) assert.equal(isMarkEightOn(getRowRules("case20", {}, mark)), false, `mark ${mark}`);
   assert.equal(isMarkEightOn(getRowRules("case20", {}, 8)), true);
-});
-
-test("G19: the late bill asks for all the heat from 66, and a plain board's start cap (wall low end - 8) still holds it", () => {
-  const dealt = (gauge, rules) => buildNextSchema({ outcome: "cash", cause: "cash", gauge, pushes: 4, streak: 0, rules, twist: "lateBill" }).startGauge;
-  assert.equal(dealt(60, EIGHT), 45, "under 66, three quarters");
-  // Measured 11-23: three quarters of 66 is already over the cap of 48, so on a plain board 8 deals what 7 dealt.
-  assert.equal(dealt(70, EIGHT), 48);
-  assert.equal(dealt(70, SEVEN), 48);
 });
 
 test("G21: METRONOME pays on a switch and on the first board past six in a row", () => {
@@ -83,35 +70,13 @@ test("G23: 사건 08 to 42 ask how to open, and opening big pays more on a neare
   assert.equal(signCase(open("case07"), "big").open.opening, undefined);
 });
 
-test("G25: a refined tool pays half as much bonus again, once a season, and is priced on the draft", () => {
-  assert.equal(getRefinedBoost("frontPage"), 1.3);
-  const cash = { gauge: 40, pushes: 2, streak: 0, move: "grow", mutations: ["overclock"], clockLeft: 0.1, afterBust: false };
-  assert.equal(readRelicBoost(["frontPage"], cash, RELIC_BOOST_CAP, ["frontPage"]).factor, 1.3);
-  // Together they stay under the cap, or the biggest alone: a second tool never takes from the first.
-  const both = { ...cash, gauge: 80, clockLeft: 0.9 };
-  const held = readRelicBoost(["frontPage", "heatSink", "testimony"], both, RELIC_BOOST_CAP, ["heatSink"]);
-  assert.equal(held.factor, getRefinedBoost("heatSink"));
-  assert.equal(held.capped, true);
-  assert.ok(held.factor > RELIC_BOOSTS.heatSink.boost);
-  const run = normalizeRunState({ vault: REFINE_COST + 100, relics: ["frontPage", "insurance"], ...openRelicDraft("g25", ["heatSink", "encore", "testimony", "coldBlood"], ["frontPage", "insurance"]) });
-  assert.deepEqual(readDraftSpend(run).refine.targets, ["frontPage"], "a tool with no condition has nothing to refine");
-  const paid = refineRelic(run, "frontPage");
-  assert.equal(paid.vault, 100);
-  assert.deepEqual(paid.refined, ["frontPage"]);
-  assert.equal(paid.relicDraft.cost, REFINE_COST);
-  assert.equal(getRelicDraftCost(normalizeRelicDraft(paid.relicDraft)), REFINE_COST);
-  assert.equal(readDraftSpend(paid).refine.reason, "used");
-  assert.equal(refineRelic(run, "insurance").vault, run.vault);
-  assert.equal(refineRelic({ ...run, vault: REFINE_COST - 1 }, "frontPage").vault, REFINE_COST - 1);
-  assert.equal(refineRelic({ ...run, story: true }, "frontPage").vault, run.vault);
+test("G26: an open slack door lowers the record bar to 0.5, and OPEN OVERSIGHT's legitimacy by 9 and trust by 8", () => {
+  assert.deepEqual(getSlackGates(0.8), { clueRate: 0.5, oversight: 9, trust: 8 });
 });
 
-test("G26: an open slack door lowers the record bar to 0.7 and OPEN OVERSIGHT's legitimacy by 3", () => {
-  assert.deepEqual(getSlackGates(0.8), { clueRate: 0.7, oversight: 3 });
-});
-
-test("G24 and G27 stay behind the trial, which the public site cannot turn on", () => {
-  assert.equal(getNarrowReach(), 7, "14 cells unless the trial says otherwise");
+test("G25 and G27 stay behind the trial, which the public site cannot turn on", () => {
+  assert.equal(isRefineOn(), false);
+  assert.equal(readDraftSpend(normalizeRunState({ vault: 99999, relics: ["frontPage"] })).refine, undefined);
   const page = (hostname, search) => ({ location: { hostname, search } });
   assert.equal(rulesTrialOn(page("localhost", "?rules=next")), true);
   assert.equal(rulesTrialOn(page("127.0.0.1", "?rules=next")), true);
