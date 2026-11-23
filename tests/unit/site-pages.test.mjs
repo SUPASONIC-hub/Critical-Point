@@ -5,6 +5,7 @@ import test from "node:test";
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
 import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../../scripts/content-pages/news.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -47,7 +48,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length, "with the policy's six, the content pages and the notes out today (scripts/content-pages)");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length, "with the policy's six, the content pages, the notes out today and the world's newspaper (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -55,8 +56,8 @@ test("each page has its own title and description, a canonical link and every la
   const descriptions = new Set();
   const titles = new Set();
   for (const [file, html] of Object.entries(all)) {
-    // The notes are Korean only and name no other language (tests/unit/notes.test.mjs).
-    if (file.startsWith("notes/")) continue;
+    // The notes and the world's newspaper are Korean only and name no other language (tests/unit/notes.test.mjs, news.test.mjs).
+    if (file.startsWith("notes/") || file.startsWith("news/")) continue;
     const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
     const page = file.slice(FOLDER[language].length);
     assert.match(html, /^<!doctype html>/, file);
@@ -165,8 +166,8 @@ test("the start screen's reading section links the five pages in the screen's la
 });
 
 test("the service worker keeps every page for offline reading, and leaves the crawler's files alone", () => {
-  // A note is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
-  for (const file of Object.keys(all)) if (!file.startsWith("notes/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
+  // A note or an article of the world's newspaper is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
+  for (const file of Object.keys(all)) if (!file.startsWith("notes/") && !file.startsWith("news/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
   assert.doesNotMatch("/robots.txt", DOCUMENT_PAGE);
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });
@@ -178,13 +179,15 @@ test("the sitemap names the start page in three languages and every plain page, 
   const start = { ko: "/", en: "/en/", ja: "/ja/" };
   assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
   assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
-  const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
+  // The sitemap's date also decides which notes are out, so it is the day `all` was rendered for: a fixed past day lost every note since.
+  const day = notesDay();
+  const xml = sitemapXml({ origin: ORIGIN, date: day });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   assert.equal(locs.length, count);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, count);
+  assert.equal(xml.split(`<lastmod>${day}</lastmod>`).length - 1, count);
   for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
   assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");

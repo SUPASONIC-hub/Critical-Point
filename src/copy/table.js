@@ -55,7 +55,7 @@ const tableCopy = {
     best: "최고",
     audit: "감사",
     // G17: beside the count, one cash under the line from its limit.
-    auditWarn: "이번에 낮게 끊으면 감사",
+    auditWarn: "낮게 끊으면 감사",
     links: "연결",
     lockCap: "상한",
     lockMultiplier: "배율",

@@ -6,6 +6,7 @@ import { style as jaStyle } from "../src/locales/ja/index.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../src/responsiveArt.js";
 import { NOTES_INDEX_PATH, READING_EYEBROW, readingMenu } from "../src/homeReading.js";
 import { recentNotes } from "../src/notes/noteIndex.js";
+import { frontPageFor, NEWS_INDEX_PATH, NEWS_PAPER } from "../src/news/newsIndex.js";
 import { notesDay } from "./content-pages/notes.mjs";
 import { showHanja, wordmarkLogoMarkup } from "../src/components/wordmarkLogo.js";
 
@@ -101,7 +102,8 @@ function wordmark(label, reading) {
 
 /**
  * 읽을거리 as HomeReading.jsx draws it, in the page's language, with the notes
- * out by `day`: the same classes, so the app's sheet styles it the moment it
+ * out by `day` and that day's 오늘의 1면 (`frontPageFor`; the screen shows the
+ * reader's own day once it runs): the same classes, so the app's sheet styles it the moment it
  * loads. No `<section>` inside it, which is how `localizeStaticShell` finds its end.
  */
 export function staticReadingMarkup({ language = "ko", day = notesDay() } = {}) {
@@ -119,13 +121,20 @@ export function staticReadingMarkup({ language = "ko", day = notesDay() } = {}) 
   const list = notes.length
     ? `<ul lang="ko">${notes.map((note) => `<li><a href="${note.href}">${escape(note.title)}</a><time datetime="${note.day}">${note.date}</time><p>${escape(note.summary)}</p></li>`).join("")}</ul>`
     : `<p>${escape(words.notesEmpty)}</p>`;
+  const front = frontPageFor(day);
+  const press =
+    `<div class="home-reading-front"><h3>${escape(words.frontTitle)}</h3>` +
+    `<div class="home-reading-story" lang="ko"><p class="home-reading-paper">${escape(NEWS_PAPER)} · ${escape(front.section)} · <time datetime="${front.day}">${front.date}</time></p>` +
+    `<a href="${front.href}">${escape(front.title)}</a><p>${escape(front.summary)}</p></div>` +
+    `<p class="home-reading-fiction">${escape(words.frontNote)}</p>` +
+    `<a class="home-reading-all" href="${NEWS_INDEX_PATH}"${korean}>${escape(words.frontAll)}</a></div>`;
   return (
     `<section class="home-reading" ${READING_ATTRIBUTE} aria-labelledby="home-reading-title">` +
     `<div class="home-reading-head"><span class="home-reading-eyebrow" lang="en">${READING_EYEBROW}</span><h2 id="home-reading-title">${escape(words.title)}</h2></div>` +
     `<div class="home-reading-about">${words.intro.map((line) => `<p>${escape(line)}</p>`).join("")}</div>` +
     `<nav class="home-reading-menu" aria-label="${escape(words.menuLabel)}"><h3>${escape(words.menuTitle)}</h3><ul>${menu}</ul></nav>` +
-    `<div class="home-reading-notes"><h3>${escape(words.notesTitle)}</h3>${list}` +
-    `<a class="home-reading-all" href="${NOTES_INDEX_PATH}"${korean}>${escape(words.notesAll)}</a></div>` +
+    `<div class="home-reading-press">${press}<div class="home-reading-notes"><h3>${escape(words.notesTitle)}</h3>${list}` +
+    `<a class="home-reading-all" href="${NOTES_INDEX_PATH}"${korean}>${escape(words.notesAll)}</a></div></div>` +
     READING_END
   );
 }
