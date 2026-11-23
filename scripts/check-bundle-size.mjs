@@ -1310,7 +1310,8 @@ const budgets = [
   // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 220676 / 42720 in CI verify-quick, the plus 4.
   // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_794, maxGzip: 42_739 },
+  // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_876, maxGzip: 42_759 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -2811,7 +2812,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 386,141 / 451,678 / 460,111 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured first paint 386,137 / 451,674 / 460,107 in CI verify-quick, the plus 4.
 // -> 386,594 / 452,432 / 460,844 on 2026-11-23 (user's choice 1): measured 386,145 / 451,682 / 460,118, plus the largest day built through the notes written so far (2027-01-11: +441 / +742 / +718), plus Linux's 4 and the plus 4.
 // first paint +509 / +875 / +896: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
-const FIRST_PAINT_BUDGETS = { ko: 387_103, en: 453_307, ja: 461_740 };
+// -> 386,614 / 452,452 / 460,864 on 2026-11-23: the stylesheet's +20 gzip above, on the same largest day.
+// -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
+const FIRST_PAINT_BUDGETS = { ko: 387_123, en: 453_327, ja: 461_760 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

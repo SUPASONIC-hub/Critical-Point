@@ -645,3 +645,37 @@ test("the ranking, the board, the error log and the settings stay readable", asy
   await page.locator(".comfort-dialog").waitFor();
   await expectReadable(page, "settings");
 });
+
+/**
+ * States a walk through the game rarely or never lands on: a clue on the reveal,
+ * a broken streak and every route tone in the report, a relic in the bank, a
+ * carried rule's badge, a locked and a running case card. Their real classes on
+ * the real stylesheet, read in each mood (2026-11-23: all of these had shipped
+ * unreadable, or were one colour rule away from it, with this file green).
+ */
+const RARE_STATES = `
+  <div class="cinematic-clue-card"><div><span>단서</span><strong>지워진 결재선</strong><p>사라진 줄을 찾았다.</p></div></div>
+  <div style="background:var(--ui-surface-2)">
+    <div class="route-atlas-meta"><b class="route-break">연속 끊김</b></div>
+    ${["branch", "system", "evidence", "memory", "turnaround", "reaction", "aftermath"].map((tone) => `<article class="route-atlas-node ${tone}"><div class="route-atlas-dot">01</div></article>`).join("")}
+  </div>
+  <main class="shell"><div class="gx-bank"><b class="gx-relic-chip"><span class="gx-relic-name">유물</span></b></div></main>
+  <div class="gx-panel gx-carry"><ul><li class="gx-mutation"><b>OVERCLOCK</b><strong>규칙</strong></li><li class="gx-mutation mut-reboot"><b>REBOOT</b><strong>규칙</strong></li></ul></div>
+  <div class="case-card locked-case"><h2>잠긴 사건</h2><p>설명</p><small>조건</small></div>
+  <div class="case-card active-case"><h2>진행 중</h2><p>설명</p></div>`;
+
+test("the rarely reached badges and cards stay readable in every mood", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.waitForSelector(".intro-shell");
+  await page.evaluate((html) => {
+    document.getElementById("root").style.display = "none";
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    document.body.append(host);
+  }, RARE_STATES);
+  for (const mood of MOODS) {
+    await putMood(page, mood);
+    await settle(page, { drawers: false });
+    expect(await page.evaluate(COLLECT), `rare states (${mood})`).toEqual([]);
+  }
+});

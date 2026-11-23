@@ -16,7 +16,7 @@
   gap: 10px;
   margin: 16px 0 2px;
   padding: 13px;
-  color: var(--c-ink);
+  color: var(--c-paper);
   background: var(--c-acid);
   border: 1px solid var(--c-acid-deep);
   border-radius: 6px;
@@ -27,26 +27,30 @@
   margin-top: 2px;
 }
 
-.cinematic-clue-card span,
-.cinematic-clue-card strong {
+/* The card's own label and title only: the words marked inside its text stay in their line. */
+.cinematic-clue-card > div > span,
+.cinematic-clue-card > div > strong {
   display: block;
 }
 
-.cinematic-clue-card span {
-  color: var(--c-teal-deep);
+.cinematic-clue-card > div > span {
+  color: var(--c-mint-soft);
   font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
-.cinematic-clue-card strong {
+.cinematic-clue-card > div > strong {
   margin-top: 3px;
   font-size: 1.0625rem;
 }
 
+/* The marked words read on the card's green, where the paper's teal and red would not. */
 .cinematic-clue-card p {
+  --pr-say: var(--c-mint-soft);
+  --pr-num: var(--c-mint-soft);
+  --pr-note: var(--c-paper);
   margin: 5px 0 0;
-  color: var(--c-ink-raised);
   font-size: 0.75rem;
   line-height: 1.5;
 }
