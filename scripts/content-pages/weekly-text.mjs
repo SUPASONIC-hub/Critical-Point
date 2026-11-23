@@ -6,6 +6,7 @@ import {
   MARKET_SHOCK_WOBBLE,
 } from "../../src/gauntlet/weeklyRules.js";
 import { WEEKLY_RULES, weekStartMs } from "../../src/gauntlet/weeklyCalendar.js";
+import { LOCK_DRAG } from "../../src/gauntlet/tableRules.js";
 import weekRulesKo from "../../src/copy/weekRules.js";
 import weekRulesEn from "../../src/locales/en/screens/weekRules.js";
 import weekRulesJa from "../../src/locales/ja/screens/weekRules.js";
@@ -78,6 +79,8 @@ function ruleValues(schema = {}) {
     seconds: -(schema.secondsShift ?? 0),
     chips: schema.chipsFactor,
     crisisChips: schema.chipsFactor,
+    // G18 (RULES_MARK 7): SHORT CLOCK's LOCK drag, a constant of the table, not of the schema.
+    lockDrag: LOCK_DRAG,
   };
 }
 

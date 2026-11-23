@@ -23,6 +23,7 @@ export default {
     question: "How will you sign this Case? If you don’t choose, you sign with conditions.",
     name: "Name only",
     terms: "With conditions",
+    nameWall: "On this signature line, Name only stands the Wall band {wall} closer.",
   },
   comfort: {
     title: "Comfort settings",

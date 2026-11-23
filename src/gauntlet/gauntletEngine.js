@@ -20,6 +20,8 @@ import {
   HOT_CASH_MULTIPLIER,
   INSURANCE_SHARE,
   KINETIC_GRIP_CHIPS,
+  LOCK_DRAG,
+  LOCK_DRAG_RULES,
   LOCK_PRESS_SECONDS,
   LOGIC_CAP,
   LOGIC_HOLD,
@@ -48,9 +50,9 @@ import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
-import { LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, readSignWay, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
-import { COLD_BLOOD_WALL, NEXT_REROLL_COST, readRelicBoost } from "./relicsNext.js";
-import { BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { LATE_BILL_CHIPS, LATE_BILL_KEEP, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
+import { COLD_BLOOD_WALL, NEXT_REROLL_COST, readRelicBoost, RELIC_BOOST_CAP } from "./relicsNext.js";
+import { BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_SECONDS, BREATH_WALL, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -67,7 +69,7 @@ export { decisionWindowSeconds, stakeTier } from "./stakeClock.js";
  * screen loads to repair a save, and the list brings the prologues' copy.
  */
 // The next rules (G1~G7, nextTableRules.js): this stand-in names neither mark, so it plays what the page plays.
-const ALL_RULES = Object.freeze({ has: (id) => id !== NEXT_RULE && id !== OLD_RULE });
+const ALL_RULES = Object.freeze({ has: (id) => id !== NEXT_RULE && id !== OLD_RULE && id !== SEVEN_RULE && id !== BEFORE_SEVEN_RULE });
 
 /**
  * The gauntlet: one hand of cards, one gauge, one wall you cannot see.
@@ -312,6 +314,8 @@ export function normalizeSchema(value) {
   if (source.lateBill === true) schema.lateBill = true;
   // G15: the heat the BUST before this board went at, under the next rules; only ever written when set.
   if (Number.isFinite(source.bustHeat) && source.bustHeat > 0) schema.bustHeat = clamp(Math.round(source.bustHeat), 0, GAUGE_MAX);
+  // G18 (RULES_MARK 7): a short clock's board, where a LOCK press takes LOCK_DRAG of its clock; only ever written when true.
+  if (source.lockDrag === true) schema.lockDrag = true;
   // G5 4막 학습된 벽: the band stood around the last cash's heat (`getTrainedBand`); only ever written when true.
   if (source.trained === true) schema.trained = true;
   // G5 6막 진술 고정: the stance the case's first cash put on record; only ever written when set.
@@ -381,15 +385,17 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
  * window spent its look (B1): SCOUT_TRUST of 믿음 comes off after everything
  * else -- unmultiplied, unfractured, and on a bust like any other cost.
  * `narrowed` is the second look (B1, 11-18): SCOUT_NARROW_TRUST more, billed the same way.
+ * `scoutTrust` is the first look's price, SCOUT_TRUST but under RULES_MARK 7 (G13, `scoutTrustAt`).
  */
-export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false, narrowed = false, narrowTrust = SCOUT_NARROW_TRUST } = {}) {
+export function applyGauntletEffect(effect = {}, { outcome = "cash", gauge = 0, fracturedAxis = null, fractureRate = FRACTURE_RATE, focusMultiplier = 1, scouted = false, narrowed = false, narrowTrust = SCOUT_NARROW_TRUST, scoutTrust = SCOUT_TRUST } = {}) {
   const fractured = applyFracture(effect, fracturedAxis, fractureRate);
   const multiplier = getResourceMultiplier(gauge) * Math.max(1, Number(focusMultiplier) || 1);
   const priced = Object.fromEntries(
     Object.entries(fractured).map(([key, value]) => [key, isResourceGain(key, value) ? (outcome === "bust" ? 0 : roundAway(value * multiplier)) : value]),
   );
   // G2: under the next rules the second look's price climbs within a case (`narrowTrustAt`), and the verdict carries it.
-  const looks = scouted ? SCOUT_TRUST + (narrowed ? Math.max(0, Number(narrowTrust) || 0) : 0) : 0;
+  // G13 (RULES_MARK 7): so does the first look's (`scoutTrustAt`).
+  const looks = scouted ? Math.max(0, Number(scoutTrust) || 0) + (narrowed ? Math.max(0, Number(narrowTrust) || 0) : 0) : 0;
   return looks ? { ...priced, trust: (priced.trust ?? 0) - looks } : priced;
 }
 
@@ -711,8 +717,10 @@ export function getTableSchema(run) {
   // week's is, and only in a season without one: never two rules on a board.
   if (run?.story !== true) {
     const rule = run?.weekRule || caseRuleFor(run?.open?.caseId, run);
-    // G5 8막 실명 서명: the board moves the way the case was signed.
-    return getWeekBoard(schema, rule, twistHasDevice(rule, "signedByName") ? readSignWay(run?.open?.signed) : null);
+    // G5 8막 실명 서명: the board moves the way the case was signed (G16: by name, as far as the case drew).
+    if (!twistHasDevice(rule, "signedByName")) return getWeekBoard(schema, rule);
+    const way = readSignWay(run?.open?.signed);
+    return getWeekBoard(schema, rule, way, way === "name" ? getNameWall(run) : null);
   }
   if (!storyBoards.has(schema)) storyBoards.set(schema, { ...schema, wallMin: Math.max(Number(schema.wallMin) || 0, STORY_WALL_MIN), wallMax: STORY_WALL_MAX });
   return storyBoards.get(schema);
@@ -769,6 +777,21 @@ export function asksToSign(run) {
   return Boolean(state?.open) && tableDeviceOn(state, "signedByName") && Number(state.windowIndex) === Number(state.open.windowIndex);
 }
 
+/**
+ * G16 (RULES_MARK 7): how much closer 「이름만」 stands the wall in the case
+ * open on `run`: drawn from SIGN_NAME_WALL_LOW to SIGN_NAME_WALL_HIGH off the
+ * case and the window it opened on (the same draw on a reload, the replay and
+ * the server's), SIGN_NAME_WALL_HIGH in SIGN_LAST_CASE; SIGN_NAME_WALL before 7.
+ * The sign panel prints it before the choice (WeekRulePanel.jsx `SignAsk`).
+ */
+export function getNameWall(run, rules = undefined) {
+  if (!isMarkSevenOn(rules)) return SIGN_NAME_WALL;
+  const caseId = run?.open?.caseId;
+  if (caseId === SIGN_LAST_CASE) return SIGN_NAME_WALL_HIGH;
+  const span = SIGN_NAME_WALL_HIGH - SIGN_NAME_WALL_LOW + 1;
+  return SIGN_NAME_WALL_LOW + Math.floor(seededUnit(`signName:${caseId}:${Number(run?.open?.windowIndex) || 0}`) * span);
+}
+
 /** `run` with its case signed `way` (`name` or `terms`), written on the case's open snapshot; the same run when it does not ask. */
 export function signCase(run, way) {
   if (!asksToSign(run) || !Object.hasOwn(SIGN_WAYS, way)) return run;
@@ -782,16 +805,20 @@ export function signCase(run, way) {
  * so the rule cannot push a board past its ends.
  */
 const weekBoards = new Map();
-function getWeekBoard(schema, weekRule, way = null) {
-  const overlay = weekRuleOverlay(weekRule, schema, way ? SIGN_WAYS[way] : null);
+function getWeekBoard(schema, weekRule, way = null, nameWall = null) {
+  // G16: 「이름만」 with the wall its case drew, when that is not the fixed one.
+  const drawn = way === "name" && nameWall !== null && nameWall !== SIGN_NAME_WALL;
+  const overlay = weekRuleOverlay(weekRule, schema, way ? (drawn ? { wallShift: -nameWall, chipsFactor: SIGN_NAME_CHIPS } : SIGN_WAYS[way]) : null);
   if (!overlay) return schema;
-  const key = way ? `${weekRule}:${way}` : weekRule;
+  const key = way ? `${weekRule}:${way}${drawn ? nameWall : ""}` : weekRule;
   if (!weekBoards.has(key)) weekBoards.set(key, new WeakMap());
   const boards = weekBoards.get(key);
   if (!boards.has(schema)) {
     const clamped = normalizeSchema({ ...schema, ...overlay });
     const moved = { ...schema };
     for (const key of ["seconds", "wallMin", "wallMax", "startGauge", "chipsScale", "fractureRate", "sealBreak"]) moved[key] = clamped[key];
+    // G18: a short clock's board carries the LOCK drag (`getLockPressSeconds`, LOCK_DRAG_RULES).
+    if (LOCK_DRAG_RULES.includes(weekRule)) moved.lockDrag = true;
     boards.set(schema, moved);
   }
   return boards.get(schema);
@@ -816,6 +843,15 @@ export function getTableClockScale(run, tableTime = 1) {
  */
 export function getWindowSeconds(window) {
   return decisionWindowSeconds(window.gauge, window.schema);
+}
+
+/**
+ * The clock a LOCK press takes on `window`: LOCK_PRESS_SECONDS, and under
+ * RULES_MARK 7 on a short clock's board (`lockDrag`: SHORT CLOCK, 7막 청문회)
+ * LOCK_DRAG times that (G18), so charging there is a choice and not a habit.
+ */
+export function getLockPressSeconds(window, rules = ALL_RULES) {
+  return window?.schema?.lockDrag === true && isMarkSevenOn(rules) ? LOCK_PRESS_SECONDS * LOCK_DRAG : LOCK_PRESS_SECONDS;
 }
 
 export function getRemainingSeconds(window) {
@@ -964,7 +1000,7 @@ export function reduceWindow(window, event = {}, rules = ALL_RULES) {
         maxFocusCombo: Math.max(Number(window.maxFocusCombo) || 0, scored.focusCombo),
         focusHits: (Number(window.focusHits) || 0) + 1,
         gauge: clamp(window.gauge - scored.focusRelief, 0, GAUGE_MAX),
-      }, LOCK_PRESS_SECONDS);
+      }, getLockPressSeconds(window, rules));
     }
     case "SCOUT": {
       // One look a window, paid in clock like a LOCK press: no heat of its own,
@@ -2006,8 +2042,12 @@ function readWindowUnder(window, rules) {
  * `shock` says the board this window deals is the case's MARKET SHOCK board
  * (`isShockDue` over the case's log, false under any week without it): the
  * pot stacked so far swings, and the board's wall comes closer.
+ *
+ * `narrows` and `scouts` are the second and first looks the case has bought
+ * before this window (`countNarrows`, `countScouts` over its log): what the
+ * next look costs (G2, and G13 under RULES_MARK 7).
  */
-export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false, shock = false, sign = false, narrows = 0 }) {
+export function resolveWindow({ run, window: closedWindow, card, forced, offered, caseClosed = false, offerRelics = false, relicPool = DEFAULT_RELIC_POOL, rules = ALL_RULES, nextRules = rules, audit = 0, cascade = false, shock = false, sign = false, narrows = 0, scouts = 0 }) {
   const window = readWindowUnder(closedWindow, rules);
   const current = normalizeRunState(run);
   const relics = current.relics;
@@ -2082,7 +2122,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       clockLeft: 1 - (Number(window?.elapsed) || 0) / Math.max(1, Number(window?.schema?.seconds) || current.schema.seconds),
       focusMode,
       focusCharged: focusCharge >= STANCE_CHARGE,
-    })
+    }, isMarkSevenOn(rules) ? RELIC_BOOST_CAP : Infinity)
     : { fired: [], factor: 1 };
   const basePot = paysPot ? Math.round(chips * multiplier * boost.factor) : 0;
   const pot = paysPot ? Math.round(chips * multiplier * handBonus * boost.factor) : 0;
@@ -2189,6 +2229,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     pushes: Number(window?.pushes) || 0,
     // B1: the look was spent on this window, so its 믿음 is billed (applyGauntletEffect) and the log says so.
     scouted: window?.scouted === true,
+    // G13 (RULES_MARK 7): the first look's price, the case's nth (`scoutTrustAt`), written only when spent.
+    ...(window?.scouted === true && isMarkSevenOn(rules) ? { scoutTrust: scoutTrustAt(scouts) } : {}),
     // The second look (B1, 11-18), written only when spent: SCOUT_NARROW_TRUST more.
     ...(window?.scouted === true && window?.narrowed === true ? { narrowed: true, ...(next ? { narrowTrust: narrowTrustAt(narrows) } : {}) } : {}),
     // G7: 숨 고르기 was pressed on this window.
@@ -2484,15 +2526,18 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 6 (2026-11-25: G5's
- * other acts, 1, 2, 4, 6 and 8, each a table twist of its own; the user's
+ * The mark of a case closed at the table of RULES_MARK 7 (2026-11-30, with
+ * the wipe of that day: G11b·c, G13, G16 and G18 of the gameplay notes of
+ * 11-20, the user's 「1 나눠서 두 번」; nextTableRules.js `isMarkSevenOn` plays
+ * them for a row marked 7 or later only). 6 was 2026-11-25: G5's
+ * other acts, 1, 2, 4, 6 and 8, each a table twist of its own (the user's
  * 「전부 1」 of 11-19). 5 was 2026-11-20, the
  * user's answer 「1」 of 11-19: G1 to G7, the next table rules of
  * src/gauntlet/rulesNext.js, and N26, #591: 사건 09, 11, 14 and 16 deal a rule
  * of their own for that case in a season with no weekly rule, so the same play
  * scores differently). It ships before the wipe of 2026-11-30, which keeps its
  * announced day: until then the server still ranks seasons from 4 up, and
- * that wipe asks for 6 (*_ranking_reset_1130.sql).
+ * that wipe asks for 7 (*_ranking_reset_1130.sql).
  * 4 was C-3 and C-4 (the user's answers of 2026-10-25: the logic streak held
  * on the card's direction, 사람 or 자리, and OVERCLOCK, the audit and the
  * links opening one a case in 사건 01 to 03), 3 B3's audit and B2's links as
@@ -2508,7 +2553,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 6;
+export const RULES_MARK = 7;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

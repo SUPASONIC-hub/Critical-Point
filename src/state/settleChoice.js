@@ -1,7 +1,7 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
 import { getBranchDetourBypass, nodes } from "../gameData.js";
-import { countNarrows } from "../gauntlet/nextTableRules.js";
+import { countNarrows, countScouts } from "../gauntlet/nextTableRules.js";
 import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
@@ -165,6 +165,8 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     // G6: the board this decision deals is the case's last (the 결재 판); G2: the second looks the case has bought.
     sign: !route.caseClosed && isSignScene(caseId, route.nextNode),
     narrows: countNarrows(log),
+    // G13 (RULES_MARK 7): the first looks the case has bought.
+    scouts: countScouts(log),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -176,6 +178,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     scouted: verdict.scouted,
     narrowed: verdict.narrowed === true,
     ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
+    ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
   });
   return {
     ...route,

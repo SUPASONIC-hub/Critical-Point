@@ -1,4 +1,4 @@
-import { countNarrows } from "../gauntlet/nextTableRules.js";
+import { countNarrows, countScouts } from "../gauntlet/nextTableRules.js";
 import { useEffect, useMemo } from "react";
 
 import { readSettledWindowSeeds } from "../appConfig.js";
@@ -149,7 +149,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // The two as one field of the play view, which has room for one (check:runtime-budget).
   // G2: the second looks the case has bought, which price the next one (nextTableRules.js).
   const narrowCount = useMemo(() => countNarrows(log), [log]);
-  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading, narrows: narrowCount }), [auditCount, linkReading, narrowCount]);
+  // G13 (RULES_MARK 7): the first looks, which price the next one the same way.
+  const scoutCount = useMemo(() => countScouts(log), [log]);
+  const tableRisk = useMemo(() => ({ audit: auditCount, links: linkReading, narrows: narrowCount, scouts: scoutCount }), [auditCount, linkReading, narrowCount, scoutCount]);
   // The trace is session storage, not state, and only the debug overlay prints
   // it, so only a debug build reads it on render.
   const silentFailureCount = debugTools

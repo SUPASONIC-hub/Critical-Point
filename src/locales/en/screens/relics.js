@@ -27,7 +27,7 @@ export default {
     spendNote: "It comes straight out of your KD Bank account and can't be undone.",
     spendHint: "One more only when a slot is open. Buy every time and the Vault runs dry before the ending.",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
-    spendHintNext: "One more once a Season. Rerolls are cheap: reroll a weak three.",
+    spendHintNext: "One more once a Season. Rerolls are cheap: reroll a weak three. Tools that pay on the same hand pay ×{cap} at most together (a single tool that pays more keeps its own).",
     secondTitle: "Pick one more tool",
     secondLede: "You bought one more: pick it from the two left.",
     off: {

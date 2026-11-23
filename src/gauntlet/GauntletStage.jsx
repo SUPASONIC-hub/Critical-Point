@@ -31,7 +31,7 @@ import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTableTabTitle } from "./tableTabTitle.js";
 import { listOfferedDirections } from "./logicStreak.js";
-import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
+import { GAUGE_MARKS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { LogicLine, RelicChips, ScoutBand, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -78,7 +78,7 @@ const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather, sign
 export function GauntletStage({
   seed,
   run,
-  auditCount = 0, narrowCount = 0,
+  auditCount = 0, narrowCount = 0, scoutCount = 0,
   links = null,
   cards,
   reframeChoice,
@@ -183,9 +183,9 @@ export function GauntletStage({
   // with it selected.
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
-  const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout, canPayNarrow, nextClock, next, narrowPrice, lockShut, breathable,
-  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount }); // G1~G7: the next rules' readings (tableMeters.js).
+  const { selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
+    canPayScout, canPayNarrow, nextClock, next, narrowPrice, scoutPrice, lockSeconds, lockShut, breathable,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount, scoutCount }); // G1~G7, MARK 7 (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
   // G17: one cash under the audit's line from its limit, the token's label says so in words (in place of 감사: E1g, a phrase beside it overflowed).
@@ -635,7 +635,7 @@ export function GauntletStage({
             <span aria-hidden="true">
               {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice}
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice} scoutTrust={scoutPrice}
               board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
             {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
             {breathable && win.schema.bustHeat > 0 && (
@@ -794,7 +794,7 @@ export function GauntletStage({
           aria-keyshortcuts={keys("E")}
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
-          aria-label={lockShut ? `LOCK · ${say.lockShut}` : `LOCK ${lockCapped ? say.lockCapped : Math.round(win.focus)} · ${fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}`}
+          aria-label={lockShut ? `LOCK · ${say.lockShut}` : `LOCK ${lockCapped ? say.lockCapped : Math.round(win.focus)} · ${fill(say.lockPrice, { seconds: lockSeconds })}`}
           aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
           {steadyCold && <span id="gx-steady-cold" className="sr-only">{say.steadyCold}</span>}
@@ -807,9 +807,9 @@ export function GauntletStage({
               prints it with the same charge, and with it the line was 94 to
               112px in a button with 82px of room at 390px (74px at 360px). */}
           {/* At the cap the press still charges the resources, the stance and STEADY's cooling, so it still costs the clock (C-6): the price stays in the name. */}
-          <small>{lockShut ? say.lockShut : lockCapped ? say.lockCapped : <>{Math.round(win.focus)} · {fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}</>}</small>
+          <small>{lockShut ? say.lockShut : lockCapped ? say.lockCapped : <>{Math.round(win.focus)} · {fill(say.lockPrice, { seconds: lockSeconds })}</>}</small>
           <span id="gx-focus-detail" className="sr-only">
-            {fill(say.lockDetail, { charge: Math.round(win.focus), seconds: LOCK_PRESS_SECONDS })} {fill(lockCapped ? say.lockAtCap : say.lockUnderCap, { cap: LOCK_CAP })}
+            {fill(say.lockDetail, { charge: Math.round(win.focus), seconds: lockSeconds })} {fill(lockCapped ? say.lockAtCap : say.lockUnderCap, { cap: LOCK_CAP })}
             {stanceOn && fill(say.lockStance, { charge: STANCE_CHARGE })}{focusBonus.note}
           </span>
         </button>
@@ -870,7 +870,7 @@ export function GauntletStage({
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
-        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, audit, links, logic, lockRefused,
+        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, scoutTrust: scoutPrice, audit, links, logic, lockRefused,
           hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}

@@ -74,6 +74,16 @@ export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;
 /**
+ * G18 LOCK 충전 비용 (RULES_MARK 7, nextTableRules.js `isMarkSevenOn`): on a
+ * board with a short clock (SHORT CLOCK, a week's or 사건 09's, and 7막 청문회:
+ * the schema's `lockDrag`) a LOCK press takes LOCK_DRAG times LOCK_PRESS_SECONDS.
+ * Only there, for now: LOCK is the table's centre (게임성 개선점 G18's risk), so
+ * the rest of the season charges as before.
+ */
+export const LOCK_DRAG = 1.15;
+/** The rules whose boards carry the drag (gauntletEngine.js `getWeekBoard`): a week's or 사건 09's SHORT CLOCK, and 7막's hearing. */
+export const LOCK_DRAG_RULES = Object.freeze(["short-clock", "hearing"]);
+/**
  * SCOUT (B1, 11일차 초안): what one look at the wall costs on the table clock,
  * once a window, and how far the band it draws reaches -- a band
  * `2 * SCOUT_REACH` wide that holds the wall at a seeded place inside it, cut

@@ -208,6 +208,7 @@ const budgets = [
   // 165,507 / 61,707 -> 165,734 / 61,769 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 165,730 / 61,765 (over budget only) in the e2e build, the plus 4.
   // 165,737 / 61,781 -> 165,887 / 61,843 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 165883 / 61839 (over budget only) in the e2e build, the plus 4.
   // 165,887 / 61,843 -> 166,159 / 61,971 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 166155 / 61967 (over budget only) in the e2e build, the plus 4.
+  // 166,159 / 61,971 -> 166,257 / 62,028 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 166253 / 62024 (over budget only) in the e2e build, the plus 4.
   // 165,737 / 61,781 -> 165,737 / 61,790 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 61786 (over budget only) in the e2e build, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured - / 61793 in CI verify-quick, the plus 4.
   // 166,159 / 61,971 -> 166,164 / 61,971 #635 1178f9fe over main 78be3bd4. Measured 166160 / - (over budget only) in CI verify-quick, the plus 4.
@@ -349,7 +350,8 @@ const budgets = [
   // 37,740 / 15,897 -> 37,830 / 15,928 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 37826 / 15924 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
   // DRYRUN 1123: main's number; CI measures it on the day.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_830, maxGzip: 15_928 },
+  // 37,830 / 15,928 -> 37,918 / 15,957 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 37914 / 15953 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_918, maxGzip: 15_957 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1570,6 +1572,7 @@ const budgets = [
   // 57,902 / 21,716 -> 59,662 / 22,407 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 59658 / 22403 (over budget only) in the e2e build, the plus 4.
   // 57,902 / 21,716 -> 57,927 / 21,728 hotfix rule chips (#636) over main f3815370. Measured 57923 / 21724 (over budget only) in CI verify-quick, the plus 4.
   // 59,662 / 22,407 -> 60,090 / 22,537 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 60086 / 22533 (over budget only) in the e2e build, the plus 4.
+  // 60,090 / 22,537 -> 61,319 / 23,005 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 61315 / 23001 (over budget only) in the e2e build, the plus 4.
   // 57,927 / 21,728 -> 57,927 / 21,781 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 21777 (over budget only) in the e2e build, the plus 4.
   // 60,090 / 22,537 -> 60,090 / 22,591 #635 1178f9fe over main 78be3bd4. Measured - / 22587 (over budget only) in CI verify-quick, the plus 4.
   { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 60_090, maxGzip: 22_591 },
@@ -1765,7 +1768,8 @@ const budgets = [
   // 7,144 / 2,960 -> 7,170 / 2,974 G4·G5 rules-set switch (gameplay-g-relic-act) over main 065d684d. Measured 7166 / 2970 (over budget only) in the e2e build, the plus 4.
   // 7,170 / 2,974 -> 10,622 / 4,304 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 10618 / 4300 (over budget only) in the e2e build, the plus 4.
   // 10,622 / 4,304 -> 10,622 / 4,325 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured - / 4321 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 10_622, maxGzip: 4_325 },
+  // 10,622 / 4,325 -> 10,940 / 4,429 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 10936 / 4425 (over budget only) in the e2e build, the plus 4.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 10_940, maxGzip: 4_429 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1816,6 +1820,8 @@ const budgets = [
   // 2,343 / 1,114 -> 2,348 / 1,114 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 2344 / - (over budget only) in the e2e build, the plus 4.
   // 2,348 / 1,114 -> 3,005 / 1,265 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 3001 / 1261 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,265 -> 3,005 / 1,270 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured - / 1266 (over budget only) in the e2e build, the plus 4.
+  // 3,005 / 1,270 -> 3,110 / 1,308 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 3106 / 1304 (over budget only) in the e2e build, the plus 4.
+  // 3,110 / 1,308 -> 3,258 / 1,358 gameplay-mark7 over g5-rest 54713815 (G13 조사, G16 서명란 설명 묶음, 서명 버튼 44px). Measured in CI verify-quick (#640 ef87e037), the plus 4. Measured 3254 / 1354 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,270 -> 3,034 / 1,284 8막 서명 버튼 높이 44px (#635 54713815, Linux CI 11-20). Measured 3030 / 1280 in the e2e build, the plus 4.
   // 3,034 / 1,284 -> 3,034 / 1,289 on 2026-11-23. Measured - / 1285 (over budget only), the plus 4.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_034, maxGzip: 1_289 },
@@ -2167,6 +2173,7 @@ const budgets = [
   // 203,560 / 68,103 -> 205,670 / 68,690 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 205666 / 68686 (over budget only) in the e2e build, the plus 4.
   // 203,560 / 68,103 -> 205,604 / 68,826 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 205600 / 68822 in CI verify-quick, the plus 4.
   // 205,670 / 68,826 -> 208,131 / 69,519 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 208127 / 69515 (over budget only) in the e2e build, the plus 4.
+  // 208,131 / 69,519 -> 208,597 / 69,672 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 208593 / 69668 (over budget only) in the e2e build, the plus 4.
   // 205,604 / 68,826 -> 205,810 / 68,911 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 205806 / 68907 (over budget only) in the e2e build, the plus 4.
   // 208,131 / 69,519 -> 208,316 / 69,601 #635 1178f9fe over main 78be3bd4. Measured 208312 / 69597 in CI verify-quick, the plus 4.
   { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 208_316, maxGzip: 69_601 },
@@ -2288,6 +2295,7 @@ const budgets = [
   // 170,126 / 60,820 -> 171,914 / 61,373 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 171910 / 61369 (over budget only) in the e2e build, the plus 4.
   // 170,126 / 60,820 -> 171,838 / 61,420 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 171834 / 61416 in CI verify-quick, the plus 4.
   // 171,914 / 61,420 -> 174,008 / 62,102 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 174004 / 62098 (over budget only) in the e2e build, the plus 4.
+  // 174,008 / 62,102 -> 174,414 / 62,245 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 174410 / 62241 (over budget only) in the e2e build, the plus 4.
   // 171,838 / 61,420 -> 172,012 / 61,492 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 172008 / 61488 (over budget only) in the e2e build, the plus 4.
   // 174,008 / 62,102 -> 174,157 / 62,173 #635 1178f9fe over main 78be3bd4. Measured 174153 / 62169 in CI verify-quick, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 174_157, maxGzip: 62_173 },
@@ -2785,10 +2793,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,536 / 445,591 / 453,735 hotfix rule chips (#636) over main f3815370. Measured first paint 381,532 / 445,587 / 453,731 in CI verify-quick, the plus 4.
 // -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
 // -> 384,610 / 449,801 / 458,281 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured first paint, the plus 4.
+// -> 384,610 / 449,939 / 458,431 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4 (first paint).
+// -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
+// Both sides kept (mark7 follows g5-rest 54713815); the numbers are re-measured in CI verify-quick, the plus 4.
 // -> 385,486 / 450,214 / 458,672 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured first paint, the plus 4.
 // -> 385,503 / 450,231 / 458,685 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured first paint, the plus 4.
-
-// -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
 // -> 385,516 / 450,244 / 458,698 world-news #639 over main 1e0a57ab. Measured first paint 385,512 / 450,240 / 458,694 in CI verify-quick, the plus 4.
 // -> 385,516 / 450,920 / 459,383 #635 1178f9fe over main 78be3bd4. Measured first paint en 450,916 / ja 459,379 in CI verify-quick, the plus 4.
 // -> 386,141 / 451,678 / 460,111 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured first paint 386,137 / 451,674 / 460,107 in CI verify-quick, the plus 4.

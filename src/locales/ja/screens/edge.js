@@ -23,6 +23,7 @@ export default {
     question: "この事件の署名欄にどう書く？選ばなければ条件をつける。",
     name: "名前だけ書く",
     terms: "条件をつける",
+    nameWall: "今回の署名欄は、名前だけ書けば壁の帯が{wall}手前に立つ。",
   },
   comfort: {
     title: "快適設定",
