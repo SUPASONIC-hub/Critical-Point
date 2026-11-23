@@ -84,6 +84,8 @@
     "src/logicReport.js": 100,
     "src/mood.js": 100,
     "src/nearestEnding.js": 100,
+    "src/news/newsIndex.js": 100,
+    "src/news/newsPaper.js": 100,
     "src/notes/noteIndex.js": 100,
     "src/personalBests.js": 97,
     "src/plateStory.js": 100,
