@@ -191,7 +191,7 @@ function DraftRefine({ state, onPress }) {
     <>
       <DraftBuy id="refine" state={state} label={say.refine} onPress={() => setOpen((was) => !was)} />
       {open && state.open && (
-        <span role="group" aria-label={say.refineGroup} data-testid="relic-refine-list" style={{ display: "flex", flexWrap: "wrap", gap: 6, flexBasis: "100%", minWidth: 0 }}>
+        <span role="group" aria-label={say.refineGroup} data-testid="relic-refine-list" style={{ display: "flex", flexWrap: "wrap", gap: 6, gridColumn: "1 / -1", minWidth: 0 }}>
           {state.targets.map((id) => (
             <button key={id} type="button" className="ghost gx-draft-buy" data-testid="relic-refine-option" data-relic={id}
               aria-label={fill(say.refineOption, { name: RELICS[id].name, boost: getRefinedBoost(id) })} onClick={() => onPress(id)}>
