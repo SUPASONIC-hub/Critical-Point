@@ -112,6 +112,18 @@ export const NOTES = [
     summary: "말하는 사람 87명 가운데 66명이 실루엣이던 날부터, 악역도 평범한 얼굴로 그린다는 두 번째 규칙까지.",
   },
   {
+    slug: "weekly-rules-table",
+    published: "2026-12-26",
+    title: "주간 규칙별 대응표: 바뀌는 숫자와 하지 말 것",
+    summary: "그 주에만 서는 여섯 규칙이 무슨 숫자를 바꾸는지, 측정으로 확인한 하지 말 것과 함께 한 표로 모았습니다.",
+  },
+  {
+    slug: "reading-the-report",
+    published: "2026-12-29",
+    title: "판단 리포트 읽는 법: 버스트 점수의 일곱 칸",
+    summary: "금고와 점수는 무엇이 다른지, 칸마다 무엇을 묻는지, 글자와 리그는 어떻게 정해지는지 차례로 풀었습니다.",
+  },
+  {
     slug: "accessibility",
     published: "2026-12-31",
     title: "접근성: 낭독기·동작 줄이기·키보드로 끝까지",
