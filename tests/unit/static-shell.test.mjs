@@ -13,6 +13,10 @@ import { renderStaticPages } from "../../scripts/site-pages.mjs";
 import { READING_KINDS } from "../../src/homeReading.js";
 import { HERO_ART, localizeStaticShell, rootMarkup, STATIC_SHELL_ATTRIBUTE, staticReadingMarkup, staticShellMarkup, withStaticShell } from "../../scripts/static-shell.mjs";
 import { frontPageFor } from "../../src/news/newsIndex.js";
+import { notesDay } from "../../scripts/content-pages/notes.mjs";
+
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
 
 const INDEX = readFileSync("index.html", "utf8");
 const shelled = withStaticShell(INDEX);

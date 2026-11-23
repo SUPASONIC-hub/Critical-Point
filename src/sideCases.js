@@ -20,15 +20,42 @@
 import { readStoredValue, SIDE_CASES_KEY } from "./appConfig.js";
 import introCopy from "./copy/intro.js";
 import { fill } from "./locale.js";
-import { SIDE_CASES } from "./nodes/sidePacks.js";
+import { NEXT_SEASON, SIDE_CASES } from "./nodes/sidePacks.js";
+import { weeklyRuleNow } from "./state/weeklyClock.js";
 
-export { SIDE_CASES, SIDE_CASES_KEY };
+export { NEXT_SEASON, SIDE_CASES, SIDE_CASES_KEY };
 
 /** A side case's id: `side` and two digits. Never `caseNN`, which the server reads as a season case. */
 export const SIDE_CASE_ID_PATTERN = /^side\d{2}$/;
 
 export function isSideCaseId(caseId) {
   return typeof caseId === "string" && SIDE_CASE_ID_PATTERN.test(caseId);
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The side cases a release has opened by `ms` (the weekly clock): every entry
+ * without `opensAt`, and those whose Season has begun (NEXT_SEASON,
+ * src/nodes/sidePacks.js). The start screen's slot, the report's 「번외 사건이
+ * 열렸습니다」 line and 「지난번 이후」 read this list; SIDE_CASES itself stays
+ * whole for check:case and report:season-ready.
+ */
+export function releasedSides(cases = SIDE_CASES, ms = weeklyRuleNow()) {
+  return cases.filter((sideCase) => !Number.isFinite(sideCase?.opensAt) || Number(ms) >= sideCase.opensAt);
+}
+
+/**
+ * The start screen's Season line at `ms`, or null: from `noticeDays` before
+ * the Season opens to the end of its first day, and only while some side case
+ * names it. `{ count, today }` -- `today` once it has opened.
+ */
+export function seasonNoticeAt(ms = weeklyRuleNow(), { season = NEXT_SEASON, cases = SIDE_CASES } = {}) {
+  const at = Number(ms);
+  const count = cases.filter((sideCase) => sideCase?.opensAt === season.opensAt).length;
+  if (!count || !Number.isFinite(at)) return null;
+  if (at < season.opensAt - season.noticeDays * DAY_MS || at >= season.opensAt + DAY_MS) return null;
+  return { count, today: at >= season.opensAt };
 }
 
 /**
@@ -98,7 +125,7 @@ export function readSideRecord() {
  * `book` is the line the 결말 도감 keeps for side cases apart from the
  * season's (설계안 질문 5 (1)): the cases closed, of all those written.
  */
-export function getSideSlot({ newGamePlusUnlocked = false, caseResults = null, cases = SIDE_CASES, record = null } = {}) {
+export function getSideSlot({ newGamePlusUnlocked = false, caseResults = null, cases = releasedSides(), record = null } = {}) {
   if (!cases.length) return null;
   const marks = record ?? readSideRecord();
   const rows = cases
