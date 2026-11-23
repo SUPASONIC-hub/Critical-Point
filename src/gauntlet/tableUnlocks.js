@@ -143,9 +143,10 @@ const STEPS = [
     adds: [],
     kicker: unlocksCopy.steps.prologue01.kicker,
     // The second line is what a bust costs, which the first table never said:
-    // the first bust was the tutorial. A story run is not told it, because
-    // there the next scene is not skipped.
-    storyIntro: [0],
+    // the first bust was the tutorial. Since N21 (11-30) a bust here and in
+    // 프롤로그 02 keeps the next scene (caseRoutes.js `keepsSceneOnBust`), so the
+    // line says the stake alone, and a story run, which loses its stake too,
+    // is told both lines.
     intro: unlocksCopy.steps.prologue01.intro,
   },
   {

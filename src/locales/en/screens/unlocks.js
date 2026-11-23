@@ -10,7 +10,7 @@ export default {
       kicker: "FIRST TABLE · how this table works",
       intro: [
         "Push, and Heat and the multiplier go up. Commit before you hit the Wall. When the heartbeat speeds up, the Wall is close.",
-        "Hit the Wall and you lose this case’s whole stake and the next scene. What’s in the Vault stays.",
+        "Hit the Wall and you lose this case’s whole stake. What’s in the Vault stays.",
       ],
     },
     prologue02: {

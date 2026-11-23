@@ -30,7 +30,7 @@ export const GUIDE_BODY = {
 <p>프롤로그 03부터 「조회」로 믿음 1과 시간 3초를 내고 벽 구간을 20칸 폭으로 좁힐 수 있습니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다. 한 번 더 누르면 시간 3초로 14칸까지 좁힙니다. 이 둘째 조회의 믿음은 한 사건 안에서 2, 2, 3, 3, 4, 4…로 오르고, 버튼에 이번 값이 나옵니다.</p>
 <h3>판돈, 확정, BUST</h3>
 <p>「확정」을 누르면 칩 × 배율 × 콤보와 LOCK 보너스가 사건의 판돈에 더해집니다. 판돈은 사건이 닫힐 때까지 금고 밖에 있으므로, 사건 도중 한 번의 BUST가 그때까지의 판돈을 모두 지웁니다. 사건의 마지막 장면이거나 열기가 이미 벽 구간 안이라면, 확정을 약 0.6초 꾹 누르거나 3초 안에 「한 번 더」를 눌러야 합니다.</p>
-<p>BUST는 밀어붙여 벽에 닿거나, 시계가 올린 열기가 벽에 닿거나, 시간이 다 될 때 납니다. 판돈은 0이 되고, 카드는 이득 없이 비용만 치르며, 믿음 6, 공정함 6, 남은 시간 4를 잃고 피로가 8 오릅니다. 이야기는 다음 장면을 건너뜁니다. 금고는 건드리지 않습니다.</p>
+<p>BUST는 밀어붙여 벽에 닿거나, 시계가 올린 열기가 벽에 닿거나, 시간이 다 될 때 납니다. 판돈은 0이 되고, 카드는 이득 없이 비용만 치르며, 믿음 6, 공정함 6, 남은 시간 4를 잃고 피로가 8 오릅니다. 이야기는 다음 장면을 건너뜁니다(프롤로그 01·02는 빼고). 금고는 건드리지 않습니다.</p>
 <h3>테이블 시계</h3>
 <p>판의 시간은 기본 45초이고, 열기 45부터 40초, 열기 65부터 35초로 줄며, 12초보다 짧아지지는 않습니다. 판이 열리고 4초가 지나면 시계가 스스로 열기를 올립니다. 초당 0.5이고, 밀 때마다 12%씩 빨라지며 「시계 열기 ×N」으로 표시됩니다.</p>
 <h3>LOCK과 자세</h3>
@@ -160,7 +160,7 @@ export const GUIDE_BODY = {
 <p>From Prologue 03, “Scout” narrows the Wall band to 20 wide for 1 Trust and 3 seconds, once per hand. The Wall is not necessarily in the middle of it. Press again to narrow it to 14 for 3 more seconds. Within a case this second look costs 2, 2, 3, 3, 4, 4… Trust, and the button shows this time’s price.</p>
 <h3>Stake, Commit and BUST</h3>
 <p>“Commit” adds chips × multiplier × your combo and LOCK bonus to the case’s stake. That stake sits outside the Vault until the case closes, so one BUST anywhere in the case wipes all of it. In a case’s last scene, or once Heat is inside the band, Commit must be held for about 0.6 seconds or pressed again (“Once more”) within 3 seconds.</p>
-<p>You BUST by pushing into the Wall, letting the clock’s Heat creep into it, or running out of time. The stake drops to zero, the card pays its costs without its gains, and you lose 6 Trust, 6 Fairness and 4 Time left and gain 8 Fatigue. The story skips the next scene. The Vault is never touched.</p>
+<p>You BUST by pushing into the Wall, letting the clock’s Heat creep into it, or running out of time. The stake drops to zero, the card pays its costs without its gains, and you lose 6 Trust, 6 Fairness and 4 Time left and gain 8 Fatigue. The story skips the next scene (except in Prologues 01 and 02). The Vault is never touched.</p>
 <h3>The table clock</h3>
 <p>A hand has 45 seconds, cut to 40 from Heat 45 and to 35 from Heat 65, never below 12. Four seconds after the table opens, the clock starts adding Heat by itself, 0.5 a second, 12% faster for each push, shown as “Clock heat ×N”.</p>
 <h3>LOCK and Stances</h3>
@@ -290,7 +290,7 @@ export const GUIDE_BODY = {
 <p>プロローグ03から、「照会」で信頼1と時間3秒を払い、壁の区間を20マス幅に絞れます。勝負ごとに一回で、壁がその真ん中にあるという意味ではありません。もう一度押すと、時間3秒で14マスまで絞ります。この二度目の照会の信頼は、一つの事件の中で2、2、3、3、4、4…と上がり、ボタンに今回の値が出ます。</p>
 <h3>賭け金、確定、BUST</h3>
 <p>「確定」を押すと、チップ × 倍率 × コンボとLOCKのボーナスが事件の賭け金に加わります。賭け金は事件が閉じるまで金庫の外にあるので、事件の途中の一度のBUSTが、それまでの賭け金をすべて消します。事件の最後のシーンや、熱がすでに壁の区間に入っているときは、確定を約0.6秒長押しするか、3秒以内に「もう一度」を押す必要があります。</p>
-<p>BUSTは、押し切って壁に触れる、時計が上げた熱が壁に触れる、時間切れになる、のいずれかで起こります。賭け金は0になり、カードは利益なしにコストだけを払い、信頼6、公正さ6、残り時間4を失って疲労が8上がります。物語は次のシーンを飛ばします。金庫には手を付けられません。</p>
+<p>BUSTは、押し切って壁に触れる、時計が上げた熱が壁に触れる、時間切れになる、のいずれかで起こります。賭け金は0になり、カードは利益なしにコストだけを払い、信頼6、公正さ6、残り時間4を失って疲労が8上がります。物語は次のシーンを飛ばします(プロローグ01・02を除く)。金庫には手を付けられません。</p>
 <h3>テーブルの時計</h3>
 <p>勝負の時間は標準で45秒、熱45から40秒、熱65から35秒に縮み、12秒より短くはなりません。卓が開いて4秒たつと、時計がひとりでに熱を上げはじめます。毎秒0.5で、押すたびに12%ずつ速くなり、「時計が上げる熱 N倍」と表示されます。</p>
 <h3>LOCKと構え</h3>

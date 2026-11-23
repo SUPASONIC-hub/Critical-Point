@@ -24,3 +24,33 @@ test("settleChoice runs in node with no browser, and the same state and press se
   assert.equal(first.verdict.outcome, "cash");
   assert.deepEqual(carryChoiceLinks(first, { run, nextLog: [], runId: "run-node", caseId: node.caseId }), first.settledRun, "an open case hands nothing on");
 });
+
+/**
+ * N21 (the owner's answer of 2026-11-16, (1), for the reset of 11-30): a bust
+ * in 프롤로그 01 or 02 costs the stake and not the next scene; from 프롤로그 03
+ * the room plays it without the analyst, as before.
+ */
+test("a bust in 프롤로그 01 and 02 keeps the next scene; from 프롤로그 03 it skips it", async () => {
+  const { routeChoice } = await import("../../src/state/settleChoice.js");
+  const { getBlackoutSkip, keepsSceneOnBust, SCENE_KEPT_CASES } = await import("../../src/state/caseRoutes.js");
+  assert.deepEqual(SCENE_KEPT_CASES, ["prologue01", "prologue02"]);
+  const bust = { status: "bust" };
+  const resources = { trust: 50, legitimacy: 50, fatigue: 20 };
+  const skippable = (caseId) =>
+    Object.entries(nodes)
+      .filter(([, node]) => node.caseId === caseId)
+      .flatMap(([nodeId, node]) => (node.choices ?? []).map((choice) => ({ nodeId, choice })))
+      .find(({ choice }) => getBlackoutSkip(choice.next, { resources }));
+  for (const caseId of ["prologue01", "prologue02", "prologue03"]) {
+    const found = skippable(caseId);
+    assert.ok(found, `${caseId} has a scene a bust could skip`);
+    const route = routeChoice({ caseId, nodeId: found.nodeId, resources, run: {} }, { choice: found.choice, window: bust });
+    if (keepsSceneOnBust(caseId)) {
+      assert.equal(route.blackoutSkip, null, `${caseId}: the next scene is kept`);
+      assert.equal(route.nextNode, found.choice.next, `${caseId}: the run goes where the card leads`);
+    } else {
+      assert.ok(route.blackoutSkip, `${caseId}: the scene is skipped`);
+      assert.notEqual(route.nextNode, found.choice.next);
+    }
+  }
+});

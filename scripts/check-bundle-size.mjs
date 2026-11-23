@@ -347,6 +347,8 @@ const budgets = [
   // 35,422 / 15,018 -> 37,405 / 15,744 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 37,401 / 15,740 (over budget only) in the e2e build, the plus 4.
   // 37,484 / 15,785 -> 37,740 / 15,897 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 37736 / 15893 (over budget only) in the e2e build, the plus 4.
   // 37,740 / 15,897 -> 37,830 / 15,928 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 37826 / 15924 (over budget only) in the e2e build, the plus 4.
+  // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
+  // DRYRUN 1123: main's number; CI measures it on the day.
   { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_830, maxGzip: 15_928 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
