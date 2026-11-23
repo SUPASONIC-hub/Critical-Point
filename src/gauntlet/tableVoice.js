@@ -107,7 +107,7 @@ export const describeScout = ({ wallMin, wallMax, narrowed }) =>
  * window's clock lost (`cut` > 0) or got back (`cut` < 0), and the seconds it
  * now shows. Only what the HUD's clock already shows, in words.
  */
-export const describeStakeClock = ({ gauge, cut, remaining }) =>
+const describeStakeClock = ({ gauge, cut, remaining }) =>
   fill(cut > 0 ? voice().stakeClockCut : voice().stakeClockBack, { gauge: Math.round(gauge), cut: Math.abs(cut), seconds: Math.max(0, Math.ceil(remaining)) });
 
 /**
@@ -200,7 +200,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
  * card leaves it, LOCK's reason when a shut LOCK is pressed (`lockRefused`
  * counts the presses), and what 숨 고르기 did once pressed.
  */
-export function readNextLines({ win, logic = null, lockRefused = 0 }) {
+function readNextLines({ win, logic = null, lockRefused = 0 }) {
   const stage = tableCopy.stage;
   return {
     exposure: logic?.exposure?.spoken ?? "",
@@ -211,7 +211,7 @@ export function readNextLines({ win, logic = null, lockRefused = 0 }) {
 }
 
 /** G6: the 결재 판's line, said once as its table opens: the stake and the cell it shows. */
-export function readSignOpening(win, band) {
+function readSignOpening(win, band) {
   return getBoardMark(win?.schema) === SIGN_MARK && band?.shown !== undefined ? fill(tableCopy.stage.signOpen, { chips: SIGN_CHIPS, cell: band.shown }) : "";
 }
 

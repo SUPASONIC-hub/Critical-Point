@@ -23,7 +23,7 @@ export const SIDE_STREAK = 5;
 /** ENCORE: a streak of this many pays `boost`. Small: the streak hands hold one this long on most cashes, and with G1 halving instead of ending the streak ENCORE already lifts them about 7% (at 1.3 it lifted a switching hand 39%, past RELIC_LIFT_CAP). */
 export const LONG_STREAK = 8;
 /** TESTIMONY: a cash with at least this share of the clock left pays `boost`. */
-export const FAST_CASH_SHARE = 0.5;
+const FAST_CASH_SHARE = 0.5;
 
 /**
  * The pot multiplier per tool and what it asks. `when` reads the cash:

@@ -208,7 +208,7 @@ export const notePath = (slug) => `/notes/${slug}.html`;
 export const NOTES_INDEX_PATH = "/notes/index.html";
 
 /** How many notes the start screen's reading section shows (src/homeReading.js). */
-export const RECENT_NOTE_COUNT = 3;
+const RECENT_NOTE_COUNT = 3;
 
 /** The newest notes out by `day`, as the start screen lists them: `{ href, title, summary, day, date }`. */
 export function recentNotes(day, count = RECENT_NOTE_COUNT) {

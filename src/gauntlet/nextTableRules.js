@@ -31,7 +31,7 @@ export function wantsNextRules(scope = globalThis) {
 }
 
 /** What a rule set that names neither plays: this page's (or script's) choice, read once. */
-export const nextByDefault = () => (nextByDefault.value ??= wantsNextRules());
+const nextByDefault = () => (nextByDefault.value ??= wantsNextRules());
 
 /** Whether `rules` plays the next rules. */
 export function isNextOn(rules) {
@@ -65,8 +65,8 @@ export function withNextRules(rules, on = nextByDefault()) {
  * streak (instead of ending it). A charged EXPOSE cash is never caught (G3).
  */
 export const EXPOSURE_FROM = 4;
-export const EXPOSURE_STEP = 0.05;
-export const EXPOSURE_MAX = 0.3;
+const EXPOSURE_STEP = 0.05;
+const EXPOSURE_MAX = 0.3;
 export const EXPOSURE_HEAT = 50;
 
 /** 눈에 띔 after `held` windows in a row on one direction. */
@@ -97,8 +97,6 @@ export const STRIKE_HOT_GAUGE = 60;
 export const STRIKE_HOT_CAP = 1.55;
 /** STEADY, a little weaker: its pot rate and the heat a press cools. */
 export const STEADY_NEXT = Object.freeze({ potRate: 0.55, relief: 1 });
-/** A charged EXPOSE cash adds no audit mark under AUDIT_HEAT, and is never caught (G1). */
-export const EXPOSE_SHIELD = true;
 /** A charged EXPOSE cash also thickens the next board's chips this much (EXPOSED HAND), as STRIKE WAKE does by STRIKE_WAKE_CHIPS. */
 // G14 (11-20, 게임성 개선점 Q8 (1)): 1.25 -> 1.3.
 export const EXPOSE_CARRY_CHIPS = 1.3;

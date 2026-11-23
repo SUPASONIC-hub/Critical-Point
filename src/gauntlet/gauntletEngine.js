@@ -495,7 +495,7 @@ export function getLockCap(mode, gauge = 0, next = false) {
 }
 
 /** G3: the streak a board is dealt with already fills LOCK's cap, so LOCK is shut on it (a rule, not a display). */
-export function isLockShutBy(streak) {
+function isLockShutBy(streak) {
   return getLogicBonus(streak) >= LOCK_CAP;
 }
 
@@ -896,7 +896,7 @@ export function getWindowBand(window, reach = SCOUT_REACH) {
  * G6 결재 판: the cell the board shows, drawn from the seed between the band's
  * near end and the wall: the wall is at it or past it. Null on any other board.
  */
-export function getSignCell(window) {
+function getSignCell(window) {
   if (!window?.schema?.mutations?.includes?.(SIGN_MARK)) return null;
   const { wallMin } = window.schema;
   const wall = Number(window.wall) || wallMin;
@@ -1408,7 +1408,7 @@ export const BREATHER_MARK = "breather";
  * it (tableUnlocks.js `PEAK_CASES`). The engine's own "every rule" stand-in
  * says yes to anything, and a board dealt with no case named is no peak.
  */
-export const isPeakTable = (rules) => rules instanceof Set && rules.has(PEAK_MARK);
+const isPeakTable = (rules) => rules instanceof Set && rules.has(PEAK_MARK);
 
 /** An act's last case: the wall's band `PEAK_WALL` closer and the chips `PEAK_CHIPS` thicker, once. */
 export function applyPeak(schema, rules) {
