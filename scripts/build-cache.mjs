@@ -31,7 +31,7 @@ const KEY_VERSION = 1;
 // Names Vite exposes (VITE_), the prefixes vite.config.js loads with loadEnv,
 // and the variables it or its plugins read from process.env.
 const ENV_PREFIXES = ["VITE_", "GA_", "ADSENSE_", "GOOGLE_", "E2E_"];
-const ENV_NAMES = ["NODE_ENV", "SKIP_CRITICAL_CSS", "SERVICE_WORKER", "RENDER_GIT_COMMIT", "RENDER_EXTERNAL_URL", "SITE_URL", "BASE_URL"];
+const ENV_NAMES = ["NODE_ENV", "SKIP_CRITICAL_CSS", "SERVICE_WORKER", "RENDER_GIT_COMMIT", "RENDER_EXTERNAL_URL", "SITE_URL", "BASE_URL", "CP_NOTES_DAY"];
 
 /** The environment variables that can change the build, sorted by name. */
 export function buildEnv(env) {
@@ -123,7 +123,8 @@ function main() {
     tree: git(["rev-parse", "HEAD^{tree}"], root),
     mode,
     args: viteArgs,
-    env: process.env,
+    // The build writes the notes and the front page of its day in Seoul, so yesterday's dist/ is not today's.
+    env: { ...process.env, CP_NOTES_DAY: process.env.CP_NOTES_DAY || new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10) },
     envFiles,
     node: process.version,
     deps: existsSync(depsFile) ? readFileSync(depsFile, "utf8") : "",
