@@ -3,6 +3,9 @@ import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
 import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
 import { NEWS_KINDS } from "../../scripts/content-pages/news.mjs";
 
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
+
 /** The plain pages a build writes today: the five pages, the policy, the content pages, the notes out by now and the world's newspaper. */
 const PAGE_COUNT = 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length;
 import { readFileSync } from "node:fs";
