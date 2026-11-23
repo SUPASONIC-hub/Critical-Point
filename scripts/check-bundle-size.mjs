@@ -211,8 +211,8 @@ const budgets = [
   // 165,737 / 61,781 -> 165,737 / 61,790 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 61786 (over budget only) in the e2e build, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured - / 61793 in CI verify-quick, the plus 4.
   // 166,159 / 61,971 -> 166,164 / 61,971 #635 1178f9fe over main 78be3bd4. Measured 166160 / - (over budget only) in CI verify-quick, the plus 4.
-  // 166,164 / 61,971 -> 166,164 / 61,979 #635 67b93c64. Measured - / 61975 (over budget only) in CI verify-quick, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_164, maxGzip: 61_979 },
+  // 166,164 / 61,971 -> 166,164 / 61,989 #635 on 2026-11-23: the chunk's hashed imports move with the day's notes. Largest day 61,981 (2027-01-08), plus Linux's 4 and the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_164, maxGzip: 61_989 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -750,7 +750,8 @@ const budgets = [
   // hotfix #644 (gauge row wraps whole items) over main. Measured - / 81113 in CI verify-quick, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 223463 / 81476 in CI verify-quick, the plus 4.
   // 223,467 / 81,480 -> 224,086 / 81,803 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured 224082 / 81799 in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 224_086, maxGzip: 81_803 },
+  // -> 224,494 / 82,064 on 2026-11-23 (user's choice 1): the start screen carries up to three notes, so the budget holds the largest day built through the notes written so far (raw 224,480 on 12-05, gzip 82,056 on 2027-01-11), plus Linux's 4 and the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 224_494, maxGzip: 82_064 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1300,7 +1301,8 @@ const budgets = [
   // 220,608 / 42,715 + notes-batch2's one code point -> 220,615 / 42,715 (merge of main e13e40cb into world-news; re-measured below if over).
   // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 220676 / 42720 in CI verify-quick, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_680, maxGzip: 42_724 },
+  // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_794, maxGzip: 42_739 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1813,7 +1815,8 @@ const budgets = [
   // 2,348 / 1,114 -> 3,005 / 1,265 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 3001 / 1261 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,265 -> 3,005 / 1,270 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured - / 1266 (over budget only) in the e2e build, the plus 4.
   // 3,005 / 1,270 -> 3,034 / 1,284 8막 서명 버튼 높이 44px (#635 54713815, Linux CI 11-20). Measured 3030 / 1280 in the e2e build, the plus 4.
-  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_034, maxGzip: 1_284 },
+  // 3,034 / 1,284 -> 3,034 / 1,289 on 2026-11-23. Measured - / 1285 (over budget only), the plus 4.
+  { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_034, maxGzip: 1_289 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
   // own from the start and fetched with the table. Its style is inline, so no
@@ -2787,7 +2790,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 385,516 / 450,244 / 458,698 world-news #639 over main 1e0a57ab. Measured first paint 385,512 / 450,240 / 458,694 in CI verify-quick, the plus 4.
 // -> 385,516 / 450,920 / 459,383 #635 1178f9fe over main 78be3bd4. Measured first paint en 450,916 / ja 459,379 in CI verify-quick, the plus 4.
 // -> 386,141 / 451,678 / 460,111 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured first paint 386,137 / 451,674 / 460,107 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 386_141, en: 451_678, ja: 460_111 };
+// -> 386,594 / 452,432 / 460,844 on 2026-11-23 (user's choice 1): measured 386,145 / 451,682 / 460,118, plus the largest day built through the notes written so far (2027-01-11: +441 / +742 / +718), plus Linux's 4 and the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 386_594, en: 452_432, ja: 460_844 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -3004,7 +3008,8 @@ function checkBudget(file, budget) {
 // -> 12,784 / 4,542 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today), the plus 4.
 // -> 12,816 / 4,547 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
 // -> 12,816 / 4,554 on 2026-11-20 (world-news 2차 30편: newsIndex 60편), the plus 4.
-const WORKER_BUDGET = { maxBytes: 12_816, maxGzip: 4_554 };
+// 4,554 -> 4,566 gzip on 2026-11-23: the worker names the day's hashed files. Largest day 4,558 (2026-12-03), plus Linux's 4 and the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_816, maxGzip: 4_566 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
