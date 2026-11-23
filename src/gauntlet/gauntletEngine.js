@@ -2498,7 +2498,8 @@ export function createTableRecord(log = []) {
  * rules of the table from 프롤로그 04, 2 the day-ten table of 2026-10-20.
  * Every run summary carries it, so every case row carries it as `dynamics`,
  * and the server ranks no season with a case row below it
- * (the one wipe of 2026-11-12, *_ranking_reset_rules_mark4_relic_draft.sql, asked for 4,
+ * (*_ranking_reset_1130.sql, the wipe of 2026-11-30; the one wipe of
+ * 2026-11-12, *_ranking_reset_rules_mark4_relic_draft.sql, asked for 4,
  * 20261020010000 for 2, and the reset of 20261011010000 read `logicStreak`
  * the same way). Raise the number, never reuse it, when the table changes
  * again. The migration and check-grants.mjs name it too. The device's own
