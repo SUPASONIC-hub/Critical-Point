@@ -22,7 +22,7 @@ import {
 } from "../gameLogic.js";
 import { nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { BUST_EFFECT, createCaseClose, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { createCaseClose, getBustEffect, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../gauntlet/tableAfterword.js";
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
@@ -277,7 +277,7 @@ export function useChoiceCommit(context) {
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: runLines.commit.evidenceBonus, effect: { legitimacy: 2, fatigue: -1 } }
       : null;
-    const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? BUST_EFFECT : {});
+    const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? getBustEffect(verdict) : {});
     const finalResources = applyEffect(resources, finalEffect);
     const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
@@ -350,6 +350,8 @@ export function useChoiceCommit(context) {
         // (no audit mark), 숨 고르기, the 결재 판 and 눈에 띔.
         ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
         ...(verdict.auditShield ? { auditShield: true } : {}),
+        // G5 1막 떠넘겨진 손실: the case's twist kept part of this BUST's pot, and 사람 피해 paid (getBustEffect).
+        ...(verdict.passedDown ? { passedDown: true } : {}),
         ...(verdict.breathed ? { breathed: true } : {}),
         ...(verdict.sign ? { sign: true } : {}),
         ...(verdict.exposure ? { exposure: verdict.exposure } : {}),

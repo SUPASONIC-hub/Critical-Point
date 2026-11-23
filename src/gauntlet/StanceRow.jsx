@@ -25,7 +25,9 @@ const FOCUS_MODE_COPY = say.modes;
  * late or not at all. Both are the buttons' description now; the folded
  * briefing (`TableGlossary`) is where the count is explained on screen.
  */
-export function StanceRow({ mode: current, mastery, blocked, onPick }) {
+export function StanceRow({ mode: current, mastery, blocked: shut, fixed = false, onPick }) {
+  // G5 6막 진술 고정 (`fixed`): the recorded stance stays to the case's end; its button says so in place of its line.
+  const blocked = shut || fixed;
   return (
     <div
       className={`gx-focus-modes gx-stance-mastery mode-${current}`}
@@ -53,12 +55,12 @@ export function StanceRow({ mode: current, mastery, blocked, onPick }) {
               <span className="sr-only">{say.mastery}</span>
               {mastered ? say.mastered : `${count}/${STANCE_MASTERY_GOAL}`}
             </em>
-            <small>{FOCUS_MODE_COPY[mode] ?? profile.text}</small>
+            <small>{fixed && active ? say.fixed : FOCUS_MODE_COPY[mode] ?? profile.text}</small>
             <i aria-hidden="true"><b style={{ width: `${Math.min(100, (count / STANCE_MASTERY_GOAL) * 100)}%` }} /></i>
           </GuardedButton>
         );
       })}
-      {blocked && <span id="gx-stance-blocked" className="sr-only">{say.blocked}</span>}
+      {blocked && <span id="gx-stance-blocked" className="sr-only">{fixed ? say.fixedBlocked : say.blocked}</span>}
       <span id="gx-stance-detail" className="sr-only">{say.detail}</span>
     </div>
   );

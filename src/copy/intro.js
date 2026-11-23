@@ -179,6 +179,10 @@ const introCopy = {
     notesTitle: "최근 노트",
     notesAll: "노트 전체 보기",
     notesEmpty: "첫 노트를 준비하고 있습니다.",
+    // 오늘의 1면: one article of the world's newspaper, fixed by the day in Seoul (src/news/newsIndex.js).
+    frontTitle: "오늘의 1면",
+    frontNote: "게임 속 가상 기사입니다 — 실제 사건·인물·회사와 관계없습니다",
+    frontAll: "세계관 신문 전체 보기",
   },
   legal: { about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관" },
   opening: {

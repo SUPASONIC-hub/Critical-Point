@@ -165,6 +165,9 @@ export default {
     notesTitle: "最新のノート(韓国語)",
     notesAll: "ノート一覧",
     notesEmpty: "最初のノートを準備しています。",
+    frontTitle: "今日の一面(韓国語)",
+    frontNote: "ゲームの世界の架空の記事です。実在の出来事・人物・会社とは関係ありません",
+    frontAll: "作中の新聞をすべて見る",
   },
   legal: {
     about: "ゲーム紹介",

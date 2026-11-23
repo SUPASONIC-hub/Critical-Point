@@ -965,11 +965,21 @@
 
 .gx-gauge-read {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 3px 8px;
   padding-inline: 4px;
   color: var(--ui-text-2);
   font: 700 0.75rem/1 var(--font-sans);
+}
+
+/* Each reading stays whole: 「열기 22」 and 「심박 121」 never break inside.
+   When the row is too full -- the board after a BUST, where 숨 고르기 joins
+   it (G7) -- a whole item moves to a second line instead of every item
+   breaking to two or three (E1g 11-20: en 360x740 14 -> 108px). */
+.gx-gauge-read > * {
+  flex: none;
+  white-space: nowrap;
 }
 
 .gx-gauge-read b {
@@ -1828,6 +1838,12 @@
 
 .gx-carry b {
   color: var(--c-gx-chip);
+}
+
+/* A rule's badge keeps its own ink: the blue above on the badge's deep red could not be read (OVERCLOCK, 2026-11-23). */
+.gx-carry .gx-mutation:not(.mut-reboot) b,
+.gx-mutation.gx-carry:not(.mut-reboot) b {
+  color: var(--c-paper);
 }
 
 .gx-slam {

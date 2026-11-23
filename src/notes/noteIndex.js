@@ -129,6 +129,49 @@ export const NOTES = [
     title: "3개 언어를 두 사람이 만든 방법(용어집·검사)",
     summary: "한국어를 원문으로 두고 영어·일본어를 끝까지 연 과정. 번역보다 용어집과 검사가 더 큰 일이 된 이유입니다.",
   },
+  {
+    slug: "sales-explanation-duty",
+    published: "2027-01-08",
+    title: "설명서 22쪽 가운데 4쪽: 금융상품을 팔 때 지켜야 할 것(일반론)",
+    summary: "맞는 사람에게만 권하고, 알아듣게 설명하고, 틀린 말로 끌어들이지 않는다. 파는 쪽의 의무와, 우리가 창구 장면에 적은 숫자들.",
+  },
+  {
+    slug: "earphone-sound-fixes",
+    published: "2027-01-11",
+    title: "이어폰으로 고친 배경음: 감정 음악 다섯 가지와 지직거림",
+    summary: "「옛날 라디오처럼 찢어진다」는 후기에서 시작해, 2.7밀리초의 어긋남을 찾아내기까지. 11월에 소리를 세 번 고친 기록입니다.",
+  },
+  {
+    slug: "choosing-tools",
+    published: "2027-01-13",
+    title: "도구 고르기: 조건 붙은 열두 도구와 다시 뽑기",
+    summary: "어느 도구가 센가보다 내가 어디서 확정하는가. 손마다 달라지는 도구의 값을 측정 숫자로 따라가 봅니다.",
+  },
+  {
+    slug: "npl-discount",
+    published: "2027-01-15",
+    title: "부실채권은 왜 원금의 몇 분의 1에 팔리나(일반론)",
+    summary: "은행이 돌려받기 어려운 대출을 싸게 넘기는 이유와 값을 매기는 방식, 그리고 그 묶음 안에 들어 있는 이름들.",
+  },
+  {
+    slug: "trimming-the-prose",
+    published: "2027-01-18",
+    title: "장면 본문을 덜어 낸 기록: 줄인 문장과 되살린 대사",
+    summary: "프롤로그의 첫 장면 393자가 286자가 되기까지. 무엇을 덜어 내고, 무엇을 남기고, 무엇을 다시 되살렸는지 적었습니다.",
+  },
+  {
+    slug: "stances-and-lock",
+    published: "2027-01-20",
+    title: "자세 셋과 LOCK: 어느 판에서 무엇을 쥐나",
+    summary: "STRIKE, STEADY, EXPOSE는 비슷한 값을 내도록 맞췄지만 이기는 자리는 서로 다릅니다. 치는 방식별로 맞는 자세를 정리했습니다.",
+  },
+  // A draft: 2099-12-31 keeps it out of every build until its day is set (12-01 once 11-21~30 is filled in on 11-30).
+  {
+    slug: "november-2026-log",
+    published: "2099-12-31",
+    title: "11월 제작 일지: 무엇을 고쳤고 왜",
+    summary: "360픽셀의 판돈 줄부터 시즌 단위 공개 결정, 새 규칙까지. 11월에 바꾼 것을 날짜순으로, 그날의 기록에서 골라 적었습니다.",
+  },
 ];
 
 /** The notes' byline, the makers' names as every plain page's foot prints them (src/credits.js). */

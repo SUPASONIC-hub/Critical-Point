@@ -43,7 +43,7 @@ import {
 import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
-  BUST_EFFECT,
+  getBustEffect,
   buyExtraRelic,
   createCaseClose,
   createRunSummary,
@@ -60,6 +60,7 @@ import {
   HAND_CAP,
   isShockDue,
   openCaseRun,
+  signCase,
   reduceWindow,
   rerollRelicOffer,
   resolveWindow,
@@ -646,7 +647,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
-        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? BUST_EFFECT : {});
+        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {});
         const resourcesAfter = applyEffect(resources, finalEffect);
         if (clue) discoveredClues = [...discoveredClues, clue];
         triggers = { ...triggers };
@@ -680,6 +681,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             pushes: verdict.pushes,
             // G2: the second looks the case has bought (`countNarrows`), as useChoiceCommit logs them.
             ...(verdict.narrowed ? { narrowed: true } : {}),
+            // G5 1막 떠넘겨진 손실, as useChoiceCommit logs it: the replay prices the BUST off it (getBustEffect).
+            ...(verdict.passedDown ? { passedDown: true } : {}),
             focus: verdict.focus,
             logic: verdict.logic,
             // C-12's read, as useChoiceCommit logs it: the burst score's 판 읽기 axis sums it (C-1(1)).
@@ -889,10 +892,12 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * season far along, say. The rules a story run plays under are the caller's to
    * pass, as everywhere here.
    */
-  function playCase(caseIndex, decide, { pickType = null, logic = undefined } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
+  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules });
+    // G5's act twists (actTwists.js): caseId plays every board as that case's, sign signs it first (8막).
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}) }, { rules, ...(caseId ? { caseId } : {}) });
+    if (sign) run = signCase(run, sign);
     let audit = 0;
     // G2: the second looks this case has bought, and the 믿음 the hand may spend on looks in it (`decide.trustBudget`).
     let narrows = 0;

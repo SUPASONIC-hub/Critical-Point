@@ -18,6 +18,12 @@ export default {
     hold: "I’ll open it myself",
     keep: "Leave it to the clock",
   },
+  sign: {
+    kicker: "The signature line",
+    question: "How will you sign this Case? If you don’t choose, you sign with conditions.",
+    name: "Name only",
+    terms: "With conditions",
+  },
   comfort: {
     title: "Comfort settings",
     close: "Close",

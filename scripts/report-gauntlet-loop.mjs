@@ -170,7 +170,7 @@ const { playCase: playSimCase, playHandCase } = createCaseBot({ windowsPerCase: 
 // The case player `measure` plays; B2's rows below swap in the heavy card's for a while.
 let playCase = playSimCase;
 
-function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
+function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false, twist = null) {
   const paid = { cashed: 0, bonus: 0, capped: 0, best: 0 };
   let logic;
   let vault = 0;
@@ -184,7 +184,8 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     // A hand that plays for the streak carries it from case to case for a
     // season's length, and starts again with the next season.
     if (caseIndex % SEASON_CASES === 0) logic = undefined;
-    const result = playCase(caseIndex, decide, hand ? { pickType: hand, logic } : undefined, relics, lock, rules, story);
+    // 	wist: G5's act twists, every case played as 	wist.caseId (and signed 	wist.sign, 8막).
+    const result = playCase(caseIndex, decide, hand || twist ? { ...(hand ? { pickType: hand, logic } : {}), ...twist } : undefined, relics, lock, rules, story);
     if (hand) logic = result.logic;
     for (const key of ["cashed", "bonus", "capped"]) paid[key] += result[key];
     paid.best = Math.max(paid.best, result.logic.best);
@@ -1152,6 +1153,45 @@ if (CASCADE_ON) {
 }
 
 /**
+ * G5's acts 1, 2, 4, 6 and 8 (src/gauntlet/actTwists.js, 2026-11-25): each
+ * twist played as one of its act's cases, every board of the case under it,
+ * beside the same hand on a plain case. Printed for the record of each act's
+ * two good answers (cp-archive 메모-20261119 G5-나머지-막-설계.md); the only
+ * assertions are what the twist itself must do -- the numbers are the user's
+ * (played only with `node scripts/report-gauntlet-loop.mjs --compare`)
+ * (「전부 1」), and a gap is reported, not tuned here.
+ */
+function reportActTwists({ pct, listening, G_CASES }) {
+  const gap = (a, b) => pct(Math.abs(a.meanVault / Math.max(1, b.meanVault) - 1));
+  const pair = (label, decide, twist, lock = null) => ({ label, off: measure(label, decide, null, [], G_CASES, lock), on: measure(`${label} as ${twist.caseId}`, decide, null, [], G_CASES, lock, ALL_RULES, false, twist) });
+  const line = (act, { label, off, on }) => console.log(`next G5 ${act} ${label.padEnd(18)} vault ${off.meanVault} -> ${on.meanVault}  bust ${pct(off.bustRate)} -> ${pct(on.bustRate)}`);
+  // 1막 떠넘겨진 손실 (사건 05): softer busts for a pushing hand, paid in 사람 피해.
+  const act1 = [["heat 50", (win) => win.gauge < 50], ["heat 60", (win) => win.gauge < 60], ["heartbeat", listening]].map(([label, decide]) => pair(label, decide, { caseId: "case05" }));
+  for (const row of act1) line("1막 떠넘김", row);
+  for (const row of act1) assert.ok(row.on.meanVault >= row.off.meanVault, `G5 1막: a kept third can only add to the vault (${row.label})`);
+  // 2막 뒤늦은 청구서 (사건 10): cash big at 60 and over and carry half, or clean at 40-59.
+  // The same listening hand, two habits (11-20): cash where the heartbeat says (often 60 and over), or stop before a push could reach 60.
+  const act2 = [["heartbeat (big)", listening], ["heartbeat (clean)", (win) => listening(win) && win.gauge + win.schema.stepMin < 60]].map(([label, decide]) => pair(label, decide, { caseId: "case10" }));
+  for (const row of act2) line("2막 청구서", row);
+  console.log(`next G5 2막 청구서 big ${act2[0].on.meanVault} against clean ${act2[1].on.meanVault} (${gap(act2[0].on, act2[1].on)} apart)`);
+  // 4막 학습된 벽 (사건 22): the band stands around the last cash; how much more a hand banks.
+  const act4 = [["heat 60", (win) => win.gauge < 60], ["heat 70", (win) => win.gauge < 70], ["heartbeat", listening]].map(([label, decide]) => pair(label, decide, { caseId: "case22" }));
+  for (const row of act4) line("4막 학습벽", row);
+  console.log(`next G5 4막 학습벽 vault up ${act4.map((row) => `${row.label} ${pct(row.on.meanVault / Math.max(1, row.off.meanVault) - 1)}`).join(", ")}`);
+  // 6막 진술 고정 (사건 33): one stance for the case, carried on every cash without a charge.
+  const act6 = FOCUS_MODES.map((mode) => pair(`${mode}, no charge`, listening, { caseId: "case33" }, { mode, idle: true }));
+  for (const row of act6) line("6막 진술", row);
+  const best6 = Math.max(...act6.map((row) => row.on.meanVault));
+  const low6 = Math.min(...act6.map((row) => row.on.meanVault));
+  console.log(`next G5 6막 진술 stances on record ${act6.map((row) => `${row.label.split(",")[0]} ${row.on.meanVault}`).join(", ")} (${pct(1 - low6 / Math.max(1, best6))} apart)`);
+  // 8막 실명 서명 (사건 48): by name or with conditions, for a hand that listens and one that does not.
+  for (const [label, decide] of [["heartbeat", listening], ["heat 50", (win) => win.gauge < 50]]) {
+    const named = measure(`${label}, name only`, decide, null, [], G_CASES, null, ALL_RULES, false, { caseId: "case48", sign: "name" });
+    const terms = measure(`${label}, conditions`, decide, null, [], G_CASES, null, ALL_RULES, false, { caseId: "case48", sign: "terms" });
+    console.log(`next G5 8막 서명 ${label.padEnd(18)} name only ${named.meanVault} (bust ${pct(named.bustRate)})  conditions ${terms.meanVault} (bust ${pct(terms.bustRate)})  best ${named.meanVault >= terms.meanVault ? "name" : "conditions"}`);
+  }
+}
+/**
  * G1·G2·G3·G6·G7 (the next rules, 2026-11-19 「전부 1」): every choice has
  * more than one good answer. Played only with the next rules on (RULES_NEXT=0
  * plays the old ones, where these do not hold: that is what they changed).
@@ -1246,6 +1286,8 @@ if (NEXT_ON) {
   for (const { name, off, on } of breathRows.slice(0, 2)) assert.ok(afterBust(on) < afterBust(off), `G7: 숨 고르기 should help a ${name} hand after a bust`);
   const beat = breathRows[2];
   assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < 0.02, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
+  // Only on `--compare`: 22 more measures of 500 cases, kept out of the default run under CI's 480-second cap.
+  if (process.argv.includes("--compare")) reportActTwists({ pct, listening, G_CASES });
 }
 
 // WEEK_RULE (season-bot.mjs): every case above was played under that week's rule.

@@ -57,7 +57,7 @@ import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
 import { useRunReadout } from "./state/useRunReadout.js";
 import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
-import { normalizeRunState } from "./gauntlet/gauntletEngine.js";
+import { normalizeRunState, signCase } from "./gauntlet/gauntletEngine.js";
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
@@ -675,6 +675,11 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     const paid = relicTable.spend(gauntletRun, kind);
     if (!staleSave && paid !== gauntletRun) applyRun({ gauntletRun: paid });
   }
+  /** G5 8막 실명 서명: the case's way to sign, on its open snapshot before its first board (gauntletEngine's signCase). */
+  function signRun(way) {
+    const signed = signCase(gauntletRun, way);
+    if (!staleSave && signed !== gauntletRun) applyRun({ gauntletRun: signed });
+  }
 
   /**
    * The first touch on a window is saved before the window can be won or lost:
@@ -958,7 +963,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
-    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, spendAtDraft,
+    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, spendAtDraft, signCase: signRun,
     onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace,
   };
   return (

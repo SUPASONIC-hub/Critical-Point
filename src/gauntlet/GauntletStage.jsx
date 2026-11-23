@@ -19,6 +19,7 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
+  signCase,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { HoldGauge } from "./HoldGauge.jsx";
@@ -56,7 +57,7 @@ import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
-
+import { SignAsk } from "./WeekRulePanel.jsx";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
@@ -90,7 +91,7 @@ export function GauntletStage({
   onResolve,
   onTouch,
   onPickRelic,
-  onSpendAtDraft = null,
+  onSpendAtDraft = null, onSign = null,
   onSuspendable = null,
   staleSave = false,
   onReload,
@@ -187,6 +188,9 @@ export function GauntletStage({
   } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount }); // G1~G7: the next rules' readings (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
+  // G17: one cash under the audit's line from its limit, the token's label says so in words (in place of 감사: E1g, a phrase beside it overflowed).
+  const auditWarned = audit?.atRisk && audit.ifCash > 0;
+  const auditLabel = auditWarned ? <small data-testid="audit-warn" style={{ whiteSpace: "nowrap" }}>{say.auditWarn}</small> : <small>{say.audit}</small>;
   // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
   const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(
@@ -228,7 +232,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && canPayNarrow : canPayScout);
+  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && win.schema?.trained !== true && canPayNarrow : canPayScout);
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -366,6 +370,12 @@ export function GauntletStage({
     }
     setSwapFor(null);
     onPickRelic(relicId, dropId);
+  }
+
+  /** G5 8막 실명 서명: the case signed before its first board, which is dealt again under the way chosen (signCase). */
+  function signWay(way) {
+    dispatch({ type: "REDEAL", schema: getTableSchema(signCase(run, way)) });
+    onSign(way);
   }
 
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
@@ -527,8 +537,8 @@ export function GauntletStage({
               <b>{formatMoney(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> {!auditWarned && <><small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit">{auditLabel} <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
@@ -555,7 +565,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}>{auditLabel} <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
@@ -613,6 +623,8 @@ export function GauntletStage({
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
             {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
+            {/* G10: where the band stood before the case's rule pulled it closer (합병 and the like): the rule seen on the bar, not only in the panel. */}
+            {schema.wallMin < (run?.schema?.wallMin ?? 0) && <span className="gx-gauge-mark" data-testid="gauge-pulled" style={{ left: `${run.schema.wallMin}%` }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -623,7 +635,12 @@ export function GauntletStage({
             <span aria-hidden="true">
               {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice}
+              board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
+            {breathable && win.schema.bustHeat > 0 && (
+              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</span>
+            )}
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
               aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
@@ -706,7 +723,7 @@ export function GauntletStage({
             </small>
           </article>
         </section>
-        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} onPick={setFocusMode} />}
+        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} fixed={Boolean(win.schema?.stanceLocked)} onPick={setFocusMode} />}
         </div>
 
         <div className="gx-hand-head" aria-hidden="true">
@@ -839,7 +856,7 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
-          reading={trackReading}
+          reading={trackReading} signAsk={<SignAsk run={run} onSign={onSign && signWay} />}
         />
       )}
 

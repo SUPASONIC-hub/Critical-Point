@@ -1,7 +1,7 @@
-import { canBreathe, LOCK_CAP } from "./gauntletEngine.js";
+import { canBreathe, getCaseTwist, getPaidChips, LOCK_CAP } from "./gauntletEngine.js";
 import { isNextOn, narrowTrustAt, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { getTableRules } from "./tableUnlocks.js";
-import { decisionWindowSeconds, GAUGE_MAX, getCardChips, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
+import { decisionWindowSeconds, GAUGE_MAX, getFocusBonus, getFocusModeProfile, getHeartbeatBpm, getMultiplier, getRemainingSeconds, getWindowBand, getWindowSeconds } from "./gauntletEngine.js";
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
 import { HEAT_DEBT_GAUGE, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { readSafeLine } from "./tableAfterword.js";
@@ -108,7 +108,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
   const band = getWindowBand(win);
   const reading = readAudit(run, audit, win);
   return {
-    selectedChips: selectedCard ? getCardChips(selectedCard, schema) : 0,
+    // G5 2막: the chips a cash at this heat pays (getPaidChips), which the case's twist may thin at 60 and over.
+    selectedChips: selectedCard ? getPaidChips(selectedCard, schema, win.gauge, getCaseTwist(run, getTableRules(caseId, run))) : 0,
     multiplier: getMultiplier(win.gauge),
     // `note` is what the LOCK button's description adds under the next rules (G3): the reason when shut, STRIKE's hotter cap otherwise.
     focusBonus: { ...getFocusBonus(win.focus, win.focusMode, next), note: !next ? "" : lockShut ? ` ${fill(tableCopy.stage.lockShutReason, { cap: LOCK_CAP })}` : fill(tableCopy.stage.lockStrikeHot, { heat: STRIKE_HOT_GAUGE, cap: STRIKE_HOT_CAP }) },
