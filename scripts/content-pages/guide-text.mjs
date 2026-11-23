@@ -86,7 +86,7 @@ export const GUIDE_BODY = {
 <dt>뒤늦은 청구서 (2막, 사건 10)</dt><dd>열기 60 이상에서 확정하면 HEAT DEBT가 열기의 3분의 1이 아니라 4분의 3을 안고 다음 판을 시작하게 합니다(방열판을 들었다면 방열판의 값). 60 밑에서 확정하면 모든 카드의 칩이 1.25배입니다. 크게 확정할지, 깨끗하게 챙길지를 고르는 사건입니다.</dd>
 <dt>학습된 벽 (4막, 사건 20·22·23)</dt><dd>판이 내가 확정한 열기를 배웁니다. 다음 판의 벽 구간은 그 열기보다 10 아래부터 18 위까지(폭은 34 이상)로 서되, 구간의 가운데가 원래 구간의 가운데보다 아래로 내려가지는 않습니다. 이렇게 선 판의 조회는 처음부터 14칸으로 좁히고, 한 번뿐입니다. BUST 다음 판은 평소 구간입니다.</dd>
 <dt>진술 고정 (6막, 사건 32~35)</dt><dd>사건에서 처음 확정한 자세가 사건 끝까지 남고 바꿀 수 없습니다. 대신 확정할 때마다 충전이 모자라도 그 자세가 다음 판으로 이어집니다. 시즌 숙련은 평소처럼 충전 70 이상의 확정만 셉니다.</dd>
-<dt>실명 서명 (8막, 사건 44·46·48·49)</dt><dd>첫 판 전에 브리핑에서 서명 방식을 고릅니다. 「이름만 쓴다」는 모든 카드의 칩이 1.25배이고 벽 구간이 2 앞당겨지며, 「조건을 단다」는 벽 구간이 3 물러서고 칩이 0.9배입니다. 고르지 않으면 조건을 단 것으로 칩니다.</dd>
+<dt>실명 서명 (8막, 사건 44·46·48·49)</dt><dd>첫 판 전에 브리핑에서 서명 방식을 고릅니다. 「이름만 쓴다」는 모든 카드의 칩이 1.25배이고 벽 구간이 1~3 앞당겨지며, 「조건을 단다」는 벽 구간이 3 물러서고 칩이 0.9배입니다. 고르지 않으면 조건을 단 것으로 칩니다.</dd>
 </dl>
 <p>이 다섯 규칙도 이번 주의 규칙으로 시작한 시즌과 스토리 모드에는 없습니다.</p>
 <p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
@@ -217,7 +217,7 @@ export const GUIDE_BODY = {
 <dt>The Late Bill (Act 2, Case 10)</dt><dd>Commit at Heat 60 or more and HEAT DEBT starts the next hand with three quarters of that Heat, not a third (Heat Sink’s own share if you hold it). Commit under 60 and every card’s chips are ×1.25. The case asks whether you commit big or bank clean.</dd>
 <dt>The Trained Wall (Act 4, Cases 20, 22 and 23)</dt><dd>The table learns the Heat you commit at. On the next hand the Wall band stands from 10 below that Heat to 18 above it (at least 34 wide), but its middle never sits lower than the middle of its usual band. On such a hand, Scout narrows straight to 14 wide, once. The hand after a BUST has the usual band.</dd>
 <dt>On the Record (Act 6, Cases 32 to 35)</dt><dd>The Stance of the case’s first commit stays until the case ends and can’t change. In return, every commit carries that Stance into the next hand, even without a full charge. Season mastery still counts only commits with a charge of 70 or more.</dd>
-<dt>Signed by Name (Act 8, Cases 44, 46, 48 and 49)</dt><dd>Before the first hand, choose on the briefing how to sign. “Name only” makes every card’s chips ×1.25 and moves the Wall band 2 closer; “With conditions” moves the Wall band 3 further and makes chips ×0.9. Choose nothing and you sign with conditions.</dd>
+<dt>Signed by Name (Act 8, Cases 44, 46, 48 and 49)</dt><dd>Before the first hand, choose on the briefing how to sign. “Name only” makes every card’s chips ×1.25 and moves the Wall band 1 to 3 closer; “With conditions” moves the Wall band 3 further and makes chips ×0.9. Choose nothing and you sign with conditions.</dd>
 </dl>
 <p>A season started with the Rule of the Week, and Story Mode, get none of these five either.</p>
 <p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
@@ -348,7 +348,7 @@ export const GUIDE_BODY = {
 <dt>遅れてきた請求書（第2幕、事件10）</dt><dd>熱60以上で確定すると、HEAT DEBTが熱の3分の1ではなく4分の3を抱えて次の勝負を始めさせます（「放熱板」を持っていれば放熱板の値）。60未満で確定すると、すべてのカードのチップが1.25倍です。大きく確定するか、きれいに取るかを選ぶ事件です。</dd>
 <dt>学習された壁（第4幕、事件20・22・23）</dt><dd>卓があなたの確定した熱を学びます。次の勝負の壁の区間は、その熱の10下から18上まで（幅は34以上）に立ちますが、区間の真ん中がいつもの区間の真ん中より下に下がることはありません。こうして立った勝負の照会は、最初から14マスに絞り、一度だけです。BUSTの次の勝負はいつもの区間です。</dd>
 <dt>供述の固定（第6幕、事件32〜35）</dt><dd>事件で最初に確定した構えが事件の終わりまで残り、変えられません。そのかわり、確定するたびにチャージが足りなくても、その構えが次の勝負に続きます。シーズンの熟練は、いつもどおりチャージ70以上の確定だけを数えます。</dd>
-<dt>実名の署名（第8幕、事件44・46・48・49）</dt><dd>最初の勝負の前に、ブリーフィングで署名のしかたを選びます。「名前だけ書く」はすべてのカードのチップが1.25倍で壁の区間が2手前に立ち、「条件をつける」は壁の区間が3下がってチップが0.9倍です。選ばなければ、条件をつけたことになります。</dd>
+<dt>実名の署名（第8幕、事件44・46・48・49）</dt><dd>最初の勝負の前に、ブリーフィングで署名のしかたを選びます。「名前だけ書く」はすべてのカードのチップが1.25倍で壁の区間が1〜3手前に立ち、「条件をつける」は壁の区間が3下がってチップが0.9倍です。選ばなければ、条件をつけたことになります。</dd>
 </dl>
 <p>この五つのルールも、今週のルールで始めたシーズンとストーリーモードにはありません。</p>
 <p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>
