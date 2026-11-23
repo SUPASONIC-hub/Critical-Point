@@ -1299,12 +1299,12 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-.route-atlas-node.branch .route-atlas-dot,
-.route-atlas-node.system .route-atlas-dot {
+.route-atlas-node:is(.branch, .system) .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-violet);
 }
-.route-atlas-node.evidence .route-atlas-dot,
-.route-atlas-node.memory .route-atlas-dot {
+.route-atlas-node:is(.evidence, .memory) .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-teal);
 }
 .route-atlas-node.turnaround .route-atlas-dot,
@@ -1313,6 +1313,7 @@
   background: var(--c-coral);
 }
 .route-atlas-node.aftermath .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-danger);
 }
 .route-atlas-copy {
@@ -2150,7 +2151,7 @@
 }
 .route-break,
 .route-atlas-meta .route-break {
-  color: var(--color-white);
+  color: var(--c-paper);
   background: var(--c-danger-deep);
   border-color: var(--c-danger-deep);
 }

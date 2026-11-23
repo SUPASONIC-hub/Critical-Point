@@ -873,12 +873,12 @@ export function withAbsoluteSiteLinks(html, origin) {
  * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS, `adStage` in legal-pages.mjs) are the build's two switches: ANALYTICS_POLICY,
  * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS. The content pages say nothing of ads.
  */
-export function renderStaticPages(origin = "", { analytics = null, ads = false, day = notesDay() } = {}) {
+export function renderStaticPages(origin = "", { analytics = null, ads = false, day = notesDay(), pageDates } = {}) {
   // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
   const pages = {
     ...renderLegalPages({ analytics, ads }),
     ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }),
-    ...renderContentPages({ analytics, day }),
+    ...renderContentPages({ analytics, day, pageDates }),
     ...renderNotePages({ analytics, day }),
     ...renderNewsPages({ analytics }),
   };
@@ -945,10 +945,12 @@ export const wordsOf = (html) => String(html).replace(/<[^>]+>/g, " ").replace(/
  * since the rest of index.html is scripts and styles a release changes every
  * week. Until 11-16 every entry carried the build's day, so each deploy told a
  * crawler that all of them had changed (SEO 점검 11-03, 낮음 6).
+ * The pages are rendered with no date line (`pageDates: null`): the line shows
+ * the date this hash decides, and hashing it would re-date a page for being dated.
  */
 export function pageFingerprints() {
   const hash = (text) => createHash("sha256").update(text).digest("hex").slice(0, 16);
-  const plain = renderStaticPages("");
+  const plain = renderStaticPages("", { pageDates: null });
   const prints = {};
   for (const { loc } of sitemapEntries()) {
     if (isNoteAddress(loc)) continue;

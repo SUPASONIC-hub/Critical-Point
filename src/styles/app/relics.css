@@ -262,7 +262,7 @@
   padding: 1px 8px 1px 6px;
   border: 1px solid var(--c-gx-relic-a30);
   border-radius: var(--radius-pill);
-  color: var(--c-gx-relic);
+  color: rgb(108 71 0);
   background: rgb(132 88 0 / 0.06);
   font-size: 0.6875rem;
   font-weight: 700;
