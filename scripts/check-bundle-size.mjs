@@ -210,7 +210,8 @@ const budgets = [
   // 165,887 / 61,843 -> 166,159 / 61,971 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 166155 / 61967 (over budget only) in the e2e build, the plus 4.
   // 165,737 / 61,781 -> 165,737 / 61,790 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 61786 (over budget only) in the e2e build, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured - / 61793 in CI verify-quick, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_159, maxGzip: 61_971 },
+  // 166,159 / 61,971 -> 166,164 / 61,971 #635 1178f9fe over main 78be3bd4. Measured 166160 / - (over budget only) in CI verify-quick, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_164, maxGzip: 61_971 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1564,7 +1565,8 @@ const budgets = [
   // 57,902 / 21,716 -> 57,927 / 21,728 hotfix rule chips (#636) over main f3815370. Measured 57923 / 21724 (over budget only) in CI verify-quick, the plus 4.
   // 59,662 / 22,407 -> 60,090 / 22,537 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 60086 / 22533 (over budget only) in the e2e build, the plus 4.
   // 57,927 / 21,728 -> 57,927 / 21,781 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 21777 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 60_090, maxGzip: 22_537 },
+  // 60,090 / 22,537 -> 60,090 / 22,591 #635 1178f9fe over main 78be3bd4. Measured - / 22587 (over budget only) in CI verify-quick, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 60_090, maxGzip: 22_591 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2159,7 +2161,8 @@ const budgets = [
   // 203,560 / 68,103 -> 205,604 / 68,826 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 205600 / 68822 in CI verify-quick, the plus 4.
   // 205,670 / 68,826 -> 208,131 / 69,519 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 208127 / 69515 (over budget only) in the e2e build, the plus 4.
   // 205,604 / 68,826 -> 205,810 / 68,911 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 205806 / 68907 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 208_131, maxGzip: 69_519 },
+  // 208,131 / 69,519 -> 208,316 / 69,601 #635 1178f9fe over main 78be3bd4. Measured 208312 / 69597 in CI verify-quick, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 208_316, maxGzip: 69_601 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2279,7 +2282,8 @@ const budgets = [
   // 170,126 / 60,820 -> 171,838 / 61,420 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 171834 / 61416 in CI verify-quick, the plus 4.
   // 171,914 / 61,420 -> 174,008 / 62,102 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 174004 / 62098 (over budget only) in the e2e build, the plus 4.
   // 171,838 / 61,420 -> 172,012 / 61,492 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 172008 / 61488 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 174_008, maxGzip: 62_102 },
+  // 174,008 / 62,102 -> 174,157 / 62,173 #635 1178f9fe over main 78be3bd4. Measured 174153 / 62169 in CI verify-quick, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 174_157, maxGzip: 62_173 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2779,7 +2783,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 
 // -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
 // -> 385,516 / 450,244 / 458,698 world-news #639 over main 1e0a57ab. Measured first paint 385,512 / 450,240 / 458,694 in CI verify-quick, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 385_516, en: 450_244, ja: 458_698 };
+// -> 385,516 / 450,920 / 459,383 #635 1178f9fe over main 78be3bd4. Measured first paint en 450,916 / ja 459,379 in CI verify-quick, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 385_516, en: 450_920, ja: 459_383 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
