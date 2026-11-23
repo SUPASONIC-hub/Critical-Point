@@ -9,8 +9,8 @@
 
 /** Places a board keeps (question 6 (1)). */
 export const HALL_OF_FAME_PLACES = 3;
-/** Checked seasons a board needs before it keeps any place (question 6 (1)). */
-export const HALL_OF_FAME_MIN_SEASONS = 10;
+/** Checked seasons a board needs before it keeps any place (question 6 (1), lowered from ten by decision T's T12). */
+export const HALL_OF_FAME_MIN_SEASONS = 5;
 /** A week's board settles this many days after its Monday (question 9 (1)). */
 export const WEEK_SETTLE_DAYS = 28;
 
@@ -40,7 +40,7 @@ export function hallOfFameBadges(rows, words) {
 
 /**
  * N46 (11-18 「1」): while a board keeps no place yet, how far it is from its
- * first three, 「첫 세 자리는 10시즌이 모이면 열립니다 (지금 n/10)」, one line a
+ * first three, 「첫 세 자리는 5시즌이 모이면 열립니다 (지금 n/5)」, one line a
  * board on the ranking screen in place of the bare 「표본 부족」 the daily log
  * keeps. Read off the same view as the badges: each board's row carries the
  * server's own count (`checked_seasons`, hall_of_fame_counts), places or not.
