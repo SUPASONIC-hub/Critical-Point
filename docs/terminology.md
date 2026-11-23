@@ -66,7 +66,7 @@ what the copy actually says today.
 | 서명란: 이름만 쓴다 / 조건을 단다 | The signature line: Name only / With conditions | 署名欄: 名前だけ書く / 条件をつける | 판 규칙 6 (G5 8막). 고르지 않으면 조건을 단다 |
 | 조서에 남은 자세 | On record until the Case ends | 調書に残った構え | 판 규칙 6 (G5 6막). 자세 줄의 고정 표시 |
 | 지난 판 N에서 터짐 | Last BUST at N | 前回NでBUST | 판 규칙 6 (G15). 숨 고르기 옆, 60 이상이면 열기 −14 |
-| 이번에 낮게 끊으면 감사 / 왜 | Cash low now and you're audited / Why | いま低く確定すると監査 / なぜ | G17. 감사 한도 한 칸 앞 경고, 감사로 잃은 결과의 이유 줄 |
+| 낮게 끊으면 감사 / 왜 | Low cash = audit / Why | 低く確定で監査 / なぜ | G17. 감사 한도 한 칸 앞에서 지금 확정하면 칸이 찰 때의 경고, 감사로 잃은 결과의 이유 줄 |
 | 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
 
 ## People (prologue 01 to case 07)

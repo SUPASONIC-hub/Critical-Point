@@ -47,7 +47,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
 <dt>OVERCLOCK (사건 01)</dt><dd>×4 이상 확정을 두 번 잇달아 하면 다음 판의 칩이 2배가 되지만 밀 때 오르는 열기도 커집니다. ×4 이상 확정이 이어지는 동안 계속됩니다.</dd>
-<dt>감사, AUDIT (사건 02)</dt><dd>한 번 이상 밀고 열기 40 미만에서 확정하면 감사가 한 칸 차고, 60 이상에서 확정하면 두 칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다. 한도까지 한 칸 남으면 판에 「이번에 낮게 끊으면 감사」가 뜨고, 감사로 잃은 사건의 결과에는 「왜」 한 줄이 붙습니다.</dd>
+<dt>감사, AUDIT (사건 02)</dt><dd>한 번 이상 밀고 열기 40 미만에서 확정하면 감사가 한 칸 차고, 60 이상에서 확정하면 두 칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다. 한도까지 한 칸 남았을 때 지금 확정하면 감사가 차는 열기면 판에 「낮게 끊으면 감사」가 뜨고, 감사로 잃은 사건의 결과에는 「왜」 한 줄이 붙습니다.</dd>
 <dt>연결, CASCADE (사건 03)</dt><dd>한 자원을 8 이상 태운 카드로 확정하면 연결이 생겨, 2~4판 뒤의 한 판에서 벽 구간이 6 가까워집니다. 다음 사건으로는 가장 최근 연결 하나만 넘어갑니다.</dd>
 </dl>
 <p>사건이 닫히면 REBOOT가 흔적을 지웁니다. 각 막의 마지막 사건은 「고점 판」이라 벽이 5 가까워지고 칩이 1.25배가 됩니다.</p>
@@ -177,7 +177,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
 <dt>OVERCLOCK (Case 01)</dt><dd>Two commits in a row at ×4 or more double the next hand’s chips, but each push adds more Heat. It lasts while the ×4 commits continue.</dd>
-<dt>AUDIT (Case 02)</dt><dd>Commit below Heat 40 after at least one push and an Audit box fills; commit at 60 or more and two boxes clear. Four full boxes when the case closes cost a quarter of the share bound for the Vault. One box from the limit, the table shows “Cash low now and you're audited”, and a case that lost to the audit gets a “Why” line on its result.</dd>
+<dt>AUDIT (Case 02)</dt><dd>Commit below Heat 40 after at least one push and an Audit box fills; commit at 60 or more and two boxes clear. Four full boxes when the case closes cost a quarter of the share bound for the Vault. One box from the limit, if committing now would fill a box, the table shows “Low cash = audit”, and a case that lost to the audit gets a “Why” line on its result.</dd>
 <dt>CASCADE (Case 03)</dt><dd>Commit a card that burns 8 or more of one resource and you make a link: one hand 2 to 4 hands later has its Wall band 6 closer. Only the newest link carries into the next case.</dd>
 </dl>
 <p>REBOOT clears these marks when a case closes. The last case of each act is a “Peak hand” case, with the Wall 5 closer and chips ×1.25.</p>
@@ -307,7 +307,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>
 <dt>OVERCLOCK（事件01）</dt><dd>×4以上の確定を2回続けると次の勝負のチップが2倍になりますが、押したときに上がる熱も大きくなります。×4以上の確定が続くあいだ続きます。</dd>
-<dt>監査、AUDIT（事件02）</dt><dd>一度以上押して熱40未満で確定すると監査が1マス埋まり、60以上で確定すると2マス減ります。事件が閉じるとき4マス埋まっていると、金庫へ行く取り分の4分の1を失います。上限まで1マスになると卓に「いま低く確定すると監査」が出て、監査で失った事件の結果には「なぜ」の一行が付きます。</dd>
+<dt>監査、AUDIT（事件02）</dt><dd>一度以上押して熱40未満で確定すると監査が1マス埋まり、60以上で確定すると2マス減ります。事件が閉じるとき4マス埋まっていると、金庫へ行く取り分の4分の1を失います。上限まで1マスのとき、いま確定すると監査が埋まる熱なら卓に「低く確定で監査」が出て、監査で失った事件の結果には「なぜ」の一行が付きます。</dd>
 <dt>連結、CASCADE（事件03）</dt><dd>一つのリソースを8以上燃やすカードで確定すると連結ができ、2〜4勝負あとのひとつの勝負で壁の区間が6近づきます。次の事件に持ち越されるのは、いちばん新しい連結一つだけです。</dd>
 </dl>
 <p>事件が閉じるとREBOOTが跡を消します。各幕の最後の事件は「山場の勝負」で、壁が5近づき、チップが1.25倍になります。</p>
