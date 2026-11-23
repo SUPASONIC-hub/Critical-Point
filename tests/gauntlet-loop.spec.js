@@ -2,7 +2,7 @@ import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { CASE_RESULT_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
-import { nodeOrders, nodes } from "../src/gameData.js";
+import { CASE_START_NODES, nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
@@ -240,6 +240,22 @@ test("an act's last case is 「고점 판」: the briefing says it and the board
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveAttribute("data-mark", "peak");
   await startDebugNode(page, "case06", "c6_start");
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
+});
+// G23 (RULES_MARK 8): 사건 08 to 42 ask how to open, in the signature's frame, and 크게 연다 deals the nearer wall.
+test("a case from 사건 08 asks how to open, inside a 360px phone, and opening big stands the wall from 30 @once", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await startDebugNode(page, "case12", CASE_START_NODES.case12, { openTable: false });
+  const ask = page.getByTestId("opening-ask");
+  await expect(ask).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("opening-normal")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("opening-big")).toHaveAccessibleDescription(/30/);
+  // Polled: the briefing's entrance scales the page for a moment (43.65px mid-way).
+  await expect.poll(async () => (await page.getByTestId("opening-big").boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByTestId("opening-big").click();
+  await expect(page.getByTestId("opening-big")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("open-table").click();
+  await expect(page.locator(".gx-band-label").first()).toContainText("30");
 });
 // G25 (RULES_MARK 8): 도구 다듬기 lists the held tools inside the draft's width on the narrowest phone, and pays once.
 test("the draft refines a held tool, inside a 360px phone's width, and pays out of the vault @once", async ({ page }) => {
