@@ -137,6 +137,13 @@ const SPEAKER_PORTRAITS = {
   // side, so a photograph of a real model (docs/portrait-credits.md). 위성규
   // speaks only in the narration, as 번외 8's 설경민.
   "아이굴 세리코바": "/portrait-aigul-serikova.webp",
+  // 번외 10 (2026-11-20, Season 12-14): the side case's one new speaker, a
+  // 요양보호사 on its right side, so a photograph of a real model
+  // (docs/portrait-credits.md). The households do not speak by name.
+  "변정순": "/portrait-byeon-jeongsun.webp",
+  // 번외 11 (2026-11-20, Season 12-14): its one new speaker, the beach's
+  // 수상안전요원, not on any wrong side, so a photograph of a real model.
+  "염봉수": "/portrait-yeom-bongsu.webp",
 };
 
 /** Every speaker's name: the briefing gives a scene's speech to the one the narration last named (speakerLine.js). */
