@@ -1,5 +1,5 @@
-import { ENDING_THRESHOLDS as GATE, getFinaleOutcome, getSlackGates } from "./gameLogic.js";
-import { readCollapseGate } from "./seasonStanding.js";
+import { ENDING_THRESHOLDS as GATE, getFinaleOutcome } from "./gameLogic.js";
+import { getSlackGates, readCollapseGate } from "./seasonStanding.js";
 
 /**
  * The ending a season came closest to and did not reach, for the finale's one
@@ -56,8 +56,9 @@ export function nearestEnding(input = {}) {
   const reframes = Number.isFinite(seasonReframeRoutes) ? seasonReframeRoutes : (log ?? []).filter((entry) => entry?.reframeOpenedRoute).length;
   const slack = (seasonBusts === 0 && seasonBestMultiplier >= GATE.heldLineMultiplier)
     || seasonBestLogic >= GATE.logicSlackStreak || seasonVaultPerCase >= GATE.vaultSlackPerCase;
-  const recordClues = share(clues, cases, slack ? getSlackGates().clueRate : GATE.clueRate);
-  const oversightBar = GATE.oversightLegitimacy - (slack ? getSlackGates().oversight : 0);
+  const gates = getSlackGates(GATE.clueRateSlack);
+  const recordClues = share(clues, cases, slack ? gates.clueRate : GATE.clueRate);
+  const oversightBar = GATE.oversightLegitimacy - (slack ? gates.oversight : 0);
 
   const lacks = {
     "human-record": { reframes: share(reframes, cases, GATE.recordReframeRate), clues: share(clues, cases, GATE.recordClueRate), trust: atLeast(trust, GATE.recordTrust) },
@@ -77,5 +78,5 @@ export function nearestEnding(input = {}) {
     if (!best || distance < best.distance) best = { id, gaps, distance };
   }
   // G26: `door` when the table opened the slack door this season (the finale says so, display only).
-  return best ? { id: best.id, label: endingLabelOf(best.id), gaps: best.gaps, ...(slack && getSlackGates().oversight ? { door: true } : {}) } : null;
+  return best ? { id: best.id, label: endingLabelOf(best.id), gaps: best.gaps, ...(slack && gates.oversight ? { door: true } : {}) } : null;
 }

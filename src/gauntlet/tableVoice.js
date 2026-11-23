@@ -13,6 +13,9 @@ import { BREATH_GAUGE, SIGN_CHIPS, SIGN_MARK } from "./nextTableRules.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 
+/** G15·G22: the line beside 숨 고르기: where the last BUST went, and on a hot one how far the wall moves. */
+export const readBreathBust = (board) => fill(tableCopy.stage.breathBust, { heat: board.bustHeat }) + (board.breathHot ? fill(tableCopy.stage.breathHotWall, { wall: getBreathWall(board) }) : "");
+
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
  *

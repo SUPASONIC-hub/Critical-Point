@@ -1,5 +1,4 @@
 import { createTableRecord } from "./gauntlet/gauntletEngine.js";
-import { isMarkEightOn } from "./gauntlet/nextTableRules.js";
 import { byEffectWeight, CASE_PACKS, CASE_SEQUENCE, characterProfiles, choiceVoiceLines, echoReplies, isResourceGain } from "./gameData.js";
 // Read through a namespace: the import-name budget (check-runtime-budget.mjs) is full at 20.
 import * as gameConstants from "./gameConstants.js";
@@ -529,11 +528,6 @@ export function getAuthorityGate(choice = {}, { clueCount = 0, trust = 0, legiti
 // (24.6k) play check:pressure measures at nine windows a case (16,000 at 7).
 const { clueRate: CLUE_RATE_BAR, oversightTrust: OVERSIGHT_TRUST } = gameConstants.ENDING_GATES; // the collapse gates are read in seasonStanding.js
 const CLUE_RATE_SLACK_BAR = 0.8;
-// G26 (RULES_MARK 8): the slack door opens further: the record bar 0.7, and OPEN OVERSIGHT's legitimacy this much lower.
-const CLUE_RATE_SLACK_EIGHT = 0.7;
-const OVERSIGHT_SLACK_EIGHT = 3;
-/** What an open slack door lowers, for the ruling and the finale's line (nearestEnding.js). */
-export const getSlackGates = () => (isMarkEightOn() ? { clueRate: CLUE_RATE_SLACK_EIGHT, oversight: OVERSIGHT_SLACK_EIGHT } : { clueRate: CLUE_RATE_SLACK_BAR, oversight: 0 });
 const QUIET_CLUE_RATE = 0.5; // under half the records the truth is still asleep,
 const QUIET_SUSTAINED_PRESSURE = 12; // as it is when cases typically peak under 12 (p25 13)
 const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten (p75 0.75)
@@ -703,7 +697,7 @@ export function getEndingVariant({
 
   const heldTheLine = seasonBusts === 0 && seasonBestMultiplier >= HELD_LINE_MULTIPLIER;
   const slack = heldTheLine || seasonBestLogic >= LOGIC_SLACK_STREAK || seasonVaultPerCase >= VAULT_SLACK_PER_CASE;
-  const slackGates = getSlackGates();
+  const slackGates = seasonStanding.getSlackGates(CLUE_RATE_SLACK_BAR);
   const recordsOpen = clueRate >= (slack ? slackGates.clueRate : CLUE_RATE_BAR);
   const reform = recordsOpen && legitimacy >= REFORM_LEGITIMACY;
   if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];

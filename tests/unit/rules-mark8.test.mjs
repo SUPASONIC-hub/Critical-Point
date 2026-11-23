@@ -24,7 +24,7 @@ import { getRefinedBoost, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP, RELIC_BO
 import { rulesTrialOn } from "../../src/gauntlet/rulesNext.js";
 import { readDraftSpend } from "../../src/gauntlet/draftSpend.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
-import { getSlackGates } from "../../src/gameLogic.js";
+import { getSlackGates } from "../../src/seasonStanding.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 
 const EIGHT = withMarkEight(ALL_RULES, true);
@@ -107,7 +107,7 @@ test("G25: a refined tool pays half as much bonus again, once a season, and is p
 });
 
 test("G26: an open slack door lowers the record bar to 0.7 and OPEN OVERSIGHT's legitimacy by 3", () => {
-  assert.deepEqual(getSlackGates(), { clueRate: 0.7, oversight: 3 });
+  assert.deepEqual(getSlackGates(0.8), { clueRate: 0.7, oversight: 3 });
 });
 
 test("G24 and G27 stay behind the trial, which the public site cannot turn on", () => {
