@@ -68,6 +68,8 @@ what the copy actually says today.
 | 지난 판 N에서 터짐 | Last BUST at N | 前回NでBUST | 판 규칙 6 (G15). 숨 고르기 옆, 60 이상이면 열기 −14 |
 | 낮게 끊으면 감사 / 왜 | Low cash = audit / Why | 低く確定で監査 / なぜ | G17. 감사 한도 한 칸 앞에서 지금 확정하면 칸이 찰 때의 경고, 감사로 잃은 결과의 이유 줄 |
 | 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
+| 판돈 배수는 합쳐 ×1.6까지 (도구 겹침) | pay ×1.6 at most together | 合わせて1.6倍まで | 판 규칙 7 (G11c). 드래프트 안내 줄. 혼자 더 큰 도구는 그 값 |
+| 이번 서명란 (「이름만」의 벽 값) | this signature line | 今回の署名欄 | 판 규칙 7 (G16). 사건마다 1~3, 사건 49는 3 |
 
 ## People (prologue 01 to case 07)
 
