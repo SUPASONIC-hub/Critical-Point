@@ -102,7 +102,8 @@ export function describeNearestEnding(nearest) {
     legitimacy,
     particle: subjectParticle(key === "pactGap" ? trust : legitimacy),
   }));
-  return fill(NEAREST.line, { ending: nearest.label, gaps: gaps.join(" · ") });
+  const line = fill(NEAREST.line, { ending: nearest.label, gaps: gaps.join(" · ") });
+  return nearest.door ? `${line} ${NEAREST.door}` : line;
 }
 
 export function createEndingProfile({ finalEndingEntry }) {

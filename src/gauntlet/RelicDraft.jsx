@@ -10,7 +10,7 @@ import { fill } from "../locale.js";
 import { formatMoney } from "./tableReadout.js";
 import { readDraftSpend } from "./draftSpend.js";
 import { isNextOn } from "./nextTableRules.js";
-import { RELIC_BOOST_CAP } from "./relicsNext.js";
+import { getRefinedBoost, RELIC_BOOST_CAP } from "./relicsNext.js";
 
 // The draft's words (src/copy/relics.js).
 const say = relicsCopy.draft;
@@ -128,6 +128,7 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
           <div className="gx-draft-spend" data-testid="relic-spend">
             <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
             <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
+            {spend.refine && <DraftRefine state={spend.refine} onPress={(id) => onSpend("refine", id)} />}
             <small className="gx-draft-note">{say.spendNote}</small>
             <small className="gx-draft-note">{isNextOn() ? fill(say.spendHintNext, { cap: RELIC_BOOST_CAP }) : say.spendHint}</small>
           </div>
@@ -177,6 +178,29 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * G25 도구 다듬기: the buy, and once pressed the held tools it can take, each a button that says what it buys.
+ * They wrap inside the spend row, so a 360px phone keeps its width.
+ */
+function DraftRefine({ state, onPress }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <DraftBuy id="refine" state={state} label={say.refine} onPress={() => setOpen((was) => !was)} />
+      {open && state.open && (
+        <span role="group" aria-label={say.refineGroup} data-testid="relic-refine-list" style={{ display: "flex", flexWrap: "wrap", gap: 6, flexBasis: "100%", minWidth: 0 }}>
+          {state.targets.map((id) => (
+            <button key={id} type="button" className="ghost gx-draft-buy" data-testid="relic-refine-option" data-relic={id}
+              aria-label={fill(say.refineOption, { name: RELICS[id].name, boost: getRefinedBoost(id) })} onClick={() => onPress(id)}>
+              {RELICS[id].name} ×{getRefinedBoost(id)}
+            </button>
+          ))}
+        </span>
+      )}
+    </>
   );
 }
 

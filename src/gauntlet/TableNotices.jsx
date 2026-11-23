@@ -3,12 +3,12 @@ import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatMoney, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
-import { getBreathGauge, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
+import { getBreathGauge, getBreathWall, getNarrowReach, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicDirection, getLogicType } from "./logicStreak.js";
-import { SCOUT_NARROW_REACH, SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
+import { SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
-import { BREATH_SECONDS, BREATH_WALL } from "./nextTableRules.js";
+import { BREATH_SECONDS } from "./nextTableRules.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
 import { MoneyBurst } from "./MoneyBurst.jsx";
 import { readBurst } from "./moneyFeedback.js";
@@ -199,14 +199,14 @@ export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCO
   // G7: 숨 고르기 on the board right after a BUST, before the first push, while it can be pressed (`onBreathe`).
   const shown = <>{band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(tableCopy.stage.signCell, { cell: band.shown })}</span>}
     {onBreathe && <button type="button" className="gx-scout" data-testid="commit-breathe" onClick={onBreathe}
-      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: getBreathGauge(board), wall: BREATH_WALL })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}</>;
+      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: getBreathGauge(board), wall: getBreathWall(board) })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}</>;
   if (!canScout && !band.scouted) return <><span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>{shown}</>;
   // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
   const narrows = band.scouted && canScout;
   const label = !band.scouted
     ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: scoutTrust, seconds: SCOUT_SECONDS })
     : narrows
-      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
+      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: getNarrowReach() * 2 })
       : undefined;
   return (
     <><button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}

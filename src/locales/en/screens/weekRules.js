@@ -42,7 +42,7 @@ export default {
   actTwists: {
     merger: {
       title: "The Merger",
-      text: "This Case, every card’s chips are ×{mergerChips}, but the Wall band stands {mergerShift} Heat closer.",
+      text: "This Case, every card’s chips are ×{mergerChips}, but the far end of the Wall band stands {mergerTop} Heat closer.",
       world: "The group merges its companies and calls it reform. Bigger stakes, a nearer Wall.",
     },
     scattered: {
@@ -63,7 +63,7 @@ export default {
     },
     lateBill: {
       title: "The Late Bill",
-      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 3/4 of that Heat. Commit under it and every card’s chips are ×{billChips}.",
+      text: "This Case, commit at {billHeat} Heat or more and the next hand starts with 3/4 of that Heat (all of it past {billFull}). Commit under it and every card’s chips are ×{billChips}.",
       world: "The ten days someone carried alone are billed the day after the win.",
     },
     trainedWall: {

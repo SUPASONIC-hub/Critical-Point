@@ -65,6 +65,7 @@ const reportLinesCopy = {
   // {label} in a gap is the resource's own word (easyResourceLabels).
   nearest: {
     line: "가장 가까웠던 다른 결말: {ending}까지 {gaps}",
+    door: "판에서 연 문: 판을 잘 쳐서 기록 결말의 문턱이 낮아졌습니다.",
     gaps: {
       trust: "{label} {value} 모자람",
       legitimacy: "{label} {value} 모자람",

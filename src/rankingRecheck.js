@@ -48,7 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
-import { isNextOn, RULES_NEXT_MARK, RULES_SEVEN_MARK, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
+import { isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_SEVEN_MARK, withMarkEight, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -98,7 +98,8 @@ export function recheckCaseScore(row) {
 export function getRowRules(caseId, summary, mark = undefined) {
   const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
   if (mark === undefined || mark === null) return rules;
-  return withMarkSeven(withNextRules(rules, Number(mark) >= RULES_NEXT_MARK), Number(mark) >= RULES_SEVEN_MARK);
+  // RULES_MARK 8 (G19~G26): a row of 5 to 7 is played again without them (`before8`).
+  return withMarkEight(withMarkSeven(withNextRules(rules, Number(mark) >= RULES_NEXT_MARK), Number(mark) >= RULES_SEVEN_MARK), Number(mark) >= RULES_EIGHT_MARK);
 }
 
 /**
@@ -272,6 +273,8 @@ export function recheckRelicDraft(row, before = null) {
       if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned))) differs.push("reroll");
       const last = draft.reroll?.offer ?? draft.offer;
       if (draft.picked.some((id) => !last.includes(id)) || draft.picked.length > (draft.extra ? 2 : 1)) differs.push("picked");
+      // G25: a refined tool is one the draft held.
+      if (draft.refine && !draft.owned.includes(draft.refine)) differs.push("refine");
       if (numberOf(raw.cost) !== getRelicDraftCost(draft, rowRules(row))) differs.push("cost");
       if (draft.cost > 0 && (open?.story === true || open?.practice === true || entry.assistStory)) differs.push("spent");
       if (draft.cost > 0 && numberOf(open?.vault) !== null && draft.cost > open.vault) differs.push("vault");

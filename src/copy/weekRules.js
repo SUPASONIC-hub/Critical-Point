@@ -55,7 +55,7 @@ const weekRulesCopy = {
   actTwists: {
     merger: {
       title: "합병",
-      text: "이번 사건은 모든 카드의 칩이 {mergerChips}배지만, 벽 띠가 열기 {mergerShift}만큼 앞당겨 선다.",
+      text: "이번 사건은 모든 카드의 칩이 {mergerChips}배지만, 벽 띠의 먼 끝이 열기 {mergerTop}만큼 앞당겨 선다.",
       world: "그룹이 「개혁」이라며 계열사를 합친다. 판은 커지고 벽은 가까워진다.",
     },
     scattered: {
@@ -76,7 +76,7 @@ const weekRulesCopy = {
     },
     lateBill: {
       title: "뒤늦은 청구서",
-      text: "이번 사건은 열기 {billHeat} 이상에서 확정하면 그 열기의 4분의 3을 안고 다음 판을 시작한다. 그 아래에서 확정하면 모든 카드의 칩이 {billChips}배다.",
+      text: "이번 사건은 열기 {billHeat} 이상에서 확정하면 그 열기의 4분의 3을 안고 다음 판을 시작한다({billFull} 넘으면 전부). 그 아래에서 확정하면 모든 카드의 칩이 {billChips}배다.",
       world: "열흘을 혼자 버틴 값은 이긴 다음 날 청구된다.",
     },
     trainedWall: {

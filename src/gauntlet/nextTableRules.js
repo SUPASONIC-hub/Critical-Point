@@ -1,4 +1,4 @@
-import { rulesNextOn } from "./rulesNext.js";
+import { rulesNextOn, rulesTrialOn } from "./rulesNext.js";
 
 /**
  * G1·G2·G3·G6·G7 (2026-11-19, 「전부 1」): the numbers of the next table rules
@@ -179,3 +179,74 @@ export const scoutTrustAt = (count) => {
 export function countScouts(log = []) {
   return (Array.isArray(log) ? log : []).filter((entry) => entry?.threshold?.scouted === true).length;
 }
+
+/* ------------------------------------------- RULES_MARK 8 (2027-01-04) */
+
+/**
+ * G19~G26 (게임성 개선점 3차, the user's 「전부 1」 of 2026-11-23): rules that
+ * ship on the quarter's first Monday as RULES_MARK 8. A row is rechecked under
+ * them only when its mark is `RULES_EIGHT_MARK` or later (rankingRecheck.js
+ * `getRowRules`), so a row of 5 to 7 is played again as it was. They ride on
+ * RULES_MARK 7's: a set that plays those off plays none of these. `EIGHT_RULE`
+ * in a set plays them, `BEFORE_EIGHT_RULE` the rules of 7, and a set with
+ * neither what this page plays. `RULES_MARK8=0` turns them off in a script.
+ */
+export const RULES_EIGHT_MARK = 8;
+export const EIGHT_RULE = "mark8";
+export const BEFORE_EIGHT_RULE = "before8";
+
+/** Whether this page (or this script) plays RULES_MARK 8's rules: `RULES_MARK8=0` turns them off in a script. */
+export function wantsMarkEight(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK8 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+export const eightByDefault = () => (eightByDefault.value ??= wantsMarkEight());
+
+/** Whether `rules` plays RULES_MARK 8's rules (and so 7's too). */
+export function isMarkEightOn(rules) {
+  if (!isMarkSevenOn(rules)) return false;
+  if (rules?.has?.(BEFORE_EIGHT_RULE)) return false;
+  if (rules?.has?.(EIGHT_RULE)) return true;
+  return eightByDefault();
+}
+
+const eightSets = new WeakMap();
+const beforeEightSets = new WeakMap();
+/** `rules` playing RULES_MARK 8's rules (`on`) or those of 7; the same set back when it already does. */
+export function withMarkEight(rules, on = eightByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkEightOn(rules) === Boolean(on) || (on && !isMarkSevenOn(rules))) return rules;
+  const mark = on ? EIGHT_RULE : BEFORE_EIGHT_RULE;
+  const drop = on ? BEFORE_EIGHT_RULE : EIGHT_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? eightSets : beforeEightSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/** G21: METRONOME also pays on the first board after this many in a row on one direction. */
+export const METRONOME_HOLD = 6;
+/** G22: 숨 고르기 after a BUST at BREATH_HOT_FROM or over moves the wall this far instead of BREATH_WALL. */
+export const BREATH_HOT_WALL = 5;
+/**
+ * G24: the second look's band is twice this wide on the trial (20 to 10 cells). Off by default: at 10 the best
+ * narrowing hand reads 0.821 of a wall seen, over check:pressure's 0.8 cap, so the width is the user's to decide.
+ */
+export const NARROW_REACH_EIGHT = 5;
+/** The page's trial switch (rulesNext.js), read once. */
+export const trialByDefault = () => (trialByDefault.value ??= rulesTrialOn());
+
+/** G23 여는 판돈: 크게 연다 pays every card this much in the case, and the band's near end stands here. */
+export const OPEN_BIG_CHIPS = 1.2;
+export const OPEN_BIG_WALL = 30;
+export const OPEN_WAYS = Object.freeze(["normal", "big"]);
+/** The cases that ask: 사건 08 to 42 (the first hour plays as it does, and 8막 has its signature in the same place). */
+export function isOpeningCase(caseId) {
+  const number = /^case(\d{2})$/.exec(String(caseId))?.[1];
+  return Boolean(number) && Number(number) >= 8 && Number(number) <= 42;
+}
+
+/** G27 (trial only): this long after a full charge it starts to leak, one step a second of table clock. A stopped clock leaks nothing. */
+export const CHARGE_LEAK_GRACE = 4;
+export const CHARGE_LEAK_STEP = 10;

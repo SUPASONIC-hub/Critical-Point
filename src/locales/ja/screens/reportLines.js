@@ -40,6 +40,7 @@ export default {
   witnessHeld: "最後にあなたは告発を選びました。現金は減り、スコアにも残りませんが、人的被害を線の下に抑えたまま、隠された記録を外に出しました。このシーズンが勝ち取ったものは、数字の外にあります。",
   nearest: {
     line: "最も近かった別の結末：{ending}まで{gaps}",
+    door: "勝負で開いた扉：うまく打ったので、記録の結末の敷居が下がりました。",
     gaps: {
       trust: "{label}が{value}不足",
       legitimacy: "{label}が{value}不足",

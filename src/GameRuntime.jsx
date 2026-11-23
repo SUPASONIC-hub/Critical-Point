@@ -671,8 +671,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   function pickRelic(relicId = null, dropId = null) {
     if (!staleSave) applyRun({ gauntletRun: relicTable.equip(gauntletRun, relicId, dropId) });
   }
-  function spendAtDraft(kind) {
-    const paid = relicTable.spend(gauntletRun, kind);
+  function spendAtDraft(kind, id = null) {
+    const paid = relicTable.spend(gauntletRun, kind, id);
     if (!staleSave && paid !== gauntletRun) applyRun({ gauntletRun: paid });
   }
   /** G5 8막 실명 서명: the case's way to sign, on its open snapshot before its first board (gauntletEngine's signCase). */

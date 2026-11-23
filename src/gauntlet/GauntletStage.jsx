@@ -11,6 +11,7 @@ import {
   GAUGE_MAX,
   REFRAME_CARD_ID,
   getBoardMark,
+  getBreathWall,
   getHandBonus,
   LOCK_CAP,
   readRoomCards,
@@ -639,7 +640,7 @@ export function GauntletStage({
               board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
             {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
             {breathable && win.schema.bustHeat > 0 && (
-              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}</span>
+              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{fill(say.breathBust, { heat: win.schema.bustHeat })}{win.schema.breathHot && fill(say.breathHotWall, { wall: getBreathWall(win.schema) })}</span>
             )}
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
               aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}

@@ -24,6 +24,9 @@ export default {
     skipPaid: "Continue without picking",
     reroll: "Reroll · {cost}",
     extra: "One more · {cost}",
+    refine: "Refine a tool · {cost}",
+    refineGroup: "Tool to refine",
+    refineOption: "Refine {name}, its condition pays ×{boost}",
     spendNote: "It comes straight out of your KD Bank account and can't be undone.",
     spendHint: "One more only when a slot is open. Buy every time and the Vault runs dry before the ending.",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
@@ -39,6 +42,7 @@ export default {
       few: "Only one tool left",
       short: "Not enough in the account",
       season: "Already bought this Season",
+      none: "No tool to refine",
     },
   },
   relics: {
@@ -47,7 +51,7 @@ export default {
       text: "Until the scene after Heat rises, a change of side still counts as a switch.",
       proc: "Caught the switch",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "Cash on a hand where you switched sides: stake +{pct}%.",
+      next: "Commit on a hand where you changed side (a switch), or the first hand after 6 in a row on one side: stake +{pct}%.",
     },
     coldBlood: {
       name: "Cold Blood",

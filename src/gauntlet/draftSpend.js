@@ -1,6 +1,6 @@
 import { RELIC_EXTRA_COST, RELIC_REROLL_COST } from "./relics.js";
-import { isNextOn } from "./nextTableRules.js";
-import { NEXT_REROLL_COST } from "./relicsNext.js";
+import { isMarkEightOn, isNextOn } from "./nextTableRules.js";
+import { listRefinable, NEXT_REROLL_COST, REFINE_COST } from "./relicsNext.js";
 
 /**
  * What the draft's two buttons say (C9, the KD은행 계좌 at the draft; the
@@ -33,7 +33,11 @@ export function readDraftSpend(run) {
     common ?? (bought ? "used" : extra && next && run?.extraBought === true ? "season" : picked ? "picked" : extra && offer.length < 2 ? "few" : vault < cost ? "short" : null);
   const reroll = reason(Boolean(draft?.reroll), rerollCost, false);
   const extra = reason(Boolean(draft?.extra), RELIC_EXTRA_COST, true);
+  // G25 도구 다듬기 (RULES_MARK 8): the held tools it can still take; `none` when there are none.
+  const targets = listRefinable(run?.relics ?? [], run?.refined ?? []);
+  const refine = common ?? (draft?.refine ? "used" : picked ? "picked" : !targets.length ? "none" : vault < REFINE_COST ? "short" : null);
   return {
+    ...(isMarkEightOn() ? { refine: { cost: REFINE_COST, open: refine === null, reason: refine, targets } } : {}),
     reroll: { cost: rerollCost, open: reroll === null, reason: reroll },
     extra: { cost: RELIC_EXTRA_COST, open: extra === null, reason: extra },
     second: Boolean(draft?.extra) && picked === 1 && offer.length > 0,

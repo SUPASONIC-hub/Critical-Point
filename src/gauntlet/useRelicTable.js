@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { readStoredValue, writeStoredValue } from "../appConfig.js";
 import { settleAgainstCodex } from "../state/settleChoice.js";
-import { buyExtraRelic, equipRelic, rerollRelicOffer } from "./gauntletEngine.js";
+import { buyExtraRelic, equipRelic, refineRelic, rerollRelicOffer } from "./gauntletEngine.js";
 import { readDraftSpend } from "./draftSpend.js";
 import { normalizeRelicIds } from "./relics.js";
 
@@ -64,9 +64,9 @@ export function addToRelicCodex(codex, unlockedRelics = []) {
  * caller saves nothing. Nothing is asked. Here rather than in draftSpend.js so
  * that sheet of reasons stays pure of the engine, and in the runtime's chunk.
  */
-export function spendAtDraft(run, kind) {
+export function spendAtDraft(run, kind, id = null) {
   if (!readDraftSpend(run)[kind]?.open) return run;
-  const paid = kind === "reroll" ? rerollRelicOffer(run) : buyExtraRelic(run);
+  const paid = kind === "refine" ? refineRelic(run, id) : kind === "reroll" ? rerollRelicOffer(run) : buyExtraRelic(run);
   return paid.vault === run.vault ? run : paid;
 }
 

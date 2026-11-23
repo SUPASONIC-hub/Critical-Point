@@ -474,7 +474,7 @@ test("the mark of a case closed at the logic table is the streak in its run summ
   const { logicStreak: _streak, bestLogic: _best, ...beatSummary } = paid.caseResults.prologue02.gauntlet;
   const between = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: beatSummary } } };
   // The first build that paid the streak is itself an older table since 2026-10-20 (the day-ten table): it has no `tableRules`.
-  const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 7 } } } };
+  const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 8 } } } };
   // RULES_MARK 4 (C-3 and C-4) is an older table since N26 (2026-11-30).
   const markFour = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 4 } } } };
   // RULES_MARK 3 (the audit and the links from 프롤로그 04) is an older table since C-3 and C-4 (2026-10-25).

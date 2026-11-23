@@ -40,6 +40,8 @@ const edgeCopy = {
     // G16 (RULES_MARK 7): what 「이름만」 does to the wall in this case, drawn for it.
     nameWall: "이번 서명란은 이름만 쓰면 벽 띠가 {wall} 앞당겨 선다.",
   },
+  // G23 여는 판돈 (WeekRulePanel.jsx OpeningAsk).
+  opening: { kicker: "여는 판돈", question: "이번 사건을 어떻게 열까? 고르지 않으면 보통으로 연다.", normal: "보통으로 연다", big: "크게 연다", bigNote: "크게 열면 이 사건의 모든 카드 칩이 {chips}배, 대신 벽이 열기 {wall}부터 설 수 있다." },
   // ComfortDialog.jsx
   comfort: {
     title: "편의 설정",

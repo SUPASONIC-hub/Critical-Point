@@ -42,7 +42,7 @@ export default {
   actTwists: {
     merger: {
       title: "合併",
-      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯が熱{mergerShift}ぶん手前に立つ。",
+      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯の奥の端が熱{mergerTop}ぶん手前に立つ。",
       world: "グループは「改革」と称して系列会社を合併する。賭けは大きく、壁は近くなる。",
     },
     scattered: {
@@ -63,7 +63,7 @@ export default {
     },
     lateBill: {
       title: "遅れてきた請求書",
-      text: "この事件は熱{billHeat}以上で確定すると、その熱の4分の3を抱えて次の勝負が始まる。それより下で確定すると、すべてのカードのチップが{billChips}倍。",
+      text: "この事件は熱{billHeat}以上で確定すると、その熱の4分の3を抱えて次の勝負が始まる({billFull}を超えると全部)。それより下で確定すると、すべてのカードのチップが{billChips}倍。",
       world: "ひとりで耐えた十日分は、勝った翌日に請求される。",
     },
     trainedWall: {

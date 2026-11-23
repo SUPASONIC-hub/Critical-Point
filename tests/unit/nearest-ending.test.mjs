@@ -67,8 +67,8 @@ test("records are counted as the ruling divides them: the fewest that reach the 
   const near = nearestEnding({ ...input, endingId: "cold-justice" });
   assert.deepEqual(near, { id: "evidence-reform", label: "EVIDENCE REFORM", gaps: [{ key: "clues", value: 2 }] });
   assert.equal(ruled({ ...input, discoveredClues: Array.from({ length: 7 }, (_, index) => `clue-${index}`) }), "evidence-reform");
-  // Table slack lowers the bar the records are counted against (0.8 of 20 is 16, 0.9 is 18).
-  const slack = season({ finale: "control", legitimacy: 86, trust: 80, clues: 15, casesPlayed: 20, seasonBestLogic: ENDING_THRESHOLDS.logicSlackStreak });
+  // Table slack lowers the bar the records are counted against (G26: 0.7 of 20 is 14, 0.9 is 18).
+  const slack = season({ finale: "control", legitimacy: 86, trust: 80, clues: 13, casesPlayed: 20, seasonBestLogic: ENDING_THRESHOLDS.logicSlackStreak });
   assert.deepEqual(nearestEnding({ ...slack, endingId: ruled(slack) }).gaps, [{ key: "clues", value: 1 }]);
 });
 

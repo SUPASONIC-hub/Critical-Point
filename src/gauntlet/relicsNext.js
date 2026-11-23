@@ -40,7 +40,8 @@ export const RELIC_BOOSTS = Object.freeze({
   heatSink: Object.freeze({ boost: 1.6, when: (cash) => cash.gauge >= HOT_CASH_HEAT }),
   fieldNote: Object.freeze({ boost: 1.25, when: (cash) => cash.streak >= SIDE_STREAK }),
   encore: Object.freeze({ boost: 1.15, when: (cash) => cash.streak >= LONG_STREAK }),
-  metronome: Object.freeze({ boost: 1.7, when: (cash) => cash.move === "switch" }),
+  // G21 (RULES_MARK 8): also the first board after METRONOME_HOLD in a row on one direction (`heldPast`, set by the settlement).
+  metronome: Object.freeze({ boost: 1.7, when: (cash) => cash.move === "switch" || cash.heldPast === true }),
   coldBlood: Object.freeze({ boost: 2, when: (cash) => cash.afterBust }),
   carbonCopy: Object.freeze({ boost: 1.7, when: (cash) => cash.mutations.includes("blackout") }),
   testimony: Object.freeze({ boost: 1.1, when: (cash) => cash.clockLeft >= FAST_CASH_SHARE }),
@@ -65,16 +66,24 @@ export const RELIC_BOOST_CAP = 1.6;
  * (AUDIT CONTACT ×1.8, COLD BLOOD ×2): a second tool never takes from the first.
  * `capped` when the cap cut the product.
  */
-export function readRelicBoost(relics, cash, cap = Infinity) {
+export function readRelicBoost(relics, cash, cap = Infinity, refined = []) {
+  const boostOf = (id) => (refined.includes(id) ? getRefinedBoost(id) : RELIC_BOOSTS[id].boost);
   const held = Array.isArray(relics) ? relics : [];
   const fired = held.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && RELIC_BOOSTS[id].when(cash));
-  const product = fired.reduce((total, id) => total * RELIC_BOOSTS[id].boost, 1);
-  const most = fired.length > 1 ? Math.max(cap, ...fired.map((id) => RELIC_BOOSTS[id].boost)) : Infinity;
+  const product = fired.reduce((total, id) => total * boostOf(id), 1);
+  const most = fired.length > 1 ? Math.max(cap, ...fired.map(boostOf)) : Infinity;
   return product > most ? { fired, factor: most, capped: true } : { fired, factor: product };
 }
 
 /** What the draft costs under the next rules: the reroll 1,500 (was 4,000); one more stays 12,000, once a season. */
 export const NEXT_REROLL_COST = 1500;
+
+/** G25 도구 다듬기 (RULES_MARK 8): once a season per tool, for this much; the tool's bonus is REFINE_SHARE times what it was. */
+export const REFINE_COST = 8000;
+export const REFINE_SHARE = 1.5;
+export const getRefinedBoost = (id) => Math.round((1 + (RELIC_BOOSTS[id].boost - 1) * REFINE_SHARE) * 1000) / 1000;
+/** The held tools that can still be refined: those with a boost, not refined yet. */
+export const listRefinable = (relics = [], refined = []) => relics.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && !refined.includes(id));
 
 /** The card's numbers as percent, for the words. */
 export const boostPercent = (id) => Math.round((RELIC_BOOSTS[id].boost - 1) * 100);
