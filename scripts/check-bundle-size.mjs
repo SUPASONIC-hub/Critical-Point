@@ -1371,7 +1371,8 @@ const budgets = [
   // 17,296 / 6,136 in the e2e build, the gzip plus 4.
   // 17,286 / 6,142 -> 17,532 / 6,240 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): C-7's five tool icons on top of board-report's Flag. Measured 17,532 / 6,236. Measured in the e2e build, the gzip plus 4.
   // 17,532 / 6,240 -> 17,602 / 6,264 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 17,598 / 6,260 in the e2e build, the plus 4.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_602, maxGzip: 6_264 },
+  // 17,602 / 6,264 -> 17,758 / 6,335 on 2026-11-23, deps-1123: lucide-react 1.76.0 (Dependabot #652). Measured 17,754 / 6,331 in the e2e build and in #652's CI, the plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_758, maxGzip: 6_335 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -2813,8 +2814,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 386,594 / 452,432 / 460,844 on 2026-11-23 (user's choice 1): measured 386,145 / 451,682 / 460,118, plus the largest day built through the notes written so far (2027-01-11: +441 / +742 / +718), plus Linux's 4 and the plus 4.
 // first paint +509 / +875 / +896: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
 // -> 386,614 / 452,452 / 460,864 on 2026-11-23: the stylesheet's +20 gzip above, on the same largest day.
+// -> 386,678 / 452,514 / 460,927 on 2026-11-23, deps-1123 (lucide-react 1.76.0, Dependabot #652): measured 386,233 / 451,769 / 460,207 against main's 386,169 / 451,707 / 460,144; the room for the largest note day (445 / 745 / 720) is kept.
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
-const FIRST_PAINT_BUDGETS = { ko: 387_123, en: 453_327, ja: 461_760 };
+// -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
+const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_399, ja: 461_834 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -3033,8 +3036,10 @@ function checkBudget(file, budget) {
 // -> 12,816 / 4,547 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
 // -> 12,816 / 4,554 on 2026-11-20 (world-news 2차 30편: newsIndex 60편), the plus 4.
 // 4,554 -> 4,566 gzip on 2026-11-23: the worker names the day's hashed files. Largest day 4,558 (2026-12-03), plus Linux's 4 and the plus 4.
+// 4,566 -> 4,570 gzip on 2026-11-23, deps-1123 (Dependabot #651 #652): measured 4,554 against main's 4,550; the room for the largest note day (16) is kept.
 // +58 / +18: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
-const WORKER_BUDGET = { maxBytes: 12_874, maxGzip: 4_584 };
+// 12,874 / 4,584 -> 12,874 / 4,589 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 12,870 / 4,573, raw plus 4, gzip plus the largest note day's room (16).
+const WORKER_BUDGET = { maxBytes: 12_874, maxGzip: 4_589 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
