@@ -95,6 +95,9 @@ test("a story run's rules are its case's own, less the seven: on every step, und
     case01: ["lock", "logic", "relics", "scout", "stance"],
     case02: ["lock", "logic", "relics", "scout", "stance"],
     case03: ["lock", "logic", "relics", "scout", "stance"],
+    // 사건 04 and 05 open AFTERSHOCK and SILENCE (N18), both off in a story run.
+    case04: ["lock", "logic", "relics", "scout", "stance"],
+    case05: ["lock", "logic", "relics", "scout", "stance"],
   };
   for (const caseId of PROLOGUES) {
     const base = rulesFor(caseId, { staged: true });

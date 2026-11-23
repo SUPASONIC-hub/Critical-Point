@@ -1007,9 +1007,12 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
         busts += 1;
         if (!caseClosed) midCaseBusts += 1;
         // Broken is the blackout the bust files on the next board. A bare hand
-        // also has to find it face down and already hot; a mastered lock may turn
-        // the board back over (`applyStanceMastery`), which is the lock working.
-        const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && nextRun.schema.startGauge > 0);
+        // also has to find it face down, and already hot where the case has
+        // AFTERSHOCK (from 사건 04 since N18; 프롤로그 02 to 사건 03 deal BLACKOUT
+        // alone); a mastered lock may turn the board back over
+        // (`applyStanceMastery`), which is the lock working.
+        const hot = !rules.has("aftershock") || nextRun.schema.startGauge > 0;
+        const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && hot);
         if (!caseClosed && broken) mutatedAfterBust += 1;
         // The blackout skip: the room plays the next scene without the player. It
         // never skips onto the result, so the case's last window is always played.

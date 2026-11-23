@@ -38,11 +38,11 @@ export const GUIDE_BODY = {
 <p>들고 온 연속이 이미 LOCK 상한(1.5배)을 채운 판에서는 LOCK이 닫힙니다. 더할 것이 없기 때문이고, 누르면 그 이유가 나옵니다.</p>
 
 <h2>판단이 남기는 흔적</h2>
-<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 03부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
+<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 05부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
 <dl>
 <dt>BLACKOUT (프롤로그 02)</dt><dd>BUST 다음 판은 카드의 칩과 소모가 가려지고 벽 구간이 6 가까워집니다.</dd>
-<dt>AFTERSHOCK (프롤로그 02)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
-<dt>SILENCE (프롤로그 02)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
+<dt>AFTERSHOCK (사건 04)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
+<dt>SILENCE (사건 05)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
 <dt>COLD FEET (프롤로그 03)</dt><dd>한 번도 밀지 않고 확정하면 다음 판의 칩이 가장 많은 카드가 열기 30을 넘을 때까지 봉인되고, 칩이 0.6배가 됩니다.</dd>
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
@@ -168,11 +168,11 @@ export const GUIDE_BODY = {
 <p>On a hand where the streak you carried in already fills LOCK’s ×1.5 cap, LOCK is shut: it would add nothing, and pressing it tells you why.</p>
 
 <h2>The marks your calls leave</h2>
-<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 03 all of them are on, and NEW GAME+ has them all from the start.</p>
+<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 05 all of them are on, and NEW GAME+ has them all from the start.</p>
 <dl>
 <dt>BLACKOUT (Prologue 02)</dt><dd>After a BUST, the cards’ chips and costs are hidden and the Wall band comes 6 closer.</dd>
-<dt>AFTERSHOCK (Prologue 02)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
-<dt>SILENCE (Prologue 02)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
+<dt>AFTERSHOCK (Case 04)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
+<dt>SILENCE (Case 05)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
 <dt>COLD FEET (Prologue 03)</dt><dd>Commit without a single push and the next hand seals its card with the most chips until Heat passes 30, with chips at ×0.6.</dd>
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
@@ -298,11 +298,11 @@ export const GUIDE_BODY = {
 <p>持ち込んだ連続がすでにLOCKの上限（1.5倍）を満たしている勝負では、LOCKが止まります。足すものがないからで、押すとその理由が出ます。</p>
 
 <h2>判断が残す跡</h2>
-<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件03からはすべてオン、NEW GAME+では最初から全部オンです。</p>
+<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件05からはすべてオン、NEW GAME+では最初から全部オンです。</p>
 <dl>
 <dt>BLACKOUT（プロローグ02）</dt><dd>BUSTの次の勝負は、カードのチップと消耗が伏せられ、壁の区間が6近づきます。</dd>
-<dt>AFTERSHOCK（プロローグ02）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
-<dt>SILENCE（プロローグ02）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
+<dt>AFTERSHOCK（事件04）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
+<dt>SILENCE（事件05）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
 <dt>COLD FEET（プロローグ03）</dt><dd>一度も押さずに確定すると、次の勝負でチップがいちばん多いカードが熱30を超えるまで封印され、チップが0.6倍になります。</dd>
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>

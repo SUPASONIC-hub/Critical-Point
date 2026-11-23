@@ -3103,6 +3103,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
 // snapshot rebuilt again.
 {
   const LADDER_C4 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_c4.sql"));
+  const LADDER_N18 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_n18.sql"));
   const SCENE_SEED = "grants-check-scene";
   const NG_SCENE = "ngplus_scene";
   await db.exec(`set session_replication_role = replica`);
@@ -3114,6 +3115,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
       [4, "prologue05", { newGamePlus: true }],
       [5, "case01", { newGamePlus: true }],
       [6, "case03", { newGamePlus: true }],
+      [7, "case05", { newGamePlus: true }],
     ]) {
       await db.query(
         `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
@@ -3126,10 +3128,10 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
   }
   await db.query(`select public.refresh_scene_bust_stats()`);
   const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
-  const expected = LADDER_C4 ? ["case03:1", "prologue01:1"] : ["case01:1", "case03:1", "prologue01:1", "prologue05:1"];
+  const expected = LADDER_N18 ? ["case05:1", "prologue01:1"] : LADDER_C4 ? ["case03:1", "case05:1", "prologue01:1"] : ["case01:1", "case03:1", "case05:1", "prologue01:1", "prologue05:1"];
   check(
     JSON.stringify(counted) === JSON.stringify(expected),
-    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
+    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_N18 ? "prologue 01 to case 04" : LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
   // N44 (*_scene_bust_collecting): a scene under twenty windows and runs is
   // answered with its count and no percent, which the page prints as 「모으는 중」.

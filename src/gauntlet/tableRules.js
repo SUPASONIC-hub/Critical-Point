@@ -45,6 +45,16 @@ export const STAKE_CLOCK_FLOOR = 12;
 export const HOT_CASH_MULTIPLIER = 4;
 export const OVERCLOCK_STREAK = 2;
 export const OVERCLOCK_CHIPS = 2;
+/**
+ * How much wider an OVERCLOCK board's push is (`stepMin`, `stepMax`): 7~15
+ * becomes 11~20. It was +4/+6 (11~21) until N18 (2026-11-17, the owner's
+ * answer Q3 (1)): with AFTERSHOCK moved to 사건 04, 사건 01 to 03 had no bet
+ * left -- the best blind policy was heat 40 at 0.3% BUST, 25 points of vault
+ * over heat 50 at 8.8% -- and check:pressure's floor is 4%. One point off the
+ * top puts heat 50 ahead again by about 500 there and on the whole table.
+ * FRONT PAGE takes back about half of it (FRONT_PAGE_STEP).
+ */
+export const OVERCLOCK_STEP = Object.freeze([4, 5]);
 export const COLD_FEET_CHIPS = 0.6;
 /** What a charged stance carries into the next board. */
 export const STRIKE_WAKE_CHIPS = 1.25;
