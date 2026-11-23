@@ -371,7 +371,8 @@ const fileBudgets = {
   // -> 3264 lines / 62512 bytes on 2026-11-19, 묶음 11-19b, measured: N36b 3안 (short phone: the staked slip in two lines, the lock reason full width, tighter pills).
   // -> 3270 lines / 62596 bytes on 2026-11-20, hotfix #644 (E1g): the gauge read row wraps whole items, each nowrap. Measured.
   // -> 3275 lines / 62710 bytes on 2026-11-23: a rule's badge keeps its own ink inside a carried board (OVERCLOCK). Measured.
-  "play.css": { lines: 3275, bytes: 62710 },
+  // -> 3277 lines / 62807 bytes on 2026-11-23: the clue card's marked words stay in their line, in colours that read on its green. Measured.
+  "play.css": { lines: 3277, bytes: 62807 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
