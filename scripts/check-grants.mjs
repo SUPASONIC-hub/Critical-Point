@@ -214,6 +214,10 @@ async function seedBeforeRankingReset() {
     if (await boardAdminLogExists()) {
       await db.query(`insert into public.board_admin_log (admin_email, action, post_id) values ($1, 'hide', 0)`, [`${RESET_SEED}@check.invalid`]);
     }
+    // The weekly reminder's subscriptions (20261129000000) exist before the 11-30 reset: a reset leaves them as it found them.
+    if (await pushSubscriptionsExist()) {
+      await db.query(`insert into public.push_subscriptions (endpoint, p256dh, auth) values ($1, $2, 'QUJDREVGR0hJSktMTU5PUA')`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`, `B${"A".repeat(86)}`]);
+    }
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -238,7 +242,11 @@ async function removeRankingResetSeed() {
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
   if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
   if (await boardAdminLogExists()) await db.query(`delete from public.board_admin_log where admin_email = $1`, [`${RESET_SEED}@check.invalid`]);
+  if (await pushSubscriptionsExist()) await db.query(`delete from public.push_subscriptions where endpoint = $1`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`]);
   return removed;
+}
+async function pushSubscriptionsExist() {
+  return (await db.query(`select to_regclass('public.push_subscriptions') is not null as here`)).rows[0].here;
 }
 async function boardAdminLogExists() {
   return (await db.query(`select to_regclass('public.board_admin_log') is not null as here`)).rows[0].here;
