@@ -1840,6 +1840,12 @@
   color: var(--c-gx-chip);
 }
 
+/* A rule's badge keeps its own ink: the blue above on the badge's deep red could not be read (OVERCLOCK, 2026-11-23). */
+.gx-carry .gx-mutation:not(.mut-reboot) b,
+.gx-mutation.gx-carry:not(.mut-reboot) b {
+  color: var(--c-paper);
+}
+
 .gx-slam {
   position: fixed;
   inset: 0;
