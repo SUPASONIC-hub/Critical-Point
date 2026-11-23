@@ -37,6 +37,10 @@ export default {
   previousMessage: "Left by the last player: “{message}”",
   rankingReset: "Ranking notice: on Monday, November 30, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
   castRenamed: "Cast notice: a few people now have new names and faces. Old names in earlier records show as the new ones ({names}).",
+  seasonNotice: {
+    soon: "New Season: on Monday, December 14, at midnight, {count} side cases are added. Each opens in the side case slot once the story passes its place.",
+    today: "New Season: {count} side cases were added today. Each opens in the side case slot once the story passes its place.",
+  },
   setup: {
     label: "Get ready to start",
     title: "Record access setup",

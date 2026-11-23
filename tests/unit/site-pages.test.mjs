@@ -24,6 +24,9 @@ import { DATA_RETENTION_DAYS, legalPagePath, SITE_PAGES } from "../../src/privac
 import { DOCUMENT_PAGE } from "../../src/serviceWorker/worker.js";
 import { READING_KINDS } from "../../src/homeReading.js";
 
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
+
 /**
  * The about, FAQ and contact pages (scripts/site-pages.mjs), the policy's six
  * beside them, and the crawler's two files: the site's text for a search
