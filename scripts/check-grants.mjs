@@ -1899,10 +1899,10 @@ if (!HALL_OF_FAME) {
   ]) {
     await raises(label, "service_role", settle([{ board, places }]), [], /^22023 /);
   }
-  // Below ten by the server's own count: a count in the call is not read.
+  // Below five by the server's own count: a count in the call is not read.
   // A call that says its own count, as the draft's did, is answered by the server's.
   const settleSaying = (boards) => `select public.hall_of_fame_settle('${JSON.stringify(boards)}'::jsonb) as settled;`;
-  await raises("post a place below ten checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below ten checked seasons \(it has 1\)/);
+  await raises("post a place below five checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 1\)/);
   await raises("post four places", "service_role", settle([{ board: table, places: [place("AAAA0001", 91), place("AAAA0002", 85), place("AAAA0003", 80), place("AAAA0003", 80)] }]), [], /^22023 /);
   await raises("post a board that is not one", "service_role", settle([{ board: "table-x", places: [] }]), [], /^22023 /);
   await raises("post a style the ranking does not have", "service_role", settle([{ board: table, places: [{ ...place("AAAA0001", 91), style: "GOD MODE" }] }]), [], /23514/);
@@ -1911,30 +1911,34 @@ if (!HALL_OF_FAME) {
   check(JSON.stringify(await tags(table)) === JSON.stringify(["AAAA0001", "AAAA0002", "AAAA0003"]), `a refused call changed the table board: ${JSON.stringify(await tags(table))}.`);
   check((await view(oldWeek)).length === 0, "a refused call wrote the board beside the refused one.");
 
-  // Below ten: the board stays, with the server's count and no place (「표본 부족」).
+  // Below five: the board stays, with the server's count and no place (「표본 부족」).
   await allowed("write a week's board below the threshold", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [] }]));
   const sparse = await view(thisWeek);
-  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below ten reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
-  // Nine more seasons on this week's board, none of them replayed: it reaches ten.
-  await fill("fwk", 9, { week: thisWeek });
-  check((await counted()).get(thisWeek) === 10, "nine more seasons with no mark did not bring this week's board to ten.");
+  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below five reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
+  // Three more seasons on this week's board, none of them replayed: at four it
+  // is still refused; one more reaches five, the threshold itself.
+  await fill("fwk", 3, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 4, "three more seasons with no mark did not bring this week's board to four.");
+  await raises("post a place at four checked seasons", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 4\)/);
+  await fill("fwl", 1, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 5, "one more season with no mark did not bring this week's board to five.");
   await allowed("write this week's board, provisional", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]));
   const provisional = await view(thisWeek);
-  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 10, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 10.`);
+  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 5, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 5.`);
 
   // A week four weeks past its Monday settles on the day's write, and is kept from then on.
   const settled = (await allowed("settle a week four weeks old", "service_role", settle([{ board: oldWeek, places: [place("CCCC0002", 60)] }])))?.rows[0]?.settled;
   check(JSON.stringify(settled?.settled) === JSON.stringify([oldWeek]), `a week four weeks old was not settled: ${JSON.stringify(settled)}.`);
   // A settled board's candidates are no longer read.
   check(!(await listedRuns(3)).some((runId) => runId === "run-hall-cccc0002" || runId === "run-hall-cccc0003"), "the checker's read still lists a settled week's seasons.");
-  // A settled board is kept even when its count fell below ten since.
+  // A settled board is kept even when its count fell below five since.
   await db.exec(`set session_replication_role = replica`);
   try {
-    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id = 'run-hall-fow00001' and case_id = 'season-final'`);
+    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id between 'run-hall-fow00001' and 'run-hall-fow00006' and case_id = 'season-final'`);
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
-  check((await counted()).get(oldWeek) === 9, "a season marked since did not leave the settled week's count.");
+  check((await counted()).get(oldWeek) === 4, "the seasons marked since did not leave the settled week's count.");
   const kept = (await allowed("write a settled week again", "service_role", settle([{ board: oldWeek, places: [place("CCCC0003", 65)] }])))?.rows[0]?.settled;
   check(JSON.stringify(kept?.kept) === JSON.stringify([oldWeek]), `a settled week answered ${JSON.stringify(kept)}.`);
   const old = await view(oldWeek);
