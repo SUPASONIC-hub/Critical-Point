@@ -179,13 +179,15 @@ test("the sitemap names the start page in three languages and every plain page, 
   const start = { ko: "/", en: "/en/", ja: "/ja/" };
   assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
   assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
-  const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
+  // The sitemap's date also decides which notes are out, so it is the day `all` was rendered for: a fixed past day lost every note since.
+  const day = notesDay();
+  const xml = sitemapXml({ origin: ORIGIN, date: day });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   assert.equal(locs.length, count);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, count);
+  assert.equal(xml.split(`<lastmod>${day}</lastmod>`).length - 1, count);
   for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
   assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");
