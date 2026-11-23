@@ -70,6 +70,12 @@ WEEK. 판 규칙 5부터는 3·5·7막의 막 비틀기(`gauntlet/actTwists.js`:
 (`caseRuleFor`). 그래서 이벤트 주 순위는 주간 규칙만으로 겨루고, 이벤트 주를 고를 때 막 비틀기와 겹칠 걱정은 하지
 않아도 됩니다. 패널은 주간 규칙과 같은 `WeekRulePanel`에 「이번 사건만 · 이 사건이 닫힐 때까지」 머리로 나옵니다.
 
+판 규칙 6(2026-11-23)부터는 1·2·4·6·8막도 막 비틀기가 섭니다: 사건 04~06 떠넘겨진 손실, 10 뒤늦은 청구서, 20·22·23
+학습된 벽, 32~35 진술 고정, 44·46·48·49 실명 서명. 이 다섯은 판의 숫자만이 아니라 판이 닫힐 때 무언가를 읽는
+「장치」라(`actTwistFor`, `twistHasDevice`), 엔진은 판의 rules로 막 비틀기를 읽고(`getCaseTwist`) 다시보기와 서버
+재검사도 같은 값을 봅니다. 주간 규칙과의 관계는 위와 같습니다: 주간 규칙 시즌과 이야기 모드에는 없고, 8막의 서명란
+(`SignAsk`)도 나오지 않습니다.
+
 **화면** --
 
 - 시작 화면 한 줄(`src/components/WeeklyRuleNotice.jsx` → `WeeklyRuleViews.jsx` → `gauntlet/weeklyRuleLine.js`):

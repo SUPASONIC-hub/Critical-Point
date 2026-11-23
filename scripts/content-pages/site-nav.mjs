@@ -1,7 +1,7 @@
 /**
  * The site's menu, at the head and the foot of every plain page: the game,
  * the pages about it (the guide, the case files, the cast, how we made it,
- * the notes)
+ * the notes, the world's newspaper)
  * and the five that were there before them (about, FAQ, contact and the two
  * policies), in the page's language, and at the head the page in the other
  * two languages. `renderDocumentPage` (scripts/legal-pages.mjs) prints it;
@@ -20,14 +20,15 @@
 const MENU_LANGUAGES = ["ko", "en", "ja"];
 
 /** The pages the menu lists after the game, in its order. Each is `/<kind>.html`, `/en/<kind>.html`, `/ja/<kind>.html`. */
-export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "notes/index", "faq", "contact", "privacy", "terms"];
+export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "notes/index", "news/index", "faq", "contact", "privacy", "terms"];
 
 /**
  * The notes (/notes/, scripts/content-pages/notes.mjs) are written in Korean
  * only (owner's decision 2026-11-20, Q3 「1」): every language's menu links the
- * one Korean list, and says so in its own words.
+ * one Korean list, and says so in its own words. So is the world's newspaper,
+ * 석간 원장 (/news/, scripts/content-pages/news.mjs).
  */
-export const isKoreanOnly = (kind) => String(kind).startsWith("notes/");
+export const isKoreanOnly = (kind) => /^(notes|news)\//.test(String(kind));
 
 /** The menu's words. `game` opens the game in the page's language. */
 export const MENU_LABELS = {
@@ -41,6 +42,7 @@ export const MENU_LABELS = {
     characters: "인물",
     making: "만든 이야기",
     "notes/index": "노트",
+    "news/index": "세계관 신문",
     faq: "FAQ",
     contact: "문의",
     privacy: "개인정보",
@@ -57,6 +59,7 @@ export const MENU_LABELS = {
     characters: "Characters",
     making: "How We Made It",
     "notes/index": "Notes (in Korean)",
+    "news/index": "In-World Paper (in Korean)",
     faq: "FAQ",
     contact: "Contact",
     privacy: "Privacy",
@@ -73,6 +76,7 @@ export const MENU_LABELS = {
     characters: "登場人物",
     making: "制作の話",
     "notes/index": "ノート(韓国語)",
+    "news/index": "作中の新聞(韓国語)",
     faq: "よくある質問",
     contact: "お問い合わせ",
     privacy: "プライバシー",
@@ -88,7 +92,7 @@ export const menuPath = (kind, language) => `${isKoreanOnly(kind) ? "" : folderO
 const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
 /** The section a page belongs to: a case's page is under the case files, the weekly calendar under the guide. */
-const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : isKoreanOnly(kind) ? "notes/index" : kind === "weekly" ? "guide" : kind);
+const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : isKoreanOnly(kind) ? `${String(kind).split("/")[0]}/index` : kind === "weekly" ? "guide" : kind);
 
 function menuLinks(kind, language) {
   const words = MENU_LABELS[language];

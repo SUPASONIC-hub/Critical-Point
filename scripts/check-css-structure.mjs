@@ -370,7 +370,8 @@ const fileBudgets = {
   // -> 3219 lines on 2026-11-19, 묶음 11-19 (N37 + N36), measured.
   // -> 3264 lines / 62512 bytes on 2026-11-19, 묶음 11-19b, measured: N36b 3안 (short phone: the staked slip in two lines, the lock reason full width, tighter pills).
   // -> 3270 lines / 62596 bytes on 2026-11-20, hotfix #644 (E1g): the gauge read row wraps whole items, each nowrap. Measured.
-  "play.css": { lines: 3270, bytes: 62596 },
+  // -> 3275 lines / 62710 bytes on 2026-11-23: a rule's badge keeps its own ink inside a carried board (OVERCLOCK). Measured.
+  "play.css": { lines: 3275, bytes: 62710 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -560,7 +561,8 @@ const fileBudgets = {
   "clock-cut.css": { lines: 34, bytes: 639 },
   // New on 2026-11-20 (adsense-notes, draft over main 065d684d): 읽을거리, the start screen's
   // last section (HomeReading.jsx), in a file of its own; .intro-legal left base-intro-ranking.css with it. Measured.
-  "home-reading.css": { lines: 97, bytes: 1885 },
+  // 97 / 1885 -> 114 / 2274 on 2026-11-20 (world-news): 오늘의 1면 beside the notes, sharing their rules. Measured.
+  "home-reading.css": { lines: 114, bytes: 2274 },
 };
 
 /** Every rule, in cascade order, tagged with the at-rules it sits inside. */

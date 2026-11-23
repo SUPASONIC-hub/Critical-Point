@@ -2212,15 +2212,16 @@ summary:focus-visible {
   border-color: var(--ui-line-strong);
   box-shadow: none;
 }
+/* A locked card is told by its dashed edge, ground and lock, not by faint words (2026-11-23). */
 .case-card.locked-case h2 {
-  color: var(--ui-text-2);
+  color: var(--ui-text);
   -webkit-text-fill-color: currentColor;
 }
 .case-card.locked-case span,
 .case-card.locked-case b,
 .case-card.locked-case p,
 .case-card.locked-case small {
-  color: var(--ui-text-3);
+  color: var(--ui-text-2);
   -webkit-text-fill-color: currentColor;
 }
 .case-card.locked-case::before {
@@ -2241,7 +2242,7 @@ summary:focus-visible {
     0 20px 60px rgb(22 96 62 / 0.06);
 }
 .case-card.active-case::before {
-  color: rgb(40 50 30);
+  color: var(--ui-surface-3);
 }
 .case-card.active-case:hover {
   border-color: var(--ui-accent);

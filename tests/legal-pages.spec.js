@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./helpers/network.js";
 import { CONTENT_KINDS } from "../scripts/content-pages/pages.mjs";
 import { noteKinds, notesDay } from "../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../scripts/content-pages/news.mjs";
 
 /**
  * The plain pages beside the build -- the privacy policy and the terms of use
@@ -150,8 +151,8 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const xml = await sitemap.text();
-  // The fifteen, the start page in three languages, the content pages and the notes out on the build's day (scripts/content-pages).
-  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length);
+  // The fifteen, the start page in three languages, the content pages, the notes out on the build's day and the world's newspaper (scripts/content-pages).
+  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length);
   for (const [path] of PAGES) expect(xml, path).toContain(`<loc>${path}</loc>`);
   for (const path of ["/", "/en/", "/ja/"]) expect(xml, path).toContain(`<loc>${path}</loc>`);
   // The content pages are plain files too, at their own addresses, and in the sitemap.
