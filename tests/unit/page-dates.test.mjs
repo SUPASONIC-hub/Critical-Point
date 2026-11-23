@@ -4,9 +4,9 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { CASE_PAGES } from "../../scripts/content-pages/cases.mjs";
-import { CONTENT_KINDS, CONTENT_PUBLISHED, dateLineOptions, pageDateLine, renderContentPages, WEEKLY_PUBLISHED } from "../../scripts/content-pages/pages.mjs";
-import { PAGE_LANGUAGES, pagePath } from "../../scripts/legal-pages.mjs";
-import { mainOf, pageFingerprints, renderStaticPages, wordsOf } from "../../scripts/site-pages.mjs";
+import { CONTENT_KINDS, CONTENT_PUBLISHED, dateLineOptions, pageDateLine, renderContentPages, SITE_PUBLISHED, WEEKLY_PUBLISHED } from "../../scripts/content-pages/pages.mjs";
+import { PAGE_LANGUAGES, pagePath, renderLegalPages } from "../../scripts/legal-pages.mjs";
+import { mainOf, pageFingerprints, renderSitePages, renderStaticPages, wordsOf } from "../../scripts/site-pages.mjs";
 import { refreshDates } from "../../scripts/sitemap-dates.mjs";
 import { CREATORS, STUDIO_NAMES } from "../../src/credits.js";
 
@@ -78,6 +78,46 @@ test("the byline is the studio's name in each language: no word studio, no perso
       for (const { name, email } of CREATORS) assert.ok(!line.includes(name) && !line.includes(email), `${kind} ${language}`);
       assert.equal(line.includes(STUDIO_NAMES[language]), kind !== "making", `${kind} ${language}: the making-of is signed at its foot`);
     }
+  }
+});
+
+const SITE_KINDS = ["about", "faq", "contact"];
+const siteLocs = SITE_KINDS.flatMap((kind) => PAGE_LANGUAGES.map((language) => ({ kind, language, loc: pagePath(kind, language) })));
+
+test("the about, FAQ and contact pages show their dates, and the line stays out of their hash", () => {
+  const file = recorded();
+  const dated = renderSitePages();
+  const bare = renderSitePages({ pageDates: null });
+  const moved = renderSitePages({ pageDates: Object.fromEntries(siteLocs.map(({ loc }) => [loc, { date: "2031-02-03" }])) });
+  const prints = pageFingerprints();
+  for (const { kind, language, loc } of siteLocs) {
+    const page = loc.slice(1);
+    assert.ok(file[loc].date >= SITE_PUBLISHED, `${loc} did not change before it went up`);
+    assert.ok(mainOf(dated[page]).includes(lineOf(kind, language, file[loc].date)), loc);
+    assert.equal(moved[page].replace(lineOf(kind, language, "2031-02-03"), ""), bare[page], loc);
+    assert.equal(prints[loc], file[loc].hash, `${loc} keeps its recorded hash`);
+  }
+});
+
+test("the about page is not signed twice; the FAQ and contact pages carry the studio's name alone", () => {
+  for (const { kind, language } of siteLocs) {
+    const line = lineOf(kind, language, "2026-11-20");
+    assert.equal(line.includes(STUDIO_NAMES[language]), kind !== "about", `${kind} ${language}`);
+    for (const { name, email } of CREATORS) assert.ok(!line.includes(name) && !line.includes(email), `${kind} ${language}`);
+  }
+});
+
+test("the about page's line heads its text, under the showcase", () => {
+  for (const language of PAGE_LANGUAGES) {
+    const main = mainOf(renderSitePages()[pagePath("about", language).slice(1)]);
+    assert.ok(main.indexOf('class="sc-more"') < main.indexOf('<p class="effective">'), language);
+  }
+});
+
+test("the privacy policy and the terms keep their effective date and gain no date line", () => {
+  for (const [file, html] of Object.entries(renderLegalPages())) {
+    assert.doesNotMatch(html, /<time /, file);
+    assert.match(html, /<p class="effective">[^<]+<\/p>/, file);
   }
 });
 

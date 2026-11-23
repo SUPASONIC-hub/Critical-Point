@@ -243,8 +243,13 @@ export const CONTENT_PUBLISHED = "2026-11-09";
 /** The weekly calendar came a week later (9129fbf1). */
 export const WEEKLY_PUBLISHED = "2026-11-16";
 
+/** The about page, the FAQ and the contact page went up with #376, merged to main on 2026-10-30 (Seoul). */
+export const SITE_PUBLISHED = "2026-10-30";
+
+const SITE_KINDS = new Set(["about", "faq", "contact"]);
+
 /** The day each page's words last changed, the same record the sitemap's lastmod reads. */
-const recordedDates = () => JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
+export const recordedDates = () =>JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
 
 const UPDATED_WORD = { ko: "고친 날", en: "Updated", ja: "更新日" };
 
@@ -261,6 +266,7 @@ const dateTag = (day, language) => `<time datetime="${day}">${adsEffectiveDate(d
  * The notes' date line (`bylineOf`, ./notes.mjs) in the page's language: when
  * it went up, when its words last changed if they have since, and who wrote
  * it. The making-of leaves the last out: its foot already signs it (MAKERS_LINE).
+ * So does the about page, whose text says who made the game.
  */
 export function pageDateLine(language, changed, { published = CONTENT_PUBLISHED, signed = true } = {}) {
   const update = changed && changed !== published ? ` · ${UPDATED_WORD[language]} ${dateTag(changed, language)}` : "";
@@ -269,7 +275,10 @@ export function pageDateLine(language, changed, { published = CONTENT_PUBLISHED,
 }
 
 /** The date line's facts for a page kind. */
-export const dateLineOptions = (kind) => ({ published: kind === "weekly" ? WEEKLY_PUBLISHED : CONTENT_PUBLISHED, signed: kind !== "making" });
+export const dateLineOptions = (kind) => ({
+  published: SITE_KINDS.has(kind) ? SITE_PUBLISHED : kind === "weekly" ? WEEKLY_PUBLISHED : CONTENT_PUBLISHED,
+  signed: kind !== "making" && kind !== "about",
+});
 
 /**
  * Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash.
