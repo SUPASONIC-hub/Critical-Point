@@ -1,5 +1,6 @@
+import { readFileSync } from "node:fs";
 import { CREATOR_LINE, studioName } from "../../src/credits.js";
-import { escapeHtml, gamePath, PAGE_LANGUAGES, pagePath, renderDocumentPage } from "../legal-pages.mjs";
+import { adsEffectiveDate, escapeHtml, gamePath, PAGE_LANGUAGES, pagePath, renderDocumentPage } from "../legal-pages.mjs";
 import {
   CASE_INDEX_DESCRIPTION,
   CASE_INDEX_INTRO,
@@ -230,13 +231,43 @@ function trailOf(kind, language, heading) {
   return structuredDataTag(breadcrumbStructuredData(trail));
 }
 
-/** Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash. */
-export function renderContentPages({ analytics = null, day = notesDay() } = {}) {
+/* ----------------------------------------------------------------- the dates */
+
+/**
+ * The day the guide and the case files went up: all of them with #478, merged
+ * to main on 2026-11-09. A case page added later is not that old, so
+ * tests/unit/page-dates.test.mjs fails until it has a day of its own.
+ */
+export const CONTENT_PUBLISHED = "2026-11-09";
+
+/** The day each page's words last changed, the same record the sitemap's lastmod reads. */
+const recordedDates = () => JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
+
+const UPDATED_WORD = { ko: "고친 날", en: "Updated", ja: "更新日" };
+
+const dateTag = (day, language) => `<time datetime="${day}">${adsEffectiveDate(day)[language]}</time>`;
+
+/** The notes' date line (`bylineOf`, ./notes.mjs) in the page's language: when it went up and, if its words changed since, when. */
+export function pageDateLine(language, changed) {
+  const update = changed && changed !== CONTENT_PUBLISHED ? ` · ${UPDATED_WORD[language]} ${dateTag(changed, language)}` : "";
+  return `<p class="effective">${dateTag(CONTENT_PUBLISHED, language)}${update}</p>\n`;
+}
+
+const hasDateLine = (kind) => kind === "guide" || kind.startsWith("cases/");
+
+/**
+ * Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash.
+ * `pageDates` (`{ loc: { date } }`, scripts/sitemap-dates.json by default) dates the guide and the case files; `null` writes them with no date
+ * line, which is how `pageFingerprints` reads them: a page's hash must not depend on the date that hash decides.
+ */
+export function renderContentPages({ analytics = null, day = notesDay(), pageDates = recordedDates() } = {}) {
   const pages = {};
   for (const kind of CONTENT_KINDS) {
     for (const language of PAGE_LANGUAGES) {
       const page = pageOf(kind, language, day);
-      pages[pagePath(kind, language).slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, structuredData: trailOf(kind, language, page.heading) });
+      const loc = pagePath(kind, language);
+      const line = pageDates && hasDateLine(kind) ? pageDateLine(language, pageDates[loc]?.date) : "";
+      pages[loc.slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, body: `${line}${page.body}`, structuredData: trailOf(kind, language, page.heading) });
     }
   }
   return pages;
