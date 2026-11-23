@@ -60,13 +60,39 @@ const weekRulesCopy = {
     },
     scattered: {
       title: "흩어진 자리",
-      text: "이번 사건은 벽 띠가 양쪽으로 열기 {spread}씩 넓어지고, 모든 카드의 칩이 {scatterChips}배다.",
+      text: "이번 사건은 벽 띠가 양쪽으로 열기 {spread}씩 넓어진다. 벽이 어디 설지 더 넓게 봐야 한다.",
       world: "트리거랩 사람들이 곳곳으로 흩어져, 자리마다 벽이 선 곳이 다르다.",
     },
     hearing: {
       title: "청문회",
       text: "이번 사건은 판마다 시간이 {hearingCut}% 짧고, 모든 카드의 칩이 {hearingChips}배다.",
       world: "기록의 주인을 다투는 청문회. 답할 시간은 짧고, 한마디의 값은 크다.",
+    },
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`): dealt once the table does what they say.
+    passedDown: {
+      title: "떠넘겨진 손실",
+      text: "이번 사건은 처음 BUST가 나도 판돈의 {downShare}분의 1이 남는다. 대신 그 판의 사람 피해가 {downHarm} 오른다.",
+      world: "은행이 앞당긴 상환은 돌봄 시간으로, 배차표로 내려간다.",
+    },
+    lateBill: {
+      title: "뒤늦은 청구서",
+      text: "이번 사건은 열기 {billHeat} 이상에서 확정하면 그 열기의 4분의 3을 안고 다음 판을 시작한다. 그 아래에서 확정하면 모든 카드의 칩이 {billChips}배다.",
+      world: "열흘을 혼자 버틴 값은 이긴 다음 날 청구된다.",
+    },
+    trainedWall: {
+      title: "학습된 벽",
+      text: "이번 사건은 노아가 당신이 확정한 열기를 배운다. 확정한 다음 판의 벽 띠는 그 열기 쪽으로 옮겨 서되, 원래 띠의 가운데 아래로는 내려가지 않는다.",
+      world: "노아는 당신이 고른 것과 망설인 초를 배웠다.",
+    },
+    onRecord: {
+      title: "진술 고정",
+      text: "이번 사건은 첫 판에 확정한 자세를 사건 끝까지 바꿀 수 없다. 대신 확정할 때마다 충전이 모자라도 그 자세가 다음 판에 남는다.",
+      world: "한 번 한 진술은 조서에 남고, 다음 질문은 그 줄에서 시작한다.",
+    },
+    signedByName: {
+      title: "실명 서명",
+      text: "이번 사건은 첫 판 전에 서명 방식을 고른다. 이름만 쓰면 모든 카드의 칩이 {nameChips}배, 벽 띠가 {nameWall} 앞당겨 선다. 조건을 달면 벽 띠가 {termsWall} 물러서고 칩이 {termsChips}배다.",
+      world: "이제 서명란에 빈칸은 없다. 이름 옆에 조건을 달 수 있을 뿐이다.",
     },
   },
   caseRules: {

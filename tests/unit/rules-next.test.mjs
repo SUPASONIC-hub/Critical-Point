@@ -7,6 +7,7 @@ import {
   canBreathe,
   createWindow,
   getBoardMark,
+  getBreathGauge,
   getFocusBonus,
   getLockCap,
   getWindowBand,
@@ -21,6 +22,8 @@ import {
 import { countAudit } from "../../src/gauntlet/auditRisk.js";
 import {
   BREATH_GAUGE,
+  BREATH_HOT_FROM,
+  BREATH_HOT_GAUGE,
   BREATH_WALL,
   countNarrows,
   EXPOSURE_FROM,
@@ -182,7 +185,13 @@ test("G7: 숨 고르기, once, on the board after a BUST and before its first pu
   assert.equal(canBreathe(createWindow({ schema: BASE_SCHEMA, seed: "g7" }), NEXT), false, "a fresh board has nothing to ease");
   const breathed = reduceWindow(win, { type: "BREATHE" }, NEXT);
   assert.equal(breathed.breathed, true);
-  assert.equal(breathed.gauge, Math.max(0, win.gauge - BREATH_GAUGE));
+  // G15 (11-20): a BUST at BREATH_HOT_FROM or over is eased BREATH_HOT_GAUGE, one under it BREATH_GAUGE.
+  assert.equal(after.bustHeat, 70);
+  assert.equal(getBreathGauge(win.schema), BREATH_HOT_GAUGE);
+  assert.equal(breathed.gauge, Math.max(0, win.gauge - BREATH_HOT_GAUGE));
+  const cool = createWindow({ schema: buildNextSchema({ outcome: "bust", cause: "push", gauge: BREATH_HOT_FROM - 1, pushes: 3, streak: 0, rules: NEXT }), seed: "g7" });
+  assert.equal(reduceWindow(cool, { type: "BREATHE" }, NEXT).gauge, Math.max(0, cool.gauge - BREATH_GAUGE));
+  assert.equal(buildNextSchema({ outcome: "bust", cause: "push", gauge: 70, pushes: 3, streak: 0, rules: OLD }).bustHeat, undefined, "the old table writes none");
   assert.equal(breathed.wall, win.wall + BREATH_WALL);
   assert.equal(breathed.elapsed, 2);
   assert.equal(reduceWindow(breathed, { type: "BREATHE" }, NEXT), breathed, "once");

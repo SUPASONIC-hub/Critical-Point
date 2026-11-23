@@ -30,6 +30,7 @@ export default {
     auditCaught: " Audit caught it: of ",
     auditOf: " headed for the Vault,",
     auditTaken: " was clawed back · Vault ",
+    auditWhy: "Why: commits cashed under the audit line filled the audit to its limit. Push once more and cash above the line, and it goes down.",
     toVault: " To the Vault ",
     vault: " · Vault",
     staked: "Stake on the line ",

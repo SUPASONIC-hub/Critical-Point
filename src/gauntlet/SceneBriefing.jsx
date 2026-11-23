@@ -161,6 +161,7 @@ export function SceneBriefing({
   moveOf,
   onOpen,
   reading,
+  signAsk = null,
 }) {
   const { letterKeys, keys } = useShortcutHints();
   const intro = getBriefingIntro(node, nodeId, run);
@@ -389,8 +390,9 @@ export function SceneBriefing({
           )}
         </div>
 
-        {/* Under the page's grid, so it takes none of its rows. */}
+        {/* Under the page's grid, so it takes none of its rows; G5 8막's signature line under the case's rule. */}
         {weekRulePanel}
+        {signAsk}
 
         {intro.length > 0 && (
           <div className="gx-panel gx-panel-breach gx-carry" data-testid="unlock-intro" style={{ gridArea: "auto" }}>

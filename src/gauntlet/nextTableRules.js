@@ -100,7 +100,8 @@ export const STEADY_NEXT = Object.freeze({ potRate: 0.55, relief: 1 });
 /** A charged EXPOSE cash adds no audit mark under AUDIT_HEAT, and is never caught (G1). */
 export const EXPOSE_SHIELD = true;
 /** A charged EXPOSE cash also thickens the next board's chips this much (EXPOSED HAND), as STRIKE WAKE does by STRIKE_WAKE_CHIPS. */
-export const EXPOSE_CARRY_CHIPS = 1.25;
+// G14 (11-20, 게임성 개선점 Q8 (1)): 1.25 -> 1.3.
+export const EXPOSE_CARRY_CHIPS = 1.3;
 
 /* --------------------------------------------------------- G6 결재 판 */
 
@@ -114,3 +115,6 @@ export const SIGN_MARK = "sign";
 export const BREATH_SECONDS = 2;
 export const BREATH_GAUGE = 11;
 export const BREATH_WALL = 3;
+/** G15 (11-20, 게임성 개선점 Q9 (1)): after a BUST at this heat or over, 숨 고르기 cools this much instead. */
+export const BREATH_HOT_FROM = 60;
+export const BREATH_HOT_GAUGE = 14;

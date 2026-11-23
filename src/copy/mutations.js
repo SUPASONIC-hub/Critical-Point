@@ -80,6 +80,10 @@ const mutationsCopy = {
     },
   },
   // What BLACKOUT and COLD FEET say once EXPOSE mastery has taken half of the rule back.
+  // G5 2막 뒤늦은 청구서 (G8): HEAT DEBT's line on the case's board, 3/4 of the heat.
+  lateBill: {
+    text: "높은 배율로 확정한 대가. 이번 열기의 4분의 3을 안고 시작하고, {seconds}초를 잃는다.",
+  },
   lifted: {
     blackout: {
       title: "벽이 다가왔다",

@@ -31,6 +31,13 @@ const edgeCopy = {
     hold: "직접 열기로 바꾼다",
     keep: "시계에 맡긴다",
   },
+  // WeekRulePanel.jsx SignAsk: G5 8막 실명 서명, before the case's first board.
+  sign: {
+    kicker: "서명란",
+    question: "이번 사건의 서명란에 어떻게 쓸까? 고르지 않으면 조건을 단다.",
+    name: "이름만 쓴다",
+    terms: "조건을 단다",
+  },
   // ComfortDialog.jsx
   comfort: {
     title: "편의 설정",

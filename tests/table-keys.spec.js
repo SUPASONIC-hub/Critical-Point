@@ -101,7 +101,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   // (from RULES_MARK 5 the stance's hot line, G3, may follow it).
   const lock = page.getByTestId("commit-focus");
   await expect(lock.locator("small")).toHaveText("0 · −1.5초");
-  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 LOCK으로 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 LOCK으로 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다\.(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
   // Any moment is as good as another: the press is not timed.
@@ -117,7 +117,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await page.keyboard.press("e");
   await expect(focus).toContainText("STRIKE 59");
   await expect(focus.locator("small")).toHaveText(/^상한 ×1\.5 · 자원 ×/);
-  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
+  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다\.(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
   await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 

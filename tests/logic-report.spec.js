@@ -55,8 +55,8 @@ test.beforeEach(async ({ page }) => {
  */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  // RULES_MARK 5 (G1~G7 and N26): a case closed at 4 is from the table before and keeps the season off the ranking.
-  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 5 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  // RULES_MARK 6 (G5's other acts): a case closed at 5 is from the table before and keeps the season off the ranking.
+  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 6 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
   return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
 }
 
