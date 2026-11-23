@@ -1,6 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { CASE_RESULT_NODES } from "../src/gameCases.js";
+import { CASE_RESULT_NODES, CASE_START_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
@@ -552,7 +552,8 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
 });
 
 test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  // 사건 04 is where AFTERSHOCK opens (N18), and the gauge below is its start.
+  await openTable(page, "case04", CASE_START_NODES.case04);
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
   // Bank something first, so there is a pot for the wall to take.
   await page.locator(".choices .choice").first().click();
@@ -1135,7 +1136,8 @@ async function pushToHotCash(page) {
 }
 
 test("a bust's next rules are headed as a broken board, and no row is drawn as a carried rule", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  // 사건 04 is where AFTERSHOCK opens (N18).
+  await openTable(page, "case04", CASE_START_NODES.case04);
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   await expect(page.locator(".decision-reveal h2")).toHaveText("BUST", { timeout: TRANSITION_TIMEOUT_MS });

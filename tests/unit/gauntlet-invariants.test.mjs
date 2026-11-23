@@ -134,8 +134,8 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
     window: { status: "cashed", gauge: 22, pushes: 0, focus: 80, focusMode: "strike", focusHits: 3 },
     card: staked,
   });
-  // 15 + OVERCLOCK's 5 (6 until N18, 2026-11-17) + STRIKE WAKE's 3.
-  assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [23, 56], "the push and the wall are what their rules made them");
+  // 15 + OVERCLOCK's 6 + STRIKE WAKE's 3.
+  assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [24, 56], "the push and the wall are what their rules made them");
   assert.deepEqual([nextRun.schema.sealHighest, nextRun.schema.sealBreak], [true, SEAL_BREAK_GAUGE], "with the wall where it was, the seal has room");
   // The same board on a peak table, whose wall is 5 closer, is the one that would break it now.
   const peak = resolveWindow({
@@ -144,7 +144,7 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
     card: staked,
     rules: rulesFor("case07"),
   }).nextRun.schema;
-  assert.deepEqual([peak.stepMax, peak.wallMin], [23, 51], "the push and the wall are what their rules made them");
+  assert.deepEqual([peak.stepMax, peak.wallMin], [24, 51], "the push and the wall are what their rules made them");
   assert.ok(peak.sealHighest && peak.sealBreak < SEAL_BREAK_GAUGE, "and the seal opens earlier to make room");
 });
 

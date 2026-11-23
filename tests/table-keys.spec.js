@@ -427,8 +427,9 @@ test("a save that holds a locked card as its bet still settles", { tag: "@once" 
 
 test("an untouched window that runs out cannot be replayed by reloading under the slam", { tag: "@once" }, async ({ page }) => {
   test.setTimeout(120_000);
-  // The shortest clock a board can carry, so the test waits twelve seconds, not forty-five.
-  await openBrokenBoard(page, "case01", "start", { schema: { seconds: 12 } });
+  // The shortest clock a board can carry, so the test waits twelve seconds, not
+  // forty-five. 사건 05 is where SILENCE opens (N18), which the end reads.
+  await openBrokenBoard(page, "case05", CASE_START_NODES.case05, { schema: { seconds: 12 } });
   const fresh = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(fresh.dynamics?.openSeed ?? null, "reading alone is not a touch").toBeNull();
 
@@ -625,7 +626,10 @@ const STAGED_STEPS = [
   { caseId: "case01", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case02", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case03", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
-  { caseId: "case04", on: WHOLE, lines: 0 },
+  // AFTERSHOCK and SILENCE (N18), a line each; 사건 06 is the first with nothing new.
+  { caseId: "case04", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case06", on: WHOLE, lines: 0 },
 ];
 
 /** A scene's briefing page, with the table behind it still shut. */
