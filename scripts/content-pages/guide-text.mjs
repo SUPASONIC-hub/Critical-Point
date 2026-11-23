@@ -53,7 +53,7 @@ export const GUIDE_BODY = {
 <p>사건이 닫히면 REBOOT가 흔적을 지웁니다. 각 막의 마지막 사건은 「고점 판」이라 벽이 5 가까워지고 칩이 1.25배가 됩니다.</p>
 <dl>
 <dt>결재 판</dt><dd>사건의 마지막 판입니다. 판돈이 1.5배이고, 벽이 있을 수 있는 가장 가까운 칸 하나가 보입니다. 결과 장부에 크게 남습니다.</dd>
-<dt>숨 고르기</dt><dd>BUST 바로 다음 판에서, 첫 밀기 전에 한 번 누를 수 있습니다. 시계 2초를 쓰고 열기를 11 내리며(지난 판이 열기 60 이상에서 터졌다면 14) 벽을 3 뒤로 보냅니다. 버튼 옆에 「지난 판 N에서 터짐」이 나옵니다. 드래프트를 넘길 때의 「숨 고르기」와는 다른, 판 위의 버튼입니다.</dd>
+<dt>숨 고르기</dt><dd>BUST 바로 다음 판에서, 첫 밀기와 첫 조회 전에 한 번 누를 수 있습니다. 시계 2초를 쓰고 열기를 11 내리며(지난 판이 열기 60 이상에서 터졌다면 14) 벽을 3 뒤로 보냅니다. 버튼 옆에 「지난 판 N에서 터짐」이 나옵니다. 드래프트를 넘길 때의 「숨 고르기」와는 다른, 판 위의 버튼입니다.</dd>
 </dl>
 
 <h2>논리 콤보</h2>
@@ -184,7 +184,7 @@ export const GUIDE_BODY = {
 <p>REBOOT clears these marks when a case closes. The last case of each act is a “Peak hand” case, with the Wall 5 closer and chips ×1.25.</p>
 <dl>
 <dt>Sign-off hand</dt><dd>The case’s last hand. The stake is ×1.5, and the nearest cell the Wall can be on is shown. The result ledger draws it large.</dd>
-<dt>Catch breath</dt><dd>On the hand right after a BUST, once, before the first push: spend 2 seconds of clock to lower Heat by 11 (by 14 if the last hand burst at Heat 60 or more) and move the Wall back 3. “Last BUST at N” shows beside the button.</dd>
+<dt>Catch breath</dt><dd>On the hand right after a BUST, once, before the first push or Scout: spend 2 seconds of clock to lower Heat by 11 (by 14 if the last hand burst at Heat 60 or more) and move the Wall back 3. “Last BUST at N” shows beside the button.</dd>
 </dl>
 
 <h2>Logic Combo</h2>
@@ -315,7 +315,7 @@ export const GUIDE_BODY = {
 <p>事件が閉じるとREBOOTが跡を消します。各幕の最後の事件は「山場の勝負」で、壁が5近づき、チップが1.25倍になります。</p>
 <dl>
 <dt>決裁の勝負</dt><dd>事件の最後の勝負です。賭け金は1.5倍で、壁がありうるいちばん近いマスが一つ見えます。結果の帳簿に大きく残ります。</dd>
-<dt>息を整える</dt><dd>BUSTのすぐ次の勝負で、最初の押し込みの前に一度だけ押せます。時計を2秒使い、熱を11下げ（前の勝負が熱60以上でBUSTしていれば14）、壁を3遠ざけます。ボタンの横に「前回NでBUST」が出ます。</dd>
+<dt>息を整える</dt><dd>BUSTのすぐ次の勝負で、最初の押し込みと最初の照会の前に一度だけ押せます。時計を2秒使い、熱を11下げ（前の勝負が熱60以上でBUSTしていれば14）、壁を3遠ざけます。ボタンの横に「前回NでBUST」が出ます。</dd>
 </dl>
 
 <h2>ロジックコンボ</h2>

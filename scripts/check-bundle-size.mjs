@@ -206,6 +206,8 @@ const budgets = [
   // 165,507 / 61,707 -> 165,507 / 61,716 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured - / 61712 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,716 -> 165,737 / 61,781 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 165733 / 61777 (over budget only) in the e2e build, the plus 4.
   // 165,507 / 61,707 -> 165,734 / 61,769 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 165,730 / 61,765 (over budget only) in the e2e build, the plus 4.
+  // 165,737 / 61,781 -> 165,764 / 61,799 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
+  // 165,764 / 61,799 -> 165,845 / 61,823 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 165841 / 61819 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
   // 165,737 / 61,781 -> 165,887 / 61,843 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 165883 / 61839 (over budget only) in the e2e build, the plus 4.
   // 165,887 / 61,843 -> 166,159 / 61,971 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 166155 / 61967 (over budget only) in the e2e build, the plus 4.
   // 166,159 / 61,971 -> 166,257 / 62,028 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 166253 / 62024 (over budget only) in the e2e build, the plus 4.
@@ -214,6 +216,9 @@ const budgets = [
   // 166,159 / 61,971 -> 166,164 / 61,971 #635 1178f9fe over main 78be3bd4. Measured 166160 / - (over budget only) in CI verify-quick, the plus 4.
   // 166,164 / 61,971 -> 166,164 / 61,989 #635 on 2026-11-23: the chunk's hashed imports move with the day's notes. Largest day 61,981 (2027-01-08), plus Linux's 4 and the plus 4.
   // 166,164 / 61,989 -> 166,257 / 62,017 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 166253 / 62013 in CI verify-quick, the plus 4.
+  // +92 / +10: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // 166,256 / 61,999 -> 166,256 / 62,010 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_257, maxGzip: 62_017 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -347,6 +352,7 @@ const budgets = [
   // 35,422 / 15,018 -> 35,508 / 15,073 G4·G5 (gameplay-g-relic-act, N26 merged) over main 065d684d. Measured 35504 / 15069 (over budget only) in the e2e build, the plus 4.
   // 35,508 / 15,073 -> 37,484 / 15,785 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 37480 / 15781 (over budget only) in the e2e build, the plus 4.
   // 35,422 / 15,018 -> 37,405 / 15,744 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 37,401 / 15,740 (over budget only) in the e2e build, the plus 4.
+  // 37,484 -> 37,490 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
   // 37,484 / 15,785 -> 37,740 / 15,897 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 37736 / 15893 (over budget only) in the e2e build, the plus 4.
   // 37,740 / 15,897 -> 37,830 / 15,928 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 37826 / 15924 (over budget only) in the e2e build, the plus 4.
   // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
@@ -398,7 +404,8 @@ const budgets = [
   // 300,667 / 89,754 -> 300,673 / 89,754 번외 6 화자 이름 레 티 호아(글꼴 레·호·レ·ホ). Measured 300669 / - (over budget only) in the e2e build, the plus 4.
   // 300,673 / 89,754 -> 302,809 / 90,483 번외 8 over main 29120d32. Measured 302805 / 90479 (over budget only) in the e2e build, the plus 4.
   // 300,673 / 89,754 -> 300,673 / 89,769 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b. Measured - / 89765 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^pastPicks-.*\.js$/, maxBytes: 302_809, maxGzip: 90_483 },
+  // 302,809 / 90,483 -> 303,646 / 90,781 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 303642 / 90777 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
+  { pattern: /^pastPicks-.*\.js$/, maxBytes: 303_646, maxGzip: 90_781 },
   // One case: its scenes, replies and voice lines. A first visit fetches the
   // season's first one before the table and the rest behind it. The largest,
   // case01, was 79,679 / 19,176 on 2026-09-29, and 94,175 / 24,159 on
@@ -750,31 +757,39 @@ const budgets = [
   // 218,967 / 79,833 -> 218,967 / 79,843 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured - / 79839 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 222,467 / 81,110 adsense-notes (draft over main 065d684d): 읽을거리 on the start screen (HomeReading.jsx, home-reading.css, the intro copy's reading block in three languages) and the critical CSS cut again. Measured 222463 / 81106 (over budget only) in the e2e build, the plus 4.
   // 218,967 / 79,833 -> 218,967 / 79,838 hotfix rule chips (#636) over main f3815370. Measured - / 79834 (over budget only) in CI verify-quick, the plus 4.
+  // 222,467 / 81,110 -> 223,389 / 81,471 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
+  // 223,389 / 81,471 -> 223,816 / 81,591 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 223812 / 81587 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
   // 222,467 / 81,110 -> 223,467 / 81,471 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 223463 / 81467 (over budget only) in the e2e build, the plus 4.
   // 223,467 / 81,471 -> 223,467 / 81,477 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured - / 81473 (over budget only) in the e2e build, the plus 4.
   // hotfix #644 (gauge row wraps whole items) over main. Measured - / 81113 in CI verify-quick, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 223463 / 81476 in CI verify-quick, the plus 4.
   // 223,467 / 81,480 -> 224,086 / 81,803 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured 224082 / 81799 in CI verify-quick, the plus 4.
   // -> 224,494 / 82,064 on 2026-11-23 (user's choice 1): the start screen carries up to three notes, so the budget holds the largest day built through the notes written so far (raw 224,480 on 12-05, gzip 82,056 on 2027-01-11), plus Linux's 4 and the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 224_494, maxGzip: 82_064 },
+  // +1,349 / +509: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // 225,843 / 82,573 -> 225,843 / 82,575 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 225_843, maxGzip: 82_575 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
   // 559 / 323 -> 564 / 323 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured 560 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^InstallHint-.*\.js$/, maxBytes: 564, maxGzip: 323 },
+  // 564 / 323 -> 564 / 326 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^InstallHint-.*\.js$/, maxBytes: 564, maxGzip: 326 },
   // N3 (2026-11-12): the habits table (src/copy/habits.js), fetched by the start
   // page only for a visit from a shared card (`/?from=card&h=<id>`, shareLink.js)
   // to print 「친구의 결과: …」. Measured 1,468 / 906 in the e2e build, the plus 4.
   // 1,472 / 910 -> 1,561 / 966 N32 친구 기록 넘기기 over main 705a809f. Measured 1557 / 962 (over budget only) in the e2e build, the plus 4.
   // 1,472 / 910 -> 1,561 / 965 묶음 11-17 over main 705a809f. Measured 1557 / 961 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^habits-.*\.js$/, maxBytes: 1_561, maxGzip: 965 },
+  // 1,561 / 965 -> 1,561 / 973 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^habits-.*\.js$/, maxBytes: 1_561, maxGzip: 973 },
   // N32 (2026-11-16): the friend's record kept on this device (src/friendTarget.js), fetched by the start page only for a shared card's score or a kept one, and by the ending. Measured 1,099 / 601 in the e2e build, the plus 4.
-  { pattern: /^friendTarget-.*\.js$/, maxBytes: 1_103, maxGzip: 605 },
+  // 1,103 / 605 -> 1,103 / 610 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^friendTarget-.*\.js$/, maxBytes: 1_103, maxGzip: 610 },
   // N12 (2026-11-12): the speed watcher (src/webVitals.js), fetched after `load`
   // by one page in twenty with Google's tag (gameEvents.startVitalsSample).
   // Measured 1,186 / 707 in the e2e build, the plus 4.
   // -> gzip 716 묶음 11-18, measured 712 in CI verify-quick, the plus 4.
-  { pattern: /^webVitals-.*\.js$/, maxBytes: 1_190, maxGzip: 716 },
+  // 1,190 / 716 -> 1,190 / 720 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^webVitals-.*\.js$/, maxBytes: 1_190, maxGzip: 720 },
   // The table and its plate painters. 97,490 / 30,995 on 2026-09-27.
   // 102,400 / 32,600 -> 104,200 / 34,300 on 2026-09-28, with the table's
   // fixes from the audit. What it bought is the table being playable and
@@ -1075,7 +1090,8 @@ const budgets = [
   // 52,590 / 17,383 -> 52,590 / 17,388 b5-stake-clock-voice over main bded5a33: 판돈 시계 낭독(ko/en/ja 두 줄). Measured - / 17384 (over budget only) in the CI e2e build, the plus 4.
   // 52,590 / 17,383 -> 52,590 / 17,390 유입 1(공유 주소 언어별·게임 이름): 실측 +4 over main bded5a33. Measured - / 17386 (over budget only) in the e2e build, the plus 4.
   { pattern: /^ResultScreen-.*\.js$/, maxBytes: 52_651, maxGzip: 17_406 },
-  { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_478 },
+  // 47,091 / 14,478 -> 47,091 / 14,480 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^ScenePlate-.*\.js$/, maxBytes: 47_091, maxGzip: 14_480 },
   // The whole stylesheet (the intro's share is also inlined; see
   // build-critical-css.mjs). 199,426 / 36,483 before 2026-09-27, when 133 unread
   // tokens went; 196,510 / 35,448 after. 185,195 / 33,636 on 2026-09-28, when 514
@@ -1307,7 +1323,8 @@ const budgets = [
   // hotfix #644 (gauge row wraps whole items) over main. Measured 220342 / 42657 in CI verify-quick, the plus 4.
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 220676 / 42720 in CI verify-quick, the plus 4.
   // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_794, maxGzip: 42_739 },
+  // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_876, maxGzip: 42_759 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1367,7 +1384,8 @@ const budgets = [
   // 17,296 / 6,136 in the e2e build, the gzip plus 4.
   // 17,286 / 6,142 -> 17,532 / 6,240 on 2026-10-29, table-rhythm-bundle (C-7, B-13(2), C-10) merged with #224 602ec69b (main 43078a46): C-7's five tool icons on top of board-report's Flag. Measured 17,532 / 6,236. Measured in the e2e build, the gzip plus 4.
   // 17,532 / 6,240 -> 17,602 / 6,264 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes, lucide-react 1.69 draws TriangleAlert and ShieldAlert as TriangleExclamationPoint and ShieldExclamationPoint, the names the screens now import). Measured 17,598 / 6,260 in the e2e build, the plus 4.
-  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_602, maxGzip: 6_264 },
+  // 17,602 / 6,264 -> 17,758 / 6,335 on 2026-11-23, deps-1123: lucide-react 1.76.0 (Dependabot #652). Measured 17,754 / 6,331 in the e2e build and in #652's CI, the plus 4.
+  { pattern: /^icons-vendor-.*\.js$/, maxBytes: 17_758, maxGzip: 6_335 },
   // 5,293 / 2,232, with the board's loading, error and retry states.
   // 5,560 / 2,350 -> 6,040 / 2,490 on 2026-10-07, measured 5,748 / 2,373 plus
   // 5%: a button that says why it will not act, and the counters as
@@ -1389,13 +1407,15 @@ const budgets = [
   // 10,676 / 4,394 -> 12,339 / 5,112 묶음 11-17 over main 705a809f. Measured 12335 / 5108 (over budget only) in the e2e build, the plus 4.
   // 10,676 / 4,394 -> 12,339 / 5,109 묶음 11-17 over main 705a809f. Measured 12335 / 5105 (over budget only) in the e2e build, the plus 4.
   // -> gzip 5,114 묶음 11-18, measured 5,110 in CI verify-quick, the plus 4.
-  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 12_339, maxGzip: 5_114 },
+  // 12,339 / 5,114 -> 12,339 / 5,117 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^BoardScreen-.*\.js$/, maxBytes: 12_339, maxGzip: 5_117 },
   // The board's admin sheet and bar (src/components/BoardAdmin.jsx, src/boardAdmin.js, BoardAdmin.css), fetched only
   // on a page opened with ?admin or holding a maker's sign-in (src/boardAdminEntry.js); no player's page loads either
   // file. In the build since 2026-11-16, board-admin over main 83570151. Measured 11785 / 4548 and 2007 / 661 in the
   // e2e build, the plus 4.
   // 11,789 / 4,552 -> 15,773 / 5,645 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 15769 / 5641 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 15_773, maxGzip: 5_645 },
+  // 15,773 / 5,645 -> 15,773 / 5,654 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^BoardAdmin-.*\.js$/, maxBytes: 15_773, maxGzip: 5_654 },
   // 2,011 / 665 -> 2,495 / 735 board-admin-queue over board-admin d86d008f: 신고 대기·관리 기록 보기와 대기 배지(BoardAdmin chunk only). Measured 2491 / 731 (over budget only) in the e2e build, the plus 4.
   { pattern: /^BoardAdmin-.*\.css$/, maxBytes: 2_495, maxGzip: 735 },
   // 3,860 / 1,759, with rows typed before they are rendered.
@@ -1429,7 +1449,8 @@ const budgets = [
   // 7,251 / 3,201 -> 7,325 / 3,231 n37-followups, measured locally 7,321 / 3,227 in the e2e build, the plus 4: the back button says where it goes (returnTo).
   // 7,251 / 3,201 -> 8,192 / 3,565 n46-hall-progress, measured locally 8,188 / 3,561: the hall of fame's progress line (hallOfFameProgress, the week key it reads, ranking.hallProgress), the plus 4.
   // 8,192 / 3,565 -> 8,278 / 3,602 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today). Measured 8274 / 3598 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 8_278, maxGzip: 3_602 },
+  // 8,278 / 3,602 -> 8,278 / 3,611 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^RankingScreen-.*\.js$/, maxBytes: 8_278, maxGzip: 3_611 },
   // Online save, which left the entry chunk: a device that never turned it on
   // does not download it. 9,530 / 3,780 and 4,510 / 1,890.
   // -> 10,960 / 4,380 on 2026-10-07, measured 10,438 / 4,173 plus 5%: the
@@ -1456,7 +1477,8 @@ const budgets = [
   // 11,785 / 4,773 -> 11,901 / 4,809 on 2026-11-11, E-11 번외 온라인 저장 (#317) over #314 9b34ba69 (main 5c93b496). Measured 11897 / 4805 (over budget only) in the e2e build, the plus 4.
   // 11,901 / 4,809 -> 11,901 / 4,816 on 2026-11-11, E-11 번외 온라인 저장 (#317) after merging main c61d6618 (#314). Measured - / 4812 (over budget only) in the e2e build, the plus 4.
   // 11,901 / 4,816 -> 11,901 / 4,821 bundle 1112d (#523) over main 68c7071e. Measured - / 4817 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_821 },
+  // 11,901 / 4,821 -> 11,901 / 4,822 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^cloudSave-.*\.js$/, maxBytes: 11_901, maxGzip: 4_822 },
   // E-12's merge of those three device keys on a restore, loaded only when a
   // copy is restored (cloudSave.applyCloudSave). Measured 1,934 / 938 in the
   // e2e build, the gzip plus 4.
@@ -1479,7 +1501,8 @@ const budgets = [
   // plus 4.
   // 4,458 / 1,893 -> 5,014 / 2,135 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 5,014 / 2,135 -> 5,023 / 2,138 on 2026-11-10, deps-1123: vite 8.3.6 / lucide-react 1.69 after merging main cb8346da (replaces Dependabot #479 and #480; vite 8.3.6 changes the build's bytes). Measured 5,019 / 2,134 in the e2e build, the plus 4.
-  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_023, maxGzip: 2_138 },
+  // 5,023 / 2,138 -> 5,023 / 2,143 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^CloudSavePanelBody-.*\.js$/, maxBytes: 5_023, maxGzip: 2_143 },
   // The table's engine, shared by the shell's save repair and the runtime, so
   // the bundler gives it a chunk of its own. 34,010 / 12,870.
   // 35,720 / 13,520 -> 37,870 / 14,200 on 2026-10-09, measured 36,063 /
@@ -1626,7 +1649,8 @@ const budgets = [
   // 9,313 / 4,442 -> 9,816 / 4,642 N32 친구 기록 넘기기 over main 705a809f. Measured 9812 / 4638 (over budget only) in the e2e build, the plus 4.
   // 9,313 / 4,442 -> 9,804 / 4,631 묶음 11-17 over main 705a809f. Measured 9800 / 4627 (over budget only) in the e2e build, the plus 4.
   // 9,804 / 4,631 -> 9,804 / 4,637 11-18 2안 감사 장부 over bundle-1117 b78d5938. Measured - / 4633 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_804, maxGzip: 4_637 },
+  // 9,804 / 4,637 -> 9,804 / 4,641 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^ResultCardShare-.*\.js$/, maxBytes: 9_804, maxGzip: 4_641 },
   // What a run and its report read about the analyst, the ending and the
   // record (src/runtimeSystems.js). It was in the entry chunk, inside
   // advancedSystems.js, where the screen before a run never called it: taking
@@ -1677,7 +1701,8 @@ const budgets = [
   // 107,420 / 35,886 -> 107,426 / 35,892 on 2026-11-04, canon-a044 over main 7ddced5f: A044, 사건 26's 32억 goes to 해온파트너스와 같은 주소의 새 법인 in Korean, English and Japanese, and 사건 29's premise says 그리고 지금. Measured 107,422 / 35,888 in the e2e build, the plus 4.
   // 107,426 / 35,892 -> 107,667 / 35,994 c4c5-copy over main 7ec2304e. Measured 107663 / 35990 (over budget only) in the e2e build, the plus 4.
   // 107,667 / 35,994 -> 107,695 / 36,012 다국적 인물. Measured 107691 / 36008 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_695, maxGzip: 36_012 },
+  // 107,695 / 36,012 -> 107,695 / 36,018 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_695, maxGzip: 36_018 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -1706,7 +1731,8 @@ const budgets = [
   // 989 -> 990 raw on 2026-10-29, E-11 번외 사건 온라인 저장 (draft) restacked on e11-side01 7a6e26f8: only the chunk names it imports. Measured 990 / 614.
   // 998 -> 1,055 raw on 2026-11-18, d3-next over main 4d549334: the line prints the window count grouped by thousands. Measured 1,051 raw (gzip under 619) in the CI e2e build, the plus 4.
   // 1,055 / 619 -> 1,172 / 639 on 2026-11-18, n39-n40-n44 over main eb2d9aeb: N44's 「모으는 중 (판단 N번)」 under twenty windows. Measured 1,168 / 635, the plus 4.
-  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_172, maxGzip: 639 },
+  // 1,172 / 639 -> 1,172 / 645 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^sceneTraces-.*\.js$/, maxBytes: 1_172, maxGzip: 645 },
   // The other players' card share under the decision reveal (E-6, 2026-10-22):
   // src/state/useSceneChoiceRates.js and src/sceneChoices.js, the frame of
   // sceneTraces above (SCENE_CHOICES in vite.config.js). 1,216 / 724
@@ -1771,6 +1797,9 @@ const budgets = [
   // 7,170 / 2,974 -> 10,622 / 4,304 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 10618 / 4300 (over budget only) in the e2e build, the plus 4.
   // 10,622 / 4,304 -> 10,622 / 4,325 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured - / 4321 (over budget only) in the e2e build, the plus 4.
   // 10,622 / 4,325 -> 10,940 / 4,429 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 10936 / 4425 (over budget only) in the e2e build, the plus 4.
+  // +0 / +13: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // 10,622 / 4,338 -> 10,622 / 4,342 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 10_940, maxGzip: 4_429 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
@@ -1789,7 +1818,8 @@ const budgets = [
   // 1,996 / 1,056 -> 2,176 / 1,138 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
   // 2,176 / 1,138 -> 2,537 / 1,280 on 2026-10-26, 영어판 3단계: the start screen's line read by key, and the rules' words by id (src/copy/weekRule.js `line`, `rules`). The Korean is the same. Measured in the e2e build, the gzip plus 4.
   // 2,537 / 1,280 -> 3,223 / 1,436 on 2026-11-06, w47-rule-line over main e1f5e515: the test week (W47) told as a board of its own, since #461 made 감사·연쇄 rules of the table (src/copy/weekRule.js `line.testWeek`, the two box labels; ko/en/ja). Measured 3,219 / 1,432 in the e2e build, the plus 4.
-  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 3_223, maxGzip: 1_436 },
+  // 3,223 / 1,436 -> 3,223 / 1,444 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^WeeklyRuleViews-.*\.js$/, maxBytes: 3_223, maxGzip: 1_444 },
   // Its panel on a case's opening page (src/gauntlet/WeekRulePanel.jsx,
   // WEEK_RULE_PANEL in vite.config.js), taken out of the PlayScreen chunk on
   // 2026-10-20 and fetched with it. 801 / 511 measured, the gzip plus 4.
@@ -1827,6 +1857,8 @@ const budgets = [
   // 3,005 / 1,270 -> 3,034 / 1,284 8막 서명 버튼 높이 44px (#635 54713815, Linux CI 11-20). Measured 3030 / 1280 in the e2e build, the plus 4.
   // 3,034 / 1,284 -> 3,034 / 1,289 on 2026-11-23. Measured - / 1285 (over budget only), the plus 4.
   // 3,034 / 1,289 -> 3,258 / 1,360 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 3254 / 1356 in CI verify-quick, the plus 4.
+  // 3,034 / 1,289 -> 3,034 / 1,294 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 3_258, maxGzip: 1_360 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
@@ -1850,7 +1882,8 @@ const budgets = [
   // 11,705 / 5,445 -> 11,609 / 5,405 on 2026-10-24, Vite 8 (#225) on main
   // e72c415f: measured 11,609 / 5,401 in the e2e build, the gzip plus 4.
   // 11,609 / 5,405 -> 11,682 / 5,448 on 2026-10-26, 다국어 틀 (en-step1, on main 1cbdf70e): src/locale.js and the intro's language choice (index), and the screens' words moved into src/copy/*.js tables read by key so another language can be laid over them -- the Korean is the same, the keys and reads are what grew (the table's words now sit in RelicDraft, which the table and the runtime share). Measured in the e2e build, the gzip plus 4.
-  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 11_682, maxGzip: 5_448 },
+  // 11,682 / 5,448 -> 11,682 / 5,453 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^EdgeNotice-.*\.js$/, maxBytes: 11_682, maxGzip: 5_453 },
   // The act title card (src/gauntlet/ActCard.jsx with actCardCopy.js, B-11(1)
   // 막 표지), 2026-10-24: eight acts' names and sentences, the count to the
   // season's end and the dialog, fetched by the PlayScreen chunk's fold only
@@ -1868,7 +1901,8 @@ const budgets = [
   // 5,054 / 2,504 -> 5,173 / 2,553 묶음 11-17 over main 705a809f. Measured 5169 / 2549 (over budget only) in the e2e build, the plus 4.
   // 5,054 / 2,504 -> 5,173 / 2,553 묶음 11-17 over main 705a809f. Measured 5169 / 2549 (over budget only) in the e2e build, the plus 4.
   // 5,173 / 2,553 -> 5,173 / 2,558 묶음 11-17 CI 수정 뒤 실측 +4 (ecc6b3a5). Measured - / 2554 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_173, maxGzip: 2_558 },
+  // 5,173 / 2,558 -> 5,173 / 2,562 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^ActTally-.*\.js$/, maxBytes: 5_173, maxGzip: 2_562 },
   // The reading clock's one question (src/gauntlet/ReadingClockAsk.jsx,
   // READING_CLOCK_ASK in vite.config.js), 2026-10-22: 프롤로그 01-02 start held
   // and the first page the clock would open asks instead (A-11 = D-4).
@@ -1883,7 +1917,8 @@ const budgets = [
   // 시작; in the build since 2026-11-10, cold-opening-style (#477) switched the
   // page on over main cb8346da. Measured 3,440 / 2,002 and 1,394 / 566 in the
   // e2e build, the plus 4. Switched off, neither file is emitted.
-  { pattern: /^ColdOpening-.*\.js$/, maxBytes: 3_444, maxGzip: 2_006 },
+  // 3,444 / 2,006 -> 3,444 / 2,013 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^ColdOpening-.*\.js$/, maxBytes: 3_444, maxGzip: 2_013 },
   { pattern: /^ColdOpening-.*\.css$/, maxBytes: 1_398, maxGzip: 570 },
   // B3's audit (src/gauntlet/auditRisk.js, AUDIT_RISK in vite.config.js): its
   // count, its judgement, the table's reading and its words, out of the
@@ -1917,7 +1952,8 @@ const budgets = [
   // 2,440 / 1,282 -> 2,572 / 1,314 on 2026-10-29, the 11-30 rehearsal (integration-1130b: #224 602ec69b + #307 + #316 + #320 + #308): AUDIT CONTACT's limit and the ladder's cases before the audit together. Measured 2,572 / 1,310 in the e2e build, the gzip plus 4, the raw the measurement.
   // 2,572 / 1,314 -> 2,635 / 1,343 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 2631 / 1339 (over budget only) in the e2e build, the plus 4.
   // 2,572 / 1,314 -> 2,635 / 1,343 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 2,631 / 1,339 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_343 },
+  // 2,635 / 1,343 -> 2,635 / 1,352 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_352 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -1948,7 +1984,8 @@ const budgets = [
   // e72c415f: measured 1,195 / 676 in the e2e build, the gzip plus 4.
   // 1,195 / 680 -> 1,206 / 686 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 1202 / 682 (over budget only) in the e2e build, the plus 4.
   // 1,195 / 680 -> 1,206 / 687 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 1,202 / 683 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 686 },
+  // 1,206 / 686 -> 1,206 / 692 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 692 },
   // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
   // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
   // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
@@ -1957,7 +1994,8 @@ const budgets = [
   // e72c415f: measured 1,157 / 650 in the e2e build, the gzip plus 4.
   // 654 -> 669 gzip on 2026-11-03, caption-split: its sentence cut is now proseSentences.js's, imported from the chunk that holds it rather than written here. Measured 1,153 / 665 in the e2e build, the plus 4.
   // 1,157 / 669 -> 1,056 / 623 on 2026-11-04, caption-split: speechSpans reads proseSentences.js's pairedQuotes instead of its own loop. Measured 1,052 / 619 in the e2e build, the plus 4.
-  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_056, maxGzip: 623 },
+  // 1,056 / 623 -> 1,056 / 630 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^speakerLine-.*\.js$/, maxBytes: 1_056, maxGzip: 630 },
   // [batch-c] 묶음 B (#277):
   // The case file's cast and the case's scenes so far (src/gauntlet/CaseCast.jsx
   // and caseCastModel.js, improvement notes D-8 and B-6(2)), fetched the first
@@ -1987,8 +2025,10 @@ const budgets = [
   // The 지난번 이후 card (components/SinceLastCard.jsx, N24 11-17), fetched only on a visit back after 3+ days. Measured 2,110 / 1,165, the plus 4.
   // 4,594 / 2,081 -> 4,600 / 2,081 N32 친구 기록 넘기기 over main 705a809f. Measured 4596 / - (over budget only) in the e2e build, the plus 4.
   // 4,594 / 2,081 -> 4,600 / 2,081 묶음 11-17 over main 705a809f. Measured 4596 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^SideCaseScreen-.*\.js$/, maxBytes: 4_600, maxGzip: 2_081 },
-  { pattern: /^SinceLastCard-.*\.js$/, maxBytes: 2_114, maxGzip: 1_169 },
+  // 4,600 / 2,081 -> 4,600 / 2,088 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^SideCaseScreen-.*\.js$/, maxBytes: 4_600, maxGzip: 2_088 },
+  // 2,114 / 1,169 -> 2,114 / 1,177 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^SinceLastCard-.*\.js$/, maxBytes: 2_114, maxGzip: 1_177 },
   // The locale preload (scripts/locale-preload.mjs, perf-first-visit 2026-11-03): the other languages' first files by name,
   // asked for from the head. Grows with each language's between-cases files; measured 951 raw / 492 gzip with two languages.
   { pattern: /^locale-preload-[0-9a-f]{8}\.js$/, maxBytes: 1_600, maxGzip: 700 },
@@ -2011,15 +2051,19 @@ const budgets = [
   // Push subscribe code, both loaded only when the settings panel opens.
   // Measured 1,516 / 967 and 2,287 / 1,092 (the larger of the plain and e2e
   // builds), the plus 4.
-  { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 971 },
+  // 1,520 / 971 -> 1,520 / 976 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^WeeklyReminderToggle-.*.js$/, maxBytes: 1_520, maxGzip: 976 },
+  // 2,291 / 1,096 -> 2,291 / 1,101 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured - / 1097 (its imports' hashed names) in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
   // 2,291 / 1,096 -> 2,291 / 1,101 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
-  { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_101 },
+  // 2,291 / 1,101 -> 2,291 / 1,104 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^weeklyReminderPush-.*.js$/, maxBytes: 2_291, maxGzip: 1_104 },
   // 석간 원장 (world-news, 2026-11-20): the articles' titles and summaries
   // the start screen's 오늘의 1면 picks from, loaded once 읽을거리 is drawn
   // (HomeReading.jsx) so the first paint carries only the paper's name.
   // Measured 10,626 / 5,243, the plus 4.
   // 10,630 / 5,247 -> 20,403 / 9,012 on 2026-11-20 (world-news 2차 30편: newsIndex 60편). Measured 20399 / 9008 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^newsIndex-.*\.js$/, maxBytes: 20_403, maxGzip: 9_012 },
+  // 20,403 / 9,012 -> 20,403 / 9,017 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^newsIndex-.*\.js$/, maxBytes: 20_403, maxGzip: 9_017 },
   // The deferred-stylesheet loader (vite.config.js), a fixed string. 153 bytes.
   { pattern: /^deferred-styles-.*\.js$/, maxBytes: 200, maxGzip: 200 },
   // Rolldown's runtime helpers (Vite 8, #225): the CommonJS wrapper React is
@@ -2175,12 +2219,16 @@ const budgets = [
   // 203,461 / 68,093 -> 203,560 / 68,103 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 203556 / 68099 (over budget only) in the e2e build, the plus 4.
   // 203,560 / 68,103 -> 205,670 / 68,690 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 205666 / 68686 (over budget only) in the e2e build, the plus 4.
   // 203,560 / 68,103 -> 205,604 / 68,826 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 205600 / 68822 in CI verify-quick, the plus 4.
+  // 205,604 / 68,826 -> 205,955 / 68,923 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
+  // 205,955 / 68,923 -> 206,442 / 69,162 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 206438 / 69158 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
   // 205,670 / 68,826 -> 208,131 / 69,519 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 208127 / 69515 (over budget only) in the e2e build, the plus 4.
   // 208,131 / 69,519 -> 208,597 / 69,672 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 208593 / 69668 (over budget only) in the e2e build, the plus 4.
   // 205,604 / 68,826 -> 205,810 / 68,911 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 205806 / 68907 (over budget only) in the e2e build, the plus 4.
   // 208,131 / 69,519 -> 208,316 / 69,601 #635 1178f9fe over main 78be3bd4. Measured 208312 / 69597 in CI verify-quick, the plus 4.
   // 208,316 / 69,601 -> 208,782 / 69,752 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 208778 / 69748 in CI verify-quick, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 208_782, maxGzip: 69_752 },
+  // +838 / +330: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 209_154, maxGzip: 69_931 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2298,12 +2346,16 @@ const budgets = [
   // 170,051 / 60,807 -> 170,126 / 60,820 G1~G7 + G4 encore/audit (#629, Linux CI 11-19). Measured 170122 / 60816 (over budget only) in the e2e build, the plus 4.
   // 170,126 / 60,820 -> 171,914 / 61,373 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 171910 / 61369 (over budget only) in the e2e build, the plus 4.
   // 170,126 / 60,820 -> 171,838 / 61,420 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured 171834 / 61416 in CI verify-quick, the plus 4.
+  // 171,838 / 61,420 -> 172,128 / 61,517 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
+  // 172,128 / 61,517 -> 172,584 / 61,743 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 172580 / 61739 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
   // 171,914 / 61,420 -> 174,008 / 62,102 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 174004 / 62098 (over budget only) in the e2e build, the plus 4.
   // 174,008 / 62,102 -> 174,414 / 62,245 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 174410 / 62241 (over budget only) in the e2e build, the plus 4.
   // 171,838 / 61,420 -> 172,012 / 61,492 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured 172008 / 61488 (over budget only) in the e2e build, the plus 4.
   // 174,008 / 62,102 -> 174,157 / 62,173 #635 1178f9fe over main 78be3bd4. Measured 174153 / 62169 in CI verify-quick, the plus 4.
   // 174,157 / 62,173 -> 174,563 / 62,316 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 174559 / 62312 in CI verify-quick, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 174_563, maxGzip: 62_316 },
+  // +746 / +308: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 174_903, maxGzip: 62_481 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2337,7 +2389,8 @@ const budgets = [
   // 61,186 / 21,029 -> 64,562 / 22,016 묶음 1113 (번외 4·5·6·7의 새 화자 아홉 프로필 함께) over main dcbbe5e0. Measured ja 64558 / 22012 in the e2e build, the plus 4.
   // 64,562 / 22,016 -> 64,674 / 22,137 다국적 인물 over main e43f7bf6: the renamed profiles' names in katakana and kanji on top of 번외 4~7's. Measured ja 64670 / 22133 in the e2e build, the plus 4.
   // 64,674 / 22,137 -> 66,283 / 22,623 번외 8 over main 29120d32: 새 화자 셋(설경민, 심재만, 비노드 타파) 프로필. Measured ja 66279 / 22619 in the e2e build, the plus 4.
-  { pattern: /^locale-(en|ja)-late-gameDialogue-.*\.js$/, maxBytes: 66_283, maxGzip: 22_623 },
+  // 66,283 / 22,623 -> 66,869 / 22,815 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 66865 / 22811 (ja) in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
+  { pattern: /^locale-(en|ja)-late-gameDialogue-.*\.js$/, maxBytes: 66_869, maxGzip: 22_815 },
   // 6,589 / 2,026 -> 8,013 / 2,344 on 2026-10-26, 일본어 1단계: the Japanese files in the overlay's import maps and its
   // `addStyle` (a dictionary's own CSS). Loads on a page in another language only. Measured 8,013 / 2,340, the gzip plus 4.
   // 8,013 / 2,344 -> 8,731 / 2,640 on 2026-10-26, en-between-11-20: the between/ files in its import map, fetched once
@@ -2376,7 +2429,9 @@ const budgets = [
   // 14,649 / 3,913 -> 14,805 / 3,942 묶음 11-17 over main 705a809f. Measured 14801 / 3938 (over budget only) in the e2e build, the plus 4.
   // 14,649 / 3,913 -> 14,806 / 3,944 묶음 11-17 over main 705a809f. Measured 14802 / 3940 (over budget only) in the e2e build, the plus 4.
   // 14,649 / 3,913 -> 14,806 / 3,949 묶음 11-17 over main 705a809f. Measured 14802 / 3945 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 14_806, maxGzip: 3_949 },
+  // 14,806 / 3,949 -> 15,118 / 4,000 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 15114 / 3996 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
+  // 15,118 / 4,000 -> 15,118 / 4,006 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  { pattern: /^locale-overlay-.*\.js$/, maxBytes: 15_118, maxGzip: 4_006 },
   { pattern: /^rolldown-runtime-.*\.js$/, maxBytes: 726, maxGzip: 433 },
 ];
 
@@ -2797,6 +2852,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 381,541 / 446,146 / 454,326 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured first paint, the plus 4.
 // -> 381,536 / 445,591 / 453,735 hotfix rule chips (#636) over main f3815370. Measured first paint 381,532 / 445,587 / 453,731 in CI verify-quick, the plus 4.
 // -> 384,603 / 449,112 / 457,581 adsense-notes over main 4e0606e9 (읽을거리·노트 메뉴 + 핫픽스 #636). Measured first paint 384,599 / 449,108 / 457,577 in CI verify-quick, the plus 4.
+// -> 384,966 / 449,569 / 458,039 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured first paint 384,962 / 449,565 / 458,035 in CI verify-quick, the plus 4.
+// -> 385,085 / 449,970 / 458,452 season-1214-sides over main 0d83f9fb (번외 10·11). Measured first paint 385,081 / 449,966 / 458,448 in the e2e build, the plus 4.
 // -> 384,610 / 449,801 / 458,281 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured first paint, the plus 4.
 // -> 384,610 / 449,939 / 458,431 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4 (first paint).
 // -> 384,614 / 449,124 / 457,593 hotfix #644 (gauge row wraps whole items) over main. Measured first paint 384,610 / 449,120 / 457,589 in CI verify-quick, the plus 4.
@@ -2807,7 +2864,12 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 385,516 / 450,920 / 459,383 #635 1178f9fe over main 78be3bd4. Measured first paint en 450,916 / ja 459,379 in CI verify-quick, the plus 4.
 // -> 386,141 / 451,678 / 460,111 #635 67b93c64 on 2026-11-23, with two notes on the start screen. Measured first paint 386,137 / 451,674 / 460,107 in CI verify-quick, the plus 4.
 // -> 386,594 / 452,432 / 460,844 on 2026-11-23 (user's choice 1): measured 386,145 / 451,682 / 460,118, plus the largest day built through the notes written so far (2027-01-11: +441 / +742 / +718), plus Linux's 4 and the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 386_594, en: 452_432, ja: 460_844 };
+// first paint +509 / +875 / +896: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+// -> 386,614 / 452,452 / 460,864 on 2026-11-23: the stylesheet's +20 gzip above, on the same largest day.
+// -> 386,678 / 452,514 / 460,927 on 2026-11-23, deps-1123 (lucide-react 1.76.0, Dependabot #652): measured 386,233 / 451,769 / 460,207 against main's 386,169 / 451,707 / 460,144; the room for the largest note day (445 / 745 / 720) is kept.
+// -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
+// -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
+const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_399, ja: 461_834 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -3022,10 +3084,14 @@ function checkBudget(file, budget) {
 // -> 11,284 / 4,049 묶음 11-18 over main 4d549334 (아이콘 -v2 + 2안), the plus 4.
 // -> 12,564 / 4,458 on 2026-11-17, N25 weekly reminder (Web Push) on #595 41be216b, the plus 4.
 // -> 12,784 / 4,542 묶음 11-19b over main ec89d22b (#621 #622 #623 #624 #618 #595 #596 #625 N36b), measured in the e2e build (matches CI verify-quick today), the plus 4.
+// 12,784 / 4,542 -> 12,842 / 4,560 season-1214-sides over main 0d83f9fb (번외 10·11 목록·사전·프로필 en/ja·Season 예고). Measured 12838 / 4556 in the e2e build (local matched CI verify-quick on 11-20), the plus 4.
 // -> 12,816 / 4,547 on 2026-11-20 (world-news, CI 실측 over main 028766e6), the plus 4.
 // -> 12,816 / 4,554 on 2026-11-20 (world-news 2차 30편: newsIndex 60편), the plus 4.
 // 4,554 -> 4,566 gzip on 2026-11-23: the worker names the day's hashed files. Largest day 4,558 (2026-12-03), plus Linux's 4 and the plus 4.
-const WORKER_BUDGET = { maxBytes: 12_816, maxGzip: 4_566 };
+// 4,566 -> 4,570 gzip on 2026-11-23, deps-1123 (Dependabot #651 #652): measured 4,554 against main's 4,550; the room for the largest note day (16) is kept.
+// +58 / +18: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+// 12,874 / 4,584 -> 12,874 / 4,589 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 12,870 / 4,573, raw plus 4, gzip plus the largest note day's room (16).
+const WORKER_BUDGET = { maxBytes: 12_874, maxGzip: 4_589 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;
