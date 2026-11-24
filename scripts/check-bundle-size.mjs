@@ -352,7 +352,8 @@ const budgets = [
   // 37,484 -> 37,490 season-1214 over main 0d83f9fb (번외 공개 시각 잠금 + Season 예고 줄 ko/en/ja). Measured in CI verify-quick, the plus 4.
   // 37,484 / 15,785 -> 37,740 / 15,897 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 37736 / 15893 (over budget only) in the e2e build, the plus 4.
   // 37,740 / 15,897 -> 37,830 / 15,928 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 37826 / 15924 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_830, maxGzip: 15_928 },
+  // 37,830 / 15,928 -> 37,959 / 15,980 BUST display hotfix (#665, Linux CI 11-24): the table says what a bust keeps as the settle does. Measured 37955 / 15976 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_959, maxGzip: 15_980 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
