@@ -97,6 +97,38 @@ test("only what ships to players waits for a deploy day", () => {
   assert.equal(mergeVerdict(kst("2026-11-18T15:00:00"), ["src/App.jsx"]).ok, true, "before ops mode");
 });
 
+test("the first Monday of a quarter is the rule-change window, and no other Monday is", () => {
+  const files = ["src/gauntlet/weeklyCalendar.js"];
+  for (const local of ["2026-12-28T10:00:00", "2027-01-11T10:00:00", "2027-04-12T10:00:00"]) {
+    const verdict = mergeVerdict(kst(local), files);
+    assert.equal(verdict.ok, false, local);
+    assert.doesNotMatch(verdict.reason, /분기 규칙 변경 창/, local);
+  }
+  for (const [local, label] of [["2027-01-04T10:00:00", "01-04\\(월\\)"], ["2027-04-05T10:00:00", "04-05\\(월\\)"]]) {
+    const verdict = mergeVerdict(kst(local), files);
+    assert.equal(verdict.ok, true, local);
+    assert.match(verdict.reason, new RegExp(`${label}은 분기 첫 월요일, 분기 규칙 변경 창`));
+    assert.match(verdict.reason, /노트·화면 등 다른 변경은 다음 배포 요일/);
+  }
+  // Tuesday and Friday stay plain deploy days, also right after the window.
+  for (const local of ["2027-01-05T10:00:00", "2027-01-08T10:00:00"]) {
+    const verdict = mergeVerdict(kst(local), files);
+    assert.equal(verdict.ok, true, local);
+    assert.match(verdict.reason, /배포 요일입니다/, local);
+    assert.doesNotMatch(verdict.reason, /분기 규칙 변경 창/, local);
+  }
+  // The window is the Korean day, not the UTC one.
+  assert.equal(mergeVerdict(Date.parse("2027-01-03T14:59:59Z"), files).ok, false, "Sunday 23:59:59 KST");
+  assert.match(mergeVerdict(Date.parse("2027-01-03T15:00:00Z"), files).reason, /분기 규칙 변경 창/, "Monday 00:00 KST");
+  assert.match(mergeVerdict(Date.parse("2027-01-04T14:59:59Z"), files).reason, /분기 규칙 변경 창/, "Monday 23:59:59 KST");
+  assert.doesNotMatch(mergeVerdict(Date.parse("2027-01-04T15:00:00Z"), files).reason, /분기 규칙 변경 창/, "Tuesday 00:00 KST");
+  // The window does not make the Monday a deploy day anywhere else.
+  assert.equal(isDeployDay(kst("2027-01-04T10:00:00")), false);
+  assert.equal(nextDeployDay(kst("2027-01-04T10:00:00")), "2027-01-05");
+  assert.equal(main(["--at", "2027-01-04T10:00:00+09:00", "--merge"], { changedFiles: files }).code, 0);
+  assert.equal(main(["--at", "2027-01-11T10:00:00+09:00", "--merge"], { changedFiles: files }).code, 1);
+});
+
 test("the lines say the day, the next wipe and the calendar", () => {
   assert.match(describeToday(kst("2026-11-16T10:00:00")), /11-16\(월\): 운영 모드 전.*2027-01-04\(예고 2026-12-21부터\).*주 남음/);
   assert.match(describeToday(kst("2026-12-02T10:00:00")), /배포 요일 아님 — 다음 12-04\(금\)/);
