@@ -110,6 +110,8 @@ export function GauntletStage({
   const abandoned = hold.seed === seed && !resume;
   const heldByOtherTab = abandoned && hold.token !== tabToken;
   const [claimed, setClaimed] = useState(!heldByOtherTab);
+  // The pot as the window closed: the slam goes on saying it after the settle has moved the run.
+  const [closedPot, setClosedPot] = useState(null);
   // Another tab settled this window or took hold of it. This table stops: no
   // clock, no input, nothing to write over the other tab's result.
   const [lostToTab, setLostToTab] = useState(false);
@@ -335,6 +337,7 @@ export function GauntletStage({
     // handed over as the player's: the room plays its own.
     const staked = selectedCard ?? (savedStake && isCardOpen(savedStake) ? savedStake : null);
     const card = staked ?? forcedCard;
+    setClosedPot({ runPot: run.runPot, bustKeeps });
     const timer = globalThis.setTimeout(() => {
       if (resolvedRef.current) return;
       resolvedRef.current = true;
@@ -478,6 +481,9 @@ export function GauntletStage({
   useTableTabTitle({ win, band, schema, tableOpen, live });
   // On a closed window the purse shows what the settle will leave.
   const settling = !live && claimed && run?.windowIndex === dealtIndex;
+  // Once settled, `run.runPot` is what the bust left, and the forecast has nothing more to say.
+  const unsettled = run?.windowIndex === dealtIndex;
+  const slamPot = unsettled || !closedPot ? { runPot: run.runPot, bustKeeps } : closedPot;
 
   return (
     <section
@@ -529,7 +535,7 @@ export function GauntletStage({
             <span className={`gx-stat${run.runPot > 0 ? " gx-at-risk" : ""}`}>
               <Flame size={13} aria-hidden="true" />
               <small>{say.runPot}</small>
-              <b data-testid="gauntlet-run-pot">{win.status === "bust" ? formatMoney(bustKeeps) : formatMoney(run.runPot)}</b>
+              <b data-testid="gauntlet-run-pot">{win.status === "bust" && unsettled ? formatMoney(bustKeeps) : formatMoney(run.runPot)}</b>
             </span>
             <span className="gx-stat">
               <Vault size={13} aria-hidden="true" />
@@ -872,7 +878,7 @@ export function GauntletStage({
         // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
         voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, audit, links, logic, lockRefused,
           hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
-        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
+        slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, ...slamPot, target: purseRef } : null}
         onReload={onReload}
         onClaim={claimHeldWindow}
         onLeave={() => setLostToTab(true)}
