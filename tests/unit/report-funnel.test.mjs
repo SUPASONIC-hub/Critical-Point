@@ -205,7 +205,8 @@ test("a season counts as finished from its finale case row too, once a run, and 
   const text = describeFunnel(f, { since: "", at: new Date((after + 3 * DAY) * 1000) });
   assert.match(text, /시즌을 끝낸 런\(season-final 또는 피날레 사건 행, 런마다 한 번\) \| 4 \(80\.0%\) \|/);
   assert.match(text, /└ season-final 행이 남은 완주 \| 1 \|/);
-  assert.match(text, /└ 비움 전 완주\(피날레 사건 행만 남음: 2026-11-12 랭킹 비움 전에 끝냄[^|]*\| 2 \|/);
+  // The day follows LAST_RANKING_RESET as it moves on with each reset.
+  assert.match(text, new RegExp("└ 비움 전 완주\\(피날레 사건 행만 남음: " + LAST_RANKING_RESET.slice(0, 10) + " 랭킹 비움 전에 끝냄[^|]*\\| 2 \\|"));
   assert.match(text, /└ 그 뒤 랭킹 행 없이 끝낸 완주[^|]*\| 1 \|/);
 
   // The traffic tables count the same finishes, on the day each was made.

@@ -46,7 +46,9 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * - a bust changes what the next window is, not just what the score is;
  * - a bust skips the next scene, which shortens the case. That must never be a
  *   shortcut: busting on purpose to reach the case's end sooner has to bank far
- *   less than playing the table;
+ *   less than playing the table. 프롤로그 01 and 02 are the exception that cannot be
+ *   one (N21, 11-30): there a bust keeps the scene, so it shortens nothing and
+ *   is the pot lost alone (caseRoutes.js `keepsSceneOnBust`);
  * - the logic streak is a hand skill, not a second instrument: a hand that
  *   holds one direction (사람 or 자리; a thinking type until C-3, 2026-10-25)
  *   busts exactly as often as one whose card leans neither way, is paid more

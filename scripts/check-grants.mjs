@@ -138,9 +138,18 @@ const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules
 // two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql` (promoted 11-12, the one wipe, with C9's
 // `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
 const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
-const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// The resets after 11-12 are named by their day (`*_ranking_reset_<MMDD>.sql`, 11-30's
+// first, then the quarterly ones of docs/ops-mode.md): the newest of them, by name, is the one replayed here.
+const DATED_RESET = readdirSync(MIGRATIONS).filter((file) => /_ranking_reset_\d{4}\.sql$/.test(file)).sort().at(-1) ?? null;
+const RANKING_RESET = DATED_RESET ?? MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// A dated reset may raise the mark (11-30's to RULES_MARK 5, N26) or keep it, so its mark is read from
+// the file itself: the `>= N` its `ranking_check_run_marks` asks of `tableRules`.
+const datedMark = DATED_RESET
+  ? Number(readFileSync(path.join(MIGRATIONS, DATED_RESET), "utf8").match(/'tableRules'\)::numeric >= (\d+) end/)?.[1] ?? Number.NaN)
+  : null;
+if (DATED_RESET && !Number.isInteger(datedMark)) throw new Error(`supabase/migrations/${DATED_RESET}: no \`(dynamics->>'tableRules')::numeric >= N\` in ranking_check_run_marks to read the server's mark from.`);
 /** The table mark the replayed server asks of every case row of a ranked season. */
-const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
+const SERVER_MARK = datedMark ?? (MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2);
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -201,6 +210,14 @@ async function seedBeforeRankingReset() {
       await db.query(`insert into public.hall_of_fame_boards (board, kind, checked_seasons, settled_at) values ('table-1', 'table', 12, now())`);
       await db.query(`insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-1', 1, 'RESETSD1', 90, 'S', 'BOARD BREAKER')`);
     }
+    // The board admins' log (20261118000000) exists before the 11-30 reset: a reset leaves it as it found it.
+    if (await boardAdminLogExists()) {
+      await db.query(`insert into public.board_admin_log (admin_email, action, post_id) values ($1, 'hide', 0)`, [`${RESET_SEED}@check.invalid`]);
+    }
+    // The weekly reminder's subscriptions (20261129000000) exist before the 11-30 reset: a reset leaves them as it found them.
+    if (await pushSubscriptionsExist()) {
+      await db.query(`insert into public.push_subscriptions (endpoint, p256dh, auth) values ($1, $2, 'QUJDREVGR0hJSktMTU5PUA')`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`, `B${"A".repeat(86)}`]);
+    }
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -224,7 +241,15 @@ async function removeRankingResetSeed() {
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
   if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
+  if (await boardAdminLogExists()) await db.query(`delete from public.board_admin_log where admin_email = $1`, [`${RESET_SEED}@check.invalid`]);
+  if (await pushSubscriptionsExist()) await db.query(`delete from public.push_subscriptions where endpoint = $1`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`]);
   return removed;
+}
+async function pushSubscriptionsExist() {
+  return (await db.query(`select to_regclass('public.push_subscriptions') is not null as here`)).rows[0].here;
+}
+async function boardAdminLogExists() {
+  return (await db.query(`select to_regclass('public.board_admin_log') is not null as here`)).rows[0].here;
 }
 async function hallOfFameExists() {
   return (await db.query(`select to_regclass('public.hall_of_fame') is not null as here`)).rows[0].here;
@@ -1882,10 +1907,10 @@ if (!HALL_OF_FAME) {
   ]) {
     await raises(label, "service_role", settle([{ board, places }]), [], /^22023 /);
   }
-  // Below ten by the server's own count: a count in the call is not read.
+  // Below five by the server's own count: a count in the call is not read.
   // A call that says its own count, as the draft's did, is answered by the server's.
   const settleSaying = (boards) => `select public.hall_of_fame_settle('${JSON.stringify(boards)}'::jsonb) as settled;`;
-  await raises("post a place below ten checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below ten checked seasons \(it has 1\)/);
+  await raises("post a place below five checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 1\)/);
   await raises("post four places", "service_role", settle([{ board: table, places: [place("AAAA0001", 91), place("AAAA0002", 85), place("AAAA0003", 80), place("AAAA0003", 80)] }]), [], /^22023 /);
   await raises("post a board that is not one", "service_role", settle([{ board: "table-x", places: [] }]), [], /^22023 /);
   await raises("post a style the ranking does not have", "service_role", settle([{ board: table, places: [{ ...place("AAAA0001", 91), style: "GOD MODE" }] }]), [], /23514/);
@@ -1894,30 +1919,34 @@ if (!HALL_OF_FAME) {
   check(JSON.stringify(await tags(table)) === JSON.stringify(["AAAA0001", "AAAA0002", "AAAA0003"]), `a refused call changed the table board: ${JSON.stringify(await tags(table))}.`);
   check((await view(oldWeek)).length === 0, "a refused call wrote the board beside the refused one.");
 
-  // Below ten: the board stays, with the server's count and no place (「표본 부족」).
+  // Below five: the board stays, with the server's count and no place (「표본 부족」).
   await allowed("write a week's board below the threshold", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [] }]));
   const sparse = await view(thisWeek);
-  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below ten reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
-  // Nine more seasons on this week's board, none of them replayed: it reaches ten.
-  await fill("fwk", 9, { week: thisWeek });
-  check((await counted()).get(thisWeek) === 10, "nine more seasons with no mark did not bring this week's board to ten.");
+  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below five reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
+  // Three more seasons on this week's board, none of them replayed: at four it
+  // is still refused; one more reaches five, the threshold itself.
+  await fill("fwk", 3, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 4, "three more seasons with no mark did not bring this week's board to four.");
+  await raises("post a place at four checked seasons", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 4\)/);
+  await fill("fwl", 1, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 5, "one more season with no mark did not bring this week's board to five.");
   await allowed("write this week's board, provisional", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]));
   const provisional = await view(thisWeek);
-  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 10, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 10.`);
+  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 5, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 5.`);
 
   // A week four weeks past its Monday settles on the day's write, and is kept from then on.
   const settled = (await allowed("settle a week four weeks old", "service_role", settle([{ board: oldWeek, places: [place("CCCC0002", 60)] }])))?.rows[0]?.settled;
   check(JSON.stringify(settled?.settled) === JSON.stringify([oldWeek]), `a week four weeks old was not settled: ${JSON.stringify(settled)}.`);
   // A settled board's candidates are no longer read.
   check(!(await listedRuns(3)).some((runId) => runId === "run-hall-cccc0002" || runId === "run-hall-cccc0003"), "the checker's read still lists a settled week's seasons.");
-  // A settled board is kept even when its count fell below ten since.
+  // A settled board is kept even when its count fell below five since.
   await db.exec(`set session_replication_role = replica`);
   try {
-    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id = 'run-hall-fow00001' and case_id = 'season-final'`);
+    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id between 'run-hall-fow00001' and 'run-hall-fow00006' and case_id = 'season-final'`);
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
-  check((await counted()).get(oldWeek) === 9, "a season marked since did not leave the settled week's count.");
+  check((await counted()).get(oldWeek) === 4, "the seasons marked since did not leave the settled week's count.");
   const kept = (await allowed("write a settled week again", "service_role", settle([{ board: oldWeek, places: [place("CCCC0003", 65)] }])))?.rows[0]?.settled;
   check(JSON.stringify(kept?.kept) === JSON.stringify([oldWeek]), `a settled week answered ${JSON.stringify(kept)}.`);
   const old = await view(oldWeek);
@@ -3086,6 +3115,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
 // snapshot rebuilt again.
 {
   const LADDER_C4 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_c4.sql"));
+  const LADDER_N18 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_n18.sql"));
   const SCENE_SEED = "grants-check-scene";
   const NG_SCENE = "ngplus_scene";
   await db.exec(`set session_replication_role = replica`);
@@ -3097,6 +3127,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
       [4, "prologue05", { newGamePlus: true }],
       [5, "case01", { newGamePlus: true }],
       [6, "case03", { newGamePlus: true }],
+      [7, "case05", { newGamePlus: true }],
     ]) {
       await db.query(
         `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
@@ -3109,10 +3140,10 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
   }
   await db.query(`select public.refresh_scene_bust_stats()`);
   const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
-  const expected = LADDER_C4 ? ["case03:1", "prologue01:1"] : ["case01:1", "case03:1", "prologue01:1", "prologue05:1"];
+  const expected = LADDER_N18 ? ["case05:1", "prologue01:1"] : LADDER_C4 ? ["case03:1", "case05:1", "prologue01:1"] : ["case01:1", "case03:1", "case05:1", "prologue01:1", "prologue05:1"];
   check(
     JSON.stringify(counted) === JSON.stringify(expected),
-    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
+    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_N18 ? "prologue 01 to case 04" : LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
   // N44 (*_scene_bust_collecting): a scene under twenty windows and runs is
   // answered with its count and no percent, which the page prints as 「모으는 중」.

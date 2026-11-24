@@ -74,7 +74,7 @@ import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../..
 import { countNarrows, countScouts, isMarkSevenOn, isNextOn, narrowTrustAt, scoutTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
-import { describeCaseOpening, getBlackoutSkip, getReframeTarget } from "../../src/state/caseRoutes.js";
+import { describeCaseOpening, getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "../../src/state/caseRoutes.js";
 import { isSignScene } from "../../src/state/settleChoice.js";
 import { createChoiceReaders } from "../../src/state/useDecision.js";
 
@@ -618,8 +618,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         const branchContext = { resources, previousOutcomeChoiceId: outcomeId };
         const branchBypass = getBranchDetourBypass(choice, branchContext);
         const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-        // A story run is skipped past nothing (useChoiceCommit).
-        const skip = window.status === "bust" && !run.story ? getBlackoutSkip(plannedNode, branchContext) : null;
+        // A story run is skipped past nothing (useChoiceCommit), nor is 프롤로그 01 or 02 (N21).
+        const skip = window.status === "bust" && !run.story && !keepsSceneOnBust(caseId) ? getBlackoutSkip(plannedNode, branchContext) : null;
         if (skip) skipped += 1;
         const nextNode = skip?.nodeId ?? plannedNode;
         const caseClosed = CASE_RESULT_NODES[caseId] === nextNode;
@@ -1019,9 +1019,12 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
         busts += 1;
         if (!caseClosed) midCaseBusts += 1;
         // Broken is the blackout the bust files on the next board. A bare hand
-        // also has to find it face down and already hot; a mastered lock may turn
-        // the board back over (`applyStanceMastery`), which is the lock working.
-        const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && nextRun.schema.startGauge > 0);
+        // also has to find it face down, and already hot where the case has
+        // AFTERSHOCK (from 사건 04 since N18; 프롤로그 02 to 사건 03 deal BLACKOUT
+        // alone); a mastered lock may turn the board back over
+        // (`applyStanceMastery`), which is the lock working.
+        const hot = !rules.has("aftershock") || nextRun.schema.startGauge > 0;
+        const broken = nextRun.schema.mutations.includes("blackout") && (lock ? true : nextRun.schema.faceDown && hot);
         if (!caseClosed && broken) mutatedAfterBust += 1;
         // The blackout skip: the room plays the next scene without the player. It
         // never skips onto the result, so the case's last window is always played.

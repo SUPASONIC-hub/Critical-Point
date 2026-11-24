@@ -8,7 +8,7 @@ import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedDirections } from "../gauntlet/logicStreak.js";
 import { getRelicPool, getRelicUnlocks } from "../gauntlet/relics.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
-import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
+import { getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "./caseRoutes.js";
 
 /**
  * The settlement of one decision, outside React (F1 phase 3, S2 in
@@ -110,7 +110,7 @@ export function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, 
   };
   const branchBypass = getBranchDetourBypass(choice, branchContext);
   const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-  const blackoutSkip = window.status === "bust" && run?.story !== true ? getBlackoutSkip(plannedNode, branchContext) : null;
+  const blackoutSkip = window.status === "bust" && run?.story !== true && !keepsSceneOnBust(caseId) ? getBlackoutSkip(plannedNode, branchContext) : null;
   const nextNode = blackoutSkip?.nodeId ?? plannedNode;
   return {
     reframe,
