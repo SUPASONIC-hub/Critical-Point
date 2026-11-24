@@ -588,8 +588,9 @@ test("the creep across a stake tier marks the clock's cut beside it for a moment
 });
 
 test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
-  // 사건 04 is where AFTERSHOCK opens (N18), and the gauge below is its start.
-  await openTable(page, "case04", CASE_START_NODES.case04);
+  // AFTERSHOCK is open from 사건 04 (N18), and the gauge below is its start.
+  // 사건 07, because the first BUST of 사건 04~06 keeps a third of the pot (G5).
+  await openTable(page, "case07", CASE_START_NODES.case07);
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
   // Bank something first, so there is a pot for the wall to take.
   await page.locator(".choices .choice").first().click();
