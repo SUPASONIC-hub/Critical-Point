@@ -1237,7 +1237,7 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    `scripts/workflow-keepalive.mjs`)가 비활성으로 꺼진 워크플로만 `gh workflow enable`로 다시 켭니다(손으로 끈 것은 그대로,
    main에 빈 커밋을 만들지 않음).
    **운영 모드**(2026-12-01부터, [docs/ops-mode.md](docs/ops-mode.md)): 화면·규칙·서버가 바뀌는 병합은 화·금만,
-   랭킹 비움은 분기 첫 월요일만입니다. `node scripts/ops-calendar.mjs --merge`가 오늘 병합해도 되는지 답하고,
+   랭킹 비움과 규칙 숫자 변경은 분기 첫 월요일만입니다. `node scripts/ops-calendar.mjs --merge`가 오늘 병합해도 되는지 답하고,
    `Funnel` 요약의 「운영 달력」 절이 다음 배포일·다음 비움 가능일·주간 규칙 달력의 남은 주를 적습니다(6주 밑이면 경고).
    **로컬 백업**: 랭킹(`public_rankings`)·명예의 전당·`cloud_saves`를 주인 PC에만 JSON으로 받습니다. 워크플로로
    돌리지 않습니다(공개 저장소의 아티팩트는 누구나 받습니다). PowerShell에서
