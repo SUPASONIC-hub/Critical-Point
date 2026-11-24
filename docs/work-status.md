@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-23 (the state of `main` at `7b45eff7`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-23 (the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -919,9 +919,18 @@ Still open, on purpose:
   daily (the user's choice); and points the sitemap test at the rendered
   date. Decision T: every threshold is still short (finished seasons 0/30,
   case records 88/150, BUST hands 55/100, W47 records 0/80), so the numbers
-  stay and the held items come back on 12-01. The day's first deploy is `7b45eff7`.
-  Waiting: the 11-30 bundle R (#582 with #586 #590) with RULES_MARK 7 (local
-  branch `gameplay-mark7`: G11c, G13, G16, G18), whose ranking wipe clears
+  stay and the held items come back on 12-01. Later that day: #650 (page
+  dates kept out of the sitemap hash, notes 18 and 20, text contrast on rare
+  states), #642 with #654 (two side cases locked by the device clock until
+  2026-12-14 00:00 KST, notice from 12-07, review on 12-04; the midnight test
+  boundary and the local build cache's day), #656 (dependencies) and #657
+  (chunks whose size moves with the day's notes budgeted at their largest
+  day). #659 with #661 dates and bylines the content, about, FAQ and contact
+  pages, and Notes Publish retries a past-due note that production still
+  answers 404 for, once a Seoul day. The E1f phone sweep on `af5d5ef1` read
+  11,532 rows with no overflow. The day's last code deploy is `981a2404`.
+  Waiting: the 11-30 bundle R (#582 with #586 #590 #648) with RULES_MARK 7
+  (#640 #646 #655: G11c, G13, G16, G18), whose ranking wipe clears
   rows below mark 7 (`>= 7` kept). GA4 still counts no
   `cp_scene` event: the custom dimensions (`case_no`, `scene_no`, `value`)
   are registered; no consenting device has played the first hour since.

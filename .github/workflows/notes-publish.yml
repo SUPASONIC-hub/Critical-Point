@@ -8,7 +8,9 @@ name: Notes Publish
 # main: the same dispatch a person would make, held to the same gate (on main,
 # its push's Verify green; deploy.yml). Render's build then runs on the new day
 # and writes the note, its place in the list, the sitemap and the start
-# screen's 읽을거리. On every other day it does nothing.
+# screen's 읽을거리. If that Deploy failed, the note's page is still a 404 the
+# next night, and this presses again (scripts/notes-publish-due.mjs). On every
+# other day it does nothing.
 #
 # Why the notes are spread out: cp-archive/메모-20261120/adsense-2차-분석.md
 # (4-2), the owner's decision 2026-11-20 「전부 1」. No new secret: the run's
@@ -40,16 +42,18 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-      - name: Is a note's day today?
+      # Today's note, or an earlier one the site still answers 404 for because
+      # that day's Deploy failed. At most one press a Seoul day.
+      - name: Is a note waiting for a build?
         id: due
         shell: bash
-        run: |
-          set -euo pipefail
-          due=$(node --input-type=module -e 'import { NOTES, seoulDay } from "./src/notes/noteIndex.js"; const today = seoulDay(); console.log(NOTES.filter((note) => note.published === today).map((note) => note.slug).join(" "));')
-          echo "notes=$due" >> "$GITHUB_OUTPUT"
-          if [ -n "$due" ]; then echo "Out today: $due" >> "$GITHUB_STEP_SUMMARY"; else echo "No note goes out today." >> "$GITHUB_STEP_SUMMARY"; fi
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/notes-publish-due.mjs
       - name: Deploy the tip of main, so the build writes them
-        if: steps.due.outputs.notes != ''
+        if: steps.due.outputs.press == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

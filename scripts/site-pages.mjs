@@ -8,7 +8,7 @@ import { DATA_RETENTION_DAYS } from "../src/privacyText.js";
 import { withSwaps } from "./analytics-config.mjs";
 import { localizeStaticShell } from "./static-shell.mjs";
 import { SILENCE_SECONDS } from "../src/gauntlet/tableRules.js";
-import { CONTENT_KINDS, renderContentPages } from "./content-pages/pages.mjs";
+import { CONTENT_KINDS, dateLineOptions, pageDateLine, recordedDates, renderContentPages } from "./content-pages/pages.mjs";
 import { MENU_LABELS } from "./content-pages/site-nav.mjs";
 import { noteKinds, noteLastmod, notesDay, renderNotePages } from "./content-pages/notes.mjs";
 import { NEWS_KINDS, renderNewsPages } from "./content-pages/news.mjs";
@@ -557,19 +557,23 @@ function siteBody(kind, language, { analytics, ads }) {
  * The three pages about the game in the three languages: `{ "about.html": "<!doctype html>...", "en/faq.html": ... }`.
  * With `analytics` each carries Google's tag, and the FAQ says so. `ads` (a build with ADSENSE_ADS=on) then applies
  * SITE_AD_EDITS, or ANALYTICS_SITE_AD_EDITS on the FAQ that already says Google Analytics; without `ads` the pages are
- * main's, byte for byte, either way.
+ * main's, byte for byte, either way, but for the date line.
+ * `pageDates` dates each page as `renderContentPages` does; `null` leaves the line out, for `pageFingerprints`.
  */
-export function renderSitePages({ analytics = null, ads = false } = {}) {
+export function renderSitePages({ analytics = null, ads = false, pageDates = recordedDates() } = {}) {
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
       // The about page opens on the README's first screen over the key visual (scripts/content-pages/about-showcase.mjs), its text whole below.
       const showcase = kind === "about" ? aboutShowcase(language) : null;
       const body = siteBody(kind, language, { analytics, ads });
-      pages[pagePath(kind, language).slice(1)] = renderDocumentPage({
+      const loc = pagePath(kind, language);
+      const line = pageDates ? pageDateLine(language, pageDates[loc]?.date, dateLineOptions(kind)) : "";
+      pages[loc.slice(1)] = renderDocumentPage({
         kind,
         language,
-        body: showcase ? withShowcase(body, showcase) : body,
+        // On the about page the line heads its text, under 「자세히 보기」, not the showcase above it.
+        body: showcase ? withShowcase(body, { ...showcase, body: `${showcase.body}${line}` }) : `${line}${body.trimStart()}`,
         hero: showcase?.hero ?? null,
         style: showcase?.style ?? "",
         description: DESCRIPTION[kind][language],
@@ -877,7 +881,7 @@ export function renderStaticPages(origin = "", { analytics = null, ads = false, 
   // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
   const pages = {
     ...renderLegalPages({ analytics, ads }),
-    ...renderSitePages({ analytics, ads: adStage(ads).stage === "on" }),
+    ...renderSitePages({ analytics, ads: adStage(ads).stage === "on", pageDates }),
     ...renderContentPages({ analytics, day, pageDates }),
     ...renderNotePages({ analytics, day }),
     ...renderNewsPages({ analytics }),
