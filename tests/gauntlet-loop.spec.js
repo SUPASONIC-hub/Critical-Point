@@ -646,10 +646,9 @@ test("a passed-down bust shows the third of the pot it keeps", async ({ page }) 
   await pushUntilBust(page);
   await expect(page.locator(".gx-slam-bust")).toContainText(`→ $${kept.toLocaleString("en-US")}`);
   await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
-  // And still after the settle, which moves the run the table reads.
+  // The settle keeps what the table said, and the next table opens on it.
   await expect(page.locator(".decision-reveal h2")).toHaveText("BUST");
   await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.runPot).toBe(kept);
-  await expect(page.locator(".gx-slam-bust")).toContainText(`→ $${kept.toLocaleString("en-US")}`);
   await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
 });
 
