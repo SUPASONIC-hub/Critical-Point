@@ -632,6 +632,28 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
 });
 
+// 11-24: the first BUST of 사건 04~06 keeps a third of the pot (G5), and the table said $0.
+test("a passed-down bust shows the third of the pot it keeps", async ({ page }) => {
+  await openTable(page, "case05", CASE_START_NODES.case05);
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+  const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const kept = Math.floor(banked.dynamics.runPot / 3);
+  expect(kept).toBeGreaterThan(0);
+
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  await pushUntilBust(page);
+  await expect(page.locator(".gx-slam-bust")).toContainText(`→ $${kept.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
+  // The settle keeps what the table said, and the next table opens on it.
+  await expect(page.locator(".decision-reveal h2")).toHaveText("BUST");
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.runPot).toBe(kept);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
+});
+
 // money-feedback (2026-11-02): the hand's amount is thrown large at the middle
 // of the screen and flies into the bank rail's purse, which holds the run's
 // money, the last hand's change with its sign and arrow, and the season's won

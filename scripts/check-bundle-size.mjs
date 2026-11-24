@@ -358,7 +358,9 @@ const budgets = [
   // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
   // DRYRUN 1123: main's number; CI measures it on the day.
   // 37,830 / 15,928 -> 37,918 / 15,957 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 37914 / 15953 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 38_337, maxGzip: 16_063 },
+  // 37,830 / 15,928 -> 37,959 / 15,980 BUST display hotfix (#665, Linux CI 11-24): the table says what a bust keeps as the settle does. Measured 37955 / 15976 in the e2e build, the plus 4.
+  // DRYRUN 1124 with #665: Windows max over 11-30~01-20 is 38,468 (all days) / 16,115 (01-02), the plus 8. CI measures it on the day.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 38_476, maxGzip: 16_123 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -2870,7 +2872,7 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
 // -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
 // DRYRUN 1123: largest of 27 note days + 8.
-const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_401, ja: 461_840 };
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_411, ja: 461_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

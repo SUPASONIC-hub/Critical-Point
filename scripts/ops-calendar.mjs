@@ -12,6 +12,8 @@
  *     an outage or a security fix goes any day (`--hotfix`);
  *   - the ranking is wiped, and the rules' numbers change, only on the first
  *     Monday of a quarter (next: 2027-01-04), told in the game 14 days before;
+ *     `--merge` opens that one Monday as the quarter's rule-change window, for
+ *     that change alone: it is not a deploy day for notes or screens;
  *   - the weekly rule calendar is topped up by 12 weeks when fewer than 6
  *     booked weeks are left.
  *
@@ -169,6 +171,13 @@ export function mergeVerdict(ms, files, { hotfix = false } = {}) {
   if (shipping.length === 0) return { ok: true, reason: "화면·규칙·서버가 바뀌지 않는 PR이라 요일과 상관없이 병합할 수 있습니다.", shipping };
   if (hotfix) return { ok: true, reason: "장애·보안 수정(--hotfix)이라 요일과 상관없이 병합합니다.", shipping };
   if (isDeployDay(ms)) return { ok: true, reason: `오늘 ${shortDay(day)}은 배포 요일입니다(${DEPLOY_CUTOFF}까지).`, shipping };
+  if (isQuarterResetDay(day)) {
+    return {
+      ok: true,
+      reason: `오늘 ${shortDay(day)}은 분기 첫 월요일, 분기 규칙 변경 창입니다(${DEPLOY_CUTOFF}까지). 규칙 숫자·랭킹 비움만 병합하고, 노트·화면 등 다른 변경은 다음 배포 요일 ${shortDay(nextDeployDay(ms))}에 묶음으로.`,
+      shipping,
+    };
+  }
   return {
     ok: false,
     reason: `오늘 ${shortDay(day)}은 배포 요일이 아닙니다. 화면·규칙·서버가 바뀌는 파일 ${shipping.length}개 → 다음 배포 요일 ${shortDay(nextDeployDay(ms))}에 묶음으로.`,
