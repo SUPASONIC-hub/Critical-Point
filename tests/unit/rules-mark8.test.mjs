@@ -26,7 +26,7 @@ const EIGHT = withMarkEight(ALL_RULES, true);
 const SEVEN = withMarkEight(ALL_RULES, false);
 
 test("RULES_MARK 8: the engine's mark, on by default, and a row of 5 to 7 played without it", () => {
-  assert.equal(RULES_MARK, 8);
+  assert.ok(RULES_MARK >= 8, "RULES_MARK 9 keeps 8's rules");
   assert.equal(RULES_EIGHT_MARK, 8);
   assert.equal(isMarkEightOn(ALL_RULES), true);
   assert.equal(isMarkEightOn(SEVEN), false);
