@@ -26,7 +26,7 @@ test("settleChoice runs in node with no browser, and the same state and press se
 });
 
 /**
- * N21 (the owner's answer of 2026-11-16, (1), for the reset of 11-30): a bust
+ * N21 (the owner's answer of 2026-11-16, (1), for the reset of 11-26): a bust
  * in 프롤로그 01 or 02 costs the stake and not the next scene; from 프롤로그 03
  * the room plays it without the analyst, as before.
  */
