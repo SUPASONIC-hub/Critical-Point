@@ -2,6 +2,7 @@
 export default {
   weekRule: "Rule of the Week · until this season ends",
   caseRule: "This case only · until this case closes",
+  movedTwist: "NEW GAME+ · this act’s rule this season",
   unfold: "Read last season · Show",
   pastPick: {
     wildPicked: "Reframed last season too",

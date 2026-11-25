@@ -3,8 +3,11 @@ export default {
   mutation: {
     title: "あのときの決裁が戻ってきた",
     text: "数勝負前に大きく燃やしたカードの連結。この勝負は壁が{wall}近づく。",
+    textTop: "数勝負前に大きく燃やしたカードの連結。この勝負は壁の帯の奥の端が{wall}近づく。",
   },
   linkMade: "{min}〜{max}勝負のうちに、ひとつの勝負の壁が{wall}近づく。",
+  linkMadeTop: "{min}〜{max}勝負のうちに、ひとつの勝負の壁の帯の奥の端が{wall}近づく。",
   range: { next: "次の勝負", after: "{low}勝負後", within: "{low}〜{high}勝負のうち" },
   links: "連結 {live}。いちばん早いものは{range}、その勝負の壁が{wall}近づく",
+  linksTop: "連結 {live}。いちばん早いものは{range}、その勝負の壁の帯の奥の端が{wall}近づく",
 };

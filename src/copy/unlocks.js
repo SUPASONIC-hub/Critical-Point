@@ -57,10 +57,14 @@ const unlocksCopy = {
       intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
     },
     case02: {
+      // G35 (RULES_MARK 9): SMOOTH_SPAN, SMOOTH_LIMIT and AUDIT_SHARE (auditRisk.js), held to them by a unit test.
+      introNine: ["이번 사건부터 감사가 판에 붙습니다. 한 사건 안에서 한 번이라도 밀고 확정한 열기가 ±1 안의 같은 자리에 5번 모이면, 사건이 닫힐 때 금고로 갈 몫의 4분의 1을 잃습니다. 끊는 자리를 바꾸면 피합니다."],
       intro: ["이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 40 아래에서 확정하면 한 칸 차고, 60 이상에서 확정하면 2칸 줄어듭니다. 사건이 닫힐 때 4칸이 차 있으면 금고로 갈 몫의 4분의 1을 잃습니다."],
     },
     case03: {
       intro: ["이번 사건부터 연결이 판에 붙습니다. 한 자원을 8 이상 태운 카드로 확정하면, 2~4판 뒤의 한 판에서 벽이 6 가까워집니다."],
+      // G32 (RULES_MARK 9): LINK_TOP_WALL, only the band's far end.
+      introNine: ["이번 사건부터 연결이 판에 붙습니다. 한 자원을 8 이상 태운 카드로 확정하면, 2~4판 뒤의 한 판에서 벽 띠의 먼 끝이 10 가까워집니다."],
     },
     // 사건 04 and 05 since N18: AFTERSHOCK and SILENCE, which 프롤로그 02 opened before.
     case04: {

@@ -135,6 +135,8 @@ const tableCopy = {
     slamPot: "판돈",
     slamStill: "심장이 멈춘 자리에서 벽이 드러났다.",
     slamCombo: " · 논리 콤보 {streak}",
+    // G30 (RULES_MARK 9): a cash this close under the real wall, paid ×{bonus}.
+    slamEdge: "아슬아슬 ×{bonus} · 벽까지 {gap}",
     equipped: "장착",
     dropped: "· {name} 내려놓음",
     logicWord: "논리 ",
@@ -287,6 +289,8 @@ const tableCopy = {
   // tableAfterword.js: what a closed window still says about itself, and the
   // recap over the next scene's reaction.
   afterword: {
+    // G30: put before nextPush on a cash close under the wall.
+    edge: "아슬아슬 ×{bonus} · 벽까지 {gap}. ",
     nextPush: "한 번 더 밀었다면 +{step} → {gauge}, 벽 {wall}: {outcome}.",
     nextSafe: "갈 수 있었다",
     nextBust: "BUST였다",

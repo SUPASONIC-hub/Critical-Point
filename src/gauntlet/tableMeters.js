@@ -111,7 +111,7 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
   const reading = readAudit(run, audit, win);
   return {
     // G5 2막: the chips a cash at this heat pays (getPaidChips), which the case's twist may thin at 60 and over.
-    selectedChips: selectedCard ? getPaidChips(selectedCard, schema, win.gauge, getCaseTwist(run, getTableRules(caseId, run))) : 0,
+    selectedChips: selectedCard ? getPaidChips(selectedCard, schema, win.gauge, getCaseTwist(run, getTableRules(caseId, run)), getTableRules(caseId, run)) : 0,
     multiplier: getMultiplier(win.gauge),
     // `note` is what the LOCK button's description adds under the next rules (G3): the reason when shut, STRIKE's hotter cap otherwise.
     focusBonus: { ...getFocusBonus(win.focus, win.focusMode, next), note: !next ? "" : lockShut ? ` ${fill(tableCopy.stage.lockShutReason, { cap: LOCK_CAP })}` : fill(tableCopy.stage.lockStrikeHot, { heat: STRIKE_HOT_GAUGE, cap: STRIKE_HOT_CAP }) },
@@ -144,6 +144,7 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
     safe: readSafeLine(win, band.wallMin),
     // C-9: on a table that counts the audit, its line (40) and the band a cash
     // moves it neither way in, up to HEAT DEBT's 60.
-    auditBand: reading ? [AUDIT_HEAT, HEAT_DEBT_GAUGE] : null,
+    // G35 (RULES_MARK 9): the heats where a cash would make the ledger smoother instead.
+    auditBand: reading ? (reading.smooth === undefined ? [AUDIT_HEAT, HEAT_DEBT_GAUGE] : reading.band) : null,
   };
 }

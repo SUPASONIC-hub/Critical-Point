@@ -190,7 +190,7 @@ export function GauntletStage({
   const live = win.status === "live";
   // G17: one cash under the audit's line from its limit, the token's label says so in words (in place of 감사: E1g, a phrase beside it overflowed).
   const auditWarned = audit?.atRisk && audit.ifCash > 0;
-  const auditLabel = auditWarned ? <small data-testid="audit-warn" style={{ whiteSpace: "nowrap" }}>{say.auditWarn}</small> : <small>{say.audit}</small>;
+  const auditLabel = auditWarned ? <small data-testid="audit-warn" style={{ whiteSpace: "nowrap" }}>{audit.warn || say.auditWarn}</small> : <small>{say.audit}</small>;
   // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
   const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(

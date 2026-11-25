@@ -21,6 +21,7 @@
 import { LOCK_CAP, PEAK_CASES, PEAK_CHIPS, PEAK_MARK, PEAK_WALL, STANCE_CHARGE } from "./gauntletEngine.js";
 import { fill } from "../locale.js";
 import unlocksCopy from "../copy/unlocks.js";
+import { isMarkNineOn } from "./nextTableRules.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -227,7 +228,8 @@ const STEPS = [
     caseId: "case02",
     adds: ["audit"],
     storyIntro: [],
-    intro: unlocksCopy.steps.case02.intro,
+    // G35 (RULES_MARK 9): the smooth ledger's line.
+    intro: isMarkNineOn() ? unlocksCopy.steps.case02.introNine : unlocksCopy.steps.case02.intro,
   },
   {
     // LINK_BURN, LINK_SPAN_MIN..LINK_SPAN_MAX and LINK_WALL (cascadeRisk.js),
@@ -236,7 +238,8 @@ const STEPS = [
     caseId: "case03",
     adds: ["cascade"],
     storyIntro: [],
-    intro: unlocksCopy.steps.case03.intro,
+    // G32 (RULES_MARK 9): only the band's far end.
+    intro: isMarkNineOn() ? unlocksCopy.steps.case03.introNine : unlocksCopy.steps.case03.intro,
   },
   // 사건 04 and 05 (N18): the two ways a bust breaks the next board that
   // 프롤로그 02 opened with BLACKOUT until 11-25. The 22 and the 30 are

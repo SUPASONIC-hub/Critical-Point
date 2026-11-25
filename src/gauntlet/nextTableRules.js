@@ -226,6 +226,85 @@ export function withMarkEight(rules, on = eightByDefault()) {
   return cache.get(rules);
 }
 
+/* ------------------------------------------- RULES_MARK 9 (2027-04-05) */
+
+/**
+ * G29~G37 (게임성 개선점 4차, the user's 「전부 1」 of 2026-11-25): rules that
+ * ship as RULES_MARK 9. A row is rechecked under them only when its mark is
+ * `RULES_NINE_MARK` or later (rankingRecheck.js `getRowRules`), so a row of 5
+ * to 8 is played again as it was. They ride on RULES_MARK 8's: a set that
+ * plays those off plays none of these. `NINE_RULE` in a set plays them,
+ * `BEFORE_NINE_RULE` the rules of 8, and a set with neither what this page
+ * plays. `RULES_MARK9=0` turns them off in a script.
+ */
+export const RULES_NINE_MARK = 9;
+export const NINE_RULE = "mark9";
+export const BEFORE_NINE_RULE = "before9";
+
+/** Whether this page (or this script) plays RULES_MARK 9's rules: `RULES_MARK9=0` turns them off in a script. */
+export function wantsMarkNine(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK9 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let nineChoice;
+export const nineByDefault = () => (nineChoice ??= wantsMarkNine());
+
+/** Whether `rules` plays RULES_MARK 9's rules (and so 8's too). */
+export function isMarkNineOn(rules) {
+  if (!isMarkEightOn(rules)) return false;
+  if (rules?.has?.(BEFORE_NINE_RULE)) return false;
+  if (rules?.has?.(NINE_RULE)) return true;
+  return nineByDefault();
+}
+
+const nineSets = new WeakMap();
+const beforeNineSets = new WeakMap();
+/** `rules` playing RULES_MARK 9's rules (`on`) or those of 8; the same set back when it already does. */
+export function withMarkNine(rules, on = nineByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkNineOn(rules) === Boolean(on) || (on && !isMarkEightOn(rules))) return rules;
+  const mark = on ? NINE_RULE : BEFORE_NINE_RULE;
+  const drop = on ? BEFORE_NINE_RULE : NINE_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? nineSets : beforeNineSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G29 돈 쪽 유혹 (RULES_MARK 9): a card's 자본 and 시간 gains weigh this much
+ * in its chips; every other gain (사람 피해 down, 믿음, 정당성, 피로 down) keeps
+ * ×2. Before, a 사람 card out-paid a 자리 card in 72% of the scenes that dealt
+ * both (게임성 개선점 4차 G29); the 사람 피해 a money card brings is paid in
+ * the story, at the collapse gate.
+ */
+// 2.75, the top of the notes' 2.5~2.75: mixed scenes 67.7% money-richer (target 55~70%); 2.5 left the money hand's vault at 0.75 of people-first's.
+export const COIN_GAIN_WEIGHT = 2.75;
+export const COIN_GAIN_KEYS = Object.freeze(["capital", "time"]);
+
+/**
+ * G30 벽 앞 확정 (RULES_MARK 9): a cash this close to the real wall or closer
+ * pays its pot EDGE_CASH_BONUS times. Unknown at the press (the heartbeat
+ * hears the wall within its error), told on the slam and the reveal. It
+ * multiplies whatever the tools paid (G11c's cap is the tools' own): laid
+ * under that cap it turned FRONT PAGE (×1.2 -> ×1.5) into every hand's best,
+ * and as the bigger of the two it took the worth out of the draft's 「one
+ * more」 (check:pressure, measured 11-25; 게임성 4차 G30).
+ */
+export const EDGE_CASH_REACH = 3;
+export const EDGE_CASH_BONUS = 1.25;
+/** How far under the wall a cashed window closed, when that is EDGE_CASH_REACH or less; null otherwise. */
+export function readEdgeCash(win) {
+  if (win?.status !== "cashed") return null;
+  const gap = Number(win.wall) - Number(win.gauge);
+  return Number.isFinite(gap) && gap >= 0 && gap <= EDGE_CASH_REACH ? Math.floor(gap) : null;
+}
+/** The pot factor of a cash with the tools' `boost` (readRelicBoost) and, when `edge`, G30's on top of it. */
+export function withEdgeBonus(boost, edge) {
+  return edge ? boost.factor * EDGE_CASH_BONUS : boost.factor;
+}
+
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */
 export const METRONOME_HOLD = 6;
 /** G22: 숨 고르기 after a BUST at BREATH_HOT_FROM or over moves the wall this far instead of BREATH_WALL. */
