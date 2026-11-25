@@ -94,7 +94,7 @@ export const STOPS = [
  * (20261112000000_ranking_reset_rules_mark4_relic_draft.sql) at 2026-11-12
  * 17:25 KST. Move it on with the next reset.
  */
-export const LAST_RANKING_RESET = "2026-11-25T15:01:00+09:00";
+export const LAST_RANKING_RESET = "2026-11-25T14:05:00+09:00";
 
 const FINAL_INDEX = CASE_SEQUENCE.indexOf("final");
 const indexOf = (caseId) => CASE_SEQUENCE.indexOf(caseId);
