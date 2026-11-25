@@ -221,7 +221,8 @@ const budgets = [
   // main + gameplay-mark7's own growth (+93 / +28), merged for gameplay-mark8; CI re-measures.
   // 166,349 / 62,038 -> 166,557 / 62,134 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+206 / +96), so the largest-note-day room stays.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_585, maxGzip: 62_134 },
+  // 166,585 / 62,134 -> 168,213 / 62,760 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G34's 보상금 line on the result page (CaseCover through useRuntimeRenderers)). Measured 168,209 / 62,756 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_213, maxGzip: 62_760 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -272,7 +273,8 @@ const budgets = [
   // 38,372 / 14,883 -> 38,372 / 14,890 f1-evening (#518 #525 #532) over #466 1331e71d. Measured - / 14886 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,890 -> 38,372 / 14,895 묶음 1113. Measured - / 14891 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,895 -> 38,502 / 14,954 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+130 / +59), so the largest-note-day room stays.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_541, maxGzip: 14_982 },
+  // 38,541 / 14,982 -> 38,751 / 15,053 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G34's covers in the season strain and the ruling). Measured 38,747 / 15,049 in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_751, maxGzip: 15_053 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -362,7 +364,8 @@ const budgets = [
   // DRYRUN 1123: main's number; CI measures it on the day.
   // 37,830 / 15,928 -> 37,918 / 15,957 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 37914 / 15953 (over budget only) in the e2e build, the plus 4.
   // 37,918 / 15,957 -> 38,907 / 16,320 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+989 / +363), so the largest-note-day room stays.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 38_907, maxGzip: 16_320 },
+  // 38,907 / 16,320 -> 39,592 / 16,552 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G33's 「○○가 건넨 것」 line). Measured 39,588 / 16,548 in the e2e build, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 39_592, maxGzip: 16_552 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1605,7 +1608,8 @@ const budgets = [
   // 60,090 / 22,537 -> 60,090 / 22,591 #635 1178f9fe over main 78be3bd4. Measured - / 22587 (over budget only) in CI verify-quick, the plus 4.
   // 60,090 / 22,591 -> 61,319 / 23,064 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 61315 / 23060 in CI verify-quick, the plus 4.
   // 61,319 / 23,064 -> 64,254 / 24,083 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+2935 / +1019), so the largest-note-day room stays.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 64_254, maxGzip: 24_083 },
+  // 64,254 / 24,083 -> 67,540 / 25,211 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31's tilt (storyTilt.js), G33's handed card, G34's payment (settlementPay.js) in the engine's chunk). Measured 67,536 / 25,207 in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 67_540, maxGzip: 25_211 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1962,7 +1966,8 @@ const budgets = [
   // 2,572 / 1,314 -> 2,635 / 1,343 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 2631 / 1339 (over budget only) in the e2e build, the plus 4.
   // 2,572 / 1,314 -> 2,635 / 1,343 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 2,631 / 1,339 (over budget only) in the e2e build, the plus 4.
   // 2,635 / 1,343 -> 2,635 / 1,352 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_635, maxGzip: 1_352 },
+  // 2,635 / 1,352 -> 2,656 / 1,360 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31's limit passed in). Measured 2,652 / 1,356 in the e2e build, the plus 4.
+  { pattern: /^auditRisk-.*\.js$/, maxBytes: 2_656, maxGzip: 1_360 },
   // B2's links (src/gauntlet/cascadeRisk.js, CASCADE_RISK in vite.config.js),
   // out of the PlayScreen, engine and runtime chunks on 2026-10-20. 322 / 306
   // while a constant switched it off and the build dropped the walk; on
@@ -2239,7 +2244,8 @@ const budgets = [
   // main + gameplay-mark7's own growth (+466 / +151), merged for gameplay-mark8; CI re-measures.
   // 209,620 / 70,082 -> 210,408 / 70,403 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+788 / +321), so the largest-note-day room stays.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 210_408, maxGzip: 70_403 },
+  // 210,408 / 70,403 -> 211,352 / 70,689 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31·G33·G34 words in Japanese). Measured 211,348 / 70,685 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 211_352, maxGzip: 70_689 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2368,7 +2374,8 @@ const budgets = [
   // main + gameplay-mark7's own growth (+406 / +143), merged for gameplay-mark8; CI re-measures.
   // 175,309 / 62,624 -> 176,025 / 62,932 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+716 / +308), so the largest-note-day room stays.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_025, maxGzip: 62_932 },
+  // 176,025 / 62,932 -> 176,920 / 63,207 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31·G33·G34 words in English). Measured 176,916 / 63,203 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_920, maxGzip: 63_207 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2883,7 +2890,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
 // -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
 // DRYRUN 1123: largest of 27 note days + 8.
-const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_401, ja: 461_840 };
+// en 453,401 -> 453,718, ja 461,840 -> 462,193 gameplay-g4b (G31·G33·G34 words in the overlay indexes). Measured 453,714 / 462,189, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_718, ja: 462_193 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

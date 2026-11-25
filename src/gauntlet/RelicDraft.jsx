@@ -120,7 +120,7 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
                     <b lang="en">{relic.label}</b>
                     <strong>{relic.name}</strong>
                     <small>{relic.text}</small>
-                    {giver && index === 0 && <em className="gx-relic-from" data-testid="relic-handed">{fill(say.handedBy, { name: giver, particle: subjectParticle(giver) })}</em>}
+                    {giver && index === 0 && <em data-testid="relic-handed" style={{ color: "var(--c-gx-relic)", fontStyle: "normal", fontSize: "0.6875rem", fontWeight: 700 }}>{fill(say.handedBy, { name: giver, particle: subjectParticle(giver) })}</em>}
                   </span>
                   {swapFor ? <em className="gx-relic-tier">{say.drop}</em> : relic.unlock && <em className="gx-relic-tier">{say.rare}</em>}
 
