@@ -1,8 +1,8 @@
--- 묶음 R (2026-11-26, moved up from Monday 11-30 on 11-25, the owner's
+-- 묶음 R (2026-11-25, moved up from Monday 11-30 on 11-25, the owner's
 -- answer 2): the public ranking is emptied once with the rules change, as the
 -- start screen and the guide have said since 11-16 (#535, `rankingReset` in
--- src/copy/intro.js; the day in them is 11-26 since the move). Merged by hand
--- on 11-26, not before: merging a `.sql` to main applies it within a minute,
+-- src/copy/intro.js; the day in them is 11-25 since the move). Merged by hand
+-- on 11-25, not before: merging a `.sql` to main applies it within a minute,
 -- before the client deploys (Supabase migrations apply on merge). The file
 -- keeps its 1130 name: it sorts after every migration applied before it
 -- (20261129120000), so it applies in order; a later migration needs a name
@@ -32,7 +32,7 @@
 -- 2. The finished count is snapshotted before the delete (N15, 2026-11-16):
 --    a `raise notice` with the `season-final` rows and finished runs, read
 --    in the migration's log. The numbers to keep are taken by hand first
---    (`node scripts/report-funnel.mjs`, the 11-30 (now 11-26) checklist in
+--    (`node scripts/report-funnel.mjs`, the 11-30 (now 11-25) checklist in
 --    docs/work-status.md); this line is the second copy. No table is
 --    written: check:grants holds a reset to deleting `season-final` rows and
 --    changing nothing else.
@@ -132,7 +132,7 @@ begin
     from public.playtest_sessions where case_id = 'season-final';
   select count(distinct run_id) into v_finals
     from public.playtest_sessions where case_id = 'final';
-  raise notice 'ranking reset 2026-11-26: % season-final rows (% runs) deleted; % runs keep a final case row', v_rows, v_runs, v_finals;
+  raise notice 'ranking reset 2026-11-25: % season-final rows (% runs) deleted; % runs keep a final case row', v_rows, v_runs, v_finals;
 end;
 $$;
 

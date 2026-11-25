@@ -35,7 +35,7 @@ export default {
   round: " · Season {round}",
   stats: { cases: "Cases", oneCase: "Per case", minutes: " min or so", answers: "Right answers" },
   previousMessage: "Left by the last player: “{message}”",
-  rankingReset: "Ranking notice: on Thursday, November 26, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
+  rankingReset: "Ranking notice: on Wednesday, November 25, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
   castRenamed: "Cast notice: a few people now have new names and faces. Old names in earlier records show as the new ones ({names}).",
   setup: {
     label: "Get ready to start",

@@ -98,7 +98,7 @@ export const SIGN_NAME_WALL = 2;
 export const SIGN_TERMS_WALL = 3;
 export const SIGN_TERMS_CHIPS = 0.9;
 /**
- * G16 (RULES_MARK 7, 2026-11-26): 「이름만」's wall is drawn for each case,
+ * G16 (RULES_MARK 7, 2026-11-25): 「이름만」's wall is drawn for each case,
  * SIGN_NAME_WALL_LOW to SIGN_NAME_WALL_HIGH closer, and shown before the
  * choice; the season's last signature (`SIGN_LAST_CASE`) is always the
  * highest. One hand gave every one of the four cases the same answer (게임성

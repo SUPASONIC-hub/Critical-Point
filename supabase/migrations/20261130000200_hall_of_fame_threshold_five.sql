@@ -1,6 +1,6 @@
 -- D2, the hall of fame: a board keeps its first three from five checked
 -- seasons, not ten (decision T's T12). Merging to main applies this to the live
--- database within a minute; it merges with bundle R (11-26), after the
+-- database within a minute; it merges with bundle R (11-25), after the
 -- ranking reset (20261130000000) and N18 (20261130000100).
 --
 -- hall_of_fame_settle restated whole from 20261106010000_hall_of_fame.sql, its
