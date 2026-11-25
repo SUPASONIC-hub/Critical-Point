@@ -386,7 +386,7 @@ export const WEEK_VALUES = (() => {
  * draws nothing; the second pick of a draft that bought one more draws as the
  * first does.
  */
-export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule = WEEK_RULE, snap = false, reads = false, spend = "never" }) {
+export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETYPES }, reduce = reduceWindow, windowSeed = ({ seasonIndex, windowIndex }) => `season:${seasonIndex}:${windowIndex}`, weekRule = WEEK_RULE, snap = false, reads = false, spend = "never", veteran = false }) {
   const stamped = weekRule === undefined ? null : weeklyRules.normalizeWeekRuleId(weekRule);
   const seasonStamp = (story) => (!story && stamped ? { weekRule: stamped } : {});
   let seed = start;
@@ -531,7 +531,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // the close's links and draft, and the case's opening snapshot (useChoiceCommit, S3).
     const caseDynamics = {};
     let discoveredClues = [];
-    let run = normalizeStart(story);
+    let run = normalizeStart(story, seasonIndex);
     let final = null;
     const casePeaks = [];
     let windows = 0;
@@ -757,8 +757,9 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     return pick(wanted.length ? wanted : cards);
   }
 
-  function normalizeStart(story = false) {
-    return { ...RUN_INITIAL_STATE, story, ...seasonStamp(story) };
+  // `veteran`: every season begun with NEW GAME+ (every rule from its first case; G36 places its act twists by its seed).
+  function normalizeStart(story = false, seasonIndex = 0) {
+    return { ...RUN_INITIAL_STATE, story, ...(veteran && !story ? { veteran: true, twistSeed: `ng:${seasonIndex}` } : {}), ...seasonStamp(story) };
   }
 
   return { random, pick, reseed, archetypes, makePolicy, scoreCard, playWindow, playSeason, pickByType };
@@ -909,12 +910,12 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * pass, as everywhere here. `resources`, with `caseId`, is what the case opens
    * on (`open.resources`): G31's tilt (storyTilt.js) reads it.
    */
-  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null, openAt = 0, resources = null } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
+  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null, openAt = 0, twistSeed = null, resources = null } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
     // G5's act twists (actTwists.js): caseId plays every board as that case's, sign signs it first (8막).
-    // `openAt`: the season's window the case opens on (G16 draws 8막's name wall off it).
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}), ...(openAt ? { windowIndex: openAt } : {}) }, { rules, ...(caseId ? { caseId } : {}), ...(resources ? { resources } : {}) });
+    // `openAt`: the season's window the case opens on (G16 draws 8막's name wall off it). `twistSeed`: a NEW GAME+ season's (G36).
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}), ...(openAt ? { windowIndex: openAt } : {}), ...(twistSeed ? { veteran: true, twistSeed } : {}) }, { rules, ...(caseId ? { caseId } : {}), ...(resources ? { resources } : {}) });
     if (sign) run = signCase(run, sign);
     let audit = 0;
     // G2: the second looks this case has bought, and the 믿음 the hand may spend on looks in it (`decide.trustBudget`).

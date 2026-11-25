@@ -61,9 +61,42 @@ export const AUDIT_SHARE = 4;
 /** How much further AUDIT CONTACT moves the limit (C-7). */
 export const AUDIT_CONTACT_SLACK = 1;
 
-/** The audit's limit for a run: `AUDIT_LIMIT`, `AUDIT_CONTACT_SLACK` more with AUDIT CONTACT among its relics. */
-export function getAuditLimit(relics) {
-  return AUDIT_LIMIT + (Array.isArray(relics) && relics.includes("auditContact") ? AUDIT_CONTACT_SLACK : 0);
+/**
+ * G35 너무 매끈한 장부 (RULES_MARK 9, the user's 「전부 1」 of 2026-11-25): the
+ * audit no longer counts cold cashes, which only heat 20 and 30 hands ever
+ * met (600 seasons: 10 catches). It counts the case's cashes -- pushed at
+ * least once, not on a CASCADE board, not a charged EXPOSE -- that closed
+ * within `SMOOTH_SPAN` of one another, both ways: `SMOOTH_LIMIT` of them in
+ * one band of 2 x SMOOTH_SPAN heat and the books look made up. The skilled
+ * habit of cutting at the same place every time is what it reads. The case's
+ * audit is then a tally, the heats it counted (`countAudit`), and its level
+ * the most of them in one band (`getSmoothness`); the judgement and the
+ * share it takes are the same. Before 9 the tally is the count, as it was.
+ * The chunk still imports nothing but its words: the callers, who read the
+ * case's rules (nextTableRules.js `isMarkNineOn`), say `smooth`.
+ */
+export const SMOOTH_SPAN = 1;
+// ±1 and 5, tuned on 80 bot seasons with every pushed cash counted (target 0.3~1 a season, under 5% of the vault; the notes
+// let the band and the count be set by the bots): ±2/4 caught 7.63 a season (5.6%), ±2/5 3.19, ±2/6 1.18, ±1/5 0.61 (0.5%), ±1/6 0.10.
+export const SMOOTH_LIMIT = 5;
+
+/** The most heats of `tally` within one band of 2 x SMOOTH_SPAN (0 for none). */
+export function getSmoothness(tally) {
+  const heats = (Array.isArray(tally) ? tally : []).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  let most = 0;
+  for (let low = 0, high = 0; high < heats.length; high += 1) {
+    while (heats[high] - heats[low] > SMOOTH_SPAN * 2) low += 1;
+    most = Math.max(most, high - low + 1);
+  }
+  return most;
+}
+
+/** The audit's level: the count before RULES_MARK 9, the tally's smoothness from it. */
+export const getAuditLevel = (count) => (Array.isArray(count) ? getSmoothness(count) : Math.max(0, Math.trunc(Number(count) || 0)));
+
+/** The audit's limit for a run: `AUDIT_LIMIT` (`SMOOTH_LIMIT` under RULES_MARK 9), `AUDIT_CONTACT_SLACK` more with AUDIT CONTACT among its relics. */
+export function getAuditLimit(relics, smooth = false) {
+  return (smooth ? SMOOTH_LIMIT : AUDIT_LIMIT) + (Array.isArray(relics) && relics.includes("auditContact") ? AUDIT_CONTACT_SLACK : 0);
 }
 /**
  * HEAT DEBT's heat (`HEAT_DEBT_GAUGE`, tableRules.js), where a cash takes the
@@ -103,17 +136,31 @@ const shieldStep = (step, shield) => (shield && step > 0 ? 0 : step);
  * the case's first board has none before it and is REBOOT's, which never
  * carries CASCADE (a carried link is due from board 1), so it always counts.
  */
-export function countAudit(log = []) {
-  let count = 0;
+export function countAudit(log = [], smooth = false) {
+  // G35 (RULES_MARK 9, `smooth`): the heats the case's counted cashes closed at (`smoothStep`).
+  let count = smooth ? [] : 0;
   let cascade = false;
   for (const entry of log) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
-    count = addAudit(count, shieldStep(auditStep({ busted: threshold.busted === true || threshold.state === "bust", gauge: threshold.gauge, pushes: threshold.pushes, cascade }), threshold.auditShield === true));
+    const busted = threshold.busted === true || threshold.state === "bust";
+    if (smooth) count = smoothStep(count, { busted, gauge: threshold.gauge, pushes: threshold.pushes, cascade });
+    else count = addAudit(count, shieldStep(auditStep({ busted, gauge: threshold.gauge, pushes: threshold.pushes, cascade }), threshold.auditShield === true));
     // No other board rule's id has "cascade" in it.
     cascade = String(entry.environmentMode).includes("cascade");
   }
   return count;
+}
+
+/**
+ * G35: the tally after one settled window: its heat added when it is a cash pushed at least once, off CASCADE.
+ * A charged EXPOSE cash is counted too: its shield (G3) was against the cold line, which G35 has not, and
+ * exempted from the tally it made EXPOSE every LOCK hand's best (check:pressure's G3 stances, 11-25).
+ * AUDIT CONTACT moves the limit instead (`getAuditLimit`).
+ */
+export function smoothStep(tally, { busted = false, gauge = 0, pushes = 0, cascade = false } = {}) {
+  const before = Array.isArray(tally) ? tally : [];
+  return busted || cascade || !((Number(pushes) || 0) > 0) ? before : [...before, Math.round(Number(gauge) || 0)];
 }
 
 /**
@@ -122,12 +169,12 @@ export function countAudit(log = []) {
  * vault and from the hand's share of it, by the same part, so the hand's
  * vault stays inside the vault.
  */
-export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
+export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT, base = AUDIT_LIMIT }) {
   const caught = count >= limit;
   return {
     caught,
     // AUDIT CONTACT's slack was what kept it from catching (`relicProcs`).
-    ...(!caught && count >= AUDIT_LIMIT ? { spared: true } : {}),
+    ...(!caught && count >= base ? { spared: true } : {}),
     lost: caught ? Math.floor(Math.max(0, secured) / AUDIT_SHARE) : 0,
     handLost: caught ? Math.floor(Math.max(0, hand) / AUDIT_SHARE) : 0,
   };
@@ -138,12 +185,18 @@ export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
  * audit; else the count after this window (`count` is the case's before it)
  * and, when the window closes a case that pays (`closed`), the judgement.
  */
-export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false, tilt = 0 }) {
+export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false, smooth = false, tilt = 0 }) {
   if (!isAuditOn(run, rules)) return null;
+  // G35 (RULES_MARK 9): the tally takes the cash's heat, and its smoothness is judged (`count` stays the tally, `level` the number).
+  if (smooth) {
+    const tally = smoothStep(count, { busted, gauge, pushes, cascade: isCascadeBoard(run.schema) });
+    const level = getSmoothness(tally);
+    return { count: tally, level, ...(closed ? judgeAudit({ count: level, secured, hand, limit: getAuditLimit(run.relics, true) + tilt, base: SMOOTH_LIMIT + tilt }) : { caught: false, lost: 0, handLost: 0 }) };
+  }
   const after = addAudit(count, shieldStep(auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }), shield));
   // G31 (RULES_MARK 9): `tilt`, what the case's 정당성 does to the limit (storyTilt.js), as the case's rules say.
   const limit = getAuditLimit(run.relics) + tilt;
-  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit }) : { caught: false, lost: 0, handLost: 0 }) };
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit, base: AUDIT_LIMIT + tilt }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
 /**
@@ -154,7 +207,7 @@ export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, 
  */
 export function findAudit(before, after) {
   if (!before || !after.audit || after.windowIndex !== before.windowIndex + 1) return null;
-  if (after.audit.count === before.audit?.count) return null;
+  if (after.audit.count === before.audit?.count && after.audit.smooth === before.audit?.smooth) return null;
   return { windowIndex: after.windowIndex, text: describeAudit(after.audit) };
 }
 
@@ -167,11 +220,32 @@ export function findAudit(before, after) {
  */
 export function readAudit(run, count, win, tilt = 0) {
   if (!run || count == null) return null;
+  if (Array.isArray(count)) return readSmooth(run, count, win, tilt);
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
   const limit = getAuditLimit(run.relics) + tilt;
   const reading = { count: now, limit, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= limit - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
+}
+
+/**
+ * G35's reading (RULES_MARK 9): the tally's smoothness, what a cash now makes
+ * it, and `band`, the heats where a cash would raise it (the first such run,
+ * drawn on the gauge instead of the cold line), or null while none would.
+ */
+function readSmooth(run, tally, win, tilt = 0) {
+  const now = getSmoothness(tally);
+  const cash = smoothStep(tally, { gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
+  const afterCash = getSmoothness(cash);
+  const limit = getAuditLimit(run.relics, true) + tilt; // G31: the case's 정당성 moves it
+  let band = null;
+  for (let heat = 0; heat <= 100; heat += 1) {
+    if (getSmoothness([...tally, heat]) <= now) {
+      if (band) break;
+    } else band = [band?.[0] ?? heat, heat + 1];
+  }
+  const reading = { count: now, limit, ifCash: afterCash - now, afterCash, atRisk: now >= limit - 1, smooth: tally.join(), band: now > 0 ? band : null, warn: auditCopy.smoothWarn };
+  return { ...reading, spoken: fill(afterCash > now ? auditCopy.smoothUp : auditCopy.smoothSame, { after: afterCash, limit, span: SMOOTH_SPAN }) };
 }
 
 /**
@@ -182,8 +256,8 @@ const describeAuditIfCash = ({ ifCash, afterCash, limit }) =>
   fill(ifCash > 0 ? auditCopy.ifCashUp : ifCash < 0 ? auditCopy.ifCashDown : auditCopy.ifCashSame, { relief: -ifCash, after: afterCash, limit });
 
 /** What the voice says when a table opens on an audit that moved (B3). 초안. */
-const describeAudit = ({ count, limit }) =>
-  fill(auditCopy.spoken, { count, limit, share: AUDIT_SHARE });
+const describeAudit = ({ count, limit, smooth }) =>
+  fill(smooth === undefined ? auditCopy.spoken : auditCopy.smoothSpoken, { count, limit, share: AUDIT_SHARE, span: SMOOTH_SPAN });
 
 /**
  * The cases whose step of the ladder does not have the audit yet (tableUnlocks.js
@@ -218,7 +292,9 @@ export function describeAuditLedger(log, summary, caseId) {
   if (!log.some((entry) => entry?.threshold) || log.some((entry) => entry?.assistStory || entry?.threshold?.firstRecord)) return null;
   const mark = Number(summary?.tableRules);
   if (!(mark >= 3) || (mark >= 4 ? CASES_BEFORE_AUDIT : CASES_BEFORE_AUDIT_MARK3).includes(caseId)) return null;
-  const count = countAudit(log);
-  const limit = getAuditLimit(summary?.relics);
+  // G35: a case closed at RULES_MARK 9 or later was judged on its smoothness; one before it on the count (`before9`).
+  const smooth = mark >= 9;
+  const count = getAuditLevel(countAudit(log, smooth));
+  const limit = getAuditLimit(summary?.relics, smooth);
   return `${fill(auditCopy.ledger, { count, limit })}${count < limit ? "" : auditCopy.caught}`;
 }

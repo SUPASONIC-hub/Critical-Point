@@ -1394,7 +1394,8 @@
           "mutations": [],
           "relics": [],
           "stakeClock": true
-        }
+        },
+        "twistSeed": "run-1"
       },
       "pendingTelemetry": [
         {
@@ -1607,7 +1608,8 @@
           "mutations": [],
           "relics": [],
           "stakeClock": true
-        }
+        },
+        "twistSeed": "run-1"
       },
       "paused": false,
       "savedAt": "<savedAt>",
@@ -1812,7 +1814,8 @@
           "mutations": [],
           "relics": [],
           "stakeClock": true
-        }
+        },
+        "twistSeed": "run-1"
       },
       "pendingTelemetry": [
         {
@@ -2025,7 +2028,8 @@
           "mutations": [],
           "relics": [],
           "stakeClock": true
-        }
+        },
+        "twistSeed": "run-1"
       },
       "paused": false,
       "savedAt": "<savedAt>",

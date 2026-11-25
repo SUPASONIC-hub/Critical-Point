@@ -35,8 +35,8 @@
  * ranking's table, and the ranking only changes on a reset.
  */
 
-import { actTwistFor, twistHasDevice } from "./actTwists.js";
-import { isNextOn } from "./nextTableRules.js";
+import { actTwistFor, getTwistShuffle, twistHasDevice } from "./actTwists.js";
+import { isMarkNineOn, isNextOn } from "./nextTableRules.js";
 
 /** The switch. Off, no case has a rule of its own: the table as it was before N26. */
 export const CASE_RULES_ON = true;
@@ -54,14 +54,25 @@ export const CASE_RULES = Object.freeze({
  * in a story run, in a season that carries a week's rule, and with the switch
  * off. `run` is the gauntlet's run (the save's `dynamics`).
  */
-export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = isNextOn()) {
+export function caseRuleFor(caseId, run, on = CASE_RULES_ON, next = isNextOn(), nine = isMarkNineOn()) {
   if (typeof caseId !== "string") return null;
   const own = on && Object.hasOwn(CASE_RULES, caseId) ? CASE_RULES[caseId] : null;
-  // G5 (actTwists.js): under the next rules the act's twist, behind the case's own.
-  const id = own ?? (next ? actTwistFor(caseId) : null);
+  // G5 (actTwists.js): under the next rules the act's twist, behind the case's own. G36: NEW GAME+ moves it (`getTwistShuffle`).
+  const id = own ?? (next ? actTwistFor(caseId, undefined, nine ? readTwistShuffle(run) : null) : null);
   if (!id) return null;
   if (run?.story === true || (typeof run?.weekRule === "string" && run.weekRule)) return null;
   return id;
+}
+
+/** G36 (RULES_MARK 9): the act twists' places in a NEW GAME+ season (`twistSeed`, its run id), or null. */
+export function readTwistShuffle(run) {
+  return run?.veteran === true && typeof run.twistSeed === "string" && run.twistSeed ? getTwistShuffle(run.twistSeed) : null;
+}
+
+/** G36: whether the twist the case deals in `run` is one NEW GAME+ moved there (the briefing's kicker says so). */
+export function isTwistMoved(caseId, run) {
+  const id = caseRuleFor(caseId, run);
+  return Boolean(id) && id !== caseRuleFor(caseId, { ...run, veteran: false });
 }
 
 /**

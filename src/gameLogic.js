@@ -540,6 +540,8 @@ const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten
 const HUMAN_RECORD_CLUE_RATE = 1;
 const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
+// G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
+const STORY_COLD_GAP = 10; // and a burned story season that kept OPEN OVERSIGHT's trust leaves the question open
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
@@ -553,7 +555,7 @@ export const LOGIC_SLACK_STREAK = 24;
 export const ENDING_THRESHOLDS = Object.freeze({
   clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY,
   reformLegitimacy: REFORM_LEGITIMACY, recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, recordClueRate: HUMAN_RECORD_CLUE_RATE,
-  silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, pactGap: PACT_GAP,
+  silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, storyColdGap: STORY_COLD_GAP, pactGap: PACT_GAP,
   heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK,
 });
 
@@ -624,6 +626,7 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
       ) / summaries.length
       : 0,
     seasonBestLogic: summaries.reduce((best, summary) => Math.max(best, Number(summary.logicRecord?.best) || 0, Number(summary.gauntlet?.bestLogic) || 0), 0),
+    storySeason: summaries.some((summary) => summary?.assistStory === true), // G37: ruled on story mode's gates
   };
 }
 
@@ -666,6 +669,7 @@ export function getEndingVariant({
   seasonReframeRoutes,
   seasonResources = null,
   seasonCovers = 0,
+  storySeason = false,
 } = {}) {
   // A caller that still passes only the old six fields (a report built before
   // `getSeasonStrain` moved here) reads as a whole season with the last case
@@ -687,7 +691,7 @@ export function getEndingVariant({
   // quote the gate that closed rather than a number of its own.
   if (cause) return { ...ENDINGS.collapse, cause: { id: cause, harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
 
-  const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= COLD_GAP;
+  const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= (storySeason ? STORY_COLD_GAP : COLD_GAP);
   const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST + seasonCovers * seasonStanding.COVER_SILENCE_TRUST;
   const pact = trust - legitimacy >= PACT_GAP;
   // Burning every record closes the endings made of records. What is left is
@@ -696,6 +700,7 @@ export function getEndingVariant({
     if (silent) return ENDINGS["profitable-silence"];
     if (cold) return ENDINGS["cold-justice"];
     if (pact) return ENDINGS["field-pact"];
+    if (storySeason && trust >= OVERSIGHT_TRUST) return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
     return ENDINGS["quiet-cover"];
   }
 

@@ -220,7 +220,7 @@ export function DecisionReveal({ view }) {
                   <Vault size={14} aria-hidden="true" />{revealCopy.pot.auditCaught}<b>{formatMoney(verdict.secured + verdict.audit.lost)}</b>{revealCopy.pot.auditOf}{" "}
                   <b>{formatMoney(verdict.audit.lost)}</b>{revealCopy.pot.auditTaken}<b>{formatMoney(decisionReveal.vault)}</b>
                   {/* G17: why the case lost it, in a line of its own. */}
-                  <small className="gx-reveal-why" data-testid="audit-why" style={{ display: "block" }}>{revealCopy.pot.auditWhy}</small>
+                  <small className="gx-reveal-why" data-testid="audit-why" style={{ display: "block" }}>{verdict.audit.level === undefined ? revealCopy.pot.auditWhy : revealCopy.pot.auditWhySmooth}</small>
                 </>
               ) : decisionReveal.caseClosed ? (
                 <>

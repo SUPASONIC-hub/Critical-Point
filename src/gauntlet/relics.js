@@ -32,8 +32,8 @@ import { subjectParticle } from "../playerLanguage.js";
 import { formatMoney } from "../gameConstants.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
-import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
-import { isNextOn } from "./nextTableRules.js";
+import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT, SMOOTH_LIMIT } from "./auditRisk.js";
+import { isMarkNineOn, isNextOn } from "./nextTableRules.js";
 import { boostPercent, COLD_BLOOD_WALL, HOT_CASH_HEAT, LONG_STREAK, LOW_CASH_HEAT, RELIC_BOOSTS, SIDE_STREAK } from "./relicsNext.js";
 import {
   AFTERSHOCK_START,
@@ -114,7 +114,7 @@ export const RELICS = Object.freeze({
   }),
   heatSink: relic("heatSink", { label: "HEAT SINK", icon: "fan", softens: "heatDebt" }, { share: HEAT_SINK_SHARE, seconds: HEAT_SINK_SECONDS }),
   // C-7's five, each a person of the season (2026-10-25).
-  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: AUDIT_LIMIT + AUDIT_CONTACT_SLACK }),
+  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: (isMarkNineOn() ? SMOOTH_LIMIT : AUDIT_LIMIT) + AUDIT_CONTACT_SLACK }),
   carbonCopy: relic("carbonCopy", { label: "CARBON COPY", icon: "files", softens: "blackout" }, {
     shift: BLACKOUT_WALL_SHIFT, particle: subjectParticle(String(BLACKOUT_WALL_SHIFT)), pull: BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD,
   }),

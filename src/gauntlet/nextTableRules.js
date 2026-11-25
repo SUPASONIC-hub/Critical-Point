@@ -32,7 +32,7 @@ export function wantsNextRules(scope = globalThis) {
 
 /** What a rule set that names neither plays: this page's (or script's) choice, read once. */
 let nextChoice;
-export const nextByDefault = () => (nextChoice ??= wantsNextRules());
+const nextByDefault = () => (nextChoice ??= wantsNextRules());
 
 /** Whether `rules` plays the next rules. */
 export function isNextOn(rules) {
@@ -66,8 +66,8 @@ export function withNextRules(rules, on = nextByDefault()) {
  * streak (instead of ending it). A charged EXPOSE cash is never caught (G3).
  */
 export const EXPOSURE_FROM = 4;
-export const EXPOSURE_STEP = 0.05;
-export const EXPOSURE_MAX = 0.3;
+const EXPOSURE_STEP = 0.05;
+const EXPOSURE_MAX = 0.3;
 export const EXPOSURE_HEAT = 50;
 
 /** 눈에 띔 after `held` windows in a row on one direction. */
@@ -98,8 +98,6 @@ export const STRIKE_HOT_GAUGE = 60;
 export const STRIKE_HOT_CAP = 1.55;
 /** STEADY, a little weaker: its pot rate and the heat a press cools. */
 export const STEADY_NEXT = Object.freeze({ potRate: 0.55, relief: 1 });
-/** A charged EXPOSE cash adds no audit mark under AUDIT_HEAT, and is never caught (G1). */
-export const EXPOSE_SHIELD = true;
 /** A charged EXPOSE cash also thickens the next board's chips this much (EXPOSED HAND), as STRIKE WAKE does by STRIKE_WAKE_CHIPS. */
 // G14 (11-20, 게임성 개선점 Q8 (1)): 1.25 -> 1.3.
 export const EXPOSE_CARRY_CHIPS = 1.3;
@@ -272,6 +270,39 @@ export function withMarkNine(rules, on = nineByDefault()) {
   const cache = on ? nineSets : beforeNineSets;
   if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
   return cache.get(rules);
+}
+
+/**
+ * G29 돈 쪽 유혹 (RULES_MARK 9): a card's 자본 and 시간 gains weigh this much
+ * in its chips; every other gain (사람 피해 down, 믿음, 정당성, 피로 down) keeps
+ * ×2. Before, a 사람 card out-paid a 자리 card in 72% of the scenes that dealt
+ * both (게임성 개선점 4차 G29); the 사람 피해 a money card brings is paid in
+ * the story, at the collapse gate.
+ */
+// 2.75, the top of the notes' 2.5~2.75: mixed scenes 67.7% money-richer (target 55~70%); 2.5 left the money hand's vault at 0.75 of people-first's.
+export const COIN_GAIN_WEIGHT = 2.75;
+export const COIN_GAIN_KEYS = Object.freeze(["capital", "time"]);
+
+/**
+ * G30 벽 앞 확정 (RULES_MARK 9): a cash this close to the real wall or closer
+ * pays its pot EDGE_CASH_BONUS times. Unknown at the press (the heartbeat
+ * hears the wall within its error), told on the slam and the reveal. It
+ * multiplies whatever the tools paid (G11c's cap is the tools' own): laid
+ * under that cap it turned FRONT PAGE (×1.2 -> ×1.5) into every hand's best,
+ * and as the bigger of the two it took the worth out of the draft's 「one
+ * more」 (check:pressure, measured 11-25; 게임성 4차 G30).
+ */
+export const EDGE_CASH_REACH = 3;
+export const EDGE_CASH_BONUS = 1.25;
+/** How far under the wall a cashed window closed, when that is EDGE_CASH_REACH or less; null otherwise. */
+export function readEdgeCash(win) {
+  if (win?.status !== "cashed") return null;
+  const gap = Number(win.wall) - Number(win.gauge);
+  return Number.isFinite(gap) && gap >= 0 && gap <= EDGE_CASH_REACH ? Math.floor(gap) : null;
+}
+/** The pot factor of a cash with the tools' `boost` (readRelicBoost) and, when `edge`, G30's on top of it. */
+export function withEdgeBonus(boost, edge) {
+  return edge ? boost.factor * EDGE_CASH_BONUS : boost.factor;
 }
 
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */

@@ -54,8 +54,8 @@ import { normalizePaid } from "./settlementPay.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
 import { LATE_BILL_CHIPS, LATE_BILL_KEEP, MERGER_EIGHT, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { COLD_BLOOD_WALL, listRefinable, NEXT_REROLL_COST, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP } from "./relicsNext.js";
-import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isMarkNineOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
-import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
+import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, COIN_GAIN_KEYS, COIN_GAIN_WEIGHT, isMarkNineOn, readEdgeCash, withEdgeBonus, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { CASCADE_MUTATION, CASCADE_MUTATION_TOP, describeLinkMade, getLinkShift, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
 import { fill } from "../locale.js";
@@ -346,14 +346,19 @@ export const REFRAME_CARD_ID = "__reframe__";
 const WILD_CARD_CHIPS = 24;
 
 /** Chips: what a card is worth before heat. The sum of what it gains. */
-export function getCardChips(choice, schema = BASE_SCHEMA) {
+export function getCardChips(choice, schema = BASE_SCHEMA, rules = undefined) {
   if (choice?.type === "reframe") return Math.round(WILD_CARD_CHIPS * normalizeSchema(schema).chipsScale);
   const effect = choice?.effect ?? {};
+  // G29 (RULES_MARK 9): 자본 and 시간 gains weigh COIN_GAIN_WEIGHT, the rest ×2.
+  const coin = isMarkNineOn(rules) ? COIN_GAIN_WEIGHT : 2;
   const gains = Object.entries(effect)
     .filter(([key, value]) => isResourceGain(key, value))
-    .reduce((sum, [, value]) => sum + Math.abs(value), 0);
-  return Math.max(5, Math.round((10 + gains * 2) * normalizeSchema(schema).chipsScale));
+    .reduce((sum, [key, value]) => sum + Math.abs(value) * (COIN_GAIN_KEYS.includes(key) ? coin : 2), 0);
+  if (schema === BASE_SCHEMA_RAW) return 10 + gains;
+  return Math.max(5, Math.round((10 + gains) * normalizeSchema(schema).chipsScale));
 }
+/** `getCardChips` on this board returns the chips before scale and rounding (`getSealedCardId`). */
+const BASE_SCHEMA_RAW = Object.freeze({ raw: true });
 
 /** What the card burns, with the fractured axis billed half again. */
 export function getCardBurn(choice, schema = BASE_SCHEMA) {
@@ -376,14 +381,17 @@ function applyFracture(effect, fracturedAxis, rate = FRACTURE_RATE) {
 }
 
 /** The card a sealed hand locks: the richest one. Ties go to the earlier card. */
-export function getSealedCardId(choices = [], schema = BASE_SCHEMA) {
+export function getSealedCardId(choices = [], schema = BASE_SCHEMA, rules = undefined) {
   const normalized = normalizeSchema(schema);
   if (!normalized.sealHighest) return null;
   const playable = choices.filter((choice) => choice && choice.type !== "reframe");
   if (playable.length < 2) return null;
+  // G29 (RULES_MARK 9): the coin weight's quarter points round differently on boards of another chipsScale (the run's
+  // board and the window's, under 8막's signature), so the richest card is read off the chips before scale and rounding.
+  const worth = isMarkNineOn(rules) ? (choice) => getCardChips(choice, BASE_SCHEMA_RAW, rules) : (choice) => getCardChips(choice, normalized, rules);
   let best = playable[0];
   for (const choice of playable) {
-    if (getCardChips(choice, normalized) > getCardChips(best, normalized)) best = choice;
+    if (worth(choice) > worth(best)) best = choice;
   }
   return best.id;
 }
@@ -512,7 +520,7 @@ export function getLockCap(mode, gauge = 0, next = false) {
 }
 
 /** G3: the streak a board is dealt with already fills LOCK's cap, so LOCK is shut on it (a rule, not a display). */
-export function isLockShutBy(streak) {
+function isLockShutBy(streak) {
   return getLogicBonus(streak) >= LOCK_CAP;
 }
 
@@ -773,7 +781,7 @@ function readTableBoard(run) {
  * twist's device of (`twistHasDevice`).
  */
 export function getCaseTwist(run, rules = ALL_RULES) {
-  return run?.story === true ? null : caseRuleFor(run?.open?.caseId, run, CASE_RULES_ON, isNextOn(rules));
+  return run?.story === true ? null : caseRuleFor(run?.open?.caseId, run, CASE_RULES_ON, isNextOn(rules), isMarkNineOn(rules));
 }
 
 /**
@@ -799,10 +807,10 @@ export function getTrainedBand(heat, { wallMin, wallMax }) {
  * `twist`: the board's, except under G5 2막 뒤늦은 청구서, whose ×LATE_BILL_CHIPS
  * pays only a cash under HEAT DEBT's line (11-20, the user's 「1」).
  */
-export function getPaidChips(card, board, gauge, twist = null) {
-  if (!twistHasDevice(twist, "lateBill") || gauge < HEAT_DEBT_GAUGE) return getCardChips(card, board);
+export function getPaidChips(card, board, gauge, twist = null, rules = undefined) {
+  if (!twistHasDevice(twist, "lateBill") || gauge < HEAT_DEBT_GAUGE) return getCardChips(card, board, rules);
   const schema = normalizeSchema(board);
-  return getCardChips(card, { ...schema, chipsScale: schema.chipsScale / LATE_BILL_CHIPS });
+  return getCardChips(card, { ...schema, chipsScale: schema.chipsScale / LATE_BILL_CHIPS }, rules);
 }
 
 /** Whether the case open on `run` switches on the act twist's `device` (actTwists.js `ACT_DEVICES`). */
@@ -983,7 +991,7 @@ export function getWindowBand(window, reach = SCOUT_REACH) {
  * G6 결재 판: the cell the board shows, drawn from the seed between the band's
  * near end and the wall: the wall is at it or past it. Null on any other board.
  */
-export function getSignCell(window) {
+function getSignCell(window) {
   if (!window?.schema?.mutations?.includes?.(SIGN_MARK)) return null;
   const { wallMin } = window.schema;
   const wall = Number(window.wall) || wallMin;
@@ -1329,6 +1337,8 @@ export function normalizeRunState(value) {
   if (normalizeRelicIds(source.refined).length) run.refined = normalizeRelicIds(source.refined);
   run.practice = normalizePractice(source.practice);
   run.veteran = source.veteran === true;
+  // G36: the NEW GAME+ season's seed for its act twists' places (its run id); only ever written when set.
+  if (run.veteran && typeof source.twistSeed === "string" && source.twistSeed) run.twistSeed = source.twistSeed.slice(0, 80);
   run.story = source.story === true;
   run.weekRule = normalizeWeekRuleId(source.weekRule);
   run.linksIn = normalizeLinks(source.linksIn);
@@ -1405,8 +1415,10 @@ export const MUTATIONS = Object.freeze({
   exposedHand: mutation("exposedHand", { label: "EXPOSED HAND" }),
   strikeMastery: mutation("strikeMastery", { label: "STRIKE MASTERY" }),
   steadyMastery: mutation("steadyMastery", { label: "STEADY MASTERY" }),
-  // B2, on a table that counts links only (cascadeRisk.js).
-  cascade: CASCADE_MUTATION,
+  // B2, on a table that counts links only (cascadeRisk.js). G32 (RULES_MARK 9): the band's far end only, on this page's rules.
+  get cascade() {
+    return isMarkNineOn() ? CASCADE_MUTATION_TOP : CASCADE_MUTATION;
+  },
   exposeMastery: mutation("exposeMastery", { label: "EXPOSE MASTERY" }),
   // MARKET SHOCK, a week's device (weeklyRules.js): once a case, mid-case. Not a
   // penalty: no decision of the player's broke this board, the week did.
@@ -1526,7 +1538,7 @@ export const BREATHER_MARK = "breather";
  * it (tableUnlocks.js `PEAK_CASES`). The engine's own "every rule" stand-in
  * says yes to anything, and a board dealt with no case named is no peak.
  */
-export const isPeakTable = (rules) => rules instanceof Set && rules.has(PEAK_MARK);
+const isPeakTable = (rules) => rules instanceof Set && rules.has(PEAK_MARK);
 
 /** An act's last case: the wall's band `PEAK_WALL` closer and the chips `PEAK_CHIPS` thicker, once. */
 export function applyPeak(schema, rules) {
@@ -2077,9 +2089,11 @@ export function buildNextSchema({ outcome, cause, gauge, pushes, streak, burnAxi
   }
   // CASCADE (B2): a link made boards ago comes back on this one; never with
   // BLACKOUT, whose wall already moved (the caller's link waits a board).
+  // G32 (RULES_MARK 9): only the band's top end, LINK_TOP_WALL (`getLinkShift`).
   if (cascade && !schema.mutations.includes("blackout")) {
-    schema.wallMin -= LINK_WALL;
-    schema.wallMax -= LINK_WALL;
+    const [bottom, top] = getLinkShift(isMarkNineOn(rules));
+    schema.wallMin -= bottom;
+    schema.wallMax -= top;
     schema.mutations.push("cascade");
   }
   // MARKET SHOCK (a week's device): the market moves this board's wall, on
@@ -2181,7 +2195,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // laid over the run's board). Before, the run's bare board paid MERGER's ×1.5
   // and every chipsFactor as ×1; rows of the older marks are re-checked as they were.
   // G5 2막 (`getPaidChips`): the case's twist may thin a cash at 60 and over.
-  const chips = card ? getPaidChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema, gauge, getCaseTwist(current, rules)) : 0;
+  const chips = card ? getPaidChips(card, isNextOn(rules) && window?.schema ? window.schema : current.schema, gauge, getCaseTwist(current, rules), rules) : 0;
   const reachedGroove = Math.max(0, Number(window?.groove) || 0);
   const focusCharge = Math.max(0, Number(window?.focus) || 0);
   const focusMode = normalizeFocusMode(window?.focusMode);
@@ -2245,11 +2259,14 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       focusCharged: focusCharge >= STANCE_CHARGE,
     }, isMarkSevenOn(rules) ? RELIC_BOOST_CAP : Infinity, isMarkEightOn(rules) ? current.refined ?? [] : [])
     : { fired: [], factor: 1 };
-  const basePot = paysPot ? Math.round(chips * multiplier * boost.factor) : 0;
-  const pot = paysPot ? Math.round(chips * multiplier * handBonus * boost.factor) : 0;
+  // G30 (RULES_MARK 9): a cash EDGE_CASH_REACH or less under the real wall pays EDGE_CASH_BONUS more (`withEdgeBonus`).
+  const edge = paysPot && isMarkNineOn(rules) && readEdgeCash(window) !== null;
+  const potFactor = withEdgeBonus(boost, edge);
+  const basePot = paysPot ? Math.round(chips * multiplier * potFactor) : 0;
+  const pot = paysPot ? Math.round(chips * multiplier * handBonus * potFactor) : 0;
   // The hand's share of the pot, told apart: what the streak earned, and what
   // LOCK added on top of it under the cap.
-  const logicPot = paysPot ? Math.min(pot, Math.round(chips * multiplier * earnedBonus * boost.factor)) - basePot : 0;
+  const logicPot = paysPot ? Math.min(pot, Math.round(chips * multiplier * earnedBonus * potFactor)) - basePot : 0;
   const focusPot = pot - basePot - logicPot;
   // INSURANCE: once a case, the wall leaves a third of the pot. At half it lifted
   // the best heartbeat play to 0.59 of a wall-seeing player, against a 0.60 cap.
@@ -2287,7 +2304,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const practice = caseClosed ? current.practice : null;
   // AUDIT, in a case whose rules have it (auditRisk.js): null, or this window's step
   // and on the close the part of the vault's share and the hand's it takes.
-  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter, shield: shielded, tilt: getStoryTilt(current, rules)?.audit ?? 0 });
+  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter, shield: shielded, tilt: getStoryTilt(current, rules)?.audit ?? 0, smooth: isMarkNineOn(rules) });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
   // IDLE MONEY (B4): on a season's own close under the week that has it, the
   // vault held through the case shrinks before the case's pot is banked. Not
@@ -2357,6 +2374,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(window?.scouted === true && isMarkSevenOn(rules) ? { scoutTrust: scoutTrustAt(scouts) } : {}),
     // The second look (B1, 11-18), written only when spent: SCOUT_NARROW_TRUST more.
     ...(window?.scouted === true && window?.narrowed === true ? { narrowed: true, ...(next ? { narrowTrust: narrowTrustAt(narrows) } : {}) } : {}),
+    // G30: the cash closed EDGE_CASH_REACH or less under the wall and was paid for it.
+    ...(edge ? { edge: true } : {}),
     // G7: 숨 고르기 was pressed on this window.
     ...(window?.breathed === true ? { breathed: true } : {}),
     // G6: this window was the case's 결재 판, and the cell it showed.
@@ -2381,12 +2400,13 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     ...(shocked ? { shock: { wall: MARKET_SHOCK_WALL, pot: shockSwing } } : {}),
     // Only on a table that counts it: the audit after this window, and on the
     // close whether it took its part and how much (`secured` is after it).
-    ...(audited ? { audit: { count: audited.count, caught: audited.caught, lost: audited.lost } } : {}),
+    // G35 (RULES_MARK 9): `count` is the tally of heats and `level` its smoothness (DecisionReveal reads which audit caught).
+    ...(audited ? { audit: { count: audited.count, caught: audited.caught, lost: audited.lost, ...(audited.level === undefined ? {} : { level: audited.level }) } } : {}),
     fracturedAxis: current.schema.fracturedAxis,
     fractureRate: current.schema.fractureRate,
     nextMutations,
     // B2, on a table that counts links: the reveal's line when this cash made one.
-    link: describeLinkMade(current, { cashed: outcome === "cash", burn }, rules),
+    link: describeLinkMade(current, { cashed: outcome === "cash", burn }, rules, isMarkNineOn(rules)),
     relicProcs,
     relicOffer,
     // Carried on the closing entry of a replayed case, where the summary's
@@ -2653,9 +2673,10 @@ export function createTableRecord(log = []) {
  * The mark of a case closed at the table of RULES_MARK 9 (G29 to G37 of the
  * fourth gameplay notes, the user's 「전부 1」 of 2026-11-25; nextTableRules.js
  * `isMarkNineOn` plays them for a row marked 9 or later only). 8 was the
- * table merged right after bundle R: G19 to G26 of the third gameplay notes,
- * the user's 「전부 1」 of 2026-11-23; nextTableRules.js `isMarkEightOn` plays
- * them for a row marked 8 or later only). 7 was the table of 2026-11-25, with
+ * table merged right after bundle R, no longer held for 2027-01-04: G19 to G26
+ * of the third gameplay notes, the user's 「전부 1」 of 2026-11-23;
+ * nextTableRules.js `isMarkEightOn` plays them for a row marked 8 or later
+ * only). 7 was the table of 2026-11-25, with
  * the wipe of that day: G11b·c, G13, G16 and G18 of the gameplay notes of
  * 11-20, the user's 「1 나눠서 두 번」; nextTableRules.js `isMarkSevenOn` plays
  * them for a row marked 7 or later only). 6 was 2026-11-25: G5's

@@ -58,7 +58,12 @@ test("the audit's limit moves with 정당성, under RULES_MARK 9 only", () => {
   assert.equal(settle(0).caught, false);
   // The engine hands the case's tilt to the audit it settles (resolveWindow).
   const engine = readFileSync(new URL("../../src/gauntlet/gauntletEngine.js", import.meta.url), "utf8");
-  assert.ok(engine.includes("shield: shielded, tilt: getStoryTilt(current, rules)?.audit ?? 0 })"));
+  assert.ok(engine.includes("tilt: getStoryTilt(current, rules)?.audit ?? 0, smooth: isMarkNineOn(rules) })"));
+  // G35's smooth ledger (RULES_MARK 9) takes the same tilt on its limit, read and judged.
+  const smooth = (tilt) => settleAudit({ run: low, rules: nine, count: [50, 50, 50, 50], busted: false, gauge: 50, pushes: 1, closed: true, secured: 1000, hand: 0, smooth: true, tilt });
+  assert.equal(smooth(0).caught, smooth(0).level >= readAudit(low, [50, 50, 50, 50], win).limit);
+  assert.equal(readAudit(low, [50, 50], win, -TILT_AUDIT).limit, readAudit(low, [50, 50], win).limit - TILT_AUDIT);
+  assert.ok(smooth(-TILT_AUDIT).caught || !smooth(0).caught);
 });
 
 test("the briefing's line: one entry a tilt, on the case's first page only", () => {

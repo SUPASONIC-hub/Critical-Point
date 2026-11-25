@@ -1,4 +1,4 @@
-import { countNarrows, countScouts } from "../gauntlet/nextTableRules.js";
+import { countNarrows, countScouts, isMarkNineOn } from "../gauntlet/nextTableRules.js";
 import { useEffect, useMemo } from "react";
 
 import { readSettledWindowSeeds } from "../appConfig.js";
@@ -143,9 +143,9 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
   // The case's rules (tableUnlocks.js): the audit is on from 사건 02 and the links from 사건 03 (RULES_MARK 4, C-4; 프롤로그 04 at RULES_MARK 3).
   const caseRules = getTableRules(currentCase, gauntletRun);
   // The case's audit (B3), off the same log the settlement counts; null in a case whose rules do not count it.
-  const auditCount = useMemo(() => (isAuditOn(gauntletRun, caseRules) ? countAudit(log) : null), [caseRules, gauntletRun, log]);
+  const auditCount = useMemo(() => (isAuditOn(gauntletRun, caseRules) ? countAudit(log, isMarkNineOn(caseRules)) : null), [caseRules, gauntletRun, log]);
   // B2's links off the case's log (cascadeRisk.js): null in a case whose rules do not have them.
-  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId, caseRules), [caseRules, gauntletRun, log, runId]);
+  const linkReading = useMemo(() => readLinks(gauntletRun, log, runId, caseRules, isMarkNineOn(caseRules)), [caseRules, gauntletRun, log, runId]);
   // The two as one field of the play view, which has room for one (check:runtime-budget).
   // G2: the second looks the case has bought, which price the next one (nextTableRules.js).
   const narrowCount = useMemo(() => countNarrows(log), [log]);

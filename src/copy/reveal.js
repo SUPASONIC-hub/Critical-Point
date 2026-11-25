@@ -41,6 +41,8 @@ const revealCopy = {
     auditTaken: " 환수 · 금고 ",
     // G17: why, under the line above.
     auditWhy: "왜: 감사 선 아래에서 끊은 확정이 감사 칸을 한도까지 채웠다. 한 번 더 밀어 선 위에서 끊으면 칸이 줄어든다.",
+    // G35 (RULES_MARK 9).
+    auditWhySmooth: "왜: 같은 자리(열기 ±1)에서 끊은 확정이 한도까지 모여 장부가 너무 매끈했다. 끊는 자리를 바꾸면 피한다.",
     toVault: " 금고로 이동 ",
     vault: " · 금고",
     staked: "걸려 있는 판돈 ",

@@ -112,6 +112,7 @@ export default {
     slamPot: "賭け金",
     slamStill: "鼓動が止まった場所に、壁が現れた。",
     slamCombo: " · ロジックコンボ {streak}",
+    slamEdge: "ギリギリ ×{bonus} · 壁まで{gap}",
     equipped: "装備",
     dropped: "· {name}を手放した",
     logicWord: "ロジック",
@@ -269,6 +270,7 @@ export default {
     status: "熱 {gauge} · {danger} · 賭け金 {pot} · 残り{seconds}秒 · 心拍 {bpm}",
   },
   afterword: {
+    edge: "ギリギリ ×{bonus} · 壁まで{gap}。",
     nextPush: "もう一度押していたら +{step} → {gauge}、壁 {wall}: {outcome}。",
     nextSafe: "行けた",
     nextBust: "BUSTだった",

@@ -185,7 +185,7 @@ export function SceneBriefing({
   // clock; above it, on a NEW GAME+ season's first page of a case, what the
   // season before left there (`echo`, an object of two lines: secondSeason.js).
   // All are drawn by WeekRulePanel.jsx.
-  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run), echo, getBriefingCaseRuleCase(node, nodeId, run));
+  const [weekRules, weekRulePanel] = useWeekRulePanel(getBriefingWeekRuleId(node, nodeId, run), echo, getBriefingCaseRuleCase(node, nodeId, run), run);
   // E-1: on a NEW GAME+ season, the scene as the page tells it (`told`: a
   // scene a season before read, folded), the button that unfolds it and the
   // NEW mark of one none read. Also WeekRulePanel.jsx's, for the same reason.

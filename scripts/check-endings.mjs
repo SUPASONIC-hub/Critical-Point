@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
 import { getEndingVariant, LOGIC_SLACK_STREAK, VAULT_SLACK_PER_CASE } from "../src/gameLogic.js";
-import { AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
+import { AUDIT_LIMIT, SMOOTH_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
@@ -488,7 +488,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * reads of the story: the wall stands at 88 and up, so a season has next to no
  * busts and a vault several times the table's, and no bust plays a scene
  * without the player. The endings are judged by the same function on the same
- * thresholds (a decision: story mode does not get endings of its own), so two
+ * thresholds but two (G37, below; story mode gets no endings of its own), so two
  * things have to stay true under that strain. Every ending a season can close
  * on by choosing is still reachable -- a full vault and a clean record must
  * not fold them into one. And SYSTEM COLLAPSE still answers for the people a
@@ -497,22 +497,21 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * Collapse by overreach (harm together with a bust rate) needs busts a story
  * season does not have. It is counted and printed, not required.
  *
- * Two of the endings are thin here, and that is measured, not asserted away:
- * with no bust to take trust and legitimacy down together, COLD JUSTICE closes
- * one or two story seasons in a hundred (14 of 600 and 59 of 4,800, against 34
- * of 600 at the table) and is asked to be reachable, which is what was decided.
- *
- * The open question is counted and printed, not required. It is the fallback,
- * and a story season that finds its clues rarely falls through to it: 6 of
- * 4,800 replayed seasons, so none in 600 is the usual count. It read as four of
- * 600 while this script handed the clue roll a field the reader does not
- * return (`finalRiskDelta`), which left every card's risk change at zero and
- * the twelve-second rule as the only way to a clue.
+ * Two of the endings were thin here: with no bust to take trust and legitimacy
+ * down together, COLD JUSTICE closed 3.0% of 600 story seasons and the open
+ * question none (it is the fallback, and a story season finds every clue).
+ * G37 (2026-11-25, the user's 「전부 1」) moved two gates for story seasons
+ * only (`storySeason`, gameLogic.js): the cold gap 12 -> 10, and a burned
+ * season that kept OPEN OVERSIGHT's trust leaves the question open. Every
+ * ending, the collapse and the open question with them, now closes at least
+ * STORY_ENDING_FLOOR of story seasons (1,200 on another seed before the
+ * change: cold 1.3 -> 3.3%, open question 0.0 -> 2.7%, quiet cover 7.0 -> 3.1%).
  *
  * Played after everything above, on the same seeded stream, so the seasons
  * above are the ones they always were.
  */
 const STORY_SEASONS = Number(process.env.ENDING_STORY_SEASONS) || SEASONS;
+const STORY_ENDING_FLOOR = 0.02;
 if (!process.env.ENDING_BASELINE) {
   const storyCounts = new Map();
   const collapseCauses = new Map();
@@ -534,10 +533,32 @@ if (!process.env.ENDING_BASELINE) {
   const storyUnexpected = [...storyCounts.keys()].filter((id) => !EXPECTED.includes(id));
   assert.deepEqual(storyUnexpected, [], `unlisted ending ids reached in story mode: ${storyUnexpected.join(", ")}`);
   assert.ok((collapseCauses.get("harm") ?? 0) > 0, `no story season collapsed on the people it spent in ${STORY_SEASONS} replayed seasons`);
+  const storyThin = EXPECTED.filter((id) => share(storyCounts, id, STORY_SEASONS) < STORY_ENDING_FLOOR);
+  if (STORY_SEASONS >= SEASONS) assert.deepEqual(storyThin, [], `G37: story-mode endings under ${STORY_ENDING_FLOOR * 100}% of ${STORY_SEASONS} seasons: ${storyThin.join(", ")}`);
   const storySpread = EXPECTED.map((id) => `${id} ${(share(storyCounts, id, STORY_SEASONS) * 100).toFixed(1)}%`).join(", ");
   console.log(
     `Story-mode ending checks passed (${STORY_SEASONS} replayed seasons: ${storySpread}; collapse by harm ${collapseCauses.get("harm") ?? 0}, by overreach ${collapseCauses.get("overreach") ?? 0}; busts ${band(storySamples.busts)}, windows ${band(storySamples.windows)}, vault a case ${band(storySamples.vaultPerCase)})`,
   );
+}
+
+/**
+ * G36 (RULES_MARK 9): seasons begun with NEW GAME+, every rule from the first
+ * case and the act twists placed by each season's seed (actTwists.js
+ * `getTwistShuffle`; RULES_MARK9=0 plays them where the first season has
+ * them). A stream of their own, so every season above is the one it was.
+ * Printed for the notes' target (collapse 20~25%), not asserted.
+ */
+// 80 so the run stays inside verify:static's eight minutes beside the other checks; 160 measured collapse 21.9% (11-25).
+const VETERAN_SEASONS = Number(process.env.ENDING_VETERAN_SEASONS) || 80;
+if (!process.env.ENDING_BASELINE && VETERAN_SEASONS > 0) {
+  const veteranBot = createSeasonBot({ seed: 20261125, staged, veteran: true });
+  const veteranCounts = new Map();
+  for (let index = 0; index < VETERAN_SEASONS; index += 1) {
+    const season = veteranBot.playSeason(`veteran:${index}`, POPULATION[index % POPULATION.length]);
+    veteranCounts.set(season.ending.id, (veteranCounts.get(season.ending.id) ?? 0) + 1);
+  }
+  const veteranSpread = EXPECTED.map((id) => `${id} ${(share(veteranCounts, id, VETERAN_SEASONS) * 100).toFixed(1)}%`).join(", ");
+  console.log(`NEW GAME+ seasons (G36, ${VETERAN_SEASONS} replayed, act twists ${isMarkNineOn() ? "placed by each season's seed" : "in the first season's places"}): ${veteranSpread}`);
 }
 
 /**
@@ -710,7 +731,8 @@ function toolTable({ codex = [], learns = false, hand = false, slots = Infinity,
     if (verdict.logic.move === "bust") count(table.need, "tool:encore");
     if (verdict.logic.move === "break") count(table.need, "tool:metronome");
     if (verdict.logic.move === "build" && verdict.logic.held > 1) count(table.need, "tool:fieldNote");
-    if ((verdict.audit?.count ?? 0) >= AUDIT_LIMIT - 1) count(table.need, "tool:auditContact");
+    // G35 (RULES_MARK 9): the level is the ledger's smoothness against SMOOTH_LIMIT.
+    if ((verdict.audit?.level ?? verdict.audit?.count ?? 0) >= (verdict.audit?.level === undefined ? AUDIT_LIMIT : SMOOTH_LIMIT) - 1) count(table.need, "tool:auditContact");
     if (verdict.cause === "creep" || verdict.cause === "timeout") count(table.need, "tool:testimony");
   };
   const needOf = (id) => table.need[RELICS[id].softens?.mutation ?? `tool:${id}`] ?? 0;
