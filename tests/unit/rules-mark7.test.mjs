@@ -56,7 +56,7 @@ const OLD = withNextRules(ALL_RULES, false);
 const card = { id: "c", label: "c", effect: { trust: 10, capital: -4 } };
 
 test("RULES_MARK 7: this engine's mark, its rules on by default, and a row of 6 or older played without them", () => {
-  assert.equal(RULES_MARK, 7);
+  assert.ok(RULES_MARK >= 7, "RULES_MARK 8 keeps 7's rules");
   assert.equal(RULES_SEVEN_MARK, 7);
   assert.equal(wantsMarkSeven({}), true);
   assert.equal(wantsMarkSeven({ process: { env: { RULES_MARK7: "0" } } }), false);

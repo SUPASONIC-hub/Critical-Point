@@ -38,6 +38,9 @@ const relicsCopy = {
     // price, filled formatted; a button that is off says why in `off`.
     reroll: "다시 뽑기 · {cost}",
     extra: "하나 더 · {cost}",
+    refine: "도구 다듬기 · {cost}",
+    refineGroup: "다듬을 도구",
+    refineOption: "{name} 다듬기, 조건 배수 {boost}배로",
     spendNote: "누르면 KD은행 계좌에서 바로 빠지고, 되돌릴 수 없다.",
     // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
     spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
@@ -54,6 +57,7 @@ const relicsCopy = {
       few: "남은 도구가 하나뿐",
       short: "잔액 부족",
       season: "이번 시즌에 이미 샀음",
+      none: "다듬을 도구가 없음",
     },
   },
   // By the tool's id: its name, what it does, what it says when it fires, the
@@ -64,7 +68,7 @@ const relicsCopy = {
       text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
       proc: "전환을 붙잡았다",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "방향을 바꾼 판(전환)에서 확정하면 판돈 +{pct}%.",
+      next: "방향을 바꾼 판(전환), 또는 같은 방향 6연속 뒤 첫 판에서 확정하면 판돈 +{pct}%.",
     },
     coldBlood: {
       name: "냉혈",

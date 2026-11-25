@@ -37,6 +37,8 @@ const tableCopy = {
     breath: "숨 고르기",
     // G15: beside 숨 고르기, where the BUST before this board went.
     breathBust: "지난 판 {heat}에서 터짐",
+    breathHotWall: " · 이번 판 벽 +{wall}",
+    chargeLeak: "충전이 새기 시작했다. 지금 확정하거나 다시 눌러라.",
     breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
     breathDone: "숨을 골랐다. 열기 {gauge} 내려 {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",

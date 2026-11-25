@@ -25,6 +25,8 @@ export default {
     terms: "With conditions",
     nameWall: "On this signature line, Name only stands the Wall band {wall} closer.",
   },
+  // G23 여는 판돈 (WeekRulePanel.jsx OpeningAsk).
+  opening: { kicker: "Opening stake", question: "How do you open this Case? If you don't choose, it opens normally.", normal: "Open normally", big: "Open big", bigNote: "Open big and every card's chips are ×{chips} this Case, but the Wall can stand as low as {wall} Heat." },
   comfort: {
     title: "Comfort settings",
     close: "Close",

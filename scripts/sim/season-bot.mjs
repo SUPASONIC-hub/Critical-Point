@@ -1049,9 +1049,9 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
     return { vault: run.vault, busts, midCaseBusts, mutatedAfterBust, nextTableRules, played, ...paid, logic: run.logic, seen, trustSpent };
   }
 
-  function playHandCase(caseIndex, decide, relics, { stanceMastery, logic } = {}, handRules = ALL_RULES) {
+  function playHandCase(caseIndex, decide, relics, { stanceMastery, logic, refined } = {}, handRules = ALL_RULES) {
     const rules = withNextRules(handRules, NEXT_ON);
-    let run = openCaseRun({ relics, stanceMastery, ...(logic ? { logic } : {}) }, { rules });
+    let run = openCaseRun({ relics, stanceMastery, ...(logic ? { logic } : {}), ...(refined ? { refined } : {}) }, { rules });
     let played = 0;
     for (let windowIndex = 0; windowIndex < WINDOWS_PER_CASE; windowIndex += 1) {
       played += 1;

@@ -55,7 +55,7 @@ const weekRulesCopy = {
   actTwists: {
     merger: {
       title: "합병",
-      text: "이번 사건은 모든 카드의 칩이 {mergerChips}배지만, 벽 띠가 열기 {mergerShift}만큼 앞당겨 선다.",
+      text: "이번 사건은 모든 카드의 칩이 {mergerChips}배지만, 벽 띠의 먼 끝이 열기 {mergerTop}만큼 앞당겨 선다.",
       world: "그룹이 「개혁」이라며 계열사를 합친다. 판은 커지고 벽은 가까워진다.",
     },
     scattered: {

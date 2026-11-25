@@ -24,6 +24,8 @@ export default {
     signCell: "Wall from {cell}",
     breath: "Catch breath",
     breathBust: "Last BUST at {heat}",
+    breathHotWall: " · Wall +{wall} this hand",
+    chargeLeak: "The charge has started to leak. Commit now or press again.",
     breathLabel: "Catch breath: spend {seconds}s of clock, lower Heat by {gauge} and move the Wall back {wall}. Once, before the first push.",
     breathDone: "Breath caught. Heat down {gauge} to {to}, the Wall moved back {wall}.",
     combo: "Combo",

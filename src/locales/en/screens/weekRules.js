@@ -42,7 +42,7 @@ export default {
   actTwists: {
     merger: {
       title: "The Merger",
-      text: "This Case, every card’s chips are ×{mergerChips}, but the Wall band stands {mergerShift} Heat closer.",
+      text: "This Case, every card’s chips are ×{mergerChips}, but the far end of the Wall band stands {mergerTop} Heat closer.",
       world: "The group merges its companies and calls it reform. Bigger stakes, a nearer Wall.",
     },
     scattered: {

@@ -241,6 +241,22 @@ test("an act's last case is 「고점 판」: the briefing says it and the board
   await startDebugNode(page, "case06", "c6_start");
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
 });
+// G23 (RULES_MARK 8): 사건 08 to 42 ask how to open, in the signature's frame, and 크게 연다 deals the nearer wall.
+test("a case from 사건 08 asks how to open, inside a 360px phone, and opening big stands the wall from 48 @once", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await startDebugNode(page, "case12", CASE_START_NODES.case12, { openTable: false });
+  const ask = page.getByTestId("opening-ask");
+  await expect(ask).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("opening-normal")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("opening-big")).toHaveAccessibleDescription(/48/);
+  // Polled: the briefing's entrance scales the page for a moment (43.65px mid-way).
+  await expect.poll(async () => (await page.getByTestId("opening-big").boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByTestId("opening-big").click();
+  await expect(page.getByTestId("opening-big")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("open-table").click();
+  await expect(page.locator(".gx-band-label").first()).toContainText("48");
+});
 // C9 (11-30): the KD은행 계좌 pays at the draft. The vault a fresh case01
 // close leaves is too small for either buy, so the save is given one and
 // reloaded on the draft, which a reload keeps.
