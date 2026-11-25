@@ -176,7 +176,7 @@ export const side11 = {
       triggers: ["choice", "affection", "recognition"],
       choices: [
         { id: "s11_after_record", label: "재경기 기록을 초 단위로 적는다", effect: { legitimacy: 5, trust: 2 }, cognition: { inference: 2 }, next: "s11_result" },
-        { id: "s11_after_nobody", label: "'9시까지 아무도 재지 않기'이라고 쓴다", effect: { trust: 6, fatigue: -3 }, cognition: { reframing: 2 }, next: "s11_result" },
+        { id: "s11_after_nobody", label: "'9시까지 아무도 재지 않기'라고 쓴다", effect: { trust: 6, fatigue: -3 }, cognition: { reframing: 2 }, next: "s11_result" },
         { id: "s11_after_none", label: "아무것도 쓰지 않고 서울로 출발한다", effect: { time: 4, trust: -2 }, cognition: { risk: 1 }, next: "s11_result" },
       ],
     },
