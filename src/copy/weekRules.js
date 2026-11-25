@@ -24,7 +24,7 @@ const weekRulesCopy = {
     },
     "short-clock": {
       title: "시간이 짧다",
-      text: "이번 주는 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",
+      text: "이번 주는 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다. LOCK 충전은 시간을 {lockDrag}배 쓴다.",
       world: "이번 주 이사회는 보고 시간을 줄이고 보고서 값을 올렸다.",
     },
     "crisis-week": {
@@ -65,7 +65,7 @@ const weekRulesCopy = {
     },
     hearing: {
       title: "청문회",
-      text: "이번 사건은 판마다 시간이 {hearingCut}% 짧고, 모든 카드의 칩이 {hearingChips}배다.",
+      text: "이번 사건은 판마다 시간이 {hearingCut}% 짧고, 모든 카드의 칩이 {hearingChips}배다. LOCK 충전은 시간을 {lockDrag}배 쓴다.",
       world: "기록의 주인을 다투는 청문회. 답할 시간은 짧고, 한마디의 값은 크다.",
     },
     // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`): dealt once the table does what they say.
@@ -91,13 +91,13 @@ const weekRulesCopy = {
     },
     signedByName: {
       title: "실명 서명",
-      text: "이번 사건은 첫 판 전에 서명 방식을 고른다. 이름만 쓰면 모든 카드의 칩이 {nameChips}배, 벽 띠가 {nameWall} 앞당겨 선다. 조건을 달면 벽 띠가 {termsWall} 물러서고 칩이 {termsChips}배다.",
+      text: "이번 사건은 첫 판 전에 서명 방식을 고른다. 이름만 쓰면 모든 카드의 칩이 {nameChips}배, 벽 띠가 사건마다 {nameWallLow}~{nameWallHigh} 앞당겨 선다(서명란에 이번 값). 조건을 달면 벽 띠가 {termsWall} 물러서고 칩이 {termsChips}배다.",
       world: "이제 서명란에 빈칸은 없다. 이름 옆에 조건을 달 수 있을 뿐이다.",
     },
   },
   caseRules: {
     case09: {
-      text: "이번 사건은 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다.",
+      text: "이번 사건은 판마다 시간이 {seconds}초 짧고, 모든 카드의 칩이 {chips}배다. LOCK 충전은 시간을 {lockDrag}배 쓴다.",
       world: "청산 안건이 72시간 안에 표결에 오른다. 보고는 짧게, 값은 비싸게.",
     },
     case11: {

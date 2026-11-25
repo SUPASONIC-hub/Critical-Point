@@ -27,7 +27,7 @@ export default {
     spendNote: "押すとKD銀行口座からすぐ引かれ、取り消せない。",
     spendHint: "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
-    spendHintNext: "もう一つはシーズンに一度。引き直しは安い：弱い三つなら引き直そう。",
+    spendHintNext: "もう一つはシーズンに一度。引き直しは安い：弱い三つなら引き直そう。同じ勝負で道具が重なっても、賭け金の倍率は合わせて{cap}倍まで（一つでそれより大きい道具はその値）。",
     secondTitle: "もう一つ選ぶ",
     secondLede: "買った一つを、残る二つから選ぶ。",
     off: {

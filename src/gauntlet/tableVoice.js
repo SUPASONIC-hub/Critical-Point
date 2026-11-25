@@ -98,9 +98,9 @@ export const describeWall = ({ gauge, dangerLine }) => fill(voice().wall, { gaug
 
 export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
-/** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
-export const describeScout = ({ wallMin, wallMax, narrowed }) =>
-  fill(narrowed ? voice().scoutNarrow : voice().scout, { min: wallMin, max: wallMax, trust: narrowed ? SCOUT_NARROW_TRUST : SCOUT_TRUST });
+/** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took (`trust`: the first look's price, G13). */
+export const describeScout = ({ wallMin, wallMax, narrowed }, trust = SCOUT_TRUST) =>
+  fill(narrowed ? voice().scoutNarrow : voice().scout, { min: wallMin, max: wallMax, trust: narrowed ? SCOUT_NARROW_TRUST : trust });
 
 /**
  * The stake clock's move (B5): the heat that moved it, the seconds the
@@ -168,7 +168,7 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "" }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, scoutTrust = SCOUT_TRUST, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "" }) {
   const carry = findStanceCarry(cashMutations);
   return {
     asked,
@@ -188,7 +188,7 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
     hold: getHoldCall(hold),
-    scout: band?.scouted ? describeScout(band) : "",
+    scout: band?.scouted ? describeScout(band, scoutTrust) : "",
     gauge: win.gauge,
     remaining: clock.remaining,
     windowSeconds: readWindowSeconds(win),

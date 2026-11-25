@@ -479,7 +479,7 @@ test("a board with no place yet says how far it is from its first three (N46)", 
   await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
   await page.route(`${SUPABASE}/rest/v1/public_hall_of_fame**`, (route) => route.fulfill(json([
     { board: "table-4", place: null, run_tag: null, settled_on: null, checked_seasons: 3 },
-    { board: "2026-W02", place: null, run_tag: null, settled_on: null, checked_seasons: 7 },
+    { board: "2026-W02", place: null, run_tag: null, settled_on: null, checked_seasons: 4 },
     { board: "2026-W01", place: null, run_tag: null, settled_on: null, checked_seasons: 2 },
   ])));
   await useMockSupabase(page);
@@ -487,8 +487,8 @@ test("a board with no place yet says how far it is from its first three (N46)", 
   await page.getByRole("button", { name: "랭킹" }).first().click();
   const lines = page.getByTestId("ranking-hall-progress");
   await expect(lines).toHaveText([
-    "명예의 전당 · 본 판: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 3/10)",
-    "명예의 전당 · 2026-W02: 첫 세 자리는 10시즌이 모이면 열립니다 (지금 7/10)",
+    "명예의 전당 · 본 판: 첫 세 자리는 5시즌이 모이면 열립니다 (지금 3/5)",
+    "명예의 전당 · 2026-W02: 첫 세 자리는 5시즌이 모이면 열립니다 (지금 4/5)",
   ]);
   // On a phone the line wraps inside the panel.
   await page.setViewportSize({ width: 360, height: 740 });

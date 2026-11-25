@@ -135,6 +135,7 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
     window: { status: "cashed", gauge: 22, pushes: 0, focus: 80, focusMode: "strike", focusHits: 3 },
     card: staked,
   });
+  // 15 + OVERCLOCK's 6 + STRIKE WAKE's 3.
   assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [24, 56], "the push and the wall are what their rules made them");
   assert.deepEqual([nextRun.schema.sealHighest, nextRun.schema.sealBreak], [true, SEAL_BREAK_GAUGE], "with the wall where it was, the seal has room");
   // The same board on a peak table, whose wall is 5 closer, is the one that would break it now.

@@ -193,11 +193,11 @@ Still open, on purpose:
   (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
   `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
   `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
-  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  five since bundle R (#648; ten before), tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
   and two steps in `verify-ranking.yml`: the settle call right after the
   marks, from the same check, and a job of its own with `contents: write`
   that force-pushes one commit to the orphan branch `hall-of-fame`. Each
-  board is read on its own: the threshold of ten counts the board's complete
+  board is read on its own: the threshold (five since bundle R, ten before) counts the board's complete
   seasons with no mark over the whole board (`hall_of_fame_counts`, counted
   again inside the settle call), and the replay reads each open board's first
   ten candidates beside the top `limit`. A week's
@@ -207,10 +207,11 @@ Still open, on purpose:
   at the earliest).
 - Since #556 (2026-11-16) the nightly Verify Ranking summary's "Hall of fame
   (D2)" section carries one line, `formatHallOfFameThreshold` in
-  `scripts/verify-ranking-rows.mjs`: how many boards hold ten and five or more
-  complete seasons with no mark, and the fullest board. Read only; the
-  threshold `HALL_OF_FAME_MIN_SEASONS = 10` and the server stay, for decision
-  T's T12 (11-23).
+  `scripts/verify-ranking-rows.mjs`: how many boards hold five (the threshold)
+  and ten (the one before) or more complete seasons with no mark, and the
+  fullest board. Since bundle R (#648, merged with the 11-25 wipe) the
+  threshold is five: `HALL_OF_FAME_MIN_SEASONS = 5` and the server's
+  `hall_of_fame_settle` (20261130000200_hall_of_fame_threshold_five.sql).
 - Bundle 11-16a (#566, 2026-11-16, `60dc8551`): the board has an admin tool
   for the two makers only (#561): `?admin` or `#admin` opens it, Google sign-in
   through Supabase Auth's REST (no supabase-js), and `is_board_admin()` asks
@@ -1841,10 +1842,14 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
     The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
     from its `final` case row as well, since the reset takes the ranking row:
-    every reset (11-30's included, and any later one) deletes
+    every reset (11-25's included, moved up from 11-30, and any later one) deletes
     `season-final` only and keeps the `final` case rows, or snapshots the
     finished count first, and moves `LAST_RANKING_RESET` there to its own
     merge time; point check:grants' newest reset at the new file too.
+    From 11-25 on a reset keeps the mark unless the rules change and is named
+    by its day (`*_ranking_reset_<MMDD>.sql`); check:grants replays the newest
+    such file (`DATED_RESET`). The day's order is under Database Deployment,
+    "11-30 당일 순서".
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
     copy, and requires every glossary term (191) to carry a plain explanation
@@ -2467,6 +2472,50 @@ Manual steps after pushing the 2026-09-28 migrations:
   governs the local stack.
 - Expect the public ranking to be empty: season rows the new rules would refuse
   were deleted.
+
+### 11-30 당일 순서 (묶음 R, 랭킹 비움 + 개편) → 11-25(수)로 앞당김
+
+**11-25 사용자 결정(보기 2, 이어서 13시대 「1」)**: 수정·개선은 개발이 끝나는 대로 앞당겨 병합한다. 묶음 R은 11-25(수)
+CI가 초록이 되는 대로 병합·배포하며 PR 「묶음 R 앞당김 (11-25)」 하나(갈래 `bundle-r-early`)에 모았고, `RANKING_RESET_MS`와
+시작 화면·가이드의 예고 문구는 11-25로 바꿨다. 병합이 더 늦어지면 그 날 0시로 다시 맞춘다. 마이그레이션
+파일 이름 `20261130…`은 그대로 둔다(이름이 이미 적용된 가장 늦은 번호 `20261129120000`보다 뒤라 순서대로
+적용됨). 다만 그 뒤에 만드는 마이그레이션은 `20261130000200`보다 늦은 이름이어야 한다. 아래 순서의 「11-30」은
+11-25로 읽는다.
+
+묶음 R은 draft PR 「묶음 R 뼈대 (11-30 랭킹 비움)」 하나에 모은다. 마이그레이션
+`20261130000000_ranking_reset_1130.sql`은 병합 1분 안에 적용되므로 11-30 전에는
+병합하지 않는다. 비움은 우선순위 70의 규칙대로 `season-final` 행만 지우고
+`final` 사건 행은 남긴다.
+
+1. ~~11-23(월) 결정 T~~ → **11-19에 닫음**(사용자 Q4 (1)): `report-decision-t.mjs --fetch`
+   (run 44453002577)에서 끝난 시즌 0/30·사건 행 87/150·BUST 판 55/100·W47 0/80, 판단할
+   줄 0. 이용자가 적어 11-23에도 같으므로 「바꿈 없음」.
+2. ~~11-24~11-29 숫자 채움~~ → `[SLOT DECISION-T]`에 「바꿈 없음」을 적었다(서버 문장 없음). RULES_MARK는 11-17에 5로 올렸다(`[SLOT RULES_MARK]` 채움):
+   N26(#591)이 주간 규칙 없는 시즌의 사건 09·11·14·16에 「이번 사건만」 규칙을
+   깔아 채점이 바뀌기 때문이다. 마이그레이션은 `>= 5`를 요구하고, check:grants의
+   `SERVER_MARK`는 그 파일의 `>= N`을 읽는다. verify-ranking-rows.mjs의 `DB_MARKS`는
+   검사기의 글자 표시라 이 숫자와 상관없다. 기기 안 로컬 랭킹 키는 v12 그대로다(Q2).
+   명예의 전당 본 판은 `table-5`로 새로 시작하고 `table-4`는 남는다.
+3. **N18·N21 합치기**: 프롤로그 02 규칙 나누기(N18)와 첫 BUST 장면 유지(N21)의 draft
+   갈래를 묶음 R 갈래에 병합한다(충돌은 표시된 부분만 고친다). main 따라가기는
+   병합 직전에 한 번만 한다. 그 뒤 `npm run check:grants`, `npm test`,
+   `npm run check:changed`를 돌리고, `e2e` 라벨이 붙은 CI가 초록인지 본다.
+4. **11-30(월) 비움 전 숫자 남기기**: 병합 전에 Funnel 워크플로를 한 번 돌려
+   (`gh workflow run funnel.yml`) 요약을 `..\cp-archive\메모-20261130\`에 남긴다.
+   완주 수와 `season-final` 행 수가 들어 있어야 한다. 마이그레이션의 `raise notice`는
+   두 번째 사본이다.
+5. **병합**: scripts/report-funnel.mjs의 `LAST_RANKING_RESET`을 실제 병합 예정 시각
+   +1분으로 고치고 push한다. 갈래가 main보다 뒤처지지 않았는지 확인하고 손으로
+   병합한다(`--auto` 금지). 마이그레이션이 먼저 적용되고(병합 커밋의 「Supabase Preview」
+   체크), 클라이언트는 약 15분 뒤 Verify·Deploy로 따라온다. 실제 병합 시각이 예정과
+   어긋나면 `LAST_RANKING_RESET`만 고치는 한 줄 PR을 따로 낸다.
+6. **확인**: `gh workflow run migration-drift.yml`을 돌려 초록인지, 열린 drift 이슈가
+   없는지 본다. 공개 랭킹은 0행, 명예의 전당 표는 그대로, 시작 화면 예고는
+   11-25이 끝나면 저절로 사라진다(`rankingResetNoticeAt`).
+7. **알림**: 게시판에 비움과 개편이 끝났다는 글을 올리고, README 새 소식 한 줄을 쓴다.
+8. ~~12-01(화)부터 운영 모드~~ → 11-25 사용자 결정으로 없앰(#671): 매일 배포 그대로(docs/ops-mode.md).
+   다음 비움도 `*_ranking_reset_<MMDD>.sql` 이름으로
+   만든다. check:grants는 이름이 가장 늦은 파일을 재생한다.
 
 ## Looked at and left
 

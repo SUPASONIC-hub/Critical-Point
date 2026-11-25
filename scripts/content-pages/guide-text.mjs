@@ -27,22 +27,22 @@ export const GUIDE_BODY = {
 <h3>심박</h3>
 <p>벽을 듣는 것은 심박뿐입니다. 열기가 벽에서 44 안으로 들어오면 가까워질수록 빨라지고, 최대 190까지 오릅니다. 다만 심박이 듣는 벽은 실제와 최대 18까지 어긋나고, 열기가 높거나 시계가 거의 다 되면 벽과 상관없이 빨라집니다. BUST 뒤에는 벽이 실제로 어디 있었는지와 심박이 어디로 들었는지가 함께 나오니, 귀를 맞추는 데 쓰십시오.</p>
 <h3>조회</h3>
-<p>프롤로그 03부터 「조회」로 믿음 1과 시간 3초를 내고 벽 구간을 20칸 폭으로 좁힐 수 있습니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다. 한 번 더 누르면 시간 3초로 14칸까지 좁힙니다. 이 둘째 조회의 믿음은 한 사건 안에서 2, 2, 3, 3, 4, 4…로 오르고, 버튼에 이번 값이 나옵니다.</p>
+<p>프롤로그 03부터 「조회」로 믿음 1과 시간 3초를 내고 벽 구간을 20칸 폭으로 좁힐 수 있습니다. 판마다 한 번이고, 벽이 그 한가운데 있다는 뜻은 아닙니다. 한 번 더 누르면 시간 3초로 14칸까지 좁힙니다. 이 둘째 조회의 믿음은 한 사건 안에서 2, 2, 3, 3, 4, 4…로 오르고, 버튼에 이번 값이 나옵니다. 첫 조회도 한 사건 안에서 처음 세 번만 믿음 1이고, 그 뒤로 2, 2, 3, 3…으로 오릅니다. 우리는 「이번 판은 심박만 믿고 간다」도 고를 만한 선택이 되기를 바랐습니다.</p>
 <h3>판돈, 확정, BUST</h3>
 <p>「확정」을 누르면 칩 × 배율 × 콤보와 LOCK 보너스가 사건의 판돈에 더해집니다. 판돈은 사건이 닫힐 때까지 금고 밖에 있으므로, 사건 도중 한 번의 BUST가 그때까지의 판돈을 모두 지웁니다. 사건의 마지막 장면이거나 열기가 이미 벽 구간 안이라면, 확정을 약 0.6초 꾹 누르거나 3초 안에 「한 번 더」를 눌러야 합니다.</p>
-<p>BUST는 밀어붙여 벽에 닿거나, 시계가 올린 열기가 벽에 닿거나, 시간이 다 될 때 납니다. 판돈은 0이 되고, 카드는 이득 없이 비용만 치르며, 믿음 6, 공정함 6, 남은 시간 4를 잃고 피로가 8 오릅니다. 이야기는 다음 장면을 건너뜁니다. 금고는 건드리지 않습니다.</p>
+<p>BUST는 밀어붙여 벽에 닿거나, 시계가 올린 열기가 벽에 닿거나, 시간이 다 될 때 납니다. 판돈은 0이 되고, 카드는 이득 없이 비용만 치르며, 믿음 6, 공정함 6, 남은 시간 4를 잃고 피로가 8 오릅니다. 이야기는 다음 장면을 건너뜁니다(프롤로그 01·02는 빼고). 금고는 건드리지 않습니다.</p>
 <h3>테이블 시계</h3>
 <p>판의 시간은 기본 45초이고, 열기 45부터 40초, 열기 65부터 35초로 줄며, 12초보다 짧아지지는 않습니다. 판이 열리고 4초가 지나면 시계가 스스로 열기를 올립니다. 초당 0.5이고, 밀 때마다 12%씩 빨라지며 「시계 열기 ×N」으로 표시됩니다.</p>
 <h3>LOCK과 자세</h3>
 <p>프롤로그 04부터 카드를 건 뒤 LOCK을 누를 수 있습니다. 한 번에 1.5초가 들고 충전이 쌓여, 카드의 자원 효과와 칩 배율이 커집니다(칩 배율은 1.5배까지). 프롤로그 05부터 자세를 고릅니다. STRIKE는 배율을 가장 빨리 키우고, 열기 60 이상에서 확정하면 상한이 1.55배로 오릅니다. STEADY는 한 번 민 뒤의 LOCK마다 열기를 1씩 식힙니다. EXPOSE는 자원 효과를 키우고, 가득 충전해 확정하면 감사가 차지 않고 적발되지 않으며 다음 판의 칩이 1.3배가 됩니다. 충전 70 이상으로 확정하면 자세가 다음 판으로 이어지고, 한 자세로 이렇게 세 번 확정하면 시즌 숙련이 생깁니다.</p>
-<p>들고 온 연속이 이미 LOCK 상한(1.5배)을 채운 판에서는 LOCK이 닫힙니다. 더할 것이 없기 때문이고, 누르면 그 이유가 나옵니다.</p>
+<p>들고 온 연속이 이미 LOCK 상한(1.5배)을 채운 판에서는 LOCK이 닫힙니다. 더할 것이 없기 때문이고, 누르면 그 이유가 나옵니다. 시계가 짧은 판, 곧 SHORT CLOCK(이번 주의 규칙과 사건 09)과 7막 「청문회」에서는 LOCK 한 번이 1.15배인 약 1.7초를 씁니다. 버튼에 이번 값이 나오니, 충전 없이 빨리 끊는 판도 생각해 보십시오.</p>
 
 <h2>판단이 남기는 흔적</h2>
-<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 03부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
+<p>한 번의 결정은 다음 판의 규칙을 바꿉니다. 아래 규칙은 괄호 속 사건에서 열리고, 사건 05부터는 모두 켜지며, NEW GAME+는 처음부터 모두 켜져 있습니다.</p>
 <dl>
 <dt>BLACKOUT (프롤로그 02)</dt><dd>BUST 다음 판은 카드의 칩과 소모가 가려지고 벽 구간이 6 가까워집니다.</dd>
-<dt>AFTERSHOCK (프롤로그 02)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
-<dt>SILENCE (프롤로그 02)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
+<dt>AFTERSHOCK (사건 04)</dt><dd>BUST 다음 판은 열기 22에서 시작합니다.</dd>
+<dt>SILENCE (사건 05)</dt><dd>시간이 다 돼 BUST하면 다음 판은 심박이 벽을 가리키지 않고, 시간이 30초입니다.</dd>
 <dt>COLD FEET (프롤로그 03)</dt><dd>한 번도 밀지 않고 확정하면 다음 판의 칩이 가장 많은 카드가 열기 30을 넘을 때까지 봉인되고, 칩이 0.6배가 됩니다.</dd>
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
@@ -63,7 +63,7 @@ export const GUIDE_BODY = {
 
 <h2>도구</h2>
 <p>프롤로그 05부터 사건이 닫히면 다음 사건의 첫 테이블에서 드래프트가 열립니다. 시계가 멈춘 동안 도구 세 개 가운데 하나를 고릅니다. 도구는 다섯 개까지 들고, 다 차면 하나를 내려놓습니다. 아무것도 고르지 않으면 「숨 고르기」가 되어 첫 판의 시간이 10초 늘고 벽이 3 멀어집니다. 고르기 전에 금고에서 1,500을 내면 「다시 뽑기」를 드래프트마다 한 번, 12,000을 내면 「하나 더」를 시즌에 한 번 할 수 있습니다. 다시 뽑기는 싸니 셋이 약하면 다시 뽑으십시오.</p>
-<p>도구마다 조건이 있고, 조건이 맞은 확정은 판돈이 크게 오릅니다. 「방열판」은 열기 75 이상에서 확정하면 +60%, 「감사실 연줄」은 한 번 이상 밀고 열기 50 밑에서 확정하면 +80%(눈에 띔에도 적발되지 않음), 「냉혈」은 BUST 다음 판을 AFTERSHOCK 없이 열기 0에서 시작하게 하고 벽을 2 물리며 그 판의 확정을 +100%로 만듭니다. 「도윤하의 현장 메모」는 같은 쪽 콤보 5 이상에서 +25%, 「메트로놈」은 방향을 바꾼 판에서 +70%, 「임경수의 사본」은 BLACKOUT 판에서 +70%, 「차지원의 1면」은 OVERCLOCK 판에서 +20%입니다. 그러니 내 플레이에 맞는 조건을 고르십시오. 조건을 채워야 풀리는 도구도 있습니다. 논리 콤보 8을 달성하면 BUST해도 콤보가 남는 「앙코르」(콤보 8 이상 확정 +15%)가, 판돈 5,000 이상을 벽에 잃으면 사건마다 한 번 판돈의 3분의 1을 지키는 「보험」이 풀립니다.</p>
+<p>도구마다 조건이 있고, 조건이 맞은 확정은 판돈이 크게 오릅니다. 「방열판」은 열기 75 이상에서 확정하면 +60%, 「감사실 연줄」은 한 번 이상 밀고 열기 50 밑에서 확정하면 +80%(눈에 띔에도 적발되지 않음), 「냉혈」은 BUST 다음 판을 AFTERSHOCK 없이 열기 0에서 시작하게 하고 벽을 2 물리며 그 판의 확정을 +100%로 만듭니다. 「도윤하의 현장 메모」는 같은 쪽 콤보 5 이상에서 +25%, 「메트로놈」은 방향을 바꾼 판에서 +70%, 「임경수의 사본」은 BLACKOUT 판에서 +70%, 「차지원의 1면」은 OVERCLOCK 판에서 +20%입니다. 그러니 내 플레이에 맞는 조건을 고르십시오. 조건을 채워야 풀리는 도구도 있습니다. 논리 콤보 8을 달성하면 BUST해도 콤보가 남는 「앙코르」(콤보 8 이상 확정 +15%)가, 판돈 5,000 이상을 벽에 잃으면 사건마다 한 번 판돈의 3분의 1을 지키는 「보험」이 풀립니다. 조건이 맞은 도구가 한 판에 둘 이상 겹치면 배수는 합쳐 1.6배에서 멈춥니다. 혼자서 그보다 큰 도구(감사실 연줄 1.8배, 냉혈 2배)는 그 값까지 받으니, 두 번째 도구가 첫 도구의 몫을 깎지는 않습니다.</p>
 
 <h2>여섯 가지 자원</h2>
 <p>남은 시간, 현금, 믿음, 공정함은 높을수록 좋고, 사람 피해와 피로는 오를수록 손해입니다. 사건은 남은 시간 72, 현금 100, 믿음 50, 공정함 50, 사람 피해 0, 피로 10에서 출발하되 앞 사건의 결과만큼 달라집니다. S 랭크 뒤에는 믿음 +4와 공정함 +3, C 랭크 뒤에는 공정함 −2와 피로 +4를 안고 시작하고, 시즌 후반의 사건일수록 더 지친 채 열립니다. 카드의 이득은 열기에 따라 커져 열기 60에서 1.9배, 100에서 2.5배가 되지만, 비용은 커지지 않습니다.</p>
@@ -86,10 +86,11 @@ export const GUIDE_BODY = {
 <dt>뒤늦은 청구서 (2막, 사건 10)</dt><dd>열기 60 이상에서 확정하면 HEAT DEBT가 열기의 3분의 1이 아니라 4분의 3을 안고 다음 판을 시작하게 합니다(방열판을 들었다면 방열판의 값). 60 밑에서 확정하면 모든 카드의 칩이 1.25배입니다. 크게 확정할지, 깨끗하게 챙길지를 고르는 사건입니다.</dd>
 <dt>학습된 벽 (4막, 사건 20·22·23)</dt><dd>판이 내가 확정한 열기를 배웁니다. 다음 판의 벽 구간은 그 열기보다 10 아래부터 18 위까지(폭은 34 이상)로 서되, 구간의 가운데가 원래 구간의 가운데보다 아래로 내려가지는 않습니다. 이렇게 선 판의 조회는 처음부터 14칸으로 좁히고, 한 번뿐입니다. BUST 다음 판은 평소 구간입니다.</dd>
 <dt>진술 고정 (6막, 사건 32~35)</dt><dd>사건에서 처음 확정한 자세가 사건 끝까지 남고 바꿀 수 없습니다. 대신 확정할 때마다 충전이 모자라도 그 자세가 다음 판으로 이어집니다. 시즌 숙련은 평소처럼 충전 70 이상의 확정만 셉니다.</dd>
-<dt>실명 서명 (8막, 사건 44·46·48·49)</dt><dd>첫 판 전에 브리핑에서 서명 방식을 고릅니다. 「이름만 쓴다」는 모든 카드의 칩이 1.25배이고 벽 구간이 2 앞당겨지며, 「조건을 단다」는 벽 구간이 3 물러서고 칩이 0.9배입니다. 고르지 않으면 조건을 단 것으로 칩니다.</dd>
+<dt>실명 서명 (8막, 사건 44·46·48·49)</dt><dd>첫 판 전에 브리핑에서 서명 방식을 고릅니다. 「이름만 쓴다」는 모든 카드의 칩이 1.25배이고 벽 구간이 1~3 앞당겨지며, 「조건을 단다」는 벽 구간이 3 물러서고 칩이 0.9배입니다. 고르지 않으면 조건을 단 것으로 칩니다.</dd>
 </dl>
 <p>이 다섯 규칙도 이번 주의 규칙으로 시작한 시즌과 스토리 모드에는 없습니다.</p>
 <p>어느 주에 어떤 규칙이 서는지는 <a href="/weekly.html">주간 규칙 달력</a>에 미리 적어 둡니다.</p>
+<p><strong>서명란의 값.</strong> 8막 「실명 서명」의 「이름만 쓴다」가 벽 구간을 앞당기는 폭은 사건마다 1~3으로 다릅니다. 서명란이 고르기 전에 이번 사건의 값을 먼저 보여 주고, 사건 49는 늘 3입니다. 우리는 같은 사람도 사건마다 서명을 다시 고민하게 하고 싶었습니다.</p>
 
 <h2>리포트와 버스트 점수</h2>
 <p>리포트는 사건마다 얼마나 벌었는지가 아니라 어떻게 판단했는지를 0~100점으로 매깁니다.</p>
@@ -112,7 +113,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: 나머지 모두.</li>
 </ul>
 <p>스토리 모드로 연 사건이 있는 시즌은 공개 랭킹에 오르지 않습니다.</p>
-<p>2026년 11월 30일(월) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남으며, 시작 화면에도 11월 16일부터 같은 안내가 나옵니다.</p>
+<p>2026년 11월 25일(수) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남으며, 시작 화면에도 11월 16일부터 같은 안내가 나옵니다.</p>
 
 <h2>시즌의 끝</h2>
 <p>결말은 아홉 가지이고, 시즌 전체를 읽어 정해집니다. 사건이 닫힐 때마다의 믿음, 공정함, 현금의 평균, 사건당 평균 사람 피해, BUST한 판의 비율, 찾은 숨은 기록의 비율, 판을 다시 짜 숨은 경로를 연 비율, 압력이 얼마나 높게 이어졌는지, 그리고 마지막 사건의 결정입니다. 사람 피해가 사건당 평균 20 이상이거나, 판의 20% 이상에서 BUST하면서 사람 피해도 평균 10 이상이면 시즌은 버티지 못한 것으로 읽힙니다. BUST 없이 높은 배율을 지켰거나 콤보를 아주 길게 이었거나 사건당 금고를 넉넉히 쌓은 시즌은, 기록을 묻는 결말의 문턱이 조금 낮아집니다. 나머지는 직접 찾아보십시오.</p>
@@ -157,22 +158,22 @@ export const GUIDE_BODY = {
 <h3>The heartbeat</h3>
 <p>Only the heartbeat listens for the Wall. Within 44 Heat of it, the beat speeds up as you close in, up to 190. But the Wall it hears can be off by up to 18, and high Heat or a nearly empty clock make it race anyway. After a BUST the game shows where the Wall was and where the heartbeat heard it, so use that to tune your ear.</p>
 <h3>Scout</h3>
-<p>From Prologue 03, “Scout” narrows the Wall band to 20 wide for 1 Trust and 3 seconds, once per hand. The Wall is not necessarily in the middle of it. Press again to narrow it to 14 for 3 more seconds. Within a case this second look costs 2, 2, 3, 3, 4, 4… Trust, and the button shows this time’s price.</p>
+<p>From Prologue 03, “Scout” narrows the Wall band to 20 wide for 1 Trust and 3 seconds, once per hand. The Wall is not necessarily in the middle of it. Press again to narrow it to 14 for 3 more seconds. Within a case this second look costs 2, 2, 3, 3, 4, 4… Trust, and the button shows this time’s price. The first look climbs too: within a case only the first three cost 1 Trust, then 2, 2, 3, 3… Trust. We wanted “this hand I trust the heartbeat alone” to be a choice worth making.</p>
 <h3>Stake, Commit and BUST</h3>
 <p>“Commit” adds chips × multiplier × your combo and LOCK bonus to the case’s stake. That stake sits outside the Vault until the case closes, so one BUST anywhere in the case wipes all of it. In a case’s last scene, or once Heat is inside the band, Commit must be held for about 0.6 seconds or pressed again (“Once more”) within 3 seconds.</p>
-<p>You BUST by pushing into the Wall, letting the clock’s Heat creep into it, or running out of time. The stake drops to zero, the card pays its costs without its gains, and you lose 6 Trust, 6 Fairness and 4 Time left and gain 8 Fatigue. The story skips the next scene. The Vault is never touched.</p>
+<p>You BUST by pushing into the Wall, letting the clock’s Heat creep into it, or running out of time. The stake drops to zero, the card pays its costs without its gains, and you lose 6 Trust, 6 Fairness and 4 Time left and gain 8 Fatigue. The story skips the next scene (except in Prologues 01 and 02). The Vault is never touched.</p>
 <h3>The table clock</h3>
 <p>A hand has 45 seconds, cut to 40 from Heat 45 and to 35 from Heat 65, never below 12. Four seconds after the table opens, the clock starts adding Heat by itself, 0.5 a second, 12% faster for each push, shown as “Clock heat ×N”.</p>
 <h3>LOCK and Stances</h3>
 <p>From Prologue 04 you can press LOCK after staking a card. Each press costs 1.5 seconds and builds charge, which grows the card’s resource effects and the chip multiplier, up to ×1.5. From Prologue 05 you pick a Stance: STRIKE grows the multiplier fastest, and committed at Heat 60 or more it lifts the cap to ×1.55. STEADY cools Heat by 1 with each LOCK after a push. EXPOSE boosts resource effects, and a fully charged EXPOSE commit fills no Audit box, can’t be caught, and makes the next hand’s chips ×1.3. Commit with a charge of 70 or more and the Stance carries into the next hand; three such commits in one Stance earn its season mastery.</p>
-<p>On a hand where the streak you carried in already fills LOCK’s ×1.5 cap, LOCK is shut: it would add nothing, and pressing it tells you why.</p>
+<p>On a hand where the streak you carried in already fills LOCK’s ×1.5 cap, LOCK is shut: it would add nothing, and pressing it tells you why. On a short clock, in SHORT CLOCK (the Rule of the Week, and Case 09) and in Act 7’s “The Hearing”, each LOCK press takes 1.15 times as long, about 1.7 seconds. The button shows the price, so think about a hand you close fast without charging.</p>
 
 <h2>The marks your calls leave</h2>
-<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 03 all of them are on, and NEW GAME+ has them all from the start.</p>
+<p>A decision changes the next hand’s rules. Each rule below opens in the case in brackets; from Case 05 all of them are on, and NEW GAME+ has them all from the start.</p>
 <dl>
 <dt>BLACKOUT (Prologue 02)</dt><dd>After a BUST, the cards’ chips and costs are hidden and the Wall band comes 6 closer.</dd>
-<dt>AFTERSHOCK (Prologue 02)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
-<dt>SILENCE (Prologue 02)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
+<dt>AFTERSHOCK (Case 04)</dt><dd>After a BUST, the next hand starts at Heat 22.</dd>
+<dt>SILENCE (Case 05)</dt><dd>After a BUST by running out of time, the heartbeat stops pointing at the Wall and the next hand has 30 seconds.</dd>
 <dt>COLD FEET (Prologue 03)</dt><dd>Commit without a single push and the next hand seals its card with the most chips until Heat passes 30, with chips at ×0.6.</dd>
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
@@ -193,7 +194,7 @@ export const GUIDE_BODY = {
 
 <h2>Tools</h2>
 <p>From Prologue 05, each closed case is followed by a draft at the next case’s first table: pick one of three tools while the clock waits. You carry up to five, and when you are full you put one down. Pick nothing to “catch your breath”: the first hand gets 10 more seconds and the Wall moves 3 farther. Before you pick, “Reroll” costs 1,500 from the Vault, once per draft, and “One more” costs 12,000, once a Season. Rerolls are cheap: reroll a weak three.</p>
-<p>Each tool has a condition, and a commit that meets it raises the stake a lot. “Heat Sink” pays +60% on a commit at Heat 75 or more; “Audit Contact” +80% when you push at least once and commit under Heat 50 (and Noticed never gets you caught); “Cold Blood” starts the hand after a BUST at Heat 0 with no AFTERSHOCK and the Wall 2 further, and pays +100% on that hand. “Do Yoonha’s Field Notes” pays +25% at a same-side combo of 5 or more, “Metronome” +70% on a hand where you switched sides, “Lim Kyungsoo’s Copy” +70% on a BLACKOUT hand and “Cha Jiwon’s Front Page” +20% on an OVERCLOCK hand. So pick the condition that fits how you play. Some tools unlock through feats: a Logic Combo of 8 opens “Encore”, which keeps your combo through a BUST (+15% on a commit at combo 8 or more), and losing a stake of 5,000 or more to the Wall opens “Insurance”, which saves a third of the stake once per case.</p>
+<p>Each tool has a condition, and a commit that meets it raises the stake a lot. “Heat Sink” pays +60% on a commit at Heat 75 or more; “Audit Contact” +80% when you push at least once and commit under Heat 50 (and Noticed never gets you caught); “Cold Blood” starts the hand after a BUST at Heat 0 with no AFTERSHOCK and the Wall 2 further, and pays +100% on that hand. “Do Yoonha’s Field Notes” pays +25% at a same-side combo of 5 or more, “Metronome” +70% on a hand where you switched sides, “Lim Kyungsoo’s Copy” +70% on a BLACKOUT hand and “Cha Jiwon’s Front Page” +20% on an OVERCLOCK hand. So pick the condition that fits how you play. Some tools unlock through feats: a Logic Combo of 8 opens “Encore”, which keeps your combo through a BUST (+15% on a commit at combo 8 or more), and losing a stake of 5,000 or more to the Wall opens “Insurance”, which saves a third of the stake once per case. When two or more tools meet their conditions on the same hand, their boosts together stop at ×1.6. A single tool worth more than that (Audit Contact ×1.8, Cold Blood ×2) keeps its own, so a second tool never takes from the first.</p>
 
 <h2>The six resources</h2>
 <p>Time left, Cash, Trust and Fairness are better high; Human cost and Fatigue hurt as they rise. A case starts from Time left 72, Cash 100, Trust 50, Fairness 50, Human cost 0 and Fatigue 10, shifted by your last case: after an S rank you start with Trust +4 and Fairness +3, after a C with Fairness −2 and Fatigue +4, and cases late in the season open more worn down. A card’s gains grow with Heat, ×1.9 at 60 and ×2.5 at 100, but its costs never do.</p>
@@ -216,10 +217,11 @@ export const GUIDE_BODY = {
 <dt>The Late Bill (Act 2, Case 10)</dt><dd>Commit at Heat 60 or more and HEAT DEBT starts the next hand with three quarters of that Heat, not a third (Heat Sink’s own share if you hold it). Commit under 60 and every card’s chips are ×1.25. The case asks whether you commit big or bank clean.</dd>
 <dt>The Trained Wall (Act 4, Cases 20, 22 and 23)</dt><dd>The table learns the Heat you commit at. On the next hand the Wall band stands from 10 below that Heat to 18 above it (at least 34 wide), but its middle never sits lower than the middle of its usual band. On such a hand, Scout narrows straight to 14 wide, once. The hand after a BUST has the usual band.</dd>
 <dt>On the Record (Act 6, Cases 32 to 35)</dt><dd>The Stance of the case’s first commit stays until the case ends and can’t change. In return, every commit carries that Stance into the next hand, even without a full charge. Season mastery still counts only commits with a charge of 70 or more.</dd>
-<dt>Signed by Name (Act 8, Cases 44, 46, 48 and 49)</dt><dd>Before the first hand, choose on the briefing how to sign. “Name only” makes every card’s chips ×1.25 and moves the Wall band 2 closer; “With conditions” moves the Wall band 3 further and makes chips ×0.9. Choose nothing and you sign with conditions.</dd>
+<dt>Signed by Name (Act 8, Cases 44, 46, 48 and 49)</dt><dd>Before the first hand, choose on the briefing how to sign. “Name only” makes every card’s chips ×1.25 and moves the Wall band 1 to 3 closer; “With conditions” moves the Wall band 3 further and makes chips ×0.9. Choose nothing and you sign with conditions.</dd>
 </dl>
 <p>A season started with the Rule of the Week, and Story Mode, get none of these five either.</p>
 <p>Which week brings which rule is written ahead on the <a href="/en/weekly.html">Rule of the Week calendar</a>.</p>
+<p><strong>The signature line’s number.</strong> In Act 8’s “Signed by Name”, how far “Name only” moves the Wall band closer changes from case to case, 1 to 3. The signature line shows this case’s number before you choose, and Case 49 is always 3. We wanted the same player to weigh the signature again in every case.</p>
 
 <h2>The report and the Burst Score</h2>
 <p>The report scores each case from 0 to 100 on how you judged, not on how much you banked:</p>
@@ -242,7 +244,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: everyone else.</li>
 </ul>
 <p>A season with any case opened in Story Mode stays off the public ranking.</p>
-<p>On Monday, November 30, 2026, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is, and the start screen says the same from November 16.</p>
+<p>On Wednesday, November 25, 2026, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is, and the start screen says the same from November 16.</p>
 
 <h2>The end of a season</h2>
 <p>There are nine endings, and yours is read from the whole season: your average Trust, Fairness and Cash as each case closed, your average Human cost per case, the share of hands that busted, the share of hidden records found, how often a reframe opened a hidden route, how high the pressure stayed, and your decision in the last case. An average Human cost of 20 a case, or busting in 20% of hands while averaging 10, reads as a season that could not hold. A season with no BUST at a high multiplier, a very long combo or a rich Vault per case needs slightly fewer records. The rest is yours to find.</p>
@@ -287,22 +289,22 @@ export const GUIDE_BODY = {
 <h3>心拍</h3>
 <p>壁を聞き取るのは心拍だけです。熱が壁から44以内に入ると、近づくほど速くなり、最大190まで上がります。ただし心拍が聞いている壁は実際と最大18ずれ、熱が高いときや時計がほとんど残っていないときは、壁と関係なく速くなります。BUSTのあとには、壁が実際にどこにあったかと、心拍がどこに聞いていたかが一緒に示されるので、耳を合わせるのに使ってください。</p>
 <h3>照会</h3>
-<p>プロローグ03から、「照会」で信頼1と時間3秒を払い、壁の区間を20マス幅に絞れます。勝負ごとに一回で、壁がその真ん中にあるという意味ではありません。もう一度押すと、時間3秒で14マスまで絞ります。この二度目の照会の信頼は、一つの事件の中で2、2、3、3、4、4…と上がり、ボタンに今回の値が出ます。</p>
+<p>プロローグ03から、「照会」で信頼1と時間3秒を払い、壁の区間を20マス幅に絞れます。勝負ごとに一回で、壁がその真ん中にあるという意味ではありません。もう一度押すと、時間3秒で14マスまで絞ります。この二度目の照会の信頼は、一つの事件の中で2、2、3、3、4、4…と上がり、ボタンに今回の値が出ます。最初の照会も、一つの事件の中で信頼1なのは最初の三回だけで、その後は2、2、3、3…と上がります。私たちは「この勝負は心拍だけを信じる」も選ぶ価値のある選択にしたいと考えました。</p>
 <h3>賭け金、確定、BUST</h3>
 <p>「確定」を押すと、チップ × 倍率 × コンボとLOCKのボーナスが事件の賭け金に加わります。賭け金は事件が閉じるまで金庫の外にあるので、事件の途中の一度のBUSTが、それまでの賭け金をすべて消します。事件の最後のシーンや、熱がすでに壁の区間に入っているときは、確定を約0.6秒長押しするか、3秒以内に「もう一度」を押す必要があります。</p>
-<p>BUSTは、押し切って壁に触れる、時計が上げた熱が壁に触れる、時間切れになる、のいずれかで起こります。賭け金は0になり、カードは利益なしにコストだけを払い、信頼6、公正さ6、残り時間4を失って疲労が8上がります。物語は次のシーンを飛ばします。金庫には手を付けられません。</p>
+<p>BUSTは、押し切って壁に触れる、時計が上げた熱が壁に触れる、時間切れになる、のいずれかで起こります。賭け金は0になり、カードは利益なしにコストだけを払い、信頼6、公正さ6、残り時間4を失って疲労が8上がります。物語は次のシーンを飛ばします(プロローグ01・02を除く)。金庫には手を付けられません。</p>
 <h3>テーブルの時計</h3>
 <p>勝負の時間は標準で45秒、熱45から40秒、熱65から35秒に縮み、12秒より短くはなりません。卓が開いて4秒たつと、時計がひとりでに熱を上げはじめます。毎秒0.5で、押すたびに12%ずつ速くなり、「時計が上げる熱 N倍」と表示されます。</p>
 <h3>LOCKと構え</h3>
 <p>プロローグ04から、カードを賭けたあとにLOCKを押せます。一回に1.5秒かかってチャージがたまり、カードのリソース効果とチップ倍率が大きくなります（チップ倍率は1.5倍まで）。プロローグ05から構えを選びます。STRIKEは倍率をいちばん速く伸ばし、熱60以上で確定すると上限が1.55倍に上がります。STEADYは一度押したあとのLOCKごとに熱を1ずつ冷まします。EXPOSEはリソース効果を伸ばし、満タンまで溜めて確定すると監査が埋まらず摘発もされず、次の勝負のチップが1.3倍になります。チャージ70以上で確定すると構えが次の勝負に続き、一つの構えでこれを3回確定するとシーズンの熟練が付きます。</p>
-<p>持ち込んだ連続がすでにLOCKの上限（1.5倍）を満たしている勝負では、LOCKが止まります。足すものがないからで、押すとその理由が出ます。</p>
+<p>持ち込んだ連続がすでにLOCKの上限（1.5倍）を満たしている勝負では、LOCKが止まります。足すものがないからで、押すとその理由が出ます。時計の短い勝負、つまりSHORT CLOCK（今週のルールと事件09）と第7幕の「公聴会」では、LOCK一回が1.15倍の約1.7秒かかります。ボタンに今回の値が出るので、チャージせずに早く切る勝負も考えてみてください。</p>
 
 <h2>判断が残す跡</h2>
-<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件03からはすべてオン、NEW GAME+では最初から全部オンです。</p>
+<p>一度の決定は、次の勝負のルールを変えます。次のルールはかっこ内の事件で開き、事件05からはすべてオン、NEW GAME+では最初から全部オンです。</p>
 <dl>
 <dt>BLACKOUT（プロローグ02）</dt><dd>BUSTの次の勝負は、カードのチップと消耗が伏せられ、壁の区間が6近づきます。</dd>
-<dt>AFTERSHOCK（プロローグ02）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
-<dt>SILENCE（プロローグ02）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
+<dt>AFTERSHOCK（事件04）</dt><dd>BUSTの次の勝負は、熱22から始まります。</dd>
+<dt>SILENCE（事件05）</dt><dd>時間切れでBUSTすると、次の勝負は心拍が壁を指さず、時間が30秒になります。</dd>
 <dt>COLD FEET（プロローグ03）</dt><dd>一度も押さずに確定すると、次の勝負でチップがいちばん多いカードが熱30を超えるまで封印され、チップが0.6倍になります。</dd>
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>
@@ -323,7 +325,7 @@ export const GUIDE_BODY = {
 
 <h2>ツール</h2>
 <p>プロローグ05から、事件が閉じると次の事件の最初のテーブルでドラフトが開きます。時計が止まっているあいだに、ツール三つのうち一つを選びます。ツールは五つまで持て、いっぱいになったら一つを置きます。何も選ばなければ「ひと息つく」になり、最初の勝負の時間が10秒延び、壁が3遠ざかります。選ぶ前に、金庫から1,500を払えば「引き直し」がドラフトごとに一回、12,000を払えば「もう一つ」がシーズンに一度できます。引き直しは安いので、三つが弱ければ引き直しましょう。</p>
-<p>ツールにはそれぞれ条件があり、条件を満たした確定は賭け金が大きく上がります。「放熱板」は熱75以上で確定すると+60%、「監査室のつて」は一度以上押して熱50未満で確定すると+80%（目立ちがあっても見逃される）、「冷血」はBUSTの次の勝負をAFTERSHOCKなしに熱0から始めさせて壁を2遠ざけ、その勝負の確定を+100%にします。「ト・ユナの現場メモ」は同じ側のコンボ5以上で+25%、「メトロノーム」は向きを変えた勝負で+70%、「イム・ギョンスの写し」はBLACKOUTの勝負で+70%、「チャ・ジウォンの1面」はOVERCLOCKの勝負で+20%です。自分の遊び方に合う条件を選びましょう。条件を満たしてはじめて解放されるツールもあります。ロジックコンボ8を達成するとBUSTしてもコンボが残る「アンコール」（コンボ8以上の確定で+15%）が、賭け金5,000以上を壁に失うと事件ごとに一回賭け金の3分の1を守る「保険」が解放されます。</p>
+<p>ツールにはそれぞれ条件があり、条件を満たした確定は賭け金が大きく上がります。「放熱板」は熱75以上で確定すると+60%、「監査室のつて」は一度以上押して熱50未満で確定すると+80%（目立ちがあっても見逃される）、「冷血」はBUSTの次の勝負をAFTERSHOCKなしに熱0から始めさせて壁を2遠ざけ、その勝負の確定を+100%にします。「ト・ユナの現場メモ」は同じ側のコンボ5以上で+25%、「メトロノーム」は向きを変えた勝負で+70%、「イム・ギョンスの写し」はBLACKOUTの勝負で+70%、「チャ・ジウォンの1面」はOVERCLOCKの勝負で+20%です。自分の遊び方に合う条件を選びましょう。条件を満たしてはじめて解放されるツールもあります。ロジックコンボ8を達成するとBUSTしてもコンボが残る「アンコール」（コンボ8以上の確定で+15%）が、賭け金5,000以上を壁に失うと事件ごとに一回賭け金の3分の1を守る「保険」が解放されます。条件を満たしたツールが一つの勝負で二つ以上重なると、倍率は合わせて1.6倍で止まります。一つでそれより大きいツール（監査室のつて1.8倍、冷血2倍）はその値まで受け取れるので、二つ目のツールが一つ目の分を削ることはありません。</p>
 
 <h2>六つのリソース</h2>
 <p>残り時間、現金、信頼、公正さは高いほど良く、人的被害と疲労は上がるほど損です。事件は残り時間72、現金100、信頼50、公正さ50、人的被害0、疲労10から出発し、前の事件の結果の分だけ変わります。Sランクのあとは信頼+4と公正さ+3、Cランクのあとは公正さ−2と疲労+4を抱えて始まり、シーズンの後半の事件ほど疲れた状態で開きます。カードの利益は熱に応じて大きくなり、熱60で1.9倍、100で2.5倍になりますが、コストは大きくなりません。</p>
@@ -346,10 +348,11 @@ export const GUIDE_BODY = {
 <dt>遅れてきた請求書（第2幕、事件10）</dt><dd>熱60以上で確定すると、HEAT DEBTが熱の3分の1ではなく4分の3を抱えて次の勝負を始めさせます（「放熱板」を持っていれば放熱板の値）。60未満で確定すると、すべてのカードのチップが1.25倍です。大きく確定するか、きれいに取るかを選ぶ事件です。</dd>
 <dt>学習された壁（第4幕、事件20・22・23）</dt><dd>卓があなたの確定した熱を学びます。次の勝負の壁の区間は、その熱の10下から18上まで（幅は34以上）に立ちますが、区間の真ん中がいつもの区間の真ん中より下に下がることはありません。こうして立った勝負の照会は、最初から14マスに絞り、一度だけです。BUSTの次の勝負はいつもの区間です。</dd>
 <dt>供述の固定（第6幕、事件32〜35）</dt><dd>事件で最初に確定した構えが事件の終わりまで残り、変えられません。そのかわり、確定するたびにチャージが足りなくても、その構えが次の勝負に続きます。シーズンの熟練は、いつもどおりチャージ70以上の確定だけを数えます。</dd>
-<dt>実名の署名（第8幕、事件44・46・48・49）</dt><dd>最初の勝負の前に、ブリーフィングで署名のしかたを選びます。「名前だけ書く」はすべてのカードのチップが1.25倍で壁の区間が2手前に立ち、「条件をつける」は壁の区間が3下がってチップが0.9倍です。選ばなければ、条件をつけたことになります。</dd>
+<dt>実名の署名（第8幕、事件44・46・48・49）</dt><dd>最初の勝負の前に、ブリーフィングで署名のしかたを選びます。「名前だけ書く」はすべてのカードのチップが1.25倍で壁の区間が1〜3手前に立ち、「条件をつける」は壁の区間が3下がってチップが0.9倍です。選ばなければ、条件をつけたことになります。</dd>
 </dl>
 <p>この五つのルールも、今週のルールで始めたシーズンとストーリーモードにはありません。</p>
 <p>どの週にどのルールが立つかは、<a href="/ja/weekly.html">今週のルール カレンダー</a>に前もって書いておきます。</p>
+<p><strong>署名欄の値。</strong>第8幕「実名の署名」で「名前だけ書く」が壁の区間を手前に寄せる幅は、事件ごとに1〜3で変わります。署名欄が選ぶ前に今回の事件の値を先に見せ、事件49はいつも3です。私たちは、同じ人でも事件ごとに署名をもう一度迷うようにしたいと考えました。</p>
 
 <h2>レポートとバーストスコア</h2>
 <p>レポートは事件ごとに、いくら稼いだかではなく、どう判断したかを0〜100点で採点します。</p>
@@ -372,7 +375,7 @@ export const GUIDE_BODY = {
 <li><strong>FIELD LEAGUE</strong>: 残りすべて。</li>
 </ul>
 <p>ストーリーモードで開いた事件があるシーズンは公開ランキングに載りません。</p>
-<p>2026年11月30日(月)、ルールの改定とあわせて公開ランキングを一度リセットします。名誉の殿堂の表はそのまま残り、最初の画面でも11月16日から同じお知らせが出ます。</p>
+<p>2026年11月25日(水)、ルールの改定とあわせて公開ランキングを一度リセットします。名誉の殿堂の表はそのまま残り、最初の画面でも11月16日から同じお知らせが出ます。</p>
 
 <h2>シーズンの終わり</h2>
 <p>結末は九つあり、シーズン全体を読んで決まります。読むのは、事件が閉じるたびの信頼、公正さ、現金の平均、事件あたりの平均の人的被害、BUSTした勝負の割合、見つけた隠れた記録の割合、卓を組み替えて隠れたルートを開いた割合、圧力がどれだけ高く続いたか、そして最後の事件の決定です。人的被害が事件あたり平均20以上、または勝負の20%以上でBUSTしつつ人的被害も平均10以上なら、シーズンは持ちこたえられなかったと読まれます。BUSTなしで高い倍率を守った、コンボをとても長く続けた、事件あたりの金庫をたっぷり積んだシーズンは、記録を求める結末の敷居が少し下がります。残りはご自身で見つけてください。</p>

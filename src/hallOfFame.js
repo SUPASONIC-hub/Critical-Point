@@ -24,18 +24,18 @@
  * Boards (설계안 1절 "판 나누기"): the table's own, `table-<RULES_MARK>`, for
  * the ordinary ranking (`week` null), and one per week's rule board
  * (`summary.week`, the server's). Each keeps its first three, best first in
- * the ranking's own order (buildLeaderboard), and only once ten seasons on it
+ * the ranking's own order (buildLeaderboard), and only once five seasons on it
  * passed (question 6 (1)); below that it is kept empty, 「표본 부족」.
  *
  * Each board is read on its own (assumption 4 of the draft, resolved): the
- * ten are counted over the whole board, not over the rows the day's check
+ * five are counted over the whole board, not over the rows the day's check
  * replayed. A season counts when it is a complete public season on that board
  * with no mark at all (`suspicion` an empty array: the insert trigger judged
  * it and found nothing, and no daily check marked it), whether or not the
  * replay ever reached it. The server counts it, `hall_of_fame_counts()`
  * (20261106010000_hall_of_fame.sql), after the day's marks are written; the
  * CI job reads that count (HALL_OF_FAME_COUNTS_SQL) and hall_of_fame_settle
- * counts again itself, so a place below ten is refused whatever the call says.
+ * counts again itself, so a place below five is refused whatever the call says.
  * The replay, which a place still needs, reads only each open board's first
  * HALL_OF_FAME_CANDIDATES seasons that could stand (verify-ranking-rows
  * --runs-sql), beside the ranking's top `limit` it always read for the marks.

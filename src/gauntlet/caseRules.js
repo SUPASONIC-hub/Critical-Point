@@ -31,7 +31,7 @@
  * twists and the next-rules switch), so the PlayScreen chunk
  * (tableStaging.js) can ask which case has a rule without the catalogue.
  *
- * Ships with the 11-30 reset (묶음 R): a rule on a board is a change of the
+ * Ships with the 11-25 reset (묶음 R): a rule on a board is a change of the
  * ranking's table, and the ranking only changes on a reset.
  */
 
