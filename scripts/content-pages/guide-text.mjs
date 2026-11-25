@@ -34,7 +34,7 @@ export const GUIDE_BODY = {
 <h3>테이블 시계</h3>
 <p>판의 시간은 기본 45초이고, 열기 45부터 40초, 열기 65부터 35초로 줄며, 12초보다 짧아지지는 않습니다. 판이 열리고 4초가 지나면 시계가 스스로 열기를 올립니다. 초당 0.5이고, 밀 때마다 12%씩 빨라지며 「시계 열기 ×N」으로 표시됩니다.</p>
 <h3>LOCK과 자세</h3>
-<p>프롤로그 04부터 카드를 건 뒤 LOCK을 누를 수 있습니다. 한 번에 1.5초가 들고 충전이 쌓여, 카드의 자원 효과와 칩 배율이 커집니다(칩 배율은 1.5배까지). 프롤로그 05부터 자세를 고릅니다. STRIKE는 배율을 가장 빨리 키우고, 열기 60 이상에서 확정하면 상한이 1.55배로 오릅니다. STEADY는 한 번 민 뒤의 LOCK마다 열기를 1씩 식힙니다. EXPOSE는 자원 효과를 키우고, 가득 충전해 확정하면 감사가 차지 않고 적발되지 않으며 다음 판의 칩이 1.3배가 됩니다. 충전 70 이상으로 확정하면 자세가 다음 판으로 이어지고, 한 자세로 이렇게 세 번 확정하면 시즌 숙련이 생깁니다.</p>
+<p>프롤로그 04부터 카드를 건 뒤 LOCK을 누를 수 있습니다. 한 번에 1.5초가 들고 충전이 쌓여, 카드의 자원 효과와 칩 배율이 커집니다(칩 배율은 1.5배까지). 프롤로그 05부터 자세를 고릅니다. STRIKE는 배율을 가장 빨리 키우고, 열기 60 이상에서 확정하면 상한이 1.55배로 오릅니다. STEADY는 한 번 민 뒤의 LOCK마다 열기를 1씩 식힙니다. EXPOSE는 자원 효과를 키우고, 가득 충전해 확정하면 눈에 띔에 잡히지 않고(감사의 같은 자리 확정에는 셉니다) 다음 판의 칩이 1.3배가 됩니다. 충전 70 이상으로 확정하면 자세가 다음 판으로 이어지고, 한 자세로 이렇게 세 번 확정하면 시즌 숙련이 생깁니다.</p>
 <p>들고 온 연속이 이미 LOCK 상한(1.5배)을 채운 판에서는 LOCK이 닫힙니다. 더할 것이 없기 때문이고, 누르면 그 이유가 나옵니다. 시계가 짧은 판, 곧 SHORT CLOCK(이번 주의 규칙과 사건 09)과 7막 「청문회」에서는 LOCK 한 번이 1.15배인 약 1.7초를 씁니다. 버튼에 이번 값이 나오니, 충전 없이 빨리 끊는 판도 생각해 보십시오.</p>
 
 <h2>판단이 남기는 흔적</h2>
@@ -165,7 +165,7 @@ export const GUIDE_BODY = {
 <h3>The table clock</h3>
 <p>A hand has 45 seconds, cut to 40 from Heat 45 and to 35 from Heat 65, never below 12. Four seconds after the table opens, the clock starts adding Heat by itself, 0.5 a second, 12% faster for each push, shown as “Clock heat ×N”.</p>
 <h3>LOCK and Stances</h3>
-<p>From Prologue 04 you can press LOCK after staking a card. Each press costs 1.5 seconds and builds charge, which grows the card’s resource effects and the chip multiplier, up to ×1.5. From Prologue 05 you pick a Stance: STRIKE grows the multiplier fastest, and committed at Heat 60 or more it lifts the cap to ×1.55. STEADY cools Heat by 1 with each LOCK after a push. EXPOSE boosts resource effects, and a fully charged EXPOSE commit fills no Audit box, can’t be caught, and makes the next hand’s chips ×1.3. Commit with a charge of 70 or more and the Stance carries into the next hand; three such commits in one Stance earn its season mastery.</p>
+<p>From Prologue 04 you can press LOCK after staking a card. Each press costs 1.5 seconds and builds charge, which grows the card’s resource effects and the chip multiplier, up to ×1.5. From Prologue 05 you pick a Stance: STRIKE grows the multiplier fastest, and committed at Heat 60 or more it lifts the cap to ×1.55. STEADY cools Heat by 1 with each LOCK after a push. EXPOSE boosts resource effects, and a fully charged EXPOSE commit can’t be caught for being Noticed (it still counts toward the Audit’s same-spot commits) and makes the next hand’s chips ×1.3. Commit with a charge of 70 or more and the Stance carries into the next hand; three such commits in one Stance earn its season mastery.</p>
 <p>On a hand where the streak you carried in already fills LOCK’s ×1.5 cap, LOCK is shut: it would add nothing, and pressing it tells you why. On a short clock, in SHORT CLOCK (the Rule of the Week, and Case 09) and in Act 7’s “The Hearing”, each LOCK press takes 1.15 times as long, about 1.7 seconds. The button shows the price, so think about a hand you close fast without charging.</p>
 
 <h2>The marks your calls leave</h2>
@@ -296,7 +296,7 @@ export const GUIDE_BODY = {
 <h3>テーブルの時計</h3>
 <p>勝負の時間は標準で45秒、熱45から40秒、熱65から35秒に縮み、12秒より短くはなりません。卓が開いて4秒たつと、時計がひとりでに熱を上げはじめます。毎秒0.5で、押すたびに12%ずつ速くなり、「時計が上げる熱 N倍」と表示されます。</p>
 <h3>LOCKと構え</h3>
-<p>プロローグ04から、カードを賭けたあとにLOCKを押せます。一回に1.5秒かかってチャージがたまり、カードのリソース効果とチップ倍率が大きくなります（チップ倍率は1.5倍まで）。プロローグ05から構えを選びます。STRIKEは倍率をいちばん速く伸ばし、熱60以上で確定すると上限が1.55倍に上がります。STEADYは一度押したあとのLOCKごとに熱を1ずつ冷まします。EXPOSEはリソース効果を伸ばし、満タンまで溜めて確定すると監査が埋まらず摘発もされず、次の勝負のチップが1.3倍になります。チャージ70以上で確定すると構えが次の勝負に続き、一つの構えでこれを3回確定するとシーズンの熟練が付きます。</p>
+<p>プロローグ04から、カードを賭けたあとにLOCKを押せます。一回に1.5秒かかってチャージがたまり、カードのリソース効果とチップ倍率が大きくなります（チップ倍率は1.5倍まで）。プロローグ05から構えを選びます。STRIKEは倍率をいちばん速く伸ばし、熱60以上で確定すると上限が1.55倍に上がります。STEADYは一度押したあとのLOCKごとに熱を1ずつ冷まします。EXPOSEはリソース効果を伸ばし、満タンまで溜めて確定すると目立ちで摘発されず(監査の同じ位置の確定には数えます)、次の勝負のチップが1.3倍になります。チャージ70以上で確定すると構えが次の勝負に続き、一つの構えでこれを3回確定するとシーズンの熟練が付きます。</p>
 <p>持ち込んだ連続がすでにLOCKの上限（1.5倍）を満たしている勝負では、LOCKが止まります。足すものがないからで、押すとその理由が出ます。時計の短い勝負、つまりSHORT CLOCK（今週のルールと事件09）と第7幕の「公聴会」では、LOCK一回が1.15倍の約1.7秒かかります。ボタンに今回の値が出るので、チャージせずに早く切る勝負も考えてみてください。</p>
 
 <h2>判断が残す跡</h2>

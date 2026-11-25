@@ -96,12 +96,12 @@ test("G35: the audit counts a case's pushed cashes within ±SMOOTH_SPAN of one a
   assert.equal(getSmoothness([40, 44, 45]), 2);
   assert.equal(getAuditLevel([40, 41]), 2);
   assert.equal(getAuditLevel(3), 3, "8's count reads as it was");
-  // The tally takes pushed, unbusted cashes off CASCADE and not shielded.
+  // The tally takes pushed, unbusted cashes off CASCADE.
   assert.deepEqual(smoothStep([40], { gauge: 41.4, pushes: 2 }), [40, 41]);
   assert.deepEqual(smoothStep([40], { gauge: 41, pushes: 0 }), [40]);
   assert.deepEqual(smoothStep([40], { gauge: 41, pushes: 2, busted: true }), [40]);
   assert.deepEqual(smoothStep([40], { gauge: 41, pushes: 2, cascade: true }), [40]);
-  assert.deepEqual(smoothStep([40], { gauge: 41, pushes: 2, shield: true }), [40]);
+  assert.deepEqual(smoothStep([40], { gauge: 41, pushes: 2, shield: true }), [40, 41], "a charged EXPOSE cash is counted: G3 shielded the cold line only");
   const log = [40, 42, 41, 70, 43].map((gauge) => ({ threshold: { gauge, pushes: 2 } }));
   assert.deepEqual(countAudit(log, true), [40, 42, 41, 70, 43]);
   assert.equal(countAudit(log, false), 0, "8's audit: no cash under 40, one at 60 or more takes off");

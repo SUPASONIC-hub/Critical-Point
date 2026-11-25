@@ -143,7 +143,7 @@ export function countAudit(log = [], smooth = false) {
     const threshold = entry?.threshold;
     if (!threshold) continue;
     const busted = threshold.busted === true || threshold.state === "bust";
-    if (smooth) count = smoothStep(count, { busted, gauge: threshold.gauge, pushes: threshold.pushes, cascade, shield: threshold.auditShield === true });
+    if (smooth) count = smoothStep(count, { busted, gauge: threshold.gauge, pushes: threshold.pushes, cascade });
     else count = addAudit(count, shieldStep(auditStep({ busted, gauge: threshold.gauge, pushes: threshold.pushes, cascade }), threshold.auditShield === true));
     // No other board rule's id has "cascade" in it.
     cascade = String(entry.environmentMode).includes("cascade");
@@ -151,10 +151,15 @@ export function countAudit(log = [], smooth = false) {
   return count;
 }
 
-/** G35: the tally after one settled window: its heat added when it is a cash pushed at least once, off CASCADE, not shielded. */
-export function smoothStep(tally, { busted = false, gauge = 0, pushes = 0, cascade = false, shield = false } = {}) {
+/**
+ * G35: the tally after one settled window: its heat added when it is a cash pushed at least once, off CASCADE.
+ * A charged EXPOSE cash is counted too: its shield (G3) was against the cold line, which G35 has not, and
+ * exempted from the tally it made EXPOSE every LOCK hand's best (check:pressure's G3 stances, 11-25).
+ * AUDIT CONTACT moves the limit instead (`getAuditLimit`).
+ */
+export function smoothStep(tally, { busted = false, gauge = 0, pushes = 0, cascade = false } = {}) {
   const before = Array.isArray(tally) ? tally : [];
-  return busted || cascade || shield || !((Number(pushes) || 0) > 0) ? before : [...before, Math.round(Number(gauge) || 0)];
+  return busted || cascade || !((Number(pushes) || 0) > 0) ? before : [...before, Math.round(Number(gauge) || 0)];
 }
 
 /**
@@ -183,7 +188,7 @@ export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, 
   if (!isAuditOn(run, rules)) return null;
   // G35 (RULES_MARK 9): the tally takes the cash's heat, and its smoothness is judged (`count` stays the tally, `level` the number).
   if (smooth) {
-    const tally = smoothStep(count, { busted, gauge, pushes, cascade: isCascadeBoard(run.schema), shield });
+    const tally = smoothStep(count, { busted, gauge, pushes, cascade: isCascadeBoard(run.schema) });
     const level = getSmoothness(tally);
     return { count: tally, level, ...(closed ? judgeAudit({ count: level, secured, hand, limit: getAuditLimit(run.relics, true), base: SMOOTH_LIMIT }) : { caught: false, lost: 0, handLost: 0 }) };
   }
