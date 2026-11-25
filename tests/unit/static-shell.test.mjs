@@ -14,6 +14,7 @@ import { READING_KINDS } from "../../src/homeReading.js";
 import { HERO_ART, localizeStaticShell, rootMarkup, STATIC_SHELL_ATTRIBUTE, staticReadingMarkup, staticShellMarkup, withStaticShell } from "../../scripts/static-shell.mjs";
 import { frontPageFor } from "../../src/news/newsIndex.js";
 import { notesDay } from "../../scripts/content-pages/notes.mjs";
+import { NOTES, notePath } from "../../src/notes/noteIndex.js";
 
 // One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
 process.env.CP_NOTES_DAY ||= notesDay();
@@ -129,9 +130,15 @@ test("under the shell, 읽을거리 shows what the game is and every kind of pag
     for (const line of copy.reading.intro) assert.ok(markup.includes(line.replace(/&/g, "&amp;")), `${language}: ${line.slice(0, 20)}`);
     assert.equal(markup.match(/<li data-kind=/g).length, READING_KINDS.length, `${language}: nine kinds of page`);
     for (const [, href] of markup.matchAll(/href="([^"]+)"/g)) assert.ok(written.has(href), `${language}: ${href} is a page the build writes`);
-    // 오늘의 1면 of 11-27 (its date inside the world), then the three newest notes of the four out by 11-27, newest first.
+    // 오늘의 1면 of 11-27 (its date inside the world), then the three newest notes out by 11-27, newest first. Since
+    // 2026-11-25 (the owner's 「2」) ready notes go out at once, so several share a day: among them the later in NOTES
+    // shows first, the same order on every build.
     const front = frontPageFor("2026-11-27");
-    assert.deepEqual([...markup.matchAll(/<time datetime="([^"]+)">/g)].map((match) => match[1]), [front.day, "2026-11-27", "2026-11-25", "2026-11-23"], language);
+    const out = NOTES.map((note, at) => ({ ...note, at })).filter((note) => note.published <= "2026-11-27");
+    const newest = out.sort((a, b) => b.published.localeCompare(a.published) || b.at - a.at).slice(0, 3);
+    assert.deepEqual([...markup.matchAll(/<time datetime="([^"]+)">/g)].map((match) => match[1]), [front.day, ...newest.map((note) => note.published)], language);
+    const notesHtml = markup.slice(markup.indexOf('class="home-reading-notes"'));
+    assert.deepEqual([...notesHtml.matchAll(/<li><a href="([^"]+)">/g)].map((match) => match[1]), newest.map((note) => notePath(note.slug)), language);
     assert.ok(markup.includes(`<a href="${front.href}">`) && markup.includes(`<p class="home-reading-fiction">${copy.reading.frontNote}</p>`), `${language}: the day's article, said to be made up`);
   }
   // Before the first note, the section says one is coming and still links the list.

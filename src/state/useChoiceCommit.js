@@ -349,6 +349,8 @@ export function useChoiceCommit(context) {
         // G1~G7 (the next rules), each only when it happened: the second look's price, a charged EXPOSE cash
         // (no audit mark), 숨 고르기, the 결재 판 and 눈에 띔.
         ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
+        // G13 (RULES_MARK 7): the first look's price, the case's nth.
+        ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
         ...(verdict.auditShield ? { auditShield: true } : {}),
         // G5 1막 떠넘겨진 손실: the case's twist kept part of this BUST's pot, and 사람 피해 paid (getBustEffect).
         ...(verdict.passedDown ? { passedDown: true } : {}),

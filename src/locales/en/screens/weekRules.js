@@ -15,7 +15,7 @@ export default {
     },
     "short-clock": {
       title: "Time is short",
-      text: "This week every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much.",
+      text: "This week every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much. Charging LOCK takes {lockDrag} times the time.",
       world: "This week the board cut reporting time and raised the value of reports.",
     },
     "crisis-week": {
@@ -52,7 +52,7 @@ export default {
     },
     hearing: {
       title: "The Hearing",
-      text: "This Case, every hand’s clock is {hearingCut}% shorter, and every card’s chips are ×{hearingChips}.",
+      text: "This Case, every hand’s clock is {hearingCut}% shorter, and every card’s chips are ×{hearingChips}. Charging LOCK takes {lockDrag} times the time.",
       world: "A hearing over who owns the records. Little time to answer, and every word costs more.",
     },
     // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`).
@@ -78,13 +78,13 @@ export default {
     },
     signedByName: {
       title: "Signed by Name",
-      text: "This Case, you choose how to sign before the first hand. Name only: every card’s chips ×{nameChips}, and the Wall band stands {nameWall} closer. With conditions: the Wall band stands {termsWall} further, and chips ×{termsChips}.",
+      text: "This Case, you choose how to sign before the first hand. Name only: every card’s chips ×{nameChips}, and the Wall band stands {nameWallLow}–{nameWallHigh} closer, drawn for each Case (the signature line shows this one). With conditions: the Wall band stands {termsWall} further, and chips ×{termsChips}.",
       world: "There are no blank boxes now. You can only add conditions beside your name.",
     },
   },
   caseRules: {
     case09: {
-      text: "In this case every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much.",
+      text: "In this case every hand has {seconds} seconds less, and every card’s chips are worth {chips} times as much. Charging LOCK takes {lockDrag} times the time.",
       world: "The liquidation agenda goes to a vote within 72 hours. Reports short, and priced high.",
     },
     case11: {

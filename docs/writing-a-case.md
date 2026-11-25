@@ -484,11 +484,9 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
    카드 셋이 `s1_result`로 가며, 그 카드 id마다 `outcomes`에 결말 하나(`title`, `text`)를 씁니다. 시작 자원은
    `startState.resources`에 직접 씁니다(시즌 자원을 읽지 않습니다).
 2. **목록**: `src/nodes/sidePacks.js`의 `SIDE_CASES`에 `{ id, label: "번외 1", title, load }` 한 줄. 목록이 비어
-   있으면 시작 화면의 칸이 보이지 않습니다. 이야기 속 자리는 `unlockAfter`(그 날짜 바로 앞 시즌 사건)로 적고,
-   Season 날에 열 번외는 `opensAt: NEXT_SEASON.opensAt`을 더합니다. 배포는 그 앞의 화·금에 하고(운영 모드),
-   그 시각 전에는 번외 칸·결과 화면 줄·「지난번 이후」에 나오지 않으며, 7일 전부터 시작 화면에 예고 줄이 붙습니다.
-   테스트 빌드는 주간 시계가 2026-01-07에 고정이라, 그 번외의 e2e는 `__weeklyRuleClock`를 공개 시각 뒤로 옮깁니다
-   (`tests/side-case.spec.js`의 Season 칸).
+   있으면 시작 화면의 칸이 보이지 않습니다. 이야기 속 자리는 `unlockAfter`(그 날짜 바로 앞 시즌 사건)로 적습니다.
+   공개 날짜나 예고 줄은 없습니다(11-25 「준비되면 불시에 오픈」, `docs/ops-mode.md`): 목록에 넣어 배포한 번외는 그 배포부터 열립니다.
+   그래서 목록에는 다 쓴 번외만 넣고, e2e는 `tests/side-case.spec.js`의 `RELEASE_CASES`에 한 줄을 더합니다.
 3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
    `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
 4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,
@@ -522,12 +520,12 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 
    | 판정 | 뜻 |
    | --- | --- |
-   | 「공개 가능 — sideNN 준비됨.」 | 대기 중인 번외가 모두 초록. Season 날을 고를 수 있음 |
+   | 「공개 가능 — sideNN 준비됨.」 | 대기 중인 번외가 모두 초록. 목록에 넣어 바로 열 수 있음 |
    | 「아직 — sideNN에 경고나 e2e 빠짐.」 | 대기 중인 번외 가운데 빨강이 있음 |
    | 「새로 준비된 번외 없음」 | 모든 번외 파일이 이미 공개 목록에 있음 |
 
    `CASE_SEQUENCE` 밖의 시즌 사건 파일(`caseNN.js`, `prologueNN.js`)이 있으면 그 이름도 마지막 줄에 나옵니다.
-   Season은 사용자가 날을 고르므로(11-18), 이 표가 그 근거입니다. 종료 코드는 늘 0입니다.
+   준비된 번외는 예고 없이 바로 엽니다(11-25), 이 표가 그 근거입니다. 종료 코드는 늘 0입니다.
 
 ---
 
