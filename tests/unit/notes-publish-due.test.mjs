@@ -51,6 +51,13 @@ test("today's note is waiting unless the site already serves it", async () => {
   assert.deepEqual(await notesToPublish({ notes, today: "2026-11-25", origin: ORIGIN, fetcher: site().fetcher }), { today: [], overdue: [] });
 });
 
+test("notes sharing a day (ready notes go out at once since 2026-11-25) are each waited for, and each found when one is missing", async () => {
+  const shared = [...notes, { slug: "today-2", published: "2026-11-25" }, { slug: "today-3", published: "2026-11-25" }];
+  assert.deepEqual(await notesToPublish({ notes: shared, today: "2026-11-25", origin: ORIGIN, fetcher: site({ "today-2": 404 }).fetcher }), { today: ["today-2"], overdue: [] });
+  assert.deepEqual(await notesToPublish({ notes: shared, today: "2026-11-25", origin: "", fetcher: site().fetcher }), { today: ["today", "today-2", "today-3"], overdue: [] });
+  assert.deepEqual(await notesToPublish({ notes: shared, today: "2026-11-26", origin: ORIGIN, fetcher: site({ "today-3": 404 }).fetcher }), { today: [], overdue: ["today-3"] });
+});
+
 test("a site that is down costs one request and presses nothing for earlier notes", async () => {
   const { asked, fetcher } = site({ today: "down", recent: "down", old: "down" });
   assert.deepEqual(await notesToPublish({ notes, today: "2026-11-26", origin: ORIGIN, fetcher }), { today: [], overdue: [] });
