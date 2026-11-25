@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-24 (`main` at `d418828d`, after #664 the quarter-Monday calendar window and #665 the BUST display hotfix; before that 2026-11-23, the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-25 (`main` at `364da91e`, after #671 no ops mode, #670 and #667 every written note out now, #669 side cases 10 and 11 open now, #668 bundle R (#582 #590 #586 #640 #646 #655 #648) with the ranking wipe and RULES_MARK 7, #674 the wipe time, #662 RULES_MARK 8, #672 G37 story-mode ending gates and #660 unused exports; before that 2026-11-24 at `d418828d`, after #664 the quarter-Monday calendar window and #665 the BUST display hotfix; before that 2026-11-23, the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -951,12 +951,34 @@ Still open, on purpose:
   deploys as now (a green PR merges by 18:50 that day); no Tuesday/Friday
   deploy days and no quarter-first-Monday window for ranking wipes and rule
   numbers, nor its 14-day notice: a change merges when it is ready (bundle
-  R's wipe moves to 11-26). The same day: no Season notice (a ready side
+  R and its wipe merged the same day, 14:04). The same day: no Season notice (a ready side
   story opens at once), no note release dates (a written note goes out at
   once), and operational data verdicts (decision T and the like) wait
   until the user sets a date. `scripts/ops-calendar.mjs` keeps only the
   weekly rule calendar's weeks left for the Funnel summary; `--merge`, the
   deploy days and the quarter days are gone (`docs/ops-mode.md`).
+- 2026-11-25 merges (KST): #671 (`d1559cdd`, 11:40) the ops mode above;
+  #670 (`169a06b6`, 12:08) moves 21 notes dated 11-27 to 2027-01-20 to
+  11-25 (on one day the later entry in `NOTES` is the newer note) and #667
+  (`88cf8085`, 12:38) adds note 19 with no operational numbers; #669
+  (`c967db59`, 13:14) opens 번외 10 and 11 (release rule below), and release
+  v2026.11.25 went out from it. Bundle R (#668, `b2fa5c01`, 14:04, with
+  #582 #590 #586 #640 #646 #655 #648) moved up from 11-30: the ranking wipe
+  (`season-final` rows only, mark 7 and up kept), RULES_MARK 7, N18, N21,
+  the hall of fame threshold 10 → 5 and the last three notes out on 11-25;
+  its three migrations keep their `20261130…` names, so a later migration
+  must sort after `20261130000200`. #674 (`e990ec93`, 14:35) sets
+  `LAST_RANKING_RESET` to 14:05, one minute after the real merge. #662
+  (`49d84be5`, 15:17) RULES_MARK 8: G20, G21, G22, G23 and G26 on, G19 and
+  G24 off, G25 and G27 only behind the local `?rules=next`; rows marked 5~7
+  are rechecked by the older rules, the hall of fame starts `table-8`, no
+  server change. #672 (`5b2b3e92`, 16:04) G37 moves two ending gates in
+  story-mode seasons only (RULES_MARK unchanged; every ending at 2% or more
+  in check:endings' story line). #660 (`364da91e`, 16:17) drops the unused
+  `EXPOSE_SHIELD` and 12 exports with no chunk size change. Production runs
+  `364da91e` (#672 shipped with it). In progress: gameplay round 4, MARK 9
+  (#675 G29 G30 G32 G35 G36, #673 G31 G33 G34); G34's migration waits for
+  the user's answer before merging.
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
   (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
