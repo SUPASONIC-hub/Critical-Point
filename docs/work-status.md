@@ -975,10 +975,19 @@ Still open, on purpose:
   server change. #672 (`5b2b3e92`, 16:04) G37 moves two ending gates in
   story-mode seasons only (RULES_MARK unchanged; every ending at 2% or more
   in check:endings' story line). #660 (`364da91e`, 16:17) drops the unused
-  `EXPOSE_SHIELD` and 12 exports with no chunk size change. Production runs
-  `364da91e` (#672 shipped with it). In progress: gameplay round 4, MARK 9
-  (#675 G29 G30 G32 G35 G36, #673 G31 G33 G34); G34's migration waits for
-  the user's answer before merging.
+  `EXPOSE_SHIELD` and 12 exports with no chunk size change. #675
+  (`90db9f3d`, 17:55) gameplay round 4 A, RULES_MARK 9: G29 money-side
+  chips (cash and time gains weigh ×2.75, other gains ×2), G30 a cash 3 or
+  less under the real wall pays its pot ×1.25 on top of the tools, G32
+  CASCADE moves only the band's far end, −10, G35 the audit reads a ledger
+  too smooth (5 pushed cashes within ±1 heat in a case), G36 a NEW GAME+
+  season shuffles the act twists' places (act 8 fixed); rows marked 8 or
+  less are rechecked by the older rules. G35 was decided at ±2/4 and set to
+  ±1/5 after a bot remeasure that also counts charged EXPOSE cashes (80
+  seasons: 7.63 catches a season at ±2/4, 0.61 at ±1/5). It was the day's
+  ninth production deploy; production runs `90db9f3d`. #673 (round 4 B,
+  G31 G33 G34) goes tomorrow, with its migration; G34's migration waits
+  for the user's answer before merging.
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
   (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
