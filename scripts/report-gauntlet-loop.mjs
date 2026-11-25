@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { isNextOn, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, isMarkNineOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -143,7 +143,13 @@ assert.equal(getLogicDirection(card), LOGIC_EVEN, "the bare card leans neither w
 for (const direction of LOGIC_DIRECTIONS) {
   const leaned = directCard(card, direction);
   assert.equal(getLogicDirection(leaned), direction, `the card leaned toward ${direction} reads so`);
-  assert.deepEqual([getCardChips(leaned), getCardBurn(leaned)], [getCardChips(card), getCardBurn(card)], `leaning the card toward ${direction} moves neither its chips nor its burn`);
+  assert.deepEqual(getCardBurn(leaned), getCardBurn(card), `leaning the card toward ${direction} does not move its burn`);
+  // G29 (RULES_MARK 9): 자본 weighs COIN_GAIN_WEIGHT and 믿음 ×2, so the lean toward 자리 pays more chips and toward 사람 fewer,
+  // by the coin weight's share of the shift -- the temptation it is for. Before 9 neither moved.
+  const moved = getCardChips(leaned) - getCardChips(card);
+  const shift = leaned.effect.capital - card.effect.capital;
+  if (!isMarkNineOn()) assert.equal(moved, 0, `leaning the card toward ${direction} does not move its chips`);
+  else assert.ok(Math.abs(moved - shift * (COIN_GAIN_WEIGHT - 2)) <= 1, `leaning toward ${direction} moves the chips by the coin weight only: ${moved}`);
 }
 
 /**
@@ -500,7 +506,9 @@ assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a direction 
  */
 // Under the next rules (G3, G6) the same hands, measured 11-19: STRIKE may pay to ×1.55 at heat 60 or more,
 // EXPOSE carries thicker chips, STEADY is a little weaker, and every case's last board pays ×1.5.
-const LOCK_ON_THE_BEAT = NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 };
+// G29 (RULES_MARK 9): the simulated card's 자본 7 weighs COIN_GAIN_WEIGHT, so every pot it pays is its chips' share bigger; the beat's measure is scaled by it.
+const COIN_SCALE = getCardChips(card) / getCardChips(card, BASE_SCHEMA, withMarkNine(ALL_RULES, false));
+const LOCK_ON_THE_BEAT = Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
 /**
  * A LOCK hand against the bare hand that sees the wall: never more under the
  * old rules. Under the next ones STRIKE's hot cap and EXPOSE's carry are paid

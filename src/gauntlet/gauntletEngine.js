@@ -2219,7 +2219,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
     : { fired: [], factor: 1 };
   // G30 (RULES_MARK 9): a cash EDGE_CASH_REACH or less under the real wall pays EDGE_CASH_BONUS more (`withEdgeBonus`).
   const edge = paysPot && isMarkNineOn(rules) && readEdgeCash(window) !== null;
-  const potFactor = withEdgeBonus(boost, edge, isMarkSevenOn(rules) ? RELIC_BOOST_CAP : Infinity);
+  const potFactor = withEdgeBonus(boost, edge);
   const basePot = paysPot ? Math.round(chips * multiplier * potFactor) : 0;
   const pot = paysPot ? Math.round(chips * multiplier * handBonus * potFactor) : 0;
   // The hand's share of the pot, told apart: what the streak earned, and what

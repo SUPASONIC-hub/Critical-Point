@@ -288,9 +288,11 @@ export const COIN_GAIN_KEYS = Object.freeze(["capital", "time"]);
 /**
  * G30 벽 앞 확정 (RULES_MARK 9): a cash this close to the real wall or closer
  * pays its pot EDGE_CASH_BONUS times. Unknown at the press (the heartbeat
- * hears the wall within its error), told on the slam and the reveal. With a
- * tool's boost on the same cash the two together stay under RELIC_BOOST_CAP
- * (G11c), or the tool's own where that is more: the edge never takes from it.
+ * hears the wall within its error), told on the slam and the reveal. It
+ * multiplies whatever the tools paid (G11c's cap is the tools' own): laid
+ * under that cap it turned FRONT PAGE (×1.2 -> ×1.5) into every hand's best,
+ * and as the bigger of the two it took the worth out of the draft's 「one
+ * more」 (check:pressure, measured 11-25; 게임성 4차 G30).
  */
 export const EDGE_CASH_REACH = 3;
 export const EDGE_CASH_BONUS = 1.25;
@@ -300,10 +302,9 @@ export function readEdgeCash(win) {
   const gap = Number(win.wall) - Number(win.gauge);
   return Number.isFinite(gap) && gap >= 0 && gap <= EDGE_CASH_REACH ? Math.floor(gap) : null;
 }
-/** The pot factor of a cash with the tools' `boost` (readRelicBoost) and, when `edge`, G30's; capped at `cap` with a tool. */
-export function withEdgeBonus(boost, edge, cap) {
-  if (!edge) return boost.factor;
-  return boost.fired.length ? Math.max(boost.factor, Math.min(boost.factor * EDGE_CASH_BONUS, cap)) : boost.factor * EDGE_CASH_BONUS;
+/** The pot factor of a cash with the tools' `boost` (readRelicBoost) and, when `edge`, G30's on top of it. */
+export function withEdgeBonus(boost, edge) {
+  return edge ? boost.factor * EDGE_CASH_BONUS : boost.factor;
 }
 
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */

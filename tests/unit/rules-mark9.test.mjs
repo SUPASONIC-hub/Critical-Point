@@ -49,18 +49,17 @@ test("G29: a card's 자본 and 시간 gains weigh COIN_GAIN_WEIGHT in its chips,
 
 /* ------------------------------------------------------------- G30 */
 
-test("G30: a cash EDGE_CASH_REACH or less under the real wall pays EDGE_CASH_BONUS more, a tool's boost with it capped", () => {
+test("G30: a cash EDGE_CASH_REACH or less under the real wall pays EDGE_CASH_BONUS more, on top of what the tools paid", () => {
   assert.equal(EDGE_CASH_REACH, 3);
   assert.equal(EDGE_CASH_BONUS, 1.25);
   assert.equal(readEdgeCash({ status: "cashed", wall: 60, gauge: 57 }), 3);
   assert.equal(readEdgeCash({ status: "cashed", wall: 60, gauge: 58.6 }), 1);
   assert.equal(readEdgeCash({ status: "cashed", wall: 60, gauge: 56.9 }), null);
   assert.equal(readEdgeCash({ status: "bust", wall: 60, gauge: 60 }), null);
-  assert.equal(withEdgeBonus({ fired: [], factor: 1 }, true, RELIC_BOOST_CAP), EDGE_CASH_BONUS);
-  assert.equal(withEdgeBonus({ fired: [], factor: 1 }, false, RELIC_BOOST_CAP), 1);
-  assert.equal(withEdgeBonus({ fired: ["frontPage"], factor: 1.2 }, true, RELIC_BOOST_CAP), 1.5);
-  assert.equal(withEdgeBonus({ fired: ["stethoscope"], factor: 1.5 }, true, RELIC_BOOST_CAP), RELIC_BOOST_CAP, "under G11c's cap");
-  assert.equal(withEdgeBonus({ fired: ["coldBlood"], factor: 2 }, true, RELIC_BOOST_CAP), 2, "never takes from a tool");
+  assert.equal(withEdgeBonus({ fired: [], factor: 1 }, true), EDGE_CASH_BONUS);
+  assert.equal(withEdgeBonus({ fired: [], factor: 1 }, false), 1);
+  assert.equal(withEdgeBonus({ fired: ["frontPage"], factor: 1.2 }, true), 1.2 * EDGE_CASH_BONUS, "on top of the tools");
+  assert.equal(withEdgeBonus({ fired: ["heatSink", "frontPage"], factor: RELIC_BOOST_CAP, capped: true }, true), RELIC_BOOST_CAP * EDGE_CASH_BONUS, "the cap is the tools' own");
   const card = { id: "c", effect: { trust: 10 } };
   const settle = (gauge, rules) => resolveWindow({ run: normalizeRunState({}), window: { ...createWindow({ seed: "g30" }), status: "cashed", gauge, wall: 62, pushes: 4 }, card, rules }).verdict;
   const near = settle(59, NINE);

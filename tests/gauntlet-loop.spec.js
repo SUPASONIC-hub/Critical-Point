@@ -831,7 +831,8 @@ test("안전선 pushes to the safe line at once, the reveal says what one more p
   await expect.poll(async () => Number(await stage.getAttribute("data-gauge"))).toBeGreaterThanOrEqual(Number(heat));
   await expect(safe, "the button is for the first press only").toHaveCount(0);
   await page.getByTestId("commit-confirm").click();
-  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
+  // G30 (RULES_MARK 9): a cash 3 or less under the wall says so first.
+  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^(아슬아슬 ×1\.25 · 벽까지 \d\. )?한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("table-reaction")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
 });
