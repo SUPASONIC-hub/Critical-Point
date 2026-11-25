@@ -1935,12 +1935,6 @@
   animation: gx-cash-pop 0.5s var(--ui-ease-out) both;
 }
 
-/* G30 (RULES_MARK 9): the cash close under the wall, paid more, in the cash's own colour. */
-.gx-slam .gx-slam-edge {
-  color: var(--ledger-ink);
-  background: var(--c-acid);
-}
-
 /* The stop (A2, 2026-11-05): for the first quarter second after the slam the
    table stands on its last frame, then greys over the next quarter. The heart
    has already stopped on that frame (--gx-rate 0, GauntletFx.jsx). Reduced

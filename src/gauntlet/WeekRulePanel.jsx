@@ -64,7 +64,7 @@ export function useWeekRulePanel(id, page = null, caseId = null, run = null) {
         {rule && <WeekRulePanel key="week-rule" rules={[rule]} kicker={week ? edgeCopy.weekRule : moved ? edgeCopy.movedTwist : edgeCopy.caseRule} />}
       </>,
     ];
-  }, [id, echo, recall, caseId, run?.veteran, run?.twistSeed]);
+  }, [id, echo, recall, caseId, run]);
 }
 
 /**

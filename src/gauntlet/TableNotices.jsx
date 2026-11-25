@@ -108,7 +108,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
           {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatMoney(livePot)}</span>}
           {/* The combo's copy starts on the separator the +N used to stand before. */}
           {streak > 0 && <span>{fill(say.slamCombo, { streak }).replace(/^\s*·\s*/, "")}</span>}
-          {edge !== null && <span className="gx-slam-edge" data-testid="slam-edge">{fill(say.slamEdge, { bonus: EDGE_CASH_BONUS, gap: edge })}</span>}
+          {edge !== null && <span data-testid="slam-edge">{fill(say.slamEdge, { bonus: EDGE_CASH_BONUS, gap: edge })}</span>}
         </>
       )}
     </div>
