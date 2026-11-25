@@ -226,8 +226,8 @@ const budgets = [
   // 166,349 / 62,038 -> 166,557 / 62,134 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+206 / +96), so the largest-note-day room stays.
   // 166,585 / 62,134 -> 166,585 / 62,143: measured - / 62139 (over budget only), gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 166,585 / 62,143 -> 166,585 / 62,160: measured - / 62156 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
-  // story-g37 over main 49d84be5 (#662 MARK 8): main's budget plus G37's growth, until CI measures the merge.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_640, maxGzip: 62_200 },
+  // 166,585 / 62,160 -> 166,600 / 62,169 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 166,596 / 62,165 in CI verify-quick (ba3e20f9), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_600, maxGzip: 62_169 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -279,8 +279,8 @@ const budgets = [
   // 38,372 / 14,890 -> 38,372 / 14,895 묶음 1113. Measured - / 14891 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,895 -> 38,530 / 14,941 story-g37 over main ffa6139b (G37: story mode's cold gap and open question, the strain's storySeason). Measured 38,526 / 14,937 in the e2e build, the plus 4.
   // 38,372 / 14,895 -> 38,502 / 14,954 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+130 / +59), so the largest-note-day room stays.
-  // story-g37 over main 49d84be5 (#662 MARK 8): main's 38,541 / 14,982 plus G37's growth, until CI measures the merge.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_710, maxGzip: 15_040 },
+  // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_689, maxGzip: 15_019 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
