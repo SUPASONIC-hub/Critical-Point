@@ -228,7 +228,8 @@ const budgets = [
   // 166,585 / 62,143 -> 166,585 / 62,160: measured - / 62156 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
   // 166,585 / 62,160 -> 166,600 / 62,169 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 166,596 / 62,165 in CI verify-quick (ba3e20f9), the plus 4.
   // 166,600 / 62,169 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_925, maxGzip: 62_353 },
+  // 166,925 / 62,353 -> 166,968 / 62,379 gameplay-g4a over main d946283f: measured 166964 / 62375 in CI verify-quick, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_968, maxGzip: 62_379 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
