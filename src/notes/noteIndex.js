@@ -40,12 +40,6 @@ export const NOTES = [
     summary: "현금, 받을 돈, 줄 돈, 계약서, 사람. 사흘 안에 무엇부터 확인하는지, 그리고 「실사」라는 낱말 하나를 두고 우리가 한 일.",
   },
   {
-    slug: "why-weekly-rules",
-    published: "2026-11-25",
-    title: "주간 규칙을 만든 이유와 첫 달 결과",
-    summary: "버린 아이디어에서 나온 네 원칙, 두 번 미루고 거둔 시험 주, 그리고 첫 달에 숫자 대신 고치기를 고른 이유입니다.",
-  },
-  {
     slug: "two-income-statements",
     published: "2026-11-25",
     title: "손익계산서 두 장을 나란히 읽는 법",
@@ -188,6 +182,12 @@ export const NOTES = [
     published: "2026-11-25",
     title: "자세 셋과 LOCK: 어느 판에서 무엇을 쥐나",
     summary: "STRIKE, STEADY, EXPOSE는 비슷한 값을 내도록 맞췄지만 이기는 자리는 서로 다릅니다. 치는 방식별로 맞는 자세를 정리했습니다.",
+  },
+  {
+    slug: "why-weekly-rules",
+    published: "2026-11-25",
+    title: "주간 규칙을 만든 이유와 첫 달 결과",
+    summary: "버린 아이디어에서 나온 네 원칙, 두 번 미루고 거둔 시험 주, 그리고 첫 달에 숫자 대신 고치기를 고른 이유입니다.",
   },
   // A draft: 2099-12-31 keeps it out of every build until its day is set (12-01 once 11-21~30 is filled in on 11-30).
   {
