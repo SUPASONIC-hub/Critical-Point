@@ -355,7 +355,10 @@ const budgets = [
   // 37,484 / 15,785 -> 37,740 / 15,897 G5 rest acts 1/2/4/6/8 (#635 16bd1085, Linux CI 11-20). Measured 37736 / 15893 (over budget only) in the e2e build, the plus 4.
   // 37,740 / 15,897 -> 37,830 / 15,928 G5 rest + G8~G17 over main 028766e6 (#635 bc99057f, Linux CI 11-20). Measured 37826 / 15924 (over budget only) in the e2e build, the plus 4.
   // 37,830 / 15,928 -> 37,959 / 15,980 BUST display hotfix (#665, Linux CI 11-24): the table says what a bust keeps as the settle does. Measured 37955 / 15976 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_959, maxGzip: 15_980 },
+  // 37,959 / 15,980 -> 37,959 / 15,989 notes-publish-all (#670): this chunk's gzip moves with the day's notes (hashed imports). On
+  // 2027-01-13 the start screen's three notes are a new set (choosing-tools, weekly-rules-table, reframe-wild-card): 15,981
+  // locally, plus Linux's 4 and the plus 4. CI verify-quick on 11-25: 37,955 / 15,976.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 37_959, maxGzip: 15_989 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -764,7 +767,11 @@ const budgets = [
   // -> 224,494 / 82,064 on 2026-11-23 (user's choice 1): the start screen carries up to three notes, so the budget holds the largest day built through the notes written so far (raw 224,480 on 12-05, gzip 82,056 on 2027-01-11), plus Linux's 4 and the plus 4.
   // +1,349 / +509: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 225,843 / 82,573 -> 225,843 / 82,575 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 225_843, maxGzip: 82_575 },
+  // 225,843 / 82,575 -> 225,779 / 82,462 notes-publish-all (#670, the owner's 「2」 of 2026-11-25): ready notes go out at once, so the
+  // start screen's three notes no longer change every two or three days. The days left are 11-25 and the three notes held for
+  // bundle R (12-20, 12-26, 2027-01-13), so "largest of 26 note days" became the largest of those four: 225,769 / 82,458 in CI
+  // verify-quick (11-25), 225,771 / 82,437 locally on 12-20 (Windows; plus Linux's 4 for the raw), the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 225_779, maxGzip: 82_462 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
