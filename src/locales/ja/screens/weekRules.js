@@ -42,7 +42,7 @@ export default {
   actTwists: {
     merger: {
       title: "合併",
-      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯が熱{mergerShift}ぶん手前に立つ。",
+      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯の奥の端が熱{mergerTop}ぶん手前に立つ。",
       world: "グループは「改革」と称して系列会社を合併する。賭けは大きく、壁は近くなる。",
     },
     scattered: {

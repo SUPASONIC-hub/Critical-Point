@@ -25,6 +25,8 @@ export default {
     terms: "条件をつける",
     nameWall: "今回の署名欄は、名前だけ書けば壁の帯が{wall}手前に立つ。",
   },
+  // G23 여는 판돈 (WeekRulePanel.jsx OpeningAsk).
+  opening: { kicker: "開く賭け金", question: "この事件をどう開く?選ばなければ普通に開く。", normal: "普通に開く", big: "大きく開く", bigNote: "大きく開くと、この事件のすべてのカードのチップが{chips}倍。ただし壁が熱{wall}から立つことがある。" },
   comfort: {
     title: "快適設定",
     close: "閉じる",

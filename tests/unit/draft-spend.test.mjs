@@ -78,7 +78,7 @@ test("the stage tells a swap from a bought one more's second pick, and pays thro
   const draft = read("src/gauntlet/RelicDraft.jsx");
   assert.match(draft, /const spend = onSpend \? readDraftSpend\(run\) : null;/);
   const runtime = read("src/GameRuntime.jsx");
-  assert.match(runtime, /function spendAtDraft\(kind\) \{\s*const paid = relicTable\.spend\(gauntletRun, kind\);\s*if \(!staleSave && paid !== gauntletRun\) applyRun/);
+  assert.match(runtime, /function spendAtDraft\(kind, id = null\) \{\s*const paid = relicTable\.spend\(gauntletRun, kind, id\);\s*if \(!staleSave && paid !== gauntletRun\) applyRun/);
   assert.match(runtime, /pickRelic, spendAtDraft,/);
   assert.match(read("src/gauntlet/useRelicTable.js"), /spend: spendAtDraft \}/);
   assert.match(read("src/screens/PlayScreen.jsx"), /onSpendAtDraft=\{spendAtDraft\}/);
@@ -107,7 +107,7 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   const ko = (await import("../../src/copy/relics.js")).default.draft;
   const en = (await import("../../src/locales/en/screens/relics.js")).default.draft;
   const ja = (await import("../../src/locales/ja/screens/relics.js")).default.draft;
-  const reasons = ["practice", "story", "record", "used", "season", "picked", "few", "short"];
+  const reasons = ["practice", "story", "record", "used", "season", "picked", "few", "short", "none"];
   for (const [lang, words] of Object.entries({ ko, en, ja })) {
     for (const key of ["reroll", "extra"]) assert.match(words[key], /\{cost\}/, `${lang} ${key}`);
     for (const key of ["spendNote", "spendHint", "secondTitle", "secondLede"]) assert.ok(words[key], `${lang} ${key}`);
