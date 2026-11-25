@@ -2,7 +2,7 @@ import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
 import { CASE_RESULT_NODES, CASE_START_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
-import { CASE_START_NODES, nodeOrders, nodes } from "../src/gameData.js";
+import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
