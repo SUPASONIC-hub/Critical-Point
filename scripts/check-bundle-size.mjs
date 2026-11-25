@@ -218,11 +218,12 @@ const budgets = [
   // 166,164 / 61,989 -> 166,257 / 62,017 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 166253 / 62013 in CI verify-quick, the plus 4.
   // +92 / +10: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 166,256 / 61,999 -> 166,256 / 62,010 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+93 / +28), merged for gameplay-mark8; CI re-measures.
   // 166,349 / 62,038 -> 166,557 / 62,134 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+206 / +96), so the largest-note-day room stays.
-  // DRYRUN 1123: larger of both sides until the merged build is measured.
-  // 166,585 / 62,134 -> 168,213 / 62,760 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G34's 보상금 line on the result page (CaseCover through useRuntimeRenderers)). Measured 168,209 / 62,756 in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_213, maxGzip: 62_760 },
+  // 166,585 / 62,134 -> 166,585 / 62,143: measured - / 62139 (over budget only), gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  // 166,585 / 62,143 -> 166,585 / 62,160: measured - / 62156 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_585, maxGzip: 62_160 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -363,9 +364,14 @@ const budgets = [
   // 35,033 / 14,900 -> 35,096 / 14,920 N21 #586 (11-17, bundle R prework): prologue 01/02 bust keeps the next scene. Measured 35092 / 14916 (over budget only) in the e2e build, the plus 4.
   // DRYRUN 1123: main's number; CI measures it on the day.
   // 37,830 / 15,928 -> 37,918 / 15,957 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 37914 / 15953 (over budget only) in the e2e build, the plus 4.
+  // 37,830 / 15,928 -> 37,959 / 15,980 BUST display hotfix (#665, Linux CI 11-24): the table says what a bust keeps as the settle does. Measured 37955 / 15976 in the e2e build, the plus 4.
+  // 37,959 / 15,980 -> 37,959 / 15,989 notes-publish-all (#670): this chunk's gzip moves with the day's notes (hashed imports). On
+  // 2027-01-13 the start screen's three notes are a new set (choosing-tools, weekly-rules-table, reframe-wild-card): 15,981
+  // locally, plus Linux's 4 and the plus 4. CI verify-quick on 11-25: 37,955 / 15,976.
+  // DRYRUN 1124 with #665: Windows max over 11-30~01-20 is 38,468 (all days) / 16,115 (01-02), the plus 8. CI measures it on the day.
   // 37,918 / 15,957 -> 38,907 / 16,320 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+989 / +363), so the largest-note-day room stays.
-  // 38,907 / 16,320 -> 39,592 / 16,552 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G33's 「○○가 건넨 것」 line). Measured 39,588 / 16,548 in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 39_592, maxGzip: 16_552 },
+  // 38,476 / 16,123 -> 39,465 / 16,486 gameplay-mark8 over bundle R (r-dryrun-1123 391e1016): #665's budget plus this branch's growth (+989 / +363). CI re-measures.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 39_465, maxGzip: 16_486 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -774,7 +780,14 @@ const budgets = [
   // -> 224,494 / 82,064 on 2026-11-23 (user's choice 1): the start screen carries up to three notes, so the budget holds the largest day built through the notes written so far (raw 224,480 on 12-05, gzip 82,056 on 2027-01-11), plus Linux's 4 and the plus 4.
   // +1,349 / +509: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 225,843 / 82,573 -> 225,843 / 82,575 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 225_843, maxGzip: 82_575 },
+  // 225,843 / 82,575 -> 225,779 / 82,462 notes-publish-all (#670, the owner's 「2」 of 2026-11-25): ready notes go out at once, so the
+  // start screen's three notes no longer change every two or three days. The days left are 11-25 and the three notes held for
+  // bundle R (12-20, 12-26, 2027-01-13), so "largest of 26 note days" became the largest of those four: 225,769 / 82,458 in CI
+  // verify-quick (11-25), 225,771 / 82,437 locally on 12-20 (Windows; plus Linux's 4 for the raw), the plus 4.
+  // 225,779 / 82,462 -> 225,779 / 82,479 bundle-r-early (bundle R, 11-25, over main 169a06b6): 82,471 gzip in CI verify-quick
+  // and on Windows (11-25), the largest of every notes day 11-25..01-28 (the three notes held for bundle R go out on 11-25 and
+  // make it smaller), the plus 8. Raw 225,769, inside.
+  { pattern: /^index-.*\.js$/, maxBytes: 225_779, maxGzip: 82_479 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1607,9 +1620,11 @@ const budgets = [
   // 57,927 / 21,728 -> 57,927 / 21,781 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 21777 (over budget only) in the e2e build, the plus 4.
   // 60,090 / 22,537 -> 60,090 / 22,591 #635 1178f9fe over main 78be3bd4. Measured - / 22587 (over budget only) in CI verify-quick, the plus 4.
   // 60,090 / 22,591 -> 61,319 / 23,064 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 61315 / 23060 in CI verify-quick, the plus 4.
+  // BUNDLE R EARLY 2026-11-25 over main c967db59 (#669): gzip 23,068 in CI verify-quick (the hashed names it imports moved); it
+  // moves by 2 over the notes days (Windows, 11-25..01-28), so the plus 2 and the plus 8.
   // 61,319 / 23,064 -> 64,254 / 24,083 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+2935 / +1019), so the largest-note-day room stays.
-  // 64,254 / 24,083 -> 67,540 / 25,211 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31's tilt (storyTilt.js), G33's handed card, G34's payment (settlementPay.js) in the engine's chunk). Measured 67,536 / 25,207 in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 67_540, maxGzip: 25_211 },
+  // 64,254 / 24,083 -> 64,254 / 24,095: measured - / 24091 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 64_254, maxGzip: 24_095 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -1808,9 +1823,10 @@ const budgets = [
   // 10,622 / 4,325 -> 10,940 / 4,429 gameplay-mark7 (RULES_MARK 7: G11c, G13, G16, G18) over g5-rest eb6da859. Measured in CI verify-quick (#640), the plus 4.. Measured 10936 / 4425 (over budget only) in the e2e build, the plus 4.
   // +0 / +13: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 10,622 / 4,338 -> 10,622 / 4,342 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
+  // BUNDLE R EARLY 2026-11-25 (bundle-r-early): Windows, every notes day 11-25..01-28 (65 builds, BUILD_CACHE=off, after #670): gzip max 4,448 (11-26), the plus 8.
   // main + gameplay-mark7's own growth (+318 / +104), merged for gameplay-mark8; CI re-measures.
   // 10,940 / 4,446 -> 11,109 / 4,513 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+169 / +67), so the largest-note-day room stays.
-  // DRYRUN 1123: larger of both sides until the merged build is measured.
   { pattern: /^weeklyRules-.*\.js$/, maxBytes: 11_109, maxGzip: 4_513 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
@@ -1869,9 +1885,9 @@ const budgets = [
   // 3,034 / 1,284 -> 3,034 / 1,289 on 2026-11-23. Measured - / 1285 (over budget only), the plus 4.
   // 3,034 / 1,289 -> 3,258 / 1,360 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 3254 / 1356 in CI verify-quick, the plus 4.
   // 3,034 / 1,289 -> 3,034 / 1,294 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+224 / +71), merged for gameplay-mark8; CI re-measures.
   // 3,258 / 1,365 -> 4,132 / 1,500 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+874 / +135), so the largest-note-day room stays.
-  // DRYRUN 1123: larger of both sides until the merged build is measured.
   { pattern: /^WeekRulePanel-.*\.js$/, maxBytes: 4_132, maxGzip: 1_500 },
   // The office's noise at the table's edge (개선 포인트 A5,
   // src/gauntlet/EdgeNotice.jsx, EDGE_NOTICE in vite.config.js), a file of its
@@ -2241,11 +2257,11 @@ const budgets = [
   // 208,131 / 69,519 -> 208,316 / 69,601 #635 1178f9fe over main 78be3bd4. Measured 208312 / 69597 in CI verify-quick, the plus 4.
   // 208,316 / 69,601 -> 208,782 / 69,752 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 208778 / 69748 in CI verify-quick, the plus 4.
   // +838 / +330: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+466 / +151), merged for gameplay-mark8; CI re-measures.
   // 209,620 / 70,082 -> 210,408 / 70,403 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+788 / +321), so the largest-note-day room stays.
-  // DRYRUN 1123: larger of both sides until the merged build is measured.
-  // 210,408 / 70,403 -> 211,352 / 70,689 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31·G33·G34 words in Japanese). Measured 211,348 / 70,685 in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 211_352, maxGzip: 70_689 },
+  // 210,408 / 70,403 -> 210,599 / 70,424: measured 210595 / 70420, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 210_599, maxGzip: 70_424 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2371,11 +2387,12 @@ const budgets = [
   // 174,008 / 62,102 -> 174,157 / 62,173 #635 1178f9fe over main 78be3bd4. Measured 174153 / 62169 in CI verify-quick, the plus 4.
   // 174,157 / 62,173 -> 174,563 / 62,316 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 174559 / 62312 in CI verify-quick, the plus 4.
   // +746 / +308: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
+  // DRYRUN 1123: larger of both sides until the merged build is measured.
+  // BUNDLE R EARLY 2026-11-25: the start screen's notice says "Wednesday, November 25" (was "Monday, November 30"): gzip 62,675 in CI and on Windows, the same on every notes day, the plus 4.
   // main + gameplay-mark7's own growth (+406 / +143), merged for gameplay-mark8; CI re-measures.
   // 175,309 / 62,624 -> 176,025 / 62,932 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+716 / +308), so the largest-note-day room stays.
-  // DRYRUN 1123: larger of both sides until the merged build is measured.
-  // 176,025 / 62,932 -> 176,920 / 63,207 gameplay-g4b over m8-trial-1124 (MARK 9 G31 G33 G34: G31·G33·G34 words in English). Measured 176,916 / 63,203 in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_920, maxGzip: 63_207 },
+  // 176,025 / 62,932 -> 176,213 / 62,970: measured 176209 / 62966, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_213, maxGzip: 62_970 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2890,8 +2907,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
 // -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
 // DRYRUN 1123: largest of 27 note days + 8.
-// en 453,401 -> 453,718, ja 461,840 -> 462,193 gameplay-g4b (G31·G33·G34 words in the overlay indexes). Measured 453,714 / 462,189, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_196, en: 453_718, ja: 462_193 };
+// -> 387,206 / 453,702 / 462,143 gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903: first paint en 453,490 / ja 461,939 in CI verify-quick 11-25 (Windows the same to the byte),
+// and by note day (CP_NOTES_DAY, Windows) 12-31 under budget, 01-02 453,543 / 461,991, 01-11 453,694 / 462,135 (the largest), 01-20 453,462 / 461,924; the largest plus 8 (Windows only for the note days, as bundle R).
+// The first paint still moves with the start screen's notes (#670 leaves four note days), so the largest day's room stays. ko 387,189 at most, under its budget.
+// -> back to bundle R's 387,206 / 453,411 / 461,850 after main c967db59 (#670, the start screen's notes fixed): gameplay-mark8 ef349544 measured 386,662 / 453,021 / 461,478 in CI verify-quick 11-25, 386,515 / 452,849 / 461,310 on Windows for 2027-01-13; both well under it.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_411, ja: 461_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

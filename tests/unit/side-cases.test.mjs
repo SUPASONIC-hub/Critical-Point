@@ -209,7 +209,7 @@ test("11-18: a new player has no side slot; closing each case opens exactly its 
   const slot = sideCases.getSideSlot({ cases: SIDE_CASES, caseResults: closedUpTo("case14"), record: {} });
   assert.deepEqual(slot.cases.map(({ id }) => id), ["side03", "side10"]);
   assert.equal(slot.book, `번외 0/${SIDE_CASES.length}`);
-  // Up to 사건 42: every one (the Season's held back by opensAt is another test's).
+  // Up to 사건 42: every one.
   assert.equal(sideCases.getSideSlot({ cases: SIDE_CASES, caseResults: closedUpTo("case42"), record: {} }).cases.length, SIDE_CASES.length);
 });
 
@@ -911,7 +911,7 @@ test("번외 9 plays to each of its three endings, on every route through its br
   assert.equal(ENGINE_CONSTANTS(), seasonNumbersBefore.engine, "the engine's constants moved");
 });
 
-// Season 12-14 (owner's answer 11-20): 번외 10 after 사건 05, 번외 11 after 사건 42.
+// 번외 10 after 사건 05, 번외 11 after 사건 42 (written for a December Season, opened 11-25).
 for (const [pack, label, aftershock, endingIds] of [
   [side10, "번외 10", "s10_aftershock", ["s10_after_column", "s10_after_names", "s10_after_none"]],
   [side11, "번외 11", "s11_aftershock", ["s11_after_nobody", "s11_after_none", "s11_after_record"]],
@@ -931,7 +931,7 @@ for (const [pack, label, aftershock, endingIds] of [
     for (const id of [...sceneIds, ...Object.values(pack.nodes).flatMap((scene) => scene.choices.map((choice) => choice.id))]) assert.equal(others.has(id), false, id);
   });
 
-  test(`${label}'s copy keeps the season's lengths and opens with the Season (opensAt), in story order`, () => {
+  test(`${label}'s copy keeps the season's lengths and opens as soon as it ships, in story order`, () => {
     for (const [nodeId, scene] of Object.entries(pack.nodes)) {
       assert.ok([...scene.text].length <= 420, `${nodeId}: ${[...scene.text].length} characters`);
       assert.ok(Array.isArray(scene.memo) && scene.memo.length > 0, `${nodeId}: no memo`);
@@ -943,7 +943,7 @@ for (const [pack, label, aftershock, endingIds] of [
     }
     for (const [id, { text }] of Object.entries(pack.outcomes)) assert.ok([...text].length <= 420, `${id}: ${[...text].length} characters`);
     const entry = SIDE_CASES.find(({ id }) => id === pack.id);
-    assert.equal(entry.opensAt, sideCases.NEXT_SEASON.opensAt);
+    assert.equal("opensAt" in entry, false, "a side case opens in the release that carries it (2026-11-25)");
     assert.equal(JSON.stringify(pack).includes("$"), false, "the board's money sign is not the story's");
   });
 
@@ -1276,28 +1276,14 @@ test("the runtime hands the side screen the side run and the scene readers", asy
   assert.equal(typeof sideCaseKit.getSpeakerRole(side00.nodes.s0_start), "string");
 });
 
-test("Season 12-14: a side case with opensAt stays shut until then, and the start screen says so a week before", () => {
-  const { NEXT_SEASON, releasedSides, seasonNoticeAt, getSideSlot } = sideCases;
-  assert.equal(NEXT_SEASON.opensAt, Date.parse("2026-12-14T00:00:00+09:00"));
-  const day = 24 * 60 * 60 * 1000;
-  const old = { id: "side01", label: "번외 1", title: "a", unlockAfter: "case17" };
-  const fresh = { id: "side10", label: "번외 10", title: "b", unlockAfter: "case05", opensAt: NEXT_SEASON.opensAt };
-  const cases = [old, fresh];
-  // This release holds back 번외 10 and 11 until the Season, and the line counts them.
-  assert.deepEqual(releasedSides(sideCases.SIDE_CASES, NEXT_SEASON.opensAt - 1).map(({ id }) => id), sideCases.SIDE_CASES.map(({ id }) => id).filter((id) => id !== "side10" && id !== "side11"));
-  assert.deepEqual(releasedSides(sideCases.SIDE_CASES, NEXT_SEASON.opensAt), sideCases.SIDE_CASES);
-  assert.deepEqual(seasonNoticeAt(NEXT_SEASON.opensAt), { count: 2, today: true });
-  // The gate, on the weekly clock.
-  assert.deepEqual(releasedSides(cases, NEXT_SEASON.opensAt - 1), [old]);
-  assert.deepEqual(releasedSides(cases, NEXT_SEASON.opensAt), cases);
-  const closed = { case05: { score: 1 }, case17: { score: 1 } };
-  assert.deepEqual(getSideSlot({ caseResults: closed, cases: releasedSides(cases, NEXT_SEASON.opensAt - 1), record: {} }).cases.map(({ id }) => id), ["side01"]);
-  assert.deepEqual(sideCasesOpenedBy("case05", { caseResults: { case05: { score: 1 } }, cases: releasedSides(cases, NEXT_SEASON.opensAt - 1), record: {} }), []);
-  // The line: from noticeDays before to the end of the first day.
-  const at = (ms) => seasonNoticeAt(ms, { cases });
-  assert.equal(at(NEXT_SEASON.opensAt - NEXT_SEASON.noticeDays * day - 1), null);
-  assert.deepEqual(at(NEXT_SEASON.opensAt - NEXT_SEASON.noticeDays * day), { count: 1, today: false });
-  assert.deepEqual(at(NEXT_SEASON.opensAt + day - 1), { count: 1, today: true });
-  assert.equal(at(NEXT_SEASON.opensAt + day), null);
-  assert.equal(at(Number.NaN), null);
+test("11-25: a side case opens in the release that carries it -- no Season date, no notice line", async () => {
+  assert.equal("NEXT_SEASON" in sideCases, false);
+  assert.equal("releasedSides" in sideCases, false);
+  assert.equal("seasonNoticeAt" in sideCases, false);
+  for (const entry of sideCases.SIDE_CASES) assert.equal("opensAt" in entry, false, entry.id);
+  const intro = (await import("../../src/copy/intro.js")).default;
+  assert.equal("seasonNotice" in intro, false);
+  const closed = { case05: { score: 1 } };
+  assert.deepEqual(sideCasesOpenedBy("case05", { newGamePlusUnlocked: false, caseResults: closed, record: {} }).map(({ id }) => id), ["side10"]);
+  assert.ok(sideCases.getSideSlot({ caseResults: closed, record: {} }).cases.some(({ id }) => id === "side10"));
 });

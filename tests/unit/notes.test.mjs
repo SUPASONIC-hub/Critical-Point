@@ -36,8 +36,13 @@ test("every note has its words on disk, a day of its own, a title and a summary"
     assert.ok(existsSync(`scripts/content-pages/notes/${note.slug}.md`), `${note.slug}.md`);
     assert.ok(note.title.length >= 8 && note.summary.length >= 30, note.slug);
   }
-  // Out a few a week, never two on one day: the days are the signal (AdSense 2차 분석, 4-2).
-  assert.equal(new Set(NOTES.map((note) => note.published)).size, NOTES.length);
+  // The notes were first spread out a few a week, never two on one day (AdSense 2차 분석, 4-2). Since 2026-11-25
+  // (the owner's 「2」) a ready note goes out at once, with no schedule, so several share a day. What still holds:
+  // nothing dated before the first note, and one fixed order among notes of one day (later in NOTES = newer).
+  assert.ok(NOTES.every((note) => note.published >= "2026-11-21"));
+  const sameDay = publishedNotes("2026-11-25").filter((note) => note.published === "2026-11-25");
+  assert.ok(sameDay.length >= 2, "several notes went out on 2026-11-25");
+  assert.deepEqual(sameDay.map((note) => note.slug), NOTES.filter((note) => note.published === "2026-11-25").map((note) => note.slug).reverse());
 });
 
 test("a build writes the notes whose day has come, newest first, by the day in Seoul", () => {

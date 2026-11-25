@@ -28,11 +28,12 @@
  * requests; the slot is hidden while none is open (설계안 질문 7 (1)). In
  * story order they open after 사건 14 (번외 3), 16 (번외 4), 17 (번외 1), 18
  * (번외 2), 21 (번외 5), 27 (번외 6), 31 (번외 7), 34 (번외 8) and 40 (번외 9).
- * The first Season (2026-12-14) adds 번외 10 (side10, 2025년 9월 13일 토요일)
- * after 사건 05 and 번외 11 (side11, 2026년 9월 5일 토요일) after 사건 42, both
- * shut until `NEXT_SEASON.opensAt`.
- * New content is released as a "Season" on a date the owner chooses, all at
- * once; there is no fixed monthly schedule (docs/work-status.md).
+ * 번외 10 (side10, 2025년 9월 13일 토요일) opens after 사건 05 and 번외 11
+ * (side11, 2026년 9월 5일 토요일) after 사건 42; both were written for a
+ * December Season and opened on 2026-11-25 instead.
+ * New content opens as soon as it is ready, without a notice or a date set
+ * ahead (2026-11-25 「준비되면 불시에 오픈하는걸로 규칙 변경」): an entry
+ * here is open in the release that carries it.
  *
  * `side00` is the framework's placeholder, not a case: it exists so the slot,
  * the side screen and the e2e test have something to open. It is listed only in
@@ -52,20 +53,6 @@ const sideFixtureListed =
   __CP_DEBUG_BUILD__ &&
   new URLSearchParams(globalThis.location?.search ?? "").get("side-fixture") === "1";
 
-/**
- * The next Season (2026-11-20 owner's answer: the first December Season opens
- * 2026-12-14, Monday, 00:00 KST). A side case written for it carries
- * `opensAt: NEXT_SEASON.opensAt`: the release ships it ahead (ops mode merges
- * on Tuesday and Friday only, docs/ops-mode.md), and the start screen keeps it
- * shut until that moment on the weekly clock (`releasedSides`,
- * src/sideCases.js), with a notice line from `noticeDays` before
- * (`seasonNoticeAt`). A Season is content and a release date, never a rule
- * number: no CASE_SEQUENCE, ranking or RULES_MARK change rides on it. While no
- * entry names it, nothing shows. A test build holds the weekly clock on
- * 2026-01-07, so its e2e spec moves `__weeklyRuleClock` past `opensAt`.
- */
-export const NEXT_SEASON = Object.freeze({ id: "2026-12", opensAt: Date.parse("2026-12-14T00:00:00+09:00"), noticeDays: 7 });
-
 export const SIDE_CASES = Object.freeze([
   { id: "side01", label: "번외 1", title: "아직 찾아가지 못한 일곱 명", unlockAfter: "case17", load: () => import("./side01.js").then(({ side01 }) => localizeSidePack(side01)) },
   { id: "side02", label: "번외 2", title: "돌려줄 것", unlockAfter: "case18", load: () => import("./side02.js").then(({ side02 }) => localizeSidePack(side02)) },
@@ -76,8 +63,8 @@ export const SIDE_CASES = Object.freeze([
   { id: "side07", label: "번외 7", title: "금요일 17시 58분", unlockAfter: "case31", load: () => import("./side07.js").then(({ side07 }) => localizeSidePack(side07)) },
   { id: "side08", label: "번외 8", title: "정상화", unlockAfter: "case34", load: () => import("./side08.js").then(({ side08 }) => localizeSidePack(side08)) },
   { id: "side09", label: "번외 9", title: "92일", unlockAfter: "case40", load: () => import("./side09.js").then(({ side09 }) => localizeSidePack(side09)) },
-  { id: "side10", label: "번외 10", title: "인사 없이", unlockAfter: "case05", opensAt: NEXT_SEASON.opensAt, load: () => import("./side10.js").then(({ side10 }) => localizeSidePack(side10)) },
-  { id: "side11", label: "번외 11", title: "부표까지", unlockAfter: "case42", opensAt: NEXT_SEASON.opensAt, load: () => import("./side11.js").then(({ side11 }) => localizeSidePack(side11)) },
+  { id: "side10", label: "번외 10", title: "인사 없이", unlockAfter: "case05", load: () => import("./side10.js").then(({ side10 }) => localizeSidePack(side10)) },
+  { id: "side11", label: "번외 11", title: "부표까지", unlockAfter: "case42", load: () => import("./side11.js").then(({ side11 }) => localizeSidePack(side11)) },
   ...(sideFixtureListed
     ? [{ id: "side00", label: "번외 0", title: "틀 확인용 번외 사건", fixture: true, load: () => import("./side00.js").then(({ side00 }) => localizeSidePack(side00)) }]
     : []),

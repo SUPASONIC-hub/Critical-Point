@@ -48,7 +48,7 @@ event week deadline」으로 실패해 예산 80% 알람과 같은 실패 메일
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
   고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`)에 있는 것만 켤 수 있습니다.
   감사·연쇄는 판의 규칙이 되어 목록에서 빠졌습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다 지킵니다.
-- 판 규칙 7(2026-11-30)의 LOCK 시계 1.15배(G18)는 카탈로그의 숫자가 아니라 판에 붙는 표시(`lockDrag`)입니다.
+- 판 규칙 7(2026-11-25)의 LOCK 시계 1.15배(G18)는 카탈로그의 숫자가 아니라 판에 붙는 표시(`lockDrag`)입니다.
   `getWeekBoard`가 `LOCK_DRAG_RULES`(`short-clock`, `hearing`)의 판에 붙이므로, SHORT CLOCK 주의 시즌과 사건 09,
   7막 청문회에서 섭니다. 같은 판 규칙 7의 첫 조회 사다리(G13)와 도구 겹침 상한 ×1.6(G11c)은 주간 규칙 시즌에도
   그대로 서고, 8막 서명란의 값(G16)은 막 비틀기라 주간 규칙 시즌에는 없습니다. 주간 안내 페이지의 SHORT CLOCK

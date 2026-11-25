@@ -143,7 +143,7 @@ const STEPS = [
     adds: [],
     kicker: unlocksCopy.steps.prologue01.kicker,
     // The second line is what a bust costs, which the first table never said:
-    // the first bust was the tutorial. Since N21 (11-30) a bust here and in
+    // the first bust was the tutorial. Since N21 (11-25) a bust here and in
     // 프롤로그 02 keeps the next scene (caseRoutes.js `keepsSceneOnBust`), so the
     // line says the stake alone, and a story run, which loses its stake too,
     // is told both lines.
@@ -152,7 +152,7 @@ const STEPS = [
   {
     caseId: "prologue02",
     // Two rules, where there were four (N18, the owner's answer of 2026-11-16,
-    // (1), for the reset of 11-30): the logic combo and BLACKOUT. AFTERSHOCK
+    // (1), for the reset of 11-25): the logic combo and BLACKOUT. AFTERSHOCK
     // opens in 사건 04 and SILENCE in 사건 05, each with its own line. 02 is
     // where the first hour loses the most players (funnel 11-15), and its
     // briefing said four things at once.
@@ -239,7 +239,7 @@ const STEPS = [
     intro: unlocksCopy.steps.case03.intro,
   },
   // 사건 04 and 05 (N18): the two ways a bust breaks the next board that
-  // 프롤로그 02 opened with BLACKOUT until 11-30. The 22 and the 30 are
+  // 프롤로그 02 opened with BLACKOUT until 11-25. The 22 and the 30 are
   // AFTERSHOCK_START and SILENCE_SECONDS (tableRules.js), written out like
   // SCOUT's and held to them by a unit test. Neither is a story run's rule.
   {

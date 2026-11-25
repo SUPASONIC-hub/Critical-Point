@@ -2,65 +2,22 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 const {
-  OPS_MODE_START,
   calendarRunsLow,
   calendarWeeksLeft,
   describeCalendarWarning,
   describeOpsSummary,
   describeToday,
-  isDeployDay,
-  isQuarterResetDay,
   kstDay,
   lastBookedWeek,
   main,
-  mergeVerdict,
-  nextDeployDay,
-  nextQuarterReset,
-  opsModeOn,
-  quarterResetDay,
-  shipsToPlayers,
 } = await import("../../scripts/ops-calendar.mjs");
-const { RANKING_RESET_MS, WEEKLY_RULES } = await import("../../src/gauntlet/weeklyCalendar.js");
+const { WEEKLY_RULES } = await import("../../src/gauntlet/weeklyCalendar.js");
 
 const kst = (local) => Date.parse(`${local}+09:00`);
 
-test("ops mode starts on 2026-12-01 in Korean time", () => {
-  assert.equal(OPS_MODE_START, "2026-12-01");
-  assert.equal(opsModeOn(kst("2026-11-30T23:59:59")), false);
-  assert.equal(opsModeOn(kst("2026-12-01T00:00:00")), true);
+test("the day is the Korean one", () => {
   assert.equal(kstDay(Date.parse("2026-11-30T15:00:00Z")), "2026-12-01");
-  assert.equal(opsModeOn(Number.NaN), false);
-});
-
-test("every day deploys before ops mode, Tuesday and Friday after it", () => {
-  assert.equal(isDeployDay(kst("2026-11-29T12:00:00")), true, "a Sunday in November");
-  assert.equal(isDeployDay(kst("2026-12-01T09:00:00")), true, "Tuesday");
-  assert.equal(isDeployDay(kst("2026-12-02T09:00:00")), false, "Wednesday");
-  assert.equal(isDeployDay(kst("2026-12-04T09:00:00")), true, "Friday");
-  assert.equal(isDeployDay(kst("2026-12-06T09:00:00")), false, "Sunday");
-  assert.equal(nextDeployDay(kst("2026-12-02T09:00:00")), "2026-12-04");
-  assert.equal(nextDeployDay(kst("2026-12-05T09:00:00")), "2026-12-08");
-  assert.equal(nextDeployDay(kst("2026-11-20T09:00:00")), "2026-11-20");
-  assert.equal(isDeployDay(Number.NaN), false);
-  assert.equal(nextDeployDay(Number.NaN), null);
-});
-
-test("a scheduled wipe is the first Monday of a quarter, and 11-30 is the last one off it", () => {
-  assert.equal(quarterResetDay(2027, 0), "2027-01-04");
-  assert.equal(quarterResetDay(2027, 1), "2027-04-05");
-  assert.equal(quarterResetDay(2027, 2), "2027-07-05");
-  assert.equal(quarterResetDay(2027, 3), "2027-10-04");
-  assert.equal(quarterResetDay(2029, 9 / 3), "2029-10-01", "a quarter that starts on a Monday");
-  assert.equal(isQuarterResetDay("2027-01-04"), true);
-  assert.equal(isQuarterResetDay("2027-01-11"), false);
-  assert.equal(isQuarterResetDay("2027-02-01"), false);
-  assert.equal(isQuarterResetDay("nope"), false);
-  assert.deepEqual(nextQuarterReset(kst("2026-11-16T10:00:00")), { day: "2027-01-04", noticeFrom: "2026-12-21" });
-  assert.deepEqual(nextQuarterReset(kst("2027-01-05T10:00:00")), { day: "2027-04-05", noticeFrom: "2027-03-22" });
-  assert.equal(nextQuarterReset(Number.NaN), null);
-  // The rule the start screen's notice reads: a wipe after 11-30 is a quarter day.
-  const resetDay = kstDay(RANKING_RESET_MS);
-  assert.ok(resetDay === "2026-11-30" || isQuarterResetDay(resetDay), `RANKING_RESET_MS ${resetDay} is not the first Monday of a quarter`);
+  assert.equal(kstDay(Number.NaN), null);
 });
 
 test("the calendar counts its booked weeks and warns under six", () => {
@@ -79,33 +36,14 @@ test("the calendar counts its booked weeks and warns under six", () => {
   assert.equal(calendarRunsLow(kst("2026-11-16T10:00:00")), false, "the booked calendar is not low today");
 });
 
-test("only what ships to players waits for a deploy day", () => {
-  for (const file of ["src/App.jsx", "public/sw.js", "supabase/migrations/20261119000000_x.sql", "scripts/content-pages/guide-text.mjs", "scripts\\site-pages.mjs", "index.html", "package-lock.json"]) {
-    assert.equal(shipsToPlayers(file), true, file);
-  }
-  for (const file of ["docs/work-status.md", "README.md", "tests/unit/x.test.mjs", ".github/workflows/funnel.yml", "scripts/report-funnel.mjs", "scripts/ops-calendar.mjs"]) {
-    assert.equal(shipsToPlayers(file), false, file);
-  }
-  const wednesday = kst("2026-12-02T15:00:00");
-  assert.equal(mergeVerdict(wednesday, ["docs/x.md"]).ok, true);
-  const held = mergeVerdict(wednesday, ["src/App.jsx", "docs/x.md"]);
-  assert.equal(held.ok, false);
-  assert.match(held.reason, /12-04\(금\)/);
-  assert.deepEqual(held.shipping, ["src/App.jsx"]);
-  assert.equal(mergeVerdict(wednesday, ["src/App.jsx"], { hotfix: true }).ok, true);
-  assert.equal(mergeVerdict(kst("2026-12-04T15:00:00"), ["src/App.jsx"]).ok, true);
-  assert.equal(mergeVerdict(kst("2026-11-18T15:00:00"), ["src/App.jsx"]).ok, true, "before ops mode");
-});
-
-test("the lines say the day, the next wipe and the calendar", () => {
-  assert.match(describeToday(kst("2026-11-16T10:00:00")), /11-16\(월\): 운영 모드 전.*2027-01-04\(예고 2026-12-21부터\).*주 남음/);
-  assert.match(describeToday(kst("2026-12-02T10:00:00")), /배포 요일 아님 — 다음 12-04\(금\)/);
-  assert.match(describeToday(kst("2026-12-04T10:00:00")), /배포 요일\(18:50까지\)/);
+test("the lines say every day deploys, with no deploy weekday or quarter day", () => {
+  assert.match(describeToday(kst("2026-12-02T10:00:00")), /^12-02\(수\): 매일 배포\(18:50까지\) · 주간 규칙 달력 \d+주 남음$/);
   const summary = describeOpsSummary(kst("2026-12-03T10:00:00"));
   assert.match(summary, /^## 운영 달력/);
-  assert.match(summary, /다음 배포 12-04\(금\)/);
-  assert.doesNotMatch(summary, /⚠/);
-  assert.match(describeOpsSummary(kst("2026-11-20T10:00:00")), /운영 모드 전/);
+  assert.match(summary, /12-03\(목\): 매일 배포/);
+  assert.doesNotMatch(summary, /⚠|배포 요일|분기|비움/);
+  const calendar = [{ week: "2027-W03", id: "short-clock", added: "x" }];
+  assert.match(describeOpsSummary(kst("2026-12-21T10:00:00"), calendar), /> ⚠ 주간 규칙 달력의 남은 예약이 5주/);
 });
 
 test("the command line", () => {
@@ -113,9 +51,7 @@ test("the command line", () => {
   assert.match(main(at).out, /12-02\(수\)/);
   assert.match(main([...at, "--summary"]).out, /## 운영 달력/);
   assert.equal(main([...at, "--calendar-warning"]).out, "");
-  assert.deepEqual(main([...at, "--merge"], { changedFiles: ["src/App.jsx"] }).code, 1);
-  assert.deepEqual(main([...at, "--merge", "--hotfix"], { changedFiles: ["src/App.jsx"] }).code, 0);
-  assert.equal(main([...at, "--merge"], { changedFiles: ["docs/a.md"] }).code, 0);
+  assert.equal(main([...at, "--merge"]).code, 0, "the old merge question is gone and never holds a merge");
   assert.match(main([], { now: kst("2026-11-16T10:00:00") }).out, /11-16/);
   assert.throws(() => main(["--at", "nope"]), /not a time/);
 });

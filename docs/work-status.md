@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-23 (the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-24 (`main` at `d418828d`, after #664 the quarter-Monday calendar window and #665 the BUST display hotfix; before that 2026-11-23, the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -193,11 +193,11 @@ Still open, on purpose:
   (`hall_of_fame_boards`, `hall_of_fame`, the service-role-only
   `hall_of_fame_settle` and the anon view `public_hall_of_fame`),
   `src/hallOfFame.js` (which checked seasons stand, boards, the threshold of
-  ten, tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
+  five since bundle R (#648; ten before), tags, the page), `src/hallOfFameBadges.js` (the ranking row's badge),
   and two steps in `verify-ranking.yml`: the settle call right after the
   marks, from the same check, and a job of its own with `contents: write`
   that force-pushes one commit to the orphan branch `hall-of-fame`. Each
-  board is read on its own: the threshold of ten counts the board's complete
+  board is read on its own: the threshold (five since bundle R, ten before) counts the board's complete
   seasons with no mark over the whole board (`hall_of_fame_counts`, counted
   again inside the settle call), and the replay reads each open board's first
   ten candidates beside the top `limit`. A week's
@@ -207,10 +207,11 @@ Still open, on purpose:
   at the earliest).
 - Since #556 (2026-11-16) the nightly Verify Ranking summary's "Hall of fame
   (D2)" section carries one line, `formatHallOfFameThreshold` in
-  `scripts/verify-ranking-rows.mjs`: how many boards hold ten and five or more
-  complete seasons with no mark, and the fullest board. Read only; the
-  threshold `HALL_OF_FAME_MIN_SEASONS = 10` and the server stay, for decision
-  T's T12 (11-23).
+  `scripts/verify-ranking-rows.mjs`: how many boards hold five (the threshold)
+  and ten (the one before) or more complete seasons with no mark, and the
+  fullest board. Since bundle R (#648, merged with the 11-25 wipe) the
+  threshold is five: `HALL_OF_FAME_MIN_SEASONS = 5` and the server's
+  `hall_of_fame_settle` (20261130000200_hall_of_fame_threshold_five.sql).
 - Bundle 11-16a (#566, 2026-11-16, `60dc8551`): the board has an admin tool
   for the two makers only (#561): `?admin` or `#admin` opens it, Google sign-in
   through Supabase Auth's REST (no supabase-js), and `is_board_admin()` asks
@@ -934,24 +935,52 @@ Still open, on purpose:
   rows below mark 7 (`>= 7` kept). GA4 still counts no
   `cp_scene` event: the custom dimensions (`case_no`, `scene_no`, `value`)
   are registered; no consenting device has played the first hour since.
+- 2026-11-24: #665 (`hotfix-bust-keeps`, merged 12:30 KST,
+  `d418828d`): the first BUST of cases 04~06
+  keeps a third of the pot, but the table and the BUST line showed $0. Saved
+  values and settlement were right, so only the display changed; rule
+  numbers, scores and the save format stay. #664 (`ops-calendar-quarter`,
+  merged 11:33 KST, `614dc3bd`): `ops-calendar --merge` allowed only Tuesday and Friday,
+  against the rule that rule numbers change on a quarter's first Monday; it
+  now also allows that Monday (January, April, July, October, KST), which
+  still does not count as a deploy day. The 11-30 bundle R passed a local
+  combined check, still unmerged: 2480 unit tests, grants, pressure, endings
+  and bundle checks; the one failing BUST
+  test moved to case 07, where no pot is kept, and the four changed specs then ran 117 passed, 1 skipped.
+- 2026-11-25 (the user): ops mode is dropped before it starts. Every day
+  deploys as now (a green PR merges by 18:50 that day); no Tuesday/Friday
+  deploy days and no quarter-first-Monday window for ranking wipes and rule
+  numbers, nor its 14-day notice: a change merges when it is ready (bundle
+  R's wipe moves to 11-26). The same day: no Season notice (a ready side
+  story opens at once), no note release dates (a written note goes out at
+  once), and operational data verdicts (decision T and the like) wait
+  until the user sets a date. `scripts/ops-calendar.mjs` keeps only the
+  weekly rule calendar's weeks left for the Funnel summary; `--merge`, the
+  deploy days and the quarter days are gone (`docs/ops-mode.md`).
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
-  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
-  no longer wait for a closed finale. Each entry of `SIDE_CASES`
+  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
+  (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
   (`src/nodes/sidePacks.js`) has its in-world `date` and `unlockAfter`, the
   season case whose date comes just before it, and opens once that case is
   closed in the run, once a finale is closed (NEW GAME+), or once the side
   case is in the device's side record (`isSideCaseOpen`, `src/sideCases.js`).
   Order: 사건 14 → 번외 3 (2025-11-08), 16 → 번외 4 (12-11), 17 → 번외 1
   (12-20), 18 → 번외 2 (2026-01-09), 21 → 번외 5 (02-12), 27 → 번외 6
-  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13).
+  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13);
+  since 11-25 also 05 → 번외 10 (2025-09-13) and 42 → 번외 11 (2026-09-05).
   Nothing opens before 프롤로그 01. The report of the case that opens one
   carries one line, 「번외 사건이 열렸습니다: 번외 N 「제목」」, and a button
   that goes to the start screen and opens it (`side-opened`); the finale's
   old 「번외 사건 칸이 열렸습니다」 line is gone, since every case is open by
   then. Side cases stay outside the season's score, ranking and rules mark.
-- Release rule (2026-11-18): new content is released as a "Season" on a date
-  the owner chooses, all at once; there is no fixed monthly schedule. The
-  plan of one side case a month (N11, N35) is dropped: what is ready is open.
+- Release rule (2026-11-25, replacing 11-18's Season dates): new content
+  opens as soon as it is ready, with no notice and no date set ahead
+  (「시즌제로 예고하고 오픈하는 방식이 아니라 준비되면 불시에 오픈」). The
+  December Season's 번외 10 and 11 opened on 11-25 instead of 12-14; the
+  date lock (`NEXT_SEASON`, `opensAt`, `releasedSides`) and the start
+  screen's Season line (`seasonNoticeAt`) are gone. Their 12-04 review runs
+  after the release and ships as a later PR. There is still no monthly
+  schedule (N11, N35 dropped).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
@@ -1813,11 +1842,11 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
     The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
     from its `final` case row as well, since the reset takes the ranking row:
-    every reset (11-30's included, and the quarterly ones after it) deletes
+    every reset (11-25's included, moved up from 11-30, and any later one) deletes
     `season-final` only and keeps the `final` case rows, or snapshots the
     finished count first, and moves `LAST_RANKING_RESET` there to its own
     merge time; point check:grants' newest reset at the new file too.
-    From 11-30 on a reset keeps the mark unless the rules change and is named
+    From 11-25 on a reset keeps the mark unless the rules change and is named
     by its day (`*_ranking_reset_<MMDD>.sql`); check:grants replays the newest
     such file (`DATED_RESET`). The day's order is under Database Deployment,
     "11-30 당일 순서".
@@ -2444,7 +2473,14 @@ Manual steps after pushing the 2026-09-28 migrations:
 - Expect the public ranking to be empty: season rows the new rules would refuse
   were deleted.
 
-### 11-30 당일 순서 (묶음 R, 랭킹 비움 + 개편)
+### 11-30 당일 순서 (묶음 R, 랭킹 비움 + 개편) → 11-25(수)로 앞당김
+
+**11-25 사용자 결정(보기 2, 이어서 13시대 「1」)**: 수정·개선은 개발이 끝나는 대로 앞당겨 병합한다. 묶음 R은 11-25(수)
+CI가 초록이 되는 대로 병합·배포하며 PR 「묶음 R 앞당김 (11-25)」 하나(갈래 `bundle-r-early`)에 모았고, `RANKING_RESET_MS`와
+시작 화면·가이드의 예고 문구는 11-25로 바꿨다. 병합이 더 늦어지면 그 날 0시로 다시 맞춘다. 마이그레이션
+파일 이름 `20261130…`은 그대로 둔다(이름이 이미 적용된 가장 늦은 번호 `20261129120000`보다 뒤라 순서대로
+적용됨). 다만 그 뒤에 만드는 마이그레이션은 `20261130000200`보다 늦은 이름이어야 한다. 아래 순서의 「11-30」은
+11-25로 읽는다.
 
 묶음 R은 draft PR 「묶음 R 뼈대 (11-30 랭킹 비움)」 하나에 모은다. 마이그레이션
 `20261130000000_ranking_reset_1130.sql`은 병합 1분 안에 적용되므로 11-30 전에는
@@ -2475,10 +2511,10 @@ Manual steps after pushing the 2026-09-28 migrations:
    어긋나면 `LAST_RANKING_RESET`만 고치는 한 줄 PR을 따로 낸다.
 6. **확인**: `gh workflow run migration-drift.yml`을 돌려 초록인지, 열린 drift 이슈가
    없는지 본다. 공개 랭킹은 0행, 명예의 전당 표는 그대로, 시작 화면 예고는
-   11-30이 끝나면 저절로 사라진다(`rankingResetNoticeAt`).
+   11-25이 끝나면 저절로 사라진다(`rankingResetNoticeAt`).
 7. **알림**: 게시판에 비움과 개편이 끝났다는 글을 올리고, README 새 소식 한 줄을 쓴다.
-8. **12-01(화)부터 운영 모드**: 배포는 화·금에만 한다(docs/ops-mode.md, #559).
-   다음 비움은 분기 첫 월요일이고, 그때도 `*_ranking_reset_<MMDD>.sql` 이름으로
+8. ~~12-01(화)부터 운영 모드~~ → 11-25 사용자 결정으로 없앰(#671): 매일 배포 그대로(docs/ops-mode.md).
+   다음 비움도 `*_ranking_reset_<MMDD>.sql` 이름으로
    만든다. check:grants는 이름이 가장 늦은 파일을 재생한다.
 
 ## Looked at and left
