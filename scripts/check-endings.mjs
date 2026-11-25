@@ -512,7 +512,8 @@ if (!process.env.ENDING_BASELINE) {
  * them). A stream of their own, so every season above is the one it was.
  * Printed for the notes' target (collapse 20~25%), not asserted.
  */
-const VETERAN_SEASONS = Number(process.env.ENDING_VETERAN_SEASONS) || 160;
+// 80 so the run stays inside verify:static's eight minutes beside the other checks; 160 measured collapse 21.9% (11-25).
+const VETERAN_SEASONS = Number(process.env.ENDING_VETERAN_SEASONS) || 80;
 if (!process.env.ENDING_BASELINE && VETERAN_SEASONS > 0) {
   const veteranBot = createSeasonBot({ seed: 20261125, staged, veteran: true });
   const veteranCounts = new Map();
