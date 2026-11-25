@@ -216,7 +216,8 @@ const budgets = [
   // 166,164 / 61,971 -> 166,164 / 61,989 #635 on 2026-11-23: the chunk's hashed imports move with the day's notes. Largest day 61,981 (2027-01-08), plus Linux's 4 and the plus 4.
   // +92 / +10: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 166,256 / 61,999 -> 166,256 / 62,010 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_256, maxGzip: 62_010 },
+  // 166,256 / 62,010 -> 166,291 / 62,010 story-g37 over main ffa6139b (G37: the season strain says whether a case was played in story mode). Measured 166,287 / - (over budget only) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_291, maxGzip: 62_010 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -266,7 +267,8 @@ const budgets = [
   // 38,027 / 14,776 -> 38,372 / 14,883 held-standing over f1-evening. Measured 38368 / 14879 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,883 -> 38,372 / 14,890 f1-evening (#518 #525 #532) over #466 1331e71d. Measured - / 14886 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,890 -> 38,372 / 14,895 묶음 1113. Measured - / 14891 (over budget only) in the e2e build, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_372, maxGzip: 14_895 },
+  // 38,372 / 14,895 -> 38,530 / 14,941 story-g37 over main ffa6139b (G37: story mode's cold gap and open question, the strain's storySeason). Measured 38,526 / 14,937 in the e2e build, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_530, maxGzip: 14_941 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.

@@ -43,7 +43,7 @@ function share(count, cases, rate) {
 export function nearestEnding(input = {}) {
   const {
     endingId = "", resources = {}, discoveredClues = [], log = [], seasonHumanCost = 0, casesPlayed = 0, seasonBusts = 0, seasonWindows = 0,
-    seasonBestMultiplier = 1, seasonVaultPerCase = 0, seasonBestLogic = 0, seasonReframeRoutes, seasonResources = null,
+    seasonBestMultiplier = 1, seasonVaultPerCase = 0, seasonBestLogic = 0, seasonReframeRoutes, seasonResources = null, storySeason = false,
   } = input ?? {};
   if (!endingId || endingId === "collapse") return null;
   if (getFinaleOutcome(log) === "burn") return { burn: true };
@@ -62,7 +62,7 @@ export function nearestEnding(input = {}) {
     "human-record": { reframes: share(reframes, cases, GATE.recordReframeRate), clues: share(clues, cases, GATE.recordClueRate), trust: atLeast(trust, GATE.recordTrust) },
     "evidence-reform": { clues: recordClues, legitimacy: atLeast(legitimacy, GATE.reformLegitimacy) },
     "open-oversight": { clues: recordClues, legitimacy: atLeast(legitimacy, GATE.oversightLegitimacy), trust: atLeast(trust, GATE.oversightTrust) },
-    "cold-justice": { legitimacy: atLeast(legitimacy, GATE.coldLegitimacy), coldGap: atLeast(legitimacy - trust, GATE.coldGap) },
+    "cold-justice": { legitimacy: atLeast(legitimacy, GATE.coldLegitimacy), coldGap: atLeast(legitimacy - trust, storySeason ? GATE.storyColdGap : GATE.coldGap) },
     "profitable-silence": { capital: atLeast(capital, GATE.silenceCapital), trustOver: under(trust, GATE.silenceTrust) },
     "field-pact": { pactGap: atLeast(trust - legitimacy, GATE.pactGap) },
   };
