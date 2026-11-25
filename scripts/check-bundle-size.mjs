@@ -218,12 +218,16 @@ const budgets = [
   // 166,164 / 61,989 -> 166,257 / 62,017 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 166253 / 62013 in CI verify-quick, the plus 4.
   // +92 / +10: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 166,256 / 61,999 -> 166,256 / 62,010 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
+  // 166,256 / 62,010 -> 166,291 / 62,010 story-g37 over main ffa6139b (G37: the season strain says whether a case was played in story mode). Measured 166,287 / - (over budget only) in the e2e build, the plus 4.
+  // 166,291 / 62,010 -> 166,291 / 62,031 story-g37 over main c967db59 (#669 Season open, #670 notes all on 11-25): the hashed imports moved. Measured - / 62,027 in CI verify-quick, the plus 4.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
+  // 166,355 / 62,051 -> 166,365 / 62,065 story-g37 over main b2fa5c01 (#668 bundle R: MARK 7, N18, N21, the ranking reset). Measured 166,361 / 62,061 in CI verify-quick (2ab9344d), the plus 4.
   // main + gameplay-mark7's own growth (+93 / +28), merged for gameplay-mark8; CI re-measures.
   // 166,349 / 62,038 -> 166,557 / 62,134 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+206 / +96), so the largest-note-day room stays.
   // 166,585 / 62,134 -> 166,585 / 62,143: measured - / 62139 (over budget only), gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 166,585 / 62,143 -> 166,585 / 62,160: measured - / 62156 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
-  // 166,585 / 62,160 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
+  // 166,585 / 62,160 -> 166,600 / 62,169 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 166,596 / 62,165 in CI verify-quick (ba3e20f9), the plus 4.
+  // 166,600 / 62,169 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_925, maxGzip: 62_353 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
@@ -274,8 +278,10 @@ const budgets = [
   // 38,027 / 14,776 -> 38,372 / 14,883 held-standing over f1-evening. Measured 38368 / 14879 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,883 -> 38,372 / 14,890 f1-evening (#518 #525 #532) over #466 1331e71d. Measured - / 14886 (over budget only) in the e2e build, the plus 4.
   // 38,372 / 14,890 -> 38,372 / 14,895 묶음 1113. Measured - / 14891 (over budget only) in the e2e build, the plus 4.
+  // 38,372 / 14,895 -> 38,530 / 14,941 story-g37 over main ffa6139b (G37: story mode's cold gap and open question, the strain's storySeason). Measured 38,526 / 14,937 in the e2e build, the plus 4.
   // 38,372 / 14,895 -> 38,502 / 14,954 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+130 / +59), so the largest-note-day room stays.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_541, maxGzip: 14_982 },
+  // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_689, maxGzip: 15_019 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
