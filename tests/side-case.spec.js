@@ -65,7 +65,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   // 번외 1 to 9 and the placeholder.
-  await expect(slot).toContainText("번외 0/10");
+  await expect(slot).toContainText("번외 0/12");
   await expect(slot).toContainText("랭킹 밖");
   const before = await readSeasonKeys(page);
 
@@ -94,7 +94,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   expect(await readSeasonKeys(page)).toEqual(before);
 
   await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/10");
+  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/12");
   // 이어하기 opens the season where it was paused.
   await resumeSavedRun(page);
   expect(JSON.parse(await readStorage(page, TEST_STORAGE_KEYS.save)).currentCase).toBe("case12");
