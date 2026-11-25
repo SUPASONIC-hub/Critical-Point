@@ -5,7 +5,7 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingCaseRuleCase, getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getBriefingCaseRuleCase, getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId, opensCase } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
 import { fill, speakerName } from "../locale.js";
@@ -179,7 +179,7 @@ export function SceneBriefing({
   const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
-  const tilt = listStoryTilt(run, nodeId);
+  const tilt = opensCase(node, nodeId) ? listStoryTilt(run, nodeId) : []; // G31: on a scene a case opens on only
   const tiltLine = tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ");
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
   // clock; above it, on a NEW GAME+ season's first page of a case, what the
