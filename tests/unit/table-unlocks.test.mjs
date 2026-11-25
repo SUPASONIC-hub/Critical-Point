@@ -198,12 +198,16 @@ test("every next-table mutation but REBOOT belongs to a rule", () => {
 // C-4: the audit and the links have a line of their own in 사건 02 and 03, with the numbers they act
 // on written out, as SCOUT's are; these hold them to the constants.
 test("사건 02 and 03 tell the audit and the links by their own numbers", async () => {
-  const { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_RELIEF_HEAT, AUDIT_SHARE } = await import("../../src/gauntlet/auditRisk.js");
-  const { LINK_BURN, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_WALL } = await import("../../src/gauntlet/cascadeRisk.js");
+  const { AUDIT_HEAT, AUDIT_LIMIT, AUDIT_RELIEF, AUDIT_RELIEF_HEAT, AUDIT_SHARE, SMOOTH_LIMIT, SMOOTH_SPAN } = await import("../../src/gauntlet/auditRisk.js");
+  const { LINK_BURN, LINK_SPAN_MAX, LINK_SPAN_MIN, LINK_TOP_WALL, LINK_WALL } = await import("../../src/gauntlet/cascadeRisk.js");
+  const unlocks = (await import("../../src/copy/unlocks.js")).default;
+  // RULES_MARK 9 (G35, G32) on this page: the smooth ledger and the band's far end; 8's lines stay for a page that plays 8.
   const [audit] = introFor("case02", staged);
-  assert.equal(audit, `이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 ${AUDIT_HEAT} 아래에서 확정하면 한 칸 차고, ${AUDIT_RELIEF_HEAT} 이상에서 확정하면 ${AUDIT_RELIEF}칸 줄어듭니다. 사건이 닫힐 때 ${AUDIT_LIMIT}칸이 차 있으면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃습니다.`);
+  assert.equal(audit, `이번 사건부터 감사가 판에 붙습니다. 한 사건 안에서 한 번이라도 밀고 확정한 열기가 ±${SMOOTH_SPAN} 안의 같은 자리에 ${SMOOTH_LIMIT}번 모이면, 사건이 닫힐 때 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃습니다. 끊는 자리를 바꾸면 피합니다.`);
+  assert.deepEqual(unlocks.steps.case02.intro, [`이번 사건부터 감사가 판에 붙습니다. 한 번이라도 밀고 열기 ${AUDIT_HEAT} 아래에서 확정하면 한 칸 차고, ${AUDIT_RELIEF_HEAT} 이상에서 확정하면 ${AUDIT_RELIEF}칸 줄어듭니다. 사건이 닫힐 때 ${AUDIT_LIMIT}칸이 차 있으면 금고로 갈 몫의 ${AUDIT_SHARE}분의 1을 잃습니다.`]);
   const [links] = introFor("case03", staged);
-  assert.equal(links, `이번 사건부터 연결이 판에 붙습니다. 한 자원을 ${LINK_BURN} 이상 태운 카드로 확정하면, ${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 뒤의 한 판에서 벽이 ${LINK_WALL} 가까워집니다.`);
+  assert.equal(links, `이번 사건부터 연결이 판에 붙습니다. 한 자원을 ${LINK_BURN} 이상 태운 카드로 확정하면, ${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 뒤의 한 판에서 벽 띠의 먼 끝이 ${LINK_TOP_WALL} 가까워집니다.`);
+  assert.deepEqual(unlocks.steps.case03.intro, [`이번 사건부터 연결이 판에 붙습니다. 한 자원을 ${LINK_BURN} 이상 태운 카드로 확정하면, ${LINK_SPAN_MIN}~${LINK_SPAN_MAX}판 뒤의 한 판에서 벽이 ${LINK_WALL} 가까워집니다.`]);
   // A story run plays without all three of 사건 01 to 03's rules, and is told none of them.
   for (const caseId of ["case01", "case02", "case03"]) assert.deepEqual(introFor(caseId, { staged: true, story: true }), [], caseId);
 });

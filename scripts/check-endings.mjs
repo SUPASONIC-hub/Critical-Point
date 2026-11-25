@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { CASE_SEQUENCE, nodes } from "../src/gameData.js";
 import { getEndingVariant, LOGIC_SLACK_STREAK, VAULT_SLACK_PER_CASE } from "../src/gameLogic.js";
-import { AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
+import { AUDIT_LIMIT, SMOOTH_LIMIT } from "../src/gauntlet/auditRisk.js";
 import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/gauntlet/gauntletEngine.js";
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
+import { isMarkNineOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -505,6 +506,25 @@ if (!process.env.ENDING_BASELINE) {
 }
 
 /**
+ * G36 (RULES_MARK 9): seasons begun with NEW GAME+, every rule from the first
+ * case and the act twists placed by each season's seed (actTwists.js
+ * `getTwistShuffle`; RULES_MARK9=0 plays them where the first season has
+ * them). A stream of their own, so every season above is the one it was.
+ * Printed for the notes' target (collapse 20~25%), not asserted.
+ */
+const VETERAN_SEASONS = Number(process.env.ENDING_VETERAN_SEASONS) || 160;
+if (!process.env.ENDING_BASELINE && VETERAN_SEASONS > 0) {
+  const veteranBot = createSeasonBot({ seed: 20261125, staged, veteran: true });
+  const veteranCounts = new Map();
+  for (let index = 0; index < VETERAN_SEASONS; index += 1) {
+    const season = veteranBot.playSeason(`veteran:${index}`, POPULATION[index % POPULATION.length]);
+    veteranCounts.set(season.ending.id, (veteranCounts.get(season.ending.id) ?? 0) + 1);
+  }
+  const veteranSpread = EXPECTED.map((id) => `${id} ${(share(veteranCounts, id, VETERAN_SEASONS) * 100).toFixed(1)}%`).join(", ");
+  console.log(`NEW GAME+ seasons (G36, ${VETERAN_SEASONS} replayed, act twists ${isMarkNineOn() ? "placed by each season's seed" : "in the first season's places"}): ${veteranSpread}`);
+}
+
+/**
  * Two hands that play for the logic streak, in report mode only: neither is in
  * the population the endings are judged on, and they are played last, so every
  * season above is the season it always was. They are here to say how long a
@@ -674,7 +694,8 @@ function toolTable({ codex = [], learns = false, hand = false, slots = Infinity,
     if (verdict.logic.move === "bust") count(table.need, "tool:encore");
     if (verdict.logic.move === "break") count(table.need, "tool:metronome");
     if (verdict.logic.move === "build" && verdict.logic.held > 1) count(table.need, "tool:fieldNote");
-    if ((verdict.audit?.count ?? 0) >= AUDIT_LIMIT - 1) count(table.need, "tool:auditContact");
+    // G35 (RULES_MARK 9): the level is the ledger's smoothness against SMOOTH_LIMIT.
+    if ((verdict.audit?.level ?? verdict.audit?.count ?? 0) >= (verdict.audit?.level === undefined ? AUDIT_LIMIT : SMOOTH_LIMIT) - 1) count(table.need, "tool:auditContact");
     if (verdict.cause === "creep" || verdict.cause === "timeout") count(table.need, "tool:testimony");
   };
   const needOf = (id) => table.need[RELICS[id].softens?.mutation ?? `tool:${id}`] ?? 0;

@@ -43,9 +43,11 @@ export default {
       intro: ["Commit at ×4 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat."],
     },
     case02: {
+      introNine: ["From this case on, the Audit joins the table. If 4 of a case’s Commits, each pushed at least once, land at the same spot within ±2 Heat, you lose 1/4 of the share bound for the Vault when the case closes. Change where you cut to stay clear."],
       intro: ["From this case on, the Audit joins the table. Push at least once and Commit below Heat 40 and one box fills; Commit at 60 or more and 2 boxes clear. If 4 boxes are full when the case closes, you lose 1/4 of the share bound for the Vault."],
     },
     case03: {
+      introNine: ["From this case on, Links join the table. Commit with a card that burns 8 or more of one resource, and in one hand 2–4 hands later the far end of the Wall band comes 10 closer."],
       intro: ["From this case on, Links join the table. Commit with a card that burns 8 or more of one resource, and in one hand 2–4 hands later the Wall comes 6 closer."],
     },
     case04: {

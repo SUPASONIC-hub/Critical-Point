@@ -1,7 +1,7 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
 import { getBranchDetourBypass, nodes } from "../gameData.js";
-import { countNarrows, countScouts } from "../gauntlet/nextTableRules.js";
+import { countNarrows, countScouts, isMarkNineOn } from "../gauntlet/nextTableRules.js";
 import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
@@ -156,7 +156,7 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     caseClosed: route.caseClosed,
     offerRelics: caseId !== "final",
     // The case's audit so far, read off its log (auditRisk.js); the engine reads it only in a case whose rules have it.
-    audit: countAudit(log),
+    audit: countAudit(log, isMarkNineOn(settlementRules.rules)),
     ...settlementRules,
     // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
     cascade: isLinkDue(run, log, runId, settlementRules.rules),

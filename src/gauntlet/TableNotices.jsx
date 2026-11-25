@@ -8,7 +8,7 @@ import { getLogicDirection, getLogicType } from "./logicStreak.js";
 import { SCOUT_NARROW_REACH, SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
-import { BREATH_SECONDS } from "./nextTableRules.js";
+import { BREATH_SECONDS, EDGE_CASH_BONUS, isMarkNineOn, readEdgeCash } from "./nextTableRules.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
 import { MoneyBurst } from "./MoneyBurst.jsx";
 import { readBurst } from "./moneyFeedback.js";
@@ -81,6 +81,8 @@ function HeldElsewhere({ onClaim, onLeave }) {
 function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
   // The amount flies only where there is a KD은행 계좌 (the purse) to fly to.
   const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
+  // G30 (RULES_MARK 9): a cash close under the wall, paid ×EDGE_CASH_BONUS.
+  const edge = isMarkNineOn() ? readEdgeCash(win) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
       {win.status === "bust" ? (
@@ -106,6 +108,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
           {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatMoney(livePot)}</span>}
           {/* The combo's copy starts on the separator the +N used to stand before. */}
           {streak > 0 && <span>{fill(say.slamCombo, { streak }).replace(/^\s*·\s*/, "")}</span>}
+          {edge !== null && <span className="gx-slam-edge" data-testid="slam-edge">{fill(say.slamEdge, { bonus: EDGE_CASH_BONUS, gap: edge })}</span>}
         </>
       )}
     </div>

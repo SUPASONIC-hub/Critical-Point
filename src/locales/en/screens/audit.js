@@ -6,4 +6,8 @@ export default {
   spoken: "Audit risk {count}/{limit}. If all {limit} boxes fill, you lose 1/{share} of the share bound for the Vault when the case closes",
   ledger: "Closed with the audit at {count}/{limit} boxes.",
   caught: " Caught.",
+  smoothWarn: "Same spot = audit",
+  smoothUp: "Commit now and same-spot commits go to {after}/{limit}",
+  smoothSame: "Commit now and same-spot commits stay at {after}/{limit}",
+  smoothSpoken: "Ledger too smooth {count}/{limit}. Commit {limit} times in one case at the same spot, within ±{span} Heat, and you lose 1/{share} of the share bound for the Vault when the case closes",
 };

@@ -2,6 +2,7 @@
 export default {
   weekRule: "今週のルール · このシーズンが終わるまで",
   caseRule: "この事件だけ · この事件が閉じるまで",
+  movedTwist: "NEW GAME+ · 今シーズンこの幕に立つ規則",
   unfold: "前シーズンに読んだシーン · 開く",
   pastPick: {
     wildPicked: "前シーズンも組み替えた",

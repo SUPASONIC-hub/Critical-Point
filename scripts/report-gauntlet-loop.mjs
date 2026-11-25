@@ -26,7 +26,7 @@ import { isNextOn, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
-import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, getSmoothness, SMOOTH_LIMIT, SMOOTH_SPAN } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, narrowDue, NEXT_ON, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
@@ -351,7 +351,9 @@ if (AUDIT_ON) {
   console.log(`audit week       best blind ${bestOfRows(fixed).label}, best heartbeat ${bestOfRows(heartbeat).label}`);
   const reading = [20, 30, 40, 50].map((target) => {
     const blind = fixed.find((row) => row.label === `heat ${target}`);
-    const reads = measure(`reads, heat ${target}`, (win, _run, audit) => win.gauge < (audit + 1 >= AUDIT_LIMIT ? Math.max(target, AUDIT_HEAT) : target));
+    // G35 (RULES_MARK 9): the audit is a tally of heats; the hand that reads it pushes on past the band a cash here would fill.
+    const fills = (win, audit) => (Array.isArray(audit) ? getSmoothness([...audit, Math.round(win.gauge)]) >= SMOOTH_LIMIT : audit + 1 >= AUDIT_LIMIT);
+    const reads = measure(`reads, heat ${target}`, (win, _run, audit) => win.gauge < (!fills(win, audit) ? target : Array.isArray(audit) ? target + SMOOTH_SPAN * 2 + 1 : Math.max(target, AUDIT_HEAT)));
     return `heat ${target} ${blind.meanVault} (caught ${blind.seen.audits}) -> reads ${reads.meanVault} (caught ${reads.seen.audits}, bust ${(reads.bustRate * 100).toFixed(1)}%)`;
   });
   console.log(`audit week       reading the audit: ${reading.join("; ")}`);

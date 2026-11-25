@@ -274,6 +274,38 @@ export function withMarkNine(rules, on = nineByDefault()) {
   return cache.get(rules);
 }
 
+/**
+ * G29 돈 쪽 유혹 (RULES_MARK 9): a card's 자본 and 시간 gains weigh this much
+ * in its chips; every other gain (사람 피해 down, 믿음, 정당성, 피로 down) keeps
+ * ×2. Before, a 사람 card out-paid a 자리 card in 72% of the scenes that dealt
+ * both (게임성 개선점 4차 G29); the 사람 피해 a money card brings is paid in
+ * the story, at the collapse gate.
+ */
+// 2.75, the top of the notes' 2.5~2.75: mixed scenes 67.7% money-richer (target 55~70%); 2.5 left the money hand's vault at 0.75 of people-first's.
+export const COIN_GAIN_WEIGHT = 2.75;
+export const COIN_GAIN_KEYS = Object.freeze(["capital", "time"]);
+
+/**
+ * G30 벽 앞 확정 (RULES_MARK 9): a cash this close to the real wall or closer
+ * pays its pot EDGE_CASH_BONUS times. Unknown at the press (the heartbeat
+ * hears the wall within its error), told on the slam and the reveal. With a
+ * tool's boost on the same cash the two together stay under RELIC_BOOST_CAP
+ * (G11c), or the tool's own where that is more: the edge never takes from it.
+ */
+export const EDGE_CASH_REACH = 3;
+export const EDGE_CASH_BONUS = 1.25;
+/** How far under the wall a cashed window closed, when that is EDGE_CASH_REACH or less; null otherwise. */
+export function readEdgeCash(win) {
+  if (win?.status !== "cashed") return null;
+  const gap = Number(win.wall) - Number(win.gauge);
+  return Number.isFinite(gap) && gap >= 0 && gap <= EDGE_CASH_REACH ? Math.floor(gap) : null;
+}
+/** The pot factor of a cash with the tools' `boost` (readRelicBoost) and, when `edge`, G30's; capped at `cap` with a tool. */
+export function withEdgeBonus(boost, edge, cap) {
+  if (!edge) return boost.factor;
+  return boost.fired.length ? Math.max(boost.factor, Math.min(boost.factor * EDGE_CASH_BONUS, cap)) : boost.factor * EDGE_CASH_BONUS;
+}
+
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */
 export const METRONOME_HOLD = 6;
 /** G22: 숨 고르기 after a BUST at BREATH_HOT_FROM or over moves the wall this far instead of BREATH_WALL. */

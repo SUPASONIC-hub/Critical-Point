@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { getCaseRule, getWeekRule } from "./weeklyRules.js";
-import { caseRuleFor } from "./caseRules.js";
+import { caseRuleFor, isTwistMoved } from "./caseRules.js";
 import { readSignWay } from "./actTwists.js";
 import { asksOpening, asksToSign, getNameWall } from "./gauntletEngine.js";
 import { OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS } from "./nextTableRules.js";
@@ -40,12 +40,14 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
  * SceneBriefing for the same reason the week's rule is: the PlayScreen chunk
  * had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id, page = null, caseId = null) {
+export function useWeekRulePanel(id, page = null, caseId = null, run = null) {
   const echo = page?.echo ?? null;
   const recall = page?.recall ?? null;
   return useMemo(() => {
     const week = getWeekRule(id);
-    const rule = week ?? (caseId ? getCaseRule(caseId, caseRuleFor(caseId, null)) : null);
+    // G36: a NEW GAME+ season's twist may stand in another act (`run`'s twistSeed), and the kicker says so.
+    const rule = week ?? (caseId ? getCaseRule(caseId, caseRuleFor(caseId, run)) : null);
+    const moved = !week && caseId && isTwistMoved(caseId, run);
     if (!rule && !echo && !recall) return NO_PANEL;
     // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
     const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
@@ -59,10 +61,10 @@ export function useWeekRulePanel(id, page = null, caseId = null) {
           </p>
         )}
         {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
-        {rule && <WeekRulePanel key="week-rule" rules={[rule]} kicker={week ? edgeCopy.weekRule : edgeCopy.caseRule} />}
+        {rule && <WeekRulePanel key="week-rule" rules={[rule]} kicker={week ? edgeCopy.weekRule : moved ? edgeCopy.movedTwist : edgeCopy.caseRule} />}
       </>,
     ];
-  }, [id, echo, recall, caseId]);
+  }, [id, echo, recall, caseId, run?.veteran, run?.twistSeed]);
 }
 
 /**

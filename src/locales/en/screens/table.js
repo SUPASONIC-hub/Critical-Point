@@ -112,6 +112,7 @@ export default {
     slamPot: "Stake",
     slamStill: "The wall showed where the heartbeat stopped.",
     slamCombo: " · Logic Combo {streak}",
+    slamEdge: "Close call ×{bonus} · {gap} under the Wall",
     equipped: "Equipped",
     dropped: "· {name} put down",
     logicWord: "Logic ",
@@ -248,6 +249,7 @@ export default {
     status: "Heat {gauge} · {danger} · Stake {pot} · {seconds} seconds left · Heartbeat {bpm}",
   },
   afterword: {
+    edge: "Close call ×{bonus} · {gap} under the Wall. ",
     nextPush: "One more push: +{step} → {gauge}, Wall {wall}: {outcome}.",
     nextSafe: "you’d have made it",
     nextBust: "BUST",

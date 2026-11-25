@@ -149,12 +149,70 @@ export const ACT_DEVICE_TWISTS_DEALT = Object.freeze(["passedDown", "lateBill", 
 /** Every twist, 3, 5 and 7 and the device ones, by id. */
 export const ALL_ACT_TWIST_RULES = Object.freeze({ ...ACT_TWIST_RULES, ...ACT_DEVICE_TWIST_RULES });
 
-/** The act's twist a case is dealt under the next rules, or null. */
-export function actTwistFor(caseId, dealt = ACT_DEVICE_TWISTS_DEALT) {
+/* ------------------------------------------- G36 NEW GAME+ 비틀기 자리 */
+
+/**
+ * G36 (RULES_MARK 9, the user's 「전부 1」 of 2026-11-25): a season begun with
+ * NEW GAME+ deals the act twists in other places, drawn from the season's seed
+ * (the run's `twistSeed`, its run id), so the second season's table is not
+ * the first one learned by heart. A twist only moves inside its group, the
+ * pairs the story holds together: acts 3, 5 and 7 (the board's numbers: a
+ * merger, scattered seats, a hearing), acts 1 and 2 (a cost passed on: the
+ * loss handed down, the bill that comes late) and acts 4 and 6 (what the table
+ * keeps of you: the wall that learned, the statement on record). 8막's
+ * signature stays where the season ends. A slot keeps its cases: the twist
+ * that moves to act 2 is dealt in 사건 10 only, the one that moves to act 1
+ * in 사건 04-06. At least one group always moves.
+ */
+export const TWIST_SHUFFLE_GROUPS = Object.freeze([
+  Object.freeze(["merger", "scattered", "hearing"]),
+  Object.freeze(["passedDown", "lateBill"]),
+  Object.freeze(["trainedWall", "onRecord"]),
+]);
+
+const permutations = (items) => (items.length <= 1 ? [items] : items.flatMap((item, at) => permutations([...items.slice(0, at), ...items.slice(at + 1)]).map((rest) => [item, ...rest])));
+const GROUP_ORDERS = TWIST_SHUFFLE_GROUPS.map(permutations);
+/** A unit draw off a string; written out, as this module imports nothing. */
+function unitOf(seed) {
+  let hash = 2166136261;
+  for (const character of String(seed)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 2246822519) >>> 0;
+  hash ^= hash >>> 16;
+  return (hash >>> 0) / 4294967296;
+}
+
+const shuffles = new Map();
+/** The twist each slot deals in a season of seed `seed`: { slot: twist }, only the slots that moved. */
+export function getTwistShuffle(seed) {
+  const key = String(seed);
+  if (!shuffles.has(key)) {
+    let moved = {};
+    for (let attempt = 0; attempt < 16 && !Object.keys(moved).length; attempt += 1) {
+      moved = {};
+      GROUP_ORDERS.forEach((orders, group) => {
+        const order = orders[Math.floor(unitOf(`${key}:${group}:${attempt}`) * orders.length)];
+        TWIST_SHUFFLE_GROUPS[group].forEach((slot, at) => {
+          if (order[at] !== slot) moved[slot] = order[at];
+        });
+      });
+    }
+    if (shuffles.size > 64) shuffles.clear();
+    shuffles.set(key, Object.freeze(moved));
+  }
+  return shuffles.get(key);
+}
+
+/** The act's twist a case is dealt under the next rules, or null; `shuffle` (G36) moves it to another slot's. */
+export function actTwistFor(caseId, dealt = ACT_DEVICE_TWISTS_DEALT, shuffle = null) {
   if (typeof caseId !== "string") return null;
-  if (Object.hasOwn(ACT_TWIST_CASES, caseId)) return ACT_TWIST_CASES[caseId];
-  const id = Object.hasOwn(ACT_DEVICE_CASES, caseId) ? ACT_DEVICE_CASES[caseId] : null;
-  return id && dealt.includes(id) ? id : null;
+  const slot = Object.hasOwn(ACT_TWIST_CASES, caseId) ? ACT_TWIST_CASES[caseId] : Object.hasOwn(ACT_DEVICE_CASES, caseId) ? ACT_DEVICE_CASES[caseId] : null;
+  const id = slot && shuffle && Object.hasOwn(shuffle, slot) ? shuffle[slot] : slot;
+  if (!id) return null;
+  return Object.hasOwn(ACT_TWIST_RULES, id) || dealt.includes(id) ? id : null;
 }
 
 /** Whether the twist `id` switches on `device`, which has to be one `ACT_DEVICES` allows. */
