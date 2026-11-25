@@ -1,6 +1,6 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { CASE_RESULT_NODES } from "../src/gameCases.js";
+import { CASE_RESULT_NODES, CASE_START_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { CASE_START_NODES, nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
@@ -604,7 +604,9 @@ test("the creep across a stake tier marks the clock's cut beside it for a moment
 });
 
 test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  // AFTERSHOCK is open from 사건 04 (N18), and the gauge below is its start.
+  // 사건 07, because the first BUST of 사건 04~06 keeps a third of the pot (G5).
+  await openTable(page, "case07", CASE_START_NODES.case07);
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
   // Bank something first, so there is a pot for the wall to take.
   await page.locator(".choices .choice").first().click();
@@ -644,6 +646,28 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 1");
   await expect(page.getByTestId("gauntlet-gauge")).toHaveText("22");
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
+});
+
+// 11-24: the first BUST of 사건 04~06 keeps a third of the pot (G5), and the table said $0.
+test("a passed-down bust shows the third of the pot it keeps", async ({ page }) => {
+  await openTable(page, "case05", CASE_START_NODES.case05);
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+  const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const kept = Math.floor(banked.dynamics.runPot / 3);
+  expect(kept).toBeGreaterThan(0);
+
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  await pushUntilBust(page);
+  await expect(page.locator(".gx-slam-bust")).toContainText(`→ $${kept.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
+  // The settle keeps what the table said, and the next table opens on it.
+  await expect(page.locator(".decision-reveal h2")).toHaveText("BUST");
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.runPot).toBe(kept);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
 });
 
 // money-feedback (2026-11-02): the hand's amount is thrown large at the middle
@@ -1187,7 +1211,8 @@ async function pushToHotCash(page) {
 }
 
 test("a bust's next rules are headed as a broken board, and no row is drawn as a carried rule", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  // 사건 04 is where AFTERSHOCK opens (N18).
+  await openTable(page, "case04", CASE_START_NODES.case04);
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   await expect(page.locator(".decision-reveal h2")).toHaveText("BUST", { timeout: TRANSITION_TIMEOUT_MS });

@@ -87,10 +87,14 @@ export const STOPS = [
 
 /**
  * When the last ranking reset deleted the `season-final` rows: the merge of
- * #466 (20261112000000_ranking_reset_rules_mark4_relic_draft.sql, applied on
- * merge) at 17:25 KST, plus a minute. Move it on with the next reset.
+ * bundle R (20261130000000_ranking_reset_1130.sql, applied on merge) plus a
+ * minute. [FILL on 11-30] The time below is the planned one: set it to the
+ * real merge time + 1 minute in the bundle before it merges (the 11-30
+ * checklist in docs/work-status.md). The reset before it was #466's
+ * (20261112000000_ranking_reset_rules_mark4_relic_draft.sql) at 2026-11-12
+ * 17:25 KST. Move it on with the next reset.
  */
-export const LAST_RANKING_RESET = "2026-11-12T17:26:00+09:00";
+export const LAST_RANKING_RESET = "2026-11-30T13:31:00+09:00";
 
 const FINAL_INDEX = CASE_SEQUENCE.indexOf("final");
 const indexOf = (caseId) => CASE_SEQUENCE.indexOf(caseId);

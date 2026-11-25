@@ -234,30 +234,55 @@ function trailOf(kind, language, heading) {
 /* ----------------------------------------------------------------- the dates */
 
 /**
- * The day the guide and the case files went up: all of them with #478, merged
- * to main on 2026-11-09. A case page added later is not that old, so
+ * The day the content pages went up: all but the weekly calendar with #478,
+ * merged to main on 2026-11-09. A case page added later is not that old, so
  * tests/unit/page-dates.test.mjs fails until it has a day of its own.
  */
 export const CONTENT_PUBLISHED = "2026-11-09";
 
+/** The weekly calendar came a week later (9129fbf1). */
+export const WEEKLY_PUBLISHED = "2026-11-16";
+
+/** The about page, the FAQ and the contact page went up with #376, merged to main on 2026-10-30 (Seoul). */
+export const SITE_PUBLISHED = "2026-10-30";
+
+const SITE_KINDS = new Set(["about", "faq", "contact"]);
+
 /** The day each page's words last changed, the same record the sitemap's lastmod reads. */
-const recordedDates = () => JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
+export const recordedDates = () =>JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
 
 const UPDATED_WORD = { ko: "고친 날", en: "Updated", ja: "更新日" };
 
+/** Who wrote the page: the studio's name alone, in the page's language (src/credits.js). */
+const WRITTEN_BY = {
+  ko: (studio) => `글: ${studio}`,
+  en: (studio) => `Written by ${studio}`,
+  ja: (studio) => `文: ${studio}`,
+};
+
 const dateTag = (day, language) => `<time datetime="${day}">${adsEffectiveDate(day)[language]}</time>`;
 
-/** The notes' date line (`bylineOf`, ./notes.mjs) in the page's language: when it went up and, if its words changed since, when. */
-export function pageDateLine(language, changed) {
-  const update = changed && changed !== CONTENT_PUBLISHED ? ` · ${UPDATED_WORD[language]} ${dateTag(changed, language)}` : "";
-  return `<p class="effective">${dateTag(CONTENT_PUBLISHED, language)}${update}</p>\n`;
+/**
+ * The notes' date line (`bylineOf`, ./notes.mjs) in the page's language: when
+ * it went up, when its words last changed if they have since, and who wrote
+ * it. The making-of leaves the last out: its foot already signs it (MAKERS_LINE).
+ * So does the about page, whose text says who made the game.
+ */
+export function pageDateLine(language, changed, { published = CONTENT_PUBLISHED, signed = true } = {}) {
+  const update = changed && changed !== published ? ` · ${UPDATED_WORD[language]} ${dateTag(changed, language)}` : "";
+  const author = signed ? ` · ${escapeHtml(WRITTEN_BY[language](studioName(language)))}` : "";
+  return `<p class="effective">${dateTag(published, language)}${update}${author}</p>\n`;
 }
 
-const hasDateLine = (kind) => kind === "guide" || kind.startsWith("cases/");
+/** The date line's facts for a page kind. */
+export const dateLineOptions = (kind) => ({
+  published: SITE_KINDS.has(kind) ? SITE_PUBLISHED : kind === "weekly" ? WEEKLY_PUBLISHED : CONTENT_PUBLISHED,
+  signed: kind !== "making" && kind !== "about",
+});
 
 /**
  * Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash.
- * `pageDates` (`{ loc: { date } }`, scripts/sitemap-dates.json by default) dates the guide and the case files; `null` writes them with no date
+ * `pageDates` (`{ loc: { date } }`, scripts/sitemap-dates.json by default) dates each of them; `null` writes them with no date
  * line, which is how `pageFingerprints` reads them: a page's hash must not depend on the date that hash decides.
  */
 export function renderContentPages({ analytics = null, day = notesDay(), pageDates = recordedDates() } = {}) {
@@ -266,7 +291,7 @@ export function renderContentPages({ analytics = null, day = notesDay(), pageDat
     for (const language of PAGE_LANGUAGES) {
       const page = pageOf(kind, language, day);
       const loc = pagePath(kind, language);
-      const line = pageDates && hasDateLine(kind) ? pageDateLine(language, pageDates[loc]?.date) : "";
+      const line = pageDates ? pageDateLine(language, pageDates[loc]?.date, dateLineOptions(kind)) : "";
       pages[loc.slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, body: `${line}${page.body}`, structuredData: trailOf(kind, language, page.heading) });
     }
   }

@@ -5,7 +5,8 @@ import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, get
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
 import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
-import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
+import { twistHasDevice } from "./actTwists.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD, TESTIMONY_SHARE } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
 import { getTableRules } from "./tableUnlocks.js";
 import tableCopy from "../copy/table.js";
@@ -467,10 +468,16 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       cashMutations,
       bustMutations,
       overdrive: getOverdriveCopy({ streak, hot, cashMutations }),
-      // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
-      bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
+      // What a bust leaves of the case pot, as `resolveWindow` settles it: half
+      // on a clock bust with TESTIMONY; a third with INSURANCE or 1막's
+      // 떠넘겨진 손실 while the case's one keep is unspent; otherwise nothing.
+      bustKeeps: win.status === "bust" && win.cause === "timeout" && hasRelic(relics ?? [], "testimony")
+        ? Math.floor((run?.runPot ?? 0) / TESTIMONY_SHARE)
+        : !run?.insuranceSpent && (hasRelic(relics ?? [], "insurance") || twistHasDevice(twist, "passedDown"))
+          ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE)
+          : 0,
       clockHeat: describeClockHeat(pushes),
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak, twist, win.cause, win.status]);
 }

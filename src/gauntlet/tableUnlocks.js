@@ -127,7 +127,7 @@ export const UNLOCK_INTRO_KICKER = unlocksCopy.kicker;
 /**
  * The steps, in the order the season plays them: the case, the rules it adds
  * to the ones before it, and what the briefing says about them. A case that
- * is not here -- 사건 04 onward -- plays under everything. 프롤로그 01 adds
+ * is not here -- 사건 06 onward -- plays under everything. 프롤로그 01 adds
  * nothing and explains the table itself.
  *
  * The draft a case shows was offered when the case before it closed, so
@@ -143,14 +143,20 @@ const STEPS = [
     adds: [],
     kicker: unlocksCopy.steps.prologue01.kicker,
     // The second line is what a bust costs, which the first table never said:
-    // the first bust was the tutorial. A story run is not told it, because
-    // there the next scene is not skipped.
-    storyIntro: [0],
+    // the first bust was the tutorial. Since N21 (11-30) a bust here and in
+    // 프롤로그 02 keeps the next scene (caseRoutes.js `keepsSceneOnBust`), so the
+    // line says the stake alone, and a story run, which loses its stake too,
+    // is told both lines.
     intro: unlocksCopy.steps.prologue01.intro,
   },
   {
     caseId: "prologue02",
-    adds: ["logic", "blackout", "aftershock", "silence"],
+    // Two rules, where there were four (N18, the owner's answer of 2026-11-16,
+    // (1), for the reset of 11-30): the logic combo and BLACKOUT. AFTERSHOCK
+    // opens in 사건 04 and SILENCE in 사건 05, each with its own line. 02 is
+    // where the first hour loses the most players (funnel 11-15), and its
+    // briefing said four things at once.
+    adds: ["logic", "blackout"],
     storyIntro: [0],
     // The streak is held on a direction, 사람 or 자리 (C-3, logicStreak.js),
     // the axis the report's 일관성 reads; the last sentence of the first line
@@ -232,6 +238,22 @@ const STEPS = [
     storyIntro: [],
     intro: unlocksCopy.steps.case03.intro,
   },
+  // 사건 04 and 05 (N18): the two ways a bust breaks the next board that
+  // 프롤로그 02 opened with BLACKOUT until 11-30. The 22 and the 30 are
+  // AFTERSHOCK_START and SILENCE_SECONDS (tableRules.js), written out like
+  // SCOUT's and held to them by a unit test. Neither is a story run's rule.
+  {
+    caseId: "case04",
+    adds: ["aftershock"],
+    storyIntro: [],
+    intro: unlocksCopy.steps.case04.intro,
+  },
+  {
+    caseId: "case05",
+    adds: ["silence"],
+    storyIntro: [],
+    intro: unlocksCopy.steps.case05.intro,
+  },
 ];
 
 /**
@@ -251,7 +273,7 @@ export const UNLOCK_LADDER = Object.freeze(
     // The copy's blanks are the engine's numbers (copy/unlocks.js).
     const intro = step.intro.map((line) => fill(line, { cap: LOCK_CAP, charge: STANCE_CHARGE }));
     const before = ladder.length ? [...ladder[ladder.length - 1].rules] : [];
-    // The step that completes the table (사건 03 since C-4) hands out the
+    // The step that completes the table (사건 05 since N18, 사건 03 from C-4) hands out the
     // whole table's own sets, so it is the same object a case after it gets.
     const whole = before.length + step.adds.length === ALL_RULES.size;
     const rules = whole ? ALL_RULES : freezeSet([...before, ...step.adds]);
