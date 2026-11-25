@@ -82,7 +82,7 @@ export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
  * leans neither way is called. A verdict logged before C-3 holds a thinking
  * type where the direction now is, and is read by the type's name.
  */
-export const DIRECTION_NAMES = say.directions;
+const DIRECTION_NAMES = say.directions;
 export const getDirectionName = (direction) => DIRECTION_NAMES[direction] ?? getTypeName(direction);
 
 /**
