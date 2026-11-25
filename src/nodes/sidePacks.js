@@ -55,8 +55,7 @@ const sideFixtureListed =
 /**
  * The next Season (2026-11-20 owner's answer: the first December Season opens
  * 2026-12-14, Monday, 00:00 KST). A side case written for it carries
- * `opensAt: NEXT_SEASON.opensAt`: the release ships it ahead (ops mode merges
- * on Tuesday and Friday only, docs/ops-mode.md), and the start screen keeps it
+ * `opensAt: NEXT_SEASON.opensAt`: the release ships it ahead, and the start screen keeps it
  * shut until that moment on the weekly clock (`releasedSides`,
  * src/sideCases.js), with a notice line from `noticeDays` before
  * (`seasonNoticeAt`). A Season is content and a release date, never a rule
