@@ -957,23 +957,29 @@ Still open, on purpose:
   weekly rule calendar's weeks left for the Funnel summary; `--merge`, the
   deploy days and the quarter days are gone (`docs/ops-mode.md`).
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
-  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
-  no longer wait for a closed finale. Each entry of `SIDE_CASES`
+  공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
+  (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
   (`src/nodes/sidePacks.js`) has its in-world `date` and `unlockAfter`, the
   season case whose date comes just before it, and opens once that case is
   closed in the run, once a finale is closed (NEW GAME+), or once the side
   case is in the device's side record (`isSideCaseOpen`, `src/sideCases.js`).
   Order: 사건 14 → 번외 3 (2025-11-08), 16 → 번외 4 (12-11), 17 → 번외 1
   (12-20), 18 → 번외 2 (2026-01-09), 21 → 번외 5 (02-12), 27 → 번외 6
-  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13).
+  (05-08), 31 → 번외 7 (06-12), 34 → 번외 8 (07-10), 40 → 번외 9 (08-13);
+  since 11-25 also 05 → 번외 10 (2025-09-13) and 42 → 번외 11 (2026-09-05).
   Nothing opens before 프롤로그 01. The report of the case that opens one
   carries one line, 「번외 사건이 열렸습니다: 번외 N 「제목」」, and a button
   that goes to the start screen and opens it (`side-opened`); the finale's
   old 「번외 사건 칸이 열렸습니다」 line is gone, since every case is open by
   then. Side cases stay outside the season's score, ranking and rules mark.
-- Release rule (2026-11-18): new content is released as a "Season" on a date
-  the owner chooses, all at once; there is no fixed monthly schedule. The
-  plan of one side case a month (N11, N35) is dropped: what is ready is open.
+- Release rule (2026-11-25, replacing 11-18's Season dates): new content
+  opens as soon as it is ready, with no notice and no date set ahead
+  (「시즌제로 예고하고 오픈하는 방식이 아니라 준비되면 불시에 오픈」). The
+  December Season's 번외 10 and 11 opened on 11-25 instead of 12-14; the
+  date lock (`NEXT_SEASON`, `opensAt`, `releasedSides`) and the start
+  screen's Season line (`seasonNoticeAt`) are gone. Their 12-04 review runs
+  after the release and ships as a later PR. There is still no monthly
+  schedule (N11, N35 dropped).
 - What #239 measured (2026-10-22): a hand that plays the table well cuts
   BUST to about a third, but moves the collapse ending by only about 4
   points; collapse is decided by which cards a season picks -- the `money`
