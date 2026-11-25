@@ -228,6 +228,52 @@ export function withMarkEight(rules, on = eightByDefault()) {
   return cache.get(rules);
 }
 
+/* ------------------------------------------- RULES_MARK 9 (2027-04-05) */
+
+/**
+ * G29~G37 (게임성 개선점 4차, the user's 「전부 1」 of 2026-11-25): rules that
+ * ship as RULES_MARK 9. A row is rechecked under them only when its mark is
+ * `RULES_NINE_MARK` or later (rankingRecheck.js `getRowRules`), so a row of 5
+ * to 8 is played again as it was. They ride on RULES_MARK 8's: a set that
+ * plays those off plays none of these. `NINE_RULE` in a set plays them,
+ * `BEFORE_NINE_RULE` the rules of 8, and a set with neither what this page
+ * plays. `RULES_MARK9=0` turns them off in a script.
+ */
+export const RULES_NINE_MARK = 9;
+export const NINE_RULE = "mark9";
+export const BEFORE_NINE_RULE = "before9";
+
+/** Whether this page (or this script) plays RULES_MARK 9's rules: `RULES_MARK9=0` turns them off in a script. */
+export function wantsMarkNine(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK9 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let nineChoice;
+export const nineByDefault = () => (nineChoice ??= wantsMarkNine());
+
+/** Whether `rules` plays RULES_MARK 9's rules (and so 8's too). */
+export function isMarkNineOn(rules) {
+  if (!isMarkEightOn(rules)) return false;
+  if (rules?.has?.(BEFORE_NINE_RULE)) return false;
+  if (rules?.has?.(NINE_RULE)) return true;
+  return nineByDefault();
+}
+
+const nineSets = new WeakMap();
+const beforeNineSets = new WeakMap();
+/** `rules` playing RULES_MARK 9's rules (`on`) or those of 8; the same set back when it already does. */
+export function withMarkNine(rules, on = nineByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkNineOn(rules) === Boolean(on) || (on && !isMarkEightOn(rules))) return rules;
+  const mark = on ? NINE_RULE : BEFORE_NINE_RULE;
+  const drop = on ? BEFORE_NINE_RULE : NINE_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? nineSets : beforeNineSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */
 export const METRONOME_HOLD = 6;
 /** G22: 숨 고르기 after a BUST at BREATH_HOT_FROM or over moves the wall this far instead of BREATH_WALL. */
