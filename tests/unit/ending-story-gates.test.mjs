@@ -31,11 +31,11 @@ test("story mode: the cold gap is 10, the table's stays 12", () => {
   assert.equal(getEndingVariant({ ...eleven, storySeason: true }).id, "cold-justice");
 });
 
-test("story mode: a burned season that kept oversight's trust leaves the question open", () => {
-  const kept = season({ trust: ENDING_THRESHOLDS.oversightTrust, legitimacy: 90, answer: "burn" });
+test("story mode: a burned season that kept storyOpenTrust leaves the question open", () => {
+  const kept = season({ trust: ENDING_THRESHOLDS.storyOpenTrust, legitimacy: 90, answer: "burn" });
   assert.equal(getEndingVariant(kept).id, "quiet-cover", "the table's burn still covers");
   assert.equal(getEndingVariant({ ...kept, storySeason: true }).id, "open-question");
-  const lost = season({ trust: ENDING_THRESHOLDS.oversightTrust - 1, legitimacy: 90, answer: "burn" });
+  const lost = season({ trust: ENDING_THRESHOLDS.storyOpenTrust - 1, legitimacy: 90, answer: "burn" });
   assert.equal(getEndingVariant({ ...lost, storySeason: true }).id, "quiet-cover");
 });
 

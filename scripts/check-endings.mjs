@@ -502,7 +502,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * question none (it is the fallback, and a story season finds every clue).
  * G37 (2026-11-25, the user's 「전부 1」) moved two gates for story seasons
  * only (`storySeason`, gameLogic.js): the cold gap 12 -> 10, and a burned
- * season that kept OPEN OVERSIGHT's trust leaves the question open. Every
+ * season whose trust is storyOpenTrust (83; 85 until G31·G33 moved the drafts) or more leaves the question open. Every
  * ending, the collapse and the open question with them, now closes at least
  * STORY_ENDING_FLOOR of story seasons (1,200 on another seed before the
  * change: cold 1.3 -> 3.3%, open question 0.0 -> 2.7%, quiet cover 7.0 -> 3.1%).
