@@ -24,13 +24,9 @@ const files = readdirSync(nodesDir);
 const ids = files.map(sideFileId).filter(Boolean);
 
 const { SIDE_CASES } = await import(pathToFileURL(path.join(nodesDir, "sidePacks.js")).href);
-// A side case a release carries ahead of its Season (`opensAt`, NEXT_SEASON in
-// sidePacks.js) is not open yet, so it counts as 대기 until that moment on the
-// device clock: the table is the reason for that day, not a record of what
-// shipped. `--at=<ISO time>` reads another moment.
-const atArg = process.argv.find((arg) => arg.startsWith("--at="));
-const now = atArg ? Date.parse(atArg.slice(5)) : Date.now();
-const listed = SIDE_CASES.filter((entry) => !entry.fixture && !(Number.isFinite(entry.opensAt) && entry.opensAt > now)).map((entry) => entry.id);
+// Every listed side case is open in the release that carries it (2026-11-25:
+// no Season date, no notice).
+const listed = SIDE_CASES.filter((entry) => !entry.fixture).map((entry) => entry.id);
 const titles = {};
 for (const id of ids) {
   const fromList = SIDE_CASES.find((entry) => entry.id === id)?.title;
