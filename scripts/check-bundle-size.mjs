@@ -221,8 +221,8 @@ const budgets = [
   // 166,256 / 62,010 -> 166,291 / 62,010 story-g37 over main ffa6139b (G37: the season strain says whether a case was played in story mode). Measured 166,287 / - (over budget only) in the e2e build, the plus 4.
   // 166,291 / 62,010 -> 166,291 / 62,031 story-g37 over main c967db59 (#669 Season open, #670 notes all on 11-25): the hashed imports moved. Measured - / 62,027 in CI verify-quick, the plus 4.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  // story-g37 over main b2fa5c01 (#668 bundle R): main's 166,355 / 62,051 plus G37's growth, until CI measures the merge.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_400, maxGzip: 62_080 },
+  // 166,355 / 62,051 -> 166,365 / 62,065 story-g37 over main b2fa5c01 (#668 bundle R: MARK 7, N18, N21, the ranking reset). Measured 166,361 / 62,061 in CI verify-quick (2ab9344d), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_365, maxGzip: 62_065 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
