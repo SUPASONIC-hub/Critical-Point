@@ -2906,7 +2906,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,206 / 453,702 / 462,143 gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903: first paint en 453,490 / ja 461,939 in CI verify-quick 11-25 (Windows the same to the byte),
 // and by note day (CP_NOTES_DAY, Windows) 12-31 under budget, 01-02 453,543 / 461,991, 01-11 453,694 / 462,135 (the largest), 01-20 453,462 / 461,924; the largest plus 8 (Windows only for the note days, as bundle R).
 // The first paint still moves with the start screen's notes (#670 leaves four note days), so the largest day's room stays. ko 387,189 at most, under its budget.
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_702, ja: 462_143 };
+// -> back to bundle R's 387,206 / 453,411 / 461,850 after main c967db59 (#670, the start screen's notes fixed): gameplay-mark8 ef349544 measured 386,662 / 453,021 / 461,478 in CI verify-quick 11-25, 386,515 / 452,849 / 461,310 on Windows for 2027-01-13; both well under it.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_411, ja: 461_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
