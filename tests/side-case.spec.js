@@ -65,7 +65,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   const slot = page.getByTestId("side-case-slot");
   await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   // 번외 1 to 9 and the placeholder.
-  await expect(slot).toContainText("번외 0/10");
+  await expect(slot).toContainText("번외 0/12");
   await expect(slot).toContainText("랭킹 밖");
   const before = await readSeasonKeys(page);
 
@@ -94,7 +94,7 @@ test("a device that closed a finale opens 번외 0, plays it to an ending, and f
   expect(await readSeasonKeys(page)).toEqual(before);
 
   await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/10");
+  await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/12");
   // 이어하기 opens the season where it was paused.
   await resumeSavedRun(page);
   expect(JSON.parse(await readStorage(page, TEST_STORAGE_KEYS.save)).currentCase).toBe("case12");
@@ -139,7 +139,7 @@ test("closing 사건 14 opens 번외 3 alone: one line on the report, and its bu
 
 // The release's cases: the first card each scene deals, scene after scene, to
 // the close -- 번외 1 in seven to ten decisions, 번외 2 in eight to eleven,
-// 번외 3 in seven to ten, 번외 4 in nine or ten, 번외 5 in eight or nine, 번외 6 in eight or nine, 번외 7 in seven to ten, 번외 8 in seven to ten, 번외 9 in seven to ten.
+// 번외 3 in seven to ten, 번외 4 in nine or ten, 번외 5 in eight or nine, 번외 6 in eight or nine, 번외 7 in seven to ten, 번외 8 in seven to ten, 번외 9 in seven to ten, 번외 10 and 11 in at most nine.
 const RELEASE_CASES = [
   { id: "side01", prefix: "s1", title: "아직 찾아가지 못한 일곱 명", most: 10 },
   { id: "side02", prefix: "s2", title: "돌려줄 것", most: 11 },
@@ -150,6 +150,8 @@ const RELEASE_CASES = [
   { id: "side07", prefix: "s7", title: "금요일 17시 58분", most: 10 },
   { id: "side08", prefix: "s8", title: "정상화", most: 10 },
   { id: "side09", prefix: "s9", title: "92일", most: 10 },
+  { id: "side10", prefix: "s10", title: "인사 없이", most: 9 },
+  { id: "side11", prefix: "s11", title: "부표까지", most: 9 },
 ];
 
 for (const { id, prefix, most } of RELEASE_CASES) {
@@ -163,79 +165,9 @@ for (const { id, prefix, most } of RELEASE_CASES) {
     await page.goto("/");
     const slot = page.getByTestId("side-case-slot");
     await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-    await expect(slot).toContainText("번외 0/9");
+    await expect(slot).toContainText("번외 0/11");
     for (const listed of RELEASE_CASES) await expect(slot).toContainText(listed.title);
     await expect(page.getByTestId("side-case-open-side00")).toHaveCount(0);
-    const before = await readSeasonKeys(page);
-
-    await clickElement(page.getByTestId(`side-case-open-${id}`), `open ${id}`);
-    const screen = page.getByTestId("side-case-screen");
-    await expect(screen).toHaveAttribute("data-side-node", `${prefix}_start`, { timeout: TRANSITION_TIMEOUT_MS });
-    const seen = [];
-    while (!(await page.getByTestId("side-case-ending").isVisible())) {
-      const nodeId = await screen.getAttribute("data-side-node");
-      expect(nodeId.startsWith(`${prefix}_`)).toBe(true);
-      seen.push(nodeId);
-      expect(seen.length).toBeLessThanOrEqual(most);
-      await dismissProtocolBreach(page);
-      await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
-      await cashStakedCard(page);
-      await expect
-        .poll(async () => ((await page.getByTestId("side-case-ending").isVisible()) ? "ending" : await screen.getAttribute("data-side-node")), { timeout: TRANSITION_TIMEOUT_MS })
-        .not.toBe(nodeId);
-    }
-    expect(seen[0]).toBe(`${prefix}_start`);
-    expect(seen.at(-1)).toBe(`${prefix}_aftershock`);
-    await expect(page.getByTestId("side-case-out-of-ranking")).toContainText("랭킹 밖");
-    const record = JSON.parse(await readStorage(page, SIDE_CASES_KEY));
-    expect(record[id].outcomeChoiceId.startsWith(`${prefix}_after_`)).toBe(true);
-    expect(record[id].inProgress).toBeNull();
-    expect(await readSeasonKeys(page)).toEqual(before);
-
-    await clickElement(page.getByTestId("side-case-close"), "back to the start screen");
-    await expect(page.getByTestId("side-case-slot")).toContainText("번외 1/9");
-    expect(errors).toEqual([]);
-  });
-}
-
-// Season 12-14 (owner's answer 11-20): 번외 10 and 11 ship with `opensAt`, so a
-// test build, its weekly clock held on 2026-01-07, lists only the nine above.
-// Moved past the Season's opening, the slot lists all eleven, the start screen
-// carries the Season's line for that day, and each plays to an ending.
-const SEASON_CASES = [
-  { id: "side10", prefix: "s10", title: "인사 없이", most: 9 },
-  { id: "side11", prefix: "s11", title: "부표까지", most: 9 },
-];
-const SEASON_DAY = "2026-12-14T09:00:00+09:00";
-
-test("before the Season the slot keeps 번외 10 and 11 shut and says nothing of them @once", async ({ page }) => {
-  const errors = [];
-  collectRuntimeErrors(page, errors);
-  await seedDevice(page, { finaleClosed: true });
-  await page.goto("/");
-  const slot = page.getByTestId("side-case-slot");
-  await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  await expect(slot).toContainText("번외 0/9");
-  for (const { id } of SEASON_CASES) await expect(page.getByTestId(`side-case-open-${id}`)).toHaveCount(0);
-  await expect(page.getByTestId("season-notice")).toHaveCount(0);
-  expect(errors).toEqual([]);
-});
-
-for (const { id, prefix, most } of SEASON_CASES) {
-  test(`on the Season's first day the slot lists ${id}, the start screen says so, and ${id} plays to an ending @once`, async ({ page }) => {
-    test.setTimeout(150_000);
-    const errors = [];
-    collectRuntimeErrors(page, errors);
-    await page.addInitScript((at) => {
-      globalThis.__weeklyRuleClock = at;
-    }, SEASON_DAY);
-    await seedDevice(page, { finaleClosed: true });
-    await page.goto("/");
-    await expect(page.getByTestId("season-notice")).toContainText("오늘 번외 사건 2편", { timeout: TRANSITION_TIMEOUT_MS });
-    const slot = page.getByTestId("side-case-slot");
-    await expect(slot).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-    await expect(slot).toContainText("번외 0/11");
-    for (const listed of [...RELEASE_CASES, ...SEASON_CASES]) await expect(slot).toContainText(listed.title);
     const before = await readSeasonKeys(page);
 
     await clickElement(page.getByTestId(`side-case-open-${id}`), `open ${id}`);

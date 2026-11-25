@@ -58,11 +58,6 @@ const introCopy = {
   rankingReset: "랭킹 안내: 11월 26일(목) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남습니다.",
   // From 11-13 to the end of 12-13 (castNoticeAt); {names} is castAliasLine.
   castRenamed: "등장인물 안내: 몇몇 인물이 새 이름과 얼굴로 바뀌었습니다. 이전 기록의 옛 이름은 새 이름으로 보입니다({names}).",
-  // The next Season (seasonNoticeAt, src/sideCases.js): a week before it opens, then its first day. {count} side cases.
-  seasonNotice: {
-    soon: "새 Season 안내: 12월 14일(월) 0시에 번외 사건 {count}편이 더해집니다. 이야기 속 제자리를 지나면 번외 칸에 열립니다.",
-    today: "새 Season: 오늘 번외 사건 {count}편이 더해졌습니다. 이야기 속 제자리를 지나면 번외 칸에 열립니다.",
-  },
   setup: {
     label: "게임 시작 준비",
     title: "기록 진입 설정",
