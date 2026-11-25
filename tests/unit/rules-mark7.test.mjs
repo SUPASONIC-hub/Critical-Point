@@ -46,7 +46,7 @@ import enRelics from "../../src/locales/en/screens/relics.js";
 import jaRelics from "../../src/locales/ja/screens/relics.js";
 
 /**
- * RULES_MARK 7 (2026-11-30, with the wipe; 게임성 개선점 2026-11-20 G11b·c,
+ * RULES_MARK 7 (2026-11-25, with the wipe; 게임성 개선점 2026-11-20 G11b·c,
  * G13, G16, G18): what each rule does, and that a row of 6 is played as it
  * was. What they are worth is check:pressure's (`--compare`, the `mark7` rows).
  */

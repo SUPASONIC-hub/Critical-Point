@@ -49,7 +49,7 @@ test("the ladder is the five prologues and 사건 01 to 05 in the season's order
 test("each step is the one the author decided", () => {
   const rules = (caseId) => [...rulesFor(caseId, staged)].sort();
   assert.deepEqual(rules("prologue01"), []);
-  // 프롤로그 02 opens two, the logic combo and BLACKOUT (N18, 2026-11-16 (1)); it opened four until 11-30.
+  // 프롤로그 02 opens two, the logic combo and BLACKOUT (N18, 2026-11-16 (1)); it opened four until 11-25.
   assert.deepEqual(rules("prologue02"), ["blackout", "logic"]);
   assert.deepEqual(rules("prologue03"), ["blackout", "coldFeet", "heatDebt", "logic", "scout"]);
   // 프롤로그 04 opens two rules, FRACTURE and LOCK (C-4, the user's answer of 2026-10-25, (1)); it

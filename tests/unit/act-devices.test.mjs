@@ -125,6 +125,37 @@ test("1막 떠넘겨진 손실: the case's first BUST keeps a third of the pot a
   const bot = readFileSync(new URL("../../scripts/sim/season-bot.mjs", import.meta.url), "utf8");
   assert.match(bot, /\.\.\.\(verdict\.passedDown \? \{ passedDown: true \} : \{\}\)/, "the season bot logs it as the page does");});
 
+test("the table's bust line says what the settlement keeps: 떠넘겨진 손실, INSURANCE and TESTIMONY", async () => {
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { useTableForecast } = await import("../../src/gauntlet/tableReadout.js");
+  const card = { id: "c", effect: { trust: 4 } };
+  const at = (caseId, extra = {}) => engine.normalizeRunState({ open: { caseId }, runPot: 900, runHand: 300, ...extra });
+  const said = (run, window) => {
+    let read;
+    const Probe = () => {
+      read = useTableForecast({ schema: engine.BASE_SCHEMA, run, win: window, selectedCard: null, multiplier: 1, caseId: run.open.caseId, offered: [] });
+      return null;
+    };
+    renderToStaticMarkup(createElement(Probe));
+    return read.bustKeeps;
+  };
+  const push = { status: "bust", cause: "push", gauge: 70, wall: 66, pushes: 3, elapsed: 10, focus: 0, focusHits: 0, focusMode: "strike" };
+  const clock = { ...push, cause: "timeout" };
+  for (const [name, run, window] of [
+    ["passed down", at("case05"), push],
+    ["passed down, spent", at("case05", { insuranceSpent: true }), push],
+    ["no twist", at("case07"), push],
+    ["a week's season", at("case05", { weekRule: "short-clock" }), push],
+    ["insurance", at("case07", { relics: ["insurance"] }), push],
+    ["testimony on the clock", at("case07", { relics: ["testimony"] }), clock],
+    ["testimony on a push", at("case07", { relics: ["testimony"] }), push],
+    ["testimony after the keep is spent", at("case05", { relics: ["testimony"], insuranceSpent: true }), clock],
+  ]) {
+    assert.equal(said(run, window), engine.resolveWindow({ run, window, card }).verdict.insuredPot, name);
+  }
+});
+
 test("4막 학습된 벽: the band stands around the heat the last cash was made at, and its one look is the narrow one", () => {
   const board = { wallMin: 56, wallMax: 92 };
   const middle = (band) => (band.wallMin + band.wallMax) / 2;

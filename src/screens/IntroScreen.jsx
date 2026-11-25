@@ -17,7 +17,7 @@ import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
-import { getSideSlot, peekRequestedSideCase, requestSideCase, seasonNoticeAt } from "../sideCases.js";
+import { getSideSlot, peekRequestedSideCase, requestSideCase } from "../sideCases.js";
 import { LazyScreen } from "../components/LazyScreen.jsx";
 import { loadedChunk } from "../state/chunkReload.js";
 import { retryableLazy } from "../state/retryableLazy.js";
@@ -371,8 +371,6 @@ export function IntroScreen({ view, renderers = {} }) {
   // its place in the story) and written (sideCases.getSideSlot). Read on each draw, so a case
   // closed in the side screen is counted when the start screen comes back.
   const sideSlot = getSideSlot({ newGamePlusUnlocked, caseResults });
-  // The next Season's line (seasonNoticeAt): a week before it opens and its first day.
-  const seasonNotice = seasonNoticeAt();
   if (sideCaseId) {
     return (
       <LazyScreen>
@@ -517,9 +515,6 @@ export function IntroScreen({ view, renderers = {} }) {
           )}
           {castNoticeAt(weeklyRuleNow()) && (
             <p className="previous-participant-message" data-testid="cast-rename-notice">{fill(introCopy.castRenamed, { names: castAliasLine(LANG) })}</p>
-          )}
-          {seasonNotice && (
-            <p className="previous-participant-message" data-testid="season-notice">{fill(seasonNotice.today ? introCopy.seasonNotice.today : introCopy.seasonNotice.soon, { count: seasonNotice.count })}</p>
           )}
           <WeeklyRuleNotice />
           <section id="case-access-setup" className="start-priority" aria-label={introCopy.setup.label} tabIndex={-1}>

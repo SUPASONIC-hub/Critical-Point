@@ -598,11 +598,13 @@ test("the ranking keeps last week's board for the week after it: W47 on 11-23, b
   assert.deepEqual(weekBoardsAt(Number.NaN), []);
 });
 
-test("the start screen tells of the 11-30 ranking wipe from 11-16 to the end of 11-30 (N10)", () => {
-  assert.equal(rankingResetNoticeAt(kst("2026-11-15T23:59:59")), false);
+test("the start screen tells of the 11-25 ranking wipe from 11-11 to the end of 11-25 (N10, moved up from 11-30 on 11-25)", () => {
+  assert.equal(rankingResetNoticeAt(kst("2026-11-10T23:59:59")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-11T00:00:00")), true);
   assert.equal(rankingResetNoticeAt(kst("2026-11-16T00:00:00")), true);
-  assert.equal(rankingResetNoticeAt(kst("2026-11-30T23:59:59")), true);
-  assert.equal(rankingResetNoticeAt(kst("2026-12-01T00:00:00")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-25T23:59:59")), true);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-26T00:00:00")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-30T12:00:00")), false);
   assert.equal(rankingResetNoticeAt(Date.parse(E2E_WEEKLY_RULE_CLOCK)), false, "a test build never shows it");
   assert.equal(rankingResetNoticeAt(Number.NaN), false);
 });
