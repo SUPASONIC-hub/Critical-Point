@@ -1328,8 +1328,9 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   expect(first).toBeGreaterThanOrEqual(12);
   await page.clock.runFor(3_000);
   expect(Number(await timer.locator("b").textContent())).toBeLessThan(first);
-  // The table's own clock has not moved while the page was up.
-  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  // The table's own clock has not moved while the page was up: 45, and G31 (RULES_MARK 9,
+  // storyTilt.js) gives a case opened on 남은 시간 72 (the season's start) TILT_CLOCK more.
+  await expect(page.locator(".gx-clock b")).toHaveText("47");
 
   // A card picked on the page opens the table with that card on it.
   const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").first().textContent();
@@ -1352,8 +1353,8 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(ask).toContainText("다 읽고 직접 열기로 바꿀까요?");
   await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
   await expect(page.getByTestId("reading-clock-hold")).toBeFocused();
-  // The table's clock has not moved while the page asked.
-  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  // The table's clock has not moved while the page asked (45, and G31's TILT_CLOCK on a season's first case).
+  await expect(page.locator(".gx-clock b")).toHaveText("47");
   await page.getByTestId("reading-clock-keep").click();
   await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();
