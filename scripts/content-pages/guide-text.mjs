@@ -47,7 +47,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
 <dt>OVERCLOCK (사건 01)</dt><dd>×4 이상 확정을 두 번 잇달아 하면 다음 판의 칩이 2배가 되지만 밀 때 오르는 열기도 커집니다. ×4 이상 확정이 이어지는 동안 계속됩니다.</dd>
-<dt>감사, AUDIT (사건 02)</dt><dd>장부가 너무 매끈하면 걸립니다. 한 사건 안에서 한 번 이상 밀고 확정한 열기가 ±2 안의 같은 자리에 4번 모이면, 사건이 닫힐 때 금고로 갈 몫의 4분의 1을 잃습니다. 열기 막대에는 지금 확정하면 같은 자리 확정이 늘어나는 구간이 표시되고, 한도까지 한 번 남았을 때 그 자리면 판에 「같은 자리면 감사」가 뜹니다. 감사로 잃은 사건의 결과에는 「왜」 한 줄이 붙습니다.</dd>
+<dt>감사, AUDIT (사건 02)</dt><dd>장부가 너무 매끈하면 걸립니다. 한 사건 안에서 한 번 이상 밀고 확정한 열기가 ±1 안의 같은 자리에 5번 모이면, 사건이 닫힐 때 금고로 갈 몫의 4분의 1을 잃습니다. 열기 막대에는 지금 확정하면 같은 자리 확정이 늘어나는 구간이 표시되고, 한도까지 한 번 남았을 때 그 자리면 판에 「같은 자리면 감사」가 뜹니다. 감사로 잃은 사건의 결과에는 「왜」 한 줄이 붙습니다.</dd>
 <dt>연결, CASCADE (사건 03)</dt><dd>한 자원을 8 이상 태운 카드로 확정하면 연결이 생겨, 2~4판 뒤의 한 판에서 벽 구간의 먼 끝이 10 가까워집니다(가까운 끝은 그대로). 다음 사건으로는 가장 최근 연결 하나만 넘어갑니다.</dd>
 </dl>
 <p>사건이 닫히면 REBOOT가 흔적을 지웁니다. 각 막의 마지막 사건은 「고점 판」이라 벽이 5 가까워지고 칩이 1.25배가 됩니다.</p>
@@ -132,7 +132,7 @@ export const GUIDE_BODY = {
 <li><strong>한 번은 미십시오.</strong> 「안전선 ×N」 안의 밀기는 벽에 닿지 않고, 밀지 않으면 COLD FEET가 옵니다.</li>
 <li><strong>판돈이 쌓일수록 조심하십시오.</strong> BUST는 사건의 판돈 전부를 가져가니, 사건 후반의 한 번 더는 앞의 모든 판을 건 도박입니다.</li>
 <li><strong>시계를 다 쓰지 마십시오.</strong> 시간 초과는 BUST에 SILENCE까지 붙습니다. 낮은 열기라도 확정하는 편이 낫습니다.</li>
-<li><strong>끊는 자리를 바꾸십시오.</strong> 사건 02부터 한 사건에서 같은 열기(±2)에 네 번 확정하면 감사입니다. 열기 60부터는 HEAT DEBT가 다음 판에 열기를 남깁니다.</li>
+<li><strong>끊는 자리를 바꾸십시오.</strong> 사건 02부터 한 사건에서 같은 열기(±1)에 다섯 번 확정하면 감사입니다. 열기 60부터는 HEAT DEBT가 다음 판에 열기를 남깁니다.</li>
 <li><strong>방향은 지키고 유형은 바꾸십시오.</strong> 콤보와 관점 전환을 함께 올립니다. 눈에 띔이 쌓였다면 열기 50 이상에서 확정하거나 방향을 한 번 바꾸십시오.</li>
 <li><strong>브리핑을 끝까지 읽으십시오.</strong> 바뀐 규칙이 거기 있고, 다 읽으면 즉답 패널티도 피합니다.</li>
 <li><strong>BUST를 공부하십시오.</strong> 벽의 실제 위치와 심박이 들은 위치를 견주다 보면 귀가 빨리 트입니다.</li>
@@ -178,7 +178,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
 <dt>OVERCLOCK (Case 01)</dt><dd>Two commits in a row at ×4 or more double the next hand’s chips, but each push adds more Heat. It lasts while the ×4 commits continue.</dd>
-<dt>AUDIT (Case 02)</dt><dd>A ledger that is too smooth gets audited. If 4 of a case’s commits, each after at least one push, land at the same spot within ±2 Heat, you lose a quarter of the share bound for the Vault when the case closes. The Heat bar marks where committing now would add to the same-spot count, and one short of the limit the table shows “Same spot = audit” there. A case that lost to the audit gets a “Why” line on its result.</dd>
+<dt>AUDIT (Case 02)</dt><dd>A ledger that is too smooth gets audited. If 5 of a case’s commits, each after at least one push, land at the same spot within ±1 Heat, you lose a quarter of the share bound for the Vault when the case closes. The Heat bar marks where committing now would add to the same-spot count, and one short of the limit the table shows “Same spot = audit” there. A case that lost to the audit gets a “Why” line on its result.</dd>
 <dt>CASCADE (Case 03)</dt><dd>Commit a card that burns 8 or more of one resource and you make a link: one hand 2 to 4 hands later has the far end of its Wall band 10 closer (the near end stays). Only the newest link carries into the next case.</dd>
 </dl>
 <p>REBOOT clears these marks when a case closes. The last case of each act is a “Peak hand” case, with the Wall 5 closer and chips ×1.25.</p>
@@ -263,7 +263,7 @@ export const GUIDE_BODY = {
 <li><strong>Push at least once.</strong> Pushes within “Safe ×N” cannot hit the Wall, and never pushing brings COLD FEET.</li>
 <li><strong>Grow careful as the stake grows.</strong> A BUST takes the whole case’s stake, so one more push late in a case bets every hand before it.</li>
 <li><strong>Never let the clock run out.</strong> Timing out is a BUST with SILENCE on top; committing even at low Heat is better.</li>
-<li><strong>Vary where you cut.</strong> From Case 02, four commits in one case at the same Heat (±2) bring the Audit. From Heat 60, HEAT DEBT carries Heat into the next hand.</li>
+<li><strong>Vary where you cut.</strong> From Case 02, five commits in one case at the same Heat (±1) bring the Audit. From Heat 60, HEAT DEBT carries Heat into the next hand.</li>
 <li><strong>Hold your side, vary your thinking.</strong> It feeds the combo and Perspective shifts at once. Once Noticed builds, commit at Heat 50 or more, or switch side once.</li>
 <li><strong>Read the briefing through.</strong> Changed rules are written there, and a full read spares you the Quick-answer penalty.</li>
 <li><strong>Study every BUST.</strong> Comparing where the Wall was with where the heartbeat heard it trains your ear fast.</li>
@@ -309,7 +309,7 @@ export const GUIDE_BODY = {
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>
 <dt>OVERCLOCK（事件01）</dt><dd>×4以上の確定を2回続けると次の勝負のチップが2倍になりますが、押したときに上がる熱も大きくなります。×4以上の確定が続くあいだ続きます。</dd>
-<dt>監査、AUDIT（事件02）</dt><dd>帳簿がなめらかすぎると監査されます。ひとつの事件で、一度以上押して確定した熱が±2以内の同じ位置に4回集まると、事件が閉じるとき金庫へ行く取り分の4分の1を失います。熱のバーには、いま確定すると同じ位置の確定が増える区間が示され、上限まであと1回のときその位置なら卓に「同じ位置で監査」が出ます。監査で失った事件の結果には「なぜ」の一行が付きます。</dd>
+<dt>監査、AUDIT（事件02）</dt><dd>帳簿がなめらかすぎると監査されます。ひとつの事件で、一度以上押して確定した熱が±1以内の同じ位置に5回集まると、事件が閉じるとき金庫へ行く取り分の4分の1を失います。熱のバーには、いま確定すると同じ位置の確定が増える区間が示され、上限まであと1回のときその位置なら卓に「同じ位置で監査」が出ます。監査で失った事件の結果には「なぜ」の一行が付きます。</dd>
 <dt>連結、CASCADE（事件03）</dt><dd>一つのリソースを8以上燃やすカードで確定すると連結ができ、2〜4勝負あとのひとつの勝負で壁の区間の奥の端が10近づきます(手前の端はそのまま)。次の事件に持ち越されるのは、いちばん新しい連結一つだけです。</dd>
 </dl>
 <p>事件が閉じるとREBOOTが跡を消します。各幕の最後の事件は「山場の勝負」で、壁が5近づき、チップが1.25倍になります。</p>
@@ -394,7 +394,7 @@ export const GUIDE_BODY = {
 <li><strong>一度は押しましょう。</strong>「安全線 ×N」の範囲の一押しは壁に届かず、押さないとCOLD FEETが来ます。</li>
 <li><strong>賭け金が積まれるほど慎重に。</strong>BUSTは事件の賭け金をすべて持っていくので、事件の終盤のもう一押しは、それまでのすべての勝負を賭けることになります。</li>
 <li><strong>時計を使い切らないでください。</strong>時間切れはBUSTにSILENCEまで付きます。低い熱でも確定するほうがましです。</li>
-<li><strong>切る位置を変えましょう。</strong>事件02から、ひとつの事件で同じ熱(±2)に4回確定すると監査です。熱60からはHEAT DEBTが次の勝負に熱を残します。</li>
+<li><strong>切る位置を変えましょう。</strong>事件02から、ひとつの事件で同じ熱(±1)に5回確定すると監査です。熱60からはHEAT DEBTが次の勝負に熱を残します。</li>
 <li><strong>方向は守り、タイプは変えましょう。</strong>コンボと視点の転換が一緒に上がります。目立ちが積もったら、熱50以上で確定するか、一度方向を変えましょう。</li>
 <li><strong>ブリーフィングは最後まで読みましょう。</strong>変わったルールがそこにあり、読み終えれば即答ペナルティも避けられます。</li>
 <li><strong>BUSTから学びましょう。</strong>壁の実際の位置と心拍が聞いた位置を見比べるうちに、耳がすぐに慣れてきます。</li>

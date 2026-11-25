@@ -89,11 +89,11 @@ test("G32: CASCADE pulls only the band's far end, LINK_TOP_WALL; 8's table the w
 /* ------------------------------------------------------------- G35 */
 
 test("G35: the audit counts a case's pushed cashes within ±SMOOTH_SPAN of one another, SMOOTH_LIMIT of them catch", () => {
-  assert.deepEqual([SMOOTH_SPAN, SMOOTH_LIMIT], [2, 4]);
+  assert.deepEqual([SMOOTH_SPAN, SMOOTH_LIMIT], [1, 5]);
   assert.equal(getSmoothness([]), 0);
-  assert.equal(getSmoothness([40, 44, 41, 43, 42]), 5);
-  assert.equal(getSmoothness([40, 45, 50, 55]), 1);
-  assert.equal(getSmoothness([40, 44, 45]), 2);
+  assert.equal(getSmoothness([40, 42, 41, 42, 40]), 5);
+  assert.equal(getSmoothness([40, 43, 46, 49]), 1);
+  assert.equal(getSmoothness([40, 42, 43]), 2);
   assert.equal(getAuditLevel([40, 41]), 2);
   assert.equal(getAuditLevel(3), 3, "8's count reads as it was");
   // The tally takes pushed, unbusted cashes off CASCADE.
@@ -108,34 +108,34 @@ test("G35: the audit counts a case's pushed cashes within ±SMOOTH_SPAN of one a
   // The close judges the smoothness; AUDIT CONTACT moves the limit one further.
   const run = normalizeRunState({ windowIndex: 3 });
   const close = (tally, relics = []) => settleAudit({ run: { ...run, relics }, rules: ALL_RULES, count: tally, busted: false, gauge: 42, pushes: 3, closed: true, secured: 4000, hand: 800, smooth: true });
-  assert.deepEqual(close([40, 41, 44]), { count: [40, 41, 44, 42], level: 4, caught: true, lost: 4000 / AUDIT_SHARE, handLost: 800 / AUDIT_SHARE });
-  assert.equal(close([40, 41]).caught, false);
-  assert.deepEqual(close([40, 41, 44], ["auditContact"]), { count: [40, 41, 44, 42], level: 4, caught: false, spared: true, lost: 0, handLost: 0 });
+  assert.deepEqual(close([41, 42, 43, 41]), { count: [41, 42, 43, 41, 42], level: 5, caught: true, lost: 4000 / AUDIT_SHARE, handLost: 800 / AUDIT_SHARE });
+  assert.equal(close([41, 42, 43]).caught, false);
+  assert.deepEqual(close([41, 42, 43, 41], ["auditContact"]), { count: [41, 42, 43, 41, 42], level: 5, caught: false, spared: true, lost: 0, handLost: 0 });
   assert.equal(getAuditLimit(["auditContact"], true), SMOOTH_LIMIT + 1);
   // The engine judges the smoothness under 9 and the count under 8.
   const card = { id: "c", effect: { trust: 4 } };
   const closing = (rules, audit) => resolveWindow({ run, window: { ...createWindow({ seed: "g35" }), status: "cashed", gauge: 42, wall: 80, pushes: 2 }, card, rules, audit, caseClosed: true }).verdict.audit;
-  assert.equal(closing(NINE, [40, 41, 44]).caught, true);
-  assert.equal(closing(NINE, [40, 41, 44]).level, 4);
+  assert.equal(closing(NINE, [41, 42, 43, 41]).caught, true);
+  assert.equal(closing(NINE, [41, 42, 43, 41]).level, 5);
   assert.equal(closing(EIGHT, 3).caught, false, "8's count: a cash at 42 adds nothing to 3 of 4");
 });
 
 test("G35: the table reads the smoothness, what a cash now makes it, and the band where it would rise", () => {
   const run = normalizeRunState({});
-  const reading = readAudit(run, [40, 41, 44], { gauge: 42, pushes: 2 });
-  assert.equal(reading.count, 3);
+  const reading = readAudit(run, [41, 42, 43, 41], { gauge: 42, pushes: 2 });
+  assert.equal(reading.count, 4);
   assert.equal(reading.limit, SMOOTH_LIMIT);
-  assert.equal(reading.afterCash, 4);
+  assert.equal(reading.afterCash, 5);
   assert.equal(reading.ifCash, 1);
   assert.equal(reading.atRisk, true);
-  assert.deepEqual(reading.band, [40, 45], "a cash at 40 to 44 joins the three");
-  assert.match(reading.spoken, /같은 자리 확정 4\/4/);
+  assert.deepEqual(reading.band, [41, 44], "a cash at 41 to 43 joins the four");
+  assert.match(reading.spoken, /같은 자리 확정 5\/5/);
   assert.equal(reading.warn, "같은 자리면 감사");
-  assert.equal(readAudit(run, [40, 41, 44], { gauge: 50, pushes: 2 }).ifCash, 0);
+  assert.equal(readAudit(run, [41, 42, 43, 41], { gauge: 50, pushes: 2 }).ifCash, 0);
   assert.equal(readAudit(run, [], { gauge: 50, pushes: 2 }).band, null, "nothing to join yet");
   // The table record: a case closed at 9 says its smoothness, one closed at 8 its count.
-  const log = [40, 41, 44, 42].map((gauge) => ({ threshold: { gauge, pushes: 2 } }));
-  assert.equal(describeAuditLedger(log, { tableRules: 9 }, "case10"), `감사 4/${SMOOTH_LIMIT}칸으로 닫혔다. 적발.`);
+  const log = [41, 42, 43, 41, 42].map((gauge) => ({ threshold: { gauge, pushes: 2 } }));
+  assert.equal(describeAuditLedger(log, { tableRules: 9 }, "case10"), `감사 5/${SMOOTH_LIMIT}칸으로 닫혔다. 적발.`);
   assert.equal(describeAuditLedger(log, { tableRules: 8 }, "case10"), "감사 0/4칸으로 닫혔다.");
 });
 

@@ -75,9 +75,10 @@ export const AUDIT_CONTACT_SLACK = 1;
  * The chunk still imports nothing but its words: the callers, who read the
  * case's rules (nextTableRules.js `isMarkNineOn`), say `smooth`.
  */
-export const SMOOTH_SPAN = 2;
-// 4, not the notes' 5: 80 bot seasons caught 0.10 a season at ±2/5, 0.33 at ±2/4 (target 0.3~1), 0.25 at ±3/5 (게임성 4차 G35).
-export const SMOOTH_LIMIT = 4;
+export const SMOOTH_SPAN = 1;
+// ±1 and 5, tuned on 80 bot seasons with every pushed cash counted (target 0.3~1 a season, under 5% of the vault; the notes
+// let the band and the count be set by the bots): ±2/4 caught 7.63 a season (5.6%), ±2/5 3.19, ±2/6 1.18, ±1/5 0.61 (0.5%), ±1/6 0.10.
+export const SMOOTH_LIMIT = 5;
 
 /** The most heats of `tally` within one band of 2 x SMOOTH_SPAN (0 for none). */
 export function getSmoothness(tally) {

@@ -43,7 +43,7 @@ export default {
       intro: ["Commit at ×4 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat."],
     },
     case02: {
-      introNine: ["From this case on, the Audit joins the table. If 4 of a case’s Commits, each pushed at least once, land at the same spot within ±2 Heat, you lose 1/4 of the share bound for the Vault when the case closes. Change where you cut to stay clear."],
+      introNine: ["From this case on, the Audit joins the table. If 5 of a case’s Commits, each pushed at least once, land at the same spot within ±1 Heat, you lose 1/4 of the share bound for the Vault when the case closes. Change where you cut to stay clear."],
       intro: ["From this case on, the Audit joins the table. Push at least once and Commit below Heat 40 and one box fills; Commit at 60 or more and 2 boxes clear. If 4 boxes are full when the case closes, you lose 1/4 of the share bound for the Vault."],
     },
     case03: {

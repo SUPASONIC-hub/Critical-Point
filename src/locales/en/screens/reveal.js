@@ -31,7 +31,7 @@ export default {
     auditOf: " headed for the Vault,",
     auditTaken: " was clawed back · Vault ",
     auditWhy: "Why: commits cashed under the audit line filled the audit to its limit. Push once more and cash above the line, and it goes down.",
-    auditWhySmooth: "Why: enough commits landed at the same spot (±2 Heat) that the ledger looked too smooth. Change where you cut to stay clear.",
+    auditWhySmooth: "Why: enough commits landed at the same spot (±1 Heat) that the ledger looked too smooth. Change where you cut to stay clear.",
     toVault: " To the Vault ",
     vault: " · Vault",
     staked: "Stake on the line ",
