@@ -221,7 +221,8 @@ const budgets = [
   // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+93 / +28), merged for gameplay-mark8; CI re-measures.
   // 166,349 / 62,038 -> 166,557 / 62,134 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+206 / +96), so the largest-note-day room stays.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_585, maxGzip: 62_134 },
+  // 166,585 / 62,134 -> 166,585 / 62,143: measured - / 62139 (over budget only), gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_585, maxGzip: 62_143 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -2242,7 +2243,8 @@ const budgets = [
   // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+466 / +151), merged for gameplay-mark8; CI re-measures.
   // 209,620 / 70,082 -> 210,408 / 70,403 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+788 / +321), so the largest-note-day room stays.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 210_408, maxGzip: 70_403 },
+  // 210,408 / 70,403 -> 210,599 / 70,424: measured 210595 / 70420, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 210_599, maxGzip: 70_424 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2371,7 +2373,8 @@ const budgets = [
   // DRYRUN 1123: larger of both sides until the merged build is measured.
   // main + gameplay-mark7's own growth (+406 / +143), merged for gameplay-mark8; CI re-measures.
   // 175,309 / 62,624 -> 176,025 / 62,932 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+716 / +308), so the largest-note-day room stays.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_025, maxGzip: 62_932 },
+  // 176,025 / 62,932 -> 176,213 / 62,970: measured 176209 / 62966, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 176_213, maxGzip: 62_970 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2886,7 +2889,10 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
 // -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
 // DRYRUN 1123: largest of 27 note days + 8.
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_411, ja: 461_850 };
+// -> 387,206 / 453,698 / 462,139 gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903: first paint en 453,490 / ja 461,939 in CI verify-quick 11-25 (Windows the same to the byte),
+// and by note day (CP_NOTES_DAY, Windows) 12-31 under budget, 01-02 453,543 / 461,991, 01-11 453,694 / 462,135 (the largest), 01-20 453,462 / 461,924; the largest plus 4.
+// The first paint still moves with the start screen's notes (#670 leaves four note days), so the largest day's room stays. ko 387,189 at most, under its budget.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_698, ja: 462_139 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
