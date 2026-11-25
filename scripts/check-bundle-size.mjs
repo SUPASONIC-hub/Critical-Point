@@ -1704,7 +1704,8 @@ const budgets = [
   // 107,426 / 35,892 -> 107,667 / 35,994 c4c5-copy over main 7ec2304e. Measured 107663 / 35990 (over budget only) in the e2e build, the plus 4.
   // 107,667 / 35,994 -> 107,695 / 36,012 다국적 인물. Measured 107691 / 36008 (over budget only) in the e2e build, the plus 4.
   // 107,695 / 36,012 -> 107,695 / 36,018 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_695, maxGzip: 36_018 },
+  // BUNDLE R EARLY 2026-11-25 (bundle-r-early, the 11-26 reset): Windows, every notes day 11-25..01-28 (65 builds, BUILD_CACHE=off): gzip max 36,012 (11-27), the plus 8.
+  { pattern: /^caseCopy-.*\.js$/, maxBytes: 107_695, maxGzip: 36_020 },
   // The table's sound (src/gauntlet/gauntletAudio.js). It was in the
   // PlayScreen chunk, which stood at 104,323 of 104,200 on 2026-10-19 when two
   // changes that each fitted were merged together; it is fetched with the table
@@ -1802,7 +1803,8 @@ const budgets = [
   // +0 / +13: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 10,622 / 4,338 -> 10,622 / 4,342 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 10_976, maxGzip: 4_455 },
+  // BUNDLE R EARLY 2026-11-25: Windows, every notes day 11-25..01-28: gzip max 4,448 (11-27), the plus 8.
+  { pattern: /^weeklyRules-.*\.js$/, maxBytes: 10_976, maxGzip: 4_456 },
   // WeeklyRuleViews 1,662 / 913 -> 1,796 / 966 on 2026-10-22, the test week
   // moved to W47 right after W46's NEAR WALL: this week's line says the next
   // week's rule after it (gauntlet/weeklyRuleLine.js, in this chunk so the
@@ -1987,7 +1989,8 @@ const budgets = [
   // 1,195 / 680 -> 1,206 / 686 G1~G7 merged (gameplay-g-relic-act + gameplay-g-core f5a1342e) over main 065d684d. Measured 1202 / 682 (over budget only) in the e2e build, the plus 4.
   // 1,195 / 680 -> 1,206 / 687 gameplay-g-core (G1·G2·G3·G6·G7 새 규칙과 낭독 줄) over main 065d684d, measured 1,202 / 683 (over budget only) in the e2e build, the plus 4.
   // 1,206 / 686 -> 1,206 / 692 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
-  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 692 },
+  // BUNDLE R EARLY 2026-11-25: Windows, every notes day 11-25..01-28: gzip max 685 (01-06), the plus 8.
+  { pattern: /^windowTrail-.*\.js$/, maxBytes: 1_206, maxGzip: 693 },
   // Whose a speech is and the speaker's first (A-2, src/gauntlet/speakerLine.js,
   // SPEAKER_LINE in vite.config.js), out of the PlayScreen chunk on
   // 2026-10-23. It imports nothing, so no shared chunk is split out with it.
@@ -2357,7 +2360,8 @@ const budgets = [
   // 174,157 / 62,173 -> 174,563 / 62,316 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 174559 / 62312 in CI verify-quick, the plus 4.
   // +746 / +308: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 175_527, maxGzip: 62_674 },
+  // BUNDLE R EARLY 2026-11-25: the start screen's notice says "Thursday, November 26" (was "Monday, November 30"): gzip 62,675 in CI and on Windows, the same on every notes day, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 175_527, maxGzip: 62_679 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2872,7 +2876,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,123 / 453,327 / 461,760 season-1214 over main af5d5ef1: main's budget (its largest-note-day room kept) plus the Season's first paint +509 / +875 / +896.
 // -> 387,196 / 453,399 / 461,834 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 386,751 / 452,654 / 461,114 plus the largest note day's room (445 / 745 / 720).
 // DRYRUN 1123: largest of 27 note days + 8.
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_411, ja: 461_850 };
+// BUNDLE R EARLY 2026-11-25 (the notice's day moved to 11-26): Windows max over every notes day 11-25..01-28 is ko 387,189 / en 453,406 / ja 461,838 (01-11); en takes the plus 8, ko and ja already hold it.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_414, ja: 461_850 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
