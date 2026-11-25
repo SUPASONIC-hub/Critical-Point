@@ -147,10 +147,9 @@ jobs:
         run: |
           mkdir -p funnel-report
           node scripts/report-ga4.mjs | tee funnel-report/ga4.md >> "$GITHUB_STEP_SUMMARY"
-      # Ops mode's calendar (N6, from 2026-12-01; scripts/ops-calendar.mjs):
-      # today's deploy day, the next quarter day a wipe may fall on, and the
-      # weekly rule calendar's booked weeks, with a warning under six. No
-      # database, no secret.
+      # The ops calendar (scripts/ops-calendar.mjs; ops mode's deploy days and
+      # quarter days were dropped on 2026-11-25): the weekly rule calendar's
+      # booked weeks, with a warning under six. No database, no secret.
       - name: Write the ops calendar
         if: ${{ !cancelled() }}
         shell: bash
