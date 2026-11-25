@@ -262,23 +262,24 @@ if (reportMode) {
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
 /**
- * G33 (RULES_MARK 9): the side a case closed on hands one draft card over, so
- * what a season holds at its end follows how it played. Each archetype's
- * most-held tool, over its seasons; under 9 at least HANDED_SPLIT of them differ.
+ * G33 (RULES_MARK 9): the side a case closed on hands one draft card over.
+ * Each archetype's most-held tool, at 사건 07's close and at the season's end,
+ * measured and not asserted: the bot takes a card at random from each draft,
+ * and by the season's end every archetype holds the same five, so the line
+ * does not split by play (4 ways at 사건 07, 1 at the end, with or without G33;
+ * cp-archive 메모-20261125 g4b g33-held2). What G33 is judged on here is the
+ * relic spread of check:pressure (x1.15 or more).
  */
-const HANDED_SPLIT = 3;
 {
-  const tops = [...new Set(POPULATION)].map((name) => {
+  const topOf = (lists) => [...new Set(POPULATION)].map((name) => {
     const held = new Map();
-    populationBuilds.forEach((relics, index) => {
+    lists.forEach((relics, index) => {
       if (populationArchetypes[index] === name) for (const id of relics) held.set(id, (held.get(id) ?? 0) + 1);
     });
-    const [top, seasons] = [...held.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] ?? ["(none)", 0];
-    return [name, top, seasons];
+    return [name, ([...held.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] ?? ["(none)"])[0]];
   });
-  const distinct = new Set(tops.map(([, top]) => top)).size;
-  console.log(`Most-held tool by archetype (G33, measured): ${tops.map(([name, top, seasons]) => `${name} ${top} (${seasons})`).join(", ")}; ${distinct} different`);
-  if (isMarkNineOn() && !process.env.ENDING_BASELINE) assert.ok(distinct >= HANDED_SPLIT, `G33: the archetypes' most-held tools split ${distinct} ways, under ${HANDED_SPLIT}`);
+  const line = (tops) => `${tops.map(([name, top]) => `${name} ${top}`).join(", ")}; ${new Set(tops.map(([, top]) => top)).size} different`;
+  console.log(`Most-held tool by archetype (G33, measured): at case07's close ${line(topOf(populationHeldAt.map((at) => at.case07 ?? [])))}; at the end ${line(topOf(populationBuilds))}`);
 }
 // WEEK_RULE (season-bot.mjs): every season above and below was a season begun in that week.
 if (WEEK_RULE) console.log(`Week rule (measured): every season under ${WEEK_RULE}, values ${WEEK_VALUES}`);
