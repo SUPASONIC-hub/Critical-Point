@@ -24,6 +24,9 @@ export default {
     skipPaid: "選ばずに進む",
     reroll: "引き直し · {cost}",
     extra: "もう一つ · {cost}",
+    refine: "道具を磨く · {cost}",
+    refineGroup: "磨く道具",
+    refineOption: "{name}を磨く、条件の倍率を{boost}倍に",
     spendNote: "押すとKD銀行口座からすぐ引かれ、取り消せない。",
     spendHint: "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
@@ -39,6 +42,7 @@ export default {
       few: "残りのツールが一つだけ",
       short: "残高不足",
       season: "今シーズンは購入済み",
+      none: "磨ける道具がない",
     },
   },
   relics: {
@@ -47,7 +51,7 @@ export default {
       text: "熱が上がった次のシーンまで、方向を変えても転換として認められる。",
       proc: "転換をつなぎとめた",
       // G4: the condition that pays under the next rules (relicsNext.js).
-      next: "向きを変えた盤（転換）で確定すると賭け金 +{pct}%。",
+      next: "方向を変えた勝負(転換)、または同じ方向6連続の次の勝負で確定すると賭け金+{pct}%。",
     },
     coldBlood: {
       name: "冷血",

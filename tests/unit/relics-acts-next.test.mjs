@@ -125,7 +125,9 @@ test("acts 3, 5 and 7 each deal their twist, behind a case's own rule and never 
   assert.equal(Object.keys(ACT_TWIST_CASES).length, 18);
   const plain = engine.getTableSchema({});
   const merger = engine.getTableSchema({ open: { caseId: "case15" } });
-  assert.equal(merger.wallMin, plain.wallMin - MERGER_SHIFT);
+  // G20 (RULES_MARK 8): only the top of the band moves, twice as far as the band's middle did.
+  assert.equal(merger.wallMin, plain.wallMin);
+  assert.equal(merger.wallMax, plain.wallMax - MERGER_SHIFT * 2);
   const scattered = engine.getTableSchema({ open: { caseId: "case26" } });
   assert.equal(scattered.wallMin, plain.wallMin - SCATTER_SPREAD);
   assert.equal(scattered.wallMax, Math.min(98, plain.wallMax + SCATTER_SPREAD));

@@ -33,6 +33,14 @@ export const SCATTER_SPREAD = 4;
 export const SCATTER_CHIPS = 1;
 export const HEARING_CLOCK = 0.7;
 export const HEARING_CHIPS = 1.2;
+/**
+ * G20 (RULES_MARK 8): 합병 pulls only the top of the band, this far; its bottom
+ * stays. The band's middle moves as MERGER_SHIFT did, and the hand that pushes
+ * blind to 50, who met the band's bottom end, is no longer the first one hit.
+ */
+export const MERGER_TOP_SHIFT = 6;
+/** The way RULES_MARK 8 lays 합병 over a board (gauntletEngine.js `getTableSchema`). */
+export const MERGER_EIGHT = Object.freeze({ wallTopShift: -MERGER_TOP_SHIFT, chipsFactor: MERGER_CHIPS });
 
 /** The twist's numbers, in the catalogue's schema terms (weeklyRules.js `weekRuleOverlay`). */
 export const ACT_TWIST_RULES = Object.freeze({

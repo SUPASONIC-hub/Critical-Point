@@ -1,5 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
+import { isMarkEightOn } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -11,6 +12,13 @@ import { ENDING_GATES, initialResources } from "./gameConstants.js";
  */
 
 const { collapseHarmPerCase: HARM_PER_CASE, collapseBustRate: BUST_RATE, collapseOverreachHarm: OVERREACH_HARM } = ENDING_GATES;
+
+// G26 (RULES_MARK 8): the slack door opens further: the record bar 0.5, and OPEN OVERSIGHT's legitimacy and trust this much lower (6.1% of open doors change the ending).
+const CLUE_RATE_SLACK_EIGHT = 0.5;
+const OVERSIGHT_SLACK_EIGHT = 9;
+const OVERSIGHT_TRUST_SLACK_EIGHT = 8;
+/** What an open slack door lowers, for the ruling (gameLogic.js) and the finale's line (nearestEnding.js); `bar` is the record bar before 8. */
+export const getSlackGates = (bar) => (isMarkEightOn() ? { clueRate: CLUE_RATE_SLACK_EIGHT, oversight: OVERSIGHT_SLACK_EIGHT, trust: OVERSIGHT_TRUST_SLACK_EIGHT } : { clueRate: bar, oversight: 0, trust: 0 });
 
 /**
  * How much of a gate counts as close to it. The one number the readout's

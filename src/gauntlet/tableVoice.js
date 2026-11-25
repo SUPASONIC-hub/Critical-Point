@@ -8,10 +8,13 @@ import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { decisionWindowSeconds } from "./stakeClock.js";
-import { getBoardMark, LOCK_CAP } from "./gauntletEngine.js";
-import { BREATH_GAUGE, BREATH_WALL, SIGN_CHIPS, SIGN_MARK } from "./nextTableRules.js";
+import { getBoardMark, getBreathWall, LOCK_CAP } from "./gauntletEngine.js";
+import { BREATH_GAUGE, SIGN_CHIPS, SIGN_MARK } from "./nextTableRules.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
+
+/** G15·G22: the line beside 숨 고르기: where the last BUST went, and on a hot one how far the wall moves. */
+export const readBreathBust = (board) => fill(tableCopy.stage.breathBust, { heat: board.bustHeat }) + (board.breathHot ? fill(tableCopy.stage.breathHotWall, { wall: getBreathWall(board) }) : "");
 
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
@@ -168,7 +171,7 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, scoutTrust = SCOUT_TRUST, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "" }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, scoutTrust = SCOUT_TRUST, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "", leakLine = "" }) {
   const carry = findStanceCarry(cashMutations);
   return {
     asked,
@@ -179,6 +182,8 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
     lockReason,
     breathed: win.breathed === true,
     breathLine,
+    // G27 (trial only): said once when a full charge starts to leak.
+    leakLine,
     live,
     pushes: win.pushes,
     push: describePush({ gauge: win.gauge, dangerLine }),
@@ -206,7 +211,8 @@ export function readNextLines({ win, logic = null, lockRefused = 0 }) {
     exposure: logic?.exposure?.spoken ?? "",
     lockRefused,
     lockReason: fill(stage.lockShutReason, { cap: LOCK_CAP }),
-    breathLine: win?.breathed ? fill(stage.breathDone, { gauge: BREATH_GAUGE, to: Math.round(win.gauge), wall: BREATH_WALL }) : "",
+    breathLine: win?.breathed ? fill(stage.breathDone, { gauge: BREATH_GAUGE, to: Math.round(win.gauge), wall: getBreathWall(win.schema) }) : "",
+    leakLine: win?.schema?.chargeLeak === true && win.leakFocus < win.chargedFocus ? stage.chargeLeak : "",
   };
 }
 
@@ -227,6 +233,7 @@ export function listTableCalls(before, after) {
   // G3: a LOCK refused says why, every time it is pressed; G7: 숨 고르기 says what it did; G1: 눈에 띔 moving.
   if (after.lockRefused > (before.lockRefused ?? 0) && after.lockReason) calls.push({ kind: "lock", text: after.lockReason });
   if (after.breathed && !before.breathed && after.breathLine) calls.push({ kind: "breath", text: after.breathLine });
+  if (after.leakLine && !before.leakLine) calls.push({ kind: "leak", text: after.leakLine });
   if (after.exposure && after.exposure !== before.exposure) calls.push({ kind: "exposure", text: after.exposure });
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });

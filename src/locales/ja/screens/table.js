@@ -24,6 +24,8 @@ export default {
     signCell: "壁 {cell}から",
     breath: "息を整える",
     breathBust: "前回{heat}でBUST",
+    breathHotWall: " · 今回の壁 +{wall}",
+    chargeLeak: "充電が漏れ始めた。今確定するか、もう一度押そう。",
     breathLabel: "息を整える:時計を{seconds}秒使い、熱を{gauge}下げ、壁を{wall}遠ざける。最初の押し込みの前に一度だけ。",
     breathDone: "息を整えた。熱が{gauge}下がって{to}、壁が{wall}遠のいた。",
     combo: "コンボ",

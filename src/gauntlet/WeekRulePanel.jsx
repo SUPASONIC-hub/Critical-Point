@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { getCaseRule, getWeekRule } from "./weeklyRules.js";
 import { caseRuleFor } from "./caseRules.js";
 import { readSignWay } from "./actTwists.js";
-import { asksToSign, getNameWall } from "./gauntletEngine.js";
+import { asksOpening, asksToSign, getNameWall } from "./gauntletEngine.js";
+import { OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS } from "./nextTableRules.js";
 import { fill } from "../locale.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import edgeCopy from "../copy/edge.js";
@@ -126,6 +127,7 @@ export function pastPick(picked, id, wild = 0) {
 const SIGN_BUTTON = { minHeight: 44 };
 
 export function SignAsk({ run, onSign }) {
+  if (onSign && asksOpening(run)) return <OpeningAsk run={run} onSign={onSign} />;
   if (!onSign || !asksToSign(run)) return null;
   const signed = readSignWay(run.open.signed);
   return (
@@ -141,6 +143,27 @@ export function SignAsk({ run, onSign }) {
             aria-describedby={way === "name" ? "gx-sign-name-wall" : undefined} onClick={() => onSign(way)} style={SIGN_BUTTON}>
             {signed === way && <span aria-hidden="true">✓ </span>}
             {edgeCopy.sign[way]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** G23 여는 판돈 (RULES_MARK 8): the signature's frame, asking how to open a case. Not choosing is 보통. */
+function OpeningAsk({ run, onSign }) {
+  const chosen = run.open.opening === "big" ? "big" : "normal";
+  return (
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="opening-ask" role="group" aria-labelledby="gx-opening-ask" aria-describedby="gx-opening-big" style={{ gridArea: "auto" }}>
+      <p className="gx-breach-kicker">{edgeCopy.opening.kicker}</p>
+      <p id="gx-opening-ask">{edgeCopy.opening.question}</p>
+      <p id="gx-opening-big">{fill(edgeCopy.opening.bigNote, { chips: OPEN_BIG_CHIPS, wall: OPEN_BIG_WALL })}</p>
+      <div className="gx-comic-cards">
+        {OPEN_WAYS.map((way) => (
+          <button key={way} type="button" className="gx-comic-card" data-testid={`opening-${way}`} aria-pressed={chosen === way}
+            aria-describedby={way === "big" ? "gx-opening-big" : undefined} onClick={() => onSign(way)} style={SIGN_BUTTON}>
+            {chosen === way && <span aria-hidden="true">✓ </span>}
+            {edgeCopy.opening[way]}
           </button>
         ))}
       </div>

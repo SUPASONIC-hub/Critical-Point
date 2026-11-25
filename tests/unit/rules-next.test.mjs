@@ -23,7 +23,7 @@ import { countAudit } from "../../src/gauntlet/auditRisk.js";
 import {
   BREATH_GAUGE,
   BREATH_HOT_FROM,
-  BREATH_HOT_GAUGE,
+  BREATH_HOT_GAUGE, BREATH_HOT_WALL,
   BREATH_WALL,
   countNarrows,
   EXPOSURE_FROM,
@@ -192,7 +192,9 @@ test("G7: 숨 고르기, once, on the board after a BUST and before its first pu
   const cool = createWindow({ schema: buildNextSchema({ outcome: "bust", cause: "push", gauge: BREATH_HOT_FROM - 1, pushes: 3, streak: 0, rules: NEXT }), seed: "g7" });
   assert.equal(reduceWindow(cool, { type: "BREATHE" }, NEXT).gauge, Math.max(0, cool.gauge - BREATH_GAUGE));
   assert.equal(buildNextSchema({ outcome: "bust", cause: "push", gauge: 70, pushes: 3, streak: 0, rules: OLD }).bustHeat, undefined, "the old table writes none");
-  assert.equal(breathed.wall, win.wall + BREATH_WALL);
+  // G22 (RULES_MARK 8): this board's BUST went at 70, so the wall moves BREATH_HOT_WALL.
+  assert.equal(breathed.wall, win.wall + BREATH_HOT_WALL);
+  assert.equal(reduceWindow(cool, { type: "BREATHE" }, NEXT).wall, cool.wall + BREATH_WALL, "under BREATH_HOT_FROM it moves BREATH_WALL");
   assert.equal(breathed.elapsed, 2);
   assert.equal(reduceWindow(breathed, { type: "BREATHE" }, NEXT), breathed, "once");
   assert.equal(reduceWindow(reduceWindow(win, { type: "PUSH" }, NEXT), { type: "BREATHE" }, NEXT).breathed, undefined, "not after a push");
