@@ -140,6 +140,8 @@ const WINDOWS_PER_CASE = Math.round(MEASURED_WINDOWS_PER_CASE);
 // the other (`directCard`), which moves neither.
 const card = { id: "sim", label: "sim", effect: { capital: 7, trust: 11, humanCost: 4 } };
 assert.equal(getLogicDirection(card), LOGIC_EVEN, "the bare card leans neither way");
+/** How far a typed hand leans the card's 자본 (season-bot.mjs `directCard`). */
+const DIRECTION_LEAN = Math.abs(directCard(card, "position").effect.capital - card.effect.capital);
 for (const direction of LOGIC_DIRECTIONS) {
   const leaned = directCard(card, direction);
   assert.equal(getLogicDirection(leaned), direction, `the card leaned toward ${direction} reads so`);
@@ -741,7 +743,10 @@ assert.ok(
 );
 // G4: with the reroll at 1,500, rerolling a weak offer has to pay for itself.
 if (isNextOn()) {
-  assert.ok(spendingRows.weak.meanVault > spendingRows.listen.meanVault, `rerolling a weak offer must beat never paying: ${spendingRows.weak.meanVault} against ${spendingRows.listen.meanVault}`);
+  // G29 (RULES_MARK 9, the user's 「1」 of 2026-11-25): the money cards' heavier chips leave a weak reroll 0.4% under never paying
+  // (measured with each 4차 item turned off: G29 alone moves it), so under 9 it has to come within WEAK_REROLL_ROOM of it.
+  const WEAK_REROLL_ROOM = isMarkNineOn() ? 0.99 : 1;
+  assert.ok(WEAK_REROLL_ROOM < 1 ? spendingRows.weak.meanVault >= spendingRows.listen.meanVault * WEAK_REROLL_ROOM : spendingRows.weak.meanVault > spendingRows.listen.meanVault, `rerolling a weak offer must beat never paying${WEAK_REROLL_ROOM < 1 ? ` (within ${Math.round((1 - WEAK_REROLL_ROOM) * 100)}% under RULES_MARK 9)` : ""}: ${spendingRows.weak.meanVault} against ${spendingRows.listen.meanVault}`);
 }
 for (const key of ["reroll", "extra", "always", "early", "weak", "earlyBlind"]) {
   const row = spendingRows[key];
@@ -861,6 +866,11 @@ const stepReport = UNLOCK_LADDER.slice(0, -1).map((step) => {
     steady: under("steady lock", stepListening, null, { mode: "steady" }, BRACKET_CASES),
   };
 });
+// G35 (RULES_MARK 9, the user's 「1」 of 2026-11-25): the audit reads a hand that always cuts at the same heat, which the
+// blind rows are, so the whole table a step is held under is the whole table less the audit; what the audit takes is printed.
+const auditFree = new Set([...ALL_RULES].filter((rule) => rule !== "audit"));
+const stepBound = isMarkNineOn() ? bestOfRows([40, 50, 60].map((target) => measure(`heat ${target}, no audit`, (win) => win.gauge < target, null, [], CASES, null, auditFree))) : bestFixed;
+if (stepBound !== bestFixed) console.log(`step bound       the whole table less the audit: ${stepBound.label} ${stepBound.meanVault}; with it ${bestFixed.label} ${bestFixed.meanVault} (the audit takes ${((100 * (stepBound.meanVault - bestFixed.meanVault)) / Math.max(1, stepBound.meanVault)).toFixed(1)}%)`);
 for (const row of stepReport) {
   const { caseId, rules, blind, listen, sees, skip, holds, wanders, unlocked, waited, strike, steady } = row;
   console.log(
@@ -873,7 +883,7 @@ for (const row of stepReport) {
   assert.ok(listen.meanVault < sees.meanVault * 0.6, `${caseId}: the heartbeat must not be an answer key: best ${listen.meanVault} against a wall-seeing ${sees.meanVault}`);
   assert.ok(skip.meanWindows < WINDOWS_PER_CASE, `${caseId}: busting on purpose does shorten a case`);
   assert.ok(skip.meanVault < blind.meanVault * 0.25, `${caseId}: the skip must not be a shortcut: busting to skip banks ${skip.meanVault} against ${blind.meanVault}`);
-  assert.ok(blind.meanVault <= bestFixed.meanVault, `${caseId}: a step must not bank more than the whole table (${blind.meanVault} against ${bestFixed.meanVault})`);
+  assert.ok(blind.meanVault <= stepBound.meanVault, `${caseId}: a step must not bank more than the whole table (${blind.meanVault} against ${stepBound.meanVault})`);
 
   // A bust: broken wherever the step can break a board, untouched where it cannot.
   const bust = [...row.blindRows, skip].filter((played) => played.midCase > 0);
@@ -889,8 +899,12 @@ for (const row of stepReport) {
     assert.ok(holds.meanVault <= Math.ceil(listen.meanVault * HAND_CAP) + 1, `${caseId}: the streak cannot pay past the hand's cap: ${holds.meanVault} against ${listen.meanVault}`);
     assert.ok(wanders.meanVault <= holds.meanVault, `${caseId}: picking a card at random must never pay better than holding a direction`);
   } else {
-    assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card that leans is paid as any card`);
-    assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever way it leans`);
+    // G29 (RULES_MARK 9): a leaned card's chips move by the coin weight's share of the lean (the lean check at the top), and no more.
+    const leanShare = isMarkNineOn() ? (DIRECTION_LEAN * (COIN_GAIN_WEIGHT - 2) + 1) / getCardChips(card) : 0;
+    if (!leanShare) assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card that leans is paid as any card`);
+    else assert.ok(Math.abs(holds.meanVault / listen.meanVault - 1) <= leanShare, `${caseId}: with no streak, a card that leans is paid as any card but for the coin weight's share (${holds.meanVault} against ${listen.meanVault})`);
+    if (!leanShare) assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever way it leans`);
+    else assert.ok(Math.abs(wanders.meanVault / listen.meanVault - 1) <= leanShare, `${caseId}: whichever way it leans, but for the coin weight's share (${wanders.meanVault} against ${listen.meanVault})`);
   }
   // LOCK, where the step has it, is STRIKE until the stances open.
   if (rules.has("lock")) {

@@ -350,8 +350,11 @@ export function getCardChips(choice, schema = BASE_SCHEMA, rules = undefined) {
   const gains = Object.entries(effect)
     .filter(([key, value]) => isResourceGain(key, value))
     .reduce((sum, [key, value]) => sum + Math.abs(value) * (COIN_GAIN_KEYS.includes(key) ? coin : 2), 0);
+  if (schema === BASE_SCHEMA_RAW) return 10 + gains;
   return Math.max(5, Math.round((10 + gains) * normalizeSchema(schema).chipsScale));
 }
+/** `getCardChips` on this board returns the chips before scale and rounding (`getSealedCardId`). */
+const BASE_SCHEMA_RAW = Object.freeze({ raw: true });
 
 /** What the card burns, with the fractured axis billed half again. */
 export function getCardBurn(choice, schema = BASE_SCHEMA) {
@@ -379,9 +382,12 @@ export function getSealedCardId(choices = [], schema = BASE_SCHEMA, rules = unde
   if (!normalized.sealHighest) return null;
   const playable = choices.filter((choice) => choice && choice.type !== "reframe");
   if (playable.length < 2) return null;
+  // G29 (RULES_MARK 9): the coin weight's quarter points round differently on boards of another chipsScale (the run's
+  // board and the window's, under 8막's signature), so the richest card is read off the chips before scale and rounding.
+  const worth = isMarkNineOn(rules) ? (choice) => getCardChips(choice, BASE_SCHEMA_RAW, rules) : (choice) => getCardChips(choice, normalized, rules);
   let best = playable[0];
   for (const choice of playable) {
-    if (getCardChips(choice, normalized, rules) > getCardChips(best, normalized, rules)) best = choice;
+    if (worth(choice) > worth(best)) best = choice;
   }
   return best.id;
 }
