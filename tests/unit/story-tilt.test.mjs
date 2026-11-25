@@ -67,4 +67,9 @@ test("the briefing's line: one entry a tilt, on the case's first page only", () 
   assert.deepEqual(listStoryTilt(run)[0][1], { value: 30, error: TILT_TELL.high });
   assert.deepEqual(listStoryTilt({ ...run, windowIndex: run.windowIndex + 1 }), []);
   assert.deepEqual(listStoryTilt(open(NEUTRAL)), []);
+  // On the scene the case opened on only (the route the open stamped).
+  const routed = openCaseRun({}, { caseId: "case05", resources: { fatigue: 30, time: 68, legitimacy: 52 }, route: { nodeId: "c5_start" } });
+  assert.equal(listStoryTilt(routed, "c5_start").length, 1);
+  assert.deepEqual(listStoryTilt(routed, "c5_other"), []);
+  assert.deepEqual(listStoryTilt(run, "c5_start"), [], "a debug jump stamps no route");
 });

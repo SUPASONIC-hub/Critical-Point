@@ -54,11 +54,13 @@ export function readStoryTilt(resources) {
 /**
  * The briefing's line for the case open on `run` (SceneBriefing.jsx): one
  * entry a tilt, `[key, values]` for its sentence in briefing copy's `tilt`,
- * on the case's first page only; empty otherwise.
+ * on the page of the scene the case opened on (`openingRoute`), before its
+ * first board; empty otherwise (a debug jump stamps no route, so says nothing).
  */
-export function listStoryTilt(run) {
+export function listStoryTilt(run, nodeId = undefined) {
   const tilt = getStoryTilt(run);
   if (!tilt || Number(run.windowIndex) !== Number(run.open?.windowIndex)) return [];
+  if (nodeId !== undefined && run.open?.openingRoute?.nodeId !== nodeId) return [];
   const value = (key) => Math.round(Number(run.open.resources[key]));
   return [
     ...(tilt.fatigue ? [[tilt.fatigue === "high" ? "fatigueHigh" : "fatigueLow", { value: value("fatigue"), error: tilt.tellError }]] : []),

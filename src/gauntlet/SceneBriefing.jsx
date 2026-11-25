@@ -179,7 +179,8 @@ export function SceneBriefing({
   const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
-  const tilt = listStoryTilt(run);
+  const tilt = listStoryTilt(run, nodeId);
+  const tiltLine = tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ");
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
   // clock; above it, on a NEW GAME+ season's first page of a case, what the
   // season before left there (`echo`, an object of two lines: secondSeason.js).
@@ -194,8 +195,8 @@ export function SceneBriefing({
   // same way. `mutations` is exactly the two lists printed below. The line
   // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }]),
-    [told, question, mutations, intro, weekRules, bridge, openingLine],
+    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }, { text: tiltLine }]),
+    [told, question, mutations, intro, weekRules, bridge, openingLine, tiltLine],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits,
@@ -363,20 +364,16 @@ export function SceneBriefing({
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
             <ProseCaptions text={told.text} who={node.speakerName ?? node.speaker} whoAt={speech.whoAt} />
-            {/* G31: what the case opened on does to its tables, one line on its first page. */}
-            {tilt.length > 0 && (
-              <p className="gx-caption gx-caption-tilt" data-testid="briefing-tilt">
-                {tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ")}
-              </p>
-            )}
           </div>
 
-          {(told.memo?.length > 0 || trace) && (
+          {(told.memo?.length > 0 || trace || tiltLine) && (
             <div className="gx-panel gx-panel-file">
               <p className="gx-file-tab">{briefingCopy.caseFile}</p>
               <ul>
                 <ProseItems items={told.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
+                {/* G31: what the case opened on does to its tables, one line on its first page. */}
+                {tiltLine && <li data-testid="briefing-tilt">{tiltLine}</li>}
               </ul>
             </div>
           )}
