@@ -22,6 +22,15 @@ const briefingCopy = {
   yourCall: "당신의 판단",
   caseFile: "사건 파일",
   carried: "이월 · 이번 판에 이어지는 규칙",
+  // G31 (RULES_MARK 9): what the case opened on does to its tables (storyTilt.js), one line on its first page.
+  tilt: {
+    fatigueHigh: "피로 {value} — 심박이 흐려졌다 (오차 ±{error})",
+    fatigueLow: "피로 {value} — 심박이 또렷하다 (오차 ±{error})",
+    timeLow: "남은 시간 {value} — 판 시계 {seconds}초 짧게",
+    timeHigh: "남은 시간 {value} — 판 시계 {seconds}초 길게",
+    legitimacyLow: "공정함 {value} — 감사 한도 −{limit}",
+    legitimacyHigh: "공정함 {value} — 감사 한도 +{limit}",
+  },
   // After the English PROTOCOL BREACH.
   breach: " · 이번 판의 규칙이 바뀌었다",
   hint: "카드를 고르면 그 카드를 건 채로 판이 열린다",

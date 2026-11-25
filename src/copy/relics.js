@@ -13,6 +13,8 @@ const relicsCopy = {
   draft: {
     full: "도구 칸 가득",
     closed: "사건 종료",
+    // G33 (RULES_MARK 9): on the card the side the case closed on handed over (relics.js HANDED_BY).
+    handedBy: "{name}{particle} 건넨 것",
     swapTitle: "내려놓을 도구 하나",
     title: "다음 사건에 가져갈 도구 하나",
     swapLede: "{name}{particle} 들려면 가진 도구 하나를 내려놓는다. 내려놓은 도구는 이 테이블부터 규칙을 바꾸지 않는다.",

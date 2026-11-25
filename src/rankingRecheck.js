@@ -48,7 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
-import { isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
+import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -270,8 +270,12 @@ export function recheckRelicDraft(row, before = null) {
     else {
       const known = (list) => Array.isArray(list) && list.every((id) => RELIC_IDS.includes(id));
       if (!known(raw.pool) || !known(raw.owned) || !known(raw.offer) || !known(raw.picked) || (raw.reroll && !known(raw.reroll.offer))) differs.push("ids");
-      if (!sameIds(draft.offer, drawRelicOffer(draft.seed, draft.pool, draft.owned))) differs.push("offer");
-      if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned))) differs.push("reroll");
+      // G33 (RULES_MARK 9): the side that handed a card over draws the offer with it; a row of 8 or less has none.
+      const side = draft.side ?? null;
+      const nine = Number(row?.dynamics?.[RULES_MARK_KEY]) >= RULES_NINE_MARK;
+      if (side !== null ? !isMarkNineOn(rowRules(row)) : nine) differs.push("side");
+      if (!sameIds(draft.offer, drawRelicOffer(draft.seed, draft.pool, draft.owned, side))) differs.push("offer");
+      if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned, side))) differs.push("reroll");
       const last = draft.reroll?.offer ?? draft.offer;
       if (draft.picked.some((id) => !last.includes(id)) || draft.picked.length > (draft.extra ? 2 : 1)) differs.push("picked");
       // G25: a refined tool is one the draft held.

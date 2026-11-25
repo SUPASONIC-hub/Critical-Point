@@ -1,7 +1,7 @@
 import { clamp, isResourceGain } from "../gameConstants.js";
 import { objectParticle } from "../playerLanguage.js";
 import { advanceLogic, getHeatTier, getLogicBonus, getLogicDirection, LOGIC_DIRECTIONS, LOGIC_INITIAL, normalizeLogic } from "./logicStreak.js";
-import { DEFAULT_RELIC_POOL, getSofteningRelic, hasRelic, normalizeRelicIds, RELIC_EXTRA_COST, RELIC_OFFER_SIZE, RELIC_REROLL_COST, RELIC_SLOTS } from "./relics.js";
+import { DEFAULT_RELIC_POOL, getSofteningRelic, HANDED_RELICS, handedSideOf, hasRelic, normalizeRelicIds, RELIC_EXTRA_COST, RELIC_OFFER_SIZE, RELIC_REROLL_COST, RELIC_SLOTS } from "./relics.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -49,10 +49,12 @@ import {
 import { decisionWindowSeconds } from "./stakeClock.js";
 import { IDLE_EROSION_PERCENT, MARKET_SHOCK_BOARD, MARKET_SHOCK_WALL, MARKET_SHOCK_WOBBLE, normalizeWeekRuleId, weekRuleHasDevice, weekRuleOverlay } from "./weeklyRules.js";
 import { settleAudit } from "./auditRisk.js";
+import { getStoryTilt } from "./storyTilt.js";
+import { normalizePaid } from "./settlementPay.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
 import { LATE_BILL_CHIPS, LATE_BILL_KEEP, MERGER_EIGHT, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { COLD_BLOOD_WALL, listRefinable, NEXT_REROLL_COST, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP } from "./relicsNext.js";
-import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isMarkNineOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, describeLinkMade, LINK_WALL, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -326,6 +328,8 @@ export function normalizeSchema(value) {
   if (source.trained === true) schema.trained = true;
   // G5 6막 진술 고정: the stance the case's first cash put on record; only ever written when set.
   if (FOCUS_MODES.includes(source.stanceLocked)) schema.stanceLocked = source.stanceLocked;
+  // G31 (RULES_MARK 9): the heartbeat's error the case's 피로 dealt (storyTilt.js); only ever written when set.
+  if (Number.isFinite(source.tellError) && source.tellError > 0) schema.tellError = clamp(Math.round(source.tellError), 1, 30);
   return schema;
 }
 
@@ -564,8 +568,9 @@ export function getStanceMasteryProfile(mastery) {
 
 export const TELL_ERROR = 18;
 
-export function drawTellOffset(seed) {
-  return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * TELL_ERROR);
+/** The heartbeat's lie for a board dealt from `seed`: up to `error` (TELL_ERROR, or the board's own under G31's tilt) either way. */
+export function drawTellOffset(seed, error = TELL_ERROR) {
+  return Math.round((seededUnit(`tell:${seed}`) * 2 - 1) * error);
 }
 
 /** A clock scale as a window keeps it: 1 (the board's own clock) to 4 times slower. */
@@ -592,7 +597,7 @@ export function createWindow({ schema = BASE_SCHEMA, seed = "0", abandoned = fal
     seed: String(seed),
     schema: normalized,
     wall: drawWall(normalized, seed),
-    tellOffset: drawTellOffset(seed),
+    tellOffset: drawTellOffset(seed, normalized.tellError ?? TELL_ERROR),
     gauge: normalized.startGauge,
     pushes: 0,
     lastStep: 0,
@@ -721,13 +726,17 @@ export function getTableSchema(run) {
   const board = readTableBoard(run);
   const big = run?.story !== true && run?.open?.opening === "big" && isOpeningCase(run.open.caseId);
   const leak = run?.story !== true && trialByDefault();
-  return big || leak ? getOpenedBoard(board, big, leak) : board;
+  // G31 (RULES_MARK 9): what the case opened on tilts the heartbeat and the clock (storyTilt.js).
+  const tilt = getStoryTilt(run);
+  const tell = tilt?.tellError ?? 0;
+  const clock = tilt?.clock ?? 0;
+  return big || leak || tell || clock ? getOpenedBoard(board, big, leak, tell, clock) : board;
 }
 
-/** G23 크게 연다 and G27's trial, laid over the case's board; one object per board, as the other overlays keep. */
+/** G23 크게 연다, G27's trial and G31's tilt, laid over the case's board; one object per board, as the other overlays keep. */
 const openedBoards = new Map();
-function getOpenedBoard(board, big, leak) {
-  const key = `${big}:${leak}`;
+function getOpenedBoard(board, big, leak, tell = 0, clock = 0) {
+  const key = `${big}:${leak}:${tell}:${clock}`;
   if (!openedBoards.has(key)) openedBoards.set(key, new WeakMap());
   const boards = openedBoards.get(key);
   if (!boards.has(board)) {
@@ -735,6 +744,8 @@ function getOpenedBoard(board, big, leak) {
       ...board,
       ...(big ? { openBig: true, chipsScale: board.chipsScale * OPEN_BIG_CHIPS, wallMin: Math.min(board.wallMin, OPEN_BIG_WALL) } : null),
       ...(leak ? { chargeLeak: true } : null),
+      ...(tell ? { tellError: tell } : null),
+      ...(clock ? { seconds: board.seconds + clock } : null),
     });
   }
   return boards.get(board);
@@ -1331,6 +1342,9 @@ export function normalizeRunState(value) {
   run.schema = normalizeSchema(source.schema ?? BASE_SCHEMA);
   run.suspended = normalizeSuspendedWindow(source.suspended, run.windowIndex);
   run.open = normalizeCaseOpen(source.open);
+  // G34 (RULES_MARK 9): a payment made as the last case closed, carried to the next case's open snapshot; only ever written when set.
+  const paid = normalizePaid(source.paid);
+  if (paid) run.paid = paid;
   return run;
 }
 
@@ -1564,6 +1578,8 @@ export function normalizeRelicDraft(value) {
     offer: normalizeRelicIds(value.offer, RELIC_OFFER_SIZE),
     reroll: isRecord(value.reroll) ? { offer: normalizeRelicIds(value.reroll.offer, RELIC_OFFER_SIZE) } : null,
     extra: value.extra === true,
+    // G33: the side that handed the first card over, written only when one did.
+    ...(Object.hasOwn(HANDED_RELICS, value.side) ? { side: value.side } : {}),
     // G25: the tool this draft refined, written only when one was.
     ...(normalizeRelicIds([value.refine]).length ? { refine: normalizeRelicIds([value.refine])[0] } : {}),
     picked: normalizeRelicIds(value.picked, 2),
@@ -1588,23 +1604,28 @@ export const getRelicDraftCost = (draft, rules) => (draft?.reroll ? getRerollCos
  * `drawRelicOffer` deals from `pool` for `seed`, less the relics `owned`. No
  * draft when nothing is left to offer.
  */
-export function openRelicDraft(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
-  const offer = drawRelicOffer(seed, pool, owned);
+export function openRelicDraft(seed, pool = DEFAULT_RELIC_POOL, owned = [], side = null) {
+  const offer = drawRelicOffer(seed, pool, owned, side);
   if (!offer.length) return { relicOffer: [], relicDraft: null };
   return {
     relicOffer: offer,
-    relicDraft: normalizeRelicDraft({ seed: String(seed), pool: normalizeRelicIds(pool), owned, offer, reroll: null, extra: false, picked: [], cost: 0 }),
+    relicDraft: normalizeRelicDraft({ seed: String(seed), pool: normalizeRelicIds(pool), owned, offer, reroll: null, extra: false, picked: [], cost: 0, side }),
   };
 }
 
-/** Three relics for a closed case, seeded by its last window so a reload cannot reroll them. */
-export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = []) {
-  return normalizeRelicIds(pool)
+/**
+ * Three relics for a closed case, seeded by its last window so a reload cannot reroll them.
+ * G33 (RULES_MARK 9): with a `side`, the first is that side's tool first in the same order
+ * (`HANDED_RELICS`), when one is in the pool and not held; the other two as before.
+ */
+export function drawRelicOffer(seed, pool = DEFAULT_RELIC_POOL, owned = [], side = null) {
+  const order = normalizeRelicIds(pool)
     .filter((id) => !hasRelic(owned, id))
     .map((id) => ({ id, order: seededUnit(`relic:${seed}:${id}`) }))
     .sort((left, right) => left.order - right.order)
-    .slice(0, RELIC_OFFER_SIZE)
     .map((entry) => entry.id);
+  const handed = side ? order.find((id) => HANDED_RELICS[side]?.includes(id)) : undefined;
+  return (handed ? [handed, ...order.filter((id) => id !== handed)] : order).slice(0, RELIC_OFFER_SIZE);
 }
 
 const NO_STANCE_RULES = Object.freeze({ has: (id) => id !== "stance" });
@@ -1752,7 +1773,7 @@ export function rerollRelicOffer(run) {
   const draft = current.relicDraft;
   const cost = getRerollCost();
   if (!canSpendAtDraft(current) || draft.reroll || draft.picked.length || current.vault < cost) return current;
-  const offer = drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned);
+  const offer = drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned, draft.side ?? null);
   if (!offer.length) return current;
   return normalizeRunState({ ...payFromVault(current, cost, { ...draft, reroll: { offer } }), relicOffer: offer });
 }
@@ -1839,7 +1860,8 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
   // `caseId` and `resources` stamp the opening snapshot (`stampCaseOpen`, S3),
   // with the route it opened on and the board it held (F1 step 2); a caller
   // that names no case leaves the run with none.
-  return stampCaseOpen({
+  // G34: a payment carried from the case before goes onto this open snapshot, and off the run.
+  const { paid: _paid, ...stamped } = stampCaseOpen({
     ...current,
     // B2: a real case opens on the links the last one handed on; a replay on
     // none (it holds them above), and a story case lets them lapse.
@@ -1859,6 +1881,20 @@ export function openCaseRun(run, { replayOf = null, rules = ALL_RULES, caseId = 
       ? current.schema
       : applyPeak(applyRelics(applySeasonEscalation(applyStanceMastery(BASE_SCHEMA, current.stanceMastery, rules), getEscalationWindow(current)), current.relics, rules), rules), current.logic?.streak, rules),
   }, { caseId, resources, route, focusCarry: readFocusCarry(current) });
+  return stamped;
+}
+
+/**
+ * G34 보상금 (settlementPay.js): `run` with the case `offer` names paid off out
+ * of the vault, carried as `paid` to the next case's open snapshot. The same
+ * run when the vault cannot hold the price.
+ */
+export function payCaseHarm(run, offer) {
+  const current = normalizeRunState(run);
+  const paid = normalizePaid(offer);
+  if (!paid || current.vault < paid.cost) return current;
+  const vault = current.vault - paid.cost;
+  return normalizeRunState({ ...current, vault, handVault: Math.min(current.handVault, vault), seasonSpent: current.seasonSpent + paid.cost, lastChange: -paid.cost, paid });
 }
 
 /** G3: a board dealt with a streak that fills LOCK's cap has LOCK shut (`lockShut`); otherwise the board has no such key. */
@@ -2251,7 +2287,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   const practice = caseClosed ? current.practice : null;
   // AUDIT, in a case whose rules have it (auditRisk.js): null, or this window's step
   // and on the close the part of the vault's share and the hand's it takes.
-  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter, shield: shielded });
+  const audited = settleAudit({ run: current, rules, count: audit, busted: outcome === "bust", gauge, pushes: window?.pushes, closed: caseClosed && !practice, secured: runPotAfter, hand: runHandAfter, shield: shielded, tilt: getStoryTilt(current, rules)?.audit ?? 0 });
   const secured = caseClosed && !practice ? runPotAfter - (audited?.lost ?? 0) : 0;
   // IDLE MONEY (B4): on a season's own close under the week that has it, the
   // vault held through the case shrinks before the case's pot is banked. Not
@@ -2303,7 +2339,10 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // this window was written onto its log entry (useChoiceCommit) and goes.
   const drafted = practice
     ? { relicOffer: practice.relicOffer, relicDraft: practice.relicDraft }
-    : caseClosed && offerRelics && nextRules.has("relics") ? openRelicDraft(window?.seed ?? current.windowIndex, relicPool, relics) : { relicOffer: [], relicDraft: null };
+    : caseClosed && offerRelics && nextRules.has("relics")
+      // G33 (RULES_MARK 9): the side the case closed on hands one card over (relics.js `HANDED_RELICS`).
+      ? openRelicDraft(window?.seed ?? current.windowIndex, relicPool, relics, isMarkNineOn(rules) ? handedSideOf((logicOn ? streak.logic : current.logic).type) : null)
+      : { relicOffer: [], relicDraft: null };
   const relicOffer = drafted.relicOffer;
   const verdict = {
     outcome,
@@ -2780,6 +2819,8 @@ export function normalizeCaseOpen(value) {
     // G23: how the case was opened, written only once chosen. G25: the tools refined when it opened.
     ...(OPEN_WAYS.includes(value.opening) ? { opening: value.opening } : {}),
     ...(normalizeRelicIds(value.refined).length ? { refined: normalizeRelicIds(value.refined) } : {}),
+    // G34: what was paid off between the case before and this one (settlementPay.js), written only when something was.
+    ...(normalizePaid(value.paid) ? { paid: normalizePaid(value.paid) } : {}),
   };
 }
 

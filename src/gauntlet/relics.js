@@ -143,6 +143,21 @@ export const BREATHER = Object.freeze({
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
+/**
+ * G33 (게임성 개선점 4차, 「전부 1」 of 2026-11-25; RULES_MARK 9): one card of
+ * a draft is handed over by the side the case closed on -- the direction its
+ * logic hold kept (logicStreak.js), or the record when it kept none -- from
+ * that side's tools, by that side's person (a speaker's name, said in the
+ * page's language). The other two are drawn as before.
+ */
+export const HANDED_RELICS = Object.freeze({
+  people: Object.freeze(["testimony", "fieldNote", "insurance"]),
+  position: Object.freeze(["frontPage", "heatSink", "encore"]),
+  record: Object.freeze(["auditContact", "carbonCopy", "stethoscope"]),
+});
+export const HANDED_BY = Object.freeze({ people: "도윤하", position: "오진우", record: "이민서" });
+/** The side a case closed on, from its logic hold's direction (null: none held). */
+export const handedSideOf = (direction) => (Object.hasOwn(HANDED_RELICS, direction) && direction !== "record" ? direction : "record");
 /** Relics every season can draft without unlocking anything. */
 export const DEFAULT_RELIC_POOL = Object.freeze(RELIC_IDS.filter((id) => !RELICS[id].unlock));
 

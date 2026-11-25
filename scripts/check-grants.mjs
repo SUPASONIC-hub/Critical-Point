@@ -12,6 +12,7 @@ import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/
 import { createCaseClose, createRunSummary, normalizeCaseOpen, openCaseRun, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { LINK_CARRY_MAX, LINK_SPAN_MAX } from "../src/gauntlet/cascadeRisk.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
+import { PAY_HARM_MOST, PAY_LADDER } from "../src/gauntlet/settlementPay.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
@@ -1176,6 +1177,19 @@ withHeaders(null);
   await post("send a case row with 5 KB of dynamics", "playtest_sessions", withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, note: "x".repeat(4400) } }));
   await post("send a case row from a build before the snapshot", "playtest_sessions", withDynamics({ ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 }));
   await post("send a case row whose opening snapshot is null", "playtest_sessions", withDynamics({ ...honest.dynamics, open: null }));
+  // G34 보상금 (20261202000000): a payment the opening snapshot carries is one the ladder makes (settlementPay.js PAY_LADDER).
+  const paidOpen = (paid) => withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, paid } });
+  for (const cost of [PAY_LADDER[0], PAY_LADDER.at(-1)]) await post(`send a case row whose opening paid the case before off at ${cost}`, "playtest_sessions", paidOpen({ caseId: "case08", cost, harm: 33 }));
+  await post("send a case row whose opening paid nothing (null)", "playtest_sessions", paidOpen(null));
+  for (const [what, paid] of [
+    ["a price off the ladder", { caseId: "case08", cost: PAY_LADDER[0] + 1, harm: 33 }],
+    ["no harm", { caseId: "case08", cost: PAY_LADDER[0], harm: 0 }],
+    ["more harm than a payment wipes", { caseId: "case08", cost: PAY_LADDER[0], harm: PAY_HARM_MOST + 1 }],
+    ["a harm that is not whole", { caseId: "case08", cost: PAY_LADDER[0], harm: 2.5 }],
+    ["a price as a string", { caseId: "case08", cost: String(PAY_LADDER[0]), harm: 33 }],
+    ["no case", { cost: PAY_LADDER[0], harm: 33 }],
+    ["an array", []],
+  ]) await postRefused(`send a case row whose opening paid ${what}`, "playtest_sessions", paidOpen(paid), /invalid settlement pay/);
   for (const [what, patch] of [
     ["an opening snapshot that is an array", { open: [] }],
     ["an opening snapshot with no case", { open: { vault: 0 } }],

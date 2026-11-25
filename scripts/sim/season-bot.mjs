@@ -60,6 +60,7 @@ import {
   HAND_CAP,
   isShockDue,
   openCaseRun,
+  payCaseHarm,
   signCase,
   reduceWindow,
   rerollRelicOffer,
@@ -69,6 +70,7 @@ import {
 } from "../../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../../src/gauntlet/logicStreak.js";
 import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
+import { coverCase, readPayOffer } from "../../src/gauntlet/settlementPay.js";
 import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { countNarrows, countScouts, isMarkSevenOn, isNextOn, narrowTrustAt, scoutTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
@@ -183,7 +185,8 @@ export const ARCHETYPES = {
   // The rest of the population.
   random: { values: {}, noise: 100 },
   procedure: { values: { legitimacy: 1.2, trust: 0.2 }, noise: 3 },
-  money: { values: { capital: 1.2, time: 0.5 }, noise: 3 },
+  // G34 (RULES_MARK 9): money pays a case off as it closes, when its harm is `harm` or more and the vault holds `reserve` times the price.
+  money: { values: { capital: 1.2, time: 0.5 }, noise: 3, pays: { harm: 30, reserve: 2 } },
   balanced: { values: { trust: 0.5, legitimacy: 0.5, capital: 0.5, humanCost: 0.5, fatigue: 0.3, time: 0.3 }, noise: 4 },
   "min-risk": { minRisk: true, noise: 1 },
 };
@@ -535,6 +538,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     let skipped = 0;
     // AUDIT_ON only: the season's closes the audit took its part of, and what its closes moved.
     const audits = { caught: 0, lost: 0, secured: 0 };
+    // G34: the prices the season paid its covers at.
+    const covers = [];
     // B4, under WEEK_RULE=idle-erosion: what the closes took from the vault.
     let eroded = 0;
     const links = newLinkTally();
@@ -707,6 +712,13 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           caseResults[caseId] = summary;
           caseLogs[caseId] = log;
           caseDynamics[caseId] = { ...createRunSummary(run), ...createCaseClose(run), responseTimeSec };
+          // G34 보상금, as the result page offers it after the close's row is written, before the next case opens (settlementPay.js).
+          const pay = policy.pays ? readPayOffer({ caseId, caseResults, vault: run.vault, story: run.story === true, rules }) : null;
+          if (pay && pay.harm >= policy.pays.harm && run.vault >= pay.cost * policy.pays.reserve) {
+            caseResults[caseId] = coverCase(summary, pay);
+            run = payCaseHarm(run, pay);
+            covers.push(pay.cost);
+          }
           casePeaks.push(summary.peakRiskPressure);
           if (caseId === "final") final = { resources, log };
         }
@@ -717,7 +729,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
     // cases' burst scores (getSeasonScore), where it used to take the finale's.
     const strain = getSeasonStrain(caseResults);
     const ending = getEndingVariant({ resources: final.resources, discoveredClues, log: final.log, ...strain });
-    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, relicsAt, audits, links, eroded };
+    return { ending, policy, strain, discoveredClues, clues: discoveredClues.length, windows, skipped, casePeaks, final, caseResults, caseLogs, caseDynamics, logic: getSeasonLogic(caseResults), score: getSeasonScore(caseResults), relics: run.relics, relicsAt, audits, links, eroded, covers };
   }
 
   /**
@@ -894,14 +906,15 @@ export function createCaseBot({ windowsPerCase: WINDOWS_PER_CASE, card, sceneFor
    * windows are dealt from the far wall (`getTableSchema`), and a bust skips no
    * scene (useChoiceCommit). It is `true`, or the run the case opens from -- a
    * season far along, say. The rules a story run plays under are the caller's to
-   * pass, as everywhere here.
+   * pass, as everywhere here. `resources`, with `caseId`, is what the case opens
+   * on (`open.resources`): G31's tilt (storyTilt.js) reads it.
    */
-  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null, openAt = 0 } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
+  function playCase(caseIndex, decide, { pickType = null, logic = undefined, caseId = null, sign = null, openAt = 0, resources = null } = {}, relics = [], lock = null, caseRules = ALL_RULES, story = false) {
     const rules = playedRules(caseRules, { cascade: Boolean(links) });
     const linksOut = carry && carried.caseIndex === caseIndex - 1 && caseIndex % carry !== 0 ? carried.links : [];
     // G5's act twists (actTwists.js): caseId plays every board as that case's, sign signs it first (8막).
     // `openAt`: the season's window the case opens on (G16 draws 8막's name wall off it).
-    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}), ...(openAt ? { windowIndex: openAt } : {}) }, { rules, ...(caseId ? { caseId } : {}) });
+    let run = openCaseRun(story ? { relics, ...(story === true ? {} : story), story: true } : { relics, ...(logic ? { logic } : {}), linksOut, ...(WEEK_RULE ? { weekRule: WEEK_RULE } : {}), ...(openAt ? { windowIndex: openAt } : {}) }, { rules, ...(caseId ? { caseId } : {}), ...(resources ? { resources } : {}) });
     if (sign) run = signCase(run, sign);
     let audit = 0;
     // G2: the second looks this case has bought, and the 믿음 the hand may spend on looks in it (`decide.trustBudget`).

@@ -12,6 +12,7 @@ import { fill, speakerName } from "../locale.js";
 import briefingCopy from "../copy/briefing.js";
 import { pastPick, useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
+import { listStoryTilt } from "./storyTilt.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
@@ -178,6 +179,7 @@ export function SceneBriefing({
   const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
+  const tilt = listStoryTilt(run);
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
   // clock; above it, on a NEW GAME+ season's first page of a case, what the
   // season before left there (`echo`, an object of two lines: secondSeason.js).
@@ -361,6 +363,12 @@ export function SceneBriefing({
             {/* A lead the balloon carries is not told twice. */}
             {told.lead && !speech.fromLead && <p className="gx-caption gx-caption-lead"><Prose text={told.lead} /></p>}
             <ProseCaptions text={told.text} who={node.speakerName ?? node.speaker} whoAt={speech.whoAt} />
+            {/* G31: what the case opened on does to its tables, one line on its first page. */}
+            {tilt.length > 0 && (
+              <p className="gx-caption gx-caption-tilt" data-testid="briefing-tilt">
+                {tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ")}
+              </p>
+            )}
           </div>
 
           {(told.memo?.length > 0 || trace) && (

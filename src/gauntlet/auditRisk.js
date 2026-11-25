@@ -138,10 +138,12 @@ export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT }) {
  * audit; else the count after this window (`count` is the case's before it)
  * and, when the window closes a case that pays (`closed`), the judgement.
  */
-export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false }) {
+export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false, tilt = 0 }) {
   if (!isAuditOn(run, rules)) return null;
   const after = addAudit(count, shieldStep(auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }), shield));
-  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit: getAuditLimit(run.relics) }) : { caught: false, lost: 0, handLost: 0 }) };
+  // G31 (RULES_MARK 9): `tilt`, what the case's 정당성 does to the limit (storyTilt.js), as the case's rules say.
+  const limit = getAuditLimit(run.relics) + tilt;
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
 /**
@@ -163,11 +165,11 @@ export function findAudit(before, after) {
  * (`gx-at-risk`) one short of the limit; `spoken` is the reading for the 확정
  * button's description.
  */
-export function readAudit(run, count, win) {
+export function readAudit(run, count, win, tilt = 0) {
   if (!run || count == null) return null;
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
-  const limit = getAuditLimit(run.relics);
+  const limit = getAuditLimit(run.relics) + tilt;
   const reading = { count: now, limit, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= limit - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
 }

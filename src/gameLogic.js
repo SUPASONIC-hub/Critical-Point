@@ -593,8 +593,10 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
   const collapse = seasonStanding.readCollapseTally(summaries);
   const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
   const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
+  // G34: every cover takes COVER_LEGITIMACY off the season's 공정함 (seasonStanding.js).
+  const covered = (key) => (key === "legitimacy" ? collapse.seasonCovers * seasonStanding.COVER_LEGITIMACY : 0);
   const seasonResources = closings.length
-    ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0)))]))
+    ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0))) - covered(key)]))
     : null;
   return {
     casesPlayed: collapse.casesPlayed,
@@ -606,6 +608,7 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
     ),
     seasonResources,
     seasonHumanCost: collapse.seasonHumanCost,
+    seasonCovers: collapse.seasonCovers,
     peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
     seasonBusts: collapse.seasonBusts,
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
@@ -662,6 +665,7 @@ export function getEndingVariant({
   sustainedPressure,
   seasonReframeRoutes,
   seasonResources = null,
+  seasonCovers = 0,
 } = {}) {
   // A caller that still passes only the old six fields (a report built before
   // `getSeasonStrain` moved here) reads as a whole season with the last case
@@ -684,7 +688,7 @@ export function getEndingVariant({
   if (cause) return { ...ENDINGS.collapse, cause: { id: cause, harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
 
   const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= COLD_GAP;
-  const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST;
+  const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST + seasonCovers * seasonStanding.COVER_SILENCE_TRUST;
   const pact = trust - legitimacy >= PACT_GAP;
   // Burning every record closes the endings made of records. What is left is
   // what the season valued, or a quiet it bought by burning.
@@ -709,7 +713,7 @@ export function getEndingVariant({
   if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS["profitable-silence"];
   if (pact) return ENDINGS["field-pact"];
-  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE) return ENDINGS["quiet-cover"];
+  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
   return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
 }
 
@@ -1047,6 +1051,7 @@ export function createCaseSummary(
     // read off them all (getSeasonScore), and a replay keeps its first close's.
     cognitionMix: scoring.getCognitionMix(entries),
     ...(replayOf ? { firstCognitionMix: replayOf.firstCognitionMix ?? replayOf.cognitionMix ?? null } : {}),
+    ...(replayOf?.covered ? { covered: replayOf.covered } : {}), // G34: a cover paid stays paid through a replay
     // The slowest table clock any decision of the case was played on, when the
     // comfort setting slowed it; absent on a case played at the table's pace.
     ...(assistTime > 1 ? { assistTime } : {}),

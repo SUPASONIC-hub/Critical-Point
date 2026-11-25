@@ -24,6 +24,13 @@ export default {
   rankCarryNote: "Depending on this rank, the next case starts with a little extra Trust and Fairness, or with Fatigue. ",
   rankNote: "Rank isn’t about right answers. It compares the conditions where your thinking rose most precisely.",
   titleRise: "Your record title is now {title}.",
+  cover: {
+    offer: "Compensation {cost} · wipes this Case's human cost {harm}",
+    pay: "Pay compensation",
+    short: "Not enough in the account",
+    record: "Covered record +1 · Fairness −1 · the next one costs 1.5×",
+    paid: "Paid {cost} · human cost {harm} wiped · covered records {covers}",
+  },
   actProgress: "Act {act} · {pos}/{size} · mid-season tally in {left}",
   actProgressHere: "Act {act} · {pos}/{size} · mid-season tally below",
   leaveLine: {

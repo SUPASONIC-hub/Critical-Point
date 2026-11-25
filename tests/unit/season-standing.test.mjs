@@ -235,7 +235,7 @@ test("summaries from before a field existed, and holes, add nothing", () => {
   const caseResults = { [CASE_SEQUENCE[0]]: { finalHumanCost: 12 }, [CASE_SEQUENCE[1]]: null, [CASE_SEQUENCE[2]]: { pushRecord: { busts: 2 } }, [CASE_SEQUENCE[3]]: { finalHumanCost: "8", pushRecord: { cashes: 3 } } };
   assert.equal(readClosedCases(caseResults).length, 3);
   assert.equal(readClosedCases().length, 0);
-  assert.deepEqual(readCollapseTally(), { casesPlayed: 0, seasonWindows: 0, seasonHumanCost: 0, seasonBusts: 0 });
+  assert.deepEqual(readCollapseTally(), { casesPlayed: 0, seasonWindows: 0, seasonHumanCost: 0, seasonCovers: 0, seasonBusts: 0 });
   const { standing } = assertAgrees({ caseResults });
   assert.deepEqual([standing.casesClosed, standing.harm.total, standing.overreach.busts, standing.overreach.windows], [3, 20, 2, 5]);
   assert.deepEqual(readCollapseGate(), { cases: CASE_SEQUENCE.length, harmTotal: 0, harm: 0, bustRate: 0, over: { harm: false, overreachHarm: false, bustRate: false }, cause: null });

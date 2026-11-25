@@ -6,6 +6,7 @@ import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
+import { isMarkNineOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -148,6 +149,10 @@ let doorCouldMove = 0;
 // wild-card hands; it reads the seasons and draws nothing.
 const funnelRows = [];
 const dump = [];
+// G33: which archetype each season above was, beside its tools (`populationBuilds`).
+const populationArchetypes = [];
+// G34: the prices each season above paid its covers at (season-bot.mjs `pays`: money only).
+const populationCovers = [];
 // the audit on (AUDIT=0 turns it off) (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
 const auditTally = { seasons: 0, caught: 0, lost: 0, secured: 0 };
 // the links on (CASCADE=0 turns them off) (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
@@ -165,6 +170,8 @@ for (let index = 0; index < SEASONS; index += 1) {
   const season = playSeason(index, archetype, false, seen.watch);
   populationSeen.push(seen);
   populationBuilds.push(season.relics);
+  populationArchetypes.push(archetype);
+  populationCovers.push(season.covers ?? []);
   populationHeldAt.push(season.relicsAt ?? {});
   if (season.audits.caught > 0) auditTally.seasons += 1;
   for (const key of ["caught", "lost", "secured"]) auditTally[key] += season.audits[key];
@@ -254,6 +261,25 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+/**
+ * G33 (RULES_MARK 9): the side a case closed on hands one draft card over, so
+ * what a season holds at its end follows how it played. Each archetype's
+ * most-held tool, over its seasons; under 9 at least HANDED_SPLIT of them differ.
+ */
+const HANDED_SPLIT = 3;
+{
+  const tops = [...new Set(POPULATION)].map((name) => {
+    const held = new Map();
+    populationBuilds.forEach((relics, index) => {
+      if (populationArchetypes[index] === name) for (const id of relics) held.set(id, (held.get(id) ?? 0) + 1);
+    });
+    const [top, seasons] = [...held.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] ?? ["(none)", 0];
+    return [name, top, seasons];
+  });
+  const distinct = new Set(tops.map(([, top]) => top)).size;
+  console.log(`Most-held tool by archetype (G33, measured): ${tops.map(([name, top, seasons]) => `${name} ${top} (${seasons})`).join(", ")}; ${distinct} different`);
+  if (isMarkNineOn() && !process.env.ENDING_BASELINE) assert.ok(distinct >= HANDED_SPLIT, `G33: the archetypes' most-held tools split ${distinct} ways, under ${HANDED_SPLIT}`);
+}
 // WEEK_RULE (season-bot.mjs): every season above and below was a season begun in that week.
 if (WEEK_RULE) console.log(`Week rule (measured): every season under ${WEEK_RULE}, values ${WEEK_VALUES}`);
 /**
@@ -325,6 +351,15 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   const archetypeNames = [...new Set(POPULATION)];
   const collapseOf = (name) => `${name} ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%`;
   console.log(`Collapse by archetype (measured, the ${SEASONS} seasons above, ${POPULATION.length} population slots, random in 2): ${archetypeNames.map(collapseOf).join(", ")}; all ${(share(counts, "collapse", SEASONS) * 100).toFixed(1)}%`);
+  // G34 보상금 (RULES_MARK 9): the archetypes that pay (season-bot.mjs `pays`), how often and at what share of their vault.
+  const payers = archetypeNames.filter((name) => ARCHETYPES[name]?.pays);
+  for (const name of payers) {
+    const seasons = populationCovers.filter((_, index) => populationArchetypes[index] === name);
+    const covers = seasons.map((list) => list.length);
+    const spent = seasons.map((list) => list.reduce((sum, cost) => sum + cost, 0));
+    console.log(`Covers (G34, measured) ${name}: ${fiveNumbers(covers)} a season (mean ${(covers.reduce((a, b) => a + b, 0) / Math.max(1, covers.length)).toFixed(1)}), paid ${fiveNumbers(spent)}; collapse ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%, profitable-silence ${(share(byArchetype[name], "profitable-silence", archetypeTotal(name)) * 100).toFixed(1)}%`);
+    if (isMarkNineOn() && !process.env.ENDING_BASELINE) assert.ok(covers.some((count) => count > 0), `G34: ${name} paid no case off in ${seasons.length} seasons`);
+  }
   const BOARD_PAIRS = Number(process.env.ENDING_BOARD_SEASONS) || POPULATION.length * 40;
   const boards = createSeasonBot({ seed: 20261022, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[`${name}+blind`, { ...base, board: "blind" }], [`${name}+listens`, { ...base, board: "listens" }]])) });
   const tally = () => ({ pairs: 0, moved: 0, collapseMoved: 0, blindCollapse: 0, listensCollapse: 0, blindBusts: 0, listensBusts: 0 });
