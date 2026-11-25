@@ -118,3 +118,64 @@ export const BREATH_WALL = 3;
 /** G15 (11-20, 게임성 개선점 Q9 (1)): after a BUST at this heat or over, 숨 고르기 cools this much instead. */
 export const BREATH_HOT_FROM = 60;
 export const BREATH_HOT_GAUGE = 14;
+
+/* ------------------------------------------- RULES_MARK 7 (11-30 묶음) */
+
+/**
+ * G11b·c, G13, G16 and G18 (게임성 개선점 2026-11-20, the user's 「1 나눠서 두
+ * 번」): rules that ship with the wipe of 2026-11-30 as RULES_MARK 7. A row is
+ * rechecked under them only when its mark is `RULES_SEVEN_MARK` or later
+ * (rankingRecheck.js `getRowRules`), so a row of 5 or 6 is played again as it
+ * was. They ride on the next rules: a set that plays the old ones plays none
+ * of these either. `SEVEN_RULE` in a set plays them, `BEFORE_SEVEN_RULE` the
+ * rules of RULES_MARK 6, and a set with neither what this page plays.
+ * `RULES_MARK7=0` turns them off in a script (check:pressure's before and after).
+ */
+export const RULES_SEVEN_MARK = 7;
+export const SEVEN_RULE = "mark7";
+export const BEFORE_SEVEN_RULE = "before7";
+
+/** Whether this page (or this script) plays RULES_MARK 7's rules: `RULES_MARK7=0` turns them off in a script. */
+export function wantsMarkSeven(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK7 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+export const sevenByDefault = () => (sevenByDefault.value ??= wantsMarkSeven());
+
+/** Whether `rules` plays RULES_MARK 7's rules (and so the next rules too). */
+export function isMarkSevenOn(rules) {
+  if (!isNextOn(rules)) return false;
+  if (rules?.has?.(BEFORE_SEVEN_RULE)) return false;
+  if (rules?.has?.(SEVEN_RULE)) return true;
+  return sevenByDefault();
+}
+
+const sevenSets = new WeakMap();
+const beforeSevenSets = new WeakMap();
+/** `rules` playing RULES_MARK 7's rules (`on`) or those of 6; the same set back when it already does. */
+export function withMarkSeven(rules, on = sevenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkSevenOn(rules) === Boolean(on) || (on && !isNextOn(rules))) return rules;
+  const mark = on ? SEVEN_RULE : BEFORE_SEVEN_RULE;
+  const drop = on ? BEFORE_SEVEN_RULE : SEVEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? sevenSets : beforeSevenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G13 첫 조회 사다리: the 믿음 the case's nth first look costs (n from 0):
+ * 1, 1, 1, 2, 2, 3, 3, ... The first three at today's price (SCOUT_TRUST),
+ * then one more every two, as G2 did for the second look.
+ */
+export const scoutTrustAt = (count) => {
+  const n = Math.max(0, Math.trunc(Number(count) || 0));
+  return n < 3 ? 1 : 2 + Math.floor((n - 3) / 2);
+};
+
+/** How many first looks a case's log has bought (each entry's `threshold.scouted`). */
+export function countScouts(log = []) {
+  return (Array.isArray(log) ? log : []).filter((entry) => entry?.threshold?.scouted === true).length;
+}

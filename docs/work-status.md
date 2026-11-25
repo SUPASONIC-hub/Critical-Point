@@ -1829,6 +1829,10 @@ Still open, on purpose:
     `season-final` only and keeps the `final` case rows, or snapshots the
     finished count first, and moves `LAST_RANKING_RESET` there to its own
     merge time; point check:grants' newest reset at the new file too.
+    From 11-30 on a reset keeps the mark unless the rules change and is named
+    by its day (`*_ranking_reset_<MMDD>.sql`); check:grants replays the newest
+    such file (`DATED_RESET`). The day's order is under Database Deployment,
+    "11-30 당일 순서".
 71. Plain language is a check, not a habit. `npm run check:plain-language`
     bans the Japanese-era loan vocabulary from every file that carries player
     copy, and requires every glossary term (191) to carry a plain explanation
@@ -2451,6 +2455,43 @@ Manual steps after pushing the 2026-09-28 migrations:
   governs the local stack.
 - Expect the public ranking to be empty: season rows the new rules would refuse
   were deleted.
+
+### 11-30 당일 순서 (묶음 R, 랭킹 비움 + 개편)
+
+묶음 R은 draft PR 「묶음 R 뼈대 (11-30 랭킹 비움)」 하나에 모은다. 마이그레이션
+`20261130000000_ranking_reset_1130.sql`은 병합 1분 안에 적용되므로 11-30 전에는
+병합하지 않는다. 비움은 우선순위 70의 규칙대로 `season-final` 행만 지우고
+`final` 사건 행은 남긴다.
+
+1. ~~11-23(월) 결정 T~~ → **11-19에 닫음**(사용자 Q4 (1)): `report-decision-t.mjs --fetch`
+   (run 44453002577)에서 끝난 시즌 0/30·사건 행 87/150·BUST 판 55/100·W47 0/80, 판단할
+   줄 0. 이용자가 적어 11-23에도 같으므로 「바꿈 없음」.
+2. ~~11-24~11-29 숫자 채움~~ → `[SLOT DECISION-T]`에 「바꿈 없음」을 적었다(서버 문장 없음). RULES_MARK는 11-17에 5로 올렸다(`[SLOT RULES_MARK]` 채움):
+   N26(#591)이 주간 규칙 없는 시즌의 사건 09·11·14·16에 「이번 사건만」 규칙을
+   깔아 채점이 바뀌기 때문이다. 마이그레이션은 `>= 5`를 요구하고, check:grants의
+   `SERVER_MARK`는 그 파일의 `>= N`을 읽는다. verify-ranking-rows.mjs의 `DB_MARKS`는
+   검사기의 글자 표시라 이 숫자와 상관없다. 기기 안 로컬 랭킹 키는 v12 그대로다(Q2).
+   명예의 전당 본 판은 `table-5`로 새로 시작하고 `table-4`는 남는다.
+3. **N18·N21 합치기**: 프롤로그 02 규칙 나누기(N18)와 첫 BUST 장면 유지(N21)의 draft
+   갈래를 묶음 R 갈래에 병합한다(충돌은 표시된 부분만 고친다). main 따라가기는
+   병합 직전에 한 번만 한다. 그 뒤 `npm run check:grants`, `npm test`,
+   `npm run check:changed`를 돌리고, `e2e` 라벨이 붙은 CI가 초록인지 본다.
+4. **11-30(월) 비움 전 숫자 남기기**: 병합 전에 Funnel 워크플로를 한 번 돌려
+   (`gh workflow run funnel.yml`) 요약을 `..\cp-archive\메모-20261130\`에 남긴다.
+   완주 수와 `season-final` 행 수가 들어 있어야 한다. 마이그레이션의 `raise notice`는
+   두 번째 사본이다.
+5. **병합**: scripts/report-funnel.mjs의 `LAST_RANKING_RESET`을 실제 병합 예정 시각
+   +1분으로 고치고 push한다. 갈래가 main보다 뒤처지지 않았는지 확인하고 손으로
+   병합한다(`--auto` 금지). 마이그레이션이 먼저 적용되고(병합 커밋의 「Supabase Preview」
+   체크), 클라이언트는 약 15분 뒤 Verify·Deploy로 따라온다. 실제 병합 시각이 예정과
+   어긋나면 `LAST_RANKING_RESET`만 고치는 한 줄 PR을 따로 낸다.
+6. **확인**: `gh workflow run migration-drift.yml`을 돌려 초록인지, 열린 drift 이슈가
+   없는지 본다. 공개 랭킹은 0행, 명예의 전당 표는 그대로, 시작 화면 예고는
+   11-30이 끝나면 저절로 사라진다(`rankingResetNoticeAt`).
+7. **알림**: 게시판에 비움과 개편이 끝났다는 글을 올리고, README 새 소식 한 줄을 쓴다.
+8. **12-01(화)부터 운영 모드**: 배포는 화·금에만 한다(docs/ops-mode.md, #559).
+   다음 비움은 분기 첫 월요일이고, 그때도 `*_ranking_reset_<MMDD>.sql` 이름으로
+   만든다. check:grants는 이름이 가장 늦은 파일을 재생한다.
 
 ## Looked at and left
 

@@ -8,6 +8,7 @@ import {
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
+  getNameWall,
   getRerollCost,
   getWindowBand,
   HAND_CAP,
@@ -18,9 +19,10 @@ import {
   rerollRelicOffer,
   resolveWindow,
   STANCE_CHARGE,
+  stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { isNextOn } from "../src/gauntlet/nextTableRules.js";
+import { isNextOn, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -44,7 +46,9 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * - a bust changes what the next window is, not just what the score is;
  * - a bust skips the next scene, which shortens the case. That must never be a
  *   shortcut: busting on purpose to reach the case's end sooner has to bank far
- *   less than playing the table;
+ *   less than playing the table. 프롤로그 01 and 02 are the exception that cannot be
+ *   one (N21, 11-30): there a bust keeps the scene, so it shortens nothing and
+ *   is the pot lost alone (caseRoutes.js `keepsSceneOnBust`);
  * - the logic streak is a hand skill, not a second instrument: a hand that
  *   holds one direction (사람 or 자리; a thinking type until C-3, 2026-10-25)
  *   busts exactly as often as one whose card leans neither way, is paid more
@@ -179,6 +183,7 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
   let mutated = 0;
   let nextTableRules = 0;
   let played = 0;
+  let trustSpent = 0;
   const seen = newSeen();
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
     // A hand that plays for the streak carries it from case to case for a
@@ -195,6 +200,7 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     mutated += result.mutatedAfterBust;
     nextTableRules += result.nextTableRules;
     played += result.played;
+    trustSpent += result.trustSpent ?? 0;
     addSeen(seen, result.seen);
   }
   return {
@@ -210,6 +216,8 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     meanBonus: Number((paid.bonus / Math.max(1, paid.cashed)).toFixed(3)),
     capShare: Number((paid.capped / Math.max(1, paid.cashed)).toFixed(3)),
     best: paid.best,
+    // The 믿음 a case's looks cost (RULES_MARK 7's G13 rows).
+    meanTrust: Number((trustSpent / cases).toFixed(1)),
     // For the measurements at the end of this file; no row above reads it.
     seen,
   };
@@ -1192,6 +1200,76 @@ function reportActTwists({ pct, listening, G_CASES }) {
   }
 }
 /**
+ * RULES_MARK 7 (2026-11-30, with the wipe; 게임성 개선점 2026-11-20, the
+ * user's 「1 나눠서 두 번」): each item played under the rules of 6 (`SIX`) and
+ * of 7 (`SEVEN`) on the same seeded cases. Printed for the record (the notes'
+ * targets are read off the rows); asserted is only what each rule must do.
+ * (played only with `node scripts/report-gauntlet-loop.mjs --compare`)
+ *
+ * G11b  each act's heartbeat-hand vault against the acts' mean (target ±15%;
+ *       3, 5 and 7's numbers are 11-25's, which G11b leaves as they are).
+ * G11c  tools that pay on one cash together pay RELIC_BOOST_CAP at most: a
+ *       hand holding tools banks no more than before, a hand with none the same.
+ * G13   the first look's price climbs 1, 1, 1, 2, 2, 3 in a case: for the
+ *       same 믿음 budget a case, the scouting hand looks on fewer boards.
+ * G16   8막's 「이름만」 wall drawn for each case, 1 to 3: some hand's best
+ *       answer turns on the wall its case drew (the board is the page's, so
+ *       the rows are 7's; 6 was −2, the middle row).
+ * G18   a LOCK press on 7막's hearing and SHORT CLOCK takes LOCK_DRAG of the
+ *       clock: charging there pays less against not charging than it did, and
+ *       a plain board charges as before.
+ */
+function reportMarkSeven({ pct, listening, G_CASES, bestMargin }) {
+  const SIX = withMarkSeven(ALL_RULES, false);
+  const SEVEN = withMarkSeven(ALL_RULES, true);
+  const pair = (label, decide, { relics = [], lock = null, twist = null } = {}) => ({
+    label,
+    six: measure(`${label} (6)`, decide, null, relics, G_CASES, lock, SIX, false, twist),
+    seven: measure(`${label} (7)`, decide, null, relics, G_CASES, lock, SEVEN, false, twist),
+  });
+  const change = (row) => pct(row.seven.meanVault / Math.max(1, row.six.meanVault) - 1);
+  // G11b: one case of each act, the heartbeat hand, no tools; 8막 signs with conditions (not choosing).
+  const acts = [[1, "case05"], [2, "case10"], [3, "case15"], [4, "case22"], [5, "case27"], [6, "case33"], [7, "case40"], [8, "case48"]]
+    .map(([act, caseId]) => [act, measure(`act ${act}`, listening, null, [], G_CASES, null, SEVEN, false, { caseId })]);
+  const actMean = acts.reduce((sum, [, row]) => sum + row.meanVault, 0) / acts.length;
+  console.log(`mark7 G11b 막별 heartbeat ${acts.map(([act, row]) => `${act}막 ${row.meanVault} (${pct(row.meanVault / actMean - 1)})`).join("  ")}  mean ${Math.round(actMean)}`);
+  // G11c: tool hands whose conditions can meet on one cash.
+  const tools = [["none", []], ["heatSink+frontPage", ["heatSink", "frontPage"]], ["coldBlood+heatSink+stethoscope", ["coldBlood", "heatSink", "stethoscope"]], ["auditContact+encore+testimony", ["auditContact", "encore", "testimony"]]]
+    .map(([label, relics]) => pair(label, listening, { relics }));
+  for (const row of tools) console.log(`mark7 G11c 도구 겹침 ${row.label.padEnd(30)} vault ${row.six.meanVault} -> ${row.seven.meanVault} (${change(row)})`);
+  assert.equal(tools[0].seven.meanVault, tools[0].six.meanVault, "G11c: a hand with no tool is not touched");
+  for (const row of tools) assert.ok(row.seven.meanVault <= row.six.meanVault, `G11c: the cap only ever cuts (${row.label})`);
+  // G13: the scouting hand (the best margin above), with a 믿음 budget for its first looks a case.
+  const scouting = (budget) => Object.assign((win) => (win.scouted ? win.gauge + win.schema.stepMax - bestMargin < getWindowBand(win).wallMin : listening(win)), { scout: true, ...(budget ? { scoutBudget: budget } : {}) });
+  const looks = [0, 12, 9, 7].map((budget) => pair(`budget ${budget || "none"}`, scouting(budget)));
+  const share = (row) => row.seen.scouts / Math.max(1, row.meanWindows * G_CASES);
+  for (const row of looks) console.log(`mark7 G13 첫 조회 ${row.label.padEnd(12)} looked on ${pct(share(row.six))} -> ${pct(share(row.seven))} of boards  믿음 ${row.six.meanTrust} -> ${row.seven.meanTrust}/case  vault ${row.six.meanVault} -> ${row.seven.meanVault}`);
+  assert.ok(looks[0].seven.meanTrust > looks[0].six.meanTrust, "G13: the same looks cost more 믿음 past the third");
+  assert.ok(share(looks[2].seven) < share(looks[2].six), "G13: for the same budget the hand looks on fewer boards");
+  // G16: 사건 48 opened on a window that draws each wall (getNameWall), by name and with conditions.
+  const opens = {};
+  for (let at = 0; at < 200 && Object.keys(opens).length < 3; at += 1) opens[getNameWall(stampCaseOpen(normalizeRunState({ windowIndex: at }), { caseId: "case48" }))] ??= at;
+  const flips = [];
+  for (const [label, decide] of [["heartbeat", listening], ["heat 40", (win) => win.gauge < 40], ["heat 50", (win) => win.gauge < 50], ["heat 60", (win) => win.gauge < 60]]) {
+    const terms = measure(`${label}, conditions`, decide, null, [], G_CASES, null, SEVEN, false, { caseId: "case48", sign: "terms" });
+    const named = [1, 2, 3].map((wall) => [wall, measure(`${label}, name only −${wall}`, decide, null, [], G_CASES, null, SEVEN, false, { caseId: "case48", sign: "name", openAt: opens[wall] })]);
+    const answers = named.map(([, row]) => (row.meanVault >= terms.meanVault ? "name" : "conditions"));
+    if (new Set(answers).size > 1) flips.push(label);
+    console.log(`mark7 G16 8막 서명 ${label.padEnd(10)} conditions ${terms.meanVault}  ${named.map(([wall, row], index) => `name −${wall} ${row.meanVault} (bust ${pct(row.bustRate)}) ${answers[index]}`).join("  ")}`);
+  }
+  assert.ok(flips.length > 0, "G16: some hand's best answer turns on the wall its case drew");
+  // G18: STRIKE charged before the first push against no charge, on the short clocks and a plain case.
+  for (const [label, caseId] of [["7막 청문회", "case40"], ["SHORT CLOCK 사건 09", "case09"], ["plain 사건 20", "case20"]]) {
+    const none = pair(`${label}, no charge`, listening, { twist: { caseId } });
+    const strike = pair(`${label}, STRIKE`, listening, { twist: { caseId }, lock: { mode: "strike" } });
+    const ratio = (key) => strike[key].meanVault / Math.max(1, none[key].meanVault);
+    console.log(`mark7 G18 LOCK 충전 ${label.padEnd(18)} no charge ${none.six.meanVault} -> ${none.seven.meanVault}  STRIKE ${strike.six.meanVault} -> ${strike.seven.meanVault} (bust ${pct(strike.six.bustRate)} -> ${pct(strike.seven.bustRate)})  charge pays ×${ratio("six").toFixed(2)} -> ×${ratio("seven").toFixed(2)}`);
+    if (caseId === "case20") assert.equal(strike.seven.meanVault, strike.six.meanVault, "G18: a plain board charges as before");
+    else assert.ok(ratio("seven") < ratio("six"), `G18: charging on ${label} pays less against not charging`);
+  }
+}
+
+/**
  * G1·G2·G3·G6·G7 (the next rules, 2026-11-19 「전부 1」): every choice has
  * more than one good answer. Played only with the next rules on (RULES_NEXT=0
  * plays the old ones, where these do not hold: that is what they changed).
@@ -1288,6 +1366,8 @@ if (NEXT_ON) {
   assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < 0.02, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
   // Only on `--compare`: 22 more measures of 500 cases, kept out of the default run under CI's 480-second cap.
   if (process.argv.includes("--compare")) reportActTwists({ pct, listening, G_CASES });
+  // Only on `--compare` too: RULES_MARK 7's rows, each item under the rules of 6 and of 7.
+  if (process.argv.includes("--compare")) reportMarkSeven({ pct, listening, G_CASES, bestMargin: Number(bestScout.label.split("margin ")[1]) });
 }
 
 // WEEK_RULE (season-bot.mjs): every case above was played under that week's rule.

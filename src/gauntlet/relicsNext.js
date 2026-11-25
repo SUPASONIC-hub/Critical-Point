@@ -49,11 +49,28 @@ export const RELIC_BOOSTS = Object.freeze({
   kineticGrip: Object.freeze({ boost: 1.2, when: (cash) => cash.focusMode === "strike" && cash.focusCharged }),
 });
 
-/** The tools whose condition held on this cash, and the product of their boosts. */
-export function readRelicBoost(relics, cash) {
+/**
+ * G11c (RULES_MARK 7, 2026-11-30): the most the tools' boosts may multiply one
+ * cash's pot together. They multiplied without end, so a season's end that held
+ * three tools whose conditions met (HEAT SINK, COLD BLOOD and FRONT PAGE on one
+ * hot board after a bust) paid ×3.68 and the vault of every tool ran ×2.17 the
+ * vault of none (게임성 개선점 G11).
+ */
+export const RELIC_BOOST_CAP = 1.6;
+
+/**
+ * The tools whose condition held on this cash, and the product of their boosts.
+ * Under RULES_MARK 7 (`cap`, RELIC_BOOST_CAP) two or more that held together pay
+ * no more than the cap, or than the biggest of them alone where that is more
+ * (AUDIT CONTACT ×1.8, COLD BLOOD ×2): a second tool never takes from the first.
+ * `capped` when the cap cut the product.
+ */
+export function readRelicBoost(relics, cash, cap = Infinity) {
   const held = Array.isArray(relics) ? relics : [];
   const fired = held.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && RELIC_BOOSTS[id].when(cash));
-  return { fired, factor: fired.reduce((product, id) => product * RELIC_BOOSTS[id].boost, 1) };
+  const product = fired.reduce((total, id) => total * RELIC_BOOSTS[id].boost, 1);
+  const most = fired.length > 1 ? Math.max(cap, ...fired.map((id) => RELIC_BOOSTS[id].boost)) : Infinity;
+  return product > most ? { fired, factor: most, capped: true } : { fired, factor: product };
 }
 
 /** What the draft costs under the next rules: the reroll 1,500 (was 4,000); one more stays 12,000, once a season. */

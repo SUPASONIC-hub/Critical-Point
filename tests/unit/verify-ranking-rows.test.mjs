@@ -419,6 +419,14 @@ test("the report says where the chain broke and what it did not check", () => {
   const rows = chainedRows();
   rows[20].dynamics.vault = rows[19].dynamics.vault - 1;
   rows.splice(40, 1);
+  // The ranking row's scores are the mean of the case rows it is read with, so
+  // they follow the gap: only the chain is broken here. Until N18's OVERCLOCK
+  // step (2026-11-17) the seeded season's case 40 happened to leave the
+  // rounded mean where it was, and the test leaned on that.
+  // The ranking row as the rows left say it: only the chain is broken here (a gap
+  // whose case scored off the season's mean moved it, which the bot's season decides).
+  const ranking = rows.find((row) => row.case_id === "season-final");
+  ranking.summary = { ...ranking.summary, ...getSeasonScore(Object.fromEntries(rows.filter((row) => row !== ranking).map((row) => [row.case_id, row.summary]))) };
   const report = formatReport(verifyRows(rows)).join("\n");
   assert.match(report, /chain: broken, 54 cases, 53 links read {2}marks: chain-off-log/);
   // Not replayed: the scores' line shows the scores' marks, the chain's line the chain's.

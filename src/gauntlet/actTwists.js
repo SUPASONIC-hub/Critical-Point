@@ -89,6 +89,16 @@ export const SIGN_NAME_CHIPS = 1.25;
 export const SIGN_NAME_WALL = 2;
 export const SIGN_TERMS_WALL = 3;
 export const SIGN_TERMS_CHIPS = 0.9;
+/**
+ * G16 (RULES_MARK 7, 2026-11-30): 「이름만」's wall is drawn for each case,
+ * SIGN_NAME_WALL_LOW to SIGN_NAME_WALL_HIGH closer, and shown before the
+ * choice; the season's last signature (`SIGN_LAST_CASE`) is always the
+ * highest. One hand gave every one of the four cases the same answer (게임성
+ * 개선점 G16), so the choice made once was the choice for the act.
+ */
+export const SIGN_NAME_WALL_LOW = 1;
+export const SIGN_NAME_WALL_HIGH = 3;
+export const SIGN_LAST_CASE = "case49";
 
 /** 8막 실명 서명: the two ways to sign, as the board's numbers move (weeklyRules.js `weekRuleOverlay`). Not choosing is `terms`. */
 export const SIGN_WAYS = Object.freeze({

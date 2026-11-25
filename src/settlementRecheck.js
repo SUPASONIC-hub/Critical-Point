@@ -123,6 +123,8 @@ function recheckResources(entry, index, card, breaks, unchecked) {
     narrowed: threshold.narrowed === true,
     // G2: the price the next rules charged this case's nth second look, as the entry logged it.
     ...(Number.isFinite(threshold.narrowTrust) ? { narrowTrust: threshold.narrowTrust } : {}),
+    // G13: the price RULES_MARK 7 charged this case's nth first look, as the entry logged it.
+    ...(Number.isFinite(threshold.scoutTrust) ? { scoutTrust: threshold.scoutTrust } : {}),
   });
   if (!sameEffect(price, priced)) breaks.push({ entry: index, field: "riskRewardEffect", expected: price, found: priced });
 }
