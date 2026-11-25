@@ -946,6 +946,16 @@ Still open, on purpose:
   combined check, still unmerged: 2480 unit tests, grants, pressure, endings
   and bundle checks; the one failing BUST
   test moved to case 07, where no pot is kept, and the four changed specs then ran 117 passed, 1 skipped.
+- 2026-11-25 (the user): ops mode is dropped before it starts. Every day
+  deploys as now (a green PR merges by 18:50 that day); no Tuesday/Friday
+  deploy days and no quarter-first-Monday window for ranking wipes and rule
+  numbers, nor its 14-day notice: a change merges when it is ready (bundle
+  R's wipe moves to 11-26). The same day: no Season notice (a ready side
+  story opens at once), no note release dates (a written note goes out at
+  once), and operational data verdicts (decision T and the like) wait
+  until the user sets a date. `scripts/ops-calendar.mjs` keeps only the
+  weekly rule calendar's weeks left for the Funnel summary; `--merge`, the
+  deploy days and the quarter days are gone (`docs/ops-mode.md`).
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
   (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
@@ -1831,7 +1841,7 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
     The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
     from its `final` case row as well, since the reset takes the ranking row:
-    every reset (11-30's included, and the quarterly ones after it) deletes
+    every reset (11-30's included, and any later one) deletes
     `season-final` only and keeps the `final` case rows, or snapshots the
     finished count first, and moves `LAST_RANKING_RESET` there to its own
     merge time; point check:grants' newest reset at the new file too.
