@@ -1250,9 +1250,9 @@ draft에서 e2e가 필요하면 `gh workflow run Verify --ref <갈래>`로 그 �
    main의 마지막 커밋이 45일을 넘으면 경고하고, `Workflow Keepalive`(매달 1일 10:20 KST,
    `scripts/workflow-keepalive.mjs`)가 비활성으로 꺼진 워크플로만 `gh workflow enable`로 다시 켭니다(손으로 끈 것은 그대로,
    main에 빈 커밋을 만들지 않음).
-   **운영 모드**(2026-12-01부터, [docs/ops-mode.md](docs/ops-mode.md)): 화면·규칙·서버가 바뀌는 병합은 화·금만,
-   랭킹 비움과 규칙 숫자 변경은 분기 첫 월요일만입니다. `node scripts/ops-calendar.mjs --merge`가 오늘 병합해도 되는지 답하고,
-   `Funnel` 요약의 「운영 달력」 절이 다음 배포일·다음 비움 가능일·주간 규칙 달력의 남은 주를 적습니다(6주 밑이면 경고).
+   **운영 규칙**([docs/ops-mode.md](docs/ops-mode.md), 2026-11-25): 매일 배포합니다. 검사가 초록인 PR은 18:50까지 그날 병합하고,
+   랭킹 비움과 규칙 숫자 변경도 정해 둔 날 없이 준비되면 병합합니다.
+   `Funnel` 요약의 「운영 달력」 절이 주간 규칙 달력의 남은 주를 적습니다(6주 밑이면 경고).
    **로컬 백업**: 랭킹(`public_rankings`)·명예의 전당·`cloud_saves`를 주인 PC에만 JSON으로 받습니다. 워크플로로
    돌리지 않습니다(공개 저장소의 아티팩트는 누구나 받습니다). PowerShell에서
    `$env:SUPABASE_URL="https://<ref>.supabase.co"; $env:SUPABASE_SERVICE_ROLE_KEY="<서비스 롤 키>"; node scripts/backup-local.mjs`

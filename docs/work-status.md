@@ -947,6 +947,16 @@ Still open, on purpose:
   combined check, still unmerged: 2480 unit tests, grants, pressure, endings
   and bundle checks; the one failing BUST
   test moved to case 07, where no pot is kept, and the four changed specs then ran 117 passed, 1 skipped.
+- 2026-11-25 (the user): ops mode is dropped before it starts. Every day
+  deploys as now (a green PR merges by 18:50 that day); no Tuesday/Friday
+  deploy days and no quarter-first-Monday window for ranking wipes and rule
+  numbers, nor its 14-day notice: a change merges when it is ready (bundle
+  R's wipe moves to 11-26). The same day: no Season notice (a ready side
+  story opens at once), no note release dates (a written note goes out at
+  once), and operational data verdicts (decision T and the like) wait
+  until the user sets a date. `scripts/ops-calendar.mjs` keeps only the
+  weekly rule calendar's weeks left for the Funnel summary; `--merge`, the
+  deploy days and the quarter days are gone (`docs/ops-mode.md`).
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the nine written side cases
   no longer wait for a closed finale. Each entry of `SIDE_CASES`
@@ -1826,11 +1836,11 @@ Still open, on purpose:
     it removes or rewrites any row but the `season-final` ones.
     The funnel (`scripts/report-funnel.mjs`, N15) counts a finished season
     from its `final` case row as well, since the reset takes the ranking row:
-    every reset (11-30's included, and the quarterly ones after it) deletes
+    every reset (11-26's included, moved up from 11-30, and any later one) deletes
     `season-final` only and keeps the `final` case rows, or snapshots the
     finished count first, and moves `LAST_RANKING_RESET` there to its own
     merge time; point check:grants' newest reset at the new file too.
-    From 11-30 on a reset keeps the mark unless the rules change and is named
+    From 11-26 on a reset keeps the mark unless the rules change and is named
     by its day (`*_ranking_reset_<MMDD>.sql`); check:grants replays the newest
     such file (`DATED_RESET`). The day's order is under Database Deployment,
     "11-30 당일 순서".
@@ -2497,8 +2507,8 @@ Manual steps after pushing the 2026-09-28 migrations:
    없는지 본다. 공개 랭킹은 0행, 명예의 전당 표는 그대로, 시작 화면 예고는
    11-26이 끝나면 저절로 사라진다(`rankingResetNoticeAt`).
 7. **알림**: 게시판에 비움과 개편이 끝났다는 글을 올리고, README 새 소식 한 줄을 쓴다.
-8. **12-01(화)부터 운영 모드**: 배포는 화·금에만 한다(docs/ops-mode.md, #559).
-   다음 비움은 분기 첫 월요일이고, 그때도 `*_ranking_reset_<MMDD>.sql` 이름으로
+8. ~~12-01(화)부터 운영 모드~~ → 11-25 사용자 결정으로 없앰(#671): 매일 배포 그대로(docs/ops-mode.md).
+   다음 비움도 `*_ranking_reset_<MMDD>.sql` 이름으로
    만든다. check:grants는 이름이 가장 늦은 파일을 재생한다.
 
 ## Looked at and left
