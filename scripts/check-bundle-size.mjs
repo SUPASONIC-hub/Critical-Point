@@ -217,7 +217,8 @@ const budgets = [
   // +92 / +10: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // 166,256 / 61,999 -> 166,256 / 62,010 on 2026-11-23: this chunk's size moves with the day's notes (hashed imports). Largest of 26 note days, plus Linux's 4 and the plus 4.
   // 166,256 / 62,010 -> 166,291 / 62,010 story-g37 over main ffa6139b (G37: the season strain says whether a case was played in story mode). Measured 166,287 / - (over budget only) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_291, maxGzip: 62_010 },
+  // 166,291 / 62,010 -> 166,291 / 62,031 story-g37 over main c967db59 (#669 Season open, #670 notes all on 11-25): the hashed imports moved. Measured - / 62,027 in CI verify-quick, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 166_291, maxGzip: 62_031 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
