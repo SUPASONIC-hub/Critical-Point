@@ -776,8 +776,8 @@ const budgets = [
   // start screen's three notes no longer change every two or three days. The days left are 11-25 and the three notes held for
   // bundle R (12-20, 12-26, 2027-01-13), so "largest of 26 note days" became the largest of those four: 225,769 / 82,458 in CI
   // verify-quick (11-25), 225,771 / 82,437 locally on 12-20 (Windows; plus Linux's 4 for the raw), the plus 4.
-  // 225,779 / 82,462 -> 225,779 / 82,479 bundle-r-early (bundle R, 11-26, over main 169a06b6): 82,471 gzip in CI verify-quick
-  // and on Windows (11-25), the largest of every notes day 11-25..01-28 (the three notes held for bundle R go out on 11-26 and
+  // 225,779 / 82,462 -> 225,779 / 82,479 bundle-r-early (bundle R, 11-25, over main 169a06b6): 82,471 gzip in CI verify-quick
+  // and on Windows (11-25), the largest of every notes day 11-25..01-28 (the three notes held for bundle R go out on 11-25 and
   // make it smaller), the plus 8. Raw 225,769, inside.
   { pattern: /^index-.*\.js$/, maxBytes: 225_779, maxGzip: 82_479 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
@@ -1612,7 +1612,9 @@ const budgets = [
   // 57,927 / 21,728 -> 57,927 / 21,781 on 2026-11-20 (world-news, CI 실측 over main 028766e6). Measured - / 21777 (over budget only) in the e2e build, the plus 4.
   // 60,090 / 22,537 -> 60,090 / 22,591 #635 1178f9fe over main 78be3bd4. Measured - / 22587 (over budget only) in CI verify-quick, the plus 4.
   // 60,090 / 22,591 -> 61,319 / 23,064 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 61315 / 23060 in CI verify-quick, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 61_342, maxGzip: 23_064 },
+  // BUNDLE R EARLY 2026-11-25 over main c967db59 (#669): gzip 23,068 in CI verify-quick (the hashed names it imports moved); it
+  // moves by 2 over the notes days (Windows, 11-25..01-28), so the plus 2 and the plus 8.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 61_342, maxGzip: 23_078 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2368,7 +2370,7 @@ const budgets = [
   // 174,157 / 62,173 -> 174,563 / 62,316 gameplay-mark7 over main 7b45eff7 (d53cd369). Measured 174559 / 62312 in CI verify-quick, the plus 4.
   // +746 / +308: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
   // DRYRUN 1123: larger of both sides until the merged build is measured.
-  // BUNDLE R EARLY 2026-11-25: the start screen's notice says "Thursday, November 26" (was "Monday, November 30"): gzip 62,675 in CI and on Windows, the same on every notes day, the plus 4.
+  // BUNDLE R EARLY 2026-11-25: the start screen's notice says "Wednesday, November 25" (was "Monday, November 30"): gzip 62,675 in CI and on Windows, the same on every notes day, the plus 4.
   { pattern: /^locale-en-index-.*\.js$/, maxBytes: 175_527, maxGzip: 62_679 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.

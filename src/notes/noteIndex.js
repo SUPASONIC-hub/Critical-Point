@@ -101,7 +101,7 @@ export const NOTES = [
   },
   {
     slug: "reframe-wild-card",
-    published: "2026-11-26",
+    published: "2026-11-25",
     title: "「판 바꾸기」 와일드카드 언제 쓰나",
     summary: "글 상자에서 카드 한 장이 된 「판을 다시 짠다」의 규칙과 값, 그리고 가상의 판 세 개로 따라가 보는 거는 때와 참는 때.",
   },
@@ -119,7 +119,7 @@ export const NOTES = [
   },
   {
     slug: "weekly-rules-table",
-    published: "2026-11-26",
+    published: "2026-11-25",
     title: "주간 규칙별 대응표: 바뀌는 숫자와 하지 말 것",
     summary: "그 주에만 서는 여섯 규칙이 무슨 숫자를 바꾸는지, 측정으로 확인한 하지 말 것과 함께 한 표로 모았습니다.",
   },
@@ -161,7 +161,7 @@ export const NOTES = [
   },
   {
     slug: "choosing-tools",
-    published: "2026-11-26",
+    published: "2026-11-25",
     title: "도구 고르기: 조건 붙은 열두 도구와 다시 뽑기",
     summary: "어느 도구가 센가보다 내가 어디서 확정하는가. 손마다 달라지는 도구의 값을 측정 숫자로 따라가 봅니다.",
   },

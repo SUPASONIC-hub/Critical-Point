@@ -50,7 +50,7 @@ export const RELIC_BOOSTS = Object.freeze({
 });
 
 /**
- * G11c (RULES_MARK 7, 2026-11-26): the most the tools' boosts may multiply one
+ * G11c (RULES_MARK 7, 2026-11-25): the most the tools' boosts may multiply one
  * cash's pot together. They multiplied without end, so a season's end that held
  * three tools whose conditions met (HEAT SINK, COLD BLOOD and FRONT PAGE on one
  * hot board after a bust) paid ×3.68 and the vault of every tool ran ×2.17 the

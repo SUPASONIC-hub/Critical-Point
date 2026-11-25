@@ -1,5 +1,5 @@
 -- Part of the reset bundle R (N18, the owner's answer of 2026-11-16, (1)),
--- merged with the ranking reset on 11-26 (moved up from 11-30). A `.sql` dated
+-- merged with the ranking reset on 11-25 (moved up from 11-30). A `.sql` dated
 -- after the last migration on main, beside the reset (20261130000000).
 --
 -- N18: prologue 02 opens two rules, the logic combo and BLACKOUT, where it
