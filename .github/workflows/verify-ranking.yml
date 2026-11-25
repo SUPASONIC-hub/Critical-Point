@@ -59,11 +59,11 @@ name: Verify Ranking
 # --per-board; a candidate is read every night, read before or not, within
 # the same `cap`). Right after the marks, one read-only SELECT counts each
 # board's seasons with no mark over the whole board (hall_of_fame_counts: the
-# threshold of ten is not counted within the rows read), and from the same
+# threshold of five is not counted within the rows read), and from the same
 # check of the same rows (src/hallOfFame.js, verify-ranking-rows
 # --hall-of-fame-sql) one statement calls hall_of_fame_settle
 # (*_hall_of_fame.sql) with each board's first three clean, checked seasons;
-# it counts again itself and refuses a place below ten. The check is not run
+# it counts again itself and refuses a place below five. The check is not run
 # twice, so what was checked and what is posted cannot differ. Then a job of
 # its own, the only one with `contents: write`, reads the public view and
 # force-pushes one commit with the page to the `hall-of-fame` branch, an

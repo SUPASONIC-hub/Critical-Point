@@ -140,7 +140,7 @@ test("R scouts the wall: the band narrows to 20, then to 14, the clock pays 3 se
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
   // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price (B1: 믿음 1 and the clock).
-  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1과 시간 3초$/);
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1 · 시간 3초$/);
   await expect(scout).toHaveAttribute("aria-disabled", "false");
   const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
   const [low, high] = await bandOf();
@@ -440,8 +440,9 @@ test("a save that holds a locked card as its bet still settles", { tag: "@once" 
 
 test("an untouched window that runs out cannot be replayed by reloading under the slam", { tag: "@once" }, async ({ page }) => {
   test.setTimeout(120_000);
-  // The shortest clock a board can carry, so the test waits twelve seconds, not forty-five.
-  await openBrokenBoard(page, "case01", "start", { schema: { seconds: 12 } });
+  // The shortest clock a board can carry, so the test waits twelve seconds, not
+  // forty-five. 사건 05 is where SILENCE opens (N18), which the end reads.
+  await openBrokenBoard(page, "case05", CASE_START_NODES.case05, { schema: { seconds: 12 } });
   const fresh = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(fresh.dynamics?.openSeed ?? null, "reading alone is not a touch").toBeNull();
 
@@ -638,7 +639,10 @@ const STAGED_STEPS = [
   { caseId: "case01", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case02", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case03", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
-  { caseId: "case04", on: WHOLE, lines: 0 },
+  // AFTERSHOCK and SILENCE (N18), a line each; 사건 06 is the first with nothing new.
+  { caseId: "case04", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case06", on: WHOLE, lines: 0 },
 ];
 
 /** A scene's briefing page, with the table behind it still shut. */

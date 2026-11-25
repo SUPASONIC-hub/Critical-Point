@@ -42,7 +42,7 @@ const relicsCopy = {
     // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
     spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
     // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
-    spendHintNext: "하나 더는 시즌에 한 번. 다시 뽑기는 싸다: 셋이 약하면 다시 뽑아라.",
+    spendHintNext: "하나 더는 시즌에 한 번. 다시 뽑기는 싸다: 셋이 약하면 다시 뽑아라. 한 판에 도구가 겹쳐도 판돈 배수는 합쳐 {cap}배까지다(혼자 더 큰 도구는 그 값).",
     secondTitle: "하나 더 고르기",
     secondLede: "산 도구 하나를 남은 두 개 중에서 고른다.",
     off: {
