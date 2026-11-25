@@ -284,7 +284,8 @@ const budgets = [
   // 38,372 / 14,895 -> 38,502 / 14,954 gameplay-mark8 (RULES_MARK 8: G19~G27) over 77a3b6ee: the budget plus this branch's growth (+130 / +59), so the largest-note-day room stays.
   // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
   // 38,689 / 15,019 -> 38,914 / 15,109 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 38,910 / 15,105 plus 4. CI re-measures.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_914, maxGzip: 15_109 },
+  // 38,914 / 15,109 -> 38,938 / 15,126: storyOpenTrust (G37's open question at 83). Measured 38,934 / 15,122, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_938, maxGzip: 15_126 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
