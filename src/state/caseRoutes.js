@@ -102,7 +102,7 @@ export function getReframeTarget(caseId, fromNodeId) {
 
 /**
  * The cases where a bust costs the stake and not the scene (N21, the owner's
- * answer of 2026-11-16, (1), for the reset of 11-30): 프롤로그 01 and 02,
+ * answer of 2026-11-16, (1), for the reset of 11-26): 프롤로그 01 and 02,
  * the first ten minutes, where a player who has just begun the story lost
  * the next scene to their first bust. The caller asks before
  * `getBlackoutSkip`, as it asks whether the run is a story run.

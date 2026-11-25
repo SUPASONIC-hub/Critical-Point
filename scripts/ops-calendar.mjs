@@ -111,7 +111,7 @@ export function isQuarterResetDay(day) {
 /**
  * The next day the ranking may be wiped, on or after `ms`, and the day the
  * game would start telling of it. Ops mode's first one is 2027-01-04: the
- * 11-30 wipe (RANKING_RESET_MS) is the last one off the quarter days.
+ * 11-26 wipe (RANKING_RESET_MS, moved up from 11-30) is the last one off the quarter days.
  */
 export function nextQuarterReset(ms) {
   const today = kstDay(ms);

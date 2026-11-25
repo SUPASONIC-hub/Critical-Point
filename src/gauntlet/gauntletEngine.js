@@ -2526,7 +2526,7 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 7 (2026-11-30, with
+ * The mark of a case closed at the table of RULES_MARK 7 (2026-11-26, with
  * the wipe of that day: G11b·c, G13, G16 and G18 of the gameplay notes of
  * 11-20, the user's 「1 나눠서 두 번」; nextTableRules.js `isMarkSevenOn` plays
  * them for a row marked 7 or later only). 6 was 2026-11-25: G5's
@@ -2535,7 +2535,7 @@ export function createTableRecord(log = []) {
  * user's answer 「1」 of 11-19: G1 to G7, the next table rules of
  * src/gauntlet/rulesNext.js, and N26, #591: 사건 09, 11, 14 and 16 deal a rule
  * of their own for that case in a season with no weekly rule, so the same play
- * scores differently). It ships before the wipe of 2026-11-30, which keeps its
+ * scores differently). It ships before the wipe of 2026-11-26, which keeps its
  * announced day: until then the server still ranks seasons from 4 up, and
  * that wipe asks for 7 (*_ranking_reset_1130.sql).
  * 4 was C-3 and C-4 (the user's answers of 2026-10-25: the logic streak held
@@ -2544,7 +2544,7 @@ export function createTableRecord(log = []) {
  * rules of the table from 프롤로그 04, 2 the day-ten table of 2026-10-20.
  * Every run summary carries it, so every case row carries it as `dynamics`,
  * and the server ranks no season with a case row below it
- * (*_ranking_reset_1130.sql, the wipe of 2026-11-30; the one wipe of
+ * (*_ranking_reset_1130.sql, the wipe of 2026-11-26; the one wipe of
  * 2026-11-12, *_ranking_reset_rules_mark4_relic_draft.sql, asked for 4,
  * 20261020010000 for 2, and the reset of 20261011010000 read `logicStreak`
  * the same way). Raise the number, never reuse it, when the table changes

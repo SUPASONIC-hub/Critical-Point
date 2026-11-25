@@ -47,7 +47,7 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * - a bust skips the next scene, which shortens the case. That must never be a
  *   shortcut: busting on purpose to reach the case's end sooner has to bank far
  *   less than playing the table. 프롤로그 01 and 02 are the exception that cannot be
- *   one (N21, 11-30): there a bust keeps the scene, so it shortens nothing and
+ *   one (N21, 11-26): there a bust keeps the scene, so it shortens nothing and
  *   is the pot lost alone (caseRoutes.js `keepsSceneOnBust`);
  * - the logic streak is a hand skill, not a second instrument: a hand that
  *   holds one direction (사람 or 자리; a thinking type until C-3, 2026-10-25)
@@ -1200,7 +1200,7 @@ function reportActTwists({ pct, listening, G_CASES }) {
   }
 }
 /**
- * RULES_MARK 7 (2026-11-30, with the wipe; 게임성 개선점 2026-11-20, the
+ * RULES_MARK 7 (2026-11-26, with the wipe; 게임성 개선점 2026-11-20, the
  * user's 「1 나눠서 두 번」): each item played under the rules of 6 (`SIX`) and
  * of 7 (`SEVEN`) on the same seeded cases. Printed for the record (the notes'
  * targets are read off the rows); asserted is only what each rule must do.

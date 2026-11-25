@@ -1,6 +1,6 @@
--- DRAFT for the 11-30 reset bundle (N18, the owner's answer of 2026-11-16,
--- (1)); not applied while it ends in `.sql.draft`. The bundle renames it to a
--- `.sql` dated after the last migration on main, beside RULES_MARK 5's reset.
+-- Part of the reset bundle R (N18, the owner's answer of 2026-11-16, (1)),
+-- merged with the ranking reset on 11-26 (moved up from 11-30). A `.sql` dated
+-- after the last migration on main, beside the reset (20261130000000).
 --
 -- N18: prologue 02 opens two rules, the logic combo and BLACKOUT, where it
 -- opened four; AFTERSHOCK opens in case 04 and SILENCE in case 05. The ladder

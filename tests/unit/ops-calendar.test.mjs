@@ -45,7 +45,7 @@ test("every day deploys before ops mode, Tuesday and Friday after it", () => {
   assert.equal(nextDeployDay(Number.NaN), null);
 });
 
-test("a scheduled wipe is the first Monday of a quarter, and 11-30 is the last one off it", () => {
+test("a scheduled wipe is the first Monday of a quarter, and 11-26 is the last one off it", () => {
   assert.equal(quarterResetDay(2027, 0), "2027-01-04");
   assert.equal(quarterResetDay(2027, 1), "2027-04-05");
   assert.equal(quarterResetDay(2027, 2), "2027-07-05");
@@ -58,9 +58,9 @@ test("a scheduled wipe is the first Monday of a quarter, and 11-30 is the last o
   assert.deepEqual(nextQuarterReset(kst("2026-11-16T10:00:00")), { day: "2027-01-04", noticeFrom: "2026-12-21" });
   assert.deepEqual(nextQuarterReset(kst("2027-01-05T10:00:00")), { day: "2027-04-05", noticeFrom: "2027-03-22" });
   assert.equal(nextQuarterReset(Number.NaN), null);
-  // The rule the start screen's notice reads: a wipe after 11-30 is a quarter day.
+  // The rule the start screen's notice reads: a wipe after 11-26 (moved up from 11-30 on 11-25) is a quarter day.
   const resetDay = kstDay(RANKING_RESET_MS);
-  assert.ok(resetDay === "2026-11-30" || isQuarterResetDay(resetDay), `RANKING_RESET_MS ${resetDay} is not the first Monday of a quarter`);
+  assert.ok(resetDay === "2026-11-26" || isQuarterResetDay(resetDay), `RANKING_RESET_MS ${resetDay} is not the first Monday of a quarter`);
 });
 
 test("the calendar counts its booked weeks and warns under six", () => {

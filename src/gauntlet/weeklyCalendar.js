@@ -140,15 +140,17 @@ export function weekHasNews(ms, calendar = WEEKLY_RULES, days = 7) {
 }
 
 /**
- * The last unscheduled ranking wipe (결정 T, N10): 2026-11-30, Monday 00:00
- * KST. The start screen says so from two weeks before (11-16 00:00 KST) to
+ * The last unscheduled ranking wipe (결정 T, N10): 2026-11-26, Thursday 00:00
+ * KST (moved up from Monday 11-30 on 11-25, the owner's answer 2: bundle R
+ * merges as soon as it is ready). The start screen says so from two weeks
+ * before (11-12 00:00 KST; it first showed on 11-16 with the 11-30 day) to
  * the end of that day, read off the weekly clock, so a test build (held on a
  * January week) never shows it.
  */
-export const RANKING_RESET_MS = Date.parse("2026-11-30T00:00:00+09:00");
+export const RANKING_RESET_MS = Date.parse("2026-11-26T00:00:00+09:00");
 export const RANKING_RESET_NOTICE_DAYS = 14;
 
-/** Whether the start screen tells of the 11-30 ranking wipe at `ms`. */
+/** Whether the start screen tells of the 11-26 ranking wipe at `ms`. */
 export function rankingResetNoticeAt(ms) {
   const at = Number(ms);
   return Number.isFinite(at) && at >= RANKING_RESET_MS - RANKING_RESET_NOTICE_DAYS * DAY_MS && at < RANKING_RESET_MS + DAY_MS;

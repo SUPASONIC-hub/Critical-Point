@@ -119,11 +119,11 @@ export const BREATH_WALL = 3;
 export const BREATH_HOT_FROM = 60;
 export const BREATH_HOT_GAUGE = 14;
 
-/* ------------------------------------------- RULES_MARK 7 (11-30 묶음) */
+/* ------------------------------------------- RULES_MARK 7 (11-26 묶음) */
 
 /**
  * G11b·c, G13, G16 and G18 (게임성 개선점 2026-11-20, the user's 「1 나눠서 두
- * 번」): rules that ship with the wipe of 2026-11-30 as RULES_MARK 7. A row is
+ * 번」): rules that ship with the wipe of 2026-11-26 as RULES_MARK 7. A row is
  * rechecked under them only when its mark is `RULES_SEVEN_MARK` or later
  * (rankingRecheck.js `getRowRules`), so a row of 5 or 6 is played again as it
  * was. They ride on the next rules: a set that plays the old ones plays none
