@@ -34,6 +34,12 @@ export const NOTES = [
     summary: "현금, 받을 돈, 줄 돈, 계약서, 사람. 사흘 안에 무엇부터 확인하는지, 그리고 「실사」라는 낱말 하나를 두고 우리가 한 일.",
   },
   {
+    slug: "why-weekly-rules",
+    published: "2026-11-25",
+    title: "주간 규칙을 만든 이유와 첫 달 결과",
+    summary: "버린 아이디어에서 나온 네 원칙, 두 번 미루고 거둔 시험 주, 그리고 첫 달에 숫자 대신 고치기를 고른 이유입니다.",
+  },
+  {
     slug: "two-income-statements",
     published: "2026-11-27",
     title: "손익계산서 두 장을 나란히 읽는 법",
@@ -116,12 +122,6 @@ export const NOTES = [
     published: "2026-12-26",
     title: "주간 규칙별 대응표: 바뀌는 숫자와 하지 말 것",
     summary: "그 주에만 서는 여섯 규칙이 무슨 숫자를 바꾸는지, 측정으로 확인한 하지 말 것과 함께 한 표로 모았습니다.",
-  },
-  {
-    slug: "why-weekly-rules",
-    published: "2026-12-28",
-    title: "주간 규칙을 만든 이유와 첫 달 결과: 숫자보다 고치기 먼저",
-    summary: "버린 아이디어에서 나온 네 원칙, 두 번 미루고 거둔 시험 주, 그리고 첫 달에 숫자 대신 고치기를 고른 이유입니다.",
   },
   {
     slug: "reading-the-report",
