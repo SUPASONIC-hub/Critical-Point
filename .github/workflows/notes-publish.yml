@@ -1,7 +1,8 @@
 name: Notes Publish
 
-# The notes (/notes/, scripts/content-pages/notes.mjs) go out a few a week, each
-# on its own day: a build writes only the notes whose day (`published` in
+# The notes (/notes/, scripts/content-pages/notes.mjs) go out on their day,
+# several on one day when they are ready together (since 2026-11-25, the
+# owner's 「2」: no schedule): a build writes only the notes whose day (`published` in
 # src/notes/noteIndex.js, KST) has come. A note dated for a day with no merge
 # would wait for the next deploy, so just after midnight in Seoul this asks
 # whether a note's day is today and, if one is, presses Deploy for the tip of
@@ -12,8 +13,9 @@ name: Notes Publish
 # next night, and this presses again (scripts/notes-publish-due.mjs). On every
 # other day it does nothing.
 #
-# Why the notes are spread out: cp-archive/메모-20261120/adsense-2차-분석.md
-# (4-2), the owner's decision 2026-11-20 「전부 1」. No new secret: the run's
+# Why the notes exist: cp-archive/메모-20261120/adsense-2차-분석.md (4-2), the
+# owner's decision 2026-11-20 「전부 1」. A note still dated ahead waits on code
+# that has not shipped yet; this presses on its day. No new secret: the run's
 # own GITHUB_TOKEN with `actions: write`, which a workflow_dispatch may be
 # started with.
 

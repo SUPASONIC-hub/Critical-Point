@@ -16,7 +16,8 @@ import { breadcrumbStructuredData, structuredDataTag } from "../structured-data.
  * `>` quotes and `|` tables, and nothing else (`markdownToHtml`). Its title,
  * summary and day are in src/notes/noteIndex.js, which the start screen reads
  * too. A build writes the notes whose day has come by `day` (KST), so the
- * notes go out a few a week as dated, without anyone pressing anything but a
+ * notes go out as dated (several on one day when they are ready together;
+ * the owner's 「2」 of 2026-11-25), without anyone pressing anything but a
  * build (.github/workflows/notes-publish.yml).
  *
  * Every note shows the day it went out (and the day it changed, if it did)
@@ -79,7 +80,7 @@ export function bylineOf(note) {
 
 const LIST_INTRO = [
   "노트는 임계점을 만드는 우리 두 사람이 직접 쓰는 글입니다. 게임 속 사건이 기대고 있는 금융 이야기, 테이블을 설계하며 잰 숫자와 버린 안, 처음 하는 사람을 위한 안내를 한 편씩 올립니다.",
-  "사건의 결말이나 반전은 쓰지 않습니다. 사건 이야기는 사건 파일 페이지에 공개된 첫 장면까지만 다룹니다. 새 글은 한 주에 서너 편씩, 한국어로 먼저 올립니다.",
+  "사건의 결말이나 반전은 쓰지 않습니다. 사건 이야기는 사건 파일 페이지에 공개된 첫 장면까지만 다룹니다. 새 글은 준비되는 대로 한국어로 먼저 올립니다.",
 ];
 
 const NOTE_STYLE = `
