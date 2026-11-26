@@ -286,8 +286,8 @@ const budgets = [
   // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
   // 38,689 / 15,019 -> 38,914 / 15,109 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 38,910 / 15,105 plus 4. CI re-measures.
   // 38,914 / 15,109 -> 38,938 / 15,126: storyOpenTrust (G37's open question at 83). Measured 38,934 / 15,122, the plus 4.
-  // 38,938 / 15,126 -> 39,334 / 15,317 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 39_334, maxGzip: 15_317 },
+  // 38,938 / 15,126 -> 39,567 / 15,422 gameplay-g5b (G38 (1): 결말 평균의 유지비까지) (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 39_567, maxGzip: 15_422 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
