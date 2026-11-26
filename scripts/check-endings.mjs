@@ -511,6 +511,9 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * 결재 판; its other tables are cashed at heat 70 as the page cashes them
  * (storyAutoCash.js). `by hand` is how many tables a season played itself;
  * STORY_PLAY_ALL=1 plays them all by hand, as 「판 모두 직접 치기」 does.
+ * Cashed at 70 the tables raise a season's trust (mean 71.7 -> 75.4 on 600),
+ * so G37's two gates moved again: the cold gap 10 -> 9 and storyOpenTrust
+ * 83 -> 87 (quiet cover 0.5% -> 3.0%, cold 2.7% -> 3.2% on the sim's 600).
  *
  * Played after everything above, on the same seeded stream, so the seasons
  * above are the ones they always were.
