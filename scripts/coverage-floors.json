@@ -59,6 +59,7 @@
     "src/gauntlet/speakerLine.js": 100,
     "src/gauntlet/stakeClock.js": 100,
     "src/gauntlet/stakeLayers.js": 100,
+    "src/gauntlet/storyAutoCash.js": 100,
     "src/gauntlet/storyTilt.js": 100,
     "src/gauntlet/tableAfterword.js": 100,
     "src/gauntlet/tableMeters.js": 100,

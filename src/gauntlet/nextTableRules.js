@@ -1,4 +1,5 @@
 import { rulesNextOn, rulesTrialOn } from "./rulesNext.js";
+import { HOT_CASH_MULTIPLIER } from "./tableRules.js";
 
 /**
  * G1·G2·G3·G6·G7 (2026-11-19, 「전부 1」): the numbers of the next table rules
@@ -304,6 +305,62 @@ export function readEdgeCash(win) {
 export function withEdgeBonus(boost, edge) {
   return edge ? boost.factor * EDGE_CASH_BONUS : boost.factor;
 }
+
+/* ------------------------------------------------------ RULES_MARK 10 */
+
+/**
+ * G40, G41 and G42 (게임성 개선점 5차, the user's 「전부 1」 of 2026-11-26):
+ * rules that ship as RULES_MARK 10. A row is rechecked under them only when
+ * its mark is `RULES_TEN_MARK` or later (rankingRecheck.js `getRowRules`), so
+ * a row of 5 to 9 is played again as it was. They ride on RULES_MARK 9's: a
+ * set that plays those off plays none of these. `TEN_RULE` in a set plays
+ * them, `BEFORE_TEN_RULE` the rules of 9, and a set with neither what this
+ * page plays. `RULES_MARK10=0` turns them off in a script.
+ */
+export const RULES_TEN_MARK = 10;
+export const TEN_RULE = "mark10";
+export const BEFORE_TEN_RULE = "before10";
+
+/** Whether this page (or this script) plays RULES_MARK 10's rules: `RULES_MARK10=0` turns them off in a script. */
+export function wantsMarkTen(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK10 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let tenChoice;
+export const tenByDefault = () => (tenChoice ??= wantsMarkTen());
+
+/** Whether `rules` plays RULES_MARK 10's rules (and so 9's too). */
+export function isMarkTenOn(rules) {
+  if (!isMarkNineOn(rules)) return false;
+  if (rules?.has?.(BEFORE_TEN_RULE)) return false;
+  if (rules?.has?.(TEN_RULE)) return true;
+  return tenByDefault();
+}
+
+const tenSets = new WeakMap();
+const beforeTenSets = new WeakMap();
+/** `rules` playing RULES_MARK 10's rules (`on`) or those of 9; the same set back when it already does. */
+export function withMarkTen(rules, on = tenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkTenOn(rules) === Boolean(on) || (on && !isMarkNineOn(rules))) return rules;
+  const mark = on ? TEN_RULE : BEFORE_TEN_RULE;
+  const drop = on ? BEFORE_TEN_RULE : TEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? tenSets : beforeTenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G42 OVERCLOCK 문턱 (RULES_MARK 10): the cash that builds the chain is ×32 or
+ * better, not ×4 -- every cash had reached ×4 (p50 ×32.7), so OVERCLOCK was on
+ * 63.6% of boards and paid 84.4% of the pot (게임성 5차 G42). Two in a row
+ * still OVERCLOCK the board (OVERCLOCK_STREAK); its chips and push stay.
+ */
+export const HOT_CASH_TEN = 32;
+/** The multiplier a cash needs to build the OVERCLOCK chain under `rules`. */
+export const getHotCashMultiplier = (rules) => (isMarkTenOn(rules) ? HOT_CASH_TEN : HOT_CASH_MULTIPLIER);
 
 /** G21: METRONOME also pays on the first board after this many in a row on one direction. */
 export const METRONOME_HOLD = 6;

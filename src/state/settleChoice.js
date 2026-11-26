@@ -7,6 +7,7 @@ import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedDirections } from "../gauntlet/logicStreak.js";
 import { getRelicPool, getRelicUnlocks } from "../gauntlet/relics.js";
+import { isSignNode } from "../gauntlet/storyAutoCash.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
 import { getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "./caseRoutes.js";
 
@@ -71,11 +72,10 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
  * G6 결재 판: whether the scene `nodeId` is its case's last decision -- every
  * card on it (the wild one aside) closes the case -- so the board dealt for it
  * is the case's 결재 판. A scene not loaded, or with no cards, is not one.
+ * The rule is storyAutoCash.js's (`isSignNode`): G43's story table reads it too.
  */
 export function isSignScene(caseId, nodeId) {
-  const result = CASE_RESULT_NODES[caseId];
-  const choices = (nodes[nodeId]?.choices ?? []).filter((choice) => choice?.type !== "reframe");
-  return Boolean(result) && choices.length > 0 && choices.every((choice) => choice.next === result);
+  return isSignNode(caseId, nodes[nodeId]);
 }
 
 /**

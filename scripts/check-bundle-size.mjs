@@ -234,7 +234,14 @@ const budgets = [
   // 168,866 / 63,034 -> 169,144 / 63,121 g34-cover-focus over main 9f0537f5 (#681): focus after paying 보상금 (CaseCover's ref and effect). CI measured 169,140 / 63,117 (verify-quick run 45769620269), the plus 4.
   // 169,144 / 63,121 -> 169,205 / 63,121 board-notice (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기) over main e4a5df69: main's budget plus this branch's increase (+61 / +0), which held in CI verify-quick on 9006f2b7.
   // gzip 63,121 -> 63,131: CI measured 63,127 gzip on 9abf8720 (verify-quick run 45775612541), the plus 4; raw stayed under 169,205.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_205, maxGzip: 63_131 },
+  // 169,144 / 63,121 -> 169,371 / 63,192 story-g43 (G43 이야기 모드 결재 판만 직접) over main e4a5df69: main's plus the branch's own +227 / +71 (measured 168,823 / 63,068 over d5d79552 on Windows). Provisional; CI re-measures.
+  // 169,371 / 63,192 -> 169,371 / 63,202 story-g43 after #686's (1) (the held last decision kept by hand, holdConfirm.js in storyAutoCash.js): measured 169,367 / 63,198 on Windows over e4a5df69, the plus 4. Provisional; CI re-measures.
+  // -> 169,432 / 63,212 bundle-1126e (#687 #686 #684) over main 045c9ad3: main's base plus board-notice's and story-g43's increases, provisional until CI measures the bundle.
+  // 169,144 / 63,121 -> 169,172 / 63,121 gameplay-g5a (RULES_MARK 10, G40 G41 G42) over main e4a5df69: main's budget plus this branch's local increase (+28 / +0), provisional until CI measures it.
+  // gzip 63,121 -> 63,127: CI measured 63,123 on ee32a377 (run 45776809850), the plus 4.
+  // -> 169,460 / 63,218 bundle-1126e with gameplay-g5a's increase added (GameRuntime +28 / +6, ja index +5 / +23); provisional until CI measures the bundle.
+  // gzip -> 63,255: bundle-1126e measured 63,247 on Windows, +8 (provisional, CI re-measures).
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_460, maxGzip: 63_255 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -289,7 +296,8 @@ const budgets = [
   // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
   // 38,689 / 15,019 -> 38,914 / 15,109 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 38,910 / 15,105 plus 4. CI re-measures.
   // 38,914 / 15,109 -> 38,938 / 15,126: storyOpenTrust (G37's open question at 83). Measured 38,934 / 15,122, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_938, maxGzip: 15_126 },
+  // 38,938 / 15,126 -> 39,162 / 15,244 on 2026-11-26, gameplay-g5a over main d5d79552: RULES_MARK 10 (G40 G41 G42). Local Windows build +4 (provisional: set to the CI measure +4).
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 39_162, maxGzip: 15_244 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -387,7 +395,11 @@ const budgets = [
   // 38,476 / 16,123 -> 39,465 / 16,486 gameplay-mark8 over bundle R (r-dryrun-1123 391e1016): #665's budget plus this branch's growth (+989 / +363). CI re-measures.
   // 39,465 / 16,486 -> 40,119 / 16,652 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 40119 / 16644 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 40,119 / 16,652 -> 40,800 / 16,880 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 40,385 / 16,770 plus 4. CI re-measures.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 40_800, maxGzip: 16_880 },
+  // 40,800 / 16,880 -> 41,094 / 17,065 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 41090 / 17061 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  // 41,094 / 17,065 -> 42,023 / 17,415 story-g43 after #686's (1): storyAutoCash.js reads holdConfirm.js's isClosingScene. Measured 42019 / 17411 on Windows over e4a5df69, the plus 4. Provisional; CI re-measures.
+  // gzip 17,415 -> 17,481 bundle-1126e (#687 #686 #684 over main 045c9ad3): measured on Windows gzip 17,473, raw +4 and gzip +8 for the Linux gzip spread; provisional, CI re-measures.
+  // raw -> 42,241: bundle-1126e measured 42,237 on Windows, +4 (provisional).
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 42_241, maxGzip: 17_481 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1361,7 +1373,8 @@ const budgets = [
   // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
   // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
   // -> 220,895 / 42,765 on 2026-11-26, g34-cover-e2e: G34's 보상금 button joins the leave line's 44px rule. Measured 220891 / 42761 locally, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_895, maxGzip: 42_765 },
+  // 220,895 / 42,765 -> 220,990 / 42,805 hotfix-hold-select over main e4a5df69: the action row's buttons refuse text selection and the long-press callout (Galaxy A32 2026-11-26). Local Windows build 220,986 / 42,801, the plus 4; CI re-measures.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_990, maxGzip: 42_805 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -1648,7 +1661,8 @@ const budgets = [
   // 64,254 / 24,083 -> 64,254 / 24,095: measured - / 24091 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
   // 64,254 / 24,095 -> 65,266 / 24,502 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 65266 / 24494 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 65,266 / 24,502 -> 68,548 / 25,646 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 68,483 / 25,642 plus 4. CI re-measures.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 68_548, maxGzip: 25_646 },
+  // 68,548 / 25,646 -> 68,697 / 25,702 on 2026-11-26, gameplay-g5a over main d5d79552: RULES_MARK 10 (G40 G41 G42). Local Windows build +4 (provisional: set to the CI measure +4).
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 68_697, maxGzip: 25_702 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2294,7 +2308,12 @@ const budgets = [
   // 210,599 / 70,424 -> 211,879 / 70,678 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 211879 / 70670 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 211,879 / 70,678 -> 212,819 / 70,960 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 212,632 / 70,949 plus 4. CI re-measures.
   // gzip 70,960 -> 71,018 board-notice over main d5d79552 (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기). Measured locally (Windows e2e build); provisional until CI verify-quick, then CI plus 4. 71,014 (the notice's ja words).
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 212_819, maxGzip: 71_018 },
+  // 212,819 / 70,960 -> 213,024 / 71,062 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 213020 / 71058 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  // -> 213,024 / 71,120 bundle-1126e (#687 #686 #684) over main 045c9ad3: main's base plus board-notice's and story-g43's increases, provisional until CI measures the bundle.
+  // 212,819 / 70,960 -> 212,824 / 70,983 on 2026-11-26, gameplay-g5a over main d5d79552: RULES_MARK 10 (G40 G41 G42). Local Windows build +4 (provisional: set to the CI measure +4).
+  // -> 213,029 / 71,143 bundle-1126e with gameplay-g5a's increase added (GameRuntime +28 / +6, ja index +5 / +23); provisional until CI measures the bundle.
+  // -> 213,381 / 71,167 bundle-1126e (#687 #686 #684 over main 045c9ad3): measured on Windows 213,377 / 71,159, raw +4 and gzip +8 for the Linux gzip spread; provisional, CI re-measures.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 213_381, maxGzip: 71_167 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2427,7 +2446,9 @@ const budgets = [
   // 176,025 / 62,932 -> 176,213 / 62,970: measured 176209 / 62966, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 176,213 / 62,970 -> 177,379 / 63,240 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 177379 / 63232 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 177,379 / 63,240 -> 178,270 / 63,511 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 178,088 / 63,466 plus 4. CI re-measures.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_270, maxGzip: 63_511 },
+  // 178,270 / 63,511 -> 178,380 / 63,569 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 178376 / 63565 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  // -> 178,649 / 63,647 bundle-1126e (#687 #686 #684 over main 045c9ad3): measured on Windows 178,645 / 63,639, raw +4 and gzip +8 for the Linux gzip spread; provisional, CI re-measures.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_649, maxGzip: 63_647 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2948,7 +2969,11 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> back to bundle R's 387,206 / 453,411 / 461,850 after main c967db59 (#670, the start screen's notes fixed): gameplay-mark8 ef349544 measured 386,662 / 453,021 / 461,478 in CI verify-quick 11-25, 386,515 / 452,849 / 461,310 on Windows for 2027-01-13; both well under it.
 // en 453,411 -> 453,724, ja 461,850 -> 462,199 gameplay-g4b over main 90db9f3d: G31·G33·G34 words in the overlay indexes (+313 / +349 measured before). Measured 453,613 / 462,095.
 // en 453,724 -> 453,843, ja 462,199 -> 462,349 board-notice over main d5d79552 (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기). Measured locally (Windows e2e build); provisional until CI verify-quick, then CI plus 4. 453,732 / 462,245 plus the room the last budget kept (111 / 104).
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_843, ja: 462_349 };
+// en 453,724 -> 453,822, ja 462,199 -> 462,319 on 2026-11-26, story-g43 (G43 comfort switch and reveal line). Measured 453818 / 462315 locally on Windows (provisional; CI to confirm), the plus 4.
+// en 453,822 -> 453,924, ja 462,319 -> 462,409 story-g43 over main e4a5df69 (main's first paint grew with it). Measured 453920 / 462405 on Windows, the plus 4. Provisional; CI re-measures.
+// -> en 454,043, ja 462,559 bundle-1126e (#687 #686 #684) over main 045c9ad3: main's base plus board-notice's and story-g43's increases, provisional until CI measures the bundle.
+// -> en 454,134, ja 462,651 bundle-1126e (#687 #686 #684 over main 045c9ad3): measured on Windows en 454,126, ja 462,643 (the locale gzip spread +8), raw +4 and gzip +8 for the Linux gzip spread; provisional, CI re-measures.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 454_134, ja: 462_651 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],

@@ -11,8 +11,9 @@ const reminderOffered = () => ["ok", "denied"].includes(reminderAvailability());
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
+// 판 모두 직접 치기 (G43) is beside it: it only changes what story mode does.
 // Each switch's words are src/copy/comfort.js's, under its key.
-const TOGGLES = ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"];
+const TOGGLES = ["storyMode", "playAllTables", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"];
 
 /**
  * The comfort settings: in the intro's setup console, and in the dialog the

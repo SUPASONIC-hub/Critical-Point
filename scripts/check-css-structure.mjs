@@ -372,7 +372,8 @@ const fileBudgets = {
   // -> 3270 lines / 62596 bytes on 2026-11-20, hotfix #644 (E1g): the gauge read row wraps whole items, each nowrap. Measured.
   // -> 3275 lines / 62710 bytes on 2026-11-23: a rule's badge keeps its own ink inside a carried board (OVERCLOCK). Measured.
   // -> 3277 lines / 62807 bytes on 2026-11-23: the clue card's marked words stay in their line, in colours that read on its green. Measured.
-  "play.css": { lines: 3277, bytes: 62807 },
+  // -> 3281 lines / 62918 bytes on 2026-11-26: the action row's buttons refuse text selection and the long-press callout (Galaxy A32, #687). Measured.
+  "play.css": { lines: 3281, bytes: 62918 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).

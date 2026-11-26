@@ -1218,6 +1218,25 @@ test.describe("the big decisions' 확정 is held", () => {
     await page.mouse.up();
   });
 
+  // 2026-11-26 (Galaxy A32): a held label was selected as text, the copy menu
+  // and the assistant opened, the browser cancelled the press and the clock
+  // ran out. Every button of the action row refuses selection and the
+  // long-press callout, so a hold stays a hold.
+  test("the held buttons cannot be selected as text or open the long-press menu", async ({ page }) => {
+    await stakeClosing(page);
+    const styles = await page.locator(".gx-actions button").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const style = getComputedStyle(button);
+        return { id: button.dataset.testid ?? button.className, select: style.userSelect || style.webkitUserSelect, touch: style.touchAction };
+      }),
+    );
+    expect(styles.length).toBeGreaterThan(1);
+    for (const style of styles) {
+      expect(style.select, `${style.id}: no text selection`).toBe("none");
+      expect(style.touch, `${style.id}: no double-tap zoom`).toBe("manipulation");
+    }
+  });
+
   test("a hold confirms before it is let go; one slid off confirms nothing", async ({ page }) => {
     const cash = await stakeClosing(page);
     const box = await pressDown(page, cash);
