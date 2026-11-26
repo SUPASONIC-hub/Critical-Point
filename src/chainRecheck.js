@@ -67,6 +67,7 @@
  */
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { getIdleErosion, RULES_MARK_KEY, STANCE_CARRY_MUTATIONS } from "./gauntlet/gauntletEngine.js";
+import { normalizePaid } from "./gauntlet/settlementPay.js";
 
 /**
  * What a case row's drafts paid out of the vault (C9): the first decision
@@ -235,10 +236,17 @@ function recheckOpening(before, after, snapshot, breaks, unchecked) {
   const close = before.dynamics;
   // A draft paid for and the case then opened again (left half way) opens on the vault less what was paid.
   const spent = draftSpend(after.decision_log);
+  // G34 (RULES_MARK 9): the case before paid off at its close (`open.paid`) opens on its vault less the price, once.
+  const paid = normalizePaid(snapshot.paid);
+  if (snapshot.paid !== undefined && (!paid || paid.caseId !== before.case_id)) breaks.push({ field: "open.paid", expected: before.case_id, found: snapshot.paid });
+  const owed = paid?.caseId === before.case_id ? paid.cost : 0;
+  const opensOn = { vault: numberOf(close.vault) === null ? null : close.vault - owed };
+  opensOn.handVault = numberOf(close.handVault) === null ? null : Math.min(close.handVault, opensOn.vault ?? close.handVault);
   for (const key of ["vault", "handVault"]) {
-    if (numberOf(close[key]) === null || snapshot[key] === close[key]) continue;
-    if (spent > 0 && numberOf(snapshot[key]) !== null && snapshot[key] < close[key] && snapshot[key] >= close[key] - spent) continue;
-    breaks.push({ field: `open.${key}`, expected: close[key], found: snapshot[key] ?? null });
+    const expected = opensOn[key];
+    if (expected === null || snapshot[key] === expected) continue;
+    if (spent > 0 && numberOf(snapshot[key]) !== null && snapshot[key] < expected && snapshot[key] >= expected - spent) continue;
+    breaks.push({ field: `open.${key}`, expected, found: snapshot[key] ?? null });
   }
   const between = numberOf(close.windowIndex) === null || numberOf(snapshot.windowIndex) === null ? null : snapshot.windowIndex - close.windowIndex;
   if (between !== null && between < 0) breaks.push({ field: "open.windowIndex", expected: `${close.windowIndex} or more`, found: snapshot.windowIndex });
@@ -303,7 +311,9 @@ export function recheckCaseGap(before, after, { opening = null } = {}) {
   // A draft's price (C9) is one way down; the other is IDLE MONEY's (B4), a
   // week's device: the close may take at most its share of what the close
   // before left (the vault it held through the case is that less a price).
-  const spent = draftSpend(log);
+  // G34 (RULES_MARK 9): and a 보상금 the case before was paid off with, as the opening snapshot carries it.
+  const paid = normalizePaid(open.open?.paid);
+  const spent = draftSpend(log) + (paid && paid.caseId === before?.case_id ? paid.cost : 0);
   for (const key of ["vault", "handVault"]) {
     const down = spent + (before ? getIdleErosion(close.weekRule, numberOf(close[key]) ?? 0) : 0);
     if (delta(key) !== null && delta(key) < -down) breaks.push({ field: key, expected: down ? `-${down} or more` : "+0 or more", found: delta(key) });

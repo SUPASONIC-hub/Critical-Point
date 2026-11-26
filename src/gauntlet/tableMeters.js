@@ -5,6 +5,7 @@ import { decisionWindowSeconds, GAUGE_MAX, getFocusBonus, getFocusModeProfile, g
 import { AUDIT_HEAT, readAudit } from "./auditRisk.js";
 import { HEAT_DEBT_GAUGE, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
 import { readSafeLine } from "./tableAfterword.js";
+import { getStoryTilt } from "./storyTilt.js";
 import { fill } from "../locale.js";
 import tableCopy from "../copy/table.js";
 
@@ -108,7 +109,8 @@ export function readTableMeters({ win, schema, selectedCard, run = null, audit, 
   const nextLow = Math.min(GAUGE_MAX, win.gauge + schema.stepMin);
   const nextHigh = Math.min(GAUGE_MAX, win.gauge + schema.stepMax);
   const band = getWindowBand(win);
-  const reading = readAudit(run, audit, win);
+  // G31 (RULES_MARK 9): the case's 정당성 moves the audit's limit (storyTilt.js).
+  const reading = readAudit(run, audit, win, getStoryTilt(run, getTableRules(caseId, run))?.audit ?? 0);
   return {
     // G5 2막: the chips a cash at this heat pays (getPaidChips), which the case's twist may thin at 60 and over.
     selectedChips: selectedCard ? getPaidChips(selectedCard, schema, win.gauge, getCaseTwist(run, getTableRules(caseId, run)), getTableRules(caseId, run)) : 0,

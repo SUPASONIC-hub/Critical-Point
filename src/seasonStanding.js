@@ -31,6 +31,19 @@ const NEAR_TOLERANCE = 1e-9;
 const HARM_CASES_LISTED = 3;
 
 /**
+ * G34 (RULES_MARK 9, 보상금): a case whose harm was paid off at its close
+ * (`covered`, src/gauntlet/settlementPay.js) counts what is left of it, and
+ * the cover is kept: each one takes COVER_LEGITIMACY off the season's mean
+ * 공정함 (gameLogic.js `getSeasonStrain`), and the ruling leans to the endings
+ * made of silence -- PROFITABLE SILENCE's trust bar COVER_SILENCE_TRUST
+ * higher a cover, QUIET COVER from COVER_QUIET covers on.
+ */
+export const caseHarm = (summary) => Math.max(0, (Number(summary?.finalHumanCost) || 0) - (Number(summary?.covered?.harm) || 0));
+export const COVER_LEGITIMACY = 1;
+export const COVER_SILENCE_TRUST = 3;
+export const COVER_QUIET = 6;
+
+/**
  * The season's closed cases as `[caseId, summary]`, the case that is closing
  * now (`pending`) included. A replayed case is in both -- the summary it is
  * about to replace, and the one pending -- and counts once, as the new one.
@@ -45,7 +58,8 @@ export function readCollapseTally(summaries = []) {
   return {
     casesPlayed: summaries.length,
     seasonWindows: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0) + (Number(summary.pushRecord?.cashes) || 0), 0),
-    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
+    seasonHumanCost: summaries.reduce((sum, summary) => sum + caseHarm(summary), 0),
+    seasonCovers: summaries.filter((summary) => summary?.covered).length,
     seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
   };
 }
@@ -140,7 +154,7 @@ export function getSeasonStanding({ caseResults = {}, pending = null, resources 
       level: overreachLevel,
     },
     harmCases: closed
-      .map(([caseId, summary]) => ({ caseId: caseId ?? null, harm: Number(summary.finalHumanCost) || 0 }))
+      .map(([caseId, summary]) => ({ caseId: caseId ?? null, harm: caseHarm(summary) }))
       .filter((entry) => entry.harm > 0)
       .sort((a, b) => b.harm - a.harm || seasonOrder(a.caseId) - seasonOrder(b.caseId))
       .slice(0, HARM_CASES_LISTED),

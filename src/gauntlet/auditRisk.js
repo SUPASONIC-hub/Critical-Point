@@ -185,16 +185,18 @@ export function judgeAudit({ count, secured, hand, limit = AUDIT_LIMIT, base = A
  * audit; else the count after this window (`count` is the case's before it)
  * and, when the window closes a case that pays (`closed`), the judgement.
  */
-export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false, smooth = false }) {
+export function settleAudit({ run, rules, count, busted, gauge, pushes, closed, secured, hand, shield = false, smooth = false, tilt = 0 }) {
   if (!isAuditOn(run, rules)) return null;
   // G35 (RULES_MARK 9): the tally takes the cash's heat, and its smoothness is judged (`count` stays the tally, `level` the number).
   if (smooth) {
     const tally = smoothStep(count, { busted, gauge, pushes, cascade: isCascadeBoard(run.schema) });
     const level = getSmoothness(tally);
-    return { count: tally, level, ...(closed ? judgeAudit({ count: level, secured, hand, limit: getAuditLimit(run.relics, true), base: SMOOTH_LIMIT }) : { caught: false, lost: 0, handLost: 0 }) };
+    return { count: tally, level, ...(closed ? judgeAudit({ count: level, secured, hand, limit: getAuditLimit(run.relics, true) + tilt, base: SMOOTH_LIMIT + tilt }) : { caught: false, lost: 0, handLost: 0 }) };
   }
   const after = addAudit(count, shieldStep(auditStep({ busted, gauge, pushes, cascade: isCascadeBoard(run.schema) }), shield));
-  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit: getAuditLimit(run.relics) }) : { caught: false, lost: 0, handLost: 0 }) };
+  // G31 (RULES_MARK 9): `tilt`, what the case's 정당성 does to the limit (storyTilt.js), as the case's rules say.
+  const limit = getAuditLimit(run.relics) + tilt;
+  return { count: after, ...(closed ? judgeAudit({ count: after, secured, hand, limit, base: AUDIT_LIMIT + tilt }) : { caught: false, lost: 0, handLost: 0 }) };
 }
 
 /**
@@ -216,12 +218,12 @@ export function findAudit(before, after) {
  * (`gx-at-risk`) one short of the limit; `spoken` is the reading for the 확정
  * button's description.
  */
-export function readAudit(run, count, win) {
+export function readAudit(run, count, win, tilt = 0) {
   if (!run || count == null) return null;
-  if (Array.isArray(count)) return readSmooth(run, count, win);
+  if (Array.isArray(count)) return readSmooth(run, count, win, tilt);
   const now = Math.max(0, Math.trunc(Number(count) || 0));
   const ifCash = auditStep({ gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
-  const limit = getAuditLimit(run.relics);
+  const limit = getAuditLimit(run.relics) + tilt;
   const reading = { count: now, limit, ifCash, afterCash: addAudit(now, ifCash), atRisk: now >= limit - 1 };
   return { ...reading, spoken: describeAuditIfCash(reading) };
 }
@@ -231,11 +233,11 @@ export function readAudit(run, count, win) {
  * it, and `band`, the heats where a cash would raise it (the first such run,
  * drawn on the gauge instead of the cold line), or null while none would.
  */
-function readSmooth(run, tally, win) {
+function readSmooth(run, tally, win, tilt = 0) {
   const now = getSmoothness(tally);
   const cash = smoothStep(tally, { gauge: win?.gauge, pushes: win?.pushes, cascade: isCascadeBoard(run.schema) });
   const afterCash = getSmoothness(cash);
-  const limit = getAuditLimit(run.relics, true);
+  const limit = getAuditLimit(run.relics, true) + tilt; // G31: the case's 정당성 moves it
   let band = null;
   for (let heat = 0; heat <= 100; heat += 1) {
     if (getSmoothness([...tally, heat]) <= now) {

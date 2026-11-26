@@ -5,13 +5,14 @@ import { getReadingSeconds, hashSeed, isPenaltyMutation, REFRAME_CARD_ID } from 
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { describeStanding } from "./tableReadout.js";
-import { getBriefingCaseRuleCase, getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId } from "./tableStaging.js";
+import { getBriefingCaseRuleCase, getBriefingIntro, getBriefingOpening, getBriefingWeekRuleId, opensCase } from "./tableStaging.js";
 import { getSpeakerLine } from "./speakerLine.js";
 import { SPEAKER_NAMES } from "../speakerPortraits.js";
 import { fill, speakerName } from "../locale.js";
 import briefingCopy from "../copy/briefing.js";
 import { pastPick, useSceneFold, useWeekRulePanel } from "./WeekRulePanel.jsx";
 import { getUnlockKicker } from "./tableUnlocks.js";
+import { listStoryTilt } from "./storyTilt.js";
 import { monotonicNow } from "./fxVariables.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { GuardedButton } from "../components/GuardedButton.jsx";
@@ -178,6 +179,8 @@ export function SceneBriefing({
   const openingLine = echo?.echo ? "" : getBriefingOpening(node, nodeId, opening);
   // The other players' wall rate here, pinned last in the case file (D3).
   const trace = useSceneTraceLine(node.caseId, nodeId);
+  const tilt = opensCase(node, nodeId) ? listStoryTilt(run, nodeId) : []; // G31: on a scene a case opens on only
+  const tiltLine = tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ");
   // 이번 주의 규칙, a panel of its own under the page (결정 28), on the same
   // clock; above it, on a NEW GAME+ season's first page of a case, what the
   // season before left there (`echo`, an object of two lines: secondSeason.js).
@@ -192,8 +195,8 @@ export function SceneBriefing({
   // same way. `mutations` is exactly the two lists printed below. The line
   // from the scene before (`bridge`, D-7) is read on it too.
   const readSeconds = useMemo(
-    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }]),
-    [told, question, mutations, intro, weekRules, bridge, openingLine],
+    () => getReadingSeconds({ ...told, question }, [...mutations, ...intro.map((text) => ({ text })), ...weekRules, { text: bridge }, { text: openingLine }, { text: tiltLine }]),
+    [told, question, mutations, intro, weekRules, bridge, openingLine, tiltLine],
   );
   const [shown, setShown] = useState(() => Math.ceil(readSeconds));
   // Held from the start when the player asked for a reading clock that waits,
@@ -363,12 +366,14 @@ export function SceneBriefing({
             <ProseCaptions text={told.text} who={node.speakerName ?? node.speaker} whoAt={speech.whoAt} />
           </div>
 
-          {(told.memo?.length > 0 || trace) && (
+          {(told.memo?.length > 0 || trace || tiltLine) && (
             <div className="gx-panel gx-panel-file">
               <p className="gx-file-tab">{briefingCopy.caseFile}</p>
               <ul>
                 <ProseItems items={told.memo} />
                 {trace && <li data-testid="scene-trace">{trace}</li>}
+                {/* G31: what the case opened on does to its tables, one line on its first page. */}
+                {tiltLine && <li data-testid="briefing-tilt">{tiltLine}</li>}
               </ul>
             </div>
           )}

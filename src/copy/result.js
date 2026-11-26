@@ -39,6 +39,14 @@ const resultCopy = {
   // C1-1 (2026-11-12): the line under the outcome when this case raised the record
   // title (analystTitle.js getAnalystTitleRise). Every title ends in 관, so 이.
   titleRise: "기록 칭호가 {title}이 되었습니다.",
+  // G34 보상금 (RULES_MARK 9, src/components/CaseCover.jsx).
+  cover: {
+    offer: "보상금 {cost} · 이 사건의 사람 피해 {harm} 지움",
+    pay: "보상금 내기",
+    short: "계좌 부족",
+    record: "덮은 기록 +1 · 공정함 −1 · 다음 보상금은 1.5배",
+    paid: "보상금 {cost} 냄 · 사람 피해 {harm} 지움 · 덮은 기록 {covers}",
+  },
   // N23: where the report of 사건 01~17 stands in its act, and how far the next 중간 결산 is (actProgress.js).
   actProgress: "{act}막 · {pos}/{size} · 중간 결산까지 {left}사건",
   actProgressHere: "{act}막 · {pos}/{size} · 중간 결산은 아래에",

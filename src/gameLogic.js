@@ -541,7 +541,7 @@ const HUMAN_RECORD_CLUE_RATE = 1;
 const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 // G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
-const STORY_COLD_GAP = 10; // and a burned story season that kept OPEN OVERSIGHT's trust leaves the question open
+const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [10, 83]; // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33)
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
@@ -556,7 +556,7 @@ export const ENDING_THRESHOLDS = Object.freeze({
   clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY,
   reformLegitimacy: REFORM_LEGITIMACY, recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, recordClueRate: HUMAN_RECORD_CLUE_RATE,
   silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, storyColdGap: STORY_COLD_GAP, pactGap: PACT_GAP,
-  heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK,
+  heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK, storyOpenTrust: STORY_OPEN_TRUST,
 });
 
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -595,8 +595,9 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
   const collapse = seasonStanding.readCollapseTally(summaries);
   const peaks = summaries.map((summary) => Number(summary.peakRiskPressure)).filter(Number.isFinite);
   const closings = summaries.map((summary) => summary.finalResources).filter((value) => value && typeof value === "object");
+  const covered = (key) => (key === "legitimacy" ? collapse.seasonCovers * seasonStanding.COVER_LEGITIMACY : 0); // G34: a cover takes 공정함
   const seasonResources = closings.length
-    ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0)))]))
+    ? Object.fromEntries(RESOURCE_KEYS.map((key) => [key, Math.round(mean(closings.map((closing) => Number(closing[key]) || 0))) - covered(key)]))
     : null;
   return {
     casesPlayed: collapse.casesPlayed,
@@ -607,7 +608,7 @@ export function getSeasonStrain(caseResults = {}, pending = null) {
       0,
     ),
     seasonResources,
-    seasonHumanCost: collapse.seasonHumanCost,
+    seasonHumanCost: collapse.seasonHumanCost, seasonCovers: collapse.seasonCovers,
     peakRiskPressure: summaries.reduce((peak, summary) => Math.max(peak, Number(summary.peakRiskPressure) || 0), 0),
     seasonBusts: collapse.seasonBusts,
     seasonBestMultiplier: summaries.reduce((best, summary) => Math.max(best, Number(summary.pushRecord?.bestMultiplier) || 1), 1),
@@ -665,7 +666,7 @@ export function getEndingVariant({
   sustainedPressure,
   seasonReframeRoutes,
   seasonResources = null,
-  storySeason = false,
+  seasonCovers = 0, storySeason = false,
 } = {}) {
   // A caller that still passes only the old six fields (a report built before
   // `getSeasonStrain` moved here) reads as a whole season with the last case
@@ -688,15 +689,14 @@ export function getEndingVariant({
   if (cause) return { ...ENDINGS.collapse, cause: { id: cause, harmPerCase: Math.round(harm), bustRate: Math.round(bustRate * 100) / 100 } };
 
   const cold = legitimacy >= COLD_LEGITIMACY && legitimacy - trust >= (storySeason ? STORY_COLD_GAP : COLD_GAP);
-  const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST;
+  const silent = capital >= SILENCE_CAPITAL && trust < SILENCE_TRUST + seasonCovers * seasonStanding.COVER_SILENCE_TRUST;
   const pact = trust - legitimacy >= PACT_GAP;
-  // Burning every record closes the endings made of records. What is left is
-  // what the season valued, or a quiet it bought by burning.
+  // Burning every record closes the endings made of records. What is left is what the season valued, or a quiet it bought by burning.
   if (finale === "burn") {
     if (silent) return ENDINGS["profitable-silence"];
     if (cold) return ENDINGS["cold-justice"];
     if (pact) return ENDINGS["field-pact"];
-    if (storySeason && trust >= OVERSIGHT_TRUST) return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
+    if (storySeason && trust >= STORY_OPEN_TRUST) return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
     return ENDINGS["quiet-cover"];
   }
 
@@ -714,7 +714,7 @@ export function getEndingVariant({
   if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS["profitable-silence"];
   if (pact) return ENDINGS["field-pact"];
-  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE) return ENDINGS["quiet-cover"];
+  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
   return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
 }
 
@@ -1051,7 +1051,7 @@ export function createCaseSummary(
     // Decisions by the way of thinking each leaned on: the season's 관점 전환 is
     // read off them all (getSeasonScore), and a replay keeps its first close's.
     cognitionMix: scoring.getCognitionMix(entries),
-    ...(replayOf ? { firstCognitionMix: replayOf.firstCognitionMix ?? replayOf.cognitionMix ?? null } : {}),
+    ...(replayOf ? { firstCognitionMix: replayOf.firstCognitionMix ?? replayOf.cognitionMix ?? null } : {}), ...(replayOf?.covered ? { covered: replayOf.covered } : {}),
     // The slowest table clock any decision of the case was played on, when the
     // comfort setting slowed it; absent on a case played at the table's pace.
     ...(assistTime > 1 ? { assistTime } : {}),
