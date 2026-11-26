@@ -1359,7 +1359,8 @@ const budgets = [
   // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
   // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
   // -> 220,895 / 42,765 on 2026-11-26, g34-cover-e2e: G34's 보상금 button joins the leave line's 44px rule. Measured 220891 / 42761 locally, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_895, maxGzip: 42_765 },
+  // 220,895 / 42,765 -> 220,990 / 42,805 hotfix-hold-select over main e4a5df69: the action row's buttons refuse text selection and the long-press callout (Galaxy A32 2026-11-26). Local Windows build 220,986 / 42,801, the plus 4; CI re-measures.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_990, maxGzip: 42_805 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
