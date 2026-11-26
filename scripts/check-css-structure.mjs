@@ -519,7 +519,9 @@ const fileBudgets = {
   // 2523 -> 2545 lines on 2026-11-18, N42 떠나는 순간 한 줄 (draft): the quiet
   // line at the foot of 프롤로그 05, 사건 03 and 사건 07 and its install
   // button, four rules, measured 2545 / 56815. The bytes still fit.
-  "result.css": { lines: 2545, bytes: 57089 },
+  // 2545 -> 2546 lines on 2026-11-26, g34-cover-e2e (measured): G34's 보상금
+  // button joins the leave line's 44px rule (a `.ghost` is 38px). The bytes still fit.
+  "result.css": { lines: 2546, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.
