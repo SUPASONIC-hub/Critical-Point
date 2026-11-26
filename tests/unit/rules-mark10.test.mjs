@@ -7,7 +7,7 @@ import { getRowRules } from "../../src/rankingRecheck.js";
 import { ALL_RULES, getUnlockIntro } from "../../src/gauntlet/tableUnlocks.js";
 import { getEndingVariant } from "../../src/gameLogic.js";
 import { nearestEnding } from "../../src/nearestEnding.js";
-import { COVER_QUIET, coversBeforeSilence, FINALE_WEIGHT, weighFinale } from "../../src/seasonStanding.js";
+import { COVER_QUIET, coversBeforeSilence, FINALE_WEIGHT, weighFinale, weighUpkeep } from "../../src/seasonStanding.js";
 import unlocks from "../../src/copy/unlocks.js";
 
 const TEN = withMarkTen(ALL_RULES, true);
@@ -81,10 +81,12 @@ const season = (finale, seasonResources, extra = {}) => ({
 test("G40: 증언 weighs FINALE_WEIGHT on the season's 믿음, 개혁 on its 공정함, 소각 on neither", () => {
   assert.equal(FINALE_WEIGHT, 5);
   const mean = { trust: 70, legitimacy: 97 };
-  assert.deepEqual(weighFinale(mean, "witness"), { trust: 75, legitimacy: 97 });
-  assert.deepEqual(weighFinale(mean, "control"), { trust: 70, legitimacy: 100 }, "never past 100");
-  assert.equal(weighFinale(mean, "burn"), mean);
-  assert.equal(weighFinale(mean, null), mean);
+  // G38 (RULES_MARK 11): the mean is read after 유지비 (97 reads as 91), the answer's weight on top.
+  const kept = weighUpkeep(mean);
+  assert.deepEqual(weighFinale(mean, "witness"), { trust: 75, legitimacy: kept.legitimacy });
+  assert.deepEqual(weighFinale(mean, "control"), { trust: 70, legitimacy: Math.min(100, kept.legitimacy + 5) }, "never past 100");
+  assert.deepEqual(weighFinale(mean, "burn"), kept);
+  assert.deepEqual(weighFinale(mean, null), kept);
   assert.equal(weighFinale(null, "witness"), null, "a caller without the season's mean is read as it was");
   // 공정함 84 and 믿음 80: OPEN OVERSIGHT on 증언; 개혁 lifts 공정함 past REFORM's 86.
   const standing = { trust: 80, legitimacy: 84 };
