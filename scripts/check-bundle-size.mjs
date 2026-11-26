@@ -230,8 +230,9 @@ const budgets = [
   // 166,600 / 62,169 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 166,925 / 62,353 -> 166,968 / 62,379 gameplay-g4a over main d946283f: measured 166964 / 62375 in CI verify-quick, the plus 4.
   // 166,968 / 62,379 -> 168,600 / 63,001 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 168,596 / 62,973 plus 4. CI re-measures.
-  // 168,600 / 63,001 -> 168,661 / 63,001 board-notice over main d5d79552 (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기). Measured locally (Windows e2e build); provisional until CI verify-quick, then CI plus 4. 168,657 raw.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_661, maxGzip: 63_001 },
+  // 168,600 / 63,001 -> 168,866 / 63,034 g34-cover-e2e over main d5d79552 (#673): 보상금's replay check (the log handed to CaseCover) and its live region. Measured 168,862 / 63,030 in the e2e build on Windows, the plus 4. CI re-measures.
+  // 168,866 / 63,034 -> 168,927 / 63,034 board-notice (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기) over main 9f0537f5: main's budget plus this branch's local increase (+61 / +0). Provisional until CI verify-quick measures it.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_927, maxGzip: 63_034 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -1357,7 +1358,8 @@ const budgets = [
   // world-news #639 over main 1e0a57ab (석간 원장: 1면 줄·메뉴). Measured 220676 / 42720 in CI verify-quick, the plus 4.
   // 220,680 / 42,724 -> 220,794 / 42,739 on 2026-11-23: OVERCLOCK badge ink and the case cards' words. Measured 220790 / 42735, the plus 4.
   // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_876, maxGzip: 42_759 },
+  // -> 220,895 / 42,765 on 2026-11-26, g34-cover-e2e: G34's 보상금 button joins the leave line's 44px rule. Measured 220891 / 42761 locally, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 220_895, maxGzip: 42_765 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
