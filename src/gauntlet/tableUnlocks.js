@@ -21,7 +21,7 @@
 import { LOCK_CAP, PEAK_CASES, PEAK_CHIPS, PEAK_MARK, PEAK_WALL, STANCE_CHARGE } from "./gauntletEngine.js";
 import { fill } from "../locale.js";
 import unlocksCopy from "../copy/unlocks.js";
-import { isMarkNineOn } from "./nextTableRules.js";
+import { isMarkNineOn, isMarkTenOn } from "./nextTableRules.js";
 
 /**
  * The switch, on since 2026-10-09. Off, every case plays under every rule and
@@ -215,7 +215,8 @@ const STEPS = [
     caseId: "case01",
     adds: ["overclock"],
     storyIntro: [],
-    intro: unlocksCopy.steps.case01.intro,
+    // G42 (RULES_MARK 10): the chain from ×32.
+    intro: isMarkTenOn() ? unlocksCopy.steps.case01.introTen : unlocksCopy.steps.case01.intro,
   },
   {
     // The audit had one short line with the links in 프롤로그 04, because five

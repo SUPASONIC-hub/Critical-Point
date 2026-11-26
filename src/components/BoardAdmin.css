@@ -154,3 +154,22 @@
 .board-admin-log li span {
   color: var(--ui-text-3);
 }
+/* 「만든 사람 공지」: three language boxes, the end, post and take down. */
+.board-admin-notice {
+  display: grid;
+  gap: 10px;
+}
+.board-admin-notice-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+}
+.board-admin-notice-field textarea,
+.board-admin-notice-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.board-admin-notice-field small {
+  color: var(--ui-text-3);
+}

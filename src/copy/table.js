@@ -259,10 +259,10 @@ const tableCopy = {
     rulesLift: "{rules} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.",
     overdrive: {
       ready: { label: "오버클럭 준비", text: "지금 확정하면 다음 판은 칩 2배, 밀기 폭 증가" },
-      live: { label: "이어짐", text: "한 번 더 ×4+ 확정하면 오버클럭" },
-      held: { label: "유지", text: "이번 판도 ×4 이상으로 확정해야 이어진다" },
+      live: { label: "이어짐", text: "한 번 더 ×{multiplier}+ 확정하면 오버클럭" },
+      held: { label: "유지", text: "이번 판도 ×{multiplier} 이상으로 확정해야 이어진다" },
       ignition: { label: "점화", text: "확정하면 오버클럭 연속 1단계" },
-      dormant: { label: "꺼짐", text: "×4 이상 확정부터 연속이 켜진다" },
+      dormant: { label: "꺼짐", text: "×{multiplier} 이상 확정부터 연속이 켜진다" },
     },
     rulesOn: "{rules} 적용 중",
     rulesHidden: "숨은 규칙 적용 중",

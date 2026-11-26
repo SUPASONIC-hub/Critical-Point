@@ -18,6 +18,11 @@ const comfortCopy = {
       label: "스토리 모드",
       text: "벽이 멀어지고, 벽에 닿은 판이 다음 판으로 넘어오지 않습니다. 벽에 닿아도 장면을 건너뛰지 않습니다. 시계는 2배 느립니다. 시작 전에 켜면 첫 사건부터, 사건 중에 켜면 다음 사건부터 적용되고, 공개 랭킹에는 오르지 않습니다.",
     },
+    // G43: off, a story run plays only each case's 결재 판 by hand (storyAutoCash.js).
+    playAllTables: {
+      label: "판 모두 직접 치기",
+      text: "켜면 위 모드에서도 모든 판을 직접 확정합니다. 끄면 사건마다 결재 판만 직접 치고, 나머지 판은 카드를 고르면 열기 70으로 자동 확정됩니다.",
+    },
     holdReadingClock: {
       label: "읽기 시계 자동 넘김 끄기",
       text: "장면 설명이 저절로 넘어가지 않습니다. 다 읽고 직접 테이블을 엽니다.",

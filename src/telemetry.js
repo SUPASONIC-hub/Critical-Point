@@ -304,6 +304,24 @@ export async function fetchBoardPosts(limit = 50) {
 }
 
 /**
+ * 「만든 사람 공지」 (20261202010000_board_notice.sql): the makers' one notice,
+ * as anon may read it -- its words and times while it lasts, never who posted
+ * it. No row is no notice. src/boardNotice.js reads the row.
+ */
+export async function fetchBoardNotice() {
+  if (!telemetryEnabled) return { skipped: true, rows: [] };
+
+  const query = new URLSearchParams({ select: "body_ko,body_en,body_ja,posted_at,expires_at", limit: "1" });
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/board_notice?${query.toString()}`, {
+    headers: restHeaders(),
+  });
+
+  if (!response.ok) throw await createTelemetryError(response, "Board notice fetch failed");
+
+  return { rows: await response.json() };
+}
+
+/**
  * The best completed seasons, best first. The server orders by its own `score`
  * column, so what reaches the client is the top of the table -- not the most
  * recent rows, which a flood of fresh ones could fill. `run_tag` is the short

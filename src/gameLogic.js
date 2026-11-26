@@ -541,7 +541,7 @@ const HUMAN_RECORD_CLUE_RATE = 1;
 const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 // G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
-const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [10, 83]; // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33)
+const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [9, 87]; // and a burned story season this trusted leaves the question open (G37; G43 11-26: 10/83 -> 9/87)
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
@@ -672,7 +672,8 @@ export function getEndingVariant({
   // `getSeasonStrain` moved here) reads as a whole season with the last case
   // standing in for its closing values. The collapse gate is `readCollapseGate`'s.
   const { cases, harm, bustRate, cause } = seasonStanding.readCollapseGate({ seasonHumanCost, resources, casesPlayed, seasonBusts, seasonWindows });
-  const standing = seasonResources ?? resources;
+  const finale = getFinaleOutcome(log);
+  const standing = seasonResources ? seasonStanding.weighFinale(seasonResources, finale) : resources; // G40: the last answer weighs on the mean
   const trust = Number(standing.trust) || 0;
   const legitimacy = Number(standing.legitimacy) || 0;
   const capital = Number(standing.capital) || 0;
@@ -682,7 +683,6 @@ export function getEndingVariant({
     : log.filter((entry) => entry?.reframeOpenedRoute).length;
   const reframeRate = reframeRoutes / cases;
   const clueRate = discoveredClues.length / cases;
-  const finale = getFinaleOutcome(log);
 
   // The collapse says which door it came through, so the report's advice can
   // quote the gate that closed rather than a number of its own.
@@ -712,7 +712,7 @@ export function getEndingVariant({
   if (recordsOpen && legitimacy >= OVERSIGHT_LEGITIMACY - (slack ? slackGates.oversight : 0) && trust >= OVERSIGHT_TRUST - (slack ? slackGates.trust : 0)) return ENDINGS["open-oversight"];
   if (cold) return ENDINGS["cold-justice"];
   if (reform) return ENDINGS["evidence-reform"];
-  if (silent) return ENDINGS["profitable-silence"];
+  if (silent) return ENDINGS[seasonStanding.coversBeforeSilence(seasonCovers) ? "quiet-cover" : "profitable-silence"]; // G41
   if (pact) return ENDINGS["field-pact"];
   if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
   return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });

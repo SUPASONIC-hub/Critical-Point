@@ -54,6 +54,8 @@ const unlocksCopy = {
     // 사건 01 to 03 open one rule each since C-4 (RULES_MARK 4): OVERCLOCK,
     // the audit and the links, which 프롤로그 04 opened before.
     case01: {
+      // G42 (RULES_MARK 10): the chain asks for ×32 (nextTableRules.js HOT_CASH_TEN), held to it by a unit test.
+      introTen: ["×32 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
       intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
     },
     case02: {
