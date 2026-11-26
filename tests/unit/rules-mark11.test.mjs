@@ -6,7 +6,7 @@ import { RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { describeCaseOpening } from "../../src/state/caseRoutes.js";
 import { ENDING_THRESHOLDS, getDiscoveryClue } from "../../src/gameLogic.js";
-import { getRecordCashBar } from "../../src/seasonStanding.js";
+import { getQuietClueRate, getRecordCashBar } from "../../src/seasonStanding.js";
 
 const ELEVEN = withMarkEleven(ALL_RULES, true);
 const BEFORE = withMarkEleven(ALL_RULES, false);
@@ -53,4 +53,5 @@ test("G39: a scene's record opens only on a table cashed at ×32 or more, and HU
   assert.ok(ask(null), "a preview that reads no table finds the record as before");
   assert.equal(ENDING_THRESHOLDS.recordClueRate, 0.85);
   assert.equal(getRecordCashBar(), 32);
+  assert.equal(getQuietClueRate(0.5), 0.2, "QUIET COVER's record door moves with them");
 });

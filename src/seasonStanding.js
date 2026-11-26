@@ -22,6 +22,11 @@ export const getSlackGates = (bar) => (isMarkEightOn() ? { clueRate: CLUE_RATE_S
 
 // G39 (RULES_MARK 11): a scene's record opens only on a table cashed at ×32 or more, and HUMAN RECORD asks this share of the records, not every one.
 const RECORD_CLUE_RATE_ELEVEN = 0.85;
+// G39 (RULES_MARK 11): with the records tied to the cash, a season under half of them is no longer rare (20% of
+// 600): QUIET COVER's record door moves 0.5 -> 0.2 (11.7%), and the finale's answer moves 77.3% of standing endings again (G40, 72.7%).
+const QUIET_CLUE_RATE_ELEVEN = 0.2;
+/** QUIET COVER's record door; `bar` is the door before 11. */
+export const getQuietClueRate = (bar) => (isMarkElevenOn() ? QUIET_CLUE_RATE_ELEVEN : bar);
 /** HUMAN RECORD's record bar, for the ruling and the finale's line; `bar` is the bar before 11. */
 export const getRecordClueRate = (bar) => (isMarkElevenOn() ? RECORD_CLUE_RATE_ELEVEN : bar);
 /** The cash a record opens at, or null before 11 (the case file's line). */

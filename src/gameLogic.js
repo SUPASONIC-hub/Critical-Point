@@ -714,7 +714,7 @@ export function getEndingVariant({
   if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS[seasonStanding.coversBeforeSilence(seasonCovers) ? "quiet-cover" : "profitable-silence"]; // G41
   if (pact) return ENDINGS["field-pact"];
-  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
+  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < seasonStanding.getQuietClueRate(QUIET_CLUE_RATE) || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
   return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
 }
 
