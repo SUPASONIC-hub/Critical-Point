@@ -265,10 +265,12 @@ const BUDGETS = {
   // 876 -> 886 on 2026-11-20 (G15, G17, G10): the scout band's line broken in two for the board 숨 고르기 reads (ScoutBand `board`) and the line under the row
   // saying where the BUST before went,
   // the HUD's audit warning in words (`auditWarn`), and G10's mark where a rule pulled the band from (`gauge-pulled`).
+  // 886 -> 898 lines, 76 -> 79 names on 2026-11-26 (story-g43, measured): G43, a story table other than the case's
+  // 결재 판 cashed at heat 70 once its card is picked (storyAutoCash.js `stake`), and the setting that plays them all.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 886,
+    lines: 898,
     longestLine: 250,
-    importedNames: 76,
+    importedNames: 79,
     hooks: {},
   },
 };

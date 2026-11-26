@@ -247,7 +247,7 @@ export function useChoiceCommit(context) {
     }
   }
 
-  function commit(choice, closedWindow, forced) {
+  function commit(choice, closedWindow, forced, auto = false) {
     const {
       currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
       caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
@@ -524,6 +524,8 @@ export function useChoiceCommit(context) {
         // heartbeat heard (C-11), and on the close the case against a hand that
         // sees the wall (C-12).
         afterword: describeAfterword(windowState),
+        // G43: a story table cashed at heat 70 for the player (storyAutoCash.js), said under the verdict. Display only: the log entry is a hand's.
+        ...(auto ? { auto: true } : {}),
         caseRead: caseClosed ? describeCaseRead(nextLog) : null,
         // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
         scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
@@ -546,7 +548,7 @@ export function useChoiceCommit(context) {
     }
   }
 
-  function choose(choice, closedWindow = null, forced = false) {
+  function choose(choice, closedWindow = null, forced = false, auto = false) {
     const { staleSave, clueCount, casesOpened, resources, resolvedNodeId, setSaveStatus } = context;
     if (committingRef.current || isAdvancing || staleSave) return;
     const authorityGate = getAuthorityGate(choice, {
@@ -566,7 +568,7 @@ export function useChoiceCommit(context) {
     committingRef.current = true;
     setIsAdvancing(true);
     try {
-      commit(choice, closedWindow, forced);
+      commit(choice, closedWindow, forced, auto);
     } catch (error) {
       releaseAdvance();
       throw error;
