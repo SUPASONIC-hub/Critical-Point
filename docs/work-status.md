@@ -1000,6 +1000,14 @@ Still open, on purpose:
   baselines were re-recorded for the G31 line and the 45 → 47s clock.
   No ranked rows existed under the earlier MARK 9 (0 rows after the 11-25
   wipe), so the shared mark rechecks nothing differently.
+  #679 (`f75dd8e9`, 14:08) README and the outside guide: cash/time chip
+  weight ×2.75 (was written ×2.5) and the round 4 B rules. #680
+  (`baf336a7`, 14:32) the note `story-tilts-the-table`. #681 (`9f0537f5`,
+  14:55) e2e for the settlement pay line; it found that a replayed
+  (practice) case's result page offered the pay, which could break the next
+  case's `open.paid` chain check — `CaseCover` now reads the closing
+  record's `threshold.firstRecord`; the button is 44px and the paid line
+  is announced once through `role="status"`.
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
   (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
