@@ -58,6 +58,8 @@ import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
 import { SignAsk } from "./WeekRulePanel.jsx";
+import { isAutoCashTable, planAutoCash } from "./storyAutoCash.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
@@ -172,6 +174,7 @@ export function GauntletStage({
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
   const closedRef = useRef(false);
+  const autoRef = useRef(false); // G43: this window was cashed for the player (`stake`).
 
   const { sealedId, forcedCard } = useMemo(() => readRoomCards(cards, schema), [cards, schema]);
   const sealBroken = win.gauge >= schema.sealBreak;
@@ -339,7 +342,7 @@ export function GauntletStage({
       if (resolvedRef.current) return;
       resolvedRef.current = true;
       onSuspendable?.(null);
-      onResolve({ card, window: win, forced: !staked });
+      onResolve({ card, window: win, forced: !staked, auto: autoRef.current });
     }, RESOLVE_DELAY_MS[win.status] ?? 900);
     return () => globalThis.clearTimeout(timer);
     // The window closing (or being claimed from another tab) is the only trigger;
@@ -391,8 +394,17 @@ export function GauntletStage({
     firstHour.noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
-      dispatch({ type: "SELECT", id: cardId });
+      stake(cardId);
     }
+  }
+
+  // G43: a story table other than the case's 결재 판 is cashed at heat 70 once its card is picked, through the reducer (storyAutoCash.js).
+  function stake(id) {
+    const auto = id && live && !abandoned && isAutoCashTable({ run, caseId: scene.node.caseId, node: scene.node, playAll: getAccessibility().playAllTables });
+    const plan = auto && planAutoCash(win, id, { rules, sealedId });
+    if (plan?.window.status !== "cashed") return dispatch({ type: "SELECT", id });
+    autoRef.current = true;
+    plan.events.forEach(dispatch);
   }
 
   // One gate for the click and the key. The card's button checked the run's
@@ -403,7 +415,7 @@ export function GauntletStage({
     const card = cards.find((item) => item.id === id);
     if (card ? !isCardOpen(card) : !(id === REFRAME_CARD_ID && reframeChoice)) return;
     playTargetLockCue();
-    dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
+    stake(win.selectedId === id ? null : id);
   }
 
   function setFocusMode(mode) {

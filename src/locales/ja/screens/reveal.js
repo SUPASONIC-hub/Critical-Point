@@ -21,6 +21,7 @@ export default {
     bust: "熱 {gauge} — 壁は {wall} にあった。",
     cashed: "熱 {gauge} で確定。壁は {wall} にあった。",
   },
+  autoCash: "熱 {gauge} で自動確定。決裁の勝負だけ自分で打ちます。",
   details: "詳しく",
   ledgerLabel: "判定の余波",
   pot: {

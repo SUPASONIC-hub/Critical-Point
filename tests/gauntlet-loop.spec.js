@@ -6,6 +6,7 @@ import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
+import { isSignNode, STORY_AUTO_HEAT } from "../src/gauntlet/storyAutoCash.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -896,7 +897,8 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   expect(atTheTable.log.at(-1).assistStory).toBeUndefined();
   await expect(page.getByTestId("next-mutations")).toContainText("BLACKOUT");
 
-  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true }) });
+  // 판 모두 직접 치기 (G43): this table is not the case's 결재 판, and is played by hand only with it.
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true, playAllTables: true }) });
   const inStoryMode = await bustTheFirstCard();
   const entry = inStoryMode.log.at(-1);
   expect(entry.threshold.busted).toBe(true);
@@ -920,6 +922,108 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   // The band label is SCOUT's button here, its text followed by " · 조회".
   await expect(page.locator(".gx-band-label")).toHaveText(/^벽 88–98(?: · |$)/);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
+});
+
+// G43 (2026-11-26, Q7 (1)): in story mode a case is played by hand on its
+// 결재 판 alone. Every other table is cashed at heat 70 the moment its card is
+// picked -- on the briefing page or on the table -- and the reveal says so in
+// one line, which fits a 360px phone. The entry it logs is a hand's: the
+// replay record, the pushes and a gauge the far wall never reached.
+const withStory = (page, settings) => page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify(settings) });
+const autoLine = (page) => page.locator(".decision-reveal").getByTestId("reveal-auto");
+
+test("story mode cashes every table but the case's 결재 판 at heat 70, and says so", async ({ page }) => {
+  test.setTimeout(120_000);
+  expect(isSignNode("case01", nodes.start), "사건 01's first scene is not its 결재 판").toBe(false);
+  expect(isSignNode("case01", nodes.c1_aftershock), "c1_aftershock is").toBe(true);
+  await page.setViewportSize({ width: 360, height: 740 });
+  await withStory(page, { storyMode: true });
+
+  // Picked on the briefing page: the table never asks for a push.
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const card = page.locator("[data-testid='briefing-card']:not([disabled]):not([aria-disabled='true'])").first();
+  const actCard = page.getByTestId("act-card-continue");
+  await expect(card.or(actCard).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  if (await actCard.isVisible()) await actCard.click();
+  await card.click();
+  await expect(autoLine(page)).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveText(/^자동 확정 · 열기 \d+\. 결재 판만 직접 칩니다\.$/);
+  const first = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  expect(first.nodeId).toBe("start");
+  expect(first.assistStory).toBe(true);
+  expect(first.threshold.busted).toBe(false);
+  expect(first.threshold.cause).toBe("cash");
+  expect(first.threshold.pushes).toBeGreaterThan(0);
+  expect(first.threshold.gauge).toBeGreaterThanOrEqual(STORY_AUTO_HEAT);
+  expect(first.threshold.gauge).toBeLessThan(first.threshold.wall);
+  expect(first.replay?.events?.at(-1)?.[1], "the replay record ends on its cash, as a hand's").toBe("C");
+  // One line, inside the sheet, and the page no wider for it.
+  const fit = await autoLine(page).evaluate((line) => ({
+    clipped: line.scrollWidth - line.clientWidth,
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  }));
+  expect(fit.clipped).toBeLessThanOrEqual(0);
+  expect(fit.overflow).toBeLessThanOrEqual(1);
+
+  // Picked on the table, with the briefing opened first: cashed the same way.
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId;
+  expect(isSignNode("case01", nodes[before])).toBe(false);
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(autoLine(page)).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const second = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  expect(second.nodeId).toBe(before);
+  expect(second.threshold.gauge).toBeGreaterThanOrEqual(STORY_AUTO_HEAT);
+
+  // The case's 결재 판 is played by hand: the card is staked, the table stays live.
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next").or(page.locator(".result-page")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveCount(0);
+});
+
+test("판 모두 직접 치기 plays every story table by hand, set from the play header by keyboard; board mode is untouched", async ({ page }) => {
+  test.setTimeout(120_000);
+  const stage = page.getByTestId("gauntlet-stage");
+  const playByHand = async () => {
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+    await expect(stage).toHaveAttribute("data-status", "live");
+    await cashStakedCard(page);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(autoLine(page)).toHaveCount(0);
+    return (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  };
+
+  // Board mode: the first scene is played by hand, as before G43.
+  await openTable(page, "case01", "start");
+  const board = await playByHand();
+  expect(board.assistStory).toBeUndefined();
+
+  // Story mode with the switch turned on in the play header's comfort settings, by keyboard.
+  await withStory(page, { storyMode: true });
+  await openTable(page, "case01", "start");
+  await page.getByTestId("open-comfort-settings").click();
+  const dialog = page.getByTestId("comfort-dialog");
+  const toggle = dialog.getByRole("checkbox", { name: /판 모두 직접 치기/ });
+  await expect(toggle).not.toBeChecked();
+  await toggle.focus();
+  await page.keyboard.press("Space");
+  await expect(toggle).toBeChecked();
+  expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).playAllTables, ACCESSIBILITY_SETTINGS_KEY)).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  const story = await playByHand();
+  expect(story.assistStory).toBe(true);
+  expect(story.nodeId).toBe("start");
 });
 
 /**

@@ -507,6 +507,11 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * STORY_ENDING_FLOOR of story seasons (1,200 on another seed before the
  * change: cold 1.3 -> 3.3%, open question 0.0 -> 2.7%, quiet cover 7.0 -> 3.1%).
  *
+ * G43 (2026-11-26, Q7 (1)): a story season plays by hand only each case's
+ * 결재 판; its other tables are cashed at heat 70 as the page cashes them
+ * (storyAutoCash.js). `by hand` is how many tables a season played itself;
+ * STORY_PLAY_ALL=1 plays them all by hand, as 「판 모두 직접 치기」 does.
+ *
  * Played after everything above, on the same seeded stream, so the seasons
  * above are the ones they always were.
  */
@@ -515,13 +520,14 @@ const STORY_ENDING_FLOOR = 0.02;
 if (!process.env.ENDING_BASELINE) {
   const storyCounts = new Map();
   const collapseCauses = new Map();
-  const storySamples = { busts: [], windows: [], skipped: [], vaultPerCase: [] };
+  const storySamples = { busts: [], windows: [], hands: [], skipped: [], vaultPerCase: [] };
   for (let index = 0; index < STORY_SEASONS; index += 1) {
     const season = playSeason(`story:${index}`, POPULATION[index % POPULATION.length], true);
     storyCounts.set(season.ending.id, (storyCounts.get(season.ending.id) ?? 0) + 1);
     if (season.ending.cause) collapseCauses.set(season.ending.cause.id, (collapseCauses.get(season.ending.cause.id) ?? 0) + 1);
     storySamples.busts.push(season.strain.seasonBusts);
     storySamples.windows.push(season.windows);
+    storySamples.hands.push(season.handWindows);
     storySamples.skipped.push(season.skipped);
     storySamples.vaultPerCase.push(Math.round(season.strain.seasonVaultPerCase));
     const unmarked = CASE_SEQUENCE.filter((caseId) => season.caseResults[caseId]?.assistStory !== true);
@@ -537,7 +543,7 @@ if (!process.env.ENDING_BASELINE) {
   if (STORY_SEASONS >= SEASONS) assert.deepEqual(storyThin, [], `G37: story-mode endings under ${STORY_ENDING_FLOOR * 100}% of ${STORY_SEASONS} seasons: ${storyThin.join(", ")}`);
   const storySpread = EXPECTED.map((id) => `${id} ${(share(storyCounts, id, STORY_SEASONS) * 100).toFixed(1)}%`).join(", ");
   console.log(
-    `Story-mode ending checks passed (${STORY_SEASONS} replayed seasons: ${storySpread}; collapse by harm ${collapseCauses.get("harm") ?? 0}, by overreach ${collapseCauses.get("overreach") ?? 0}; busts ${band(storySamples.busts)}, windows ${band(storySamples.windows)}, vault a case ${band(storySamples.vaultPerCase)})`,
+    `Story-mode ending checks passed (${STORY_SEASONS} replayed seasons: ${storySpread}; collapse by harm ${collapseCauses.get("harm") ?? 0}, by overreach ${collapseCauses.get("overreach") ?? 0}; busts ${band(storySamples.busts)}, windows ${band(storySamples.windows)}, by hand ${band(storySamples.hands)}, vault a case ${band(storySamples.vaultPerCase)})`,
   );
 }
 

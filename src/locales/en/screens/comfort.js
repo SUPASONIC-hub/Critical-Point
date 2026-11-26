@@ -11,6 +11,10 @@ export default {
       label: "Story Mode",
       text: "The Wall moves further away, and a hand that hits the Wall doesn’t carry over to the next. Hitting the Wall doesn’t skip a scene. The clock runs 2× slower. Turned on before you start, it applies from the first case; during a case, from the next one. These runs don’t go on the public ranking.",
     },
+    playAllTables: {
+      label: "Play every hand yourself",
+      text: "In Story Mode too, you play every hand yourself. Off, you play only each case’s Sign-off hand; the others cash at Heat 70 as soon as you pick a card.",
+    },
     holdReadingClock: {
       label: "Turn off the reading clock",
       text: "Scene text doesn’t move on by itself. Read to the end, then open the table yourself.",
