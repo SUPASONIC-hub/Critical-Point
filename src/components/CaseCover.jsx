@@ -12,12 +12,16 @@ import { fill } from "../locale.js";
  * A replay hands its lent run back as it closes, so on its report the run is
  * no longer practice: the closing entry's `firstRecord` says it was, as the
  * audit ledger reads it (auditRisk.js describeAuditLedger).
+ *
+ * The status span is the line's first child either way, so React keeps the
+ * one node from the offer to the paid line and a screen reader hears the
+ * payment once, as it lands (a polite live region that was there before).
  */
 export function CaseCover({ caseId, caseResults, run, log = [], onApply, locked = false }) {
   const covered = caseResults?.[caseId]?.covered;
   const say = resultCopy.cover;
   if (covered) {
-    return <p className="case-cover" data-testid="case-cover">{fill(say.paid, { cost: formatMoney(covered.cost), harm: covered.harm, covers: countCovers(caseResults) })}</p>;
+    return <p className="case-cover" data-testid="case-cover"><span role="status" aria-live="polite" aria-atomic="true" data-testid="case-cover-status">{fill(say.paid, { cost: formatMoney(covered.cost), harm: covered.harm, covers: countCovers(caseResults) })}</span></p>;
   }
   const offer = readPayOffer({ caseId, caseResults, vault: run?.vault, story: run?.story === true, practice: Boolean(run?.practice) || log.some((entry) => entry?.threshold?.firstRecord) });
   if (!offer) return null;
@@ -27,6 +31,7 @@ export function CaseCover({ caseId, caseResults, run, log = [], onApply, locked 
   };
   return (
     <p className="case-cover" data-testid="case-cover">
+      <span role="status" aria-live="polite" aria-atomic="true" data-testid="case-cover-status" />
       <span>{fill(say.offer, { cost: formatMoney(offer.cost), harm: offer.harm })}</span>{" "}
       <button type="button" className="ghost" data-testid="case-cover-pay" aria-disabled={offer.afford ? undefined : "true"} onClick={pay}>
         {offer.afford ? say.pay : say.short}

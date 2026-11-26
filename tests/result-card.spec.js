@@ -578,13 +578,21 @@ test("a case closed on harm offers 보상금 on its report, and paying it takes 
   expect(vault, "the 계좌 holds the price").toBeGreaterThanOrEqual(COVER_COST);
   const line = page.locator(".outcome-panel").getByTestId("case-cover");
   await expect(line).toHaveCount(1);
-  await expect(line.locator("span")).toHaveText(fill(resultCopy.cover.offer, { cost: formatMoney(COVER_COST), harm: COVER_HARM }));
+  await expect(line.locator("span:not([role='status'])")).toHaveText(fill(resultCopy.cover.offer, { cost: formatMoney(COVER_COST), harm: COVER_HARM }));
   await expect(line.locator("small")).toHaveText(resultCopy.cover.record);
   const pay = line.getByTestId("case-cover-pay");
   await expect(pay).toHaveText(resultCopy.cover.pay);
   await expect(pay).not.toHaveAttribute("aria-disabled", "true");
+  // The polite live region is on the page, empty, before the press: the paid line lands in it and is heard once.
+  const status = line.getByRole("status");
+  await expect(status).toHaveCount(1);
+  await expect(status).toHaveAttribute("aria-live", "polite");
+  await expect(status).toBeEmpty();
+  await status.evaluate((node) => (node.dataset.e2eKept = "1"));
 
   await clickElement(pay, "pay the case's 보상금");
+  await expect(status).toHaveText(fill(resultCopy.cover.paid, { cost: formatMoney(COVER_COST), harm: COVER_HARM, covers: 1 }));
+  await expect(status, "the same live region, not a new one mounted with the text").toHaveAttribute("data-e2e-kept", "1");
   await expect(line).toHaveText(fill(resultCopy.cover.paid, { cost: formatMoney(COVER_COST), harm: COVER_HARM, covers: 1 }));
   await expect(page.getByTestId("case-cover-pay")).toHaveCount(0);
   await expect
@@ -608,7 +616,7 @@ test("with too little in the 계좌 the 보상금 button says so, is off, and a 
 
   // Forced: Playwright waits for an aria-disabled control to turn on; a finger presses it anyway.
   await pay.click({ force: true });
-  await expect(line.locator("span")).toHaveText(fill(resultCopy.cover.offer, { cost: formatMoney(COVER_COST), harm: COVER_HARM }));
+  await expect(line.locator("span:not([role='status'])")).toHaveText(fill(resultCopy.cover.offer, { cost: formatMoney(COVER_COST), harm: COVER_HARM }));
   await expect(pay).toHaveAttribute("aria-disabled", "true");
   const after = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(after.caseResults.case01.covered ?? null, "nothing was paid").toBeNull();
