@@ -871,10 +871,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   const {
     renderSceneLines, renderSceneMinutes,
-    renderDecisionReveal,
-    renderRecoveryNotice,
-    renderSaveStatus,
-    renderErrorLogPanel, renderActProgress, renderLeaveLine,
+    renderDecisionReveal, renderRecoveryNotice, renderSaveStatus,
+    renderErrorLogPanel, renderActProgress, renderLeaveLine, renderCaseCover,
   } = useRuntimeRenderers({
     decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
     lastRecoveredError, started, pauseAfterRecovery: lifecycle.pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
@@ -882,6 +880,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
     startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
+    cover: { caseResults, run: gauntletRun, onApply: applyRun, locked: staleSave },
   });
 
   if (showRanking && (!started || isResult)) { // over a result page too, closing back onto it (RankingScreen returnTo)
@@ -945,7 +944,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     seasonGoals, delayedConsequences, showErrorLog, setShowErrorLog, operationsSnapshot,
   });
   if (isResult) {
-    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderActProgress, renderLeaveLine };
+    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderActProgress, renderLeaveLine, renderCaseCover };
     return (
       <LazyScreen quiet>
         <ResultScreen view={resultView} renderers={renderers} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} />

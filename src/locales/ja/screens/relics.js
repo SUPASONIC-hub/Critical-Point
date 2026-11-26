@@ -3,6 +3,7 @@ export default {
   draft: {
     full: "ツール枠がいっぱい",
     closed: "事件終了",
+    handedBy: "{name}が渡したもの",
     swapTitle: "手放すツールをひとつ",
     title: "次の事件に持っていくツールをひとつ",
     swapLede: "{name}を持つには、手持ちのツールをひとつ手放す。手放したツールは、このテーブルからルールを変えない。",

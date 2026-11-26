@@ -149,6 +149,10 @@ let doorCouldMove = 0;
 // wild-card hands; it reads the seasons and draws nothing.
 const funnelRows = [];
 const dump = [];
+// G33: which archetype each season above was, beside its tools (`populationBuilds`).
+const populationArchetypes = [];
+// G34: the prices each season above paid its covers at (season-bot.mjs `pays`: money only).
+const populationCovers = [];
 // the audit on (AUDIT=0 turns it off) (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
 const auditTally = { seasons: 0, caught: 0, lost: 0, secured: 0 };
 // the links on (CASCADE=0 turns them off) (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
@@ -166,6 +170,8 @@ for (let index = 0; index < SEASONS; index += 1) {
   const season = playSeason(index, archetype, false, seen.watch);
   populationSeen.push(seen);
   populationBuilds.push(season.relics);
+  populationArchetypes.push(archetype);
+  populationCovers.push(season.covers ?? []);
   populationHeldAt.push(season.relicsAt ?? {});
   if (season.audits.caught > 0) auditTally.seasons += 1;
   for (const key of ["caught", "lost", "secured"]) auditTally[key] += season.audits[key];
@@ -255,6 +261,26 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+/**
+ * G33 (RULES_MARK 9): the side a case closed on hands one draft card over.
+ * Each archetype's most-held tool, at 사건 07's close and at the season's end,
+ * measured and not asserted: the bot takes a card at random from each draft,
+ * and by the season's end every archetype holds the same five, so the line
+ * does not split by play (4 ways at 사건 07, 1 at the end, with or without G33;
+ * cp-archive 메모-20261125 g4b g33-held2). What G33 is judged on here is the
+ * relic spread of check:pressure (x1.15 or more).
+ */
+{
+  const topOf = (lists) => [...new Set(POPULATION)].map((name) => {
+    const held = new Map();
+    lists.forEach((relics, index) => {
+      if (populationArchetypes[index] === name) for (const id of relics) held.set(id, (held.get(id) ?? 0) + 1);
+    });
+    return [name, ([...held.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] ?? ["(none)"])[0]];
+  });
+  const line = (tops) => `${tops.map(([name, top]) => `${name} ${top}`).join(", ")}; ${new Set(tops.map(([, top]) => top)).size} different`;
+  console.log(`Most-held tool by archetype (G33, measured): at case07's close ${line(topOf(populationHeldAt.map((at) => at.case07 ?? [])))}; at the end ${line(topOf(populationBuilds))}`);
+}
 // WEEK_RULE (season-bot.mjs): every season above and below was a season begun in that week.
 if (WEEK_RULE) console.log(`Week rule (measured): every season under ${WEEK_RULE}, values ${WEEK_VALUES}`);
 /**
@@ -326,6 +352,15 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   const archetypeNames = [...new Set(POPULATION)];
   const collapseOf = (name) => `${name} ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%`;
   console.log(`Collapse by archetype (measured, the ${SEASONS} seasons above, ${POPULATION.length} population slots, random in 2): ${archetypeNames.map(collapseOf).join(", ")}; all ${(share(counts, "collapse", SEASONS) * 100).toFixed(1)}%`);
+  // G34 보상금 (RULES_MARK 9): the archetypes that pay (season-bot.mjs `pays`), how often and at what share of their vault.
+  const payers = archetypeNames.filter((name) => ARCHETYPES[name]?.pays);
+  for (const name of payers) {
+    const seasons = populationCovers.filter((_, index) => populationArchetypes[index] === name);
+    const covers = seasons.map((list) => list.length);
+    const spent = seasons.map((list) => list.reduce((sum, cost) => sum + cost, 0));
+    console.log(`Covers (G34, measured) ${name}: ${fiveNumbers(covers)} a season (mean ${(covers.reduce((a, b) => a + b, 0) / Math.max(1, covers.length)).toFixed(1)}), paid ${fiveNumbers(spent)}; collapse ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%, profitable-silence ${(share(byArchetype[name], "profitable-silence", archetypeTotal(name)) * 100).toFixed(1)}%`);
+    if (isMarkNineOn() && !process.env.ENDING_BASELINE) assert.ok(covers.some((count) => count > 0), `G34: ${name} paid no case off in ${seasons.length} seasons`);
+  }
   const BOARD_PAIRS = Number(process.env.ENDING_BOARD_SEASONS) || POPULATION.length * 40;
   const boards = createSeasonBot({ seed: 20261022, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[`${name}+blind`, { ...base, board: "blind" }], [`${name}+listens`, { ...base, board: "listens" }]])) });
   const tally = () => ({ pairs: 0, moved: 0, collapseMoved: 0, blindCollapse: 0, listensCollapse: 0, blindBusts: 0, listensBusts: 0 });
@@ -467,7 +502,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * question none (it is the fallback, and a story season finds every clue).
  * G37 (2026-11-25, the user's 「전부 1」) moved two gates for story seasons
  * only (`storySeason`, gameLogic.js): the cold gap 12 -> 10, and a burned
- * season that kept OPEN OVERSIGHT's trust leaves the question open. Every
+ * season whose trust is storyOpenTrust (83; 85 until G31·G33 moved the drafts) or more leaves the question open. Every
  * ending, the collapse and the open question with them, now closes at least
  * STORY_ENDING_FLOOR of story seasons (1,200 on another seed before the
  * change: cold 1.3 -> 3.3%, open question 0.0 -> 2.7%, quiet cover 7.0 -> 3.1%).

@@ -3,6 +3,7 @@ export default {
   draft: {
     full: "Tool slots full",
     closed: "Case closed",
+    handedBy: "Handed over by {name}",
     swapTitle: "Pick a tool to put down",
     title: "Pick one tool for the next Case",
     swapLede: "To take {name}, put down a tool you carry. A tool you put down stops changing the rules from this table on.",

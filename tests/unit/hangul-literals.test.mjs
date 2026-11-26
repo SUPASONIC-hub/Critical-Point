@@ -66,6 +66,7 @@ const KEPT_WORDS = {
   "src/components/GameWordmark.jsx": { "\"임계점\"": "the title's Korean reading, as every page's wordmark carries it" },
   "src/components/LanguagePicker.jsx": { "\"언어 · Language\"": "the picker is named in both languages" },
   "src/credits.js": { "\"찹쌀떡\"": "the studio's Korean name, on the Korean page only" },
+  "src/gauntlet/relics.js": Object.fromEntries(["\"도윤하\"", "\"오진우\"", "\"이민서\""].map((word) => [word, "G33 HANDED_BY: speaker names as keys, printed through speakerName()"])),
   "src/locale.js": { "\"한국어\"": "the Korean page's name in the picker" },
   "src/state/errorRecovery.js": { "} 에러 로그`": "a queued error row's own label; src/screens/ReportArchive.jsx prints the page's (report.session.errorRow)" },
   "src/state/useChoiceCommit.js": { "\"익명 분석관\"": "the name a sent row carries (the server sets it too)" },

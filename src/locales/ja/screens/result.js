@@ -24,6 +24,13 @@ export default {
   rankCarryNote: "次の事件は、このランクに応じて信頼と公正さを少し上乗せするか、疲労を抱えて始まります。",
   rankNote: "ランクは正解かどうかではなく、思考が精密に高まった条件を比べるプレイ指標です。",
   titleRise: "記録の称号が{title}になりました。",
+  cover: {
+    offer: "補償金 {cost} · この事件の人的被害 {harm} を消す",
+    pay: "補償金を払う",
+    short: "口座が足りない",
+    record: "隠した記録 +1 · 公正さ −1 · 次の補償金は1.5倍",
+    paid: "補償金 {cost} を払った · 人的被害 {harm} を消した · 隠した記録 {covers}",
+  },
   actProgress: "第{act}幕 · {pos}/{size} · 中間決算まであと{left}事件",
   actProgressHere: "第{act}幕 · {pos}/{size} · 中間決算は下に",
   leaveLine: {
