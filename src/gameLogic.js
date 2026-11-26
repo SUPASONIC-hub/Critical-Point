@@ -425,10 +425,10 @@ export function getDiscoveryClue({
   responseTimeSec = 45,
   logLength = 0,
   reframeOpenedRoute = false,
-  discoveredClueIds = [],
+  discoveredClueIds = [], cashMultiplier = null, // G39 (RULES_MARK 11): the table's cash, ×32 or more; none given (a preview) reads as before
 } = {}) {
   const qualifies =
-    logLength >= 1 &&
+    logLength >= 1 && seasonStanding.clueCashed(cashMultiplier) &&
     ((challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12 || riskDelta <= -2)) ||
       (reframeOpenedRoute && challengeMatch) ||
       (reframeOpenedRoute && riskDelta <= -2));
@@ -553,8 +553,8 @@ export { VAULT_SLACK_PER_CASE };
 export const LOGIC_SLACK_STREAK = 24;
 // The gates above as numbers, read by nearestEnding.js for the finale's 「가장 가까웠던 다른 결말」 line (C2, display only).
 export const ENDING_THRESHOLDS = Object.freeze({
-  clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY,
-  reformLegitimacy: REFORM_LEGITIMACY, recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, recordClueRate: HUMAN_RECORD_CLUE_RATE,
+  clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY, reformLegitimacy: REFORM_LEGITIMACY,
+  recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, get recordClueRate() { return seasonStanding.getRecordClueRate(HUMAN_RECORD_CLUE_RATE); }, // G39
   silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, storyColdGap: STORY_COLD_GAP, pactGap: PACT_GAP,
   heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK, storyOpenTrust: STORY_OPEN_TRUST,
 });
@@ -705,7 +705,7 @@ export function getEndingVariant({
   const slackGates = seasonStanding.getSlackGates(CLUE_RATE_SLACK_BAR);
   const recordsOpen = clueRate >= (slack ? slackGates.clueRate : CLUE_RATE_BAR);
   const reform = recordsOpen && legitimacy >= REFORM_LEGITIMACY;
-  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= seasonStanding.getRecordClueRate(HUMAN_RECORD_CLUE_RATE) && trust >= RECORD_TRUST) return ENDINGS["human-record"];
   // As burning closes the record endings, answering 개혁 opens the one named for it: EVIDENCE REFORM before
   // OPEN OVERSIGHT, which took nearly every reform season (5.3% of 600, 2026-11-05, note C2). The gates are the same.
   if (finale === "control" && reform) return ENDINGS["evidence-reform"];

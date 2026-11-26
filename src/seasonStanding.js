@@ -1,6 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
-import { isMarkEightOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
+import { cashOpensClue, CLUE_CASH_MULTIPLIER, isMarkEightOn, isMarkElevenOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -19,6 +19,15 @@ const OVERSIGHT_SLACK_EIGHT = 9;
 const OVERSIGHT_TRUST_SLACK_EIGHT = 8;
 /** What an open slack door lowers, for the ruling (gameLogic.js) and the finale's line (nearestEnding.js); `bar` is the record bar before 8. */
 export const getSlackGates = (bar) => (isMarkEightOn() ? { clueRate: CLUE_RATE_SLACK_EIGHT, oversight: OVERSIGHT_SLACK_EIGHT, trust: OVERSIGHT_TRUST_SLACK_EIGHT } : { clueRate: bar, oversight: 0, trust: 0 });
+
+// G39 (RULES_MARK 11): a scene's record opens only on a table cashed at ×32 or more, and HUMAN RECORD asks this share of the records, not every one.
+const RECORD_CLUE_RATE_ELEVEN = 0.85;
+/** HUMAN RECORD's record bar, for the ruling and the finale's line; `bar` is the bar before 11. */
+export const getRecordClueRate = (bar) => (isMarkElevenOn() ? RECORD_CLUE_RATE_ELEVEN : bar);
+/** The cash a record opens at, or null before 11 (the case file's line). */
+export const getRecordCashBar = () => (isMarkElevenOn() ? CLUE_CASH_MULTIPLIER : null);
+/** Whether a decision whose table cashed at `multiplier` can open its scene's record (null: no table read, as the previews ask). */
+export const clueCashed = (multiplier) => multiplier === null || multiplier === undefined || !isMarkElevenOn() || cashOpensClue(multiplier);
 
 /**
  * How much of a gate counts as close to it. The one number the readout's

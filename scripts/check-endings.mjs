@@ -149,6 +149,8 @@ const populationSeen = [];
 const populationBuilds = [];
 const populationHeldAt = [];
 let doorCouldMove = 0;
+// G38·G39 (RULES_MARK 11; measured, not asserted): decisions that raise 돈·믿음·공정함 and move none of them, and the record doors.
+const marginTally = { gains: 0, dead: 0, records: 0, quiet: 0 };
 // The ending funnel at the very end of the report: each row's seasons, kept in
 // report mode only (`funnelRow`). Filled by the population below and by the
 // wild-card hands; it reads the seasons and draws nothing.
@@ -193,6 +195,15 @@ for (let index = 0; index < SEASONS; index += 1) {
   for (const key of ["caught", "lost", "secured"]) auditTally[key] += season.audits[key];
   addLinks(linkTally, season);
   if (reportMode) funnelRow(archetype).push(funnelSeason(season));
+  for (const entry of Object.values(season.caseLogs).flat()) {
+    const keys = ["capital", "trust", "legitimacy"].filter((key) => Number(entry.effect?.[key]) > 0);
+    if (!keys.length || !entry.resourcesBefore || !entry.resourcesAfter) continue;
+    marginTally.gains += 1;
+    if (keys.every((key) => entry.resourcesAfter[key] === entry.resourcesBefore[key])) marginTally.dead += 1;
+  }
+  const clueShare = season.clues / CASE_SEQUENCE.length;
+  if (clueShare >= 0.9) marginTally.records += 1;
+  if (clueShare < 0.5) marginTally.quiet += 1;
   const closesOn = (seasonBestLogic) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic }).id;
   if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
   if (season.ending.id !== "collapse") lastAnswers.push({ archetype, endings: answerEndings(season) });
@@ -278,6 +289,7 @@ if (reportMode) {
   }, null, 2));
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
+console.log(`Margins (G38·G39, measured): decisions raising 돈·믿음·공정함 that moved none ${((100 * marginTally.dead) / Math.max(1, marginTally.gains)).toFixed(1)}% of ${marginTally.gains}; record door (records ≥0.9) ${((100 * marginTally.records) / SEASONS).toFixed(1)}%, under half ${((100 * marginTally.quiet) / SEASONS).toFixed(1)}% of seasons`);
 /**
  * G33 (RULES_MARK 9): the side a case closed on hands one draft card over.
  * Each archetype's most-held tool, at 사건 07's close and at the season's end,
