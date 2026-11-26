@@ -541,7 +541,8 @@ const HUMAN_RECORD_CLUE_RATE = 1;
 const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 // G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
-const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [9, 87]; // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33; G43 11-26: 10/83 -> 9/87, the auto tables at heat 70 lift trust)
+// G43 (11-26): 10/83 -> 9/87, the story tables cashed at heat 70 lift a season's trust.
+const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [9, 87]; // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33)
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
