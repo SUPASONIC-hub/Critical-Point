@@ -233,7 +233,8 @@ const budgets = [
   // 168,600 / 63,001 -> 168,866 / 63,034 g34-cover-e2e over main d5d79552 (#673): 보상금's replay check (the log handed to CaseCover) and its live region. Measured 168,862 / 63,030 in the e2e build on Windows, the plus 4. CI re-measures.
   // 168,866 / 63,034 -> 169,144 / 63,121 g34-cover-focus over main 9f0537f5 (#681): focus after paying 보상금 (CaseCover's ref and effect). CI measured 169,140 / 63,117 (verify-quick run 45769620269), the plus 4.
   // 169,144 / 63,121 -> 169,172 / 63,121 gameplay-g5a (RULES_MARK 10, G40 G41 G42) over main e4a5df69: main's budget plus this branch's local increase (+28 / +0), provisional until CI measures it.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_172, maxGzip: 63_121 },
+  // gzip 63,121 -> 63,127: CI measured 63,123 on ee32a377 (run 45776809850), the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_172, maxGzip: 63_127 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
