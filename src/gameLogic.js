@@ -538,10 +538,10 @@ const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten
 // harm and people-first decisions could not tell them from a balanced season.
 // With it (2026-10-15) that hand closes 67.5% as HUMAN RECORD, all 13.7% (14.0%).
 const HUMAN_RECORD_CLUE_RATE = 1;
-const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
+const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = seasonStanding.withUpkeepGates([82, 86, 75, 97, 45, 88], { 3: 91, 5: 85 });
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
 // G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
-const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [10, 83]; // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33)
+const [STORY_COLD_GAP, STORY_OPEN_TRUST] = seasonStanding.withUpkeepGates([10, 83], { 0: 9 }); // and a burned story season this trusted leaves the question open (G37, retuned with G31·G33)
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.

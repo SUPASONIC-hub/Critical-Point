@@ -6,7 +6,7 @@ import { RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { describeCaseOpening } from "../../src/state/caseRoutes.js";
 import { ENDING_THRESHOLDS, getDiscoveryClue } from "../../src/gameLogic.js";
-import { getQuietClueRate, getRecordCashBar } from "../../src/seasonStanding.js";
+import { getQuietClueRate, getRecordCashBar, weighFinale, weighUpkeep } from "../../src/seasonStanding.js";
 
 const ELEVEN = withMarkEleven(ALL_RULES, true);
 const BEFORE = withMarkEleven(ALL_RULES, false);
@@ -54,4 +54,14 @@ test("G39: a scene's record opens only on a table cashed at ×32 or more, and HU
   assert.equal(ENDING_THRESHOLDS.recordClueRate, 0.85);
   assert.equal(getRecordCashBar(), 32);
   assert.equal(getQuietClueRate(0.5), 0.2, "QUIET COVER's record door moves with them");
+});
+
+test("G38 유지비 on the ending: the season's means read a third less over 80, before the answer's weight, and three gates moved with them", () => {
+  assert.deepEqual(weighUpkeep({ trust: 100, legitimacy: 80, capital: 97, time: 90 }), { trust: 93, legitimacy: 80, capital: 91, time: 90 });
+  assert.deepEqual(weighFinale({ trust: 100, legitimacy: 70, capital: 50 }, "witness"), { trust: 98, legitimacy: 70, capital: 50 });
+  assert.deepEqual(weighFinale({ trust: 100, legitimacy: 70, capital: 50 }, "burn"), { trust: 93, legitimacy: 70, capital: 50 });
+  assert.equal(ENDING_THRESHOLDS.silenceCapital, 91);
+  assert.equal(ENDING_THRESHOLDS.coldLegitimacy, 85);
+  assert.equal(ENDING_THRESHOLDS.storyColdGap, 9);
+  assert.equal(ENDING_THRESHOLDS.oversightLegitimacy, 82, "the gates not moved stay where they were");
 });

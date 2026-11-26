@@ -1,6 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
-import { cashOpensClue, CLUE_CASH_MULTIPLIER, isMarkEightOn, isMarkElevenOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
+import { cashOpensClue, CLUE_CASH_MULTIPLIER, getUpkeep, isMarkEightOn, isMarkElevenOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -70,9 +70,31 @@ export const FINALE_WEIGHT = 5;
 const FINALE_KEYS = Object.freeze({ witness: "trust", control: "legitimacy" });
 /** The season's mean standing with the finale's answer on it, as the ruling (gameLogic.js) and the finale's line (nearestEnding.js) read it. */
 export function weighFinale(seasonResources, finale) {
+  const standing = weighUpkeep(seasonResources);
   const key = FINALE_KEYS[finale];
-  if (!seasonResources || !key || !isMarkTenOn()) return seasonResources;
-  return { ...seasonResources, [key]: Math.min(100, (Number(seasonResources[key]) || 0) + FINALE_WEIGHT) };
+  if (!standing || !key || !isMarkTenOn()) return standing;
+  return { ...standing, [key]: Math.min(100, (Number(standing[key]) || 0) + FINALE_WEIGHT) };
+}
+/**
+ * G38 (RULES_MARK 11): the ending gates the means' 유지비 moved, as the ruling
+ * (gameLogic.js) reads them: `gates` before 11, with `moved` (index: gate) laid
+ * over them from 11. PROFITABLE SILENCE's 돈 97 -> 91 and COLD JUSTICE's 공정함
+ * 88 -> 85 (the old bars after the 유지비), story mode's cold gap 10 -> 9 (story
+ * COLD JUSTICE 2.2% -> 3.2% of 600). Read once, as the module loads.
+ */
+export function withUpkeepGates(gates, moved) {
+  return isMarkElevenOn() ? gates.map((gate, index) => moved[index] ?? gate) : gates;
+}
+/**
+ * G38 유지비 on the ending (RULES_MARK 11, the user's (1) of 2026-11-26): the
+ * season's mean 믿음·공정함·돈 count a third less of what stands over 80 (100
+ * reads as 93), as a case opens on them (nextTableRules.js `getUpkeep`). Before
+ * the finale's weight (G40) goes on.
+ */
+export function weighUpkeep(seasonResources) {
+  if (!seasonResources || !isMarkElevenOn()) return seasonResources;
+  const cut = getUpkeep(seasonResources);
+  return { ...seasonResources, ...Object.fromEntries(Object.entries(cut).map(([key, value]) => [key, (Number(seasonResources[key]) || 0) + value])) };
 }
 /**
  * G41 (RULES_MARK 10): a season that paid COVER_QUIET cases off or more and did

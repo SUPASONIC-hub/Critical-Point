@@ -141,7 +141,7 @@ test("ending variant should prefer open oversight when evidence and trust are hi
 });
 test("rare ending thresholds should stay reachable without overriding evidence endings", () => {
   assert.equal(getEndingVariant(endingSeason({ capital: 100, trust: 30, legitimacy: 50 })).id, "profitable-silence");
-  assert.equal(getEndingVariant(endingSeason({ capital: 85, trust: 78, legitimacy: 96 })).id, "cold-justice");
+  assert.equal(getEndingVariant(endingSeason({ capital: 85, trust: 72, legitimacy: 96 })).id, "cold-justice"); // G38: 공정함 96 reads as 91 from RULES_MARK 11
   assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 92, legitimacy: 70 })).id, "field-pact");
   // 믿음 78: the finale's 증언 weighs 5 more on it (G40, RULES_MARK 10), 83, still under OPEN OVERSIGHT's 85.
   assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 78, legitimacy: 90 })).id, "evidence-reform");
