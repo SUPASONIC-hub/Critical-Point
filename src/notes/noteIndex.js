@@ -189,6 +189,12 @@ export const NOTES = [
     title: "주간 규칙을 만든 이유와 첫 달 결과",
     summary: "버린 아이디어에서 나온 네 원칙, 두 번 미루고 거둔 시험 주, 그리고 첫 달에 숫자 대신 고치기를 고른 이유입니다.",
   },
+  {
+    slug: "story-tilts-the-table",
+    published: "2026-11-26",
+    title: "기운 판, 건네받은 도구, 보상금: 이야기가 판에 닿는 세 규칙",
+    summary: "사건을 열 때의 상태가 판을 기울이고, 닫은 쪽의 사람이 도구를 건네고, 사람 피해는 돈으로 덮을 수 있습니다. 언제 쓰고 무엇을 잃는지 정리했습니다.",
+  },
   // A draft: 2099-12-31 keeps it out of every build until its day is set (12-01 once 11-21~30 is filled in on 11-30).
   {
     slug: "november-2026-log",
