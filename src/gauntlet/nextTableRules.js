@@ -444,7 +444,7 @@ export function withMarkEleven(rules, on = elevenByDefault()) {
 export const UPKEEP_FROM = 80;
 export const UPKEEP_KEYS = Object.freeze(["trust", "legitimacy", "capital"]);
 export function getUpkeep(resources = {}) {
-  return Object.fromEntries(UPKEEP_KEYS.map((key) => [key, -Math.round(Math.max(0, (Number(resources?.[key]) || 0) - UPKEEP_FROM) / 3)]).filter(([, cut]) => cut < 0));
+  return Object.fromEntries(UPKEEP_KEYS.map((key) => [key, -Math.round(Math.max(0, (Number(resources?.[key]) || 0) - UPKEEP_FROM) / 3)]).filter(([, cut]) => Number(cut) < 0));
 }
 
 /** G39: a scene's record opens only on a table cashed at this multiplier or more. */
