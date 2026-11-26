@@ -2610,7 +2610,9 @@
   font-size: 0.875rem;
   line-height: 1.55;
 }
-.leave-line button {
+/* G34's 보상금 button (CaseCover.jsx) is a `.ghost`, 38px: a finger's 44 here. */
+.leave-line button,
+.case-cover button {
   min-height: 44px;
 }
 .leave-line small {
