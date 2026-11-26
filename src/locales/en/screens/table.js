@@ -225,10 +225,10 @@ export default {
     rulesLift: "To lift {rules}: survive to the Case result and move your stake into the Vault.",
     overdrive: {
       ready: { label: "Overclock ready", text: "Commit now and the next hand gets ×2 chips and bigger pushes" },
-      live: { label: "Live", text: "One more ×4+ Commit for Overclock" },
-      held: { label: "Held", text: "Commit at ×4 or more this hand to keep it going" },
+      live: { label: "Live", text: "One more ×{multiplier}+ Commit for Overclock" },
+      held: { label: "Held", text: "Commit at ×{multiplier} or more this hand to keep it going" },
       ignition: { label: "Ignition", text: "Commit for Overclock streak step 1" },
-      dormant: { label: "Off", text: "The streak starts with a ×4+ Commit" },
+      dormant: { label: "Off", text: "The streak starts with a ×{multiplier}+ Commit" },
     },
     rulesOn: "{rules} in effect",
     rulesHidden: "Hidden rules in effect",

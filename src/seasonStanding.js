@@ -1,6 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
-import { isMarkEightOn } from "./gauntlet/nextTableRules.js";
+import { isMarkEightOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -42,6 +42,30 @@ export const caseHarm = (summary) => Math.max(0, (Number(summary?.finalHumanCost
 export const COVER_LEGITIMACY = 1;
 export const COVER_SILENCE_TRUST = 3;
 export const COVER_QUIET = 6;
+
+/**
+ * G40 (RULES_MARK 10, 마지막 답의 무게): the finale's answer weighs once more on
+ * the season's mean standing the ruling reads -- 증언 (witness) the people's
+ * 믿음, 개혁 (control) the system's 공정함, FINALE_WEIGHT each, up to 100; 소각
+ * (burn) nothing. Only the mean (`getSeasonStrain().seasonResources`): a caller
+ * that hands the last case's resources alone is read as it was. Measured
+ * (게임성 5차 G40, with G41): the answer moves the ending in 75.8% of standing
+ * seasons (63.3% before); +8 took COLD JUSTICE under 3%.
+ */
+export const FINALE_WEIGHT = 5;
+const FINALE_KEYS = Object.freeze({ witness: "trust", control: "legitimacy" });
+/** The season's mean standing with the finale's answer on it, as the ruling (gameLogic.js) and the finale's line (nearestEnding.js) read it. */
+export function weighFinale(seasonResources, finale) {
+  const key = FINALE_KEYS[finale];
+  if (!seasonResources || !key || !isMarkTenOn()) return seasonResources;
+  return { ...seasonResources, [key]: Math.min(100, (Number(seasonResources[key]) || 0) + FINALE_WEIGHT) };
+}
+/**
+ * G41 (RULES_MARK 10): a season that paid COVER_QUIET cases off or more and did
+ * not burn its records closes on QUIET COVER where it would have closed on
+ * PROFITABLE SILENCE: it kept the records and bought the quiet (게임성 5차 G41).
+ */
+export const coversBeforeSilence = (seasonCovers) => isMarkTenOn() && seasonCovers >= COVER_QUIET;
 
 /**
  * The season's closed cases as `[caseId, summary]`, the case that is closing

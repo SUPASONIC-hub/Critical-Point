@@ -6,10 +6,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { resourceMeta } from "../../src/appCopy.js";
 import {
-  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, HOT_CASH_MULTIPLIER, reduceWindow, RUN_INITIAL_STATE,
+  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, reduceWindow, RUN_INITIAL_STATE,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { describeCaseChange, describeClockHeat, describeEffect, describeStakedDetail, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
 import { getAuthorityGate } from "../../src/gameLogic.js";
+// G42 (RULES_MARK 10): the chain asks for ×32 on this page's table (×4 before).
+import { HOT_CASH_TEN as HOT_CASH_MULTIPLIER } from "../../src/gauntlet/nextTableRules.js";
 import observerCopy from "../../src/copy/observer.js";
 import { initialResources } from "../../src/gameConstants.js";
 import { easyResourceLabels } from "../../src/playerLanguage.js";

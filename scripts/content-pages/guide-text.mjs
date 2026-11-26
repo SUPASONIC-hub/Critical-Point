@@ -46,7 +46,7 @@ export const GUIDE_BODY = {
 <dt>COLD FEET (프롤로그 03)</dt><dd>한 번도 밀지 않고 확정하면 다음 판의 칩이 가장 많은 카드가 열기 30을 넘을 때까지 봉인되고, 칩이 0.6배가 됩니다.</dd>
 <dt>HEAT DEBT (프롤로그 03)</dt><dd>열기 60 이상에서 확정하면 다음 판은 그 열기의 3분의 1을 안고, 12초 짧게 시작합니다.</dd>
 <dt>FRACTURE (프롤로그 04)</dt><dd>확정이든 BUST든, 카드가 한 자원을 8 이상 태웠다면 다음 판에서 그 자원을 태우는 카드는 1.5배로 청구됩니다.</dd>
-<dt>OVERCLOCK (사건 01)</dt><dd>×4 이상 확정을 두 번 잇달아 하면 다음 판의 칩이 2배가 되지만 밀 때 오르는 열기도 커집니다. ×4 이상 확정이 이어지는 동안 계속됩니다.</dd>
+<dt>OVERCLOCK (사건 01)</dt><dd>×32 이상 확정을 두 번 잇달아 하면 다음 판의 칩이 2배가 되지만 밀 때 오르는 열기도 커집니다. ×32 이상 확정이 이어지는 동안 계속됩니다.</dd>
 <dt>감사, AUDIT (사건 02)</dt><dd>장부가 너무 매끈하면 걸립니다. 한 사건 안에서 한 번 이상 밀고 확정한 열기가 ±1 안의 같은 자리에 5번 모이면, 사건이 닫힐 때 금고로 갈 몫의 4분의 1을 잃습니다. 열기 막대에는 지금 확정하면 같은 자리 확정이 늘어나는 구간이 표시되고, 한도까지 한 번 남았을 때 그 자리면 판에 「같은 자리면 감사」가 뜹니다. 감사로 잃은 사건의 결과에는 「왜」 한 줄이 붙습니다.</dd>
 <dt>연결, CASCADE (사건 03)</dt><dd>한 자원을 8 이상 태운 카드로 확정하면 연결이 생겨, 2~4판 뒤의 한 판에서 벽 구간의 먼 끝이 10 가까워집니다(가까운 끝은 그대로). 다음 사건으로는 가장 최근 연결 하나만 넘어갑니다.</dd>
 </dl>
@@ -177,7 +177,7 @@ export const GUIDE_BODY = {
 <dt>COLD FEET (Prologue 03)</dt><dd>Commit without a single push and the next hand seals its card with the most chips until Heat passes 30, with chips at ×0.6.</dd>
 <dt>HEAT DEBT (Prologue 03)</dt><dd>Commit at Heat 60 or more and the next hand starts with a third of that Heat and 12 seconds less.</dd>
 <dt>FRACTURE (Prologue 04)</dt><dd>If the card just burned 8 or more of one resource, commit or BUST, cards that burn it next hand are charged ×1.5.</dd>
-<dt>OVERCLOCK (Case 01)</dt><dd>Two commits in a row at ×4 or more double the next hand’s chips, but each push adds more Heat. It lasts while the ×4 commits continue.</dd>
+<dt>OVERCLOCK (Case 01)</dt><dd>Two commits in a row at ×32 or more double the next hand’s chips, but each push adds more Heat. It lasts while the ×32 commits continue.</dd>
 <dt>AUDIT (Case 02)</dt><dd>A ledger that is too smooth gets audited. If 5 of a case’s commits, each after at least one push, land at the same spot within ±1 Heat, you lose a quarter of the share bound for the Vault when the case closes. The Heat bar marks where committing now would add to the same-spot count, and one short of the limit the table shows “Same spot = audit” there. A case that lost to the audit gets a “Why” line on its result.</dd>
 <dt>CASCADE (Case 03)</dt><dd>Commit a card that burns 8 or more of one resource and you make a link: one hand 2 to 4 hands later has the far end of its Wall band 10 closer (the near end stays). Only the newest link carries into the next case.</dd>
 </dl>
@@ -308,7 +308,7 @@ export const GUIDE_BODY = {
 <dt>COLD FEET（プロローグ03）</dt><dd>一度も押さずに確定すると、次の勝負でチップがいちばん多いカードが熱30を超えるまで封印され、チップが0.6倍になります。</dd>
 <dt>HEAT DEBT（プロローグ03）</dt><dd>熱60以上で確定すると、次の勝負はその熱の3分の1を抱え、12秒短く始まります。</dd>
 <dt>FRACTURE（プロローグ04）</dt><dd>確定でもBUSTでも、カードが一つのリソースを8以上燃やしていたら、次の勝負でそのリソースを燃やすカードは1.5倍で請求されます。</dd>
-<dt>OVERCLOCK（事件01）</dt><dd>×4以上の確定を2回続けると次の勝負のチップが2倍になりますが、押したときに上がる熱も大きくなります。×4以上の確定が続くあいだ続きます。</dd>
+<dt>OVERCLOCK（事件01）</dt><dd>×32以上の確定を2回続けると次の勝負のチップが2倍になりますが、押したときに上がる熱も大きくなります。×32以上の確定が続くあいだ続きます。</dd>
 <dt>監査、AUDIT（事件02）</dt><dd>帳簿がなめらかすぎると監査されます。ひとつの事件で、一度以上押して確定した熱が±1以内の同じ位置に5回集まると、事件が閉じるとき金庫へ行く取り分の4分の1を失います。熱のバーには、いま確定すると同じ位置の確定が増える区間が示され、上限まであと1回のときその位置なら卓に「同じ位置で監査」が出ます。監査で失った事件の結果には「なぜ」の一行が付きます。</dd>
 <dt>連結、CASCADE（事件03）</dt><dd>一つのリソースを8以上燃やすカードで確定すると連結ができ、2〜4勝負あとのひとつの勝負で壁の区間の奥の端が10近づきます(手前の端はそのまま)。次の事件に持ち越されるのは、いちばん新しい連結一つだけです。</dd>
 </dl>
