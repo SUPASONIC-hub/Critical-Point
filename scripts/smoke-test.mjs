@@ -146,7 +146,7 @@ test("rare ending thresholds should stay reachable without overriding evidence e
   // 믿음 78: the finale's 증언 weighs 5 more on it (G40, RULES_MARK 10), 83, still under OPEN OVERSIGHT's 85.
   assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 78, legitimacy: 90 })).id, "evidence-reform");
   assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 78, legitimacy: 90 }, 35)).id, "open-question", "the record endings need the season's records");
-  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 78, legitimacy: 90 }, 20)).id, "quiet-cover", "and with most of them unopened the truth is still asleep");
+  assert.equal(getEndingVariant(endingSeason({ capital: 90, trust: 78, legitimacy: 90 }, 10)).id, "quiet-cover", "and with most of them unopened the truth is still asleep"); // under 0.2 (G39, RULES_MARK 11)
 });
 test("intro view contracts should fail fast when required fields are omitted", () => {
   assert.throws(
