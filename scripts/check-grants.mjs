@@ -216,6 +216,10 @@ async function seedBeforeRankingReset() {
       await db.query(`insert into public.board_admin_log (admin_email, action, post_id) values ($1, 'hide', 0)`, [`${RESET_SEED}@check.invalid`]);
     }
     // The weekly reminder's subscriptions (20261129000000) exist before the 11-30 reset: a reset leaves them as it found them.
+    // The makers' notice (20261202010000) once a reset replays after it: a reset leaves it as it found it.
+    if (await boardNoticeExists()) {
+      await db.query(`insert into public.board_notice (body_ko, posted_by) values ('초기화 전에 올린 공지', $1)`, [`${RESET_SEED}@check.invalid`]);
+    }
     if (await pushSubscriptionsExist()) {
       await db.query(`insert into public.push_subscriptions (endpoint, p256dh, auth) values ($1, $2, 'QUJDREVGR0hJSktMTU5PUA')`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`, `B${"A".repeat(86)}`]);
     }
@@ -244,7 +248,11 @@ async function removeRankingResetSeed() {
   if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
   if (await boardAdminLogExists()) await db.query(`delete from public.board_admin_log where admin_email = $1`, [`${RESET_SEED}@check.invalid`]);
   if (await pushSubscriptionsExist()) await db.query(`delete from public.push_subscriptions where endpoint = $1`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`]);
+  if (await boardNoticeExists()) await db.query(`delete from public.board_notice where posted_by = $1`, [`${RESET_SEED}@check.invalid`]);
   return removed;
+}
+async function boardNoticeExists() {
+  return (await db.query(`select to_regclass('public.board_notice') is not null as here`)).rows[0].here;
 }
 async function pushSubscriptionsExist() {
   return (await db.query(`select to_regclass('public.push_subscriptions') is not null as here`)).rows[0].here;
@@ -322,6 +330,8 @@ const BOARD_ADMINS = files.some((file) => file.endsWith("_board_admins.sql"));
 const PUSH_SUBSCRIPTIONS = files.some((file) => file.endsWith("_push_subscriptions.sql"));
 // Its queue and log views (`*_board_admin_queue.sql`): three more RPCs for the same two.
 const BOARD_ADMIN_QUEUE = files.some((file) => file.endsWith("_board_admin_queue.sql"));
+// 「만든 사람 공지」 (`*_board_notice.sql`): one notice the same two write, anon reads while it lasts.
+const BOARD_NOTICE = files.some((file) => file.endsWith("_board_notice.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -472,6 +482,8 @@ const CLIENT_FUNCTIONS = {
     ...(BOARD_ADMINS ? ["admin_board_delete", "admin_board_me", "admin_board_same_writer", "admin_board_search", "admin_board_set_hidden"] : []),
     // The queue, its count and the log (20261118010000_board_admin_queue.sql), for the same two.
     ...(BOARD_ADMIN_QUEUE ? ["admin_board_log", "admin_board_queue", "admin_board_queue_count"] : []),
+    // The makers' notice (20261202010000_board_notice.sql), for the same two.
+    ...(BOARD_NOTICE ? ["admin_board_notice_clear", "admin_board_notice_get", "admin_board_notice_set"] : []),
   ],
 };
 {
@@ -3088,6 +3100,7 @@ const UPDATE_PROBE = {
   weekly_rules: "rule_id = rule_id",
   ...(HALL_OF_FAME ? { hall_of_fame: "score = score", hall_of_fame_boards: "checked_seasons = checked_seasons" } : {}),
   ...(PUSH_SUBSCRIPTIONS ? { push_subscriptions: "language = language" } : {}),
+  ...(BOARD_NOTICE ? { board_notice: "body_ko = body_ko" } : {}),
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -3826,6 +3839,81 @@ if (BOARD_ADMINS && BOARD_ADMIN_QUEUE) {
   await signIn("");
   await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [seeded]);
   await db.query(`delete from public.board_admin_log`);
+}
+
+// ---- 「만든 사람 공지」 (20261202010000_board_notice.sql)
+//
+// Only the two makers write the notice, and only through its RPCs: anon and a
+// signed-in stranger are refused (the stranger with `board admin only`), and
+// nobody but the service role writes the table. anon reads its words and
+// times while it lasts, never the maker's address; an ended notice reads as
+// none. One notice at most: a second set replaces the first.
+if (BOARD_ADMINS && BOARD_NOTICE) {
+  const claims = (email, providers = ["google"]) => JSON.stringify({ role: "authenticated", email, app_metadata: { provider: providers[0], providers } });
+  const signIn = (value) => db.query(`select set_config('request.jwt.claims', $1, false)`, [value]);
+  const read = async () => (await allowed("read the board notice", "anon", `select body_ko, body_en, body_ja, posted_at, expires_at from public.board_notice`))?.rows ?? [];
+  const stored = async () => (await one(`select count(*)::int as n from public.board_notice`))?.n;
+  const setSql = (ko, en = null, ja = null, ends = null) => ({
+    sql: `select public.admin_board_notice_set($1, $2, $3, $4::timestamptz) as at`,
+    params: [ko, en, ja, ends],
+  });
+  const set = (label, args) => allowed(label, "authenticated", args.sql, args.params);
+  const setRaises = (label, args, pattern) => raises(label, "authenticated", args.sql, args.params, pattern);
+  const forged = `insert into public.board_notice (body_ko, posted_by) values ('가짜 공지', 'x@example.com')`;
+
+  check((await read()).length === 0, "anon reads a board notice nobody posted.");
+  await refused("post a board notice", "anon", `select public.admin_board_notice_set('공지')`);
+  await refused("take down the board notice", "anon", `select public.admin_board_notice_clear()`);
+  await refused("read the board notice whole", "anon", `select * from public.admin_board_notice_get()`);
+  await refused("write the board notice directly", "anon", forged);
+  await refused("read who posted the board notice", "anon", `select posted_by from public.board_notice`);
+
+  for (const [who, value] of [
+    ["a stranger", claims("someone@example.com")],
+    ["a maker's address from an e-mail account", claims("goeun.nam@gmail.com", ["email"])],
+  ]) {
+    await signIn(value);
+    await setRaises(`post a board notice as ${who}`, setSql("가짜 공지"), /^42501 .*board admin only/);
+    await raises(`take down the board notice as ${who}`, "authenticated", `select public.admin_board_notice_clear()`, [], /^42501 .*board admin only/);
+    await raises(`read the board notice whole as ${who}`, "authenticated", `select * from public.admin_board_notice_get()`, [], /^42501 .*board admin only/);
+    await refused(`write the board notice directly as ${who}`, "authenticated", forged);
+  }
+  check((await stored()) === 0, "a refused notice was stored.");
+
+  await signIn(claims("goeun.nam@gmail.com"));
+  await setRaises("post a board notice with no Korean", setSql("   ", "English only"), /^22023 .*Korean/);
+  await setRaises("post a board notice over 600 characters", setSql("가".repeat(601)), /^22023 .*600/);
+  await setRaises("post an English notice over 600 characters", setSql("공지", "a".repeat(601)), /^22023 .*600/);
+  await setRaises("post a board notice that has already ended", setSql("공지", null, null, "2000-01-01T00:00:00Z"), /^22023 .*ends/);
+  check((await stored()) === 0, "a notice the server refused was stored.");
+
+  await set("post a board notice as a maker", setSql("  우리가 알립니다.  ", "  ", "私たちからのお知らせ"));
+  let shown = await read();
+  check(
+    shown.length === 1 && shown[0].body_ko === "우리가 알립니다." && shown[0].body_en === null && shown[0].body_ja === "私たちからのお知らせ" && shown[0].posted_at && shown[0].expires_at === null,
+    `anon reads the notice as ${JSON.stringify(shown)}; trimmed Korean, no English (blank), the Japanese, its time, no end.`,
+  );
+  const whole = (await allowed("read the board notice whole as a maker", "authenticated", `select * from public.admin_board_notice_get()`))?.rows ?? [];
+  check(whole.length === 1 && whole[0].posted_by === "goeun.nam@gmail.com", `the makers' read of the notice is ${JSON.stringify(whole)}.`);
+
+  await signIn(claims("from.logic.to.magic@gmail.com"));
+  await set("replace the board notice as the other maker", setSql("새 공지", "New notice", null, new Date(Date.now() + 86_400_000).toISOString()));
+  shown = await read();
+  check(shown.length === 1 && shown[0].body_ko === "새 공지" && shown[0].body_en === "New notice" && shown[0].body_ja === null && shown[0].expires_at, `a second notice left ${JSON.stringify(shown)}; one notice, the second.`);
+  check((await stored()) === 1, "two notices are stored; the second has to replace the first.");
+
+  // Ended: the row stays for the makers' form, and anon reads none.
+  await db.query(`update public.board_notice set posted_at = now() - interval '2 days', expires_at = now() - interval '1 day'`);
+  check((await read()).length === 0, "anon still reads a notice that has ended.");
+  const ended = (await allowed("read an ended notice as a maker", "authenticated", `select body_ko from public.admin_board_notice_get()`))?.rows ?? [];
+  check(ended.length === 1, "the makers cannot read back a notice that has ended.");
+
+  const cleared = await allowed("take down the board notice as a maker", "authenticated", `select public.admin_board_notice_clear() as gone`);
+  check(cleared?.rows[0]?.gone === true && (await stored()) === 0, "taking the notice down left it stored.");
+  const again = await allowed("take down a notice that is not there", "authenticated", `select public.admin_board_notice_clear() as gone`);
+  check(again?.rows[0]?.gone === false, "taking down no notice reported one.");
+
+  await signIn("");
 }
 
 // ---- retention runs as the service role and reaches every table

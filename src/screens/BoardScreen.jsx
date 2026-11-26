@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Flag, RotateCw, Send, ShieldExclamationPoint } from "lucide-react";
+import { ArrowLeft, Flag, RotateCw, Send, ShieldCheck, ShieldExclamationPoint } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { BOARD_REPORT_REASONS } from "../boardReport.js";
 import { useBoardReport } from "../state/useBoardReport.js";
@@ -7,6 +7,7 @@ import words from "../copy/board.js";
 import { fill, LANG, SOURCE_LOCALE } from "../locale.js";
 import { adminWanted } from "../boardAdminEntry.js";
 import { weekQuestionId, weekQuestionText } from "../boardQuestions.js";
+import { boardNoticeLang, boardNoticeText, loadBoardNotice } from "../boardNotice.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 
 // The makers' admin bar (components/BoardAdmin.jsx), fetched only on a page
@@ -36,6 +37,45 @@ function WeekQuestion() {
         <strong>{words.weekQuestion.label} · {words.weekQuestion.from}</strong>
         <p>{text}</p>
         <p><small>{words.weekQuestion.note}</small></p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 「만든 사람 공지」 (boardNotice.js): the makers' one notice, pinned over the
+ * week's question and the posts. Only the two makers write it (the admin
+ * bar, 20261202010000_board_notice.sql), and it is not a post: its own box
+ * and badge, no nickname, no report button. In the page's language when the
+ * notice has words in it, else in Korean; no notice draws nothing.
+ * `version` changes when the admin bar has written or taken it down.
+ */
+function MakersNotice({ version }) {
+  const [notice, setNotice] = useState(null);
+  useEffect(() => {
+    let live = true;
+    loadBoardNotice().then((next) => {
+      if (live) setNotice(next);
+    });
+    return () => {
+      live = false;
+    };
+  }, [version]);
+  if (!notice) return null;
+  const copy = words.makersNotice;
+  const posted = notice.postedAt ? ` · ${fill(copy.posted, { date: new Date(notice.postedAt).toLocaleDateString(DATE_LOCALE) })}` : "";
+  return (
+    <section className="board-status-bar board-makers-notice" aria-label={copy.label} data-testid="board-makers-notice">
+      <div>
+        <span lang="en">FROM THE MAKERS</span>
+        <strong>
+          <ShieldCheck size={18} aria-hidden="true" style={{ marginRight: 6, verticalAlign: "-3px" }} />
+          {copy.label}
+        </strong>
+        <p lang={boardNoticeLang(notice, LANG)} style={{ whiteSpace: "pre-line", overflowWrap: "anywhere" }} data-testid="board-makers-notice-text">
+          {boardNoticeText(notice, LANG)}
+        </p>
+        <p><small>{copy.note}{posted}</small></p>
       </div>
     </section>
   );
@@ -87,6 +127,7 @@ export function BoardScreen({
   const isBoardBusy = boardStatus === "loading" || boardStatus === "idle";
   const report = useBoardReport();
   const [showAdmin] = useState(() => adminWanted());
+  const [noticeVersion, setNoticeVersion] = useState(0);
 
   return (
       <main className="shell board-shell">
@@ -106,7 +147,7 @@ export function BoardScreen({
           </header>
           {showAdmin && (
             <Suspense fallback={null}>
-              <BoardAdminBar onChanged={() => reloadBoard()} />
+              <BoardAdminBar onChanged={() => reloadBoard()} onNoticeChanged={() => setNoticeVersion((n) => n + 1)} />
             </Suspense>
           )}
           <section className="board-status-bar" aria-busy={isBoardBusy}>
@@ -126,6 +167,7 @@ export function BoardScreen({
               </button>
             )}
           </section>
+          <MakersNotice version={noticeVersion} />
           <WeekQuestion />
           <section className="board-composer" aria-label={words.composer}>
             {/* The counter is the field's description, not part of its name:

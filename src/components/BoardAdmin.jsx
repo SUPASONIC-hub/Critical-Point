@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import { ADMIN_PAGE_SIZE, boardAdmin } from "../boardAdmin.js";
+import { ADMIN_PAGE_SIZE, boardAdmin, noticeArgs, toLocalInput } from "../boardAdmin.js";
+import { BOARD_NOTICE_MAX_LENGTH } from "../boardNotice.js";
 import "./BoardAdmin.css";
 
 /**
@@ -66,6 +67,27 @@ const W = {
   firstReport: "첫 신고 {time}",
   logEmpty: "관리 기록이 없습니다.",
   logFound: "최근 관리 기록 {count}건.",
+  viewNotice: "만든 사람 공지",
+  noticeIntro: "게시판 글 위에 「만든 사람 공지」로 붙는 글 하나. 우리 목소리로 씁니다(영어는 we, 일본어는 「우리」에 해당하는 말). 한국어는 꼭, 영어·일본어는 비우면 그 언어 화면에도 한국어가 보입니다.",
+  noticeKo: "한국어 (필수)",
+  noticeEn: "영어 (선택)",
+  noticeJa: "일본어 (선택)",
+  noticeCount: "{count}/{max}자",
+  noticeEnds: "끝나는 때 (비우면 직접 내릴 때까지)",
+  noticeSave: "공지 올리기",
+  noticeClear: "공지 내리기",
+  noticeNone: "올린 공지가 없습니다.",
+  noticeNow: "지금 공지: {time} 게시 · {email}",
+  noticeEnded: "끝난 공지입니다({time}). 플레이어에게는 보이지 않습니다.",
+  noticeSaved: "공지를 올렸습니다. 게시판 글 위에 보입니다.",
+  noticeCleared: "공지를 내렸습니다.",
+  noticeMissing: "내릴 공지가 없습니다.",
+  confirmNoticeClear: "「만든 사람 공지」를 내립니다. 계속할까요?",
+  noticeProblems: {
+    ko: "한국어 공지를 적어 주세요.",
+    long: "한 언어에 600자까지 쓸 수 있습니다.",
+    ended: "끝나는 때가 이미 지났습니다.",
+  },
 };
 
 /** The four reasons a report carries (board_reports_reason_check), in the report button's words (src/boardReport.js). */
@@ -137,8 +159,102 @@ export function BoardAdminSheet({ onClose, onOpenBoard = null }) {
   );
 }
 
+/** The 「만든 사람 공지」 view: the notice in three boxes, its end, post and take down. */
+function NoticeForm({ admin, busy, setBusy, setMessage, onNoticeChanged }) {
+  const [draft, setDraft] = useState({ ko: "", en: "", ja: "", expiresAt: "" });
+  const [current, setCurrent] = useState(null);
+
+  // The notice as it stands, into the boxes, once the view opens (the bar said 불러오는 중 already).
+  useEffect(() => {
+    let live = true;
+    admin.notice().then(
+      (notice) => {
+        if (!live) return;
+        setCurrent(notice);
+        if (notice) setDraft({ ko: notice.ko, en: notice.en, ja: notice.ja, expiresAt: toLocalInput(notice.expiresAt) });
+        setMessage(notice ? "" : W.noticeNone);
+      },
+      (error) => {
+        if (live) setMessage(say(W.failed, { message: error.message }));
+      },
+    );
+    return () => {
+      live = false;
+    };
+  }, [admin, setMessage]);
+
+  async function run(work, done) {
+    setBusy(true);
+    try {
+      const said = await work();
+      onNoticeChanged();
+      const notice = await admin.notice();
+      setCurrent(notice);
+      setMessage(said ?? done);
+    } catch (error) {
+      setMessage(say(W.failed, { message: error.message }));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function save(event) {
+    event.preventDefault();
+    const { args, error } = noticeArgs(draft);
+    if (error) return setMessage(W.noticeProblems[error]);
+    run(() => admin.setNotice(args).then(() => null), W.noticeSaved);
+  }
+
+  function clear() {
+    if (!globalThis.confirm?.(W.confirmNoticeClear)) return;
+    run(async () => ((await admin.clearNotice()) ? null : W.noticeMissing), W.noticeCleared);
+  }
+
+  const box = (lang, label) => (
+    <label className="board-admin-notice-field">
+      <span>{label}</span>
+      <textarea
+        rows={3}
+        lang={lang}
+        value={draft[lang]}
+        maxLength={BOARD_NOTICE_MAX_LENGTH}
+        required={lang === "ko"}
+        data-testid={`board-admin-notice-${lang}`}
+        onChange={(event) => setDraft((now) => ({ ...now, [lang]: event.target.value }))}
+      />
+      <small>{say(W.noticeCount, { count: draft[lang].length, max: BOARD_NOTICE_MAX_LENGTH })}</small>
+    </label>
+  );
+
+  return (
+    <form className="board-admin-notice" onSubmit={save} data-testid="board-admin-notice">
+      <p className="board-admin-note">{W.noticeIntro}</p>
+      {current && (
+        <p className="board-admin-note">
+          {current.ended ? say(W.noticeEnded, { time: when(current.expiresAt) }) : say(W.noticeNow, { time: when(current.postedAt), email: current.postedBy })}
+        </p>
+      )}
+      {box("ko", W.noticeKo)}
+      {box("en", W.noticeEn)}
+      {box("ja", W.noticeJa)}
+      <label className="board-admin-notice-field">
+        <span>{W.noticeEnds}</span>
+        <input type="datetime-local" value={draft.expiresAt} onChange={(event) => setDraft((now) => ({ ...now, expiresAt: event.target.value }))} />
+      </label>
+      <div className="board-admin-post-actions">
+        <button type="submit" disabled={busy}>
+          {W.noticeSave}
+        </button>
+        <button type="button" className="ghost board-admin-danger" disabled={busy || !current} onClick={() => clear()}>
+          {W.noticeClear}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 /** The board screen's admin bar: nothing at all unless the server said admin. */
-export function BoardAdminBar({ onChanged = () => {} }) {
+export function BoardAdminBar({ onChanged = () => {}, onNoticeChanged = () => {} }) {
   const [admin, state] = useBoardAdmin();
   const [view, setView] = useState("posts");
   const [query, setQuery] = useState("");
@@ -148,6 +264,8 @@ export function BoardAdminBar({ onChanged = () => {} }) {
   const [log, setLog] = useState([]);
   const [waiting, setWaiting] = useState(0);
   const [writerOf, setWriterOf] = useState(null);
+  // Each opening of the notice view reads the notice afresh.
+  const [noticeKey, setNoticeKey] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -207,6 +325,10 @@ export function BoardAdminBar({ onChanged = () => {} }) {
   async function open(next) {
     setView(next);
     if (next === "posts") return load();
+    if (next === "notice") {
+      setNoticeKey((key) => key + 1);
+      return setMessage(W.loading);
+    }
     setBusy(true);
     setMessage(W.loading);
     try {
@@ -286,6 +408,7 @@ export function BoardAdminBar({ onChanged = () => {} }) {
         {tab("posts", W.viewPosts)}
         {tab("queue", W.viewQueue)}
         {tab("log", W.viewLog)}
+        {tab("notice", W.viewNotice)}
       </div>
       {view === "posts" && (
         <form
@@ -314,6 +437,7 @@ export function BoardAdminBar({ onChanged = () => {} }) {
         </form>
       )}
       {view === "queue" && <p className="board-admin-note">{W.queueIntro}</p>}
+      {view === "notice" && <NoticeForm key={noticeKey} admin={admin} busy={busy} setBusy={setBusy} setMessage={setMessage} onNoticeChanged={onNoticeChanged} />}
       <p className="board-admin-status" role="status" aria-live="polite" data-testid="board-admin-message">
         {message}
       </p>

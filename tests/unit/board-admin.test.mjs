@@ -14,12 +14,15 @@ import {
   decodeJwtPayload,
   googleSignInUrl,
   isBoardAdminEmail,
+  noticeArgs,
   readAuthRedirect,
   readSession,
   sessionEmail,
   sessionExpiring,
   stripAuthHash,
+  toAdminNotice,
   toAdminPost,
+  toLocalInput,
   toLogRow,
   toQueuePost,
   toSession,
@@ -379,6 +382,73 @@ test("the report queue and the admin log are read without a writer key", async (
 test("the queue's reason words are the report button's", () => {
   const source = readFileSync(new globalThis.URL("../../src/components/BoardAdmin.jsx", import.meta.url), "utf8");
   for (const reason of BOARD_REPORT_REASONS) assert.match(source, new RegExp(`${reason.id}: "${reason.label}"`));
+});
+
+test("the makers' notice: read back whole, written from the form, taken down", async () => {
+  const stored = { body_ko: "우리가 알립니다.", body_en: null, body_ja: "お知らせ", posted_at: "2026-11-16T08:00:00Z", expires_at: "2026-11-16T08:30:00Z", posted_by: "goeun.nam@gmail.com" };
+  const { admin, calls } = makeAdmin({
+    stored: storedSession(),
+    answers: {
+      "POST /rest/v1/rpc/admin_board_notice_get": [200, [stored]],
+      "POST /rest/v1/rpc/admin_board_notice_set": [200, "2026-11-16T09:00:00Z"],
+      "POST /rest/v1/rpc/admin_board_notice_clear": [200, true],
+    },
+  });
+  assert.deepEqual(await admin.notice(), {
+    ko: "우리가 알립니다.",
+    en: "",
+    ja: "お知らせ",
+    postedAt: "2026-11-16T08:00:00Z",
+    expiresAt: "2026-11-16T08:30:00Z",
+    ended: true,
+    postedBy: "goeun.nam@gmail.com",
+  });
+  const args = { p_body_ko: "공지", p_body_en: null, p_body_ja: null, p_expires_at: null };
+  assert.equal(await admin.setNotice(args), "2026-11-16T09:00:00Z");
+  assert.deepEqual(calls.at(-1).body, args);
+  assert.equal(calls.at(-1).headers.Authorization.startsWith("Bearer "), true);
+  assert.equal(await admin.clearNotice(), true);
+  assert.deepEqual(calls.at(-1).body, {});
+
+  const none = makeAdmin({
+    stored: storedSession(),
+    answers: {
+      "POST /rest/v1/rpc/admin_board_notice_get": [200, []],
+      "POST /rest/v1/rpc/admin_board_notice_clear": [200, false],
+    },
+  });
+  assert.equal(await none.admin.notice(), null);
+  assert.equal(await none.admin.clearNotice(), false);
+
+  const refused = makeAdmin({
+    stored: storedSession(),
+    answers: { "POST /rest/v1/rpc/admin_board_notice_set": [403, { code: "42501", message: "board admin only" }] },
+  });
+  await assert.rejects(refused.admin.setNotice(args), /board admin only/);
+});
+
+test("the notice form's draft: Korean required, blanks as none, 600 at most, an end still ahead", () => {
+  const now = Date.parse("2026-11-26T03:00:00Z");
+  assert.deepEqual(noticeArgs({ ko: "  우리가 알립니다. ", en: " ", ja: " お知らせ " }, now), {
+    args: { p_body_ko: "우리가 알립니다.", p_body_en: null, p_body_ja: "お知らせ", p_expires_at: null },
+  });
+  assert.deepEqual(noticeArgs({ ko: " ", en: "English only" }, now), { error: "ko" });
+  assert.deepEqual(noticeArgs(undefined, now), { error: "ko" });
+  assert.deepEqual(noticeArgs({ ko: "가".repeat(601) }, now), { error: "long" });
+  assert.deepEqual(noticeArgs({ ko: "공지", ja: "あ".repeat(601) }, now), { error: "long" });
+  assert.equal(noticeArgs({ ko: "가".repeat(600) }, now).args.p_body_ko.length, 600);
+  const ahead = new Date(now + 86_400_000);
+  const local = toLocalInput(ahead.toISOString());
+  assert.match(local, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+  assert.equal(noticeArgs({ ko: "공지", expiresAt: local }, now).args.p_expires_at, new Date(local).toISOString());
+  assert.equal(Date.parse(noticeArgs({ ko: "공지", expiresAt: local }, now).args.p_expires_at), Math.floor(ahead.getTime() / 60_000) * 60_000);
+  assert.deepEqual(noticeArgs({ ko: "공지", expiresAt: toLocalInput(new Date(now - 60_000).toISOString()) }, now), { error: "ended" });
+  assert.deepEqual(noticeArgs({ ko: "공지", expiresAt: "not a time" }, now), { error: "ended" });
+  assert.equal(toLocalInput(null), "");
+  assert.equal(toLocalInput("not a time"), "");
+  assert.equal(toAdminNotice(null), null);
+  assert.equal(toAdminNotice({ body_ko: "x", expires_at: null }, now).ended, false);
+  assert.deepEqual(toAdminNotice({}, now), { ko: "", en: "", ja: "", postedAt: null, expiresAt: null, ended: false, postedBy: "" });
 });
 
 test("a refused token is refreshed once; a server error is passed on", async () => {
