@@ -508,7 +508,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * change: cold 1.3 -> 3.3%, open question 0.0 -> 2.7%, quiet cover 7.0 -> 3.1%).
  *
  * G43 (2026-11-26, Q7 (1)): a story season plays by hand only each case's
- * 결재 판; its other tables are cashed at heat 70 as the page cashes them
+ * 결재 판 and its held last decision (#686, the user's (1)); its other tables are cashed at heat 70 as the page cashes them
  * (storyAutoCash.js). `by hand` is how many tables a season played itself;
  * STORY_PLAY_ALL=1 plays them all by hand, as 「판 모두 직접 치기」 does.
  * Cashed at 70 the tables raise a season's trust (mean 71.7 -> 75.4 on 600),

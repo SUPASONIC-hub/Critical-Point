@@ -78,7 +78,7 @@ import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "../../src/state/caseRoutes.js";
 import { isSignScene } from "../../src/state/settleChoice.js";
-import { planAutoCash } from "../../src/gauntlet/storyAutoCash.js";
+import { isAutoCashTable, planAutoCash } from "../../src/gauntlet/storyAutoCash.js";
 import { createChoiceReaders } from "../../src/state/useDecision.js";
 
 // G4·G5 (2026-11-19): RULES_NEXT=0 plays the table before the next rules, 1 the
@@ -388,6 +388,7 @@ export const WEEK_VALUES = (() => {
  * first does.
  * `storyPlayAll` is the comfort setting 「판 모두 직접 치기」 (G43): left off,
  * a story season plays by hand only each case's 결재 판 (`isSignScene`) and
+ * its held last decision (holdConfirm.js `isClosingScene`), and
  * every other table is cashed at heat 70 as the page cashes it
  * (storyAutoCash.js `planAutoCash`); on (STORY_PLAY_ALL=1), every table is
  * played by the policy's hand as before G43. The auto table takes one draw
@@ -626,8 +627,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
             return !best || score > best.score ? { choice: candidate, score } : best;
           }, null).choice;
 
-        // G43: a story table other than the case's 결재 판 is cashed at heat 70, through the same reducer.
-        const autoCash = run.story === true && !storyPlayAll && !isSignScene(caseId, nodeId);
+        // G43: a story table other than the case's 결재 판 and its held last decision is cashed at heat 70, through the same reducer.
+        const autoCash = isAutoCashTable({ run, caseId, node, playAll: storyPlayAll });
         const window = autoCash ? playAutoWindow(run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules) : playWindow(policy, run, windowSeed({ seasonIndex, windowIndex: run.windowIndex, nodeId }), rules, tools?.hand ? tools.dealHand() : null, resources.trust, isNextOn(rules) ? narrowTrustAt(countNarrows(log)) : SCOUT_NARROW_TRUST, isMarkSevenOn(rules) ? scoutTrustAt(countScouts(log)) : SCOUT_TRUST);
         windows += 1;
         if (!autoCash) handWindows += 1;

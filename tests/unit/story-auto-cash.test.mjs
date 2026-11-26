@@ -14,6 +14,7 @@ const { openTraced, recordClosedWindow, reduceTraced } = await import("../../src
 const { recheckWindow } = await import("../../src/gauntlet/windowReplay.js");
 const { isTimeOffClock } = await import("../../src/rankingRecheck.js");
 const { isSignScene } = await import("../../src/state/settleChoice.js");
+const { isClosingScene } = await import("../../src/gauntlet/holdConfirm.js");
 const { isAutoCashTable, isSignNode, planAutoCash, STORY_AUTO_HEAT } = await import("../../src/gauntlet/storyAutoCash.js");
 
 const storyRun = (caseId) => openCaseRun({ ...RUN_INITIAL_STATE, story: true }, { rules: getTableRules(caseId, { story: true }), caseId });
@@ -36,10 +37,12 @@ test("G43: only a story run's tables other than the 결재 판 are cashed for th
   const caseId = CASE_SEQUENCE[3];
   const inCase = Object.values(nodes).filter((node) => node.caseId === caseId);
   const sign = inCase.find((node) => isSignNode(caseId, node));
-  const plain = inCase.find((node) => node.choices?.length && !isSignNode(caseId, node));
-  assert.ok(sign && plain);
+  const plain = inCase.find((node) => node.choices?.length && !isSignNode(caseId, node) && !isClosingScene(node));
+  const closing = inCase.find((node) => isClosingScene(node) && !isSignNode(caseId, node));
+  assert.ok(sign && plain && closing);
   assert.equal(isAutoCashTable({ run: { story: true }, caseId, node: plain }), true);
   assert.equal(isAutoCashTable({ run: { story: true }, caseId, node: sign }), false, "the 결재 판 is played by hand");
+  assert.equal(isAutoCashTable({ run: { story: true }, caseId, node: closing }), false, "the held 마지막 결정 too (#686, the user's (1))");
   assert.equal(isAutoCashTable({ run: { story: true }, caseId, node: plain, playAll: true }), false, "판 모두 직접 치기");
   assert.equal(isAutoCashTable({ run: {}, caseId, node: plain }), false, "board mode is never cashed for the player");
   assert.equal(isAutoCashTable({ run: { story: false }, caseId, node: plain }), false);

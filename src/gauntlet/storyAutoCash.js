@@ -1,5 +1,6 @@
 import { CASE_RESULT_NODES } from "../gameCases.js";
 import { reduceWindow } from "./gauntletEngine.js";
+import { isClosingScene } from "./holdConfirm.js";
 
 /**
  * G43 (게임성 개선점 5차, the user's 「전부 1」 of 2026-11-26, Q7 (1)): in story
@@ -11,8 +12,10 @@ import { reduceWindow } from "./gauntletEngine.js";
  * some 390 tables a season whose result was settled before they were played.
  * The 결재 판 is G6's (settleChoice.js `isSignScene`): the board dealt on the
  * case's last decision, the scene every card of which (the wild one aside)
- * closes the case. Every case closes through one, so a season is played by
- * hand once a case. The player still picks every card, so the story's choices
+ * closes the case. Every case closes through one. The case's last decision
+ * before it -- the scene whose 확정 is held 0.6s (holdConfirm.js
+ * `isClosingScene`, A4) -- is played by hand as well (the user's (1) of
+ * 2026-11-26 on #686): no choice that cannot be taken back is made by one tap. The player still picks every card, so the story's choices
  * are the player's as before; 「판 모두 직접 치기」 (`playAllTables`, a comfort
  * setting) plays every table by hand again.
  *
@@ -40,11 +43,12 @@ export function isSignNode(caseId, node) {
 
 /**
  * Whether the table on `node` is cashed for the player: a story run's, other
- * than the case's 결재 판, unless the player plays every table (`playAll`).
+ * than the case's 결재 판 and the held 마지막 결정 scene, unless the player
+ * plays every table (`playAll`).
  * A practice replay of a story case is a story run too.
  */
 export function isAutoCashTable({ run, caseId, node, playAll = false }) {
-  return run?.story === true && !playAll && !isSignNode(caseId, node);
+  return run?.story === true && !playAll && !isSignNode(caseId, node) && !isClosingScene(node);
 }
 
 /**

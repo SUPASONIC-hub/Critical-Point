@@ -7,6 +7,7 @@ import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
 import { isSignNode, STORY_AUTO_HEAT } from "../src/gauntlet/storyAutoCash.js";
+import { isClosingScene } from "../src/gauntlet/holdConfirm.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -932,7 +933,7 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
 const withStory = (page, settings) => page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify(settings) });
 const autoLine = (page) => page.locator(".decision-reveal").getByTestId("reveal-auto");
 
-test("story mode cashes every table but the case's 결재 판 at heat 70, and says so", async ({ page }) => {
+test("story mode cashes every table but the case's 결재 판 and its held last decision at heat 70, and says so", async ({ page }) => {
   test.setTimeout(120_000);
   expect(isSignNode("case01", nodes.start), "사건 01's first scene is not its 결재 판").toBe(false);
   expect(isSignNode("case01", nodes.c1_aftershock), "c1_aftershock is").toBe(true);
@@ -973,11 +974,24 @@ test("story mode cashes every table but the case's 결재 판 at heat 70, and sa
   await expect(stage).toHaveAttribute("data-status", "live");
   const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId;
   expect(isSignNode("case01", nodes[before])).toBe(false);
+  expect(isClosingScene(nodes[before])).toBe(false);
   await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
   await expect(autoLine(page)).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
   const second = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
   expect(second.nodeId).toBe(before);
   expect(second.threshold.gauge).toBeGreaterThanOrEqual(STORY_AUTO_HEAT);
+
+  // The case's last decision, whose 확정 is held, keeps its long press (#686, the user's (1)): one tap commits nothing.
+  expect(isClosingScene(nodes.c1_final_sale) && !isSignNode("case01", nodes.c1_final_sale)).toBe(true);
+  await startDebugNode(page, "case01", "c1_final_sale");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(page.getByTestId("commit-confirm")).toHaveAttribute("data-hold", /.+/);
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next").or(page.locator(".result-page")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveCount(0);
 
   // The case's 결재 판 is played by hand: the card is staked, the table stays live.
   await startDebugNode(page, "case01", "c1_aftershock");
