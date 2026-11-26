@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BEFORE_ELEVEN_RULE, CLUE_CASH_MULTIPLIER, cashOpensClue, ELEVEN_RULE, getUpkeep, isMarkElevenOn, RULES_ELEVEN_MARK, wantsMarkEleven, withMarkEleven, withMarkNine, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { BEFORE_ELEVEN_RULE, CLUE_CASH_MULTIPLIER, cashOpensClue, ELEVEN_RULE, getUpkeep, isMarkElevenOn, RULES_ELEVEN_MARK, wantsMarkEleven, withMarkEleven, withMarkNine, withMarkTen, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
+import { RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { describeCaseOpening } from "../../src/state/caseRoutes.js";
 import { ENDING_THRESHOLDS, getDiscoveryClue } from "../../src/gameLogic.js";
@@ -12,6 +13,7 @@ const BEFORE = withMarkEleven(ALL_RULES, false);
 
 test("RULES_MARK 11: on by default, off in a script with RULES_MARK11=0, and a row of 5 to 10 played without it", () => {
   assert.equal(RULES_ELEVEN_MARK, 11);
+  assert.equal(RULES_MARK, 11);
   assert.equal(wantsMarkEleven({}), true);
   assert.equal(wantsMarkEleven({ process: { env: { RULES_MARK11: "0" } } }), false);
   assert.equal(isMarkElevenOn(ALL_RULES), true);
@@ -19,6 +21,7 @@ test("RULES_MARK 11: on by default, off in a script with RULES_MARK11=0, and a r
   assert.equal(isMarkElevenOn(BEFORE), false);
   assert.equal(BEFORE.has(BEFORE_ELEVEN_RULE), true);
   assert.equal(isMarkElevenOn(withMarkNine(ALL_RULES, false)), false, "a set without the marks before has none of 11's");
+  assert.equal(isMarkElevenOn(withMarkTen(ALL_RULES, false)), false, "a set without 10's rules has none of 11's");
   assert.equal(isMarkElevenOn(withNextRules(ALL_RULES, false)), false);
   assert.equal(withMarkEleven(withMarkNine(ALL_RULES, false), true).has(ELEVEN_RULE), false, "11 does not ride on a set without the marks before");
   for (const mark of [5, 6, 7, 8, 9, 10]) assert.equal(isMarkElevenOn(getRowRules("case20", {}, mark)), false, `mark ${mark}`);
