@@ -230,7 +230,8 @@ const budgets = [
   // 166,600 / 62,169 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 166,925 / 62,353 -> 166,968 / 62,379 gameplay-g4a over main d946283f: measured 166964 / 62375 in CI verify-quick, the plus 4.
   // 166,968 / 62,379 -> 168,600 / 63,001 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 168,596 / 62,973 plus 4. CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_600, maxGzip: 63_001 },
+  // 168,600 / 63,001 -> 168,846 / 63,016 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_846, maxGzip: 63_016 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -285,7 +286,8 @@ const budgets = [
   // 38,541 / 14,982 -> 38,689 / 15,019 story-g37 over main 49d84be5 (#662 MARK 8, #674). Measured 38,685 / 15,015 in CI verify-quick (ba3e20f9), the plus 4.
   // 38,689 / 15,019 -> 38,914 / 15,109 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 38,910 / 15,105 plus 4. CI re-measures.
   // 38,914 / 15,109 -> 38,938 / 15,126: storyOpenTrust (G37's open question at 83). Measured 38,934 / 15,122, the plus 4.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 38_938, maxGzip: 15_126 },
+  // 38,938 / 15,126 -> 39,334 / 15,317 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 39_334, maxGzip: 15_317 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -383,7 +385,8 @@ const budgets = [
   // 38,476 / 16,123 -> 39,465 / 16,486 gameplay-mark8 over bundle R (r-dryrun-1123 391e1016): #665's budget plus this branch's growth (+989 / +363). CI re-measures.
   // 39,465 / 16,486 -> 40,119 / 16,652 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 40119 / 16644 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 40,119 / 16,652 -> 40,800 / 16,880 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 40,385 / 16,770 plus 4. CI re-measures.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 40_800, maxGzip: 16_880 },
+  // 40,800 / 16,880 -> 40,800 / 16,923 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 40_800, maxGzip: 16_923 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -1638,7 +1641,8 @@ const budgets = [
   // 64,254 / 24,083 -> 64,254 / 24,095: measured - / 24091 (over budget only), gameplay-mark8 d76e6071 over bundle-r-early 9ee5b8df (main c967db59, after #670): measured in CI verify-quick 11-25, the same on Windows for note days 11-26, 12-20, 12-26 and 2027-01-13 (same file hash), the plus 4.
   // 64,254 / 24,095 -> 65,266 / 24,502 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 65266 / 24494 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 65,266 / 24,502 -> 68,548 / 25,646 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 68,483 / 25,642 plus 4. CI re-measures.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 68_548, maxGzip: 25_646 },
+  // 68,548 / 25,646 -> 69,130 / 25,833 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 69_130, maxGzip: 25_833 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2281,7 +2285,8 @@ const budgets = [
   // 210,408 / 70,403 -> 210,599 / 70,424: measured 210595 / 70420, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 210,599 / 70,424 -> 211,879 / 70,678 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 211879 / 70670 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 211,879 / 70,678 -> 212,819 / 70,960 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 212,632 / 70,949 plus 4. CI re-measures.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 212_819, maxGzip: 70_960 },
+  // 212,819 / 70,960 -> 212,941 / 71,045 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 212_941, maxGzip: 71_045 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2414,7 +2419,8 @@ const budgets = [
   // 176,025 / 62,932 -> 176,213 / 62,970: measured 176209 / 62966, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 176,213 / 62,970 -> 177,379 / 63,240 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 177379 / 63232 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 177,379 / 63,240 -> 178,270 / 63,511 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 178,088 / 63,466 plus 4. CI re-measures.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_270, maxGzip: 63_511 },
+  // 178,270 / 63,511 -> 178,351 / 63,562 gameplay-g5b (게임성 5차 B G38·G39, RULES_MARK 11) over gameplay-g5a 93c12213 (5차 A 포함, 그 갈래는 아직 예산을 올리지 않음). Local build, provisional until CI measures it, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_351, maxGzip: 63_562 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
