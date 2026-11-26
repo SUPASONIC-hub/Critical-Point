@@ -233,7 +233,8 @@ const budgets = [
   // 168,600 / 63,001 -> 168,866 / 63,034 g34-cover-e2e over main d5d79552 (#673): 보상금's replay check (the log handed to CaseCover) and its live region. Measured 168,862 / 63,030 in the e2e build on Windows, the plus 4. CI re-measures.
   // 168,866 / 63,034 -> 169,144 / 63,121 g34-cover-focus over main 9f0537f5 (#681): focus after paying 보상금 (CaseCover's ref and effect). CI measured 169,140 / 63,117 (verify-quick run 45769620269), the plus 4.
   // 169,144 / 63,121 -> 169,371 / 63,192 story-g43 (G43 이야기 모드 결재 판만 직접) over main e4a5df69: main's plus the branch's own +227 / +71 (measured 168,823 / 63,068 over d5d79552 on Windows). Provisional; CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_371, maxGzip: 63_192 },
+  // 169,371 / 63,192 -> 169,371 / 63,202 story-g43 after #686's (1) (the held last decision kept by hand, holdConfirm.js in storyAutoCash.js): measured 169,367 / 63,198 on Windows over e4a5df69, the plus 4. Provisional; CI re-measures.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_371, maxGzip: 63_202 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -387,7 +388,8 @@ const budgets = [
   // 39,465 / 16,486 -> 40,119 / 16,652 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 40119 / 16644 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 40,119 / 16,652 -> 40,800 / 16,880 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 40,385 / 16,770 plus 4. CI re-measures.
   // 40,800 / 16,880 -> 41,094 / 17,065 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 41090 / 17061 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 41_094, maxGzip: 17_065 },
+  // 41,094 / 17,065 -> 42,023 / 17,415 story-g43 after #686's (1): storyAutoCash.js reads holdConfirm.js's isClosingScene. Measured 42019 / 17411 on Windows over e4a5df69, the plus 4. Provisional; CI re-measures.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 42_023, maxGzip: 17_415 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -2942,7 +2944,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> back to bundle R's 387,206 / 453,411 / 461,850 after main c967db59 (#670, the start screen's notes fixed): gameplay-mark8 ef349544 measured 386,662 / 453,021 / 461,478 in CI verify-quick 11-25, 386,515 / 452,849 / 461,310 on Windows for 2027-01-13; both well under it.
 // en 453,411 -> 453,724, ja 461,850 -> 462,199 gameplay-g4b over main 90db9f3d: G31·G33·G34 words in the overlay indexes (+313 / +349 measured before). Measured 453,613 / 462,095.
 // en 453,724 -> 453,822, ja 462,199 -> 462,319 on 2026-11-26, story-g43 (G43 comfort switch and reveal line). Measured 453818 / 462315 locally on Windows (provisional; CI to confirm), the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_822, ja: 462_319 };
+// en 453,822 -> 453,924, ja 462,319 -> 462,409 story-g43 over main e4a5df69 (main's first paint grew with it). Measured 453920 / 462405 on Windows, the plus 4. Provisional; CI re-measures.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_924, ja: 462_409 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
