@@ -880,7 +880,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
     startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
-    cover: { caseResults, run: gauntletRun, onApply: applyRun, locked: staleSave },
+    cover: { caseResults, run: gauntletRun, log, onApply: applyRun, locked: staleSave },
   });
 
   if (showRanking && (!started || isResult)) { // over a result page too, closing back onto it (RankingScreen returnTo)
