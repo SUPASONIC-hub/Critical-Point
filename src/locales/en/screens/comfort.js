@@ -13,7 +13,7 @@ export default {
     },
     playAllTables: {
       label: "Play every hand yourself",
-      text: "In Story Mode too, you play every hand yourself. Off, you play only each case’s Sign-off hand; the others cash at Heat 70 as soon as you pick a card.",
+      text: "On, you play every hand yourself in the mode above too. Off, you play only each case’s Sign-off hand; the others cash at Heat 70 as soon as you pick a card.",
     },
     holdReadingClock: {
       label: "Turn off the reading clock",

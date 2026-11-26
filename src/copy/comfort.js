@@ -21,7 +21,7 @@ const comfortCopy = {
     // G43: off, a story run plays only each case's 결재 판 by hand (storyAutoCash.js).
     playAllTables: {
       label: "판 모두 직접 치기",
-      text: "스토리 모드에서도 모든 판을 직접 확정합니다. 끄면 사건마다 결재 판만 직접 치고, 나머지 판은 카드를 고르면 열기 70으로 자동 확정됩니다.",
+      text: "켜면 위 모드에서도 모든 판을 직접 확정합니다. 끄면 사건마다 결재 판만 직접 치고, 나머지 판은 카드를 고르면 열기 70으로 자동 확정됩니다.",
     },
     holdReadingClock: {
       label: "읽기 시계 자동 넘김 끄기",

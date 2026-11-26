@@ -401,7 +401,7 @@ export function GauntletStage({
   // G43: a story table other than the case's 결재 판 is cashed at heat 70 once its card is picked, through the reducer (storyAutoCash.js).
   function stake(id) {
     const auto = id && live && !abandoned && isAutoCashTable({ run, caseId: scene.node.caseId, node: scene.node, playAll: getAccessibility().playAllTables });
-    const plan = auto && planAutoCash(win, id, { rules, sealedId });
+    const plan = auto ? planAutoCash(win, id, { rules, sealedId }) : null;
     if (plan?.window.status !== "cashed") return dispatch({ type: "SELECT", id });
     autoRef.current = true;
     plan.events.forEach(dispatch);
