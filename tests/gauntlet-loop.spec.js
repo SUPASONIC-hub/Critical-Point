@@ -1083,6 +1083,7 @@ test("cashing without a single push seals the best card on the next board", asyn
 });
 
 test("two hot cashouts trigger an overclock payout banner", async ({ page }) => {
+  test.setTimeout(150_000);
   // G42 (RULES_MARK 10): a hot cash is ×32 (heat 55); the wall is set past any push from there.
   await openFarWall(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
@@ -1203,19 +1204,20 @@ function findCoolWalk(caseId = "case01") {
 async function pushToHotCash(page) {
   const stage = page.getByTestId("gauntlet-stage");
   const heat = async () => Number(await stage.getAttribute("data-gauge"));
-  for (let press = 0; press < 8 && (await heat()) < HOT_HEAT; press += 1) {
-    const before = await heat();
-    await page.getByTestId("commit-push").click();
-    await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
-  }
-  expect(await heat(), "the card is hot enough to cash at x32").toBeGreaterThanOrEqual(HOT_HEAT);
+  // One push (a cash with none deals COLD FEET) from FAR_WALL's 40 lands at 55 at most; the clock's creep
+  // carries it on to ×32, and the cash is taken before 60, where it would deal HEAT DEBT.
+  const before = await heat();
+  await page.getByTestId("commit-push").click();
+  await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
+  await expect.poll(heat, { timeout: 30_000, intervals: [100] }).toBeGreaterThanOrEqual(HOT_HEAT);
+  expect(await heat(), "the card is hot enough to cash at x32, and under HEAT DEBT").toBeLessThan(60);
   await expect(stage).toHaveAttribute("data-status", "live");
 }
 
 /**
  * G42 (RULES_MARK 10): the OVERCLOCK chain asks for ×32, heat 55 (the multiplier
  * doubles every 11); 56 read on the gauge, which rounds. A board opened at heat
- * 40 under a wall of 86 or more: no push from under 56 (15 at most) reaches it.
+ * 40 under a wall of 86 or more: one push and the creep never reach it.
  * `streak` is the chain the run already holds.
  */
 const HOT_HEAT = 56;

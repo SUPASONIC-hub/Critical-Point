@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, isMarkTenOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -397,7 +397,10 @@ const bestHeartbeat = heartbeat.reduce((best, row) => (row.meanVault > best.mean
 
 assert.notEqual(bestFixed.label, "heat 0", "never pushing cannot be the best blind policy, or there is no bet");
 assert.notEqual(bestFixed.label, fixed.at(-1).label, "pushing as far as possible cannot be the best blind policy either");
-assert.ok(bestFixed.bustRate >= 0.08 && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
+// G42 (RULES_MARK 10): with OVERCLOCK from ×32 a blind hand at heat 50 (×23) never widens its push,
+// and busts 6.6% (8.8% before, when its ×4 chain overclocked most boards); the floor is 6% under 10.
+const BLIND_BUST_FLOOR = isMarkTenOn() ? 0.06 : 0.08;
+assert.ok(bestFixed.bustRate >= BLIND_BUST_FLOOR && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
 assert.ok(bestHeartbeat.meanVault > bestFixed.meanVault, "listening to the heartbeat should be worth something");
 assert.ok(
   bestHeartbeat.meanVault < oracle.meanVault * 0.6,
