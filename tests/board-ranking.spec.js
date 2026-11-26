@@ -372,6 +372,8 @@ async function openBoardIn(page, lang) {
 }
 
 test("the makers' notice is pinned over the board in the page's language, Korean where it has none", async ({ page }) => {
+  // Three page loads, two of them with a language's dictionary: a cold dev server needs the time.
+  test.setTimeout(120_000);
   // A 360px phone: the notice wraps and the page never scrolls sideways.
   await page.setViewportSize({ width: 360, height: 740 });
   const asked = [];
@@ -416,6 +418,8 @@ test("the makers' notice is pinned over the board in the page's language, Korean
 });
 
 test("no notice, or one the board cannot reach, draws nothing", async ({ page }) => {
+  // Three page loads.
+  test.setTimeout(120_000);
   await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
   await useMockSupabase(page);
   // Each time, the answer has come and been read before "nothing" is believed.
