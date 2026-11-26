@@ -605,6 +605,21 @@ test("a case closed on harm offers 보상금 on its report, and paying it takes 
   expect(paid.caseResults.case01.finalHumanCost, "the harm is kept as the case closed on it").toBe(COVER_HARM);
 });
 
+test("paying 보상금 with Enter hands focus to the next case's button, not <body>", async ({ page }) => {
+  test.setTimeout(120_000);
+  await closeCaseOneOnHarm(page, { vault: 50_000 });
+  const line = page.locator(".outcome-panel").getByTestId("case-cover");
+  const pay = line.getByTestId("case-cover-pay");
+  await pay.focus();
+  await expect(pay).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(pay).toHaveCount(0);
+  await expect(line.getByRole("status")).toHaveText(fill(resultCopy.cover.paid, { cost: formatMoney(COVER_COST), harm: COVER_HARM, covers: 1 }));
+  // The paid line itself is not the target: focus there would read the payment again over its live region.
+  await expect(page.getByTestId("next-case-button")).toBeFocused();
+  expect(await page.evaluate(() => document.activeElement?.dataset?.testid ?? document.activeElement?.tagName)).toBe("next-case-button");
+});
+
 test("with too little in the 계좌 the 보상금 button says so, is off, and a press pays nothing", async ({ page }) => {
   test.setTimeout(120_000);
   const closed = await closeCaseOneOnHarm(page, { vault: 0 });
