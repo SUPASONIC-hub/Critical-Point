@@ -56,6 +56,13 @@ const boardCopy = {
       "short-clock": "시간이 짧으면 더 빨라지나요, 더 조심하게 되나요? 이번 주 짧은 시계에서 달라진 점을 남겨 주세요.",
     },
   },
+  // 「만든 사람 공지」 (src/boardNotice.js): the makers' one notice over the posts.
+  // Only the two makers write it (the admin bar); it is not a post.
+  makersNotice: {
+    label: "만든 사람 공지",
+    note: "참가자 글이 아니라 우리가 직접 올린 공지입니다.",
+    posted: "{date} 게시",
+  },
   noTime: "기록 시각 없음",
   reportedLabel: "{name}님의 글을 신고했습니다",
   reportLabel: "{name}님의 글 신고",

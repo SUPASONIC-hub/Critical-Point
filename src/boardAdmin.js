@@ -1,4 +1,5 @@
 import { authStorageKey } from "./boardAdminEntry.js";
+import { BOARD_NOTICE_LANGS, BOARD_NOTICE_MAX_LENGTH } from "./boardNotice.js";
 import { supabaseTarget } from "./telemetry.js";
 
 /**
@@ -174,6 +175,52 @@ export function toLogRow(row) {
     action: String(row.action ?? ""),
     postId: Number(row.post_id),
   };
+}
+
+/**
+ * The makers' notice as the admin bar's form reads it back
+ * (`admin_board_notice_get`, 20261202010000): ended or not, with who posted
+ * it. Null when there is none.
+ */
+export function toAdminNotice(row, now = Date.now()) {
+  if (!row || typeof row !== "object") return null;
+  const expiresAt = row.expires_at ?? null;
+  return {
+    ko: String(row.body_ko ?? ""),
+    en: String(row.body_en ?? ""),
+    ja: String(row.body_ja ?? ""),
+    postedAt: row.posted_at ?? null,
+    expiresAt,
+    ended: Boolean(expiresAt) && Date.parse(expiresAt) <= now,
+    postedBy: String(row.posted_by ?? ""),
+  };
+}
+
+/** An ISO time as a `datetime-local` field holds it, in this device's time zone; "" for none. */
+export function toLocalInput(iso) {
+  const at = new Date(iso ?? Number.NaN);
+  if (!iso || Number.isNaN(at.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}T${pad(at.getHours())}:${pad(at.getMinutes())}`;
+}
+
+/**
+ * The form's draft as `admin_board_notice_set`'s arguments, or the problem the
+ * server would refuse it for, said first here: `{ error: "ko" | "long" |
+ * "ended" }`. Blank English or Japanese is sent as none (the page shows the
+ * Korean); the end is a `datetime-local` value in this device's time zone.
+ */
+export function noticeArgs({ ko = "", en = "", ja = "", expiresAt = "" } = {}, now = Date.now()) {
+  const texts = { ko: String(ko).trim(), en: String(en).trim(), ja: String(ja).trim() };
+  if (!texts.ko) return { error: "ko" };
+  if (BOARD_NOTICE_LANGS.some((lang) => texts[lang].length > BOARD_NOTICE_MAX_LENGTH)) return { error: "long" };
+  let ends = null;
+  if (expiresAt) {
+    const at = new Date(expiresAt).getTime();
+    if (!(at > now)) return { error: "ended" };
+    ends = new Date(at).toISOString();
+  }
+  return { args: { p_body_ko: texts.ko, p_body_en: texts.en || null, p_body_ja: texts.ja || null, p_expires_at: ends } };
 }
 
 async function request(fetchImpl, url, options) {
@@ -358,6 +405,19 @@ export function createBoardAdmin({
     },
     async log() {
       return ((await rpc("admin_board_log", { p_limit: ADMIN_LOG_SIZE })) ?? []).map(toLogRow);
+    },
+    /** The makers' notice, ended or not, or null (20261202010000_board_notice.sql). */
+    async notice() {
+      const rows = await rpc("admin_board_notice_get");
+      return toAdminNotice(Array.isArray(rows) ? rows[0] : null, now());
+    },
+    /** Writes (or replaces) the notice from `noticeArgs(...).args`; the server's posting time back. */
+    async setNotice(args) {
+      return rpc("admin_board_notice_set", args);
+    },
+    /** Takes the notice down; false when there was none. */
+    async clearNotice() {
+      return (await rpc("admin_board_notice_clear")) === true;
     },
   };
 }

@@ -41,6 +41,11 @@ export default {
       "short-clock": "When the clock is short, do you get faster or more careful? Tell us what changed for you under this week’s short clock.",
     },
   },
+  makersNotice: {
+    label: "From the makers",
+    note: "Not a participant post: we posted this ourselves.",
+    posted: "Posted {date}",
+  },
   noTime: "No timestamp",
   reportedLabel: "You reported {name}’s post",
   reportLabel: "Report {name}’s post",

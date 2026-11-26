@@ -351,6 +351,92 @@ test("a week with a question pins ours over the composer, and the test week has 
   expect(order, "the question sits above the composer").toBe(true);
 });
 
+/**
+ * 「만든 사람 공지」: the makers' one notice (board_notice, written only by
+ * the two makers' admin RPCs; check:grants holds that a stranger is refused).
+ * It is pinned over the week's question and the composer, outside the posts,
+ * in the page's language or else Korean, and no notice draws nothing.
+ */
+const NOTICE = {
+  body_ko: "우리가 알립니다.\n이번 주에는 새 사건이 열립니다.",
+  body_en: "A word from us: a new case opens this week.",
+  body_ja: null,
+  posted_at: "2026-11-26T01:00:00Z",
+  expires_at: null,
+};
+
+async function openBoardIn(page, lang) {
+  await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
+  await page.locator(".intro-board-button").first().click();
+  await expect(page.locator(".board-page")).toBeVisible();
+}
+
+test("the makers' notice is pinned over the board in the page's language, Korean where it has none", async ({ page }) => {
+  // A 360px phone: the notice wraps and the page never scrolls sideways.
+  await page.setViewportSize({ width: 360, height: 740 });
+  const asked = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, (route) =>
+    route.fulfill(json([{ id: 1, nickname: "만든 사람 공지", body: "공지처럼 보이고 싶은 글", created_at: "2026-11-25T09:00:00Z" }])),
+  );
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => {
+    asked.push(new URL(route.request().url()).searchParams.get("select"));
+    return route.fulfill(json([NOTICE]));
+  });
+  await useMockSupabase(page);
+
+  for (const [lang, label, text, textLang] of [
+    ["ko", "만든 사람 공지", "이번 주에는 새 사건이 열립니다.", "ko"],
+    ["en", "From the makers", "A word from us: a new case opens this week.", "en"],
+    ["ja", "制作者からのお知らせ", "이번 주에는 새 사건이 열립니다.", "ko"],
+  ]) {
+    await openBoardIn(page, lang);
+    const notice = page.getByRole("region", { name: label });
+    await expect(notice, `${lang}: the notice is a named region`).toBeVisible();
+    await expect(notice).toHaveAttribute("data-testid", "board-makers-notice");
+    await expect(notice).toContainText("FROM THE MAKERS");
+    await expect(page.getByTestId("board-makers-notice-text")).toContainText(text);
+    await expect(page.getByTestId("board-makers-notice-text")).toHaveAttribute("lang", textLang);
+    // Pinned: over the composer and the posts, and not one of them.
+    const placed = await page.evaluate(() => {
+      const pinned = document.querySelector("[data-testid=board-makers-notice]");
+      const composer = document.querySelector(".board-composer");
+      return {
+        above: Boolean(pinned.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING),
+        inList: Boolean(pinned.closest(".board-list-panel")),
+        reportable: pinned.querySelectorAll("[data-testid=board-report-toggle]").length,
+        wide: document.documentElement.scrollWidth <= window.innerWidth,
+      };
+    });
+    expect(placed, `${lang}: pinned above the composer, outside the posts, no report button, no sideways scroll`).toEqual({ above: true, inList: false, reportable: 0, wide: true });
+    // The post that calls itself 「만든 사람 공지」 stays a post.
+    await expect(page.locator(".board-post").first()).toContainText("공지처럼 보이고 싶은 글");
+  }
+  expect(asked.every((select) => select === "body_ko,body_en,body_ja,posted_at,expires_at"), `the board asks for the words and times only: ${asked.join(" | ")}`).toBe(true);
+});
+
+test("no notice, or one the board cannot reach, draws nothing", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  // Each time, the answer has come and been read before "nothing" is believed.
+  const openAndAnswer = async () => {
+    const answered = page.waitForResponse((response) => response.url().includes("/rest/v1/board_notice"));
+    await openBoard(page);
+    await answered;
+    await expect(page.locator(".board-composer")).toBeVisible();
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await expect(page.getByTestId("board-makers-notice")).toHaveCount(0);
+  };
+  await openAndAnswer();
+
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => route.fulfill(json({ message: "boom" }, 500)));
+  await openAndAnswer();
+
+  // An ended notice the page still receives is none as well.
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => route.fulfill(json([{ ...NOTICE, expires_at: "2000-01-01T00:00:00Z" }])));
+  await openAndAnswer();
+});
+
 test("no ranking row can take the ranking screen down", async ({ page }) => {
   const honest = {
     run_tag: "HONEST01",

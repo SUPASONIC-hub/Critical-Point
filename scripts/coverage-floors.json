@@ -15,6 +15,7 @@
     "src/boardAdmin.js": 98,
     "src/boardAdminEntry.js": 100,
     "src/boardBlockedTerms.js": 100,
+    "src/boardNotice.js": 100,
     "src/boardQuestions.js": 100,
     "src/boardReport.js": 100,
     "src/castAliases.js": 100,
