@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { COIN_GAIN_WEIGHT, isMarkNineOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, isMarkTenOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -397,7 +397,10 @@ const bestHeartbeat = heartbeat.reduce((best, row) => (row.meanVault > best.mean
 
 assert.notEqual(bestFixed.label, "heat 0", "never pushing cannot be the best blind policy, or there is no bet");
 assert.notEqual(bestFixed.label, fixed.at(-1).label, "pushing as far as possible cannot be the best blind policy either");
-assert.ok(bestFixed.bustRate >= 0.08 && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
+// G42 (RULES_MARK 10, the user's (1) of 2026-11-26): OVERCLOCK from ×32 leaves the best blind hand
+// (heat 50, ×23) on the narrow push, and it busts 6.6% (8.8% at 9, its ×4 chain overclocked most boards).
+const BLIND_BUST_FLOOR = isMarkTenOn() ? 0.06 : 0.08;
+assert.ok(bestFixed.bustRate >= BLIND_BUST_FLOOR && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
 assert.ok(bestHeartbeat.meanVault > bestFixed.meanVault, "listening to the heartbeat should be worth something");
 assert.ok(
   bestHeartbeat.meanVault < oracle.meanVault * 0.6,
@@ -407,6 +410,9 @@ const bestScout = bestOfRows(scoutRows);
 console.log(
   `scout            blind ${bestFixed.meanVault} < heartbeat ${bestHeartbeat.meanVault} < scout ${bestScout.meanVault} (${bestScout.label}, bust ${(bestScout.bustRate * 100).toFixed(1)}%) < sees ${oracle.meanVault}  (scout/sees ${(bestScout.meanVault / oracle.meanVault).toFixed(3)}, heartbeat/sees ${(bestHeartbeat.meanVault / oracle.meanVault).toFixed(3)})`,
 );
+// G42 (RULES_MARK 10): how often a cash dealt the next board OVERCLOCK (×32 twice in a row; ×4 before), measured, not asserted.
+const overclockShare = (row) => `${((row.seen.overclockDealt / Math.max(1, row.seen.windows)) * 100).toFixed(1)}%`;
+console.log(`overclock        dealt after ${overclockShare(bestFixed)} of ${bestFixed.label}'s boards, ${overclockShare(bestHeartbeat)} of ${bestHeartbeat.label}'s, ${overclockShare(oracle)} of ${oracle.label}'s (the chain from ×${getHotCashMultiplier(ALL_RULES)})`);
 assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
 assert.ok(
   bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
@@ -510,7 +516,10 @@ assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a direction 
 // EXPOSE carries thicker chips, STEADY is a little weaker, and every case's last board pays ×1.5.
 // G29 (RULES_MARK 9): the simulated card's 자본 7 weighs COIN_GAIN_WEIGHT, so every pot it pays is its chips' share bigger; the beat's measure is scaled by it.
 const COIN_SCALE = getCardChips(card) / getCardChips(card, BASE_SCHEMA, withMarkNine(ALL_RULES, false));
-const LOCK_ON_THE_BEAT = Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
+// G42 (RULES_MARK 10, the user's (1) of 2026-11-26): OVERCLOCK from ×32 takes the pot the ×4 chain had
+// inflated (the listening hand 30,041 -> 21,185), so the three lines are re-measured on 10's table
+// (check:pressure 11-26: strike 41,834, steady 40,204, expose 39,879 against 56,086 / 54,352 / 54,729 at 9).
+const LOCK_ON_THE_BEAT = isMarkTenOn() ? { strike: 41834, steady: 40204, expose: 39879 } : Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
 /**
  * A LOCK hand against the bare hand that sees the wall: never more under the
  * old rules. Under the next ones STRIKE's hot cap and EXPOSE's carry are paid

@@ -675,8 +675,9 @@ test("ranking screen has no structural accessibility violations", async ({ page 
  * projects before it merges (e2e runs only on main, and a failure there skips
  * the deploy).
  *
- * case01 `start` is the table the overclock test pushes three times without
- * meeting the wall, so one push here lands live.
+ * case01 `start`'s first board takes three pushes without meeting the wall
+ * (the overclock test pushed it so until G42 set it a far wall), so one push
+ * here lands live.
  */
 const PUSH_CALL = /^열기 \d+ · (벽까지 최소 \d+|밀면 벽 사정권|벽 구간 안)$/;
 

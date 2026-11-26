@@ -3,6 +3,8 @@ import { test } from "node:test";
 
 import { ENDING_THRESHOLDS, getEndingVariant } from "../../src/gameLogic.js";
 import { endingLabelOf, nearestEnding } from "../../src/nearestEnding.js";
+import { isMarkTenOn } from "../../src/gauntlet/nextTableRules.js";
+import { FINALE_WEIGHT } from "../../src/seasonStanding.js";
 import reportLinesCopy from "../../src/copy/reportLines.js";
 import enScreens from "../../src/locales/en/screens/index.js";
 import jaScreens from "../../src/locales/ja/screens/index.js";
@@ -16,10 +18,13 @@ import { createSeasonStandingReadout, describeNearestEnding } from "../../src/vi
  * `getEndingVariant` itself.
  */
 const CASES = 10;
+// G40 (RULES_MARK 10): the finale's answer weighs FINALE_WEIGHT on the mean the ruling reads (증언 믿음, 개혁 공정함);
+// the mean here is handed that much under, so the gates below are read at the numbers the rows name.
+const under = (finale, key) => (isMarkTenOn() && { witness: "trust", control: "legitimacy" }[finale] === key ? FINALE_WEIGHT : 0);
 function season({ trust = 60, legitimacy = 60, capital = 80, clues = 0, reframes = 0, finale = "witness", ...extra } = {}) {
   return {
     resources: { time: 0, capital, trust, legitimacy, humanCost: 0, fatigue: 0 },
-    seasonResources: { capital, trust, legitimacy },
+    seasonResources: { capital, trust: trust - under(finale, "trust"), legitimacy: legitimacy - under(finale, "legitimacy") },
     discoveredClues: Array.from({ length: clues }, (_, index) => `clue-${index}`),
     log: finale ? [{ nodeId: "f_aftershock", choiceId: `f_after_${finale}` }] : [],
     seasonHumanCost: 0,

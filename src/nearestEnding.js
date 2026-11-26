@@ -1,5 +1,5 @@
 import { ENDING_THRESHOLDS as GATE, getFinaleOutcome } from "./gameLogic.js";
-import { getSlackGates, readCollapseGate } from "./seasonStanding.js";
+import { getSlackGates, readCollapseGate, weighFinale } from "./seasonStanding.js";
 
 /**
  * The ending a season came closest to and did not reach, for the finale's one
@@ -46,9 +46,11 @@ export function nearestEnding(input = {}) {
     seasonBestMultiplier = 1, seasonVaultPerCase = 0, seasonBestLogic = 0, seasonReframeRoutes, seasonResources = null, storySeason = false,
   } = input ?? {};
   if (!endingId || endingId === "collapse") return null;
-  if (getFinaleOutcome(log) === "burn") return { burn: true };
+  const finale = getFinaleOutcome(log);
+  if (finale === "burn") return { burn: true };
   const { cases } = readCollapseGate({ seasonHumanCost, resources, casesPlayed, seasonBusts, seasonWindows });
-  const standing = seasonResources ?? resources ?? {};
+  // G40 (RULES_MARK 10): the mean with the last answer on it, as the ruling reads it.
+  const standing = (seasonResources ? weighFinale(seasonResources, finale) : resources) ?? {};
   const trust = Number(standing.trust) || 0;
   const legitimacy = Number(standing.legitimacy) || 0;
   const capital = Number(standing.capital) || 0;

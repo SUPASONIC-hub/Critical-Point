@@ -14,7 +14,7 @@ const NINE = withMarkNine(ALL_RULES, true);
 const EIGHT = withMarkNine(ALL_RULES, false);
 
 test("RULES_MARK 9: the engine's mark, on by default, and a row of 5 to 8 played without it", () => {
-  assert.equal(RULES_MARK, 9);
+  assert.ok(RULES_MARK >= 9, "RULES_MARK 10 keeps 9's rules");
   assert.equal(RULES_NINE_MARK, 9);
   assert.equal(wantsMarkNine({}), true);
   assert.equal(wantsMarkNine({ process: { env: { RULES_MARK9: "0" } } }), false);

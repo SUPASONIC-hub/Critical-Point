@@ -236,11 +236,11 @@ export default {
       },
       live: {
         label: "継続中",
-        text: "もう一度×4以上で確定するとオーバークロック",
+        text: "もう一度×{multiplier}以上で確定するとオーバークロック",
       },
       held: {
         label: "維持",
-        text: "この勝負も×4以上で確定しないと続かない",
+        text: "この勝負も×{multiplier}以上で確定しないと続かない",
       },
       ignition: {
         label: "点火",
@@ -248,7 +248,7 @@ export default {
       },
       dormant: {
         label: "オフ",
-        text: "×4以上の確定から連続が始まる",
+        text: "×{multiplier}以上の確定から連続が始まる",
       },
     },
     rulesOn: "{rules} 適用中",

@@ -808,7 +808,7 @@ export function handUnit(seed) {
  * many pushes each window made; the `lock` numbers are the cashes that held a
  * charge, how many of them LOCK added nothing to, and the pots told apart.
  */
-export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, narrows: 0, pushedBoards: 0, narrowTrust: 0, caught: 0, exposedCashes: 0, signBoards: 0, signBusts: 0, signPot: 0, breaths: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, ...newChainSeen() });
+export const newSeen = () => ({ windows: 0, streakSum: 0, moves: {}, bustAt: {}, pushed: {}, lockCashed: 0, lockUnpaid: 0, pot: 0, logicPot: 0, focusPot: 0, scouts: 0, narrows: 0, pushedBoards: 0, narrowTrust: 0, caught: 0, exposedCashes: 0, signBoards: 0, signBusts: 0, signPot: 0, breaths: 0, linksMade: 0, linksLanded: 0, linksLandedIn: 0, linksCarried: 0, linksLapsed: 0, cascadeBoards: 0, cascadeBusts: 0, audits: 0, auditLost: 0, auditSecured: 0, overclockDealt: 0, ...newChainSeen() });
 /**
  * The bust chain (improvement notes C-14, 2026-10-22): boards played right
  * after a bust in the same case, against the rest. `afterBust*` is every such
@@ -840,6 +840,8 @@ function see(seen, verdict) {
     else seen.signPot += verdict.pot;
   }
   if (verdict.breathed) seen.breaths += 1;
+  // G42: the boards whose cash dealt the next one OVERCLOCK.
+  if (verdict.nextMutations?.some((mutation) => mutation.id === "overclock")) seen.overclockDealt += 1;
   // AUDIT_ON only: the closes the audit took its part of, that part, and what those closes moved before it.
   if (verdict.audit?.caught) {
     seen.audits += 1;

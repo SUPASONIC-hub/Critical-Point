@@ -48,7 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
-import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withNextRules } from "./gauntlet/nextTableRules.js";
+import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, RULES_TEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withMarkTen, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -98,9 +98,10 @@ export function recheckCaseScore(row) {
 export function getRowRules(caseId, summary, mark = undefined) {
   const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
   if (mark === undefined || mark === null) return rules;
-  // RULES_MARK 8 (G19~G26): a row of 5 to 7 is played again without them (`before8`); RULES_MARK 9 (G29~G37) likewise for a row of 8 (`before9`).
+  // RULES_MARK 8 (G19~G26): a row of 5 to 7 is played again without them (`before8`); RULES_MARK 9 (G29~G37) likewise for a row of 8 (`before9`),
+  // and RULES_MARK 10 (G40~G42) for a row of 9 (`before10`).
   const eight = withMarkEight(withMarkSeven(withNextRules(rules, Number(mark) >= RULES_NEXT_MARK), Number(mark) >= RULES_SEVEN_MARK), Number(mark) >= RULES_EIGHT_MARK);
-  return withMarkNine(eight, Number(mark) >= RULES_NINE_MARK);
+  return withMarkTen(withMarkNine(eight, Number(mark) >= RULES_NINE_MARK), Number(mark) >= RULES_TEN_MARK);
 }
 
 /**

@@ -6,7 +6,7 @@ import { FRACTURE_MIN_BURN, getCardBurn, HAND_CAP, resolveWindow } from "../src/
 import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
-import { isMarkNineOn } from "../src/gauntlet/nextTableRules.js";
+import { isMarkNineOn, isMarkTenOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -82,7 +82,7 @@ const { random, pick, playSeason, archetypes: ARCHETYPES } = bot;
  * window made, so the two together say how often push N is the one that busts.
  */
 function watchSeason() {
-  const seen = { windows: 0, dealtWild: 0, stakedWild: 0, cashed: 0, busts: 0, moves: {}, wildMoves: {}, streakSum: 0, best: 0, bonusSum: 0, capped: 0, pot: 0, logicPot: 0, banked: 0, bustAt: {}, pushed: {}, fractureDealt: 0, fractureBurn: 0, fracturedBoards: 0 };
+  const seen = { windows: 0, dealtWild: 0, stakedWild: 0, cashed: 0, busts: 0, moves: {}, wildMoves: {}, streakSum: 0, best: 0, bonusSum: 0, capped: 0, pot: 0, logicPot: 0, banked: 0, bustAt: {}, pushed: {}, fractureDealt: 0, fractureBurn: 0, fracturedBoards: 0, overclocked: 0, overclockPot: 0 };
   const count = (map, key) => {
     map[key] = (map[key] ?? 0) + 1;
   };
@@ -112,6 +112,11 @@ function watchSeason() {
     if (Math.abs(getCardBurn(card, board)?.value ?? 0) >= FRACTURE_MIN_BURN) seen.fractureBurn += 1;
     if (verdict.nextMutations.some((mutation) => mutation.id === "fracture")) seen.fractureDealt += 1;
     if (board.fracturedAxis) seen.fracturedBoards += 1;
+    // G42: the boards played OVERCLOCKed, and the pot they paid.
+    if (board.mutations?.includes("overclock")) {
+      seen.overclocked += 1;
+      if (verdict.outcome === "cash") seen.overclockPot += verdict.pot;
+    }
   };
   return seen;
 }
@@ -153,6 +158,17 @@ const dump = [];
 const populationArchetypes = [];
 // G34: the prices each season above paid its covers at (season-bot.mjs `pays`: money only).
 const populationCovers = [];
+// G40: each standing season's ending under the finale's three answers (`answerEndings`), and its archetype.
+const lastAnswers = [];
+const ANSWERS = ["witness", "control", "burn"];
+/** The season's ending had its finale been answered each way, the rest of the season as played; null with no answer in the log. */
+function answerEndings(season) {
+  const log = season.final.log;
+  const at = log.findLastIndex((entry) => /^f_after_(witness|control|burn)$/.test(entry?.choiceId ?? ""));
+  if (at < 0) return null;
+  const answered = (answer) => log.map((entry, index) => (index === at ? { ...entry, choiceId: `f_after_${answer}` } : entry));
+  return ANSWERS.map((answer) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: answered(answer), ...season.strain }).id);
+}
 // the audit on (AUDIT=0 turns it off) (B3's test week, season-bot.mjs): the closes the audit took its part of, over the population.
 const auditTally = { seasons: 0, caught: 0, lost: 0, secured: 0 };
 // the links on (CASCADE=0 turns them off) (B2, season-bot.mjs): the population's links, and what its seasons banked and bust.
@@ -179,6 +195,7 @@ for (let index = 0; index < SEASONS; index += 1) {
   if (reportMode) funnelRow(archetype).push(funnelSeason(season));
   const closesOn = (seasonBestLogic) => getEndingVariant({ resources: season.final.resources, discoveredClues: season.discoveredClues, log: season.final.log, ...season.strain, seasonBestLogic }).id;
   if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
+  if (season.ending.id !== "collapse") lastAnswers.push({ archetype, endings: answerEndings(season) });
   counts.set(season.ending.id, (counts.get(season.ending.id) ?? 0) + 1);
   byArchetype[archetype] ??= new Map();
   byArchetype[archetype].set(season.ending.id, (byArchetype[archetype].get(season.ending.id) ?? 0) + 1);
@@ -361,6 +378,23 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
     console.log(`Covers (G34, measured) ${name}: ${fiveNumbers(covers)} a season (mean ${(covers.reduce((a, b) => a + b, 0) / Math.max(1, covers.length)).toFixed(1)}), paid ${fiveNumbers(spent)}; collapse ${(share(byArchetype[name], "collapse", archetypeTotal(name)) * 100).toFixed(1)}%, profitable-silence ${(share(byArchetype[name], "profitable-silence", archetypeTotal(name)) * 100).toFixed(1)}%`);
     if (isMarkNineOn() && !process.env.ENDING_BASELINE) assert.ok(covers.some((count) => count > 0), `G34: ${name} paid no case off in ${seasons.length} seasons`);
   }
+  // G40 마지막 답의 무게 (RULES_MARK 10): how often the finale's answer moves a standing season's ending.
+  const answered = lastAnswers.filter((row) => row.endings);
+  const moves = answered.filter((row) => new Set(row.endings).size > 1).length;
+  const apart = answered.filter((row) => row.endings[0] !== row.endings[1]).length;
+  const answerShare = moves / Math.max(1, answered.length);
+  console.log(`Last answer (G40, measured): of ${answered.length} standing seasons the ending moves with the answer in ${moves} (${(answerShare * 100).toFixed(1)}%), all three the same ${answered.length - moves} (${(((answered.length - moves) / Math.max(1, answered.length)) * 100).toFixed(1)}%), witness and control apart ${apart} (${((apart / Math.max(1, answered.length)) * 100).toFixed(1)}%)`);
+  if (isMarkTenOn() && !process.env.ENDING_BASELINE) assert.ok(answerShare >= 0.75, `G40: the finale's answer moves only ${(answerShare * 100).toFixed(1)}% of standing seasons' endings (target 75%)`);
+  // G41 (RULES_MARK 10): the endings the money paths reach, and the second one's share of their standing seasons.
+  for (const name of ["money", "spend-people"]) {
+    const map = byArchetype[name] ?? new Map();
+    const standing = [...map.entries()].filter(([id]) => id !== "collapse").sort((a, b) => b[1] - a[1]);
+    const total = standing.reduce((sum, [, count]) => sum + count, 0);
+    console.log(`Money path (G41, measured) ${name}: ${map.size} endings (${[...map.entries()].sort((a, b) => b[1] - a[1]).map(([id, count]) => `${id} ${count}`).join(", ")}); second of the standing ${standing[1] ? `${standing[1][0]} ${((standing[1][1] / Math.max(1, total)) * 100).toFixed(1)}%` : "none"}`);
+  }
+  // G42 OVERCLOCK 문턱 (RULES_MARK 10): the population's boards played OVERCLOCKed, and the share of the pot they paid.
+  const watched = addSeen(populationSeen);
+  console.log(`OVERCLOCK (G42, measured): ${watched.overclocked} of ${watched.windows} boards (${((watched.overclocked / Math.max(1, watched.windows)) * 100).toFixed(1)}%), paying ${((watched.overclockPot / Math.max(1, watched.pot)) * 100).toFixed(1)}% of the pot`);
   const BOARD_PAIRS = Number(process.env.ENDING_BOARD_SEASONS) || POPULATION.length * 40;
   const boards = createSeasonBot({ seed: 20261022, staged, archetypes: Object.fromEntries(Object.entries(ARCHETYPES).flatMap(([name, base]) => [[`${name}+blind`, { ...base, board: "blind" }], [`${name}+listens`, { ...base, board: "listens" }]])) });
   const tally = () => ({ pairs: 0, moved: 0, collapseMoved: 0, blindCollapse: 0, listensCollapse: 0, blindBusts: 0, listensBusts: 0 });
