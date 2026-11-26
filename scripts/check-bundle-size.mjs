@@ -230,8 +230,8 @@ const budgets = [
   // 166,600 / 62,169 -> 166,925 / 62,353 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 166925 / 62345 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 166,925 / 62,353 -> 166,968 / 62,379 gameplay-g4a over main d946283f: measured 166964 / 62375 in CI verify-quick, the plus 4.
   // 166,968 / 62,379 -> 168,600 / 63,001 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 168,596 / 62,973 plus 4. CI re-measures.
-  // 168,600 / 63,001 -> 168,827 / 63,066 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 168823 / 63062 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_827, maxGzip: 63_066 },
+  // 168,600 / 63,001 -> 168,827 / 63,072 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 168823 / 63068 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 168_827, maxGzip: 63_072 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -2283,8 +2283,8 @@ const budgets = [
   // 210,408 / 70,403 -> 210,599 / 70,424: measured 210595 / 70420, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 210,599 / 70,424 -> 211,879 / 70,678 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 211879 / 70670 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 211,879 / 70,678 -> 212,819 / 70,960 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 212,632 / 70,949 plus 4. CI re-measures.
-  // 212,819 / 70,960 -> 213,012 / 71,059 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 213008 / 71055 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 213_012, maxGzip: 71_059 },
+  // 212,819 / 70,960 -> 213,024 / 71,062 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 213020 / 71058 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 213_024, maxGzip: 71_062 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2417,8 +2417,8 @@ const budgets = [
   // 176,025 / 62,932 -> 176,213 / 62,970: measured 176209 / 62966, gameplay-mark8 d73e6c23 over bundle-r-early 4c15b903 (Linux CI verify-quick 11-25 = Windows to the byte; under budget on note days 12-31, 01-02, 01-11 and 01-20), the plus 4.
   // 176,213 / 62,970 -> 177,379 / 63,240 gameplay-g4a (RULES_MARK 9: G29 G30 G32 G35 G36) over main 49d84be5: measured 177379 / 63232 (over budget only) in the e2e build on Windows, plus Linux's 4 and the plus 4. CI re-measures.
   // 177,379 / 63,240 -> 178,270 / 63,511 gameplay-g4b (MARK 9 G31 G33 G34) over main 90db9f3d (#675): main's budget plus this branch's growth, at least the measured 178,088 / 63,466 plus 4. CI re-measures.
-  // 178,270 / 63,511 -> 178,373 / 63,559 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 178369 / 63555 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_373, maxGzip: 63_559 },
+  // 178,270 / 63,511 -> 178,380 / 63,569 on 2026-11-26, story-g43 (G43 이야기 모드 결재 판만 직접) over main d5d79552. Measured 178376 / 63565 locally on Windows (provisional; CI to confirm) in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 178_380, maxGzip: 63_569 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -2938,8 +2938,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // The first paint still moves with the start screen's notes (#670 leaves four note days), so the largest day's room stays. ko 387,189 at most, under its budget.
 // -> back to bundle R's 387,206 / 453,411 / 461,850 after main c967db59 (#670, the start screen's notes fixed): gameplay-mark8 ef349544 measured 386,662 / 453,021 / 461,478 in CI verify-quick 11-25, 386,515 / 452,849 / 461,310 on Windows for 2027-01-13; both well under it.
 // en 453,411 -> 453,724, ja 461,850 -> 462,199 gameplay-g4b over main 90db9f3d: G31·G33·G34 words in the overlay indexes (+313 / +349 measured before). Measured 453,613 / 462,095.
-// en 453,724 -> 453,812, ja 462,199 -> 462,316 on 2026-11-26, story-g43 (G43 comfort switch and reveal line). Measured 453808 / 462312 locally on Windows (provisional; CI to confirm), the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_812, ja: 462_316 };
+// en 453,724 -> 453,822, ja 462,199 -> 462,319 on 2026-11-26, story-g43 (G43 comfort switch and reveal line). Measured 453818 / 462315 locally on Windows (provisional; CI to confirm), the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 387_206, en: 453_822, ja: 462_319 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
