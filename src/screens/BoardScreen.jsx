@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ArrowLeft, BadgeCheck, Flag, RotateCw, Send, ShieldExclamationPoint } from "lucide-react";
+import { ArrowLeft, Flag, RotateCw, Send, ShieldCheck, ShieldExclamationPoint } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { BOARD_REPORT_REASONS } from "../boardReport.js";
 import { useBoardReport } from "../state/useBoardReport.js";
@@ -69,7 +69,7 @@ function MakersNotice({ version }) {
       <div>
         <span lang="en">FROM THE MAKERS</span>
         <strong>
-          <BadgeCheck size={18} aria-hidden="true" style={{ marginRight: 6, verticalAlign: "-3px" }} />
+          <ShieldCheck size={18} aria-hidden="true" style={{ marginRight: 6, verticalAlign: "-3px" }} />
           {copy.label}
         </strong>
         <p lang={boardNoticeLang(notice, LANG)} style={{ whiteSpace: "pre-line", overflowWrap: "anywhere" }} data-testid="board-makers-notice-text">
