@@ -954,8 +954,8 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   const playView = createPlayView({
     AdaptiveMusic, musicModeKey, screenReaderStatus, currentCase,
-    // G38 (RULES_MARK 11): what 유지비 took as this case opened, for the case file's line.
-    node, speakerProfile, speakerPortrait, narrativeSpine: openingLegacy?.upkeep ? { ...narrativeSpine, upkeep: openingLegacy.upkeep } : narrativeSpine, resolvedNodeId, sceneChallenge,
+    // G38 (RULES_MARK 11): what 유지비 took as this case opened, for the case file's line; G44 (13): and the 운영비, tagged.
+    node, speakerProfile, speakerPortrait, narrativeSpine: sceneViewModels.withOpeningCosts(narrativeSpine, openingLegacy), resolvedNodeId, sceneChallenge,
     gauntletRun, gauntletSeed, isAdvancing, decisionRevealOpen: Boolean(decisionReveal), staleSave,
     fixedChoices, clueCount, casesOpened, reframeChoice, tableRisk,
     resources, resourceMeta, progress, routePath: `${Math.max(0, routeIndex) + 1}/${routeLength}`,

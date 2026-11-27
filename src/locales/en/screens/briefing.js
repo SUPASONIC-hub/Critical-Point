@@ -21,6 +21,7 @@ export default {
     legitimacyHigh: "Fairness {value} — audit limit +{limit}",
   },
   upkeep: "{name} {from} → {to} (upkeep)",
+  operating: "{name} {from} → {to} (running costs)",
   recordAt: "This scene’s record: opens on a cash of ×{at} or more",
   breach: " · this hand’s rules have changed",
   hint: "Pick a card to open the table with it already staked",

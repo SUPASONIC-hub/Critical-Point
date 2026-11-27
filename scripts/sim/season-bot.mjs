@@ -40,6 +40,7 @@ import {
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../../src/gameLogic.js";
+import { applySceneEffect } from "../../src/sceneEffect.js";
 import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
@@ -73,7 +74,7 @@ import { RELIC_SLOTS } from "../../src/gauntlet/relics.js";
 import { coverCase, readPayOffer } from "../../src/gauntlet/settlementPay.js";
 import { LOCK_PRESS_SECONDS, SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { ALL_RULES, getTableRules, MUTATION_RULES, STORY_OFF_RULES } from "../../src/gauntlet/tableUnlocks.js";
-import { countNarrows, countScouts, isMarkSevenOn, isNextOn, narrowTrustAt, scoutTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { countNarrows, countScouts, isMarkSevenOn, isMarkThirteenOn, isNextOn, narrowTrustAt, scoutTrustAt, wantsNextRules, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { readWindowAgainstSeer } from "../../src/gauntlet/tableAfterword.js";
 import { createInheritedChallenge, createSceneChallenge } from "../../src/viewModels/sceneViewModels.js";
 import { describeCaseOpening, getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "../../src/state/caseRoutes.js";
@@ -182,7 +183,8 @@ const worth = (key, value) => (key === "humanCost" || key === "fatigue" ? -value
 export const ARCHETYPES = {
   // Named, and asserted on in check-endings.mjs.
   "people-first": { values: { trust: 1, humanCost: 1.4 }, noise: 2 },
-  "spend-people": { values: { capital: 1, time: 0.6, humanCost: -1.2, trust: -0.4 }, noise: 2 },
+  // G45 (RULES_MARK 13): spend-people pays a case off from harm 15 (the doc's spPays15: reserve 1); before 13 it never paid.
+  "spend-people": { values: { capital: 1, time: 0.6, humanCost: -1.2, trust: -0.4 }, noise: 2, ...(isMarkThirteenOn() ? { pays: { harm: 15, reserve: 1 } } : {}) },
   // The rest of the population.
   random: { values: {}, noise: 100 },
   procedure: { values: { legitimacy: 1.2, trust: 0.2 }, noise: 3 },
@@ -674,8 +676,8 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute, verdict.multiplier);
-        const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {});
-        const resourcesAfter = applyEffect(resources, finalEffect);
+        // G44·G47 (RULES_MARK 13): as useChoiceCommit pays it (applySceneEffect).
+        const { effect: finalEffect, resources: resourcesAfter } = applySceneEffect(resources, mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {}), busted ? 0 : verdict.multiplier);
         if (clue) discoveredClues = [...discoveredClues, clue];
         triggers = { ...triggers };
         for (const trigger of node.triggers ?? []) triggers[trigger] = (triggers[trigger] ?? 0) + (reframe ? 10 : 6);

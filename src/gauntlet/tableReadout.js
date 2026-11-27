@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { formatMoney, isResourceGain } from "../gameConstants.js";
 import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getCaseTwist, getClockHeatRate, getEscalationWindow, getHeartbeatBpm, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
-import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, getHotCashMultiplier, HOT_CASH_BPM, isHotCash, isMarkTwelveOn, isNextOn } from "./nextTableRules.js";
+import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, getHotCashMultiplier, HOT_CASH_BPM, isHotCash, isMarkThirteenOn, isMarkTwelveOn, isNextOn, SOFT_KEYS, softGain } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
 import { twistHasDevice } from "./actTwists.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD, TESTIMONY_SHARE } from "./tableRules.js";
@@ -245,6 +245,21 @@ export function getTabNotices({ locked, awaitingClaim, live }) {
   return { lost: Boolean(locked && (live || awaitingClaim)), held: Boolean(awaitingClaim && !locked) };
 }
 
+/**
+ * G44 (RULES_MARK 13): a card's gains to 돈·믿음·공정함 as they would land on
+ * `resources` now (softGain: half over 70, a third over 85), so the card says
+ * 「+4」 where 믿음 stands at 78 and the card's own number is 8. Without
+ * `resources`, or before 13, the card's numbers.
+ */
+export function readSoftGains(effect = {}, resources = null) {
+  if (!resources || !isMarkThirteenOn()) return effect;
+  return Object.fromEntries(Object.entries(effect ?? {}).map(([key, value]) => {
+    if (!SOFT_KEYS.includes(key) || !(Number(value) > 0)) return [key, value];
+    const from = Number(resources[key]) || 0;
+    return [key, softGain(from, Number(value)) - from];
+  }));
+}
+
 export function describeEffect(effect = {}, resourceMeta = {}) {
   return Object.entries(effect)
     .filter(([, value]) => Number(value) !== 0)
@@ -265,9 +280,9 @@ export function describeEffect(effect = {}, resourceMeta = {}) {
  * the burn billed (믿음 -15), the detail not (믿음 -10). Three at most; the
  * rest is 외 N, and all of it is in the reveal.
  */
-export function describeStakedDetail(card, schema, resourceMeta) {
+export function describeStakedDetail(card, schema, resourceMeta, resources = null) {
   const burnKey = card ? getCardBurn(card, schema)?.key : null;
-  const effects = card ? describeEffect(card.effect, resourceMeta).filter((effect) => effect.key !== burnKey) : [];
+  const effects = card ? describeEffect(readSoftGains(card.effect, resources), resourceMeta).filter((effect) => effect.key !== burnKey) : [];
   return { visibleEffects: effects.slice(0, 3), hiddenEffectCount: Math.max(0, effects.length - 3) };
 }
 

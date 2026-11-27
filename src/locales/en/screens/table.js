@@ -138,6 +138,7 @@ export default {
     preview: "Effects of the chosen card: ",
     crack: "Fracture candidate",
     more: "+{count} more",
+    halfHarm: "Commit at ×{at}+ and human cost is halved",
     seal: "Top card sealed until Heat",
     locked: "Locked · {reason}",
   },

@@ -186,7 +186,7 @@ export function SceneBriefing({
   const tiltLine = tilt.map(([key, values]) => fill(briefingCopy.tilt[key], values)).join(" · ");
   // G38 (RULES_MARK 11): what 유지비 took as the case opened (caseRoutes.js), on its first page only.
   const upkeepLine = Array.isArray(upkeep) && opensCase(node, nodeId) && Number(run?.windowIndex) === Number(run?.open?.windowIndex)
-    ? upkeep.map(([key, from, to]) => fill(briefingCopy.upkeep, { name: easyResourceLabels[key] ?? key, from, to })).join(" · ")
+    ? upkeep.map(([key, from, to, kind]) => fill(kind === "operating" ? briefingCopy.operating : briefingCopy.upkeep, { name: easyResourceLabels[key] ?? key, from, to })).join(" · ")
     : "";
   // G39 (RULES_MARK 11): while the case's record is still shut, the cash a scene's record opens at.
   const recordLine = recordAt ? fill(briefingCopy.recordAt, { at: recordAt }) : "";

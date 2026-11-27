@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BEFORE_ELEVEN_RULE, CLUE_CASH_MULTIPLIER, cashOpensClue, ELEVEN_RULE, getUpkeep, isMarkElevenOn, RULES_ELEVEN_MARK, wantsMarkEleven, withMarkEleven, withMarkNine, withMarkTen, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { BEFORE_ELEVEN_RULE, CLUE_CASH_MULTIPLIER, cashOpensClue, ELEVEN_RULE, getUpkeep, isMarkElevenOn, isMarkThirteenOn, RULES_ELEVEN_MARK, wantsMarkEleven, withMarkEleven, withMarkNine, withMarkTen, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
 import { RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
@@ -33,13 +33,14 @@ test("G38 유지비: a third of 믿음·공정함·돈 over 80 comes off as a ca
   assert.deepEqual(getUpkeep({ trust: 100, legitimacy: 80, capital: 95 }), { trust: -7, capital: -5 });
   assert.deepEqual(getUpkeep({ trust: 80, legitimacy: 50, capital: 81 }), {});
   const results = { prologue01: { outcomeChoiceId: "none", rank: "C" } };
-  const on = describeCaseOpening("prologue02", { caseResults: results, operatorOrigin: null }, true);
-  const off = describeCaseOpening("prologue02", { caseResults: results, operatorOrigin: null }, false);
+  // G44's 운영비 (RULES_MARK 13) off: 11's 유지비 alone (rules-mark13.test.mjs reads them together).
+  const on = describeCaseOpening("prologue02", { caseResults: results, operatorOrigin: null }, true, false);
+  const off = describeCaseOpening("prologue02", { caseResults: results, operatorOrigin: null }, false, false);
   assert.equal(off.resources.capital, 100);
   assert.equal(on.resources.capital, 93);
   assert.deepEqual(on.openingLegacy.upkeep, [["capital", 100, 93]]);
   assert.equal(off.openingLegacy.upkeep, undefined);
-  const first = describeCaseOpening("prologue01", { caseResults: {}, operatorOrigin: null }, true);
+  const first = describeCaseOpening("prologue01", { caseResults: {}, operatorOrigin: null }, true, false);
   assert.equal(first.openingLegacy, null, "the season's first case pays none");
 });
 
@@ -57,7 +58,8 @@ test("G39: a scene's record opens only on a table cashed at ×32 or more, and HU
 });
 
 test("G38 유지비 on the ending: the season's means read a third less over 80, before the answer's weight, and three gates moved with them", () => {
-  assert.deepEqual(weighUpkeep({ trust: 100, legitimacy: 80, capital: 97, time: 90 }), { trust: 93, legitimacy: 80, capital: 91, time: 90 });
+  // G44 (RULES_MARK 13) reads the means back through the softer gains first: 80 stands for 90, 97 for 100.
+  assert.deepEqual(weighUpkeep({ trust: 100, legitimacy: 80, capital: 97, time: 90 }), isMarkThirteenOn() ? { trust: 93, legitimacy: 87, capital: 93, time: 90 } : { trust: 93, legitimacy: 80, capital: 91, time: 90 });
   assert.deepEqual(weighFinale({ trust: 100, legitimacy: 70, capital: 50 }, "witness"), { trust: 98, legitimacy: 70, capital: 50 });
   assert.deepEqual(weighFinale({ trust: 100, legitimacy: 70, capital: 50 }, "burn"), { trust: 93, legitimacy: 70, capital: 50 });
   assert.equal(ENDING_THRESHOLDS.silenceCapital, 91);

@@ -4511,7 +4511,7 @@
       "nodeId": "p1_start",
       "resources": {
         "time": 72,
-        "capital": 98,
+        "capital": 70,
         "trust": 50,
         "legitimacy": 58,
         "humanCost": 0,
@@ -4642,7 +4642,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 98,
+            "capital": 70,
             "trust": 50,
             "legitimacy": 58,
             "humanCost": 0,
@@ -4703,7 +4703,7 @@
       "nodeId": "p1_start",
       "resources": {
         "time": 72,
-        "capital": 98,
+        "capital": 70,
         "trust": 50,
         "legitimacy": 58,
         "humanCost": 0,
@@ -4834,7 +4834,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 98,
+            "capital": 70,
             "trust": 50,
             "legitimacy": 58,
             "humanCost": 0,
@@ -4887,7 +4887,7 @@
         "logLength": 0,
         "resources": {
           "time": 72,
-          "capital": 98,
+          "capital": 70,
           "trust": 50,
           "legitimacy": 58,
           "humanCost": 0,
@@ -4943,7 +4943,7 @@
       "nodeId": "p2_start_credit",
       "resources": {
         "time": 72,
-        "capital": 93,
+        "capital": 70,
         "trust": 62,
         "legitimacy": 46,
         "humanCost": 0,
@@ -4976,6 +4976,11 @@
         "risk": 0
       },
       "openingLegacy": {
+        "operating": [
+          "capital",
+          93,
+          70
+        ],
         "upkeep": [
           [
             "capital",
@@ -5101,7 +5106,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 93,
+            "capital": 70,
             "trust": 62,
             "legitimacy": 46,
             "humanCost": 0,
@@ -5169,6 +5174,11 @@
       "playerName": "테스터",
       "playStyle": "audit",
       "openingLegacy": {
+        "operating": [
+          "capital",
+          93,
+          70
+        ],
         "upkeep": [
           [
             "capital",
@@ -5224,7 +5234,7 @@
       "nodeId": "p2_start_credit",
       "resources": {
         "time": 72,
-        "capital": 93,
+        "capital": 70,
         "trust": 62,
         "legitimacy": 46,
         "humanCost": 0,
@@ -5362,7 +5372,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 93,
+            "capital": 70,
             "trust": 62,
             "legitimacy": 46,
             "humanCost": 0,
@@ -5415,7 +5425,7 @@
         "logLength": 0,
         "resources": {
           "time": 72,
-          "capital": 93,
+          "capital": 70,
           "trust": 62,
           "legitimacy": 46,
           "humanCost": 0,
@@ -5465,7 +5475,7 @@
       "nodeId": "p3_start",
       "resources": {
         "time": 72,
-        "capital": 100,
+        "capital": 70,
         "trust": 50,
         "legitimacy": 50,
         "humanCost": 0,
@@ -5596,7 +5606,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 100,
+            "capital": 70,
             "trust": 50,
             "legitimacy": 50,
             "humanCost": 0,
@@ -5686,7 +5696,7 @@
       "nodeId": "p3_start",
       "resources": {
         "time": 72,
-        "capital": 100,
+        "capital": 70,
         "trust": 50,
         "legitimacy": 50,
         "humanCost": 0,
@@ -5824,7 +5834,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 100,
+            "capital": 70,
             "trust": 50,
             "legitimacy": 50,
             "humanCost": 0,
@@ -5877,7 +5887,7 @@
         "logLength": 0,
         "resources": {
           "time": 72,
-          "capital": 100,
+          "capital": 70,
           "trust": 50,
           "legitimacy": 50,
           "humanCost": 0,
@@ -5939,7 +5949,7 @@
       "nodeId": "p2_start_credit",
       "resources": {
         "time": 72,
-        "capital": 93,
+        "capital": 70,
         "trust": 62,
         "legitimacy": 46,
         "humanCost": 0,
@@ -5972,6 +5982,11 @@
         "risk": 0
       },
       "openingLegacy": {
+        "operating": [
+          "capital",
+          93,
+          70
+        ],
         "upkeep": [
           [
             "capital",
@@ -6120,7 +6135,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 93,
+            "capital": 70,
             "trust": 62,
             "legitimacy": 46,
             "humanCost": 0,
@@ -6188,6 +6203,11 @@
       "playerName": "테스터",
       "playStyle": "audit",
       "openingLegacy": {
+        "operating": [
+          "capital",
+          93,
+          70
+        ],
         "upkeep": [
           [
             "capital",
@@ -6249,7 +6269,7 @@
       "nodeId": "p2_start_credit",
       "resources": {
         "time": 72,
-        "capital": 93,
+        "capital": 70,
         "trust": 62,
         "legitimacy": 46,
         "humanCost": 0,
@@ -6410,7 +6430,7 @@
           },
           "resources": {
             "time": 72,
-            "capital": 93,
+            "capital": 70,
             "trust": 62,
             "legitimacy": 46,
             "humanCost": 0,
@@ -6463,7 +6483,7 @@
         "logLength": 0,
         "resources": {
           "time": 72,
-          "capital": 93,
+          "capital": 70,
           "trust": 62,
           "legitimacy": 46,
           "humanCost": 0,
