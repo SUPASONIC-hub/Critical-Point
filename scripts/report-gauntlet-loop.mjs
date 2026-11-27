@@ -104,8 +104,13 @@ const RELIC_LIFT_CAP = 1.35;
  * this from 12; 11 and before keep RELIC_LIFT_CAP. The draft's and the stances' caps stay.
  */
 const RELIC_LIFT_CAP_TWELVE = 1.4;
-// G51 (RULES_MARK 14): FRONT PAGE ×1.2 -> ×1.12 lifts the listening hand 31.2% (spread ×1.290), so 14 holds RELIC_LIFT_CAP again.
-const RELIC_ONE_CAP = isMarkTwelveOn() && !isMarkFourteenOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
+const RELIC_ONE_CAP = isMarkTwelveOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
+/**
+ * G51 (RULES_MARK 14): FRONT PAGE ×1.2 -> ×1.12 lifts the listening hand 31.2% (spread ×1.290, check:pressure 11-27), so
+ * from 14 the listening hand's single tool is held at RELIC_LIFT_CAP again. The streak hands' ENCORE stays at RELIC_ONE_CAP:
+ * it lifts the hand that switches on a rise ×1.357 at 14 as at 12 (G46's chain, not FRONT PAGE).
+ */
+const RELIC_LISTEN_CAP = isMarkFourteenOn() ? RELIC_LIFT_CAP : RELIC_ONE_CAP;
 /** What a charged stance carries into the next board is a rule too, and is held to the same. */
 const STANCE_LIFT_CAP = RELIC_LIFT_CAP;
 /**
@@ -655,7 +660,7 @@ for (const row of relicReport) {
   assert.ok(row.skip.meanVault < row.blind.meanVault * 0.25, `with ${row.name}, busting to skip must stay a loss: ${row.skip.meanVault} against ${row.blind.meanVault}`);
   if (row.relics.length === 1) {
     assert.ok(
-      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_ONE_CAP,
+      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_LISTEN_CAP,
       `${row.name} is a win button: best play banks ${row.listen.meanVault} against ${relicBaseline.listen.meanVault} without it`,
     );
   }
