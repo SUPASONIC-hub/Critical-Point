@@ -634,11 +634,12 @@ export function readSoft(value) {
  * more takes half its 사람 피해 (rounded down); the collapse gate moves from 20
  * to COLLAPSE_HARM_THIRTEEN a case to keep the season's collapses. The notes
  * measured 15 with G44 alone (18.5% of 600); with G45's paying bot and G46's
- * chain on it, 15 collapsed 15.8% and 14 17.0% (check:endings 11-27), so 14,
- * the user's (1) of 2026-11-27 (Q4 (2)).
+ * chain on it, 15 collapsed 15.8%, 14 17.0% and 13 20.0%, the finale's answer
+ * moving 73.7 / 74.1 / 76.0% of standing endings (check:endings 11-27), so 13,
+ * the user's answer of 2026-11-27 (Q4 (2), Q6 (2)).
  */
 export const SKILL_HARM_MULTIPLIER = 32;
-export const COLLAPSE_HARM_THIRTEEN = 14;
+export const COLLAPSE_HARM_THIRTEEN = 13;
 /** `effect` with G47's half harm when its table cashed at `multiplier` (null: no table, as before). */
 export function halveSkilledHarm(effect, multiplier) {
   const harm = Number(effect?.humanCost) || 0;

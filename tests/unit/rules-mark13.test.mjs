@@ -80,10 +80,10 @@ test("G44: the staked card and the ledger say what lands, not the card's own num
 
 /* ------------------------------------------------------------- G47 */
 
-test("G47: a table cashed at ×32 or more takes half its scene's 사람 피해, and collapse is 14 a case", () => {
+test("G47: a table cashed at ×32 or more takes half its scene's 사람 피해, and collapse is 13 a case", () => {
   assert.equal(SKILL_HARM_MULTIPLIER, 32);
-  assert.equal(COLLAPSE_HARM_THIRTEEN, 14);
-  assert.equal(ENDING_GATES.collapseHarmPerCase, 14);
+  assert.equal(COLLAPSE_HARM_THIRTEEN, 13);
+  assert.equal(ENDING_GATES.collapseHarmPerCase, 13);
   assert.deepEqual(halveSkilledHarm({ humanCost: 5, trust: 2 }, 32), { humanCost: 2, trust: 2 });
   assert.deepEqual(halveSkilledHarm({ humanCost: 5 }, 31.9), { humanCost: 5 });
   assert.deepEqual(halveSkilledHarm({ humanCost: -3 }, 64), { humanCost: -3 }, "a fall in harm is paid in full");
