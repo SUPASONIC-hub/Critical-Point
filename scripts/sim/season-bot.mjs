@@ -673,7 +673,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
           ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
           ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
         });
-        const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute);
+        const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute, verdict.multiplier);
         const finalEffect = mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {});
         const resourcesAfter = applyEffect(resources, finalEffect);
         if (clue) discoveredClues = [...discoveredClues, clue];

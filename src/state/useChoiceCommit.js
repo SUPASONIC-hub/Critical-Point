@@ -273,7 +273,7 @@ export function useChoiceCommit(context) {
     } = settled;
     const { challengeMatch, tacticalRead, riskDelta } = readers.getEffectiveChoiceRead(choice, baseEffect, cognitiveEffect);
 
-    const clue = busted ? null : readers.getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute);
+    const clue = busted ? null : readers.getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute, verdict?.multiplier ?? 1); // G39: the table's cash
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: runLines.commit.evidenceBonus, effect: { legitimacy: 2, fatigue: -1 } }
       : null;

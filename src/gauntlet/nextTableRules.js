@@ -386,3 +386,68 @@ export function isOpeningCase(caseId) {
 /** G27 (trial only): this long after a full charge it starts to leak, one step a second of table clock. A stopped clock leaks nothing. */
 export const CHARGE_LEAK_GRACE = 4;
 export const CHARGE_LEAK_STEP = 10;
+
+/* ------------------------------------------ RULES_MARK 11 (게임성 5차 B) */
+
+/**
+ * G38·G39 (게임성 개선점 5차, the user's 「전부 1」 of 2026-11-26): rules that
+ * ship as RULES_MARK 11. A row is rechecked under them only when its mark is
+ * `RULES_ELEVEN_MARK` or later (rankingRecheck.js `getRowRules`), so a row
+ * of 5 to 10 is played again as it was. They ride on the marks before: a set
+ * that plays those off plays none of these. `ELEVEN_RULE` in a set plays
+ * them, `BEFORE_ELEVEN_RULE` the rules before, and a set with neither what
+ * this page plays. `RULES_MARK11=0` turns them off in a script.
+ */
+export const RULES_ELEVEN_MARK = 11;
+export const ELEVEN_RULE = "mark11";
+export const BEFORE_ELEVEN_RULE = "before11";
+
+/** Whether this page (or this script) plays RULES_MARK 11's rules: `RULES_MARK11=0` turns them off in a script. */
+export function wantsMarkEleven(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK11 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let elevenChoice;
+export const elevenByDefault = () => (elevenChoice ??= wantsMarkEleven());
+
+/** The mark RULES_MARK 11 rides on (whether `rules` plays the rules before it). */
+const isMarkBeforeElevenOn = (rules) => isMarkTenOn(rules);
+
+/** Whether `rules` plays RULES_MARK 11's rules (and so those before it too). */
+export function isMarkElevenOn(rules) {
+  if (!isMarkBeforeElevenOn(rules)) return false;
+  if (rules?.has?.(BEFORE_ELEVEN_RULE)) return false;
+  if (rules?.has?.(ELEVEN_RULE)) return true;
+  return elevenByDefault();
+}
+
+const elevenSets = new WeakMap();
+const beforeElevenSets = new WeakMap();
+/** `rules` playing RULES_MARK 11's rules (`on`) or those before; the same set back when it already does. */
+export function withMarkEleven(rules, on = elevenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkElevenOn(rules) === Boolean(on) || (on && !isMarkBeforeElevenOn(rules))) return rules;
+  const mark = on ? ELEVEN_RULE : BEFORE_ELEVEN_RULE;
+  const drop = on ? BEFORE_ELEVEN_RULE : ELEVEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? elevenSets : beforeElevenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G38 유지비: a case opens with a third of what 믿음, 공정함 and 돈 stand over
+ * `UPKEEP_FROM` taken off (100 opens at 93). What it takes, as an effect
+ * (empty when nothing stands over it).
+ */
+export const UPKEEP_FROM = 80;
+export const UPKEEP_KEYS = Object.freeze(["trust", "legitimacy", "capital"]);
+export function getUpkeep(resources = {}) {
+  return Object.fromEntries(UPKEEP_KEYS.map((key) => [key, -Math.round(Math.max(0, (Number(resources?.[key]) || 0) - UPKEEP_FROM) / 3)]).filter(([, cut]) => Number(cut) < 0));
+}
+
+/** G39: a scene's record opens only on a table cashed at this multiplier or more. */
+export const CLUE_CASH_MULTIPLIER = 32;
+/** Whether a table cashed at `multiplier` can open its scene's record. */
+export const cashOpensClue = (multiplier) => (Number(multiplier) || 0) >= CLUE_CASH_MULTIPLIER;
