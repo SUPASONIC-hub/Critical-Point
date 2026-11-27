@@ -7,7 +7,7 @@ import { getRowRules } from "../../src/rankingRecheck.js";
 import { ALL_RULES, getUnlockIntro } from "../../src/gauntlet/tableUnlocks.js";
 import { getEndingVariant } from "../../src/gameLogic.js";
 import { nearestEnding } from "../../src/nearestEnding.js";
-import { COVER_QUIET, coversBeforeSilence, FINALE_WEIGHT, weighFinale, weighUpkeep } from "../../src/seasonStanding.js";
+import { COVER_QUIET, coversBeforeSilence, FINALE_WEIGHT, getFinaleWeight, weighFinale, weighUpkeep } from "../../src/seasonStanding.js";
 import unlocks from "../../src/copy/unlocks.js";
 
 // G46 (RULES_MARK 12) builds the chain on the heartbeat: 10's ×32 is read on a set without 12.
@@ -81,11 +81,13 @@ const season = (finale, seasonResources, extra = {}) => ({
 
 test("G40: 증언 weighs FINALE_WEIGHT on the season's 믿음, 개혁 on its 공정함, 소각 on neither", () => {
   assert.equal(FINALE_WEIGHT, 5);
+  // G50 (RULES_MARK 14): 6 from 14 (rules-mark14.test.mjs).
+  const weight = getFinaleWeight();
   const mean = { trust: 70, legitimacy: 97 };
   // G38 (RULES_MARK 11): the mean is read after 유지비 (97 reads as 91), the answer's weight on top.
   const kept = weighUpkeep(mean);
-  assert.deepEqual(weighFinale(mean, "witness"), { trust: 75, legitimacy: kept.legitimacy });
-  assert.deepEqual(weighFinale(mean, "control"), { trust: 70, legitimacy: Math.min(100, kept.legitimacy + 5) }, "never past 100");
+  assert.deepEqual(weighFinale(mean, "witness"), { trust: 70 + weight, legitimacy: kept.legitimacy });
+  assert.deepEqual(weighFinale(mean, "control"), { trust: 70, legitimacy: Math.min(100, kept.legitimacy + weight) }, "never past 100");
   assert.deepEqual(weighFinale(mean, "burn"), kept);
   assert.deepEqual(weighFinale(mean, null), kept);
   assert.equal(weighFinale(null, "witness"), null, "a caller without the season's mean is read as it was");
@@ -101,7 +103,7 @@ test("G40: 증언 weighs FINALE_WEIGHT on the season's 믿음, 개혁 on its 공
   // The finale's line reads the same mean: 증언 at 믿음 71 lacks nothing of HUMAN RECORD's 믿음.
   const near = nearestEnding({ ...season("witness", { trust: 66, legitimacy: 70 }, reframed), endingId: "quiet-cover" });
   assert.equal(near.id, "human-record");
-  assert.deepEqual(near.gaps, [{ key: "trust", value: 4 }]);
+  assert.deepEqual(near.gaps, [{ key: "trust", value: 75 - 66 - weight }]);
 });
 
 test("G41: COVER_QUIET covers and no burn close on QUIET COVER before PROFITABLE SILENCE", () => {

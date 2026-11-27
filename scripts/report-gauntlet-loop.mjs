@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isMarkNineOn, isMarkTenOn, isMarkTwelveOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isMarkFourteenOn, isMarkNineOn, isMarkTenOn, isMarkTwelveOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -104,7 +104,8 @@ const RELIC_LIFT_CAP = 1.35;
  * this from 12; 11 and before keep RELIC_LIFT_CAP. The draft's and the stances' caps stay.
  */
 const RELIC_LIFT_CAP_TWELVE = 1.4;
-const RELIC_ONE_CAP = isMarkTwelveOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
+// G51 (RULES_MARK 14): FRONT PAGE ×1.2 -> ×1.12 lifts the listening hand 31.2% (spread ×1.290), so 14 holds RELIC_LIFT_CAP again.
+const RELIC_ONE_CAP = isMarkTwelveOn() && !isMarkFourteenOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
 /** What a charged stance carries into the next board is a rule too, and is held to the same. */
 const STANCE_LIFT_CAP = RELIC_LIFT_CAP;
 /**

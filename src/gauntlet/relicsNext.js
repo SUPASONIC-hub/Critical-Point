@@ -13,6 +13,7 @@
  * Pure: the engine hands in what the window was (`resolveWindow`) and reads the
  * product back. The numbers are the cards' own (src/copy/relics.js `next`).
  */
+import { FRONT_PAGE_BOOST_FOURTEEN, isMarkFourteenOn } from "./nextTableRules.js";
 
 /** AUDIT CONTACT: a cash under this heat, with at least one push, pays `boost`. */
 export const LOW_CASH_HEAT = 50;
@@ -59,6 +60,11 @@ export const RELIC_BOOSTS = Object.freeze({
  */
 export const RELIC_BOOST_CAP = 1.6;
 
+/** One tool's boost under `rules`: RELIC_BOOSTS', but FRONT PAGE's FRONT_PAGE_BOOST_FOURTEEN from RULES_MARK 14 (G51). */
+export function getRelicBoost(id, rules) {
+  return id === "frontPage" && isMarkFourteenOn(rules) ? FRONT_PAGE_BOOST_FOURTEEN : RELIC_BOOSTS[id].boost;
+}
+
 /**
  * The tools whose condition held on this cash, and the product of their boosts.
  * Under RULES_MARK 7 (`cap`, RELIC_BOOST_CAP) two or more that held together pay
@@ -66,8 +72,8 @@ export const RELIC_BOOST_CAP = 1.6;
  * (AUDIT CONTACT ×1.8, COLD BLOOD ×2): a second tool never takes from the first.
  * `capped` when the cap cut the product.
  */
-export function readRelicBoost(relics, cash, cap = Infinity, refined = []) {
-  const boostOf = (id) => (refined.includes(id) ? getRefinedBoost(id) : RELIC_BOOSTS[id].boost);
+export function readRelicBoost(relics, cash, cap = Infinity, refined = [], rules = undefined) {
+  const boostOf = (id) => (refined.includes(id) ? getRefinedBoost(id, rules) : getRelicBoost(id, rules));
   const held = Array.isArray(relics) ? relics : [];
   const fired = held.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && RELIC_BOOSTS[id].when(cash));
   const product = fired.reduce((total, id) => total * boostOf(id), 1);
@@ -81,9 +87,9 @@ export const NEXT_REROLL_COST = 1500;
 /** G25 도구 다듬기 (RULES_MARK 8): once a season per tool, for this much; the tool's bonus is REFINE_SHARE times what it was. */
 export const REFINE_COST = 8000;
 export const REFINE_SHARE = 1.5;
-export const getRefinedBoost = (id) => Math.round((1 + (RELIC_BOOSTS[id].boost - 1) * REFINE_SHARE) * 1000) / 1000;
+export const getRefinedBoost = (id, rules) => Math.round((1 + (getRelicBoost(id, rules) - 1) * REFINE_SHARE) * 1000) / 1000;
 /** The held tools that can still be refined: those with a boost, not refined yet. */
 export const listRefinable = (relics = [], refined = []) => relics.filter((id) => Object.hasOwn(RELIC_BOOSTS, id) && !refined.includes(id));
 
 /** The card's numbers as percent, for the words. */
-export const boostPercent = (id) => Math.round((RELIC_BOOSTS[id].boost - 1) * 100);
+export const boostPercent = (id, rules) => Math.round((getRelicBoost(id, rules) - 1) * 100);

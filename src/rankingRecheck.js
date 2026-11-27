@@ -49,7 +49,7 @@ import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSe
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, RULES_TEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withMarkTen, withNextRules } from "./gauntlet/nextTableRules.js";
-import { RULES_ELEVEN_MARK, RULES_THIRTEEN_MARK, RULES_TWELVE_MARK, withMarkEleven, withMarkThirteen, withMarkTwelve } from "./gauntlet/nextTableRules.js";
+import { RULES_ELEVEN_MARK, RULES_FOURTEEN_MARK, RULES_THIRTEEN_MARK, RULES_TWELVE_MARK, withMarkEleven, withMarkFourteen, withMarkThirteen, withMarkTwelve } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -106,8 +106,9 @@ export function getRowRules(caseId, summary, mark = undefined) {
   // RULES_MARK 11 (G38·G39): a row of 10 or before is played again without them (`before11`),
   // and RULES_MARK 12 (G46) for a row of 11 or before (`before12`).
   const twelve = withMarkTwelve(withMarkEleven(ten, Number(mark) >= RULES_ELEVEN_MARK), Number(mark) >= RULES_TWELVE_MARK);
-  // RULES_MARK 13 (G44·G45·G47): a row of 12 or before is played again without them (`before13`).
-  return withMarkThirteen(twelve, Number(mark) >= RULES_THIRTEEN_MARK);
+  // RULES_MARK 13 (G44·G45·G47): a row of 12 or before is played again without them (`before13`),
+  // and RULES_MARK 14 (G50·G51) for a row of 13 or before (`before14`).
+  return withMarkFourteen(withMarkThirteen(twelve, Number(mark) >= RULES_THIRTEEN_MARK), Number(mark) >= RULES_FOURTEEN_MARK);
 }
 
 /**
