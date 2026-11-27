@@ -172,7 +172,7 @@ function round(value) {
  * little over half. Generous on purpose -- an estimate that runs long only
  * keeps the word further from a face.
  */
-export function measureEms(text = "", { tight = false } = {}) {
+function measureEms(text = "", { tight = false } = {}) {
   let ems = 0;
   for (const glyph of String(text)) {
     const code = glyph.codePointAt(0);

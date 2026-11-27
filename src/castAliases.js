@@ -82,8 +82,8 @@ export function renameCast(text) {
 }
 
 /** The start screen lists the renames from the change to the end of 12-13 KST. */
-export const CAST_NOTICE_FROM_MS = Date.parse("2026-11-13T00:00:00+09:00");
-export const CAST_NOTICE_UNTIL_MS = Date.parse("2026-12-14T00:00:00+09:00");
+const CAST_NOTICE_FROM_MS = Date.parse("2026-11-13T00:00:00+09:00");
+const CAST_NOTICE_UNTIL_MS = Date.parse("2026-12-14T00:00:00+09:00");
 
 /** Whether the start screen tells of the renames at `ms`. */
 export function castNoticeAt(ms) {

@@ -82,7 +82,7 @@ export function readHallOfFameCounts(rows = []) {
 const WEEK_KEY = /^([0-9]{4})-W(0[1-9]|[1-4][0-9]|5[0-3])$/;
 
 /** The table's own board: one per table rules mark (설계안 1절 본 판). */
-export const tableBoard = (rulesMark) => `table-${rulesMark}`;
+const tableBoard = (rulesMark) => `table-${rulesMark}`;
 
 /**
  * Why a checked run may not stand in the hall of fame, or null when it may.
