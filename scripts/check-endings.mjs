@@ -7,7 +7,7 @@ import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLO
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { getQuietClueRate } from "../src/seasonStanding.js";
-import { isMarkNineOn, isMarkTenOn } from "../src/gauntlet/nextTableRules.js";
+import { isMarkNineOn, isMarkTenOn, isMarkThirteenOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -152,6 +152,8 @@ const populationHeldAt = [];
 let doorCouldMove = 0;
 // G38·G39 (RULES_MARK 11; measured, not asserted): decisions that raise 돈·믿음·공정함 and move none of them, and the record doors.
 const marginTally = { gains: 0, dead: 0, records: 0, quiet: 0 };
+// G47 (RULES_MARK 13): each archetype's seasons and collapses, by whether its hand listens to the heartbeat.
+const listenCollapse = {};
 const QUIET_DOOR = getQuietClueRate(0.5);
 // The ending funnel at the very end of the report: each row's seasons, kept in
 // report mode only (`funnelRow`). Filled by the population below and by the
@@ -210,6 +212,9 @@ for (let index = 0; index < SEASONS; index += 1) {
   if (closesOn(0) !== closesOn(LOGIC_SLACK_STREAK)) doorCouldMove += 1;
   if (season.ending.id !== "collapse") lastAnswers.push({ archetype, endings: answerEndings(season) });
   counts.set(season.ending.id, (counts.get(season.ending.id) ?? 0) + 1);
+  const listenRow = (listenCollapse[`${archetype}:${season.policy?.listens ? "listens" : "deaf"}`] ??= { seasons: 0, collapse: 0 });
+  listenRow.seasons += 1;
+  if (season.ending.id === "collapse") listenRow.collapse += 1;
   byArchetype[archetype] ??= new Map();
   byArchetype[archetype].set(season.ending.id, (byArchetype[archetype].get(season.ending.id) ?? 0) + 1);
   samples.busts.push(season.strain.seasonBusts);
@@ -292,6 +297,8 @@ if (reportMode) {
 }
 console.log(`Ending checks passed (${SEASONS} replayed seasons: ${spread})`);
 console.log(`Margins (G38·G39, measured): decisions raising 돈·믿음·공정함 that moved none ${((100 * marginTally.dead) / Math.max(1, marginTally.gains)).toFixed(1)}% of ${marginTally.gains}; record door (records ≥0.9) ${((100 * marginTally.records) / SEASONS).toFixed(1)}%, quiet door (records <${QUIET_DOOR}) ${((100 * marginTally.quiet) / SEASONS).toFixed(1)}% of seasons`);
+// G44 (RULES_MARK 13, the user's (1) of 2026-11-27): 돈 opened at 70 and the softer gains took the raises that move nothing 22.6% -> 5.7% (target 12% or less).
+if (isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(marginTally.dead <= marginTally.gains * 0.12, `G44: ${((100 * marginTally.dead) / Math.max(1, marginTally.gains)).toFixed(1)}% of the decisions raising 돈·믿음·공정함 moved none of them (target 12%)`);
 /**
  * G33 (RULES_MARK 9): the side a case closed on hands one draft card over.
  * Each archetype's most-held tool, at 사건 07's close and at the season's end,
@@ -404,8 +411,14 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
     const map = byArchetype[name] ?? new Map();
     const standing = [...map.entries()].filter(([id]) => id !== "collapse").sort((a, b) => b[1] - a[1]);
     const total = standing.reduce((sum, [, count]) => sum + count, 0);
+    // G45 (RULES_MARK 13): a burned season of ten covers closes on QUIET COVER, so the people-spending path reaches three endings.
+    if (name === "spend-people" && isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(map.size >= 3, `G45: spend-people reaches ${map.size} endings (target 3)`);
     console.log(`Money path (G41, measured) ${name}: ${map.size} endings (${[...map.entries()].sort((a, b) => b[1] - a[1]).map(([id, count]) => `${id} ${count}`).join(", ")}); second of the standing ${standing[1] ? `${standing[1][0]} ${((standing[1][1] / Math.max(1, total)) * 100).toFixed(1)}%` : "none"}`);
   }
+  // G47 (RULES_MARK 13): the collapse of the hands that listen and of those that do not, by archetype; the money hand's gap at least 25 points.
+  const listenCollapseOf = (key) => listenCollapse[key] ? (100 * listenCollapse[key].collapse) / Math.max(1, listenCollapse[key].seasons) : NaN;
+  console.log(`Collapse by listening (G47, measured): ${["money", "spend-people", "min-risk"].map((name) => `${name} ${listenCollapseOf(`${name}:listens`).toFixed(1)} / ${listenCollapseOf(`${name}:deaf`).toFixed(1)}`).join(" · ")} (listens / deaf, %)`);
+  if (isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(listenCollapseOf("money:deaf") - listenCollapseOf("money:listens") >= 25, `G47: the money hand that listens collapses ${listenCollapseOf("money:listens").toFixed(1)}% against ${listenCollapseOf("money:deaf").toFixed(1)}% deaf (gap under 25 points)`);
   // G42 OVERCLOCK 문턱 (RULES_MARK 10): the population's boards played OVERCLOCKed, and the share of the pot they paid.
   const watched = addSeen(populationSeen);
   console.log(`OVERCLOCK (G42, measured): ${watched.overclocked} of ${watched.windows} boards (${((watched.overclocked / Math.max(1, watched.windows)) * 100).toFixed(1)}%), paying ${((watched.overclockPot / Math.max(1, watched.pot)) * 100).toFixed(1)}% of the pot`);

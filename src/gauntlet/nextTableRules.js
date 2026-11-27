@@ -528,3 +528,121 @@ export function isHotCash({ multiplier, gauge, window, rules, bpmOf }) {
 export function readCashBpm(gauge, window, bpmOf) {
   return bpmOf(Number(gauge) || 0, (Number(window?.wall) || 100) + (Number(window?.tellOffset) || 0), window?.schema?.sedated === true);
 }
+
+/* ------------------------------------------ RULES_MARK 13 (게임성 6차 B) */
+
+/**
+ * G44, G47 and G45 (게임성 개선점 6차, the user's 「전부 1」 of 2026-11-27):
+ * rules that ship as RULES_MARK 13. A row is rechecked under them only when
+ * its mark is `RULES_THIRTEEN_MARK` or later (rankingRecheck.js
+ * `getRowRules`), so a row of 5 to 12 is played again as it was. They ride on
+ * the marks before: a set that plays those off plays none of these.
+ * `THIRTEEN_RULE` in a set plays them, `BEFORE_THIRTEEN_RULE` the rules
+ * before, and a set with neither what this page plays. `RULES_MARK13=0` turns
+ * them off in a script.
+ */
+export const RULES_THIRTEEN_MARK = 13;
+export const THIRTEEN_RULE = "mark13";
+export const BEFORE_THIRTEEN_RULE = "before13";
+
+/** Whether this page (or this script) plays RULES_MARK 13's rules: `RULES_MARK13=0` turns them off in a script. */
+export function wantsMarkThirteen(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK13 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let thirteenChoice;
+export const thirteenByDefault = () => (thirteenChoice ??= wantsMarkThirteen());
+
+/** The mark RULES_MARK 13 rides on (whether `rules` plays the rules before it). */
+const isMarkBeforeThirteenOn = (rules) => isMarkTwelveOn(rules);
+
+/** Whether `rules` plays RULES_MARK 13's rules (and so those before it too). */
+export function isMarkThirteenOn(rules) {
+  if (!isMarkBeforeThirteenOn(rules)) return false;
+  if (rules?.has?.(BEFORE_THIRTEEN_RULE)) return false;
+  if (rules?.has?.(THIRTEEN_RULE)) return true;
+  return thirteenByDefault();
+}
+
+const thirteenSets = new WeakMap();
+const beforeThirteenSets = new WeakMap();
+/** `rules` playing RULES_MARK 13's rules (`on`) or those before; the same set back when it already does. */
+export function withMarkThirteen(rules, on = thirteenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkThirteenOn(rules) === Boolean(on) || (on && !isMarkBeforeThirteenOn(rules))) return rules;
+  const mark = on ? THIRTEEN_RULE : BEFORE_THIRTEEN_RULE;
+  const drop = on ? BEFORE_THIRTEEN_RULE : THIRTEEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? thirteenSets : beforeThirteenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G44 운영비 (RULES_MARK 13): every case opens with 돈 at OPEN_CAPITAL_MOST or
+ * less. 돈 opened at 100 (93 after G38's 유지비), so 67% of the decisions that
+ * raised it raised nothing (게임성 6차 G44).
+ */
+export const OPEN_CAPITAL_MOST = 70;
+/** The opening 돈 under RULES_MARK 13: `capital` or OPEN_CAPITAL_MOST, the lower. */
+export const capOpeningCapital = (capital) => Math.min(Number(capital) || 0, OPEN_CAPITAL_MOST);
+
+/**
+ * G44 덜 오르기 (RULES_MARK 13): over SOFT_STEPS' lines 돈·믿음·공정함 rise
+ * less -- half over 70, a third over 85, read point by point -- and a gain
+ * over 0 still moves at least 1. A cut is paid in full. With the 운영비 it
+ * took the decisions that raise nothing 22.6% -> 5.7% and the cases closed at
+ * 100 from 96.4% to 54.3% at most (600 seasons, 게임성 6차 G44).
+ */
+export const SOFT_KEYS = Object.freeze(["capital", "trust", "legitimacy"]);
+export const SOFT_STEPS = Object.freeze([Object.freeze([85, 1 / 3]), Object.freeze([70, 0.5]), Object.freeze([-Infinity, 1])]);
+const SOFT_TOP = 100;
+/** What `value` stands at after a gain of `gain` (a positive number) under the steps. */
+export function softGain(value, gain) {
+  const from = Number(value) || 0;
+  let at = from;
+  for (let step = 0; step < gain && at < SOFT_TOP; step += 1) at += SOFT_STEPS.find(([line]) => at >= line)[1];
+  const moved = Math.round(at) - from;
+  return Math.min(SOFT_TOP, Math.max(0, from + Math.max(moved, at > from ? 1 : 0)));
+}
+/**
+ * `resources` after `effect`, with G44's softer gains: `apply` is the plain
+ * effect (riskLogic.js applyEffect, passed in: this file imports no game logic).
+ */
+export function applySoftEffect(resources, effect, apply) {
+  const plain = Object.fromEntries(Object.entries(effect ?? {}).filter(([key, value]) => !(SOFT_KEYS.includes(key) && Number(value) > 0)));
+  const after = apply(resources, plain);
+  for (const key of SOFT_KEYS) if (Number(effect?.[key]) > 0) after[key] = softGain(after[key], Number(effect[key]));
+  return after;
+}
+/**
+ * The same curve read back: what a soft `value` stands for on the plain scale.
+ * The ending reads the season's means this way, which is the gates moved by
+ * the same curve (게임성 6차 G44 Q2 (1)).
+ */
+export function readSoft(value) {
+  const v = Number(value) || 0;
+  const [[high, highRate], [low, lowRate]] = SOFT_STEPS;
+  if (v <= low) return v;
+  if (v <= high) return low + (v - low) / lowRate;
+  return Math.min(SOFT_TOP, low + (high - low) / lowRate + (v - high) / highRate);
+}
+
+/**
+ * G47 (RULES_MARK 13): a scene whose table cashed at SKILL_HARM_MULTIPLIER or
+ * more takes half its 사람 피해 (rounded down); the collapse gate moves from 20
+ * to COLLAPSE_HARM_THIRTEEN a case to keep the season's collapses (with G44:
+ * 18.5% of 600, the money hand's listening and deaf collapses 37.0 / 66.7).
+ */
+export const SKILL_HARM_MULTIPLIER = 32;
+export const COLLAPSE_HARM_THIRTEEN = 15;
+/** `effect` with G47's half harm when its table cashed at `multiplier` (null: no table, as before). */
+export function halveSkilledHarm(effect, multiplier) {
+  const harm = Number(effect?.humanCost) || 0;
+  if (harm <= 0 || !((Number(multiplier) || 0) >= SKILL_HARM_MULTIPLIER)) return effect;
+  return { ...effect, humanCost: Math.floor(harm / 2) };
+}
+
+/** G45 (RULES_MARK 13): a burned season that paid this many covers (the whole ladder, settlementPay.js PAY_MOST) closes on QUIET COVER, not PROFITABLE SILENCE. */
+export const BURN_COVER_QUIET = 10;

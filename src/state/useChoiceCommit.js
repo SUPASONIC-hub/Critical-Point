@@ -4,7 +4,7 @@ import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
 import { noteCaseClosed } from "../gameEvents.js";
 import {
-  applyEffect,
+  applySceneEffect,
   buildSceneBeat,
   createCaseSummary,
   getAuthorityGate,
@@ -277,8 +277,8 @@ export function useChoiceCommit(context) {
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: runLines.commit.evidenceBonus, effect: { legitimacy: 2, fatigue: -1 } }
       : null;
-    const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? getBustEffect(verdict) : {});
-    const finalResources = applyEffect(resources, finalEffect);
+    // G44·G47 (RULES_MARK 13): softer gains near the top, and half the 사람 피해 on a table cashed at ×32 or more.
+    const { effect: finalEffect, resources: finalResources } = applySceneEffect(resources, readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? getBustEffect(verdict) : {}), busted ? 0 : verdict?.multiplier ?? null);
     const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
       riskBefore: riskPressure,

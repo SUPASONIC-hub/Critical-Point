@@ -1,6 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
-import { cashOpensClue, CLUE_CASH_MULTIPLIER, getUpkeep, isMarkEightOn, isMarkElevenOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
+import { cashOpensClue, CLUE_CASH_MULTIPLIER, getUpkeep, isMarkEightOn, isMarkElevenOn, isMarkTenOn, isMarkThirteenOn, readSoft, SOFT_KEYS, BURN_COVER_QUIET } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -93,8 +93,30 @@ export function withUpkeepGates(gates, moved) {
  */
 export function weighUpkeep(seasonResources) {
   if (!seasonResources || !isMarkElevenOn()) return seasonResources;
-  const cut = getUpkeep(seasonResources);
-  return { ...seasonResources, ...Object.fromEntries(Object.entries(cut).map(([key, value]) => [key, (Number(seasonResources[key]) || 0) + value])) };
+  const plain = readSoftMeans(seasonResources);
+  const cut = getUpkeep(plain);
+  return { ...plain, ...Object.fromEntries(Object.entries(cut).map(([key, value]) => [key, (Number(plain[key]) || 0) + value])) };
+}
+/**
+ * G44 (RULES_MARK 13, the user's (1) of 2026-11-27): the season's mean 돈·믿음·
+ * 공정함 read back through the softer gains' curve (nextTableRules.js
+ * `readSoft`), rounded, before the 유지비 and the finale's weight: the ending's
+ * gates moved by the same curve, so none of them had to be set again.
+ */
+export function readSoftMeans(seasonResources) {
+  if (!seasonResources || !isMarkThirteenOn()) return seasonResources;
+  return { ...seasonResources, ...Object.fromEntries(SOFT_KEYS.map((key) => [key, Math.round(readSoft(Number(seasonResources[key]) || 0))])) };
+}
+/**
+ * G44 (RULES_MARK 13): what an entry moved, as the ledger sums it -- 돈·믿음·
+ * 공정함's gains as they landed (resourcesAfter less resourcesBefore: softer
+ * near the top), every other key as the effect says. Before 13, the effect.
+ */
+export function readPaidEffect(entry) {
+  const effect = entry?.effect ?? {};
+  const { resourcesBefore: before, resourcesAfter: after } = entry ?? {};
+  if (!isMarkThirteenOn() || !before || !after) return effect;
+  return Object.fromEntries(Object.entries(effect).map(([key, value]) => (SOFT_KEYS.includes(key) && Number(value) > 0 && Number.isFinite(Number(after[key]) - Number(before[key])) ? [key, Number(after[key]) - Number(before[key])] : [key, value])));
 }
 /**
  * G41 (RULES_MARK 10): a season that paid COVER_QUIET cases off or more and did
@@ -102,6 +124,13 @@ export function weighUpkeep(seasonResources) {
  * PROFITABLE SILENCE: it kept the records and bought the quiet (게임성 5차 G41).
  */
 export const coversBeforeSilence = (seasonCovers) => isMarkTenOn() && seasonCovers >= COVER_QUIET;
+/**
+ * G45 (RULES_MARK 13): a season that burned its records and paid the whole
+ * ladder of covers (BURN_COVER_QUIET, ten) closes on QUIET COVER where it would
+ * have closed on PROFITABLE SILENCE: it bought the quiet twice over (게임성 6차
+ * G45: spend-people 3 endings, collapse 60.0 / silence 21.3 / quiet cover 18.7).
+ */
+export const coversBurnedSilence = (seasonCovers) => isMarkThirteenOn() && seasonCovers >= BURN_COVER_QUIET;
 
 /**
  * The season's closed cases as `[caseId, summary]`, the case that is closing

@@ -138,6 +138,7 @@ export default {
     preview: "選んだカードの詳しい影響: ",
     crack: "ひびの候補",
     more: "ほか{count}",
+    halfHarm: "×{at}以上で確定すると人的被害は半分",
     seal: "最高チップを封印",
     locked: "ロック · {reason}",
   },

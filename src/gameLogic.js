@@ -14,6 +14,7 @@ import * as riskLogic from "./riskLogic.js";
 
 export {
   applyEffect,
+  applySceneEffect,
   clamp,
   getRiskPressure,
   getRiskPressureDrivers,
@@ -693,7 +694,7 @@ export function getEndingVariant({
   const pact = trust - legitimacy >= PACT_GAP;
   // Burning every record closes the endings made of records. What is left is what the season valued, or a quiet it bought by burning.
   if (finale === "burn") {
-    if (silent) return ENDINGS["profitable-silence"];
+    if (silent) return ENDINGS[seasonStanding.coversBurnedSilence(seasonCovers) ? "quiet-cover" : "profitable-silence"]; // G45
     if (cold) return ENDINGS["cold-justice"];
     if (pact) return ENDINGS["field-pact"];
     if (storySeason && trust >= STORY_OPEN_TRUST) return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
@@ -773,7 +774,7 @@ export function getContinuityChallenge({ caseId = CASE_SEQUENCE[0], choiceId = "
 export function getDecisionLedger(entries = [], resources = {}) {
   const totals = {};
   entries.forEach((entry) => {
-    Object.entries(entry.effect ?? {}).forEach(([key, value]) => {
+    Object.entries(seasonStanding.readPaidEffect(entry)).forEach(([key, value]) => {
       totals[key] = (totals[key] ?? 0) + value;
     });
   });
