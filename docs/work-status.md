@@ -1041,7 +1041,8 @@ Still open, on purpose:
   RULES_MARK 12, G46: OVERCLOCK's chain counts cashes at heartbeat 110+
   (`before12` keeps ×32); check:pressure re-baselined at mark 12 only (one
   tool ≤1.40, stance spread ≤16%, breather ≤4%, two of three stances best
-  somewhere). #696 RULES_MARK 13: G44 money opens at 70 or less (running
+  somewhere). #696 (`e052534f`, with #698 keeping the mark-13 switch out of the
+  first paint) RULES_MARK 13: G44 money opens at 70 or less (running
   costs, replacing mark 11's upkeep), gains above 70 halved and above 85 a
   third, the ending reads the inverse curve (unmoved choices 5.8%); G47 a
   ×32+ cash halves the scene's human cost, collapse gate 20 → 13 (collapse
