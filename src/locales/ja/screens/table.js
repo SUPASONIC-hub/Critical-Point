@@ -139,6 +139,7 @@ export default {
     crack: "ひびの候補",
     more: "ほか{count}",
     halfHarm: "×{at}以上で確定すると人的被害は半分",
+    quarterHarm: "×{at}以上で確定すると人的被害は半分、×{quarter}以上なら4分の1",
     seal: "最高チップを封印",
     locked: "ロック · {reason}",
   },

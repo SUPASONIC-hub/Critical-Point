@@ -2,7 +2,7 @@ import { Link2, Lock, Zap } from "lucide-react";
 import { GuardedButton } from "../components/GuardedButton.jsx";
 import { getCardBurn, getCardChips, REFRAME_CARD_ID } from "./gauntletEngine.js";
 import { getLogicDirection } from "./logicStreak.js";
-import { isMarkThirteenOn, SKILL_HARM_MULTIPLIER } from "./nextTableRules.js";
+import { isMarkThirteenOn, quartersSkilledHarm, SKILL_HARM_MULTIPLIER, SKILL_HARM_QUARTER } from "./nextTableRules.js";
 import { describeCardMove, getDirectionParts, getMoveMark, REFRAME_CARD_NAME } from "./tableReadout.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import { pastPick } from "./WeekRulePanel.jsx";
@@ -83,6 +83,7 @@ export function GauntletHand({
   linkBurn = null,
   moveOf,
   past = null,
+  story = false,
   onSelect,
 }) {
   // The digit on a card is its key. With the single-key shortcuts off it is
@@ -184,7 +185,7 @@ export function GauntletHand({
                 {hiddenEffectCount > 0 && <i>{fill(say.more, { count: hiddenEffectCount })}</i>}
                 {/* G47 (RULES_MARK 13): a card that brings 사람 피해 says a big cash halves it. */}
                 {isMarkThirteenOn() && Number(card.effect?.humanCost) > 0 && (
-                  <i className="gx-card-half-harm" data-testid="half-harm">{fill(say.halfHarm, { at: SKILL_HARM_MULTIPLIER })}</i>
+                  <i className="gx-card-half-harm" data-testid="half-harm">{fill(quartersSkilledHarm(undefined, story) ? say.quarterHarm : say.halfHarm, { at: SKILL_HARM_MULTIPLIER, quarter: SKILL_HARM_QUARTER })}</i>
                 )}
               </span>
             )}

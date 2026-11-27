@@ -49,8 +49,9 @@ import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSe
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
 import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, RULES_TEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withMarkTen, withNextRules } from "./gauntlet/nextTableRules.js";
-import { RULES_ELEVEN_MARK, RULES_FOURTEEN_MARK, RULES_THIRTEEN_MARK, RULES_TWELVE_MARK, withMarkEleven, withMarkFourteen, withMarkThirteen, withMarkTwelve } from "./gauntlet/nextTableRules.js";
+import { isMarkFifteenOn, RULES_ELEVEN_MARK, RULES_FIFTEEN_MARK, RULES_FOURTEEN_MARK, RULES_THIRTEEN_MARK, RULES_TWELVE_MARK, withMarkEleven, withMarkFifteen, withMarkFourteen, withMarkThirteen, withMarkTwelve } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
+import { riskHarmWeightFor, withRiskHarmWeight } from "./riskLogic.js";
 import { getSeasonScore } from "./seasonScore.js";
 
 /** What createCaseSummary copies from getGameplayStats, and so what is compared. */
@@ -83,7 +84,9 @@ export function recheckCaseScore(row) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : null;
   const summary = row?.summary;
   if (!log || !summary || typeof summary !== "object") return { status: "unreadable", differs: [] };
-  const stats = getGameplayStats(log, getRiskPressure(row.resources ?? summary.finalResources ?? {}));
+  // G49 (RULES_MARK 15): the pressure weighs 사람 피해 as the row's rules did (a story case as before).
+  const weight = riskHarmWeightFor(isMarkFifteenOn(getRowRules(row?.case_id, summary, row?.dynamics?.[RULES_MARK_KEY])), summary.assistStory === true);
+  const stats = withRiskHarmWeight(weight, () => getGameplayStats(log, getRiskPressure(row.resources ?? summary.finalResources ?? {})));
   const differs = SCORE_FIELDS.filter((field) => field in summary && summary[field] !== stats[field]);
   return { status: differs.length ? "mismatch" : "match", differs, expected: stats };
 }
@@ -107,8 +110,9 @@ export function getRowRules(caseId, summary, mark = undefined) {
   // and RULES_MARK 12 (G46) for a row of 11 or before (`before12`).
   const twelve = withMarkTwelve(withMarkEleven(ten, Number(mark) >= RULES_ELEVEN_MARK), Number(mark) >= RULES_TWELVE_MARK);
   // RULES_MARK 13 (G44·G45·G47): a row of 12 or before is played again without them (`before13`),
-  // and RULES_MARK 14 (G50·G51) for a row of 13 or before (`before14`).
-  return withMarkFourteen(withMarkThirteen(twelve, Number(mark) >= RULES_THIRTEEN_MARK), Number(mark) >= RULES_FOURTEEN_MARK);
+  // and RULES_MARK 14 (G50·G51) for a row of 13 or before (`before14`), RULES_MARK 15 (G48·G49) for one of 14 or before (`before15`).
+  const fourteen = withMarkFourteen(withMarkThirteen(twelve, Number(mark) >= RULES_THIRTEEN_MARK), Number(mark) >= RULES_FOURTEEN_MARK);
+  return withMarkFifteen(fourteen, Number(mark) >= RULES_FIFTEEN_MARK);
 }
 
 /**

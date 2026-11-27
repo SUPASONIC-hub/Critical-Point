@@ -7,7 +7,7 @@ import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLO
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { getQuietClueRate } from "../src/seasonStanding.js";
-import { isMarkFourteenOn, isMarkNineOn, isMarkTenOn, isMarkThirteenOn } from "../src/gauntlet/nextTableRules.js";
+import { isMarkFifteenOn, isMarkFourteenOn, isMarkNineOn, isMarkTenOn, isMarkThirteenOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -427,7 +427,7 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   // at 14 (paired, 11-27: 37.5 at 13 and at 14, G50·G51 moving no collapse), the notes' 40 once G48's ×64 quarter lands (48.8).
   const PAIR_SEASONS = Number(process.env.ENDING_PAIR_SEASONS) || 80;
   const PAIR_HANDS = ["money", "spend-people", "min-risk"];
-  const PAIR_GAP_LEAST = 18;
+  const PAIR_GAP_LEAST = isMarkFifteenOn() ? 40 : 18;
   const pairBot = createSeasonBot({ seed: 20260927, staged, archetypes: { ...ARCHETYPES, ...Object.fromEntries(PAIR_HANDS.flatMap((name) => ["blind", "listens"].map((board) => [`${name}@${board}`, { ...ARCHETYPES[name], board }]))) } });
   const pairCollapse = Object.fromEntries(PAIR_HANDS.map((name, handIndex) => {
     const row = { blind: 0, listens: 0 };
