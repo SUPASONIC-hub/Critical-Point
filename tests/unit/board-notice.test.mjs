@@ -112,3 +112,9 @@ test("the limit is the table's, and the badge has words in every language in our
   assert.match(enBoard.makersNotice.note, /\bwe\b/);
   assert.match(jaBoard.makersNotice.note, /私たち/);
 });
+
+test("the first-hour record is skipped with no server, as every other send", async () => {
+  const { saveFirstHourRecord } = await import("../../src/telemetry.js");
+  assert.deepEqual(await saveFirstHourRecord("00000000-0000-4000-8000-000000000000", { v: 1, first: true }), { skipped: true });
+  assert.deepEqual(await saveFirstHourRecord("00000000-0000-4000-8000-000000000000", { v: 1, first: true }, { keepalive: true }), { skipped: true });
+});

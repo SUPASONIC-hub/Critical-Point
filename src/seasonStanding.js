@@ -1,6 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
-import { cashOpensClue, CLUE_CASH_MULTIPLIER, getUpkeep, isMarkEightOn, isMarkElevenOn, isMarkTenOn, isMarkThirteenOn, readSoft, SOFT_KEYS, BURN_COVER_QUIET } from "./gauntlet/nextTableRules.js";
+import { cashOpensClue, CLUE_CASH_MULTIPLIER, FINALE_WEIGHT_FOURTEEN, getUpkeep, isMarkEightOn, isMarkElevenOn, isMarkFourteenOn, isMarkTenOn, isMarkThirteenOn, readSoft, SOFT_KEYS, BURN_COVER_QUIET } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -67,13 +67,15 @@ export const COVER_QUIET = 6;
  * seasons (63.3% before); +8 took COLD JUSTICE under 3%.
  */
 export const FINALE_WEIGHT = 5;
+/** What the answer weighs under `rules`: FINALE_WEIGHT_FOURTEEN (6) from RULES_MARK 14 (G50), FINALE_WEIGHT before. */
+export const getFinaleWeight = (rules) => (isMarkFourteenOn(rules) ? FINALE_WEIGHT_FOURTEEN : FINALE_WEIGHT);
 const FINALE_KEYS = Object.freeze({ witness: "trust", control: "legitimacy" });
 /** The season's mean standing with the finale's answer on it, as the ruling (gameLogic.js) and the finale's line (nearestEnding.js) read it. */
 export function weighFinale(seasonResources, finale) {
   const standing = weighUpkeep(seasonResources);
   const key = FINALE_KEYS[finale];
   if (!standing || !key || !isMarkTenOn()) return standing;
-  return { ...standing, [key]: Math.min(100, (Number(standing[key]) || 0) + FINALE_WEIGHT) };
+  return { ...standing, [key]: Math.min(100, (Number(standing[key]) || 0) + getFinaleWeight()) };
 }
 /**
  * G38 (RULES_MARK 11): the ending gates the means' 유지비 moved, as the ruling

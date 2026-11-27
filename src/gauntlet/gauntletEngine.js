@@ -2259,7 +2259,7 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
       clockLeft: 1 - (Number(window?.elapsed) || 0) / Math.max(1, Number(window?.schema?.seconds) || current.schema.seconds),
       focusMode,
       focusCharged: focusCharge >= STANCE_CHARGE,
-    }, isMarkSevenOn(rules) ? RELIC_BOOST_CAP : Infinity, isMarkEightOn(rules) ? current.refined ?? [] : [])
+    }, isMarkSevenOn(rules) ? RELIC_BOOST_CAP : Infinity, isMarkEightOn(rules) ? current.refined ?? [] : [], rules)
     : { fired: [], factor: 1 };
   // G30 (RULES_MARK 9): a cash EDGE_CASH_REACH or less under the real wall pays EDGE_CASH_BONUS more (`withEdgeBonus`).
   const edge = paysPot && isMarkNineOn(rules) && readEdgeCash(window) !== null;
@@ -2674,7 +2674,10 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 13 (G44, G45 and G47 of
+ * The mark of a case closed at the table of RULES_MARK 14 (G50 and G51 of the
+ * seventh gameplay notes, the user's 「전부 1」 of 2026-11-27: the finale's
+ * answer weighs 6, FRONT PAGE pays ×1.12; nextTableRules.js `isMarkFourteenOn`
+ * plays them for a row marked 14 or later only). 13 was G44, G45 and G47 of
  * the sixth gameplay notes, the user's 「전부 1」 of 2026-11-27: 돈 opened at 70
  * and softer gains near the top, half the 사람 피해 on a table cashed at ×32,
  * a burned season of ten covers on QUIET COVER; nextTableRules.js
@@ -2719,7 +2722,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 13;
+export const RULES_MARK = 14;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

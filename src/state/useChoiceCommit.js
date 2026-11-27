@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "../appConfig.js";
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
 import { noteCaseClosed } from "../gameEvents.js";
+import { noteHandClosed } from "../firstHourLog.js";
 import {
   buildSceneBeat,
   createCaseSummary,
@@ -565,6 +566,8 @@ export function useChoiceCommit(context) {
       reportSilentFailure("bad-next", { from: resolvedNodeId, choiceId: choice.id, next: choice.next });
       return;
     }
+    // 첫 30분 자동 기록: the hand as it closed -- pushes, a timeout, scouting, the first BUST (firstHourLog.js).
+    if (closedWindow) noteHandClosed(resolvedNodeId, closedWindow);
     committingRef.current = true;
     setIsAdvancing(true);
     try {

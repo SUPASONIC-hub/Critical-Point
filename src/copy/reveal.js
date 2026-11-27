@@ -82,6 +82,16 @@ const revealCopy = {
     answers: { fun: "재밌음", hard: "어려움", long: "길다" },
     thanks: "고맙습니다. 다음 판으로 가세요.",
   },
+  // 첫 30분 자동 기록 (FirstHourAsk.jsx): a first-visit device is asked once each, after its first BUST and on 프롤로그 01's report.
+  firstHour: {
+    lost: "무엇을 잃었나요?",
+    lostAnswers: { stake: "판돈", next: "다음 장면", unknown: "모르겠다" },
+    again: "다음에 또 켤 것 같나요?",
+    againEnds: "0 전혀 · 10 꼭",
+    againScore: "{n}점",
+    skip: "건너뛰기",
+    thanks: "고맙습니다.",
+  },
 };
 export default revealCopy;
 

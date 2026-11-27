@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { HOLD_IDLE, holdsConfirm, PHASE_MS, stepHold } from "./holdConfirm.js";
+import { noteHoldHint } from "../firstHourLog.js";
 
 // A timer can land a frame before the clock it is measured on says the time
 // is up; the tick is sent a little late so the hold it closes has been held.
@@ -53,6 +54,8 @@ export function useHoldConfirm({ node, gauge, wallMin, canCash, resetKey, onConf
     const current = filedRef.current.key === keyRef.current ? filedRef.current.hold : HOLD_IDLE;
     if (keyRef.current === "off") return false;
     const { state, confirmed } = stepHold(current, { type, at: globalThis.performance.now() });
+    // 첫 30분 자동 기록: the hint 길게 눌러야 확정 coming up, counted on the first table (firstHourLog.js).
+    if (state.phase === "hinted" && current.phase !== "hinted") noteHoldHint();
     if (state !== current || filedRef.current.key !== keyRef.current) {
       filedRef.current = { key: keyRef.current, hold: state };
       setFiled(filedRef.current);

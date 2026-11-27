@@ -332,6 +332,8 @@ const PUSH_SUBSCRIPTIONS = files.some((file) => file.endsWith("_push_subscriptio
 const BOARD_ADMIN_QUEUE = files.some((file) => file.endsWith("_board_admin_queue.sql"));
 // 「만든 사람 공지」 (`*_board_notice.sql`): one notice the same two write, anon reads while it lasts.
 const BOARD_NOTICE = files.some((file) => file.endsWith("_board_notice.sql"));
+// 첫 30분 자동 기록 (`*_first_hour_runs.sql`): one record per first-visit device, by RPC only.
+const FIRST_HOUR = files.some((file) => file.endsWith("_first_hour_runs.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -475,6 +477,8 @@ const CLIENT_FUNCTIONS = {
     ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
     // 주 1회 알림 (N25): a device adds or removes its own push subscription, by its endpoint.
     ...(PUSH_SUBSCRIPTIONS ? ["push_subscribe", "push_unsubscribe"] : []),
+    // 첫 30분 자동 기록: a first-visit device writes its own record, by its id.
+    ...(FIRST_HOUR ? ["first_hour_record"] : []),
   ],
   // The board's two makers, signed in (20261118000000_board_admins.sql); each
   // refuses anyone `is_board_admin()` does not name.
@@ -3101,6 +3105,7 @@ const UPDATE_PROBE = {
   ...(HALL_OF_FAME ? { hall_of_fame: "score = score", hall_of_fame_boards: "checked_seasons = checked_seasons" } : {}),
   ...(PUSH_SUBSCRIPTIONS ? { push_subscriptions: "language = language" } : {}),
   ...(BOARD_NOTICE ? { board_notice: "body_ko = body_ko" } : {}),
+  ...(FIRST_HOUR ? { first_hour_runs: "updates = updates" } : {}),
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -3759,6 +3764,35 @@ if (PUSH_SUBSCRIPTIONS) {
   const twice = await allowed("unsubscribe twice", "anon", `select public.push_unsubscribe('${endpoint}') as ok`);
   check(twice?.rows[0]?.ok === false, "a second push_unsubscribe reported a row.");
   await db.query(`delete from public.telemetry_rate_limits where actor_key like 'global:push-%' or actor_key like 'push-%'`);
+}
+
+// ---- 첫 30분 자동 기록 (*_first_hour_runs.sql)
+//
+// anon writes a record and replaces it by its id, and can neither read the
+// table nor write it any other way; a record with a field the client does not
+// send, a nested value, a long string or `first` not true is refused. The
+// daily report's one SELECT (scripts/report-first-hour.mjs) runs as the
+// service role and reads the latest copy.
+if (FIRST_HOUR) {
+  const id = "6f1c7a52-6f43-4b7e-9d0c-0d6c4b1e2a11";
+  const put = (record, key = id) => `select public.first_hour_record('${key}', '${JSON.stringify(record)}'::jsonb) as ok`;
+  const base = { v: 1, first: true, dev: "phone", lang: "ko", btn: "prologue", btnS: 4, t1: "p1_start", t1Push: 3 };
+  await allowed("write a first-hour record", "anon", put(base));
+  const again = await allowed("replace it with a newer copy", "anon", put({ ...base, lost: "stake", again: 7 }));
+  check(again?.rows[0]?.ok === true, "a second first_hour_record of one id did not update the row.");
+  const kept = (await db.query(`select record, updates from public.first_hour_runs`)).rows;
+  check(kept.length === 1 && kept[0].record.again === 7 && kept[0].updates === 2, `two writes of one record left ${JSON.stringify(kept)}; one row, the newer copy, two updates.`);
+  await raises("write a record with a field the client never sends", "anon", put({ ...base, ip: "1.2.3.4" }), [], /invalid first hour record/);
+  await raises("write a nested record", "anon", put({ ...base, t1: { a: 1 } }), [], /invalid first hour record/);
+  await raises("write a long string", "anon", put({ ...base, lastAt: "x".repeat(65) }), [], /invalid first hour record/);
+  await raises("write a record of a device that was not new", "anon", put({ ...base, first: false }), [], /invalid first hour record/);
+  await refused("read the first-hour records", "anon", `select * from public.first_hour_runs`);
+  await refused("insert a first-hour record directly", "anon", `insert into public.first_hour_runs (record_id, record) values (gen_random_uuid(), '{"first":true}')`);
+  const { QUERY: FIRST_HOUR_QUERY, readFirstHour } = await import("./report-first-hour.mjs");
+  const read = (await allowed("read the first-hour report", "service_role", FIRST_HOUR_QUERY))?.rows ?? [];
+  check(readFirstHour(read).records === 1, `the first-hour report read ${JSON.stringify(read)}; one record.`);
+  await db.query(`delete from public.first_hour_runs`);
+  await db.query(`delete from public.telemetry_rate_limits where actor_key = 'global:first-hour-new'`);
 }
 
 // ---- the makers' report queue and log (20261118010000_board_admin_queue.sql)

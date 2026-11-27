@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { ENDING_THRESHOLDS, getEndingVariant } from "../../src/gameLogic.js";
 import { endingLabelOf, nearestEnding } from "../../src/nearestEnding.js";
 import { getUpkeep, isMarkTenOn, isMarkThirteenOn } from "../../src/gauntlet/nextTableRules.js";
-import { FINALE_WEIGHT } from "../../src/seasonStanding.js";
+import { getFinaleWeight } from "../../src/seasonStanding.js";
 import reportLinesCopy from "../../src/copy/reportLines.js";
 import enScreens from "../../src/locales/en/screens/index.js";
 import jaScreens from "../../src/locales/ja/screens/index.js";
@@ -20,7 +20,7 @@ import { createSeasonStandingReadout, describeNearestEnding } from "../../src/vi
 const CASES = 10;
 // G40 (RULES_MARK 10): the finale's answer weighs FINALE_WEIGHT on the mean the ruling reads (증언 믿음, 개혁 공정함);
 // the mean here is handed that much under, so the gates below are read at the numbers the rows name.
-const under = (finale, key) => (isMarkTenOn() && { witness: "trust", control: "legitimacy" }[finale] === key ? FINALE_WEIGHT : 0);
+const under = (finale, key) => (isMarkTenOn() && { witness: "trust", control: "legitimacy" }[finale] === key ? getFinaleWeight() : 0);
 // G38 (RULES_MARK 11): the ruling reads the mean less a third of what stands over 80 (weighUpkeep), before the answer's weight;
 // the mean here is the lowest that reads as the row's number.
 const kept = (key, value) => {
