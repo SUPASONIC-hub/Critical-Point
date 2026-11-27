@@ -2,7 +2,6 @@ import { caseDisplayCode, SEASON_ENTRY_CASE } from "./gameCases.js";
 import { clamp, initialResources } from "./gameConstants.js";
 import { easyResourceLabels } from "./playerLanguage.js";
 import playReads from "./copy/playReads.js";
-import { applySoftEffect, halveSkilledHarm, isMarkThirteenOn } from "./gauntlet/nextTableRules.js";
 
 export { clamp };
 
@@ -21,20 +20,6 @@ export function applyEffect(resources, effect = {}) {
     next[key] = clamp((next[key] ?? 0) + value, 0, max);
   });
   return next;
-}
-
-/**
- * A scene's effect as a decision commits it (useChoiceCommit, the season bot,
- * settlementRecheck): under RULES_MARK 13 (`on`, the page's rules unless the
- * caller says, as the recheck does for a row's mark) G47's half 사람 피해 for a
- * table cashed at ×32 or more (`multiplier`, 0 on a bust, null with no table)
- * and G44's softer gains near the top. Returns `{ effect, resources }`: the
- * effect as it was paid, and the resources after it.
- */
-export function applySceneEffect(resources, effect = {}, multiplier = null, on = isMarkThirteenOn()) {
-  if (!on) return { effect, resources: applyEffect(resources, effect) };
-  const paid = halveSkilledHarm(effect, multiplier);
-  return { effect: paid, resources: applySoftEffect(resources, paid, applyEffect) };
 }
 
 const riskDefaults = {

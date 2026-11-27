@@ -8,8 +8,10 @@ import {
 import { getRowRules } from "../../src/rankingRecheck.js";
 import { ALL_RULES } from "../../src/gauntlet/tableUnlocks.js";
 import { describeCaseOpening } from "../../src/state/caseRoutes.js";
-import { applyEffect, applySceneEffect } from "../../src/riskLogic.js";
+import { applyEffect } from "../../src/riskLogic.js";
+import { applySceneEffect } from "../../src/sceneEffect.js";
 import { ENDING_GATES } from "../../src/gameConstants.js";
+import { marksOnByDefault } from "../../src/gauntlet/rulesSwitch.js";
 import { getEndingVariant, getDecisionLedger } from "../../src/gameLogic.js";
 import { coversBurnedSilence, readPaidEffect, readSoftMeans } from "../../src/seasonStanding.js";
 import { readSoftGains } from "../../src/gauntlet/tableReadout.js";
@@ -84,6 +86,14 @@ test("G47: a table cashed at ×32 or more takes half its scene's 사람 피해, 
   assert.equal(SKILL_HARM_MULTIPLIER, 32);
   assert.equal(COLLAPSE_HARM_THIRTEEN, 13);
   assert.equal(ENDING_GATES.collapseHarmPerCase, 13);
+  // gameConstants.js reads the switch without nextTableRules.js (first paint): the same answer.
+  assert.equal(marksOnByDefault(13), isMarkThirteenOn());
+  assert.equal(marksOnByDefault(13, {}), true);
+  assert.equal(marksOnByDefault(13, { process: { env: { RULES_MARK13: "0" } } }), false);
+  assert.equal(marksOnByDefault(13, { process: { env: { RULES_MARK7: "0" } } }), false, "13 rides on the marks before");
+  assert.equal(marksOnByDefault(12, { process: { env: { RULES_MARK13: "0" } } }), true);
+  assert.equal(marksOnByDefault(13, { process: { env: { RULES_NEXT: "0" } } }), false);
+  assert.equal(marksOnByDefault(13, { process: { env: { RULES_NEXT: "1" } } }), true);
   assert.deepEqual(halveSkilledHarm({ humanCost: 5, trust: 2 }, 32), { humanCost: 2, trust: 2 });
   assert.deepEqual(halveSkilledHarm({ humanCost: 5 }, 31.9), { humanCost: 5 });
   assert.deepEqual(halveSkilledHarm({ humanCost: -3 }, 64), { humanCost: -3 }, "a fall in harm is paid in full");

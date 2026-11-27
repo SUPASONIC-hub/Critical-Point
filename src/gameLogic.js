@@ -14,13 +14,13 @@ import * as riskLogic from "./riskLogic.js";
 
 export {
   applyEffect,
-  applySceneEffect,
   clamp,
   getRiskPressure,
   getRiskPressureDrivers,
   getSuspenseEvent,
   getSuspenseState,
 } from "./riskLogic.js";
+export { applySceneEffect } from "./sceneEffect.js";
 export { getCognitionSpread } from "./seasonScore.js";
 
 export function buildNarrativeSpine({

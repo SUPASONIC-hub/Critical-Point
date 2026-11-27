@@ -1,4 +1,5 @@
-import { COLLAPSE_HARM_THIRTEEN, isMarkThirteenOn } from "./gauntlet/nextTableRules.js";
+// RULES_MARK 13's switch from the switches alone: nextTableRules.js stays out of the first paint.
+import { marksOnByDefault } from "./gauntlet/rulesSwitch.js";
 
 export const initialResources = {
   time: 72,
@@ -110,7 +111,7 @@ export const ENDING_GATES = Object.freeze({
   // Collapse is harm: the mean human cost a case closed on (season p50 about 6;
   // spending people for position closes near 25, putting them first at 0) --
   // G47 (RULES_MARK 13): 13 a case, with a table cashed at ×32 or more taking half its scene's harm.
-  collapseHarmPerCase: isMarkThirteenOn() ? COLLAPSE_HARM_THIRTEEN : 20,
+  collapseHarmPerCase: marksOnByDefault(13) ? 13 : 20, // 13: nextTableRules.js COLLAPSE_HARM_THIRTEEN
   // -- or overreach people paid for: a fifth of the windows busted (about the
   // season's p85) while cases still closed on half that harm.
   collapseBustRate: 0.2,
