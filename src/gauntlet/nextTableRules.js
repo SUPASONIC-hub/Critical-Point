@@ -650,11 +650,12 @@ export function writeSoft(value) {
  */
 export const SKILL_HARM_MULTIPLIER = 32;
 export const COLLAPSE_HARM_THIRTEEN = 13;
-/** `effect` with G47's half harm when its table cashed at `multiplier` (null: no table, as before). */
-export function halveSkilledHarm(effect, multiplier) {
+/** `effect` with G47's half harm when its table cashed at `multiplier` (null: no table, as before); a quarter at ×64 or more with G48's `quarter`. */
+export function halveSkilledHarm(effect, multiplier, quarter = false) {
   const harm = Number(effect?.humanCost) || 0;
-  if (harm <= 0 || !((Number(multiplier) || 0) >= SKILL_HARM_MULTIPLIER)) return effect;
-  return { ...effect, humanCost: Math.floor(harm / 2) };
+  const at = Number(multiplier) || 0;
+  if (harm <= 0 || !(at >= SKILL_HARM_MULTIPLIER)) return effect;
+  return { ...effect, humanCost: Math.floor(harm / (quarter && at >= SKILL_HARM_QUARTER ? 4 : 2)) };
 }
 
 /** G45 (RULES_MARK 13): a burned season that paid this many covers (the whole ladder, settlementPay.js PAY_MOST) closes on QUIET COVER, not PROFITABLE SILENCE. */
@@ -725,3 +726,66 @@ export const FINALE_WEIGHT_FOURTEEN = 6;
  * spread is ×1.290 (게임성 7차 G51), so the single tool's cap is back at ×1.35.
  */
 export const FRONT_PAGE_BOOST_FOURTEEN = 1.12;
+
+/* ------------------------------------------ RULES_MARK 15 (게임성 7차 B) */
+
+/**
+ * G48 and G49 (게임성 개선점 7차, the user's 「전부 1」 of 2026-11-27): rules
+ * that ship as RULES_MARK 15. A row is rechecked under them only when its mark
+ * is `RULES_FIFTEEN_MARK` or later (rankingRecheck.js `getRowRules`), so a row
+ * of 5 to 14 is played again as it was. They ride on the marks before.
+ * `FIFTEEN_RULE` in a set plays them, `BEFORE_FIFTEEN_RULE` the rules before,
+ * and a set with neither what this page plays. `RULES_MARK15=0` turns them off
+ * in a script. G49's weight is riskLogic.js's (the start screen loads it), read
+ * from rulesSwitch.js `marksOnByDefault(15)`; rules-mark15.test.mjs holds the two together.
+ */
+export const RULES_FIFTEEN_MARK = 15;
+export const FIFTEEN_RULE = "mark15";
+export const BEFORE_FIFTEEN_RULE = "before15";
+
+/** Whether this page (or this script) plays RULES_MARK 15's rules: `RULES_MARK15=0` turns them off in a script. */
+export function wantsMarkFifteen(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK15 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let fifteenChoice;
+export const fifteenByDefault = () => (fifteenChoice ??= wantsMarkFifteen());
+
+/** The mark RULES_MARK 15 rides on (whether `rules` plays the rules before it). */
+const isMarkBeforeFifteenOn = (rules) => isMarkFourteenOn(rules);
+
+/** Whether `rules` plays RULES_MARK 15's rules (and so those before it too). */
+export function isMarkFifteenOn(rules) {
+  if (!isMarkBeforeFifteenOn(rules)) return false;
+  if (rules?.has?.(BEFORE_FIFTEEN_RULE)) return false;
+  if (rules?.has?.(FIFTEEN_RULE)) return true;
+  return fifteenByDefault();
+}
+
+const fifteenSets = new WeakMap();
+const beforeFifteenSets = new WeakMap();
+/** `rules` playing RULES_MARK 15's rules (`on`) or those before; the same set back when it already does. */
+export function withMarkFifteen(rules, on = fifteenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkFifteenOn(rules) === Boolean(on) || (on && !isMarkBeforeFifteenOn(rules))) return rules;
+  const mark = on ? FIFTEEN_RULE : BEFORE_FIFTEEN_RULE;
+  const drop = on ? BEFORE_FIFTEEN_RULE : FIFTEEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? fifteenSets : beforeFifteenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G48 (RULES_MARK 15): a scene whose table cashed at SKILL_HARM_QUARTER or more
+ * takes a quarter of its 사람 피해 (rounded down), ×32 to ×63 still half
+ * (`halveSkilledHarm`'s `quarter`). Over ×32 a better table kept no one safer;
+ * paired seasons (게임성 7차 G48), the money hand blind / listening collapsed
+ * 92.5 / 55.0% at 13 and 92.5 / 43.8% with the quarter. A story season keeps
+ * G47's half only (its auto tables cash at heat 70 and reach ×64 most of the
+ * time, so a story season spending people never collapsed): the caller says.
+ */
+export const SKILL_HARM_QUARTER = 64;
+/** Whether a scene of a season (`story`) under `rules` takes G48's quarter. */
+export const quartersSkilledHarm = (rules, story = false) => !story && isMarkFifteenOn(rules);

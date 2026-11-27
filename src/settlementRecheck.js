@@ -48,7 +48,7 @@ import { applyGauntletEffect, getBustEffect, normalizeSchema } from "./gauntlet/
 import { describeCaseOpening } from "./state/caseRoutes.js";
 import { routeChoice } from "./state/settleChoice.js";
 import { rowRules, WINDOW_RECORD_KEY } from "./rankingRecheck.js";
-import { applySoftEffect, halveSkilledHarm, isMarkElevenOn, isMarkThirteenOn } from "./gauntlet/nextTableRules.js";
+import { applySoftEffect, halveSkilledHarm, isMarkElevenOn, isMarkFifteenOn, isMarkThirteenOn } from "./gauntlet/nextTableRules.js";
 
 /** The six resources a decision moves (resourcesBefore / resourcesAfter). */
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -85,7 +85,7 @@ function findCard(entry) {
  * `resourcesAfter` of one entry: the effect applied, the effect merged, the
  * price worked out. Pushes onto `breaks` and `unchecked`.
  */
-function recheckResources(entry, index, card, breaks, unchecked, thirteen = false) {
+function recheckResources(entry, index, card, breaks, unchecked, thirteen = false, fifteen = false) {
   const { resourcesBefore: before, resourcesAfter: after, effect } = entry;
   if (!isObject(before) || !isObject(after) || !isObject(effect) || !RESOURCE_KEYS.every((key) => isNumber(before[key]) && isNumber(after[key]))) {
     unchecked.add("resourcesAfter");
@@ -104,7 +104,8 @@ function recheckResources(entry, index, card, breaks, unchecked, thirteen = fals
   const clue = isObject(entry.clueReward?.effect) ? entry.clueReward.effect : entry.clue ? CLUE_EFFECT : {};
   const summed = mergeEffects(priced, busted ? {} : clue, busted ? getBustEffect(entry.threshold) : {});
   // G47 (RULES_MARK 13): a table cashed at ×32 or more paid half the 사람 피해.
-  const merged = thirteen ? halveSkilledHarm(summed, busted ? 0 : entry.threshold?.potMultiplier ?? null) : summed;
+  // G48 (RULES_MARK 15, `fifteen`): a quarter at ×64 or more, a story entry still half.
+  const merged = thirteen ? halveSkilledHarm(summed, busted ? 0 : entry.threshold?.potMultiplier ?? null, fifteen && entry.assistStory !== true) : summed;
   if (!sameEffect(merged, effect)) {
     breaks.push({ entry: index, field: "effect", expected: merged, found: effect });
     return;
@@ -151,11 +152,12 @@ export function recheckCaseSettlement(row, before = null) {
   const caseResults = previousKnown && previousCaseId ? { [previousCaseId]: { outcomeChoiceId: before.summary.outcomeChoiceId } } : {};
   const open = row?.dynamics?.open;
   const thirteen = isMarkThirteenOn(rowRules(row));
+  const fifteen = isMarkFifteenOn(rowRules(row));
   let reframeCount = 0;
   log.forEach((entry, index) => {
     if (!isObject(entry)) return;
     const card = findCard(entry);
-    recheckResources(entry, index, card, breaks, unchecked, thirteen);
+    recheckResources(entry, index, card, breaks, unchecked, thirteen, fifteen);
     const choice = entry.reframe === true ? nodes[entry.nodeId]?.choices?.find((item) => item.type === "reframe") ?? null : card;
     if (!choice || !isObject(entry.resourcesBefore)) unchecked.add("scene");
     else {

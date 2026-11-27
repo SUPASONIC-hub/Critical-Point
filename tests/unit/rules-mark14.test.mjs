@@ -16,7 +16,7 @@ const BEFORE = withMarkFourteen(ALL_RULES, false);
 
 test("RULES_MARK 14: on by default, off in a script with RULES_MARK14=0, and a row of 5 to 13 played without it", () => {
   assert.equal(RULES_FOURTEEN_MARK, 14);
-  assert.equal(RULES_MARK, 14);
+  assert.ok(RULES_MARK >= 14, "RULES_MARK 15 keeps 14's rules");
   assert.equal(wantsMarkFourteen({}), true);
   assert.equal(wantsMarkFourteen({ process: { env: { RULES_MARK14: "0" } } }), false);
   assert.equal(isMarkFourteenOn(ALL_RULES), true);

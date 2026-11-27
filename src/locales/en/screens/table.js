@@ -139,6 +139,7 @@ export default {
     crack: "Fracture candidate",
     more: "+{count} more",
     halfHarm: "Commit at ×{at}+ and human cost is halved",
+    quarterHarm: "Commit at ×{at}+ and human cost is halved, at ×{quarter}+ quartered",
     seal: "Top card sealed until Heat",
     locked: "Locked · {reason}",
   },

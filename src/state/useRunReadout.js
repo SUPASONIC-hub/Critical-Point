@@ -18,6 +18,7 @@ import {
   getSuspenseState,
 } from "../gameLogic.js";
 import { getRecordCashBar } from "../seasonStanding.js";
+import { holdRiskStory } from "../riskLogic.js";
 import { getJudgementHabit, habitCardLine } from "../judgementHabit.js";
 import { countAudit, isAuditOn } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
@@ -64,7 +65,12 @@ function readRecordCashBar(currentCase, discoveredClues, log) {
 export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, discoveredClues = [], gauntletRun, runId, seedBase, debugTools, echo = "", secondSeason = null, nodeId = null }) {
   // A case's report counts the doors of that case (D-10); the finale's, the season's.
   const caseScoped = currentCase !== "final";
-  const riskPressure = useMemo(() => getRiskPressure(resources), [resources]);
+  // G49 (RULES_MARK 15): a story run's pressure weighs 사람 피해 0.25, the table's 0.35 (riskLogic.js); the commit and the case summary read the same.
+  const story = gauntletRun?.story === true;
+  const riskPressure = useMemo(() => {
+    holdRiskStory(story);
+    return getRiskPressure(resources);
+  }, [resources, story]);
   const riskTier = riskPressure >= 60 ? "CRITICAL" : riskPressure >= 35 ? "UNSTABLE" : "CONTROLLED";
   // `opening` is the run's line under the scene (`run.echo`): the case's opening
   // voice until the first card is played (caseIntroEchoes). It rides on the
