@@ -53,9 +53,11 @@ export function useRuntimeRenderers({
   return {
     renderSceneLines,
     renderSceneMinutes: (nodeId) => <SceneMinutes nodeId={nodeId} />,
-    // N23: the report's act line for 사건 01~17, and 사건 07's small 중간 결산 (ActProgress.jsx); under it on
-    // 프롤로그 01's report, 첫 30분 자동 기록's 「다음에 또 켤 것 같나요?」 for a first-visit device (FirstHourAsk.jsx).
-    renderActProgress: (caseId) => <><ActProgress caseId={caseId} /><FirstHourResult caseId={caseId} /></>,
+    // N23: the report's act line for 사건 01~17, and 사건 07's small 중간 결산 (ActProgress.jsx).
+    renderActProgress: (caseId) => <ActProgress caseId={caseId} />,
+    // 첫 30분 자동 기록's 「다음에 또 켤 것 같나요?」 for a first-visit device, at the top of 프롤로그 01's report
+    // under its button row, seen without scrolling on a 390x844 phone -- where the user asked for it (2026-11-27).
+    renderResultTop: (caseId) => <FirstHourResult caseId={caseId} />,
     // G34: the result page's 보상금 line (CaseCover.jsx); `cover` is the run's caseResults, table and apply.
     renderCaseCover: (caseId) => cover && <CaseCover caseId={caseId} {...cover} />,
     // N42: the foot of 프롤로그 05, 사건 03 and 사건 07 -- saved, and what comes next (LeaveLine.jsx).

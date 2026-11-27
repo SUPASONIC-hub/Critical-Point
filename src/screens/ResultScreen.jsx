@@ -180,7 +180,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 {resultCopy.reset}
               </button>
             </div>
-          </div>
+          </div>{renderers.renderResultTop?.(currentCase)}{/* 첫 30분 자동 기록: 프롤로그 01's 「다음에 또 켤 것 같나요?」 here, the top, as the user asked (2026-11-27). */}
           <section className="outcome-panel" aria-label={resultCopy.outcomeLabel}>
             {caseOutcome.scene && <ScenePlate node={caseOutcome.scene.node} nodeId={caseOutcome.scene.nodeId} variant="result" outcome={caseOutcome.scene.tone} />}
             <div className="outcome-panel-mark">
