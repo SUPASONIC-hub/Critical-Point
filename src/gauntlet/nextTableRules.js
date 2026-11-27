@@ -451,3 +451,80 @@ export function getUpkeep(resources = {}) {
 export const CLUE_CASH_MULTIPLIER = 32;
 /** Whether a table cashed at `multiplier` can open its scene's record. */
 export const cashOpensClue = (multiplier) => (Number(multiplier) || 0) >= CLUE_CASH_MULTIPLIER;
+
+/* ------------------------------------------ RULES_MARK 12 (게임성 6차 A) */
+
+/**
+ * G46 (게임성 개선점 6차, the user's 「전부 1」 of 2026-11-27): the rule that
+ * ships as RULES_MARK 12. A row is rechecked under it only when its mark is
+ * `RULES_TWELVE_MARK` or later (rankingRecheck.js `getRowRules`), so a row of
+ * 5 to 11 is played again as it was. It rides on the marks before: a set that
+ * plays those off plays none of it. `TWELVE_RULE` in a set plays it,
+ * `BEFORE_TWELVE_RULE` the rules before, and a set with neither what this page
+ * plays. `RULES_MARK12=0` turns it off in a script.
+ */
+export const RULES_TWELVE_MARK = 12;
+export const TWELVE_RULE = "mark12";
+export const BEFORE_TWELVE_RULE = "before12";
+
+/** Whether this page (or this script) plays RULES_MARK 12's rules: `RULES_MARK12=0` turns them off in a script. */
+export function wantsMarkTwelve(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK12 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let twelveChoice;
+export const twelveByDefault = () => (twelveChoice ??= wantsMarkTwelve());
+
+/** The mark RULES_MARK 12 rides on (whether `rules` plays the rules before it). */
+const isMarkBeforeTwelveOn = (rules) => isMarkElevenOn(rules);
+
+/** Whether `rules` plays RULES_MARK 12's rules (and so those before it too). */
+export function isMarkTwelveOn(rules) {
+  if (!isMarkBeforeTwelveOn(rules)) return false;
+  if (rules?.has?.(BEFORE_TWELVE_RULE)) return false;
+  if (rules?.has?.(TWELVE_RULE)) return true;
+  return twelveByDefault();
+}
+
+const twelveSets = new WeakMap();
+const beforeTwelveSets = new WeakMap();
+/** `rules` playing RULES_MARK 12's rules (`on`) or those before; the same set back when it already does. */
+export function withMarkTwelve(rules, on = twelveByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkTwelveOn(rules) === Boolean(on) || (on && !isMarkBeforeTwelveOn(rules))) return rules;
+  const mark = on ? TWELVE_RULE : BEFORE_TWELVE_RULE;
+  const drop = on ? BEFORE_TWELVE_RULE : TWELVE_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? twelveSets : beforeTwelveSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G46 OVERCLOCK 심박 (RULES_MARK 12): the cash that builds the chain is one
+ * made with the heartbeat at HOT_CASH_BPM or over, not ×32 or better. ×32
+ * (heat about 55) was reached only on boards whose wall stood far, so it paid
+ * the luck of a far wall and the hand that sees the wall; the hand that reads
+ * the heartbeat cashes about 25 under the wall and lost 29.5% of its vault to
+ * G42 (게임성 6차 G46: the listening hand's best -17.9% instead, boards played
+ * OVERCLOCKed 32.5%). The heartbeat is the wall's tell (`getHeartbeatBpm` on
+ * the wall the window tells, its error in), without the clock's late rise, so
+ * a board waited out does not build it. Two in a row still OVERCLOCK the board.
+ */
+export const HOT_CASH_BPM = 110;
+
+/**
+ * Whether a cash at `multiplier`, closed at `gauge` on `window`, builds the
+ * OVERCLOCK chain under `rules`. `bpmOf(gauge, wall, sedated)` is the engine's
+ * getHeartbeatBpm (passed in: this file does not import the engine).
+ */
+export function isHotCash({ multiplier, gauge, window, rules, bpmOf }) {
+  if (!isMarkTwelveOn(rules)) return (Number(multiplier) || 0) >= getHotCashMultiplier(rules);
+  return readCashBpm(gauge, window, bpmOf) >= HOT_CASH_BPM;
+}
+
+/** The heartbeat a cash at `gauge` on `window` is read at for the chain (G46). */
+export function readCashBpm(gauge, window, bpmOf) {
+  return bpmOf(Number(gauge) || 0, (Number(window?.wall) || 100) + (Number(window?.tellOffset) || 0), window?.schema?.sedated === true);
+}

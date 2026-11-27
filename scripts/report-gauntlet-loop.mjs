@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, isMarkTenOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isMarkNineOn, isMarkTenOn, isMarkTwelveOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -411,8 +411,10 @@ console.log(
   `scout            blind ${bestFixed.meanVault} < heartbeat ${bestHeartbeat.meanVault} < scout ${bestScout.meanVault} (${bestScout.label}, bust ${(bestScout.bustRate * 100).toFixed(1)}%) < sees ${oracle.meanVault}  (scout/sees ${(bestScout.meanVault / oracle.meanVault).toFixed(3)}, heartbeat/sees ${(bestHeartbeat.meanVault / oracle.meanVault).toFixed(3)})`,
 );
 // G42 (RULES_MARK 10): how often a cash dealt the next board OVERCLOCK (×32 twice in a row; ×4 before), measured, not asserted.
+// G46 (RULES_MARK 12): the chain from a cash at heartbeat HOT_CASH_BPM or over instead.
 const overclockShare = (row) => `${((row.seen.overclockDealt / Math.max(1, row.seen.windows)) * 100).toFixed(1)}%`;
-console.log(`overclock        dealt after ${overclockShare(bestFixed)} of ${bestFixed.label}'s boards, ${overclockShare(bestHeartbeat)} of ${bestHeartbeat.label}'s, ${overclockShare(oracle)} of ${oracle.label}'s (the chain from ×${getHotCashMultiplier(ALL_RULES)})`);
+const overclockChain = isMarkTwelveOn() ? `heartbeat ${HOT_CASH_BPM}+` : `×${getHotCashMultiplier(ALL_RULES)}`;
+console.log(`overclock        dealt after ${overclockShare(bestFixed)} of ${bestFixed.label}'s boards, ${overclockShare(bestHeartbeat)} of ${bestHeartbeat.label}'s, ${overclockShare(oracle)} of ${oracle.label}'s (the chain from ${overclockChain})`);
 assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
 assert.ok(
   bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,

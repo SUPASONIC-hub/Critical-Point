@@ -53,7 +53,7 @@ import { normalizePaid } from "./settlementPay.js";
 import { CASE_RULES_ON, caseRuleFor } from "./caseRules.js";
 import { LATE_BILL_CHIPS, LATE_BILL_KEEP, MERGER_EIGHT, PASSED_DOWN_HARM, readSignWay, SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_WAYS, TRAINED_ABOVE, TRAINED_BELOW, TRAINED_MIN_WIDTH, twistHasDevice } from "./actTwists.js";
 import { COLD_BLOOD_WALL, listRefinable, NEXT_REROLL_COST, readRelicBoost, REFINE_COST, RELIC_BOOST_CAP } from "./relicsNext.js";
-import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, COIN_GAIN_KEYS, COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, readEdgeCash, withEdgeBonus, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
+import { BEFORE_EIGHT_RULE, BEFORE_SEVEN_RULE, COIN_GAIN_KEYS, COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isHotCash, isMarkNineOn, isMarkTwelveOn, readEdgeCash, withEdgeBonus, BREATH_GAUGE, BREATH_HOT_FROM, BREATH_HOT_GAUGE, BREATH_HOT_WALL, BREATH_SECONDS, BREATH_WALL, CHARGE_LEAK_GRACE, CHARGE_LEAK_STEP, EIGHT_RULE, isMarkEightOn, isRefineOn, isOpeningCase, METRONOME_HOLD, OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS, trialByDefault, EXPOSURE_HEAT, EXPOSE_CARRY_CHIPS, getCatchChance, getExposure, isMarkSevenOn, isNextOn, narrowTrustAt, NEXT_RULE, OLD_RULE, scoutTrustAt, SEVEN_RULE, SIGN_CHIPS, SIGN_MARK, STEADY_NEXT, STRIKE_HOT_CAP, STRIKE_HOT_GAUGE } from "./nextTableRules.js";
 import { CASCADE_MUTATION, CASCADE_MUTATION_TOP, describeLinkMade, getLinkShift, normalizeLinks } from "./cascadeRisk.js";
 import mutationsCopy from "../copy/mutations.js";
 import runLines from "../copy/runLines.js";
@@ -1401,7 +1401,10 @@ export const MUTATIONS = Object.freeze({
   aftershock: mutation("aftershock", { penalty: true, label: "AFTERSHOCK" }, { start: AFTERSHOCK_START }),
   silence: mutation("silence", { penalty: true, label: "SILENCE" }, { seconds: SILENCE_SECONDS }),
   heatDebt: mutation("heatDebt", { penalty: true, label: "HEAT DEBT" }, { share: HEAT_DEBT_SHARE, seconds: HEAT_DEBT_SECONDS }),
-  overclock: mutation("overclock", { label: "OVERCLOCK" }, { multiplier: getHotCashMultiplier(), chips: OVERCLOCK_CHIPS }),
+  // G46 (RULES_MARK 12): the chain is built on the heartbeat (HOT_CASH_BPM), and its line says so.
+  overclock: isMarkTwelveOn()
+    ? mutation("overclockBpm", { label: "OVERCLOCK" }, { bpm: HOT_CASH_BPM, chips: OVERCLOCK_CHIPS })
+    : mutation("overclock", { label: "OVERCLOCK" }, { multiplier: getHotCashMultiplier(), chips: OVERCLOCK_CHIPS }),
   coldFeet: mutation("coldFeet", { penalty: true, label: "COLD FEET" }, {
     seal: SEAL_BREAK_GAUGE, particle: objectParticle(String(SEAL_BREAK_GAUGE)),
   }),
@@ -2292,7 +2295,8 @@ export function resolveWindow({ run, window: closedWindow, card, forced, offered
   // slack reads the vault without it, and neither is reading the table.
   const runHandAfter = outcome === "cash" ? current.runHand + logicPot + focusPot : keptShare ? Math.floor(current.runHand / keptShare) : 0;
   // G42 (RULES_MARK 10): the chain asks for ×32 (getHotCashMultiplier); a row of 9 or less for ×4.
-  const hotStreak = rules.has("overclock") && outcome === "cash" && multiplier >= getHotCashMultiplier(rules) ? current.streak + 1 : 0;
+  // G46 (RULES_MARK 12): a cash with the heartbeat at HOT_CASH_BPM or over instead (isHotCash); a row of 11 or less as before.
+  const hotStreak = rules.has("overclock") && outcome === "cash" && isHotCash({ multiplier, gauge, window, rules, bpmOf: getHeartbeatBpm }) ? current.streak + 1 : 0;
   const stackedPot = outcome === "cash" ? current.runPot + pot : insuredPot;
   // MARKET SHOCK: on the window that deals the case's shock board, the pot
   // stacked so far moves (up or down) before anything else reads it.
@@ -2670,9 +2674,12 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 11 (G38 and G39 of the
+ * The mark of a case closed at the table of RULES_MARK 12 (G46 of the sixth
+ * gameplay notes, the user's 「전부 1」 of 2026-11-27: OVERCLOCK's chain on
+ * the heartbeat; nextTableRules.js `isMarkTwelveOn` plays it for a row marked
+ * 12 or later only). 11 was G38 and G39 of the
  * fifth gameplay notes, the user's 「전부 1」 of 2026-11-26; nextTableRules.js
- * `isMarkElevenOn` plays them for a row marked 11 or later only). 10 was G40
+ * `isMarkElevenOn` plays them for a row marked 11 or later only. 10 was G40
  * to G42 of the same notes and the same day; nextTableRules.js
  * `isMarkTenOn` plays them for a row marked 10 or later only. 9 was G29 to
  * G37 of the fourth gameplay notes, the user's 「전부 1」 of 2026-11-25;
@@ -2708,7 +2715,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 11;
+export const RULES_MARK = 12;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

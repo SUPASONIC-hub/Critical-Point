@@ -251,6 +251,20 @@ export default {
         text: "×{multiplier}以上の確定から連続が始まる",
       },
     },
+    overdriveBpm: {
+      live: {
+        label: "継続中",
+        text: "もう一度心拍{bpm}以上で確定するとオーバークロック",
+      },
+      held: {
+        label: "維持",
+        text: "この勝負も心拍{bpm}以上で確定しないと続かない",
+      },
+      dormant: {
+        label: "オフ",
+        text: "心拍{bpm}以上で2回確定するとオーバークロック",
+      },
+    },
     rulesOn: "{rules} 適用中",
     rulesHidden: "隠れたルールが適用中",
     rulesQuiet: "ルールは安定",

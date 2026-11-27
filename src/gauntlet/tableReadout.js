@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 
 import { formatMoney, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getCaseTwist, getClockHeatRate, getEscalationWindow, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getCaseTwist, getClockHeatRate, getEscalationWindow, getHeartbeatBpm, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
-import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, getHotCashMultiplier, isNextOn } from "./nextTableRules.js";
+import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, getHotCashMultiplier, HOT_CASH_BPM, isHotCash, isMarkTwelveOn, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
 import { twistHasDevice } from "./actTwists.js";
 import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD, TESTIMONY_SHARE } from "./tableRules.js";
@@ -348,11 +348,12 @@ function getRuleObjective(mutations) {
   return fill(say.rulesLift, { rules: labels });
 }
 
-function getOverdriveCopy({ streak, hot, cashMutations, hotCash }) {
+function getOverdriveCopy({ streak, hot, cashMutations, hotCash, hotBpm }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
-  const { overdrive } = say;
   // G42 (RULES_MARK 10): the chain's multiplier is the rules' (×32, ×4 before).
-  const line = (id, progress) => ({ id, label: overdrive[id].label, text: fill(overdrive[id].text, { multiplier: hotCash }), progress });
+  // G46 (RULES_MARK 12): the chain's heartbeat (HOT_CASH_BPM) instead, in its own lines.
+  const pick = (id) => (hotBpm && say.overdriveBpm[id]) || say.overdrive[id];
+  const line = (id, progress) => ({ id, label: pick(id).label, text: fill(pick(id).text, { multiplier: hotCash, bpm: hotBpm }), progress });
   if (willOverdrive) return line("ready", 100);
   if (streak > 0 && hot) return line("live", 75);
   if (streak > 0) return line("held", 50);
@@ -394,7 +395,8 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
   const hotCash = getHotCashMultiplier(rules);
-  const hot = multiplier >= hotCash;
+  const hotBpm = isMarkTwelveOn(rules) ? HOT_CASH_BPM : null;
+  const hot = isHotCash({ multiplier, gauge: win.gauge, window: win, rules, bpmOf: getHeartbeatBpm });
   const streak = run?.streak ?? 0;
   const { focusMode } = win;
   const indebted = win.gauge >= HEAT_DEBT_GAUGE;
@@ -470,7 +472,7 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       fractureAxis,
       cashMutations,
       bustMutations,
-      overdrive: getOverdriveCopy({ streak, hot, cashMutations, hotCash }),
+      overdrive: getOverdriveCopy({ streak, hot, cashMutations, hotCash, hotBpm }),
       // What a bust leaves of the case pot, as `resolveWindow` settles it: half
       // on a clock bust with TESTIMONY; a third with INSURANCE or 1막's
       // 떠넘겨진 손실 while the case's one keep is unspent; otherwise nothing.
@@ -482,5 +484,5 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       clockHeat: describeClockHeat(pushes),
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, hotCash, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak, twist, win.cause, win.status]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, hotBpm, hotCash, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak, twist, win.cause, win.status]);
 }

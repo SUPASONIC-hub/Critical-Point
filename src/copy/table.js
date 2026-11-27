@@ -264,6 +264,12 @@ const tableCopy = {
       ignition: { label: "점화", text: "확정하면 오버클럭 연속 1단계" },
       dormant: { label: "꺼짐", text: "×{multiplier} 이상 확정부터 연속이 켜진다" },
     },
+    // G46 (RULES_MARK 12): the chain counts cashes made with the heartbeat at {bpm} or over (nextTableRules.js HOT_CASH_BPM).
+    overdriveBpm: {
+      live: { label: "이어짐", text: "한 번 더 심박 {bpm}+에서 확정하면 오버클럭" },
+      held: { label: "유지", text: "이번 판도 심박 {bpm} 이상에서 확정해야 이어진다" },
+      dormant: { label: "꺼짐", text: "심박 {bpm} 넘게 두 번 끊으면 오버클럭" },
+    },
     rulesOn: "{rules} 적용 중",
     rulesHidden: "숨은 규칙 적용 중",
     rulesQuiet: "규칙 안정",

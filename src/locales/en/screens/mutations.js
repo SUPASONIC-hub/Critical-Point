@@ -21,6 +21,10 @@ export default {
       title: "Chips double",
       text: "You banked ×{multiplier} or better in a row. Chips are ×{chips}, but each push raises the Heat more.",
     },
+    overclockBpm: {
+      title: "Chips double",
+      text: "You banked at Heartbeat {bpm} or more in a row. Chips are ×{chips}, but each push raises the Heat more.",
+    },
     coldFeet: {
       title: "Your best card is sealed",
       text: "The price of committing without a push. The most expensive card opens only once Heat passes {seal}, and chips shrink.",

@@ -567,8 +567,9 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
     await expect.poll(() => readNumber(pot)).toBeGreaterThanOrEqual(Math.floor(previous * 1.5));
     previous = await readNumber(pot);
   }
-  // G42 (RULES_MARK 10): three pushes (45 heat at most) stay under ×32, so the chain is not lit yet.
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("꺼짐");
+  // G46 (RULES_MARK 12): the chain counts a cash at heartbeat 110 or over, which a wall near or far decides;
+  // with none taken yet it is never ready to overclock.
+  await expect(page.getByTestId("gauntlet-overdrive")).not.toContainText("오버클럭 준비");
   await expect(page.getByTestId("gauntlet-stage")).not.toContainText(/%/);
 });
 
@@ -1202,14 +1203,14 @@ test("cashing without a single push seals the best card on the next board", asyn
 
 test("two hot cashouts trigger an overclock payout banner", async ({ page }) => {
   test.setTimeout(150_000);
-  // G42 (RULES_MARK 10): a hot cash is ×32 (heat 55); the wall is set past any push from there.
-  await openFarWall(page, "case01", "start");
+  // G46 (RULES_MARK 12): a hot cash is one at heartbeat 110 or over; the wall is set near enough to race it, past any push.
+  await openHotWall(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
   await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
 
   // The first hot cash taken: the chain stands at one when the next board opens.
-  await openFarWall(page, "case01", "start", 1);
+  await openHotWall(page, "case01", "start", 1);
   await page.locator(".choices .choice").first().click();
   await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
@@ -1322,26 +1323,27 @@ function findCoolWalk(caseId = "case01") {
 async function pushToHotCash(page) {
   const stage = page.getByTestId("gauntlet-stage");
   const heat = async () => Number(await stage.getAttribute("data-gauge"));
-  // One push (a cash with none deals COLD FEET) from FAR_WALL's 40 lands at 55 at most; the clock's creep
-  // carries it on to ×32, and the cash is taken before 60, where it would deal HEAT DEBT.
+  // One push (a cash with none deals COLD FEET) from HOT_WALL's 40 lands at 55 at most; the clock's creep
+  // carries it on to HOT_HEAT, where the near wall races the heart past 110, and the cash is taken before 60, where it would deal HEAT DEBT.
   const before = await heat();
   await page.getByTestId("commit-push").click();
   await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
   await expect.poll(heat, { timeout: 30_000, intervals: [100] }).toBeGreaterThanOrEqual(HOT_HEAT);
-  expect(await heat(), "the card is hot enough to cash at x32, and under HEAT DEBT").toBeLessThan(60);
+  expect(await heat(), "the card is hot enough to build the chain, and under HEAT DEBT").toBeLessThan(60);
   await expect(stage).toHaveAttribute("data-status", "live");
 }
 
 /**
- * G42 (RULES_MARK 10): the OVERCLOCK chain asks for ×32, heat 55 (the multiplier
- * doubles every 11); 56 read on the gauge, which rounds. A board opened at heat
- * 40 under a wall of 86 or more: one push and the creep never reach it.
+ * G46 (RULES_MARK 12): the OVERCLOCK chain asks for a cash at heartbeat 110 or
+ * over (HOT_CASH_BPM). A board opened at heat 40 under a wall of 72 to 74, its
+ * tell off by 1 at most: at 56 the heart reads 118 or more (at 40 under 85),
+ * and one push and the creep never reach the wall before the cash at 60.
  * `streak` is the chain the run already holds.
  */
 const HOT_HEAT = 56;
-const FAR_WALL = Object.freeze({ wallMin: 86, wallMax: 94, startGauge: 40 });
-async function openFarWall(page, caseId, nodeId, streak = 0) {
-  await openBrokenBoard(page, caseId, nodeId, { schema: FAR_WALL, streak });
+const HOT_WALL = Object.freeze({ wallMin: 72, wallMax: 74, startGauge: 40, tellError: 1 });
+async function openHotWall(page, caseId, nodeId, streak = 0) {
+  await openBrokenBoard(page, caseId, nodeId, { schema: HOT_WALL, streak });
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
 }
 
@@ -1363,8 +1365,8 @@ test("an earned OVERCLOCK's next rules are not headed as a broken board, and its
   test.setTimeout(120_000);
   const walk = findCoolWalk();
   expect(walk, "사건 01 still has two scenes in a row with a card that fractures nothing").not.toBeNull();
-  // The first hot cash already taken (the chain at one), on a board whose wall no push to ×32 meets (G42).
-  await openFarWall(page, walk.caseId, walk.secondId, 1);
+  // The first hot cash already taken (the chain at one), on a board whose near wall races the heart and no push meets (G46).
+  await openHotWall(page, walk.caseId, walk.secondId, 1);
   await cardOf(page, walk.second).click();
   await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
