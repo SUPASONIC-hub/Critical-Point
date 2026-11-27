@@ -1,3 +1,5 @@
+// First: whether the device had the game's data, read before any other module writes (firstVisitProbe.js).
+import "./firstVisitProbe.js";
 import { createRoot } from "react-dom/client";
 import { App, AppErrorBoundary, logCaughtRenderError } from "./App.jsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.jsx";
@@ -8,6 +10,7 @@ import { installChunkReload } from "./state/chunkReload.js";
 import { loadLocale } from "./locale.js";
 import { installInstallPrompt } from "./state/installPrompt.js";
 import { startVitalsSample } from "./gameEvents.js";
+import { startFirstHour } from "./firstHourLog.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
 // does not download the code that would. Turning it on in CloudSavePanel
@@ -25,6 +28,8 @@ if (readStoredValue(WEEKLY_REMINDER_KEY, "0") === "1") {
 }
 
 installChunkReload();
+// 첫 30분 자동 기록 (firstHourLog.js): a first-visit device keeps one small record; with no backend, nothing.
+startFirstHour();
 // Before the first paint: a still intro must not start moving and then stop.
 applyAccessibilityToDocument();
 // Started here so the answer is usually in before the runtime chunk is.

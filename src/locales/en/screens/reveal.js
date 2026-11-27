@@ -68,4 +68,13 @@ export default {
     answers: { fun: "Fun", hard: "Hard", long: "Too long" },
     thanks: "Thank you. On to the next hand.",
   },
+  firstHour: {
+    lost: "What did you lose?",
+    lostAnswers: { stake: "The stake", next: "The next scene", unknown: "Not sure" },
+    again: "Will you open this again?",
+    againEnds: "0 not at all · 10 for sure",
+    againScore: "{n} out of 10",
+    skip: "Skip",
+    thanks: "Thank you.",
+  },
 };

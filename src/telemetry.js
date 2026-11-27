@@ -263,6 +263,25 @@ export async function callSupabaseRpc(name, body = {}) {
 }
 
 /**
+ * 첫 30분 자동 기록 (src/firstHourLog.js): the one compact record of a first
+ * visit, sent whole each time (`first_hour_record`, *_first_hour_runs.sql
+ * keeps the latest by its id). `keepalive` lets the send outlive a page that
+ * is closing. Not counted with the play record's deliveries: a lost send is
+ * carried by the next one, and the player is never told either way.
+ */
+export async function saveFirstHourRecord(id, record, { keepalive = false } = {}) {
+  if (!telemetryEnabled) return { skipped: true };
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/first_hour_record`, {
+    method: "POST",
+    keepalive,
+    headers: restHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ p_id: id, p_record: record }),
+  });
+  if (!response.ok) throw await createTelemetryError(response, "First hour record failed");
+  return { saved: true };
+}
+
+/**
  * A post on the 참가자 게시판.
  *
  * Every other write here is telemetry the player never reads back, so it goes

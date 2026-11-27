@@ -1,5 +1,6 @@
 import { readStoredValue, STORAGE_KEY } from "./appConfig.js";
 import { authoredNodeOrders, CASE_SEQUENCE } from "./gameCases.js";
+import * as firstHourLog from "./firstHourLog.js";
 
 /**
  * The first hour as Google Analytics counts it (N2, 2026-11-12), and the
@@ -91,12 +92,14 @@ export function sendGameEventOnce(name, params = {}, scope = globalThis) {
 }
 
 /** A table opened (GauntletStage openTable): the first one of 프롤로그 01 on this page is counted. */
-export function noteTableOpened(caseId, scope = globalThis) {
+export function noteTableOpened(caseId, scope = globalThis, nodeId = null) {
+  if (nodeId) firstHourLog.noteTable(nodeId); // 첫 30분 자동 기록: the first table (firstHourLog.js).
   return caseId === FIRST_CASE && sendGameEventOnce(GAME_EVENTS.firstTable, {}, scope);
 }
 
 /** A case closed (useChoiceCommit): 프롤로그 01 closed for the first time is counted. */
 export function noteCaseClosed(caseId, closedBefore, scope = globalThis) {
+  firstHourLog.noteCaseDone(caseId);
   return caseId === FIRST_CASE && !closedBefore && sendGameEventOnce(GAME_EVENTS.prologueDone, {}, scope);
 }
 
@@ -114,6 +117,7 @@ export function noteCaseClosed(caseId, closedBefore, scope = globalThis) {
  * same scene and go nowhere.
  */
 export function noteSceneShown(caseId, nodeId, { consent = readSavedConsent(), scope = globalThis } = {}) {
+  firstHourLog.noteScene(caseId, nodeId); // 첫 30분 자동 기록: where the player is (firstHourLog.js).
   if (consent !== true || !Object.hasOwn(SCENE_EVENT_CASES, caseId)) return false;
   const sceneNo = (authoredNodeOrders[caseId] ?? []).indexOf(nodeId) + 1;
   if (sceneNo < 1) return false;

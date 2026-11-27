@@ -391,7 +391,7 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
-    firstHour.noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
+    firstHour.noteTableOpened(scene.node.caseId, globalThis, scene.nodeId); // N2: 프롤로그 01's first table, once per page; the first table of 첫 30분 자동 기록 (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
       stake(cardId);

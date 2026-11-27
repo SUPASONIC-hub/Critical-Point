@@ -122,6 +122,32 @@ jobs:
           fi
           node scripts/report-ops-health.mjs ops.json "$(git log -1 --format=%cI)" >> "$GITHUB_STEP_SUMMARY" || exit 1
           rm -f ops.sql ops.json ops.err
+      # 첫 30분 자동 기록 (2026-11-27, scripts/report-first-hour.mjs): the
+      # records of first-visit devices that left 「기록 보내기」 on, as counts,
+      # shares and medians; one SELECT of the records' fields, no id, no time.
+      # Kept as funnel-report/first-hour.md too. Before its migration is
+      # applied the table is not there, and the section says so instead.
+      - name: Read the first half hour
+        if: ${{ !cancelled() && steps.token.outputs.configured == 'true' }}
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          mkdir -p funnel-report
+          node scripts/report-first-hour.mjs --sql > first-hour.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f first-hour.sql > first-hour.json 2> first-hour.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure first-hour.json first-hour.err
+            printf '### 첫 30분 자동 기록 (첫 방문 기기)\n\n읽지 못했습니다(표가 아직 없거나 조회 실패). 로그를 보세요.\n' | tee funnel-report/first-hour.md >> "$GITHUB_STEP_SUMMARY"
+            rm -f first-hour.sql first-hour.json first-hour.err
+            exit 0
+          fi
+          node scripts/report-first-hour.mjs first-hour.json | tee funnel-report/first-hour.md >> "$GITHUB_STEP_SUMMARY" || exit 1
+          rm -f first-hour.sql first-hour.json first-hour.err
       - name: Warn when main has been quiet
         if: ${{ !cancelled() }}
         shell: bash
@@ -160,7 +186,7 @@ jobs:
           if [ -n "$low" ]; then echo "::warning title=Weekly rule calendar runs low::$low"; fi
       - name: Remove the rows
         if: always()
-        run: rm -f rows.json query.err ops.json ops.err
+        run: rm -f rows.json query.err ops.json ops.err first-hour.json first-hour.err
       # N28: the weekly phone speed line, p75 LCP and INP of the start page by
       # device from the N12 events in Google Analytics (scripts/report-web-vitals.mjs,
       # the Data API with N17's two secrets). Without them it says it read
