@@ -195,6 +195,12 @@ export const NOTES = [
     title: "기운 판, 건네받은 도구, 보상금: 이야기가 판에 닿는 세 규칙",
     summary: "사건을 열 때의 상태가 판을 기울이고, 닫은 쪽의 사람이 도구를 건네고, 사람 피해는 돈으로 덮을 수 있습니다. 언제 쓰고 무엇을 잃는지 정리했습니다.",
   },
+  {
+    slug: "late-choices-count",
+    published: "2026-11-27",
+    title: "끝에 붙은 숫자: 후반 선택과 마지막 답이 결말에 닿게 한 여섯 규칙",
+    summary: "마지막 답의 무게, 덮음으로 닫히는 시즌, 다시 보상이 된 OVERCLOCK, 결재 판만 치는 스토리 모드, 유지비와 ×32의 기록. 닿지 못한 목표까지 적었습니다.",
+  },
   // A draft: 2099-12-31 keeps it out of every build until its day is set (12-01 once 11-21~30 is filled in on 11-30).
   {
     slug: "november-2026-log",
