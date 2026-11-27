@@ -246,7 +246,8 @@ const budgets = [
   // 169,832 / 63,399 -> 169,974 / 63,457 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 169,970 / 63,453 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,974 -> 169,981 raw g6b-firstpaint: applySceneEffect is sceneEffect.js's now (out of riskLogic.js and the first paint). Measured 169,977 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,981 / 63,457 -> 170,182 / 63,530 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 170,178 / 63,526, the plus 4; CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 170_182, maxGzip: 63_530 },
+  // -> 170,241 / 63,563 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 170,237 / 63,559 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 170_241, maxGzip: 63_563 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -304,7 +305,8 @@ const budgets = [
   // 38,938 / 15,126 -> 39,162 / 15,244 on 2026-11-26, gameplay-g5a over main d5d79552: RULES_MARK 10 (G40 G41 G42). Local Windows build +4 (provisional: set to the CI measure +4).
   // 39,162 / 15,244 -> 39,571 / 15,423 gameplay-g5b (MARK 11) over main 5d2a7431: measured 39,567 / 15,419 in the e2e build on Windows, the plus 4; CI re-measures.
   // 39,571 / 15,423 -> 40,191 / 15,644 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 40,187 / 15,640 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^gameLogic-.*\.js$/, maxBytes: 40_191, maxGzip: 15_644 },
+  // -> gzip 15,661 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured gzip 15,657 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^gameLogic-.*\.js$/, maxBytes: 40_191, maxGzip: 15_661 },
   // Rolldown names this shared file after src/gauntlet/RelicDraft.jsx: the
   // modules the table and the runtime both import since #233, split out on
   // 2026-10-24 like gameLogic above.
@@ -411,7 +413,8 @@ const budgets = [
   // 42,247 / 17,477 -> 42,425 / 17,575 gameplay-g5b (MARK 11) over main 5d2a7431: measured 42,421 / 17,571 in the e2e build on Windows, the plus 4; CI re-measures.
   // 42,425 / 17,575 -> 43,052 / 17,717 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 43,048 / 17,713 in the e2e build on Windows, the plus 4; CI re-measures.
   // 43,052 / 17,717 -> 43,520 / 17,927 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 43,516 / 17,923 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 43_520, maxGzip: 17_927 },
+  // -> 43,601 / 17,937 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 43,597 / 17,933 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 43_601, maxGzip: 17_937 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
@@ -831,7 +834,8 @@ const budgets = [
   // 230,284 / 84,263 -> 225,758 / 82,494 g6b-firstpaint: the MARK 13 switch out of the first paint again (gameConstants.js reads it from rulesSwitch.js, applySceneEffect moved to sceneEffect.js), nextTableRules.js and tableRules.js back in the game's chunks. Measured 225,754 / 82,490 in the e2e build on Windows, the plus 4; CI re-measures.
   // gzip 82,494 -> 82,502 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows gzip 82,498, the plus 4; CI re-measures.
   // 225,758 / 82,502 -> 225,833 / 82,543 bundle 11-27 (#697, the note late-choices-count on the start screen list) over main e052534f: CI verify-quick measured 225,829 / 82,539, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 225_833, maxGzip: 82_543 },
+  // -> 225,842 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 225,838 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^index-.*\.js$/, maxBytes: 225_842, maxGzip: 82_543 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1683,7 +1687,8 @@ const budgets = [
   // 69,130 / 25,783 -> 69,845 / 25,982 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 69,841 / 25,978 in the e2e build on Windows, the plus 4; CI re-measures.
   // 69,845 / 25,982 -> 70,838 / 26,324 g6b-firstpaint (over gameplay-g6b, MARK 13): nextTableRules.js and tableRules.js left the first paint (index) for this chunk, the start screen reading RULES_MARK 13 from rulesSwitch.js alone. Measured 70,834 / 26,320 in the e2e build on Windows, the plus 4; CI re-measures.
   // 70,838 / 26,324 -> 71,108 / 26,401 gameplay-g7a (RULES_MARK 14: G50 G51) over main cf7cbf6c: measured 71,104 / 26,397 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 71_108, maxGzip: 26_401 },
+  // -> 71,348 / 26,486 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 71,344 / 26,482 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 71_348, maxGzip: 26_486 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2339,7 +2344,8 @@ const budgets = [
   // 213,381 / 71,163 -> 213,498 / 71,223 gameplay-g5b (MARK 11) over main 5d2a7431: measured 213,494 / 71,219 in the e2e build on Windows, the plus 4; CI re-measures.
   // 213,498 / 71,223 -> 214,165 / 71,313 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 214,161 / 71,309 in the e2e build on Windows, the plus 4; CI re-measures.
   // 214,165 / 71,313 -> 214,274 / 71,343 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 214,270 / 71,339 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 214_274, maxGzip: 71_343 },
+  // -> 214,374 / 71,361 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 214,370 / 71,357 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 214_374, maxGzip: 71_361 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2478,7 +2484,8 @@ const budgets = [
   // 178,649 / 63,643 -> 178,758 / 63,704 gameplay-g5b (MARK 11) over main 5d2a7431: measured 178,754 / 63,700 in the e2e build on Windows, the plus 4; CI re-measures.
   // 178,758 / 63,704 -> 179,291 / 63,807 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 179,287 / 63,803 in the e2e build on Windows, the plus 4; CI re-measures.
   // 179,291 / 63,807 -> 179,396 / 63,854 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 179,392 / 63,850 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 179_396, maxGzip: 63_854 },
+  // -> 179,480 / 63,872 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 179,476 / 63,868 in the e2e build on Windows, the plus 4; CI re-measures.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 179_480, maxGzip: 63_872 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -3011,7 +3018,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> 387,136 / 454,476 / 462,962 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 387,132 / 454,472 / 462,958, the plus 4; CI re-measures.
 // -> 387,214 / 454,569 / 463,052 bundle 11-27 (#697, the note late-choices-count on the start screen list) over main e052534f: CI verify-quick measured 387,210 / 454,565 / 463,048, the plus 4.
 // -> 387,231 / 454,584 / 463,070 hotfix-a32-hold (#699, the held 확정 takes no pan) over main 4ff896f3: CI verify-quick measured 387,227 / 454,580 / 463,066, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_231, en: 454_584, ja: 463_070 };
+// -> 387,239 / 454,613 / 463,098 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 387,235 / 454,609 / 463,094 in the e2e build on Windows, the plus 4; CI re-measures.
+const FIRST_PAINT_BUDGETS = { ko: 387_239, en: 454_613, ja: 463_098 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
