@@ -415,6 +415,9 @@ console.log(
 const overclockShare = (row) => `${((row.seen.overclockDealt / Math.max(1, row.seen.windows)) * 100).toFixed(1)}%`;
 const overclockChain = isMarkTwelveOn() ? `heartbeat ${HOT_CASH_BPM}+` : `×${getHotCashMultiplier(ALL_RULES)}`;
 console.log(`overclock        dealt after ${overclockShare(bestFixed)} of ${bestFixed.label}'s boards, ${overclockShare(bestHeartbeat)} of ${bestHeartbeat.label}'s, ${overclockShare(oracle)} of ${oracle.label}'s (the chain from ${overclockChain})`);
+// G46 (RULES_MARK 12): the listening hand's best within 25% of what it banked before G42's ×32 (30,041 on 9's table).
+const LISTEN_BEFORE_G42 = 30041;
+if (isMarkTwelveOn()) assert.ok(bestHeartbeat.meanVault >= LISTEN_BEFORE_G42 * 0.75, `the heartbeat's best hand ${bestHeartbeat.meanVault} lost more than 25% of ${LISTEN_BEFORE_G42}`);
 assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
 assert.ok(
   bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
@@ -521,7 +524,9 @@ const COIN_SCALE = getCardChips(card) / getCardChips(card, BASE_SCHEMA, withMark
 // G42 (RULES_MARK 10, the user's (1) of 2026-11-26): OVERCLOCK from ×32 takes the pot the ×4 chain had
 // inflated (the listening hand 30,041 -> 21,185), so the three lines are re-measured on 10's table
 // (check:pressure 11-26: strike 41,834, steady 40,204, expose 39,879 against 56,086 / 54,352 / 54,729 at 9).
-const LOCK_ON_THE_BEAT = isMarkTenOn() ? { strike: 41834, steady: 40204, expose: 39879 } : Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
+// G46 (RULES_MARK 12, the user's (1) of 2026-11-27): the chain from heartbeat 110 pays the listening hand again
+// (21,185 -> 24,657 at < 110), and LOCK on the beat with it (check:pressure 11-27: strike 43,398, steady 51,104, expose 46,762).
+const LOCK_ON_THE_BEAT = isMarkTwelveOn() ? { strike: 43398, steady: 51104, expose: 46762 } : isMarkTenOn() ? { strike: 41834, steady: 40204, expose: 39879 } : Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
 /**
  * A LOCK hand against the bare hand that sees the wall: never more under the
  * old rules. Under the next ones STRIKE's hot cap and EXPOSE's carry are paid
