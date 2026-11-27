@@ -28,6 +28,7 @@ import {
   renderDocumentPage,
   renderLegalPages,
   SHARE_IMAGE_ALT,
+  withAppLines,
 } from "./legal-pages.mjs";
 
 /**
@@ -502,6 +503,48 @@ export const SITE_AD_EDITS = {
 };
 
 /**
+ * The store apps' copies of the FAQ (`--mode app`, app/build-web.mjs): its
+ * answers on cost and on trackers say the app's AdMob ads and Remove Ads
+ * purchase, as the apps' policy and terms do (scripts/legal-pages.mjs). Each
+ * `from` must be in its page, or the build fails. The same two sentences
+ * SITE_AD_EDITS rewrites for the web's ads; the app build never has those.
+ */
+const APP_LINES = {
+  faq: {
+    ko: [
+      [
+        "<p>웹판은 무료입니다. 지금은 광고와 유료 결제가 없습니다.",
+        "<p>앱판은 무료이며 광고가 나옵니다. 「광고 제거」는 1회 결제 상품으로 광고만 없애고 게임을 유리하게 하지 않습니다.",
+      ],
+      [
+        "게임은 쿠키와 광고·분석용 추적 도구를 쓰지 않습니다.",
+        "앱판에는 Google AdMob 광고가 있습니다. 앱판은 광고 말고는 쿠키나 분석용 추적 도구를 쓰지 않습니다.",
+      ],
+    ],
+    en: [
+      [
+        "<p>The web version is free. There are currently no ads and no payments.",
+        "<p>The app version is free and shows ads. Remove Ads is a one-time purchase that only removes ads and gives no advantage in the game.",
+      ],
+      [
+        "The game uses no cookies and no advertising or analytics trackers.",
+        "The app version shows Google AdMob ads. Apart from ads, the app version uses no cookies or analytics trackers.",
+      ],
+    ],
+    ja: [
+      [
+        "<p>ウェブ版は無料です。現在、広告や有料の決済はありません。",
+        "<p>アプリ版は無料で、広告が表示されます。「広告の削除」は1回払いの商品で、広告をなくすだけでゲームを有利にすることはありません。",
+      ],
+      [
+        "本ゲームはCookieや、広告・分析用のトラッキングツールを使用しません。",
+        "アプリ版にはGoogle AdMobの広告があります。アプリ版では、広告のほかには、Cookieや分析用のトラッキングツールを使用しません。",
+      ],
+    ],
+  },
+};
+
+/**
  * The FAQ's one sentence about cookies, in a build with Google Analytics
  * (scripts/analytics-config.mjs; the policy's own section is
  * ANALYTICS_POLICY in legal-pages.mjs). Without it the FAQ is as written above.
@@ -559,14 +602,18 @@ function siteBody(kind, language, { analytics, ads }) {
  * SITE_AD_EDITS, or ANALYTICS_SITE_AD_EDITS on the FAQ that already says Google Analytics; without `ads` the pages are
  * main's, byte for byte, either way, but for the date line.
  * `pageDates` dates each page as `renderContentPages` does; `null` leaves the line out, for `pageFingerprints`.
+ * `app` is the store apps' build, whose FAQ says what its ads and purchase do (APP_LINES; it never has `analytics` nor `ads`).
  */
-export function renderSitePages({ analytics = null, ads = false, pageDates = recordedDates() } = {}) {
+export function renderSitePages({ analytics: given = null, ads: givenAds = false, app = false, pageDates = recordedDates() } = {}) {
+  const analytics = app ? null : given;
+  const ads = app ? false : givenAds;
   const pages = {};
   for (const kind of SITE_PAGE_KINDS) {
     for (const language of PAGE_LANGUAGES) {
       // The about page opens on the README's first screen over the key visual (scripts/content-pages/about-showcase.mjs), its text whole below.
       const showcase = kind === "about" ? aboutShowcase(language) : null;
-      const body = siteBody(kind, language, { analytics, ads });
+      const webBody = siteBody(kind, language, { analytics, ads });
+      const body = app ? withAppLines({ kind, language, body: webBody }, APP_LINES[kind]?.[language]).body : webBody;
       const loc = pagePath(kind, language);
       const line = pageDates ? pageDateLine(language, pageDates[loc]?.date, dateLineOptions(kind)) : "";
       pages[loc.slice(1)] = renderDocumentPage({
@@ -876,16 +923,18 @@ export function withAbsoluteSiteLinks(html, origin) {
  * (scripts/content-pages/notes.mjs; `notesDay`, today in Seoul, by default), keyed by path from the root without its slash.
  * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS, `adStage` in legal-pages.mjs) are the build's two switches: ANALYTICS_POLICY,
  * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS. The content pages say nothing of ads.
- * `app` is the app build's policy, without the web's notice of Google Analytics (renderLegalPages).
+ * `app` is the store apps' build (`--mode app`): their copies of the policy, the terms and the FAQ, which say what
+ * their ads and purchase do, and the policy without the web's notice of Google Analytics (renderLegalPages).
  */
 export function renderStaticPages(origin = "", { analytics = null, ads = false, app = false, day = notesDay(), pageDates } = {}) {
   // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
   const pages = {
     ...renderLegalPages({ analytics, ads, app }),
-    ...renderSitePages({ analytics, ads: adStage(ads).stage === "on", pageDates }),
-    ...renderContentPages({ analytics, day, pageDates }),
-    ...renderNotePages({ analytics, day }),
-    ...renderNewsPages({ analytics }),
+    ...renderSitePages({ analytics, ads: adStage(ads).stage === "on", app, pageDates }),
+    // The app never has Google Analytics (`analyticsFor`), so its content pages carry no tag either.
+    ...renderContentPages({ analytics: app ? null : analytics, day, pageDates }),
+    ...renderNotePages({ analytics: app ? null : analytics, day }),
+    ...renderNewsPages({ analytics: app ? null : analytics }),
   };
   return Object.fromEntries(Object.entries(pages).map(([file, html]) => [file, withAbsoluteSiteLinks(html, origin)]));
 }

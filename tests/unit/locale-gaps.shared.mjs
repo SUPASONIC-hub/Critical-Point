@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 
 import { overlayModule } from "../../src/locales/overlay.js";
 import * as appCopy from "../../src/appCopy.js";
@@ -57,6 +57,12 @@ export async function layOver(lang) {
   const files = readdirSync(copyDir).filter((file) => file.endsWith(".js"));
   const tables = Object.fromEntries(await Promise.all(files.map(async (file) => [file.replace(/\.js$/, ""), (await import(new URL(file, copyDir).href)).default])));
   overlayModule(dictionary.copy, "screens", tables);
+  // The store apps' own lines (src/locales/<lang>/app/<name>.js): no page lays them, the app build's
+  // src/platform/adCopy.js lays them over src/copy/<name>.js, so the sweep does the same here.
+  const appDir = new URL(`../../src/locales/${lang}/app/`, import.meta.url);
+  const appFiles = existsSync(appDir) ? readdirSync(appDir).filter((file) => file.endsWith(".js")) : [];
+  const appScreens = Object.fromEntries(await Promise.all(appFiles.map(async (file) => [file.replace(/\.js$/, ""), (await import(new URL(file, appDir).href)).default])));
+  overlayModule({ screens: appScreens }, "screens", tables);
   overlayModule(dictionary.copy, "appCopy", appCopy);
   overlayModule(dictionary.copy, "playerLanguage", playerLanguage);
   overlayModule(dictionary.copy, "gameCases", gameCases);

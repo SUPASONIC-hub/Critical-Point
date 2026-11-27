@@ -168,6 +168,8 @@ const BUDGETS = {
   // view models are one namespace import (sceneViewModels, with the runtime
   // card's label as `runtimeCardLabel`) and the two runtime cards' words are
   // src/copy/runLines.js's. Measured 968 / 96.
+  // 960 -> 962 on 2026-10-29 (#330): openCase's store-app ad between cases, a comment and one line that the site's builds fold away.
+  // 968 -> 970 on 2026-11-03 (#330 over app-shell e5b03e64, main 16b6d349): the same two lines over bgm-variety and locale-gaps. Measured 970 / 96.
   // 960 -> 961 lines on 2026-10-29, E-11 번외 사건 틀 (draft) restacked on main
   // 43078a46: the side screen's kit re-exported from this chunk (sideCaseKit).
   // 968 -> 969 lines on 2026-11-03, E-11 over main 465ccb93: sideCaseKit over
@@ -179,8 +181,9 @@ const BUDGETS = {
   // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
   // 971 -> 976 lines, 96 -> 97 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the case's way
   // to sign written on the run (signRun, gauntletEngine's signCase), beside the draft's two answers.
+  // 976 -> 978 on 2026-11-27 (#330 over app-shell, main e9efafbf): #330's two lines (the app's ad between cases) over main's 976.
   "src/GameRuntime.jsx": {
-    lines: 976,
+    lines: 978,
     longestLine: 190,
     importedNames: 97,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },

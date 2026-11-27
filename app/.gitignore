@@ -1,11 +1,7 @@
-# The web build the iOS shell copies in (npm run build:web); made again on every sync.
+# The web build the shells copy in (npm run build:web); made again on every sync.
 dist-app/
 
-# Bubblewrap writes the Android project next to twa-manifest.json
-# (`bubblewrap update`). twa-manifest.json is the source; the project is made
-# again from it, and the keystore never leaves the machine it was made on.
-twa/*
-!twa/twa-manifest.json
-!twa/check-twa.mjs
+# Upload keys never leave the machine they were made on (docs/app-shell.md).
 *.keystore
 *.jks
+keystore.properties
