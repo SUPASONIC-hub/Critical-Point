@@ -401,7 +401,8 @@ const budgets = [
   // gzip 17,415 -> 17,481 bundle-1126e (#687 #686 #684 over main 045c9ad3): measured on Windows gzip 17,473, raw +4 and gzip +8 for the Linux gzip spread; provisional, CI re-measures.
   // raw -> 42,241: bundle-1126e measured 42,237 on Windows, +4 (provisional).
   // 42,241 / 17,481 -> 42,241 / 17,477 on 2026-11-27: main 7449dcaa measured 42,237 / 17,473 in CI verify-quick, the plus 4.
-  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 42_241, maxGzip: 17_477 },
+  // raw 42,241 -> 42,247 cleanup-exports-1127 (#691, export 20개 뗌) over main e9efafbf: CI verify-quick measured 42,243, the plus 4.
+  { pattern: /^RelicDraft-.*\.js$/, maxBytes: 42_247, maxGzip: 17_477 },
   // The season's store as the app build reads it (src/runtime/gameData.app.js
   // and virtual:season, scripts/vite-season-data.mjs), split out of the
   // runtime's chunk by Rolldown on 2026-10-24 (see GameRuntime above). It is
