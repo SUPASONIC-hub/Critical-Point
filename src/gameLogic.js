@@ -20,7 +20,6 @@ export {
   getSuspenseEvent,
   getSuspenseState,
 } from "./riskLogic.js";
-export { applySceneEffect } from "./sceneEffect.js";
 export { getCognitionSpread } from "./seasonScore.js";
 
 export function buildNarrativeSpine({

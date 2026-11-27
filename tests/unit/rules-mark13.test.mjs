@@ -128,3 +128,16 @@ test("G45: a burned season of ten covers closes on QUIET COVER, nine on PROFITAB
   assert.equal(getEndingVariant(season(9)).id, "profitable-silence");
   assert.equal(getEndingVariant(season(10)).id, "quiet-cover");
 });
+
+test("the case file reads 유지비 and 운영비 off the opening legacy, tagged", async () => {
+  const { withOpeningCosts } = await import("../../src/viewModels/sceneViewModels.js");
+  const spine = { lines: ["x"] };
+  assert.equal(withOpeningCosts(spine, null), spine);
+  assert.equal(withOpeningCosts(spine, {}), spine);
+  assert.deepEqual(withOpeningCosts(spine, { upkeep: [["trust", 100, 93]] }).upkeep, [["trust", 100, 93]]);
+  assert.deepEqual(withOpeningCosts(spine, { operating: ["capital", 100, 70] }), { lines: ["x"], upkeep: [["capital", 100, 70, "operating"]] });
+  assert.deepEqual(
+    withOpeningCosts(spine, { upkeep: [["trust", 100, 93]], operating: ["capital", 90, 70] }).upkeep,
+    [["trust", 100, 93], ["capital", 90, 70, "operating"]],
+  );
+});

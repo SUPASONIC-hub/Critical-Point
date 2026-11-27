@@ -28,7 +28,6 @@ import {
 } from "../../src/gameData.js";
 import {
   applyEffect,
-  applySceneEffect,
   createCaseSummary,
   getAuthorityGate,
   getCasesOpened,
@@ -41,6 +40,7 @@ import {
   REFRAME_COGNITION,
   REFRAME_EFFECT,
 } from "../../src/gameLogic.js";
+import { applySceneEffect } from "../../src/sceneEffect.js";
 import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,

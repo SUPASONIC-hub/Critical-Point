@@ -4,7 +4,6 @@ import { recordSettledWindowSeed, SAVE_SCHEMA_VERSION, UNNAMED_ROW_NAME } from "
 import { CASE_SEQUENCE, RESULT_NODE_IDS } from "../gameCases.js";
 import { noteCaseClosed } from "../gameEvents.js";
 import {
-  applySceneEffect,
   buildSceneBeat,
   createCaseSummary,
   getAuthorityGate,
@@ -20,6 +19,7 @@ import {
   getSuspenseEvent,
   getWindowResponseTime,
 } from "../gameLogic.js";
+import { applySceneEffect } from "../sceneEffect.js";
 import { nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
 import { createCaseClose, getBustEffect, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";

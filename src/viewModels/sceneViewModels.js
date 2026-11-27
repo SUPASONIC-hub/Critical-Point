@@ -71,6 +71,13 @@ export function createActiveBonus({ currentAverageResponseTime, currentChallenge
             : bonusCopy.waiting;
 }
 
+// G38 (RULES_MARK 11): what 유지비 took as this case opened, for the case file's line; G44 (13): and the 운영비, tagged "operating".
+export function withOpeningCosts(narrativeSpine, openingLegacy) {
+  if (!openingLegacy?.upkeep && !openingLegacy?.operating) return narrativeSpine;
+  const operating = openingLegacy.operating ? [[...openingLegacy.operating, "operating"]] : [];
+  return { ...narrativeSpine, upkeep: [...(openingLegacy.upkeep ?? []), ...operating] };
+}
+
 export function createInheritedChallenge({ isOpeningNode, openingLegacy }) {
   return openingLegacy && isOpeningNode
     ? (openingLegacy.continuityChallenge ?? {
