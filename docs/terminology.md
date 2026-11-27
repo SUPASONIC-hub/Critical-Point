@@ -77,6 +77,8 @@ what the copy actually says today.
 | ○○가 건넨 것 | Handed over by … | …が渡したもの | 판 규칙 9 (G33). 드래프트 첫 칸 |
 | 보상금 / 덮은 기록 | Compensation / Covered record | 補償金 / 隠した記録 | 판 규칙 9 (G34). 결과 화면, 6개 이상이면 판 규칙 10 (G41)에서 결말이 기움 |
 | NEW GAME+ · 이번 시즌은 이 막에 선 규칙 | NEW GAME+ · this act’s rule this season | NEW GAME+ · 今シーズンこの幕に立つ規則 | 판 규칙 9 (G36). 자리를 옮겨 선 막 비틀기 |
+| 유지비 | upkeep | 維持費 | 판 규칙 11 (G38). 사건 파일의 「현금 100 → 93(유지비)」 |
+| 이 장면의 기록: ×N 이상 확정하면 열림 | This scene’s record: opens on a cash of ×N or more | このシーンの記録: ×N以上で確定すると開く | 판 규칙 11 (G39). N은 32 |
 
 ## People (prologue 01 to case 07)
 
