@@ -130,7 +130,7 @@ export const BOARD_TERM_SCOPE = {
 };
 
 /** What may follow a "word" word inside its run: fucking, shitty, retarded, sluts. */
-export const BOARD_WORD_ENDINGS = ["s", "es", "ed", "er", "ers", "ing", "in", "y", "ty"];
+const BOARD_WORD_ENDINGS = ["s", "es", "ed", "er", "ers", "ing", "in", "y", "ty"];
 
 /**
  * A match that does not count (the table's `pass_next` and `pass_after_kanji`):

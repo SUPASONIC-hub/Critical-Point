@@ -20,7 +20,7 @@ export const FRIEND_TARGET_DAYS = 30;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** The target a shared address carries, stamped `now`, or null when it carries no score. */
-export function friendTargetFrom(search, now = Date.now()) {
+function friendTargetFrom(search, now = Date.now()) {
   const score = readSharedScore(search);
   if (!score) return null;
   return { habit: readSharedHabitId(search), score, at: now };

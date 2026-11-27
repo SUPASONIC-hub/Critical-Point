@@ -29,8 +29,8 @@ import { isClosingScene } from "./holdConfirm.js";
 /** The heat the auto table stops pushing at: the story hand check:pressure measures (STORY_SAFE_HEAT). */
 export const STORY_AUTO_HEAT = 70;
 /** The table clock the hand spends reading the board before its first push, and between pushes. */
-export const AUTO_READ_SECONDS = 1;
-export const AUTO_PUSH_SECONDS = 0.5;
+const AUTO_READ_SECONDS = 1;
+const AUTO_PUSH_SECONDS = 0.5;
 /** A cap on pushes, past any board's reach to 70 (the smallest step is 1). */
 const MAX_AUTO_PUSHES = 30;
 

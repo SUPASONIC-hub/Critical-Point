@@ -25,7 +25,7 @@ import { SIDE_CASES } from "./nodes/sidePacks.js";
 export { SIDE_CASES, SIDE_CASES_KEY };
 
 /** A side case's id: `side` and two digits. Never `caseNN`, which the server reads as a season case. */
-export const SIDE_CASE_ID_PATTERN = /^side\d{2}$/;
+const SIDE_CASE_ID_PATTERN = /^side\d{2}$/;
 
 export function isSideCaseId(caseId) {
   return typeof caseId === "string" && SIDE_CASE_ID_PATTERN.test(caseId);

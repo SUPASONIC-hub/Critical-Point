@@ -15,7 +15,7 @@
  */
 import { LAST_VISIT_KEY, readStoredValue, writeStoredValue } from "../appConfig.js";
 
-export const SINCE_LAST_DAYS = 3;
+const SINCE_LAST_DAYS = 3;
 export const DAY_MS = 24 * 60 * 60 * 1000;
 const SIDE_ID = /^side\d{2}$/;
 
