@@ -249,7 +249,8 @@ const budgets = [
   // -> 170,241 / 63,563 gameplay-g7b (RULES_MARK 15: G48 G49, riskLogic.js reading MARK 15 from rulesSwitch.js, the quarter line in three languages) over gameplay-g7a: measured 170,237 / 63,559 in the e2e build on Windows, the plus 4; CI re-measures.
   // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the two questions (FirstHourAsk.jsx) on the verdict sheet and the report, the hand-close and hint notes. Measured 171,789 / 64,040 in the e2e build, the plus 4.
   // -> 171,829 / 64,060 gameplay-g7b (RULES_MARK 15) over main 130acf1e: measured on Windows 171,825 / 64,056, the plus 4; CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 171_829, maxGzip: 64_060 },
+  // 171,829 -> 171,867 raw first-hour-top over main 38a729f0: 「다음에 또 켤 것 같나요?」 moved to the top of 프롤로그 01's report as the user asked (2026-11-27), its own renderer (renderResultTop). Measured 171,863 in the e2e build on Windows, the plus 4; gzip still inside; CI re-measures.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 171_867, maxGzip: 64_060 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two

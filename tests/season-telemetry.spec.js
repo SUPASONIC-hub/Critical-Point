@@ -379,7 +379,7 @@ test("the between-hands question is asked once in 프롤로그 01 and sends one 
 test.describe("a first visit", () => {
   test.use({ coldOpeningSeen: false });
 
-  test("is asked what it lost after its first BUST and whether it will come back on 프롤로그 01's report", async ({ page }) => {
+  test("is asked what it lost after its first BUST and whether it will come back at the top of 프롤로그 01's report", async ({ page, isMobile }) => {
     test.setTimeout(150_000);
     const records = [];
     await page.route("https://e2e.supabase.co/**", async (route) => {
@@ -421,6 +421,12 @@ test.describe("a first visit", () => {
     const again = page.getByTestId("first-hour-again");
     await expect(again).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
     await expect(again.getByRole("button")).toHaveCount(12);
+    // The top of the report, as the user asked (2026-11-27): under the button row, before the outcome,
+    // whole on a 390x844 phone without a scroll, and the focus stays on the report's title.
+    expect(await again.evaluate((node) => Boolean(node.compareDocumentPosition(document.querySelector(".outcome-panel")) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+    if (isMobile) await page.setViewportSize({ width: 390, height: 844 });
+    await expect(again).toBeInViewport({ ratio: 1 });
+    await expect(page.locator(".outcome-panel h2")).toBeFocused();
     await again.getByTestId("first-hour-again-7").click();
     await expect.poll(() => records.at(-1)?.p_record?.again).toBe(7);
     expect(records.every((record) => record.p_id === sent.p_id), "one record, sent whole each time").toBe(true);

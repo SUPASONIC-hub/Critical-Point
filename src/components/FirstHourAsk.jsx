@@ -7,7 +7,7 @@ import { FIRST_CASE } from "../gameEvents.js";
 /**
  * 첫 30분 자동 기록's two questions (firstHourLog.js decides who is asked):
  * `lost`, 「무엇을 잃었나요?」 on the verdict sheet of the first BUST, and
- * `again`, 「다음에 또 켤 것 같나요?」 0 to 10 on 프롤로그 01's report. Taps only,
+ * `again`, 「다음에 또 켤 것 같나요?」 0 to 10 at the top of 프롤로그 01's report. Taps only,
  * each with 건너뛰기, asked once per device. It never takes the focus when it
  * appears -- the sheet's 「다음 판」 and the report's next case keep it -- and
  * the way on works whether it is answered or not. Drawn in the between-hands
@@ -61,7 +61,7 @@ export function FirstHourAsk({ kind }) {
   );
 }
 
-/** The report's place for `again`: 프롤로그 01's report only (runtimeRenderers.jsx, under the act line). */
+/** The report's place for `again`: the top of 프롤로그 01's report only (runtimeRenderers.jsx, renderResultTop; 2026-11-27). */
 export function FirstHourResult({ caseId }) {
   return caseId === FIRST_CASE ? <FirstHourAsk kind="again" /> : null;
 }
