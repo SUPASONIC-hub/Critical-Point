@@ -166,6 +166,8 @@ const tableCopy = {
     more: "외 {count}",
     // G47 (RULES_MARK 13): on a staked card that brings 사람 피해 (nextTableRules.js SKILL_HARM_MULTIPLIER).
     halfHarm: "×{at} 이상 확정하면 사람 피해 절반",
+    // G48 (RULES_MARK 15): the same, with the quarter at ×{quarter} (nextTableRules.js SKILL_HARM_QUARTER); story mode keeps halfHarm.
+    quarterHarm: "×{at} 이상 확정하면 사람 피해 절반, ×{quarter} 이상이면 1/4",
     seal: "최고 칩 봉인",
     locked: "잠김 · {reason}",
   },

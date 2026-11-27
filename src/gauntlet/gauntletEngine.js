@@ -2722,7 +2722,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 14;
+export const RULES_MARK = 15;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
