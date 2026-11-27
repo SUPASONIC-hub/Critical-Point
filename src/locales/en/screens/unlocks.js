@@ -40,6 +40,7 @@ export default {
       ],
     },
     case01: {
+      introTwelve: ["Commit at Heartbeat 110 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat."],
       introTen: ["Commit at ×32 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat."],
       intro: ["Commit at ×4 or more twice in a row and the next hand’s chips go 2×, and each Push adds more Heat."],
     },

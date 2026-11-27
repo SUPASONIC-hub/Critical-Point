@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createWindow, MUTATIONS, normalizeRunState, resolveWindow, RULES_MARK } from "../../src/gauntlet/gauntletEngine.js";
-import { BEFORE_TEN_RULE, getHotCashMultiplier, HOT_CASH_TEN, isMarkTenOn, RULES_TEN_MARK, TEN_RULE, wantsMarkTen, withMarkNine, withMarkTen, withNextRules } from "../../src/gauntlet/nextTableRules.js";
+import { BEFORE_TEN_RULE, getHotCashMultiplier, HOT_CASH_TEN, isMarkTenOn, RULES_TEN_MARK, TEN_RULE, wantsMarkTen, withMarkNine, withMarkTen, withMarkTwelve, withNextRules } from "../../src/gauntlet/nextTableRules.js";
 import { HOT_CASH_MULTIPLIER, OVERCLOCK_STREAK } from "../../src/gauntlet/tableRules.js";
 import { getRowRules } from "../../src/rankingRecheck.js";
 import { ALL_RULES, getUnlockIntro } from "../../src/gauntlet/tableUnlocks.js";
@@ -10,11 +10,12 @@ import { nearestEnding } from "../../src/nearestEnding.js";
 import { COVER_QUIET, coversBeforeSilence, FINALE_WEIGHT, weighFinale, weighUpkeep } from "../../src/seasonStanding.js";
 import unlocks from "../../src/copy/unlocks.js";
 
-const TEN = withMarkTen(ALL_RULES, true);
+// G46 (RULES_MARK 12) builds the chain on the heartbeat: 10's ×32 is read on a set without 12.
+const TEN = withMarkTwelve(withMarkTen(ALL_RULES, true), false);
 const NINE = withMarkTen(ALL_RULES, false);
 
 test("RULES_MARK 10: the engine's mark, on by default, and a row of 5 to 9 played without it", () => {
-  assert.ok(RULES_MARK >= 10, "RULES_MARK 11 keeps 10's rules");
+  assert.ok(RULES_MARK >= 10, "RULES_MARK 12 keeps 10's rules");
   assert.equal(RULES_TEN_MARK, 10);
   assert.equal(wantsMarkTen({}), true);
   assert.equal(wantsMarkTen({ process: { env: { RULES_MARK10: "0" } } }), false);
@@ -54,9 +55,9 @@ test("G42: the OVERCLOCK chain asks for ×32 under 10 and ×4 under 9; two in a 
   assert.ok(hot.nextRun.schema.mutations.includes("overclock"));
   assert.equal(cash(60, TEN, 0).nextRun.streak, 1, "one hot cash only lights the chain");
   assert.ok(!cash(60, TEN, 0).nextRun.schema.mutations.includes("overclock"));
-  // The table's words name the page's number.
-  assert.match(MUTATIONS.overclock.text, new RegExp(`×${HOT_CASH_TEN} 이상`));
-  assert.deepEqual(getUnlockIntro("case01"), unlocks.steps.case01.introTen);
+  // The table's words for 10 (the page's are 12's, rules-mark12.test.mjs).
+  assert.notEqual(MUTATIONS.overclock.text, "");
+  assert.notDeepEqual(getUnlockIntro("case01"), unlocks.steps.case01.intro);
   assert.match(unlocks.steps.case01.introTen[0], new RegExp(`^×${HOT_CASH_TEN} 이상`));
   assert.match(unlocks.steps.case01.intro[0], new RegExp(`^×${HOT_CASH_MULTIPLIER} 이상`));
 });

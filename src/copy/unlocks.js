@@ -56,6 +56,8 @@ const unlocksCopy = {
     case01: {
       // G42 (RULES_MARK 10): the chain asks for ×32 (nextTableRules.js HOT_CASH_TEN), held to it by a unit test.
       introTen: ["×32 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
+      // G46 (RULES_MARK 12): the chain counts cashes at heartbeat 110 or over (nextTableRules.js HOT_CASH_BPM), held to it by a unit test.
+      introTwelve: ["심박 110 이상에서 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
       intro: ["×4 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."],
     },
     case02: {

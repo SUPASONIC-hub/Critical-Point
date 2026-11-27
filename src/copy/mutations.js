@@ -32,6 +32,11 @@ const mutationsCopy = {
       title: "칩이 두 배로 뛴다",
       text: "연속으로 ×{multiplier} 이상을 챙겼다. 칩이 {chips}배지만, 한 번 밀 때 오르는 열기도 커진다.",
     },
+    // G46 (RULES_MARK 12): the same rule, its chain built on the heartbeat.
+    overclockBpm: {
+      title: "칩이 두 배로 뛴다",
+      text: "심박 {bpm} 이상에서 연속으로 챙겼다. 칩이 {chips}배지만, 한 번 밀 때 오르는 열기도 커진다.",
+    },
     coldFeet: {
       title: "가장 좋은 카드가 봉인됐다",
       text: "밀지 않고 확정한 대가. 가장 비싼 카드는 열기 {seal}{particle} 넘겨야 열리고, 칩이 줄어든다.",

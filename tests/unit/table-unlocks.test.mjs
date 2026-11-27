@@ -178,8 +178,8 @@ test("heat is 열기 in every line, as the table's own gauge is labelled", () =>
   }
   // The lines that opened in 프롤로그 04 open with their rules: LOCK's stays, OVERCLOCK's is 사건 01's.
   assert.deepEqual(UNLOCK_LADDER[3].intro.slice(1), ["카드를 건 뒤 LOCK을 누르면 자원 배율이 오르고, 칩 배율은 1.5배까지 오릅니다. 누를 때마다 시간이 줄어듭니다."]);
-  // G42 (RULES_MARK 10): the chain from ×32 (HOT_CASH_TEN); 9's ×4 line stays for a page that plays 9.
-  assert.deepEqual(introFor("case01", staged), ["×32 이상으로 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."]);
+  // G46 (RULES_MARK 12): the chain from heartbeat 110 (HOT_CASH_BPM); 10's ×32 and 9's ×4 lines stay for a page that plays them.
+  assert.deepEqual(introFor("case01", staged), ["심박 110 이상에서 두 번 잇달아 확정하면 다음 판의 칩이 2배가 되고, 밀 때 오르는 열기도 커집니다."]);
   // 프롤로그 02 teaches the logic streak where it taught the beat, and no line says a press is timed.
   // Since C-3 the streak is held on a direction, and the line says 관점 전환 can be had inside one.
   assert.equal(UNLOCK_LADDER[1].intro[0], "같은 방향(사람 쪽 또는 자리 쪽)의 카드를 세 번 잇달아 고르면 논리 콤보가 쌓이고 배율이 커집니다. 지난 판을 더 뜨겁게 닫았다면 방향을 바꿔도 콤보가 이어집니다. '관점 전환' 점수는 생각 유형을 고르게 쓸수록 오르니, 방향은 지키고 유형은 바꿔도 됩니다.");

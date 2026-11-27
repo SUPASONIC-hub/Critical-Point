@@ -101,11 +101,12 @@ export async function measureStakedTable(page) {
  * is read, not the page. `run` writes more of the run's numbers (the vault,
  * busts, best multiplier) the same way, for a bank row as late in a season.
  */
-export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0, run = {} } = {}) {
+export async function openBrokenBoard(page, caseId, nodeId, { schema = {}, relics = [], runPot = 0, streak = 0, run = {}, open = null } = {}) {
   await startDebugNode(page, caseId, nodeId);
   const save = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   await page.goto("/profile.jpg");
-  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, ...run, openSeed: null };
+  // `open`: laid over the case-open stamp (a story tilt reads its resources, storyTilt.js).
+  save.dynamics = { ...(save.dynamics ?? {}), schema: { ...(save.dynamics?.schema ?? {}), ...schema }, relics, relicOffer: [], runPot, streak, ...run, ...(open ? { open: { ...(save.dynamics?.open ?? {}), ...open } } : {}), openSeed: null };
   await writeJsonStorage(page, TEST_STORAGE_KEYS.save, save);
   await page.goto("/");
   await page.locator(".choices .choice").first().waitFor();
