@@ -83,6 +83,7 @@ import { getRouteMarker, normalizeSavedNestedState } from "../src/state/savedSta
 import { validateTelemetryItem } from "../src/state/payloadSchemas.js";
 import { createIntroView, createPlayView, createResultView } from "../src/viewModels/appViewModels.js";
 import { test } from "node:test";
+import { getRiskHarmWeight, RISK_HARM_WEIGHT } from "../src/riskLogic.js";
 
 
 test("storage key should stay on the v2 namespace", () => {
@@ -1097,7 +1098,8 @@ test("risk pressure drivers should be sorted by pressure contribution", () => {
     getRiskPressureDrivers(riskyResources)
       .slice(0, 2)
       .map((driver) => driver.id),
-    ["time", "capital"],
+    // G49 (RULES_MARK 15): 사람 피해 40 weighs 14 at 0.35 and leads; at 0.25 it tied the clock and 돈 at 10.
+    getRiskHarmWeight() > RISK_HARM_WEIGHT ? ["humanCost", "time"] : ["time", "capital"],
     "risk pressure drivers should be sorted by pressure contribution",
   );
 });

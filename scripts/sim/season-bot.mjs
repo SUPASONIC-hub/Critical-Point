@@ -41,6 +41,7 @@ import {
   REFRAME_EFFECT,
 } from "../../src/gameLogic.js";
 import { applySceneEffect } from "../../src/sceneEffect.js";
+import { RISK_HARM_WEIGHT, withRiskHarmWeight } from "../../src/riskLogic.js";
 import { getSeasonScore } from "../../src/seasonScore.js";
 import {
   applyGauntletEffect,
@@ -539,6 +540,10 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
    * five never fill past the slots, so the seasons before the tool table never do.
    */
   function playSeason(seasonIndex, archetype, story = false, watch = null, tools = null) {
+    // G49 (RULES_MARK 15): a story season's pressure weighs 사람 피해 as before (riskLogic.js), as the play screen holds it.
+    return withRiskHarmWeight(story ? RISK_HARM_WEIGHT : null, () => playSeasonAs(seasonIndex, archetype, story, watch, tools));
+  }
+  function playSeasonAs(seasonIndex, archetype, story, watch, tools) {
     const policy = makePolicy(archetype);
     const caseResults = {};
     // Each closed case's decision log, as its case row carries it (the chain checker's tests).
@@ -677,7 +682,7 @@ export function createSeasonBot({ seed: start, staged, archetypes = { ...ARCHETY
         });
         const clue = busted ? null : readers.getClueReveal(read.challengeMatch, read.riskDelta, responseTimeSec, reframeOpenedRoute, verdict.multiplier);
         // G44·G47 (RULES_MARK 13): as useChoiceCommit pays it (applySceneEffect).
-        const { effect: finalEffect, resources: resourcesAfter } = applySceneEffect(resources, mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {}), busted ? 0 : verdict.multiplier);
+        const { effect: finalEffect, resources: resourcesAfter } = applySceneEffect(resources, mergeEffects(gauntletEffect, clue ? { legitimacy: 2, fatigue: -1 } : {}, busted ? getBustEffect(verdict) : {}), busted ? 0 : verdict.multiplier, undefined, run.story === true);
         if (clue) discoveredClues = [...discoveredClues, clue];
         triggers = { ...triggers };
         for (const trigger of node.triggers ?? []) triggers[trigger] = (triggers[trigger] ?? 0) + (reframe ? 10 : 6);
