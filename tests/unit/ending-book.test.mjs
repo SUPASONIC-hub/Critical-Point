@@ -1,3 +1,4 @@
+import { ENDING_GATES } from "../../src/gameConstants.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -63,7 +64,7 @@ test("the next line never aims at the collapse, and turns to a ruling once every
   const book = getEndingBook({ seasons: 9, endingsSeen: all, verdictsSeen: ["ending_seal"] });
   assert.match(book.head, /^결말 8\/9 · 판결 1\/3\. 다음 시즌에 노려 볼 판결은 개혁입니다\. 피날레 「그 칸을 닫는 방법」에서 규칙을 붙이는 길을 고르고, 결말이 공개와 개입 · 증거와 개혁 · /);
   assert.equal(book.hints.length, 2, "the collapse and 폭로");
-  assert.ok(book.hints.some((hint) => hint.startsWith("압박과 붕괴: 사건마다 남긴 사람 피해가 평균 20 이상")));
+  assert.ok(book.hints.some((hint) => hint.startsWith(`압박과 붕괴: 사건마다 남긴 사람 피해가 평균 ${ENDING_GATES.collapseHarmPerCase} 이상`)));
   assert.ok(book.hints.some((hint) => hint.startsWith("판결 폭로: ")));
   const done = getEndingBook({ seasons: 12, endingsSeen: BOOK_ENDINGS, verdictsSeen: BOOK_VERDICTS });
   assert.deepEqual(done, { head: "결말 9/9 · 판결 3/3.", hints: [], lang: "ko" }, "with the language the lines are in");

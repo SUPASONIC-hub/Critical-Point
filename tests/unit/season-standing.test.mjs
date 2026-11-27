@@ -38,20 +38,21 @@ function assertAgrees(input, message) {
 }
 
 test("the harm route is over exactly where the ending collapses on harm", () => {
-  const under = assertAgrees({ caseResults: season(199) }, "19.9 a case");
-  assert.equal(under.standing.harm.perCase, 19.9);
+  // G47 (RULES_MARK 13) moves the gate 20 -> 13: the seasons sit a tenth under, at and over the page's gate.
+  const under = assertAgrees({ caseResults: season(HARM_GATE * 10 - 1) }, `${HARM_GATE - 0.1} a case`);
+  assert.equal(under.standing.harm.perCase, (HARM_GATE * 10 - 1) / 10);
   assert.equal(under.standing.harm.level, "near");
   assert.equal(under.standing.level, "near");
   assert.notEqual(under.ending.id, "collapse");
 
-  const at = assertAgrees({ caseResults: season(200) }, "20 a case");
+  const at = assertAgrees({ caseResults: season(HARM_GATE * 10) }, `${HARM_GATE} a case`);
   assert.equal(at.standing.harm.perCase, HARM_GATE);
   assert.equal(at.standing.harm.level, "over");
   assert.equal(at.standing.cause, "harm");
   assert.equal(at.ending.id, "collapse");
 
-  const past = assertAgrees({ caseResults: season(201) }, "20.1 a case");
-  assert.equal(past.standing.harm.perCase, 20.1);
+  const past = assertAgrees({ caseResults: season(HARM_GATE * 10 + 1) }, `${HARM_GATE + 0.1} a case`);
+  assert.equal(past.standing.harm.perCase, (HARM_GATE * 10 + 1) / 10);
   assert.equal(past.standing.level, "over");
 });
 
@@ -116,7 +117,8 @@ test("overreach is near only when harm and bust rate are both at the near share 
     { harm: 1.2, busts: 1.25, level: "over", why: "both over" },
   ];
   const halfLevel = (share) => (share >= 1 ? "over" : share >= SEASON_STANDING_NEAR ? "near" : "clear");
-  for (const { harm, busts, level, why } of grid) {
+  // G47 (RULES_MARK 13): under a harm gate of 13 its own near begins at 10.4, so the rows past that are the harm route's, not read here.
+  for (const { harm, busts, level, why } of grid.filter((row) => row.harm * OVERREACH_HARM_GATE < HARM_GATE * SEASON_STANDING_NEAR)) {
     const input = { caseResults: season(Math.round(harm * OVERREACH_HARM_GATE * 10), Math.round(busts * BUST_GATE * 100)) };
     const { standing } = assertAgrees(input, why);
     assert.equal(standing.overreach.harmLevel, halfLevel(harm), why);

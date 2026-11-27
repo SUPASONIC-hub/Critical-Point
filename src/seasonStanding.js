@@ -270,7 +270,9 @@ export const HELD_LINE_CAPITAL_SHARE = 0.8;
  */
 export function readHeldLine({ level, closing } = {}) {
   const capital = Number(closing?.capital);
-  return level === "clear" && Number.isFinite(capital) && capital < initialResources.capital * HELD_LINE_CAPITAL_SHARE ? { capital } : null;
+  // G44 (RULES_MARK 13): the mean is read back through the softer gains, as the ending reads it, against the same share.
+  const plain = isMarkThirteenOn() ? readSoft(capital) : capital;
+  return level === "clear" && Number.isFinite(capital) && plain < initialResources.capital * HELD_LINE_CAPITAL_SHARE ? { capital } : null;
 }
 
 /** The values a season-final row's `seasonStanding` takes (`readSeasonStandingMark`; payloadSchemas.js checks it). */

@@ -74,6 +74,7 @@ import {
   triggerLabels,
 } from "../src/gameData.js";
 import { authoredEchoReplies } from "../src/gameDialogue.js";
+import { isMarkThirteenOn, writeSoft } from "../src/gauntlet/nextTableRules.js";
 import { buildLeaderboard, getLeaderboardHeadline } from "../src/ranking.js";
 import { easyResourceLabels, simplifyPlayerText } from "../src/playerLanguage.js";
 import { getRankingIntegrity } from "../src/advancedSystems.js";
@@ -130,7 +131,8 @@ const endingSeason = (seasonResources, clues = 55) => ({
   sustainedPressure: 20,
   seasonReframeRoutes: 5,
   seasonHumanCost: 55 * 3,
-  seasonResources: { time: 50, fatigue: 25, humanCost: 3, ...seasonResources },
+  // G44 (RULES_MARK 13): the means as they read back through the softer gains (writeSoft is readSoft the other way).
+  seasonResources: { time: 50, fatigue: 25, humanCost: 3, ...Object.fromEntries(Object.entries(seasonResources).map(([key, value]) => [key, isMarkThirteenOn() ? writeSoft(value) : value])) },
 });
 test("ending variant should prefer open oversight when evidence and trust are high", () => {
   assert.equal(

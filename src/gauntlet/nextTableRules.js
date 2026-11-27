@@ -629,6 +629,16 @@ export function readSoft(value) {
   return Math.min(SOFT_TOP, low + (high - low) / lowRate + (v - high) / highRate);
 }
 
+/** readSoft the other way: the soft mean that reads back as `value` (a half step where the curve has one; for reports and tests). */
+export function writeSoft(value) {
+  const v = Number(value) || 0;
+  const [[high, highRate], [low, lowRate]] = SOFT_STEPS;
+  const atHigh = low + (high - low) / lowRate;
+  if (v <= low) return v;
+  if (v <= atHigh) return low + (v - low) * lowRate;
+  return high + (v - atHigh) * highRate;
+}
+
 /**
  * G47 (RULES_MARK 13): a scene whose table cashed at SKILL_HARM_MULTIPLIER or
  * more takes half its 사람 피해 (rounded down); the collapse gate moves from 20

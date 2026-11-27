@@ -8,6 +8,7 @@ import reportLinesCopy from "../../src/copy/reportLines.js";
 import enScreens from "../../src/locales/en/screens/index.js";
 import jaScreens from "../../src/locales/ja/screens/index.js";
 import { getSeasonStanding } from "../../src/seasonStanding.js";
+import { isMarkThirteenOn, writeSoft } from "../../src/gauntlet/nextTableRules.js";
 import { HELD_LINE_CAPITAL_SHARE, createSeasonStandingReadout, readHeldLine } from "../../src/viewModels/reportViewModels.js";
 
 /**
@@ -31,38 +32,45 @@ const shown = (caseResults) => {
   return { level, route, mark, label, text };
 };
 
+// G47 (RULES_MARK 13) moves the harm gate 20 -> 13 a case: the seasons below are set against the gate the page plays.
+// `H` is a season's harm sum over ten cases (a tenth of it a case), `cut` what the line prints for it.
+const H = HARM_GATE === 20
+  ? { clear: 140, near: 160, over: 200, under: 199, underText: "19.9", thirds: 59, thirdsText: "19.6", side: 120, sideText: "12" }
+  : { clear: 90, near: 110, over: 130, under: 129, underText: "12.9", thirds: 38, thirdsText: "12.6", side: 100, sideText: "10" };
+const perCase = (sum) => String(sum / 10);
+
 test("the line prints the season's mean harm against the gate, with a shape and a word for the level", () => {
-  assert.deepEqual(shown(season(140, 12)), { level: "clear", route: "harm", mark: "○", label: "붕괴선 아래", text: `시즌 평균 사람 피해 14 / ${HARM_GATE} · 터진 판 12%` });
-  assert.deepEqual(shown(season(160)), { level: "near", route: "harm", mark: "▲", label: "붕괴선 가까움", text: `시즌 평균 사람 피해 16 / ${HARM_GATE} · 터진 판 0%` });
-  assert.deepEqual(shown(season(200)), { level: "over", route: "harm", mark: "■", label: "붕괴선 넘음", text: `시즌 평균 사람 피해 20 / ${HARM_GATE} · 터진 판 0%` });
+  assert.deepEqual(shown(season(H.clear, 12)), { level: "clear", route: "harm", mark: "○", label: "붕괴선 아래", text: `시즌 평균 사람 피해 ${perCase(H.clear)} / ${HARM_GATE} · 터진 판 12%` });
+  assert.deepEqual(shown(season(H.near)), { level: "near", route: "harm", mark: "▲", label: "붕괴선 가까움", text: `시즌 평균 사람 피해 ${perCase(H.near)} / ${HARM_GATE} · 터진 판 0%` });
+  assert.deepEqual(shown(season(H.over)), { level: "over", route: "harm", mark: "■", label: "붕괴선 넘음", text: `시즌 평균 사람 피해 ${perCase(H.over)} / ${HARM_GATE} · 터진 판 0%` });
 });
 
 test("the three levels are told apart without colour: three marks and three words", () => {
-  const rows = [season(0), season(160), season(200)].map(shown);
+  const rows = [season(0), season(H.near), season(H.over)].map(shown);
   assert.deepEqual(rows.map((row) => row.level), ["clear", "near", "over"]);
   assert.equal(new Set(rows.map((row) => row.mark)).size, 3);
   assert.equal(new Set(rows.map((row) => row.label)).size, 3);
 });
 
 test("the numbers are cut, not rounded: the line never prints a gate the season has not reached", () => {
-  assert.equal(shown(season(199)).text, `시즌 평균 사람 피해 19.9 / ${HARM_GATE} · 터진 판 0%`);
-  // 59 over three cases is 19.67 a case, and one bust in six windows is 16.7%.
+  assert.equal(shown(season(H.under)).text, `시즌 평균 사람 피해 ${H.underText} / ${HARM_GATE} · 터진 판 0%`);
+  // A third of `H.thirds` a case (19.67 at 20, 12.67 at 13), and one bust in six windows is 16.7%.
   const [a, b, c] = CASE_SEQUENCE;
-  const thirds = shown({ [a]: summary(59), [b]: summary(0, 1, 5), [c]: summary(0) });
-  assert.deepEqual([thirds.level, thirds.route, thirds.text], ["near", "harm", `시즌 평균 사람 피해 19.6 / ${HARM_GATE} · 터진 판 16%`]);
+  const thirds = shown({ [a]: summary(H.thirds), [b]: summary(0, 1, 5), [c]: summary(0) });
+  assert.deepEqual([thirds.level, thirds.route, thirds.text], ["near", "harm", `시즌 평균 사람 피해 ${H.thirdsText} / ${HARM_GATE} · 터진 판 16%`]);
   // 199 busts in 1000 windows is 19.9%: under the fifth, and printed under it.
-  const almost = shown(season(120, 199, 1000));
-  assert.deepEqual([almost.level, almost.text], ["near", `시즌 평균 사람 피해 12 / ${OVERREACH_HARM_GATE} · 터진 판 19% / 20%`]);
+  const almost = shown(season(H.side, 199, 1000));
+  assert.deepEqual([almost.level, almost.text], ["near", `시즌 평균 사람 피해 ${H.sideText} / ${OVERREACH_HARM_GATE} · 터진 판 19% / 20%`]);
 });
 
 test("a season brought near by its busts prints the gate it is near: harm against ten beside the bust share", () => {
-  // Harm at 12 a case is nowhere near 20, so the level here is the bust route's.
-  assert.deepEqual(shown(season(120, 5)), { level: "clear", route: "harm", mark: "○", label: "붕괴선 아래", text: `시즌 평균 사람 피해 12 / ${HARM_GATE} · 터진 판 5%` });
-  assert.deepEqual(shown(season(120, 18)), { level: "near", route: "overreach", mark: "▲", label: "붕괴선 가까움", text: `시즌 평균 사람 피해 12 / ${OVERREACH_HARM_GATE} · 터진 판 18% / 20%` });
-  assert.deepEqual(shown(season(120, 20)), { level: "over", route: "overreach", mark: "■", label: "붕괴선 넘음", text: `시즌 평균 사람 피해 12 / ${OVERREACH_HARM_GATE} · 터진 판 20% / 20%` });
+  // Harm at `H.side` a case is not near the harm gate, so the level here is the bust route's.
+  assert.deepEqual(shown(season(H.side, 5)), { level: "clear", route: "harm", mark: "○", label: "붕괴선 아래", text: `시즌 평균 사람 피해 ${H.sideText} / ${HARM_GATE} · 터진 판 5%` });
+  assert.deepEqual(shown(season(H.side, 18)), { level: "near", route: "overreach", mark: "▲", label: "붕괴선 가까움", text: `시즌 평균 사람 피해 ${H.sideText} / ${OVERREACH_HARM_GATE} · 터진 판 18% / 20%` });
+  assert.deepEqual(shown(season(H.side, 20)), { level: "over", route: "overreach", mark: "■", label: "붕괴선 넘음", text: `시즌 평균 사람 피해 ${H.sideText} / ${OVERREACH_HARM_GATE} · 터진 판 20% / 20%` });
   // Both doors open: the line names harm, as the ending's cause does.
-  assert.equal(shown(season(200, 20)).route, "harm");
-  assert.equal(shown(season(200, 20)).text, `시즌 평균 사람 피해 20 / ${HARM_GATE} · 터진 판 20%`);
+  assert.equal(shown(season(H.over, 20)).route, "harm");
+  assert.equal(shown(season(H.over, 20)).text, `시즌 평균 사람 피해 ${perCase(H.over)} / ${HARM_GATE} · 터진 판 20%`);
 });
 
 test("a season with nothing closed still has a line, and the harm on the table counts as the ending counts it", () => {
@@ -72,7 +80,7 @@ test("a season with nothing closed still has a line, and the harm on the table c
     assert.deepEqual(empty.harmCases, []);
   }
   const table = readout({}, { resources: { humanCost: HARM_GATE * CASE_SEQUENCE.length } });
-  assert.deepEqual([table.level, table.text, table.harmCases], ["over", `시즌 평균 사람 피해 20 / ${HARM_GATE} · 터진 판 0%`, []]);
+  assert.deepEqual([table.level, table.text, table.harmCases], ["over", `시즌 평균 사람 피해 ${HARM_GATE} / ${HARM_GATE} · 터진 판 0%`, []]);
 });
 
 test("a collapse offers the cases that did the most harm, each by the roadmap's name and the harm it closed on", () => {
@@ -128,8 +136,9 @@ test("on seasons of every shape the line's level is the standing's, and it lists
  * closed case to read a mean from.
  */
 test("the held line prints when harm is clear and the season's mean cash closed under the share of the start", () => {
-  const lost = initialResources.capital * HELD_LINE_CAPITAL_SHARE - 1;
-  const line = readout(season(140), { closing: { capital: lost }, endingId: "quiet-cover" });
+  // G44 (RULES_MARK 13): the mean read back through the softer gains (74 reads as 78; 79 as 88, over the share).
+  const lost = isMarkThirteenOn() ? 74 : initialResources.capital * HELD_LINE_CAPITAL_SHARE - 1;
+  const line = readout(season(H.clear), { closing: { capital: lost }, endingId: "quiet-cover" });
   assert.equal(line.held, `현금은 평균 ${lost}까지 내려갔지만 사람 피해는 붕괴선 아래입니다.`);
   assert.equal(line.endingHeld, "현금을 잃었지만 진 것이 아니라, 사람 피해를 선 아래에 두고 조용히 닫은 시즌입니다.");
   assert.deepEqual(readHeldLine({ level: "clear", closing: { capital: lost } }), { capital: lost });
@@ -137,16 +146,16 @@ test("the held line prints when harm is clear and the season's mean cash closed 
 
 test("the held line stays out when the season kept its cash, is near or over the line, or has no closed mean", () => {
   const lost = { capital: 40 };
-  const kept = { capital: initialResources.capital * HELD_LINE_CAPITAL_SHARE };
-  assert.equal(readout(season(140), { closing: kept, endingId: "quiet-cover" }).held, null, "at the share is not under it");
-  assert.equal(readout(season(140), { closing: { capital: 100 } }).held, null);
-  assert.equal(readout(season(160), { closing: lost, endingId: "quiet-cover" }).held, null, "near");
-  assert.equal(readout(season(200), { closing: lost, endingId: "quiet-cover" }).held, null, "over");
-  assert.equal(readout(season(120, 18), { closing: lost }).held, null, "near by its busts");
-  assert.equal(readout(season(140), { closing: null }).held, null, "no closed case");
-  assert.equal(readout(season(140), { closing: { capital: "x" } }).held, null);
-  assert.equal(readout(season(140)).held, null);
-  for (const line of [readout(season(160), { closing: lost, endingId: "quiet-cover" }), readout(season(140), { closing: kept, endingId: "quiet-cover" })]) {
+  const kept = { capital: isMarkThirteenOn() ? writeSoft(initialResources.capital * HELD_LINE_CAPITAL_SHARE) : initialResources.capital * HELD_LINE_CAPITAL_SHARE };
+  assert.equal(readout(season(H.clear), { closing: kept, endingId: "quiet-cover" }).held, null, "at the share is not under it");
+  assert.equal(readout(season(H.clear), { closing: { capital: 100 } }).held, null);
+  assert.equal(readout(season(H.near), { closing: lost, endingId: "quiet-cover" }).held, null, "near");
+  assert.equal(readout(season(H.over), { closing: lost, endingId: "quiet-cover" }).held, null, "over");
+  assert.equal(readout(season(H.side, 18), { closing: lost }).held, null, "near by its busts");
+  assert.equal(readout(season(H.clear), { closing: null }).held, null, "no closed case");
+  assert.equal(readout(season(H.clear), { closing: { capital: "x" } }).held, null);
+  assert.equal(readout(season(H.clear)).held, null);
+  for (const line of [readout(season(H.near), { closing: lost, endingId: "quiet-cover" }), readout(season(H.clear), { closing: kept, endingId: "quiet-cover" })]) {
     assert.equal(line.endingHeld, null);
   }
 });
@@ -155,12 +164,12 @@ test("every ending that can be reached on lost cash has its sentence, and the co
   const lost = { capital: 40 };
   const withOne = ENDING_IDS.filter((id) => id !== "collapse" && id !== "profitable-silence");
   for (const id of [...withOne, "open-question"]) {
-    const line = readout(season(140), { closing: lost, endingId: id });
+    const line = readout(season(H.clear), { closing: lost, endingId: id });
     assert.equal(typeof line.endingHeld, "string", id);
     assert.match(line.endingHeld, /^현금을 잃었지만 진 것이 아니라, /, id);
   }
   for (const id of ["collapse", "profitable-silence", "", "toString", undefined]) {
-    assert.equal(readout(season(140), { closing: lost, endingId: id }).endingHeld, null, String(id));
+    assert.equal(readout(season(H.clear), { closing: lost, endingId: id }).endingHeld, null, String(id));
   }
   // The table holds exactly those endings, in the three languages.
   const expected = [...withOne, "open-question"].sort();
