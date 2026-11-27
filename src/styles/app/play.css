@@ -1596,6 +1596,13 @@
     filter var(--ui-dur-fast) linear;
 }
 
+/* A held 확정 takes no pan either: `manipulation` still lets a finger that
+   drifts a few pixels start a scroll, and Chrome then cancels the press, so
+   the hold broke and the next press began again (Galaxy A32, 2026-11-27). */
+.gx-actions .gx-cash[data-hold] {
+  touch-action: none;
+}
+
 .gx-actions button:not(:disabled):hover {
   filter: brightness(1.08);
 }

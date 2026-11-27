@@ -1394,7 +1394,8 @@ const budgets = [
   // -> 220,876 / 42,759 on 2026-11-23: the rarely reached states' ink and the clue card's marked words. Measured 220872 / 42755, the plus 4.
   // -> 220,895 / 42,765 on 2026-11-26, g34-cover-e2e: G34's 보상금 button joins the leave line's 44px rule. Measured 220891 / 42761 locally, the plus 4.
   // 220,895 / 42,765 -> 220,990 / 42,805 hotfix-hold-select over main e4a5df69: the action row's buttons refuse text selection and the long-press callout (Galaxy A32 2026-11-26). Local Windows build 220,986 / 42,801, the plus 4; CI re-measures.
-  { pattern: /^index-.*\.css$/, maxBytes: 220_990, maxGzip: 42_805 },
+  // 220,990 / 42,805 -> 221,040 / 42,826 hotfix-a32-hold (#699, the held 확정 takes no pan) over main 4ff896f3: CI verify-quick measured 221,036 / 42,822, the plus 4.
+  { pattern: /^index-.*\.css$/, maxBytes: 221_040, maxGzip: 42_826 },
   // The one font file (scripts/build-fonts.mjs), already compressed, so the raw
   // size is the transfer size. 270,000 bytes on 2026-09-27; it replaced 92
   // dynamic subsets, of which the intro alone pulled ~537KB.
@@ -3015,8 +3016,9 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> ko 387,125, en 454,466, ja 462,952 g6b-firstpaint: the MARK 13 switch out of the index chunk (see index above). Measured ko 387,121, en 454,462, ja 462,948 in the e2e build on Windows, the plus 4; CI re-measures.
 // -> 387,136 / 454,476 / 462,962 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 387,132 / 454,472 / 462,958, the plus 4; CI re-measures.
 // -> 387,214 / 454,569 / 463,052 bundle 11-27 (#697, the note late-choices-count on the start screen list) over main e052534f: CI verify-quick measured 387,210 / 454,565 / 463,048, the plus 4.
-// 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the entry's probe and lazy fetch. Measured 387,706 / 455,161 / 463,630 in the e2e build, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_710, en: 455_165, ja: 463_634 };
+// -> 387,231 / 454,584 / 463,070 hotfix-a32-hold (#699, the held 확정 takes no pan) over main 4ff896f3: CI verify-quick measured 387,227 / 454,580 / 463,066, the plus 4.
+// 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the entry's probe and lazy fetch. Measured 387,706 / 455,161 / 463,630 in the e2e build over 4ff896f3, the plus 4, with #699's +17 / +15 / +18 added.
+const FIRST_PAINT_BUDGETS = { ko: 387_727, en: 455_180, ja: 463_652 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
