@@ -12,7 +12,7 @@ const BEFORE = withMarkTwelve(ALL_RULES, false);
 
 test("RULES_MARK 12: on by default, off in a script with RULES_MARK12=0, and a row of 5 to 11 played without it", () => {
   assert.equal(RULES_TWELVE_MARK, 12);
-  assert.equal(RULES_MARK, 12);
+  assert.ok(RULES_MARK >= 12, "RULES_MARK 13 keeps 12's rules");
   assert.equal(wantsMarkTwelve({}), true);
   assert.equal(wantsMarkTwelve({ process: { env: { RULES_MARK12: "0" } } }), false);
   assert.equal(isMarkTwelveOn(ALL_RULES), true);

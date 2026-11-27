@@ -14,7 +14,7 @@ import {
 } from "../gameData.js";
 import { applyEffect, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getSeasonWear, getUnattendedNext } from "../gameLogic.js";
 import { runsInto } from "../seasonRules.js";
-import { getUpkeep, isMarkElevenOn } from "../gauntlet/nextTableRules.js";
+import { capOpeningCapital, getUpkeep, isMarkElevenOn, isMarkThirteenOn } from "../gauntlet/nextTableRules.js";
 import { createOpeningResources } from "./openingState.js";
 
 /**
@@ -41,8 +41,12 @@ import { createOpeningResources } from "./openingState.js";
  * with a third of 믿음·공정함·돈 over 80 taken off (nextTableRules.js
  * `getUpkeep`), and its legacy says what was taken (`openingLegacy.upkeep`:
  * [key, from, to] rows) for the case file's line.
+ *
+ * G44 운영비 (RULES_MARK 13; `capOn`, likewise): every case, the season's first
+ * too, opens with 돈 at OPEN_CAPITAL_MOST or less (`capOpeningCapital`), after
+ * the 유지비; the legacy's `operating` row ([key, from, to]) says what it took.
  */
-export function describeCaseOpening(caseId, { caseResults, operatorOrigin }, upkeepOn = isMarkElevenOn()) {
+export function describeCaseOpening(caseId, { caseResults, operatorOrigin }, upkeepOn = isMarkElevenOn(), capOn = isMarkThirteenOn()) {
   const baseStartNode = CASE_START_NODES[caseId];
   const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
@@ -90,11 +94,14 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }, upk
   // The origin bonus is the run's opening hand, so it belongs to the season's
   // first case -- which is the 프롤로그 now, not 사건 01.
   const seasonOpening = caseId === SEASON_ENTRY_CASE && !previousResult;
-  const resources = seasonOpening
+  const kept = seasonOpening
     ? createOpeningResources(operatorOrigin)
     : held ? { ...held, ...Object.fromEntries(upkeepRows.map(([key, , to]) => [key, to])) } : initialResources;
+  const resources = capOn ? { ...kept, capital: capOpeningCapital(kept.capital) } : kept;
+  const operating = resources.capital < kept.capital ? ["capital", kept.capital, resources.capital] : null;
+  const legacy = openingLegacy && operating ? { operating, ...openingLegacy } : openingLegacy;
   const route = { after: previousResult?.outcomeChoiceId ?? null, rank: previousResult?.rank ?? null, nodeId };
-  return { nodeId, resources, openingLegacy, echo, note: previousResult?.outcomeChoiceId ?? "season-start", route };
+  return { nodeId, resources, openingLegacy: legacy, ...(operating ? { operating } : {}), echo, note: previousResult?.outcomeChoiceId ?? "season-start", route };
 }
 
 /**

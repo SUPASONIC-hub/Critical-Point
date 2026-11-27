@@ -206,7 +206,7 @@ export function GauntletStage({
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
-  const { visibleEffects, hiddenEffectCount } = describeStakedDetail(selectedCard, schema, resourceMeta);
+  const { visibleEffects, hiddenEffectCount } = describeStakedDetail(selectedCard, schema, resourceMeta, resources); // G44: the gains as they would land now
   // The types on the table, as the settlement will be handed them (useChoiceCommit).
   const standing = `${clueCount}:${resources.trust}:${resources.legitimacy}:${casesOpened}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps

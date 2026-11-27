@@ -1,3 +1,4 @@
+import { isMarkThirteenOn, writeSoft } from "../../src/gauntlet/nextTableRules.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
@@ -44,7 +45,8 @@ function reachableEndings() {
     for (const clues of [0, 6, 12]) for (const harm of [0, 9999]) for (const reframes of [0, 10]) for (const burn of [false, true]) for (const pressure of [0, 30]) {
       const ending = getEndingVariant({
         resources: { trust, legitimacy, capital },
-        seasonResources: { trust, legitimacy, capital },
+        // G44 (RULES_MARK 13): the means as they read back through the softer gains (writeSoft is readSoft the other way).
+        seasonResources: Object.fromEntries(Object.entries({ trust, legitimacy, capital }).map(([key, value]) => [key, isMarkThirteenOn() ? writeSoft(value) : value])),
         discoveredClues: Array.from({ length: clues }, (_, index) => ({ id: `clue${index}` })),
         log: burn ? [{ choiceId: "f_after_burn" }] : [],
         seasonHumanCost: harm,

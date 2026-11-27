@@ -48,7 +48,7 @@ import { applyGauntletEffect, getBustEffect, normalizeSchema } from "./gauntlet/
 import { describeCaseOpening } from "./state/caseRoutes.js";
 import { routeChoice } from "./state/settleChoice.js";
 import { rowRules, WINDOW_RECORD_KEY } from "./rankingRecheck.js";
-import { isMarkElevenOn } from "./gauntlet/nextTableRules.js";
+import { applySoftEffect, halveSkilledHarm, isMarkElevenOn, isMarkThirteenOn } from "./gauntlet/nextTableRules.js";
 
 /** The six resources a decision moves (resourcesBefore / resourcesAfter). */
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -85,13 +85,14 @@ function findCard(entry) {
  * `resourcesAfter` of one entry: the effect applied, the effect merged, the
  * price worked out. Pushes onto `breaks` and `unchecked`.
  */
-function recheckResources(entry, index, card, breaks, unchecked) {
+function recheckResources(entry, index, card, breaks, unchecked, thirteen = false) {
   const { resourcesBefore: before, resourcesAfter: after, effect } = entry;
   if (!isObject(before) || !isObject(after) || !isObject(effect) || !RESOURCE_KEYS.every((key) => isNumber(before[key]) && isNumber(after[key]))) {
     unchecked.add("resourcesAfter");
     return;
   }
-  const expected = applyEffect(before, effect);
+  // G44 (RULES_MARK 13): the gains near the top as the row's mark paid them (the effect is logged as paid, G47's half harm in it).
+  const expected = thirteen ? applySoftEffect(before, effect, applyEffect) : applyEffect(before, effect);
   if (!RESOURCE_KEYS.every((key) => expected[key] === after[key])) {
     breaks.push({ entry: index, field: "resourcesAfter", expected: Object.fromEntries(RESOURCE_KEYS.map((key) => [key, expected[key]])), found: after });
     return;
@@ -101,7 +102,9 @@ function recheckResources(entry, index, card, breaks, unchecked) {
   if (!isObject(priced)) return;
   const busted = entry.threshold?.busted === true;
   const clue = isObject(entry.clueReward?.effect) ? entry.clueReward.effect : entry.clue ? CLUE_EFFECT : {};
-  const merged = mergeEffects(priced, busted ? {} : clue, busted ? getBustEffect(entry.threshold) : {});
+  const summed = mergeEffects(priced, busted ? {} : clue, busted ? getBustEffect(entry.threshold) : {});
+  // G47 (RULES_MARK 13): a table cashed at ×32 or more paid half the 사람 피해.
+  const merged = thirteen ? halveSkilledHarm(summed, busted ? 0 : entry.threshold?.potMultiplier ?? null) : summed;
   if (!sameEffect(merged, effect)) {
     breaks.push({ entry: index, field: "effect", expected: merged, found: effect });
     return;
@@ -147,11 +150,12 @@ export function recheckCaseSettlement(row, before = null) {
   const previousKnown = !previousCaseId || (before?.case_id === previousCaseId && typeof before?.summary?.outcomeChoiceId === "string");
   const caseResults = previousKnown && previousCaseId ? { [previousCaseId]: { outcomeChoiceId: before.summary.outcomeChoiceId } } : {};
   const open = row?.dynamics?.open;
+  const thirteen = isMarkThirteenOn(rowRules(row));
   let reframeCount = 0;
   log.forEach((entry, index) => {
     if (!isObject(entry)) return;
     const card = findCard(entry);
-    recheckResources(entry, index, card, breaks, unchecked);
+    recheckResources(entry, index, card, breaks, unchecked, thirteen);
     const choice = entry.reframe === true ? nodes[entry.nodeId]?.choices?.find((item) => item.type === "reframe") ?? null : card;
     if (!choice || !isObject(entry.resourcesBefore)) unchecked.add("scene");
     else {
@@ -208,8 +212,8 @@ export function recheckOpeningRoute(row, before = null) {
   const readable = before?.case_id === previousCaseId && typeof result?.outcomeChoiceId === "string" && before?.dynamics?.open?.practice !== true;
   if (!readable || found.after === null) return { breaks, unchecked: ["openingRoute"] };
   const rank = typeof result.rank === "string" ? result.rank : null;
-  // G38 유지비 (RULES_MARK 11) on the hand as the row's mark played it.
-  const expected = describeCaseOpening(caseId, { caseResults: { [previousCaseId]: { outcomeChoiceId: result.outcomeChoiceId, rank } }, operatorOrigin: null }, isMarkElevenOn(rowRules(row)));
+  // G38 유지비 (RULES_MARK 11) and G44 운영비 (RULES_MARK 13) on the hand as the row's mark played it.
+  const expected = describeCaseOpening(caseId, { caseResults: { [previousCaseId]: { outcomeChoiceId: result.outcomeChoiceId, rank } }, operatorOrigin: null }, isMarkElevenOn(rowRules(row)), isMarkThirteenOn(rowRules(row)));
   if (found.after !== expected.route.after || found.rank !== expected.route.rank || found.nodeId !== expected.route.nodeId) {
     breaks.push({ field: "open.openingRoute", expected: expected.route, found });
   }

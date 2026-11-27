@@ -21,6 +21,7 @@ export default {
     legitimacyHigh: "公正さ {value} — 監査上限 +{limit}",
   },
   upkeep: "{name} {from} → {to}(維持費)",
+  operating: "{name} {from} → {to}(運営費)",
   recordAt: "このシーンの記録: ×{at}以上で確定すると開く",
   breach: " · この勝負のルールが変わった",
   hint: "カードを選ぶと、そのカードを賭けた状態で卓が開く",

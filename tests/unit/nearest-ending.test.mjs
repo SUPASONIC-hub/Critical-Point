@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import { ENDING_THRESHOLDS, getEndingVariant } from "../../src/gameLogic.js";
 import { endingLabelOf, nearestEnding } from "../../src/nearestEnding.js";
-import { getUpkeep, isMarkTenOn } from "../../src/gauntlet/nextTableRules.js";
+import { getUpkeep, isMarkTenOn, isMarkThirteenOn } from "../../src/gauntlet/nextTableRules.js";
 import { FINALE_WEIGHT } from "../../src/seasonStanding.js";
 import reportLinesCopy from "../../src/copy/reportLines.js";
 import enScreens from "../../src/locales/en/screens/index.js";
@@ -28,10 +28,13 @@ const kept = (key, value) => {
   for (let mean = value; mean <= 100; mean += 1) if (mean + (getUpkeep({ [key]: mean })[key] ?? 0) === value) return mean;
   throw new Error(`no mean reads as ${key} ${value}`);
 };
+// G44 (RULES_MARK 13): the ruling reads the mean back through the softer gains' curve (readSoftMeans: twice over 70) before the
+// 유지비; the mean here is the one that reads back as `value` (a half step where the curve has one).
+const soft = (value) => (isMarkThirteenOn() && value > 70 ? 70 + (value - 70) / 2 : value);
 function season({ trust = 60, legitimacy = 60, capital = 80, clues = 0, reframes = 0, finale = "witness", ...extra } = {}) {
   return {
     resources: { time: 0, capital, trust, legitimacy, humanCost: 0, fatigue: 0 },
-    seasonResources: { capital: kept("capital", capital), trust: kept("trust", trust - under(finale, "trust")), legitimacy: kept("legitimacy", legitimacy - under(finale, "legitimacy")) },
+    seasonResources: { capital: soft(kept("capital", capital)), trust: soft(kept("trust", trust - under(finale, "trust"))), legitimacy: soft(kept("legitimacy", legitimacy - under(finale, "legitimacy"))) },
     discoveredClues: Array.from({ length: clues }, (_, index) => `clue-${index}`),
     log: finale ? [{ nodeId: "f_aftershock", choiceId: `f_after_${finale}` }] : [],
     seasonHumanCost: 0,

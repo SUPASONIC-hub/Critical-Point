@@ -2674,10 +2674,14 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 12 (G46 of the sixth
- * gameplay notes, the user's 「전부 1」 of 2026-11-27: OVERCLOCK's chain on
- * the heartbeat; nextTableRules.js `isMarkTwelveOn` plays it for a row marked
- * 12 or later only). 11 was G38 and G39 of the
+ * The mark of a case closed at the table of RULES_MARK 13 (G44, G45 and G47 of
+ * the sixth gameplay notes, the user's 「전부 1」 of 2026-11-27: 돈 opened at 70
+ * and softer gains near the top, half the 사람 피해 on a table cashed at ×32,
+ * a burned season of ten covers on QUIET COVER; nextTableRules.js
+ * `isMarkThirteenOn` plays them for a row marked 13 or later only). 12 was G46
+ * of the same notes and day: OVERCLOCK's chain on the heartbeat;
+ * nextTableRules.js `isMarkTwelveOn` plays it for a row marked 12 or later
+ * only. 11 was G38 and G39 of the
  * fifth gameplay notes, the user's 「전부 1」 of 2026-11-26; nextTableRules.js
  * `isMarkElevenOn` plays them for a row marked 11 or later only. 10 was G40
  * to G42 of the same notes and the same day; nextTableRules.js
@@ -2715,7 +2719,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 12;
+export const RULES_MARK = 13;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);
