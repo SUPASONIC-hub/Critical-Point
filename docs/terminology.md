@@ -79,6 +79,9 @@ what the copy actually says today.
 | NEW GAME+ · 이번 시즌은 이 막에 선 규칙 | NEW GAME+ · this act’s rule this season | NEW GAME+ · 今シーズンこの幕に立つ規則 | 판 규칙 9 (G36). 자리를 옮겨 선 막 비틀기 |
 | 유지비 | upkeep | 維持費 | 판 규칙 11 (G38). 사건 파일의 「현금 100 → 93(유지비)」 |
 | 이 장면의 기록: ×N 이상 확정하면 열림 | This scene’s record: opens on a cash of ×N or more | このシーンの記録: ×N以上で確定すると開く | 판 규칙 11 (G39). N은 32 |
+| 심박 110 넘게 두 번 끊으면 OVERCLOCK | Cash twice at heartbeat 110+ for OVERCLOCK | 心拍110以上で2回確定するとOVERCLOCK | 판 규칙 12 (G46). 해금 안내 줄 [확인] |
+| 운영비 | operating costs | 運営費 | 판 규칙 13 (G44). 사건 파일의 「현금 100 → 70(운영비)」, 11의 유지비를 대신함 [확인] |
+| ×32 이상 확정하면 사람 피해 절반 | Cash at ×32 or more: half the harm | ×32以上で確定すると人的被害は半分 | 판 규칙 13 (G47). 사람 피해가 붙는 카드의 판 위 한 줄 [확인] |
 
 ## People (prologue 01 to case 07)
 
