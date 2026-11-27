@@ -10,9 +10,10 @@ import { fileURLToPath } from "node:url";
 // is not scanned: there 차지하다, 연락 and 터지다 are everyday Korean.
 // 압박 is retired only as a name for the table's gauge (압박계, now 열기): the
 // report's risk measures (압박 대응, 압박 누적/회수) and the everyday sense
-// (시간 압박) keep the word.
+// (시간 압박) keep the word. 푸시 유어 럭 is the genre's name (Push Your Luck),
+// which a note's title names (src/notes/noteIndex.js), not the table's push.
 const RETIRED = [
-  { word: /푸시/, instead: "밀기" },
+  { word: /푸시(?! 유어 럭)/, instead: "밀기" },
   { word: /(?<![가-힣])락(?!픽)/, instead: "LOCK" },
   { word: /(?<![가-힣])차지(?!원)/, instead: "충전" },
   { word: /케이스(?!데스크)/, instead: "사건" },
@@ -50,7 +51,7 @@ test("no player line outside the story uses a retired term", () => {
 });
 
 test("the names the retired words leave alone are not refused", () => {
-  for (const line of ["락픽: 열기 30에서 열림", "차지원은 대답 대신", "케이스데스크", "연락이 왔다", "허락을 받았다", "압박 대응", "시간 압박"]) {
+  for (const line of ["락픽: 열기 30에서 열림", "차지원은 대답 대신", "케이스데스크", "연락이 왔다", "허락을 받았다", "압박 대응", "시간 압박", "왜 「푸시 유어 럭」이었나"]) {
     assert.deepEqual(RETIRED.filter(({ word }) => word.test(line)), [], line);
   }
   for (const line of ["E 락 · 확정", "차지가 빠르다", "이전 케이스", "오버클럭 체인", "연승 2", "다음 푸시", "압박계는 낮지만"]) {

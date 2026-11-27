@@ -15,7 +15,7 @@ export default {
     },
     "short-clock": {
       title: "時間が短い",
-      text: "今週は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。",
+      text: "今週は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。LOCKのチャージは時間を{lockDrag}倍使う。",
       world: "今週、取締役会は報告の時間を削り、報告書の値を上げた。",
     },
     "crisis-week": {
@@ -36,6 +36,68 @@ export default {
     "audit-cascade": {
       title: "監査と連鎖",
       text: "今週は監査と連鎖が同時に立つ。{audit} {cascade} CASCADE勝負の確定は監査に数えない。",
+    },
+  },
+  // G5 (gauntlet/actTwists.js): the twist of acts 3, 5 and 7 under the next rules, by id.
+  actTwists: {
+    merger: {
+      title: "合併",
+      text: "この事件はすべてのカードのチップが{mergerChips}倍だが、壁の帯の奥の端が熱{mergerTop}ぶん手前に立つ。",
+      world: "グループは「改革」と称して系列会社を合併する。賭けは大きく、壁は近くなる。",
+    },
+    scattered: {
+      title: "散らばった席",
+      text: "この事件は壁の帯が両側に熱{spread}ずつ広がる。壁がどこに立つか、より広く見なければならない。",
+      world: "トリガーラボの人々があちこちに散り、席ごとに壁の立つ場所が違う。",
+    },
+    hearing: {
+      title: "公聴会",
+      text: "この事件は盤ごとの時間が{hearingCut}%短く、すべてのカードのチップが{hearingChips}倍。LOCKのチャージは時間を{lockDrag}倍使う。",
+      world: "記録の持ち主を争う公聴会。答える時間は短く、一言の値は大きい。",
+    },
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js `ACT_DEVICE_TWIST_RULES`).
+    passedDown: {
+      title: "押しつけられた損失",
+      text: "この事件は、最初のBUSTでも賭け金の{downShare}分の1が残る。そのかわり、その勝負の人的被害が{downHarm}上がる。",
+      world: "銀行が前倒しした返済は、ケアの時間へ、配車表へと降りていく。",
+    },
+    lateBill: {
+      title: "遅れてきた請求書",
+      text: "この事件は熱{billHeat}以上で確定すると、その熱の4分の3を抱えて次の勝負が始まる。それより下で確定すると、すべてのカードのチップが{billChips}倍。",
+      world: "ひとりで耐えた十日分は、勝った翌日に請求される。",
+    },
+    trainedWall: {
+      title: "学習された壁",
+      text: "この事件は、NOAHがあなたの確定した熱を学ぶ。確定した次の勝負の壁の帯は、その熱のほうへ動くが、いつもの帯の真ん中より下には下がらない。",
+      world: "NOAHは、あなたが選んだものと迷った秒数を学んだ。",
+    },
+    onRecord: {
+      title: "供述の固定",
+      text: "この事件は、最初の勝負で確定した構えを事件の終わりまで変えられない。そのかわり、確定するたびにチャージが足りなくても、その構えが次の勝負に残る。",
+      world: "一度した供述は調書に残り、次の質問はその行から始まる。",
+    },
+    signedByName: {
+      title: "実名の署名",
+      text: "この事件は、最初の勝負の前に署名のしかたを選ぶ。名前だけ書けば、すべてのカードのチップが{nameChips}倍、壁の帯が事件ごとに{nameWallLow}から{nameWallHigh}手前に立つ（署名欄に今回の値）。条件をつければ、壁の帯が{termsWall}下がり、チップが{termsChips}倍。",
+      world: "もう署名欄に空欄はない。名前の横に条件をつけられるだけだ。",
+    },
+  },
+  caseRules: {
+    case09: {
+      text: "この事件は勝負ごとに時間が{seconds}秒短く、すべてのカードのチップが{chips}倍だ。LOCKのチャージは時間を{lockDrag}倍使う。",
+      world: "清算議案が72時間以内に採決に上がる。報告は短く、値は高く。",
+    },
+    case11: {
+      text: "この事件は壁の帯が熱{shift}だけ手前に立つ。同じ熱で、より早く壁に触れる。",
+      world: "国政監査の日程が一日早まった。",
+    },
+    case14: {
+      text: "この事件はFRACTUREが、ひびの入ったリソースを{rate}倍で請求する。",
+      world: "不良債権を92ウォンで買い取った帳簿だから、ひびはもう一度のぞき込む。",
+    },
+    case16: {
+      text: "この事件は壁の帯が熱{crisisShift}だけ手前に立ち、すべてのカードのチップが{crisisChips}倍だ。",
+      world: "ロボットリースの公示で市場が揺れると、本社はまず数字を合わせろと言った。",
     },
   },
 };

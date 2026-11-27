@@ -470,9 +470,9 @@ The side cases (`src/nodes/sideNN.js`) sit outside the season's fifty-five and
 open once a finale is closed. Each is set between two of the season's days and
 is written to hold after any of the season's endings, so it says nothing a
 season case has to keep. What each one states for the first time is below.
-`check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토)
-and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금) and 6월 12일 (금) fit
-2026) and nothing else here.
+`check:canon` holds their dated weekdays like any other (12월 20일 (토), 11월 8일 (토),
+12월 11일 (목), 9월 13일 (토), 9월 14일 (일) and 9월 15일 (월) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (금), 6월 12일 (금), 7월 10일 (금),
+7월 11일 (토), 7월 13일 (월), 5월 14일 (목), 8월 13일 (목), 8월 14일 (금), 8월 18일 (화) and 9월 5일 (토) fit 2026) and nothing else here.
 
 ### 번외 1, 아직 찾아가지 못한 일곱 명 (side01)
 
@@ -572,6 +572,57 @@ and 12월 11일 (목) fit 2025, 1월 9일 (금), 2월 12일 (목), 5월 8일 (�
 | 석재우 | Sunday's draft statement: 「외부 세력의 정교한 공격 ... 고객 피해는 없습니다」 |
 | The ransom | Monday 08:40, a notice on every 자금부 screen; the first folder locked is 「해외송금_2026_06」. 이민서's Friday-night copy on the KD데이터랩 side is untouched |
 | The endings | the first line of the 09:00 report (the money chased: 11억 2천만 back three weeks later, 72억 8천만 never answered / the cause: no money back, eleven leavers' permissions struck, the shared account left as it is -- as 사건 44 still finds it / the statement's line copied, 사건 37's echo). None names the trial, the raid or 윤상혁 |
+### 번외 8, 정상화 (side08)
+
+| Fact | Value |
+|---|---|
+| When | 2026-07-10 (금) 15:20 to 07-13 (월) 09:00: a week after 사건 34 closes (7월 3일), the morning before 사건 35's night of rain (7월 14일). The analyst is in KD캐피탈 위험관리부 under 채이안, as 사건 35 finds them |
+| Where | KD캐피탈 위험관리부 and 채권관리팀; 도담사출 in 안산 반월공단 (factory, office, container dormitory); 인천공항 departures on the Saturday night |
+| 도담사출 | invented (searched 2026-11-14): a plastic injection shop, 23 people, four injection machines leased from KD캐피탈 at 2,100만 원 a month. July's fee is late. Monday's 회수심의 takes the four machines and, under the lease's 12조, the 4,200만 원 delivery payment a customer owes the shop on 7월 15일 -- its last money |
+| The pension | the shop's KD은행 퇴직연금: no company payment for seven months (2025-12 to 2026-06), 3,640만 원 for the 23. The 납입 지연 notices went to the company only; 심재만 read all seven. The group's combined screen shows the line at KD캐피탈 and nobody there reads it |
+| 「정상화」 | 설경민 (채권관리팀 차장, 43) noted in January: 「리스료 우선 입금 약속, 회수 유예. 정상화.」 The lease was paid on the 5th, January to June, never late; the team was first in collection rate for the half |
+| 비노드 타파 (39) | from Nepal; 9 years 8 months at 도담사출 on machine 3; answers in Korean (said once, in the narration). Flies home 7월 11일 (토) 23:50. Saved 2,310만 원 (last company payment November 2025); his share of the missing seven months, 182만 원. Leaves a notebook of mould temperatures (「비 오는 날 3도」) for whoever runs the machine next. He refuses 심재만's envelope of 182만 원 at the gate |
+| 심재만 (61) | 도담사출 대표; paid the lease before the pension to keep the machines running, and says he knew. He and 설경민 speak only in the narration (indirect speech or 「」), as 번외 6's 기성철: no ordinary generated face was found for either yet |
+| 채이안 | 「위험이 누구 이름으로 적히는지 정하는」 department (사건 25's line): the opinion box is 400 characters, KD캐피탈's loss only; writing the payment behind the pension puts the analyst's name on a 4,200만 원 loss |
+| The endings | the first line of the opinion (the 4,200만 held two weeks behind the pension, the seven months paid on 7월 17일, the analyst's name on the expected loss / the cause written, the agenda passed, a line added to the collection rules three months later, the 3,640만 left to a wage claim / 「특이사항 없음」 left, the shop closed that month). None touches the flood of 사건 35 |
+
+### 번외 9, 92일 (side09)
+
+| Fact | Value |
+|---|---|
+| When | 2026-08-13 (목) 16:10 to 08-14 (금) 17:50, the day before 광복절: after 사건 40 opens (the Saturday after the broadcast, 8월 8일) and before its third week (8월 17일); 사건 41's hearing is two weeks on. The analyst is in KD캐피탈 위험관리부 under 채이안, as 사건 41 finds them |
+| Where | KD캐피탈 위험관리부 and 고객채권부; 인천 남동구 (a 빌라's parking lot and living room, the 행정복지센터); 인천가정법원 민원실 |
+| 「유족 배려 안내」 | 고객채권부's monthly letter telling a dead customer's family what he owed, first line 「상속 채무 이행 안내」, due 9월 30일. Rule revised 2024-03 by 위성규 (상속채권파트장, 44): sent to customers 92 days after the death (the longest three months), 「장례 직후의 독촉은 유족에게 상처」. Collection rate on inherited debt 41% before, 68% after. August: 87 letters, list closed 8월 14일 18:00, sent 8월 18일 (화) |
+| 국진호 (61) | invented (searched 2026-11-16): a sole trader with a one-ton refrigerated truck out of 인천 연안부두; died at the wheel 5월 14일 (목). Owes KD캐피탈 6,370만 원 (3,960만 truck instalments + 2,410만 working capital); leaves the truck (1,800만) and 410만 in the bank. His three months end 8월 14일; the other 86 are past theirs. Had told his wife four more months would pay off the truck |
+| 아이굴 세리코바 (57) | his wife, from 알마티, 21 years in Korea (married 2005), a permanent resident who kept her name; answers in Korean (said once, in the narration). Her residence card reads 「세리코바」, the 2005 family register 「세리꼬바」. Lays 바우르사크 on the fortieth day. Files at 인천가정법원 on 8월 14일 16시 52분; the truck is not sold before |
+| 국하늘 (20) | their daughter, second year at university; does not speak. If the months had passed: the wife's share 3,822만, hers 2,548만 (3/5 and 2/5) |
+| 위성규 | speaks only in the narration (indirect speech or 「」), as 번외 8's 설경민; says the rule is for the bereaved. 상속인 enquiries before the letter get 안내 대본 7번 |
+| The endings | the first line of the 86 letters (the way out written on top, the analyst's name on the change, 39 houses file by November / the rule's numbers to audit, the letters sent as they were, the rule changed three months later to 14 days with a note, 위성규 up for a year-end commendation / 「상속 채무 이행 안내」 left, the first 50만 원 paid the next Wednesday). In each, her filing is accepted in September. None touches 사건 40's score or 41's hearing |
+
+### 번외 10, 인사 없이 (side10)
+
+| Fact | Value |
+|---|---|
+| When | 2025-09-13 (토) 21:00 to 09-14 (일) 07:30: two days after 사건 05's 원인 회의 (its 회의록 with seven blank signatures, 오진우's desk empty), before 사건 06's 위원회. 9월 15일 (월) 06:00 is when the automatic 배차 comes back |
+| Where | 온새 돌봄's 강서 거점 (the night 수동 배차), the houses on its hand list, and 트리거랩's 분석관실 |
+| 오진우 | spent the two nights in the passenger seat of a 요양보호사's car, visiting the houses his 가중치표 pushed back. Says he left without a word "할 말이 없어서". Nothing of a 사직서 (사건 06 has it) |
+| The 가중치표 | 민원 이력 없음 moves a house two places down, 연락 안 됨 three. Fourteen approval papers made it what it is (확인 전화 두 번 → 한 번, 연락 안 되는 집은 뒤로, 검토 6분), each by a different approver; 오진우's is the last box, the only name the press kept |
+| 변정순 (58) | 방문 요양보호사, 11 years with 온새. Her own notebook keeps a last column, 「말 안 하는 집」, a star a house, eleven years of them; before the system the 거점 ordered visits by it. "공책은 내 거예요" |
+| The houses | 312 dots, 271 visited by hand when the case opens, 41 left that night: an 82-year-old in a 반지하 with no 민원 and no phone, two days of medicine unopened; a 53-year-old former 플로우온 야간조 worker, 정리 last year, who called no one ("바쁜 데 많을 텐데") |
+| The endings | the first line of 오진우's one page for Monday (her column as a field in the 가중치표 -- a trial box 「현장 특이 사항」 appears at her 거점 that Friday / the fourteen approvers and the six minutes by name -- someone pencils '14' beside the blank signatures / nothing, and a lift home -- "이게 인사입니다"). In each the automatic 배차 comes back unchanged on Monday. None touches 사건 05 or 06 |
+
+### 번외 11, 부표까지 (side11)
+
+| Fact | Value |
+|---|---|
+| When | 2026-09-05 (토) 05:40 to noon: the morning after 사건 42 (the 경포 불꽃축제 Friday at 물결스테이, 9월 4일), two days before 사건 43's 이사회 (9월 7일). It knows nothing of the vote |
+| Where | 경포 해변 and 물결스테이's 마당 |
+| The rematch | 오진우 lost to 한서윤 by 3초 to the buoy in 사건 42 and shouted 「재경기」; it is set for 06:00. The buoy is 80m out |
+| 염봉수 (66) | 수상안전요원 of 경포 해변, a retired 해양경찰, his thirty-first summer there. 입수 from 09:00, never past the buoy; "부표는 끝이 아니라 내가 볼 수 있다는 표시". He sets out the buoys every year |
+| The wait | 2시간 40분 more for two people on 대기발령 for five months. 한서윤 has tapped an 출근 카드 every morning since (사건 42); on a Saturday there is nowhere to tap. 오진우 paints the 감시탑 ladder, fourteen rungs, "다섯 달 만에 처음 받은 일" |
+| The swim | at 40m 한서윤 stops and floats on her back; 오진우 turns back to her and they touch the buoy together. 4분 11초 on the stopwatch, two minutes of stopping in it |
+| The endings | the line in 물결스테이's 방명록 beside 강태민's 「또 옴」 (the time to the second, 「동시」 / 「9시까지 아무도 재지 않기」, with 권도현's '쉰 시간 3시간 20분' and 염봉수's '이유 있는 사람들, 오늘은 무사' / nothing, the car to Seoul before lunch). Nothing of 사건 43's vote, the 조기 회수 text or 임경수 |
+
 ## Known and left alone
 
 - **"3년".** The 프롤로그 is dated 2022-23 and 사건 01 is some months before

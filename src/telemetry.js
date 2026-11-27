@@ -22,6 +22,11 @@ function publishTelemetryStats() {
 // weeklyCalendar.js): its seasons are the maker's tests, not the ranking's.
 export const telemetryEnabled = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY) && !DEV_WEEK_RULE;
 
+/** The project the page talks to, for the board's admin sign-in (boardAdmin.js); null without one. */
+export function supabaseTarget() {
+  return SUPABASE_URL && SUPABASE_ANON_KEY ? { url: SUPABASE_URL, key: SUPABASE_ANON_KEY } : null;
+}
+
 /**
  * One request under one deadline, body included. The answer comes back with
  * its body already read: the timer used to be cleared as soon as the headers
@@ -299,6 +304,24 @@ export async function fetchBoardPosts(limit = 50) {
 }
 
 /**
+ * 「만든 사람 공지」 (20261202010000_board_notice.sql): the makers' one notice,
+ * as anon may read it -- its words and times while it lasts, never who posted
+ * it. No row is no notice. src/boardNotice.js reads the row.
+ */
+export async function fetchBoardNotice() {
+  if (!telemetryEnabled) return { skipped: true, rows: [] };
+
+  const query = new URLSearchParams({ select: "body_ko,body_en,body_ja,posted_at,expires_at", limit: "1" });
+  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/board_notice?${query.toString()}`, {
+    headers: restHeaders(),
+  });
+
+  if (!response.ok) throw await createTelemetryError(response, "Board notice fetch failed");
+
+  return { rows: await response.json() };
+}
+
+/**
  * The best completed seasons, best first. The server orders by its own `score`
  * column, so what reaches the client is the top of the table -- not the most
  * recent rows, which a flood of fresh ones could fill. `run_tag` is the short
@@ -330,13 +353,15 @@ export async function fetchLeaderboard(limit = 100, week = null) {
 }
 
 /**
- * The hall of fame's places (D2, `public_hall_of_fame`): board, place, run tag
- * and whether the board is settled, for the ranking screen's badges
- * (src/hallOfFameBadges.js). A few hundred bytes at most.
+ * The hall of fame's boards (D2, `public_hall_of_fame`): board, place, run tag,
+ * whether the board is settled and its count of checked seasons, for the
+ * ranking screen's badges and, on a board with no place yet, its progress
+ * line (N46, src/hallOfFameBadges.js). A board below five is one row with no
+ * place. A few hundred bytes at most.
  */
 export async function fetchHallOfFame() {
   if (!telemetryEnabled) return { skipped: true, rows: [] };
-  const query = new URLSearchParams({ select: "board,place,run_tag,settled_on", place: "not.is.null" });
+  const query = new URLSearchParams({ select: "board,place,run_tag,settled_on,checked_seasons" });
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/public_hall_of_fame?${query.toString()}`, {
     headers: restHeaders(),
   });

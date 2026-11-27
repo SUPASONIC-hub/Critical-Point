@@ -15,7 +15,7 @@
   overflow-y: auto;
   padding: calc(12px + env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
     calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-  background: rgb(4 7 8 / 0.74);
+  background: rgb(247 242 230 / 0.74);
   backdrop-filter: blur(12px) saturate(1.1);
 }
 
@@ -27,7 +27,7 @@
   border-radius: var(--ui-radius-lg);
   color: var(--ui-text);
   background:
-    radial-gradient(90% 60% at 50% 0%, rgb(255 196 87 / 0.14), transparent 70%),
+    radial-gradient(90% 60% at 50% 0%, rgb(132 88 0 / 0.11), transparent 70%),
     linear-gradient(180deg, var(--ui-surface-2), var(--ui-surface-1));
   box-shadow:
     var(--ui-shadow-2),
@@ -117,7 +117,7 @@
   border-radius: 6px;
   color: var(--ui-text-2);
   background: var(--ui-surface-1);
-  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+  box-shadow: inset 0 -1px 0 rgb(22 24 26 / 0.04);
   font: 700 0.6875rem/1 var(--font-sans);
 }
 
@@ -262,8 +262,8 @@
   padding: 1px 8px 1px 6px;
   border: 1px solid var(--c-gx-relic-a30);
   border-radius: var(--radius-pill);
-  color: var(--c-gx-relic);
-  background: rgb(255 196 87 / 0.08);
+  color: rgb(108 71 0);
+  background: rgb(132 88 0 / 0.06);
   font-size: 0.6875rem;
   font-weight: 700;
 }
@@ -311,7 +311,7 @@
 }
 
 .gx-equip-toast b {
-  color: var(--c-paper);
+  color: var(--ui-text);
   letter-spacing: 0.06em;
 }
 
@@ -348,7 +348,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--c-paper);
+  color: var(--ui-text);
   font-size: 0.9375rem;
 }
 

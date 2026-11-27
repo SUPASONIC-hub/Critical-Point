@@ -57,6 +57,21 @@ export const LINK_SPAN_MAX = 4;
 /** How much closer CASCADE pulls the board's wall band (B: BLACKOUT_WALL_SHIFT). */
 export const LINK_WALL = 6;
 /**
+ * G32 (RULES_MARK 9): CASCADE pulls only the top of the band, this far; its
+ * bottom stays (G20's 합병 shape). The whole band 6 closer hit the hand that
+ * pushes blind to 50 hardest (heat 50: BUST 8.8% -> 16.1% with links on, a
+ * heartbeat hand 3.7% -> 4.7%), since that hand meets the band's bottom end.
+ */
+export const LINK_TOP_WALL = 10;
+/**
+ * How far CASCADE moves the band's ends (`[bottom, top]`): G32's top only when
+ * the case plays RULES_MARK 9 (`top`, the caller's nextTableRules.js
+ * `isMarkNineOn`; this chunk imports no rules), the whole band before.
+ */
+export const getLinkShift = (top) => (top ? [0, LINK_TOP_WALL] : [LINK_WALL, LINK_WALL]);
+/** The copy and the number a line on the link prints: the far end's under G32 (`top`). */
+const linkWords = (key, top) => (top ? { line: cascadeCopy[`${key}Top`], wall: LINK_TOP_WALL } : { line: cascadeCopy[key], wall: LINK_WALL });
+/**
  * How many links a closed case hands the next one; the older beyond it lapse
  * (decision 6 (2)). 1 since 2026-10-21: with 3, collapse rose to 23.0% and a
  * look lost 29.8% to CASCADE; with 1, 21.0% and 24.2%, and 20.6% of the links
@@ -78,6 +93,17 @@ export const CASCADE_MUTATION = Object.freeze({
   },
   get text() {
     return fill(cascadeCopy.mutation.text, { wall: LINK_WALL });
+  },
+});
+/** G32 (RULES_MARK 9): the same rule, its line on the band's far end (the engine picks one by the page's rules). */
+export const CASCADE_MUTATION_TOP = Object.freeze({
+  penalty: true,
+  label: "CASCADE",
+  get title() {
+    return cascadeCopy.mutation.title;
+  },
+  get text() {
+    return fill(cascadeCopy.mutation.textTop, { wall: LINK_TOP_WALL });
   },
 });
 
@@ -214,10 +240,10 @@ export const isDueNext = ({ board, pending }) => pending.some((link) => link.due
  * `LINK_SPAN_MAX` after the board that made it, narrowing as boards pass --
  * not the drawn board, which is never shown.
  */
-export const readLinks = (run, log, runId, rules) => (isCascadeOn(run, rules) ? readWalk(walkLinks(log, runId, run.linksIn)) : null);
+export const readLinks = (run, log, runId, rules, top = false) => (isCascadeOn(run, rules) ? readWalk(walkLinks(log, runId, run.linksIn), top) : null);
 
-/** `readLinks` on any table: a walk's reading. */
-export function readWalk({ board, pending }) {
+/** `readLinks` on any table: a walk's reading (`top`: G32's line, the band's far end). */
+export function readWalk({ board, pending }, top = false) {
   const ranges = pending.map((link) => {
     const low = Math.max(1, link.from + LINK_SPAN_MIN - board);
     return [low, Math.max(low, link.from + LINK_SPAN_MAX - board)];
@@ -227,7 +253,7 @@ export function readWalk({ board, pending }) {
   // What the voice says as this board opens, once: a link the last board
   // made, or the nearest one now due next (B2 2-8). Else nothing.
   const fresh = pending.some((link) => link.from === board - 1);
-  return { ...reading, said: fresh || reading.atRisk ? describeLinks(reading) : "" };
+  return { ...reading, said: fresh || reading.atRisk ? describeLinks(reading, top) : "" };
 }
 
 /**
@@ -236,9 +262,9 @@ export function readWalk({ board, pending }) {
  * a board BLACKOUT did not deal, on a table that counts links. `burn` is the
  * card's (`getCardBurn`), which is what the card showed. 초안.
  */
-export const describeLinkMade = (run, { cashed, burn }, rules) =>
+export const describeLinkMade = (run, { cashed, burn }, rules, top = false) =>
   isCascadeOn(run, rules) && cashed && !run.schema?.mutations?.includes("blackout") && Math.abs(burn?.value ?? 0) >= LINK_BURN
-    ? fill(cascadeCopy.linkMade, { min: LINK_SPAN_MIN, max: LINK_SPAN_MAX, wall: LINK_WALL })
+    ? ((words) => fill(words.line, { min: LINK_SPAN_MIN, max: LINK_SPAN_MAX, wall: words.wall }))(linkWords("linkMade", top))
     : null;
 
 /** "다음 판" or "2~4판 안", for a range in boards from the one on the table. */
@@ -248,4 +274,7 @@ export const describeRange = ([low, high]) => {
 };
 
 /** What the voice says of the links (B2 2-8). 초안. */
-const describeLinks = ({ live, nearest }) => fill(cascadeCopy.links, { live, range: describeRange(nearest), wall: LINK_WALL });
+const describeLinks = ({ live, nearest }, top = false) => {
+  const words = linkWords("links", top);
+  return fill(words.line, { live, range: describeRange(nearest), wall: words.wall });
+};

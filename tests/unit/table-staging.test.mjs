@@ -31,9 +31,9 @@ test("a case's introduction is on the briefing of the scene it opens on and on n
       assert.deepEqual(getBriefingIntro(nodes[nodeId], nodeId, {}, true), [], `${nodeId} has nothing new to say`);
     }
   }
-  // 사건 04 is the first case with nothing to turn on (C-4: 사건 01 to 03 open one rule each).
-  const case04 = CASE_START_NODES.case04;
-  assert.deepEqual(getBriefingIntro(nodes[case04], case04, {}, true), [], "사건 04 turns nothing on");
+  // 사건 06 is the first case with nothing to turn on (C-4 and N18: 사건 01 to 05 open one rule each).
+  const case06 = CASE_START_NODES.case06;
+  assert.deepEqual(getBriefingIntro(nodes[case06], case06, {}, true), [], "사건 06 turns nothing on");
   assert.deepEqual(getBriefingIntro(undefined, undefined, {}, true), [], "a scene with no case has no introduction");
   const second = CASE_START_NODES.prologue02;
   assert.deepEqual(getBriefingIntro(nodes[second], second, {}), STAGED ? [...UNLOCK_LADDER[1].intro] : [], "the shipped switch decides by default");
@@ -77,7 +77,7 @@ test("the introduction is read against the briefing's clock, a line counted as a
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
   // And the week's rule (이번 주의 규칙), whose panel the page prints too, and the case's opening voice (Q8 (1)).
   // A scene folded on a NEW GAME+ season (E-1) is counted as it is shown, `told`.
-  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.told, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules, \{ text: bridge \}, \{ text: openingLine \}\]\)/);
+  assert.match(briefing, /getReadingSeconds\(\{ \.\.\.told, question \}, \[\.\.\.mutations, \.\.\.intro\.map\(\(text\) => \(\{ text \}\)\), \.\.\.weekRules, \{ text: bridge \}, \{ text: openingLine \}(, \{ text: tiltLine \})?\]\)/);
   assert.match(briefing, /const intro = getBriefingIntro\(node, nodeId, run\);/);
 });
 
@@ -139,5 +139,5 @@ test("a case's opening voice is shown on its first page only, and is on the read
   const briefing = readFileSync("src/gauntlet/SceneBriefing.jsx", "utf8");
   assert.ok(briefing.indexOf('data-testid="briefing-opening"') > briefing.indexOf('id="gx-comic-title"'));
   assert.ok(briefing.indexOf('data-testid="briefing-opening"') < briefing.indexOf('data-testid="reading-timer"'));
-  assert.match(briefing, /\.\.\.weekRules, (\{ text: bridge \}, )?\{ text: openingLine \}\]/);
+  assert.match(briefing, /\.\.\.weekRules, (\{ text: bridge \}, )?\{ text: openingLine \}(, \{ text: tiltLine \})?\]/);
 });

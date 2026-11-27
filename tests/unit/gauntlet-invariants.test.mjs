@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -134,6 +135,7 @@ test("every board the rules can deal keeps the sealed-card rule and its start un
     window: { status: "cashed", gauge: 22, pushes: 0, focus: 80, focusMode: "strike", focusHits: 3 },
     card: staked,
   });
+  // 15 + OVERCLOCK's 6 + STRIKE WAKE's 3.
   assert.deepEqual([nextRun.schema.stepMax, nextRun.schema.wallMin], [24, 56], "the push and the wall are what their rules made them");
   assert.deepEqual([nextRun.schema.sealHighest, nextRun.schema.sealBreak], [true, SEAL_BREAK_GAUGE], "with the wall where it was, the seal has room");
   // The same board on a peak table, whose wall is 5 closer, is the one that would break it now.
@@ -612,5 +614,6 @@ test("every rule that reads a frame-loop variable is on an element the loop writ
     }
   }
   // 18 since the beat went (2026-10-10): the ring, the reticle and the hit zone read nine more.
-  assert.ok(uses >= 16, `the scan has to find the readers it guards: ${uses}`);
+  // 15 since 2안 감사 장부 (2026-11-18): the paper skin drops the clock's and the beat's glows.
+  assert.ok(uses >= 15, `the scan has to find the readers it guards: ${uses}`);
 });

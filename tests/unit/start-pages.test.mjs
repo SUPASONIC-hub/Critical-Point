@@ -59,8 +59,8 @@ test("each start page has its language, title, description, cards and its own ca
     assert.equal(one(html, "property", "og:locale"), OG[language]);
     assert.deepEqual(metas(html, "property", "og:locale:alternate"), Object.keys(OG).filter((code) => code !== language).map((code) => OG[code]));
     assert.equal(one(html, "property", "og:url"), url);
-    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/triggerlab-key-visual.jpg`);
-    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/triggerlab-key-visual.jpg`);
+    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/og-${language}.jpg`);
+    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/og-${language}.jpg`);
     assert.equal(one(html, "property", "og:image:alt"), SHARE_IMAGE_ALT[language]);
     assert.equal(one(html, "name", "twitter:image:alt"), SHARE_IMAGE_ALT[language]);
     assert.equal(one(html, "name", "twitter:card"), "summary_large_image");
@@ -90,7 +90,7 @@ test("the Japanese start page alone drops the font preload; the Korean and the E
   assert.equal(fontPreloads(pages.en).length, 1, "/en/ preloads the font");
   assert.deepEqual(fontPreloads(pages.ja), [], "/ja/ does not");
   assert.doesNotMatch(pages.ja, /pretendard-cp[^"]*\.woff2/, "/ja/ names the woff2 nowhere: the stylesheet fetches it");
-  assert.match(pages.ja, /<!-- The first of the two font files/, "the rest of the Korean head stays as it is");
+  assert.match(pages.ja, /<link rel="manifest" href="[^"]*\/manifest\.webmanifest"/, "the rest of the Korean head stays as it is");
   // The built page names the hashed file and keeps index.html's line breaks inside the tag.
   const builtForm = INDEX.replace("/src/assets/fonts/pretendard-cp.woff2", "/assets/pretendard-cp-CmzYrx-E.woff2");
   assert.ok(builtForm.includes("pretendard-cp-CmzYrx-E.woff2"), "the source names the font once");
@@ -186,8 +186,8 @@ test("the plain pages carry a card too: title, description, own address and the 
     assert.equal(one(html, "property", "og:description"), description, file);
     assert.equal(one(html, "name", "twitter:description"), description, file);
     assert.equal(one(html, "property", "og:url"), `${ORIGIN}/${file}`, file);
-    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/triggerlab-key-visual.jpg`, file);
-    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/triggerlab-key-visual.jpg`, file);
+    assert.equal(one(html, "property", "og:image"), `${ORIGIN}/og-${language}.jpg`, file);
+    assert.equal(one(html, "name", "twitter:image"), `${ORIGIN}/og-${language}.jpg`, file);
     assert.equal(one(html, "property", "og:locale"), OG[language], file);
     assert.equal(one(html, "property", "og:site_name"), GAME_NAME[language], file);
     assert.equal(one(html, "name", "twitter:card"), "summary_large_image", file);

@@ -96,3 +96,29 @@ test("chapter 4's code blocks are copied from src/nodes/case12.js unchanged", ()
   const source = read("src/nodes/case12.js");
   for (const block of blocks) assert.ok(source.includes(block), `not in case12.js:\n${block.split("\n").slice(0, 3).join("\n")}`);
 });
+
+test("every npm script and repository path the guide names is still there (the new case's own files aside)", () => {
+  const doc = read("docs/writing-a-case.md");
+  const scripts = JSON.parse(read("package.json")).scripts;
+  const names = new Set([...doc.matchAll(/npm run ([a-z][a-z0-9:-]*)/g), ...doc.matchAll(/`((?:check|build|report|verify|test):[a-z0-9:-]+)`/g)].map((match) => match[1]));
+  assert.ok(names.size > 10);
+  assert.deepEqual([...names].filter((name) => !scripts[name]), [], "the guide names npm scripts package.json no longer has");
+  // The case being written (case50, caseNN, sideNN) is the one path that is not there yet.
+  const paths = new Set([...doc.matchAll(/`((?:src|scripts|docs|tests|public|supabase)\/[^`*<>\s]+)`/g)].map((match) => match[1]).filter((file) => !/case50|NN/.test(file)));
+  assert.ok(paths.size > 40);
+  assert.deepEqual([...paths].filter((file) => !fs.existsSync(file)), [], "the guide points at files that moved or went away");
+});
+
+test("6-1's table names every warning check:case prints", () => {
+  const doc = read("docs/writing-a-case.md");
+  const chapter = doc.slice(doc.indexOf("### 6-1. "), doc.indexOf("## 7. "));
+  assert.ok(chapter.includes("npm run new:case") && chapter.includes("npm run check:case"));
+  const source = read("scripts/check-case.mjs");
+  const kinds = new Set();
+  for (const [, plain, perLang] of source.matchAll(/warn\([^,]+, (?:"([^"]+)"|`\$\{lang\} ([^`]+)`)/g)) {
+    if (plain) kinds.add(plain);
+    else for (const lang of ["en", "ja"]) kinds.add(`${lang} ${perLang}`);
+  }
+  assert.ok(kinds.size >= 10, [...kinds].join(", "));
+  assert.deepEqual([...kinds].filter((kind) => !chapter.includes(`\`[${kind}]\``)), [], "check:case prints a warning 6-1 does not explain");
+});

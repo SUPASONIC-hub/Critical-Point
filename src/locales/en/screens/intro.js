@@ -1,12 +1,13 @@
 /** The start screen in English (src/copy/intro.js). */
 export default {
-  pageTitle: "Critical Point - Every 45 seconds, your judgment goes on the record",
+  pageTitle: "Critical Point — Free Browser Mystery Game",
   subtitle: "Every 45 seconds, your judgment goes on the record",
-  titleReading: "Trigger Lab",
+  titleReading: "Critical Point",
   premise:
     "3 years ago you filed the lone dissent on a loan. It went out anyway, and you were sent down to Trigger Lab, beneath US-backed KD Financial Group. Today's first file bears that loan number. Conditions you hold too long return as the next case's pressure. It begins earlier, with your last trainee task.",
   startButton: "Start the prologue",
   briefingLink: "Read the briefing first",
+  storyStart: { label: "Start in Story Mode", hint: "Easier · not ranked" },
   ranking: "Ranking",
   board: "Board",
   heroAlt: "Two analysts seen from behind on a high-rise rooftop at dusk, looking down at the city",
@@ -34,7 +35,7 @@ export default {
   round: " · Season {round}",
   stats: { cases: "Cases", oneCase: "Per case", minutes: " min or so", answers: "Right answers" },
   previousMessage: "Left by the last player: “{message}”",
-  rankingReset: "Ranking notice: on Monday, November 30, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
+  rankingReset: "Ranking notice: on Wednesday, November 25, the public ranking is cleared once as the rules change. The Hall of Fame stays as it is.",
   castRenamed: "Cast notice: a few people now have new names and faces. Old names in earlier records show as the new ones ({names}).",
   setup: {
     label: "Get ready to start",
@@ -131,6 +132,33 @@ export default {
     result: " · {thinking} · {seconds}s · Reframes {count}",
   },
   status: { playing: "In progress", open: "Ready to start", complete: "Done", locked: "Previous case needed" },
+  reading: {
+    title: "Read more",
+    intro: [
+      "Critical Point is a free financial mystery game you play right in the browser. You are an analyst who, three years ago, filed the lone dissent on a loan and was sent down to a basement lab for it. Now you take on the fifty-five cases that grew out of that loan, one after another.",
+      "In each case you read the scene, then decide how much to stake on a table whose clock keeps shrinking. The more you stake, the bigger the reward, but cross an unseen line and you lose the hand, and any condition you hold too long comes back as the next case's pressure. Every hard financial term is explained the first time it appears, and you can stop on a short commute and pick it up on another device.",
+      "Below are the rules, the case files, the cast, and the notes the two of us write ourselves.",
+    ],
+    menuLabel: "Site menu",
+    menuTitle: "Around the site",
+    items: {
+      guide: { label: "How to Play", text: "The table, your resources, stakes and BUST on one page" },
+      "cases/index": { label: "Case Files", text: "From the prologue to the final case: each one's opening and question" },
+      characters: { label: "Characters", text: "The people of the story, as each first appears" },
+      making: { label: "How We Made It", text: "How one question became a game of fifty-five cases" },
+      "notes/index": { label: "Notes", text: "Finance behind the cases and our design notes, written by us" },
+      about: { label: "About", text: "The game at a glance" },
+      faq: { label: "FAQ", text: "Saves, rankings, languages and your data" },
+      contact: { label: "Contact", text: "Report a bug or send us a word" },
+      policies: { label: "Policies", text: "How we handle data, and the terms of use" },
+    },
+    notesTitle: "Latest notes (in Korean)",
+    notesAll: "All notes",
+    notesEmpty: "Our first note is on its way.",
+    frontTitle: "Today's front page (in Korean)",
+    frontNote: "A made-up article from the game's world, not about any real event, person or company",
+    frontAll: "All in-world articles",
+  },
   legal: { about: "About", faq: "FAQ", contact: "Contact", privacy: "Privacy Policy", terms: "Terms of Use" },
   opening: {
     firstCase: "the first case",

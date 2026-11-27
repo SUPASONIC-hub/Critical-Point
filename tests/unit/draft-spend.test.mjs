@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
@@ -77,7 +78,7 @@ test("the stage tells a swap from a bought one more's second pick, and pays thro
   const draft = read("src/gauntlet/RelicDraft.jsx");
   assert.match(draft, /const spend = onSpend \? readDraftSpend\(run\) : null;/);
   const runtime = read("src/GameRuntime.jsx");
-  assert.match(runtime, /function spendAtDraft\(kind\) \{\s*const paid = relicTable\.spend\(gauntletRun, kind\);\s*if \(!staleSave && paid !== gauntletRun\) applyRun/);
+  assert.match(runtime, /function spendAtDraft\(kind, id = null\) \{\s*const paid = relicTable\.spend\(gauntletRun, kind, id\);\s*if \(!staleSave && paid !== gauntletRun\) applyRun/);
   assert.match(runtime, /pickRelic, spendAtDraft,/);
   assert.match(read("src/gauntlet/useRelicTable.js"), /spend: spendAtDraft \}/);
   assert.match(read("src/screens/PlayScreen.jsx"), /onSpendAtDraft=\{spendAtDraft\}/);
@@ -93,7 +94,7 @@ test("a buy that cannot pay keeps its place, is aria-disabled and says why", () 
   assert.match(buy, /onClick=\{state\.open \? onPress : undefined\}/);
   assert.doesNotMatch(buy, /\sdisabled=/, "not `disabled`: it stays reachable and read");
   assert.match(draft, /\{spend && !swapFor && !spend\.second && \(/);
-  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">\{say\.spendHint\}<\/small>/);
+  assert.match(draft, /<small className="gx-draft-note">\{say\.spendNote\}<\/small>\s*<small className="gx-draft-note">{isNextOn\(\) \? fill\(say\.spendHintNext, \{ cap: RELIC_BOOST_CAP \}\) : say\.spendHint\}<\/small>/);
   // The buys' rules are a sheet of their own (relics.css was every line spent), imported right after the draft's.
   const css = read("src/styles/app/draft-spend.css");
   const order = read("src/styles/app.css");
@@ -106,7 +107,7 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   const ko = (await import("../../src/copy/relics.js")).default.draft;
   const en = (await import("../../src/locales/en/screens/relics.js")).default.draft;
   const ja = (await import("../../src/locales/ja/screens/relics.js")).default.draft;
-  const reasons = ["practice", "story", "record", "used", "picked", "few", "short"];
+  const reasons = ["practice", "story", "record", "used", "season", "picked", "few", "short", "none"];
   for (const [lang, words] of Object.entries({ ko, en, ja })) {
     for (const key of ["reroll", "extra"]) assert.match(words[key], /\{cost\}/, `${lang} ${key}`);
     for (const key of ["spendNote", "spendHint", "secondTitle", "secondLede"]) assert.ok(words[key], `${lang} ${key}`);
@@ -119,5 +120,5 @@ test("the draft's buys are worded in all three languages, with the price as a bl
   assert.match(en.spendNote, /KD Bank account/);
   assert.match(ja.spendNote, /KD銀行口座/);
   // The hint under the note (11-05, (1)): one more only when a slot is open, in the draft's own words (slot / 枠, vault / 金庫).
-  assert.deepEqual([ko.spendHint, en.spendHint, ja.spendHint], ["하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.", "One more only when a slot is open. Buy every time and the vault runs dry before the ending.", "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。"]);
+  assert.deepEqual([ko.spendHint, en.spendHint, ja.spendHint], ["하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.", "One more only when a slot is open. Buy every time and the Vault runs dry before the ending.", "もう一つは枠が空いているときだけ。毎回買えば結末までに金庫が細る。"]);
 });

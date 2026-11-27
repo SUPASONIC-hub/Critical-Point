@@ -1,0 +1,66 @@
+name: Notes Publish
+
+# The notes (/notes/, scripts/content-pages/notes.mjs) go out on their day,
+# several on one day when they are ready together (since 2026-11-25, the
+# owner's 「2」: no schedule): a build writes only the notes whose day (`published` in
+# src/notes/noteIndex.js, KST) has come. A note dated for a day with no merge
+# would wait for the next deploy, so just after midnight in Seoul this asks
+# whether a note's day is today and, if one is, presses Deploy for the tip of
+# main: the same dispatch a person would make, held to the same gate (on main,
+# its push's Verify green; deploy.yml). Render's build then runs on the new day
+# and writes the note, its place in the list, the sitemap and the start
+# screen's 읽을거리. If that Deploy failed, the note's page is still a 404 the
+# next night, and this presses again (scripts/notes-publish-due.mjs). On every
+# other day it does nothing.
+#
+# Why the notes exist: cp-archive/메모-20261120/adsense-2차-분석.md (4-2), the
+# owner's decision 2026-11-20 「전부 1」. A note still dated ahead waits on code
+# that has not shipped yet; this presses on its day. No new secret: the run's
+# own GITHUB_TOKEN with `actions: write`, which a workflow_dispatch may be
+# started with.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 00:10 KST, every day.
+    - cron: "10 15 * * *"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      # Today's note, or an earlier one the site still answers 404 for because
+      # that day's Deploy failed. At most one press a Seoul day.
+      - name: Is a note waiting for a build?
+        id: due
+        shell: bash
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/notes-publish-due.mjs
+      - name: Deploy the tip of main, so the build writes them
+        if: steps.due.outputs.press == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha=$(git rev-parse HEAD)
+          gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main -f sha="$sha"
+          echo "Dispatched Deploy for $sha." >> "$GITHUB_STEP_SUMMARY"

@@ -1,3 +1,5 @@
+// RULES_MARK 8's audit, links and chips (G35, G32, G29 are rules-mark9.test.mjs's).
+import "./helpers/markEight.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 

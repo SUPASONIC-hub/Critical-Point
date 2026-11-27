@@ -46,6 +46,13 @@ import { ACCESSIBILITY_SETTINGS_KEY, readStoredValue, writeStoredValue } from ".
  *                    season that used it carries `assistStory` and is kept off
  *                    the public ranking. It is set in one place: the first
  *                    switch of the intro's comfort panel.
+ *   playAllTables    판 모두 직접 치기 (G43, 2026-11-26): off, a story run
+ *                    plays by hand only each case's 결재 판 and every other
+ *                    table is cashed at heat 70 when its card is picked
+ *                    (gauntlet/storyAutoCash.js); on, every table is played
+ *                    by hand as before. Read when a card is picked, so a
+ *                    change takes effect at the next table. Nothing outside
+ *                    story mode reads it.
  *   storyScale       이야기 글 크기 (2026-10-22, D-5): the story's prose -- the
  *                    briefing page, the reveal's beat, a case's ending and the
  *                    interlude -- this many times larger (1, 1.125, 1.25). The
@@ -76,6 +83,7 @@ export const DEFAULT_ACCESSIBILITY = Object.freeze({
   letterKeys: true,
   stillIntro: false,
   storyMode: false,
+  playAllTables: false,
   storyScale: 1,
   textScale: 1,
   edgeNotices: true,
@@ -89,7 +97,7 @@ export function normalizeAccessibility(value) {
   if (TABLE_TIME_SCALES.includes(source.tableTime)) settings.tableTime = source.tableTime;
   if (STORY_SCALES.includes(source.storyScale)) settings.storyScale = source.storyScale;
   if (TEXT_SCALES.includes(source.textScale)) settings.textScale = source.textScale;
-  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "edgeNotices", "crisisEdge", "foldReadScenes"]) {
+  for (const key of ["holdReadingClock", "readingClockAsked", "calmEffects", "letterKeys", "stillIntro", "storyMode", "playAllTables", "edgeNotices", "crisisEdge", "foldReadScenes"]) {
     if (typeof source[key] === "boolean") settings[key] = source[key];
   }
   return Object.freeze(settings);

@@ -2,8 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { analyticsFor } from "../../scripts/analytics-config.mjs";
+import { notesDay } from "../../scripts/content-pages/notes.mjs";
 import { AD_EDITS, ANALYTICS_AD_EDITS, ANALYTICS_NOTICE } from "../../scripts/legal-pages.mjs";
 import { ANALYTICS_SITE_AD_EDITS, renderStaticPages, SITE_AD_EDITS } from "../../scripts/site-pages.mjs";
+
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
 
 /**
  * The build's two switches on the plain pages: Google Analytics

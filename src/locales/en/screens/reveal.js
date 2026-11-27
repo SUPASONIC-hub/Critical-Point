@@ -21,6 +21,7 @@ export default {
     bust: "Heat {gauge} — the Wall was at {wall}.",
     cashed: "Committed at Heat {gauge}. The Wall was at {wall}.",
   },
+  autoCash: "Auto-cashed at Heat {gauge}. You play only the Sign-off hand.",
   details: "Details",
   ledgerLabel: "Fallout",
   pot: {
@@ -30,6 +31,8 @@ export default {
     auditCaught: " Audit caught it: of ",
     auditOf: " headed for the Vault,",
     auditTaken: " was clawed back · Vault ",
+    auditWhy: "Why: commits cashed under the audit line filled the audit to its limit. Push once more and cash above the line, and it goes down.",
+    auditWhySmooth: "Why: enough commits landed at the same spot (±1 Heat) that the ledger looked too smooth. Change where you cut to stay clear.",
     toVault: " To the Vault ",
     vault: " · Vault",
     staked: "Stake on the line ",
@@ -60,4 +63,9 @@ export default {
   next: "Next · {title}",
   caseResult: "Case result",
   nextHand: "Next hand",
+  pulse: {
+    question: "How is it going so far?",
+    answers: { fun: "Fun", hard: "Hard", long: "Too long" },
+    thanks: "Thank you. On to the next hand.",
+  },
 };

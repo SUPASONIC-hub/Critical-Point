@@ -193,7 +193,7 @@
   height: 20px;
   padding: 0 5px;
   color: inherit;
-  background: rgb(255 255 255 / 0.08);
+  background: rgb(22 24 26 / 0.06);
   border: 1px solid var(--ui-line-strong);
   border-bottom-width: 2px;
   border-radius: 6px;
@@ -214,8 +214,8 @@
   overflow: hidden;
   color: var(--ui-text);
   background:
-    radial-gradient(60% 90% at 0% 0%, rgb(217 255 98 / 0.1), transparent 62%),
-    radial-gradient(50% 80% at 100% 100%, rgb(104 196 255 / 0.07), transparent 70%), var(--ui-surface-1);
+    radial-gradient(60% 90% at 0% 0%, rgb(22 96 62 / 0.06), transparent 62%),
+    radial-gradient(50% 80% at 100% 100%, rgb(20 82 160 / 0.06), transparent 70%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-strong);
   border-radius: var(--ui-radius-xl);
   box-shadow: var(--ui-shadow-2);
@@ -227,8 +227,8 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+    linear-gradient(rgb(22 24 26 / 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(22 24 26 / 0.02) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: linear-gradient(120deg, var(--c-black), transparent 70%);
 }
@@ -246,7 +246,7 @@
   margin: 0;
   padding: 6px 12px 6px 10px;
   color: var(--ui-text-2);
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(22 24 26 / 0.03);
   border: 1px solid var(--ui-line);
   border-radius: var(--radius-pill);
   font-size: 0.8125rem;
@@ -330,10 +330,10 @@
   border-radius: 50%;
   background:
     radial-gradient(closest-side, var(--ui-surface-2) 84%, transparent 85%),
-    conic-gradient(var(--rank-tone) var(--rank-score, 0%), rgb(255 255 255 / 0.08) 0);
+    conic-gradient(var(--rank-tone) var(--rank-score, 0%), rgb(22 24 26 / 0.06) 0);
   box-shadow:
     0 0 0 1px var(--ui-line-strong),
-    0 0 60px rgb(255 206 115 / 0.12);
+    0 0 60px rgb(132 88 0 / 0.1);
 }
 .rank-s .rank-mark,
 .rank-a .rank-mark {
@@ -346,7 +346,7 @@
   --rank-tone: var(--ui-chip);
   box-shadow:
     0 0 0 1px var(--ui-line-strong),
-    0 0 60px rgb(104 196 255 / 0.16);
+    0 0 60px rgb(20 82 160 / 0.13);
 }
 .rank-mark span {
   color: var(--ui-text-3);
@@ -387,15 +387,14 @@
   gap: 6px;
 }
 .outcome-panel:not(.judgment-profile-panel) {
-  background:
-    radial-gradient(90% 70% at 0% 100%, rgb(255 206 115 / 0.08), transparent 65%), var(--ui-surface-1);
+  background: radial-gradient(90% 70% at 0% 100%, rgb(132 88 0 / 0.06), transparent 65%), var(--ui-surface-1);
 }
 .outcome-panel-mark strong {
   justify-self: start;
   padding: 4px 10px;
   color: var(--c-amber);
-  background: rgb(255 206 115 / 0.1);
-  border: 1px solid rgb(255 206 115 / 0.26);
+  background: rgb(132 88 0 / 0.08);
+  border: 1px solid rgb(132 88 0 / 0.21);
   border-radius: var(--radius-pill);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -427,12 +426,12 @@
   overflow: hidden;
   color: var(--ui-text);
   background:
-    radial-gradient(80% 120% at 100% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-2);
+    radial-gradient(80% 120% at 100% 0%, rgb(22 96 62 / 0.06), transparent 60%), var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow:
     var(--ui-shadow-2),
-    inset 0 1px 0 rgb(217 255 98 / 0.18);
+    inset 0 1px 0 rgb(22 96 62 / 0.11);
 }
 .next-case-panel > div {
   display: grid;
@@ -460,7 +459,7 @@
   display: grid;
   gap: 2px;
   padding: 8px 12px;
-  background: rgb(255 255 255 / 0.04);
+  background: rgb(22 24 26 / 0.03);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
 }
@@ -488,7 +487,7 @@
   margin-top: 6px;
   padding: 7px 12px;
   color: var(--ui-text-2);
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(22 24 26 / 0.03);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
   font-size: 0.8125rem;
@@ -516,8 +515,8 @@
 .next-case-panel button:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 0 0 1px rgb(217 255 98 / 0.7),
-    0 18px 50px rgb(217 255 98 / 0.32);
+    0 0 0 1px rgb(22 96 62 / 0.42),
+    0 18px 50px rgb(22 96 62 / 0.19);
 }
 .next-case-panel button .shortcut-hint {
   background: rgb(0 0 0 / 0.1);
@@ -602,7 +601,7 @@
   height: 5px;
   margin-top: 10px;
   overflow: hidden;
-  background: rgb(255 255 255 / 0.07);
+  background: rgb(22 24 26 / 0.05);
   border-radius: var(--radius-pill);
 }
 .score-breakdown i {
@@ -1063,7 +1062,7 @@
 .remote-status.local,
 .remote-status.pending {
   color: var(--c-amber);
-  background: rgb(255 206 115 / 0.1);
+  background: rgb(132 88 0 / 0.08);
 }
 .remote-status.error,
 .delta-down {
@@ -1076,8 +1075,8 @@
   width: min(560px, 100%);
   margin-top: 12px;
   padding: 12px;
-  background: rgb(255 206 115 / 0.08);
-  border: 1px solid rgb(255 206 115 / 0.28);
+  background: rgb(132 88 0 / 0.06);
+  border: 1px solid rgb(132 88 0 / 0.22);
   border-radius: var(--ui-radius-sm);
 }
 .retry-telemetry b {
@@ -1189,7 +1188,7 @@
 .feedback-panel .privacy-warning {
   color: var(--c-danger-81);
   background: var(--ui-heat-soft);
-  border-color: rgb(255 92 72 / 0.36);
+  border-color: rgb(176 38 30 / 0.29);
   border-radius: var(--ui-radius-sm);
 }
 .bar-row {
@@ -1208,7 +1207,7 @@
 .bar-track {
   height: 8px;
   overflow: hidden;
-  background: rgb(255 255 255 / 0.07);
+  background: rgb(22 24 26 / 0.05);
   border-radius: var(--radius-pill);
 }
 .bar-track div {
@@ -1219,7 +1218,7 @@
 .story-reveal {
   padding: 24px;
   color: var(--ui-text);
-  background: radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-2);
+  background: radial-gradient(70% 120% at 0% 0%, rgb(22 96 62 / 0.06), transparent 60%), var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
 }
@@ -1300,12 +1299,12 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-.route-atlas-node.branch .route-atlas-dot,
-.route-atlas-node.system .route-atlas-dot {
+.route-atlas-node:is(.branch, .system) .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-violet);
 }
-.route-atlas-node.evidence .route-atlas-dot,
-.route-atlas-node.memory .route-atlas-dot {
+.route-atlas-node:is(.evidence, .memory) .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-teal);
 }
 .route-atlas-node.turnaround .route-atlas-dot,
@@ -1314,6 +1313,7 @@
   background: var(--c-coral);
 }
 .route-atlas-node.aftermath .route-atlas-dot {
+  color: var(--ui-accent-ink);
   background: var(--c-danger);
 }
 .route-atlas-copy {
@@ -1345,7 +1345,7 @@
 }
 .route-atlas-meta .route-miss {
   color: var(--c-amber);
-  background: rgb(255 206 115 / 0.12);
+  background: rgb(132 88 0 / 0.1);
 }
 .route-atlas-meta .route-observer,
 .route-atlas-meta .route-memory,
@@ -1446,7 +1446,7 @@
 }
 .history-challenge :is(.challenge-miss, .challenge-grade.grade-c) {
   color: var(--c-amber);
-  background: rgb(255 206 115 / 0.12);
+  background: rgb(132 88 0 / 0.1);
 }
 .history-challenge :is(.suspense-event-log, .streak-break-log, .challenge-grade.grade-d) {
   color: var(--c-danger-81);
@@ -1585,8 +1585,7 @@
 .result-page
   > :is(section.ending-variant-panel, section.ending-epilogue-panel, section.failure-recovery-panel) {
   padding: clamp(18px, 2.4vw, 26px);
-  background:
-    radial-gradient(70% 120% at 0% 0%, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(70% 120% at 0% 0%, rgb(22 96 62 / 0.05), transparent 60%), var(--ui-surface-1);
   border-radius: var(--ui-radius-lg);
 }
 .result-page .ending-variant-panel.failure,
@@ -1684,7 +1683,7 @@
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 .result-page :is(.ranking-comparison i, .ending-axis-grid i) {
-  background: rgb(255 255 255 / 0.08);
+  background: rgb(22 24 26 / 0.06);
   border-radius: var(--radius-pill);
 }
 .result-page :is(.ranking-comparison em, .ending-axis-grid em) {
@@ -1703,7 +1702,7 @@
   padding: 0 14px;
   color: var(--ui-text);
   background: var(--ui-heat-soft);
-  border: 1px solid rgb(255 92 72 / 0.4);
+  border: 1px solid rgb(176 38 30 / 0.32);
   border-radius: var(--ui-radius-sm);
   font-weight: 700;
 }
@@ -1943,20 +1942,22 @@
   line-height: 1.75;
 }
 
+/* 2안 (11-18): the moods are inks on paper, each over 4.8:1 on the paper, the
+   white sheet and the second surface. */
 .interlude-panel.mood-warm {
-  --interlude-tint: #f0b968;
+  --interlude-tint: #8a5a00;
 }
 .interlude-panel.mood-quiet {
-  --interlude-tint: #8fb8d8;
+  --interlude-tint: #2f5f86;
 }
 .interlude-panel.mood-wry {
-  --interlude-tint: #9fd6a8;
+  --interlude-tint: #2f6b3a;
 }
 .interlude-panel.mood-grief {
-  --interlude-tint: #d89ab0;
+  --interlude-tint: #8c3a58;
 }
 .interlude-panel.mood-still {
-  --interlude-tint: #a9a4c4;
+  --interlude-tint: #5b5585;
 }
 /* Rules that lived in extensions.css, the old "late overrides" file, until
    2026-09-27. Nothing between here and where they sat sets the same property on
@@ -1971,7 +1972,7 @@
   border-radius: var(--ui-radius-xl);
   box-shadow:
     var(--ui-shadow-2),
-    0 0 90px rgb(217 255 98 / 0.08);
+    0 0 90px rgb(22 96 62 / 0.05);
 }
 .ending-sequence-header {
   position: absolute;
@@ -2008,7 +2009,7 @@
 }
 .ending-shell .ending-message-beat textarea {
   min-height: 130px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(22 24 26 / 0.06);
   font-size: 1.0625rem;
 }
 .ending-shell .ending-beat button:hover {
@@ -2081,7 +2082,7 @@
   }
 }
 .observer-turning-record {
-  background: rgb(217 255 98 / 0.1) !important;
+  background: rgb(22 96 62 / 0.06) !important;
   border-color: var(--c-acid) !important;
 }
 .final-report-locked {
@@ -2093,7 +2094,7 @@
   gap: 12px;
   padding: 18px 20px;
   text-align: left;
-  border: 1px solid rgba(217, 255, 98, 0.28);
+  border: 1px solid rgb(22 96 62 / 0.17);
   border-radius: var(--ui-radius-md);
 }
 .ending-twist-card h2 {
@@ -2142,16 +2143,15 @@
 .ending-shell .ending-beat blockquote {
   max-width: 900px;
   text-wrap: balance;
-  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.48);
 }
 .ending-shell .ending-twist-card {
   max-width: 900px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(22 24 26 / 0.07);
   box-shadow: inset 4px 0 0 var(--color-accent);
 }
 .route-break,
 .route-atlas-meta .route-break {
-  color: var(--color-white);
+  color: var(--c-paper);
   background: var(--c-danger-deep);
   border-color: var(--c-danger-deep);
 }
@@ -2209,7 +2209,7 @@
   align-items: center;
 }
 .ending-axis-panel .panel-title-row span {
-  color: var(--c-line-soft);
+  color: var(--ui-text-2);
 }
 /* The last of extensions.css, which was retired on 2026-09-28. Each rule keeps
    the order it had there. One needed its place in the cascade rather than a
@@ -2286,7 +2286,7 @@
   display: block;
   padding-top: 10px;
   color: var(--color-accent);
-  border-top: 1px solid rgba(217, 255, 98, 0.18);
+  border-top: 1px solid rgb(22 96 62 / 0.11);
   font-size: 0.75rem;
   font-weight: 900;
   line-height: 1.5;
@@ -2302,7 +2302,7 @@
   min-height: 96px;
   padding: 11px;
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgb(22 24 26 / 0.13);
   border-radius: var(--ui-radius-sm);
 }
 .ending-witness-log span {
@@ -2330,7 +2330,7 @@
   width: min(760px, 100%);
   padding: 14px 16px;
   text-align: left;
-  border: 1px solid rgba(217, 255, 98, 0.34);
+  border: 1px solid rgb(22 96 62 / 0.2);
   border-radius: var(--ui-radius-md);
 }
 .ending-archive-blueprint span {
@@ -2358,15 +2358,15 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(5, 13, 10, 0.58), rgba(5, 13, 10, 0.28) 36%, rgba(5, 13, 10, 0.82)),
-    radial-gradient(circle at 50% 45%, rgba(217, 255, 98, 0.16), transparent 54%);
+    linear-gradient(180deg, rgb(247 242 230 / 0.84), rgb(247 242 230 / 0.7) 36%, rgb(247 242 230 / 0.9)),
+    radial-gradient(circle at 50% 45%, rgb(22 96 62 / 0.1), transparent 54%);
 }
 .ending-witness-log {
   width: min(980px, 100%);
 }
 .ending-witness-log article,
 .ending-archive-blueprint {
-  background: rgba(7, 19, 15, 0.72);
+  background: rgb(247 242 230 / 0.72);
   backdrop-filter: blur(10px);
 }
 .ending-step-1 .ending-beat,
@@ -2419,7 +2419,7 @@
   gap: 8px;
   margin: 18px 0;
   padding: 16px 17px;
-  color: var(--c-paper);
+  color: var(--ui-text);
   background: var(--ui-surface-2);
   border: 1px solid var(--ui-line-accent);
   border-left: 3px solid var(--c-coral);
@@ -2443,7 +2443,7 @@
 .ending-coda p,
 .three-scenes ol {
   margin: 0;
-  color: var(--c-line-soft);
+  color: var(--ui-text-2);
   font-size: 0.8125rem;
   font-weight: 750;
   line-height: 1.6;
@@ -2455,11 +2455,11 @@
 }
 .ending-axis-grid b {
   font-size: 1.375rem;
-  color: var(--c-paper);
+  color: var(--ui-text);
 }
 .ending-axis-grid p {
   margin: 0;
-  color: var(--c-line-soft);
+  color: var(--ui-text-2);
   font-size: 0.75rem;
   font-weight: 750;
   line-height: 1.5;
@@ -2592,4 +2592,32 @@
 }
 .achievement-panel > span {
   color: var(--ui-text-3);
+}
+/* N42 (LeaveLine.jsx): the foot of 프롤로그 05, 사건 03 and 사건 07 -- one
+   quiet line that the season is saved, and 홈 화면에 추가 where offered. */
+.result-page > .leave-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px 0 4px;
+  color: var(--ui-text-2);
+  border-top: 1px solid var(--ui-line);
+}
+.leave-line p {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+/* G34's 보상금 button (CaseCover.jsx) is a `.ghost`, 38px: a finger's 44 here. */
+.leave-line button,
+.case-cover button {
+  min-height: 44px;
+}
+.leave-line small {
+  flex: 1 1 100%;
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+  line-height: 1.45;
 }

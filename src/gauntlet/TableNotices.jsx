@@ -3,11 +3,12 @@ import { RefreshCcw, Skull } from "lucide-react";
 import { RELICS } from "./relics.js";
 import { RelicIcon } from "./RelicDraft.jsx";
 import { formatMultiplier, formatMoney, getDirectionName, getDirectionParts, getTabNotices, getTypeName } from "./tableReadout.js";
-import { STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
+import { getBreathGauge, getBreathWall, STANCE_MASTERY_GOAL } from "./gauntletEngine.js";
 import { getLogicDirection, getLogicType } from "./logicStreak.js";
-import { SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
+import { SCOUT_NARROW_REACH, SCOUT_NARROW_TRUST, SCOUT_SECONDS, SCOUT_TRUST } from "./tableRules.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useTableVoice } from "./tableVoice.js";
+import { BREATH_SECONDS, EDGE_CASH_BONUS, isMarkNineOn, readEdgeCash } from "./nextTableRules.js";
 import { EdgeNotice } from "./EdgeNotice.jsx";
 import { MoneyBurst } from "./MoneyBurst.jsx";
 import { readBurst } from "./moneyFeedback.js";
@@ -80,6 +81,8 @@ function HeldElsewhere({ onClaim, onLeave }) {
 function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKeeps, target = null }) {
   // The amount flies only where there is a KD은행 계좌 (the purse) to fly to.
   const burst = target ? readBurst({ win, livePot, runPot, bustKeeps }) : null;
+  // G30 (RULES_MARK 9): a cash close under the wall, paid ×EDGE_CASH_BONUS.
+  const edge = isMarkNineOn() ? readEdgeCash(win) : null;
   return (
     <div className={`gx-slam gx-slam-${win.status}`} role="alert">
       {win.status === "bust" ? (
@@ -105,6 +108,7 @@ function VerdictSlam({ window: win, multiplier, livePot, streak, runPot, bustKee
           {burst ? <MoneyBurst burst={burst} target={target} /> : <span>+{formatMoney(livePot)}</span>}
           {/* The combo's copy starts on the separator the +N used to stand before. */}
           {streak > 0 && <span>{fill(say.slamCombo, { streak }).replace(/^\s*·\s*/, "")}</span>}
+          {edge !== null && <span data-testid="slam-edge">{fill(say.slamEdge, { bonus: EDGE_CASH_BONUS, gap: edge })}</span>}
         </>
       )}
     </div>
@@ -160,6 +164,8 @@ export function LogicLine({ logic }) {
         {logic.type ? <>{word}{after && <i>{after}</i>} {logic.held}</> : say.firstCard}
       </span>
       {logic.note && <em>{logic.note}</em>}
+      {/* G1 눈에 띔 (the next rules): its points after the staked card and what a cash under the line risks; the sentence is the buttons' description. */}
+      {logic.exposure?.points > 0 && <em className="gx-exposure" data-testid="gauntlet-exposure">{fill(say.exposure, { points: logic.exposure.points })} · {fill(say.exposureChance, { heat: logic.exposure.heat, risk: logic.exposure.points, most: logic.exposure.most })}</em>}
     </span>
   );
 }
@@ -191,13 +197,25 @@ export function RelicChips({ relics, pulse }) {
  * page. Before the case has SCOUT the band is the plain label the meter
  * already reads out.
  */
-export function ScoutBand({ band, canScout, onScout, shortcut }) {
-  if (!canScout && !band.scouted) return <span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>;
+export function ScoutBand({ band, canScout, onScout, shortcut, narrowTrust = SCOUT_NARROW_TRUST, scoutTrust = SCOUT_TRUST, onBreathe = null, board = null }) {
+  // G6: the 결재 판's shown cell, the nearest the wall can be, beside the band (its line is said once by the voice);
+  // G7: 숨 고르기 on the board right after a BUST, before the first push, while it can be pressed (`onBreathe`).
+  const shown = <>{band.shown !== undefined && <span className="gx-band-label" data-testid="gauntlet-sign-cell">{fill(tableCopy.stage.signCell, { cell: band.shown })}</span>}
+    {onBreathe && <button type="button" className="gx-scout" data-testid="commit-breathe" onClick={onBreathe}
+      aria-label={fill(tableCopy.stage.breathLabel, { seconds: BREATH_SECONDS, gauge: getBreathGauge(board), wall: getBreathWall(board) })}>{tableCopy.stage.breath} −{BREATH_SECONDS}s</button>}</>;
+  if (!canScout && !band.scouted) return <><span className="gx-band-label" aria-hidden="true">{fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })}</span>{shown}</>;
+  // After the first look the same button offers the second, which narrows the band (B1, 11-18), while the run can pay for it.
+  const narrows = band.scouted && canScout;
+  const label = !band.scouted
+    ? fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: scoutTrust, seconds: SCOUT_SECONDS })
+    : narrows
+      ? fill(say.narrowLabel, { min: band.wallMin, max: band.wallMax, trust: narrowTrust, seconds: SCOUT_SECONDS, width: SCOUT_NARROW_REACH * 2 })
+      : undefined;
   return (
-    <button type="button" className={`gx-band-label gx-scout${band.scouted ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
-      aria-keyshortcuts={shortcut} aria-label={band.scouted ? undefined : fill(say.scoutLabel, { min: band.wallMin, max: band.wallMax, trust: SCOUT_TRUST, seconds: SCOUT_SECONDS })}>
-      {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {band.scouted ? say.scouted : say.scout}
-    </button>
+    <><button type="button" className={`gx-band-label gx-scout${band.scouted && !narrows ? " is-scouted" : ""}`} data-testid="commit-scout" onClick={onScout} aria-disabled={!canScout}
+      aria-keyshortcuts={shortcut} aria-label={label}>
+      {fill(tableCopy.stage.wallRange, { min: band.wallMin, max: band.wallMax })} · {narrows ? say.narrow : band.scouted ? say.scouted : say.scout}
+    </button>{shown}</>
   );
 }
 

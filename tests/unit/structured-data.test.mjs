@@ -36,7 +36,7 @@ function expectGame(data, language, file) {
   assert.equal(game.url, home, file);
   assert.equal(game.inLanguage, language, file);
   assert.ok(game.description?.length > 40, `${file}: a description`);
-  assert.equal(game.image, `${ORIGIN}/triggerlab-key-visual.jpg`, `${file}: the share image, absolute`);
+  assert.equal(game.image, `${ORIGIN}/og-${language}.jpg`, `${file}: the share image, absolute`);
   assert.deepEqual(game.genre, GAME_GENRES[language], file);
   assert.equal(game.gamePlatform, "Web browser", file);
   assert.deepEqual(game.offers, { "@type": "Offer", price: "0", priceCurrency: { ko: "KRW", en: "USD", ja: "JPY" }[language] }, `${file}: free`);
@@ -75,7 +75,7 @@ test("the about page names the game as the start page does, in its language", ()
   }
 });
 
-test("each case's page, the guide, the cast and the making-of carry a two-step trail; the other plain pages none", () => {
+test("each case's page, the guide, the cast, the making-of and the weekly calendar carry a two-step trail; the other plain pages none", () => {
   const trailed = new Set(CONTENT_KINDS.filter((kind) => kind !== "cases/index"));
   for (const language of LANGUAGES) {
     for (const kind of CONTENT_KINDS) {
@@ -105,7 +105,7 @@ test("each case's page, the guide, the cast and the making-of carry a two-step t
       if (first[1]) assert.equal(items[0].name, first[1], file);
     }
   }
-  assert.equal(CASE_PAGES.length + 3, trailed.size);
+  assert.equal(CASE_PAGES.length + 4, trailed.size);
   for (const file of ["privacy.html", "en/terms.html", "ja/faq.html", "contact.html"]) assert.equal(readStructuredData(STATIC[file]).length, 0, file);
 });
 

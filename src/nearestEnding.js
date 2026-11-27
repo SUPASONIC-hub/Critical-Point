@@ -1,5 +1,5 @@
 import { ENDING_THRESHOLDS as GATE, getFinaleOutcome } from "./gameLogic.js";
-import { readCollapseGate } from "./seasonStanding.js";
+import { getSlackGates, readCollapseGate, weighFinale } from "./seasonStanding.js";
 
 /**
  * The ending a season came closest to and did not reach, for the finale's one
@@ -43,12 +43,14 @@ function share(count, cases, rate) {
 export function nearestEnding(input = {}) {
   const {
     endingId = "", resources = {}, discoveredClues = [], log = [], seasonHumanCost = 0, casesPlayed = 0, seasonBusts = 0, seasonWindows = 0,
-    seasonBestMultiplier = 1, seasonVaultPerCase = 0, seasonBestLogic = 0, seasonReframeRoutes, seasonResources = null,
+    seasonBestMultiplier = 1, seasonVaultPerCase = 0, seasonBestLogic = 0, seasonReframeRoutes, seasonResources = null, storySeason = false,
   } = input ?? {};
   if (!endingId || endingId === "collapse") return null;
-  if (getFinaleOutcome(log) === "burn") return { burn: true };
+  const finale = getFinaleOutcome(log);
+  if (finale === "burn") return { burn: true };
   const { cases } = readCollapseGate({ seasonHumanCost, resources, casesPlayed, seasonBusts, seasonWindows });
-  const standing = seasonResources ?? resources ?? {};
+  // G40 (RULES_MARK 10): the mean with the last answer on it, as the ruling reads it.
+  const standing = (seasonResources ? weighFinale(seasonResources, finale) : resources) ?? {};
   const trust = Number(standing.trust) || 0;
   const legitimacy = Number(standing.legitimacy) || 0;
   const capital = Number(standing.capital) || 0;
@@ -56,13 +58,15 @@ export function nearestEnding(input = {}) {
   const reframes = Number.isFinite(seasonReframeRoutes) ? seasonReframeRoutes : (log ?? []).filter((entry) => entry?.reframeOpenedRoute).length;
   const slack = (seasonBusts === 0 && seasonBestMultiplier >= GATE.heldLineMultiplier)
     || seasonBestLogic >= GATE.logicSlackStreak || seasonVaultPerCase >= GATE.vaultSlackPerCase;
-  const recordClues = share(clues, cases, slack ? GATE.clueRateSlack : GATE.clueRate);
+  const gates = getSlackGates(GATE.clueRateSlack);
+  const recordClues = share(clues, cases, slack ? gates.clueRate : GATE.clueRate);
+  const oversightBar = GATE.oversightLegitimacy - (slack ? gates.oversight : 0);
 
   const lacks = {
     "human-record": { reframes: share(reframes, cases, GATE.recordReframeRate), clues: share(clues, cases, GATE.recordClueRate), trust: atLeast(trust, GATE.recordTrust) },
     "evidence-reform": { clues: recordClues, legitimacy: atLeast(legitimacy, GATE.reformLegitimacy) },
-    "open-oversight": { clues: recordClues, legitimacy: atLeast(legitimacy, GATE.oversightLegitimacy), trust: atLeast(trust, GATE.oversightTrust) },
-    "cold-justice": { legitimacy: atLeast(legitimacy, GATE.coldLegitimacy), coldGap: atLeast(legitimacy - trust, GATE.coldGap) },
+    "open-oversight": { clues: recordClues, legitimacy: atLeast(legitimacy, oversightBar), trust: atLeast(trust, GATE.oversightTrust - (slack ? gates.trust : 0)) },
+    "cold-justice": { legitimacy: atLeast(legitimacy, GATE.coldLegitimacy), coldGap: atLeast(legitimacy - trust, storySeason ? GATE.storyColdGap : GATE.coldGap) },
     "profitable-silence": { capital: atLeast(capital, GATE.silenceCapital), trustOver: under(trust, GATE.silenceTrust) },
     "field-pact": { pactGap: atLeast(trust - legitimacy, GATE.pactGap) },
   };
@@ -75,5 +79,6 @@ export function nearestEnding(input = {}) {
     const distance = gaps.reduce((sum, { key, value }) => sum + (counted.has(key) ? value / cases : value / 100), 0);
     if (!best || distance < best.distance) best = { id, gaps, distance };
   }
-  return best ? { id: best.id, label: endingLabelOf(best.id), gaps: best.gaps } : null;
+  // G26: `door` when the table opened the slack door this season (the finale says so, display only).
+  return best ? { id: best.id, label: endingLabelOf(best.id), gaps: best.gaps, ...(slack && gates.oversight ? { door: true } : {}) } : null;
 }

@@ -256,6 +256,54 @@ export const characterProfiles = {
     voice: "영어로, 짧고 곧게 말한다. 직함보다 이름을 먼저 부른다.",
     line: "우리가 볼 수 있는 건 거래소 안쪽뿐이에요. 돈이 어디서 왔는지는 은행이 봐요.",
   },
+  // 번외 8 (src/nodes/side08.js): a side pack is not in CASE_PACKS, so its own
+  // people are introduced here, like the season's first ones. 비노드 타파
+  // answers in Korean (nine years here), said once in the narration. 설경민
+  // and 심재만 speak only in the narration (no portrait yet, as 번외 6's 기성철).
+  "비노드 타파": {
+    role: "도담사출 3번 사출기 담당 · 네팔 · 9년 8개월 · 39세",
+    stance: "기술 · 기록 · 떠나는 날",
+    job: "마지막 근무 날, 자기 몫의 퇴직금과 3번 기계의 온도를 다음 사람에게 넘긴다.",
+    appearance: "기름 묻은 면장갑, 손으로 쓴 온도표, 23킬로그램에 맞춘 가방 두 개.",
+    thought: "9년 동안 이 기계는 내 손을 알았다. 이제 그 돈이 내 손에 오는지 알고 싶다.",
+    gesture: "비노드 타파는 숫자를 말하기 전에 장갑을 벗어 기계 위에 가지런히 올려놓는다.",
+    voice: "또박또박한 한국어로 짧게 말하고, 마지막에 꼭 질문을 하나 남긴다.",
+    line: "그럼 제 퇴직금도 기계랑 같이 가요?",
+  },
+  // 번외 9 (src/nodes/side09.js): 아이굴 세리코바 answers in Korean (21 years
+  // here), said once in the narration. 위성규 speaks only in the narration.
+  "아이굴 세리코바": {
+    role: "국진호의 아내 · 카자흐스탄 알마티 · 한국 21년 · 57세",
+    stance: "약속 · 가족 · 남은 하루",
+    job: "남편이 남긴 탑차와 빚 사이에서, 석 달의 마지막 하루를 쓴다.",
+    appearance: "식품 공장 위생모 자국이 남은 이마, 남편의 탑차 열쇠, 빛바랜 혼인신고서 사본.",
+    thought: "그 사람은 넉 달만 더 내면 끝난다고 했다. 끝나지 않은 건 그 사람이 아니라 우리에게 온다.",
+    gesture: "아이굴 세리코바는 대답하기 전에 탑차 열쇠를 손바닥에 한 번 쥐었다가 놓는다.",
+    voice: "또렷한 한국어로 천천히 말하고, 모르는 말은 그 자리에서 되묻는다.",
+    line: "그 사람이 갚는다고 했으면 제가 갚아야죠.",
+  },
+  // 번외 10 (src/nodes/side10.js): the households on her list do not speak by name.
+  "변정순": {
+    role: "온새 돌봄 강서 거점 방문 요양보호사 · 11년 · 58세",
+    stance: "현장 · 손으로 쓴 순서 · 말 안 하는 집",
+    job: "사고 뒤 수동 배차의 밤, 남은 집을 자기 차로 돌며 약과 파스를 챙긴다.",
+    appearance: "무릎이 해진 작업 바지, 입에 문 마커 뚜껑, 11년 치 별이 붙은 공책.",
+    thought: "괜찮다는 집이 제일 안 괜찮다. 표는 그걸 모르고, 나는 안다.",
+    gesture: "변정순은 집에 들어서면 대답보다 먼저 싱크대의 약 봉투부터 연다.",
+    voice: "빠르고 거침없는 반말 반 존댓말로 말하고, 말끝에 할 일을 붙인다.",
+    line: "괜찮다는 사람이 제일 안 괜찮아요.",
+  },
+  // 번외 11 (src/nodes/side11.js): 여다인 and 나준혁 sleep through it.
+  "염봉수": {
+    role: "경포 해변 수상안전요원 · 은퇴 해양경찰 · 서른한 번째 여름 · 66세",
+    stance: "규칙 · 지켜보기 · 부표",
+    job: "입수 시간 전 해변을 지키고, 부표가 어디까지 보이는지 안다.",
+    appearance: "목에 건 호루라기, 소금기에 바랜 모자, 손등의 오래된 페인트 자국.",
+    thought: "부표는 끝이 아니다. 내 눈이 닿는 데까지라는 표시일 뿐이다.",
+    gesture: "염봉수는 대답하기 전에 깃발 줄을 한 번 고쳐 묶는다.",
+    voice: "짧은 반말 반 존댓말로 말하고, 규칙 뒤에 꼭 이유를 하나 붙인다.",
+    line: "이유가 있는 사람이 제일 위험해요.",
+  },
 };
 
 /**

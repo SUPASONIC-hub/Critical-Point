@@ -121,7 +121,7 @@ export const DB_MARKS = Object.freeze([...RECHECK_MARKS, CHAIN_MARK, RELIC_DRAFT
  * `unchecked` (the server's own check failed), the two an honest season can earn.
  * The switch is off until the checker has marked no honest season for 14 days.
  */
-export const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
+const TRIGGER_HIDE_MARKS = Object.freeze(["part-out-of-range", "wall-out-of-range", "rank-off-score", "tier-off-score", "score-twins-differ", "score-not-whole"]);
 export const HIDE_MARKS = Object.freeze([...DB_MARKS, ...TRIGGER_HIDE_MARKS]);
 
 /** The marks of `result` (its checker marks and its row's trigger marks) the switch would hide it for. */
@@ -392,17 +392,17 @@ export function formatChain(chain) {
 }
 
 /**
- * Decision T's T12 (the 2026-11-12 draft, read on 11-23): would a lower
- * threshold open any board? Read only from the day's counts (every board
- * hall_of_fame_counts returns, not only the ones read today); the threshold
- * itself stays HALL_OF_FAME_MIN_SEASONS until the owner answers T-11.
+ * Decision T's T12: the threshold came down from ten to five, and this line
+ * keeps the old one beside it, to show what the change opened. Read only from
+ * the day's counts (every board hall_of_fame_counts returns, not only the ones
+ * read today).
  */
-export const HALL_OF_FAME_T12_ALTERNATIVE = 5;
+export const HALL_OF_FAME_T12_ALTERNATIVE = 10;
 
-/** T12's one line for the Job Summary: boards at the threshold and at the alternative, and the fullest board. */
+/** T12's one line for the Job Summary: boards at the threshold and at the earlier one, and the fullest board. */
 export function formatHallOfFameThreshold(counts, { min = HALL_OF_FAME_MIN_SEASONS, alternative = HALL_OF_FAME_T12_ALTERNATIVE } = {}) {
   const entries = (counts instanceof Map ? [...counts] : Object.entries(counts ?? {})).filter(([, checked]) => Number.isInteger(checked) && checked >= 0);
-  if (!entries.length) return `T12 문턱(읽기만): 센 판이 없음 — 문턱 ${min}, 대안 ${alternative}`;
+  if (!entries.length) return `T12 문턱(읽기만): 센 판이 없음 — 문턱 ${min}, 이전 문턱 ${alternative}`;
   const atLeast = (n) => entries.filter(([, checked]) => checked >= n).length;
   const [fullest, most] = entries.reduce((best, entry) => (entry[1] > best[1] ? entry : best));
   return `T12 문턱(읽기만): 판 ${entries.length}개 중 표시 없는 완주 ${min}건 이상 ${atLeast(min)}개 · ${alternative}건 이상 ${atLeast(alternative)}개; 가장 많은 판 ${hallOfFameBoardLabel(fullest)} ${most}건`;

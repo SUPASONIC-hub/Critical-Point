@@ -28,6 +28,11 @@
 
 import { DAY_MS, isoWeekKey, KST_OFFSET_MS, WEEKLY_RULES, weekStartMs } from "./weeklyCalendar.js";
 import weekRulesCopy from "../copy/weekRules.js";
+import {
+  ALL_ACT_TWIST_RULES, HEARING_CHIPS, HEARING_CLOCK, LATE_BILL_CHIPS, MERGER_TOP_SHIFT, MERGER_CHIPS, MERGER_SHIFT, PASSED_DOWN_HARM, SCATTER_CHIPS, SCATTER_SPREAD,
+  SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW, SIGN_TERMS_CHIPS, SIGN_TERMS_WALL, TRAINED_ABOVE, TRAINED_BELOW,
+} from "./actTwists.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOCK_DRAG } from "./tableRules.js";
 import { fill } from "../locale.js";
 
 // The calendar and the week arithmetic are a module of their own, so the
@@ -78,9 +83,10 @@ export const CRISIS_CHIPS = 1.2;
  * time a case closes, this many hundredths of what the vault held through it
  * -- what was not spent at the drafts -- are gone, before the case's own pot
  * is banked (gauntletEngine.js `getIdleErosion`). A device (`erosion`), not a
- * number of the board: nothing on the table moves, the vault does. In the
- * catalogue only, booked in no week; draft number until the user picks one of
- * the measured candidates (check:endings with WEEK_RULE=idle-erosion).
+ * number of the board: nothing on the table moves, the vault does. Booked
+ * once, 2027-W19 (migration 20261121000000, 초안); draft number until the
+ * user picks one of the measured candidates (check:endings with
+ * WEEK_RULE=idle-erosion), at the latest before that week starts.
  * Measured 2026-11-13 (the draft-spend rows, 80 paired seasons), a player who
  * never pays: vault a case 13,965 without the week, 10,855 at 1, 8,675 at 2,
  * 7,134 at 3, 6,046 at 4; the endings the same at every one.
@@ -95,9 +101,10 @@ export const IDLE_EROSION_PERCENT = 2;
  * opens like every next-board rule, and the pot the case has stacked so far
  * moves by up to `MARKET_SHOCK_WOBBLE` hundredths, up or down, drawn from the
  * window's seed (gauntletEngine.js `drawShockSwing`). A device (`shock`), not
- * a number of every board. In the catalogue only, booked in no week; draft
- * numbers until the user picks one of the measured candidates (check:pressure
- * and check:endings with WEEK_RULE=market-shock).
+ * a number of every board. Booked once, 2027-W25 (migration 20261121000000,
+ * 초안); draft numbers until the user picks one of the measured candidates
+ * (check:pressure and check:endings with WEEK_RULE=market-shock), at the
+ * latest before that week starts.
  */
 export const MARKET_SHOCK_BOARD = 3;
 export const MARKET_SHOCK_WALL = 4;
@@ -117,11 +124,17 @@ const W47_AUDIT = Object.freeze({ heat: 40, limit: 4, share: 4 });
  * 2026-W47's line has. Read when asked, so a rule read after the page's
  * language arrived is in it.
  */
-function ruleWords(id) {
-  const { auditLine, cascadeLine, rules } = weekRulesCopy;
-  const { title, text, world } = rules[id];
+function ruleValues() {
+  const { auditLine, cascadeLine } = weekRulesCopy;
   const audit = fill(auditLine, W47_AUDIT);
-  const values = { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine };
+  return { shift: NEAR_WALL_SHIFT, rate: HEAVY_FRACTURE_RATE, seconds: SHORT_CLOCK_SECONDS, chips: SHORT_CLOCK_CHIPS, crisisShift: CRISIS_WALL_SHIFT, crisisChips: CRISIS_CHIPS, erosion: IDLE_EROSION_PERCENT, shockBoard: MARKET_SHOCK_BOARD + 1, shockWall: MARKET_SHOCK_WALL, shockSwing: MARKET_SHOCK_WOBBLE, audit, cascade: cascadeLine, mergerChips: MERGER_CHIPS, mergerShift: MERGER_SHIFT, spread: SCATTER_SPREAD, scatterChips: SCATTER_CHIPS, hearingCut: Math.round((1 - HEARING_CLOCK) * 100), hearingChips: HEARING_CHIPS,
+    // G5's acts 1, 2, 4, 6 and 8 (actTwists.js).
+    downShare: INSURANCE_SHARE, downHarm: PASSED_DOWN_HARM, billHeat: HEAT_DEBT_GAUGE, billChips: LATE_BILL_CHIPS, mergerTop: MERGER_TOP_SHIFT,
+    trainedBelow: TRAINED_BELOW, trainedAbove: TRAINED_ABOVE, nameChips: SIGN_NAME_CHIPS, nameWall: SIGN_NAME_WALL, nameWallLow: SIGN_NAME_WALL_LOW, nameWallHigh: SIGN_NAME_WALL_HIGH, lockDrag: LOCK_DRAG, termsWall: SIGN_TERMS_WALL, termsChips: SIGN_TERMS_CHIPS };
+}
+function ruleWords(id) {
+  const { title, text, world } = weekRulesCopy.rules[id];
+  const values = ruleValues();
   return world ? { title, text: fill(text, values), world } : { title, text: fill(text, values) };
 }
 
@@ -160,16 +173,15 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
     ...ruleWords("crisis-week"),
     schema: Object.freeze({ wallShift: -CRISIS_WALL_SHIFT, chipsFactor: CRISIS_CHIPS }),
   }),
-  // B4: idle money loses value, a case at a time. In the catalogue before any
-  // week names it, so it has no migration yet (booking it adds one, as
-  // crisis-week's did).
+  // B4: idle money loses value, a case at a time. Its week, 2027-W19, comes
+  // with its migration (20261121000000), as crisis-week's did.
   "idle-erosion": Object.freeze({
     label: "IDLE MONEY",
     ...ruleWords("idle-erosion"),
     rules: Object.freeze(["erosion"]),
   }),
-  // c2: the market shock, once a case. In the catalogue before any week names
-  // it, so it has no migration yet (booking it adds one, as crisis-week's did).
+  // c2: the market shock, once a case. Its week, 2027-W25, comes with its
+  // migration (20261121000000), as crisis-week's did.
   "market-shock": Object.freeze({
     label: "MARKET SHOCK",
     ...ruleWords("market-shock"),
@@ -193,6 +205,33 @@ export const WEEK_RULE_CATALOGUE = Object.freeze({
 /** The catalogue entry for an id, or null. */
 export function getWeekRule(id) {
   return typeof id === "string" && Object.hasOwn(WEEK_RULE_CATALOGUE, id) ? { id, ...WEEK_RULE_CATALOGUE[id], ...ruleWords(id) } : null;
+}
+
+/**
+ * A case's own rule (caseRules.js, N26) as its briefing prints it: the
+ * catalogue's entry for `id`, with the line the case says in place of the
+ * week's (src/copy/weekRules.js `caseRules`, 「이번 사건은」 where a week says
+ * 「이번 주는」) and its line in the story. Null for a rule the catalogue does
+ * not have and for a case with no words.
+ */
+export function getCaseRule(caseId, id) {
+  const twist = getActTwist(id);
+  const rule = getWeekRule(id) ?? twist;
+  // An act's twist (G5) says its own line in every case of the act.
+  const words = typeof caseId === "string" && Object.hasOwn(weekRulesCopy.caseRules ?? {}, caseId) ? weekRulesCopy.caseRules[caseId] : twist && typeof caseId === "string" ? weekRulesCopy.actTwists[id] : null;
+  if (!rule || !words) return null;
+  return { ...rule, title: words.title ?? rule.title, text: fill(words.text, ruleValues()), world: words.world };
+}
+
+/**
+ * An act's twist (actTwists.js, G5) as a catalogue entry: its numbers and its
+ * words (src/copy/weekRules.js `actTwists`). Not a week's rule -- no week can
+ * carry one, so `normalizeWeekRuleId` does not know it -- only a case's.
+ */
+export function getActTwist(id) {
+  if (typeof id !== "string" || !Object.hasOwn(ALL_ACT_TWIST_RULES, id)) return null;
+  const { title, text, world } = weekRulesCopy.actTwists[id];
+  return { id, ...ALL_ACT_TWIST_RULES[id], title, text: fill(text, ruleValues()), world };
 }
 
 /** What a saved stamp is: a known id, or null. */
@@ -249,16 +288,29 @@ export function pickSeasonWeekRule(ms, { declined = false, story = false, firstS
  * The numbers a rule moves on a board, before clamping: the caller hands the
  * result to `normalizeSchema` (the engine; this module does not import it).
  */
-export function weekRuleOverlay(id, schema) {
-  const rule = getWeekRule(id);
-  if (!rule?.schema || !schema) return null;
+export function weekRuleOverlay(id, schema, moves = null) {
+  // `moves`: what the case chose under a twist that asks (G5 8막 실명 서명, actTwists.js `SIGN_WAYS`).
+  // The numbers only: no words are filled on this path, which every board dealt walks.
+  const own = (table) => (typeof id === "string" && Object.hasOwn(table, id) ? table[id].schema : undefined);
+  const numbers = moves ?? own(WEEK_RULE_CATALOGUE) ?? own(ALL_ACT_TWIST_RULES);
+  if (!numbers || !schema) return null;
   const overlay = {};
-  for (const [key, value] of Object.entries(rule.schema)) {
+  for (const [key, value] of Object.entries(numbers)) {
     if (key === "wallShift") {
       overlay.wallMin = Number(schema.wallMin) + value;
       overlay.wallMax = Number(schema.wallMax) + value;
+    } else if (key === "wallTopShift") {
+      // G20's 합병 (RULES_MARK 8): only the band's top end moves.
+      overlay.wallMax = Number(schema.wallMax) + value;
+    } else if (key === "wallSpread") {
+      // G5's 흩어진 자리: the band wider on both sides.
+      overlay.wallMin = Number(schema.wallMin) - value;
+      overlay.wallMax = Number(schema.wallMax) + value;
     } else if (key === "secondsShift") {
       overlay.seconds = Number(schema.seconds) + value;
+    } else if (key === "secondsFactor") {
+      // G5's 청문회: the clock a share of itself.
+      overlay.seconds = Number(schema.seconds) * value;
     } else if (key === "chipsFactor") {
       overlay.chipsScale = Number(schema.chipsScale) * value;
     } else {

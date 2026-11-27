@@ -4,6 +4,8 @@ import test from "node:test";
 
 import { PAGE_KINDS } from "../../scripts/legal-pages.mjs";
 import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
+import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../../scripts/content-pages/news.mjs";
 import {
   crawlerFiles,
   readableCharacters,
@@ -20,6 +22,10 @@ import { SUPPORT_CONTACT } from "../../src/appConfig.js";
 import { CASE_SEQUENCE, TYPICAL_CASE_MINUTES } from "../../src/gameCases.js";
 import { DATA_RETENTION_DAYS, legalPagePath, SITE_PAGES } from "../../src/privacyText.js";
 import { DOCUMENT_PAGE } from "../../src/serviceWorker/worker.js";
+import { READING_KINDS } from "../../src/homeReading.js";
+
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
 
 /**
  * The about, FAQ and contact pages (scripts/site-pages.mjs), the policy's six
@@ -45,7 +51,7 @@ test("the build writes nine pages about the game: three kinds in three languages
     "ja/faq.html",
     "faq.html",
   ].sort());
-  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3, "with the policy's six and the content pages (scripts/content-pages)");
+  assert.equal(Object.keys(all).length, 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length, "with the policy's six, the content pages, the notes out today and the world's newspaper (scripts/content-pages)");
   assert.deepEqual(PAGE_KINDS, SITE_PAGES, "the pages' headers and the start screen's foot list the same pages");
 });
 
@@ -53,6 +59,8 @@ test("each page has its own title and description, a canonical link and every la
   const descriptions = new Set();
   const titles = new Set();
   for (const [file, html] of Object.entries(all)) {
+    // The notes and the world's newspaper are Korean only and name no other language (tests/unit/notes.test.mjs, news.test.mjs).
+    if (file.startsWith("notes/") || file.startsWith("news/")) continue;
     const language = /^(en|ja)\//.exec(file)?.[1] ?? "ko";
     const page = file.slice(FOLDER[language].length);
     assert.match(html, /^<!doctype html>/, file);
@@ -116,8 +124,8 @@ test("each Korean page is at least 1,500 characters without spaces, and the tran
   for (const [file, html] of Object.entries(site)) {
     assert.doesNotMatch(html.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<script type="application\/ld\+json">[^<]*<\/script>/g, ""), /[{}]|\$\{|undefined|NaN/, `${file}: no placeholder left`);
     if (!file.startsWith("ja/") && !file.startsWith("en/")) continue;
-    // Korean only where a page names the Korean page, or quotes the language choice as the screen shows it.
-    const left = html.replace(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
+    // Korean only where a page names the Korean page (the menu, and the about page's language row), or quotes the language choice as the screen shows it.
+    const left = html.replaceAll(' lang="ko">한국어</a>', "").replace("한국어 · English · 日本語", "");
     assert.doesNotMatch(left, /[가-힣]/, `${file}: no Korean left untranslated`);
   }
   assert.ok(site["ja/faq.html"].includes("body{word-break:normal}"), "Japanese wraps between characters");
@@ -143,9 +151,12 @@ test("the pages say what the code holds: the season's length, a case's minutes, 
   assert.match(decode(site["contact.html"]), /10일 안에 결과를 알려 드립니다/);
 });
 
-test("the start screen's foot links the five pages in the screen's language", () => {
+test("the start screen's reading section links the five pages in the screen's language, among the site's nine kinds", () => {
+  // 읽을거리 (HomeReading.jsx, src/homeReading.js) replaced the five-link foot on 2026-11-20; tests/unit/notes.test.mjs holds its rows.
   const intro = readFileSync("src/screens/IntroScreen.jsx", "utf8");
-  assert.match(intro, /SITE_PAGES\.map\(\(page\) => \(\s*<a key=\{page\} href=\{legalPagePath\(`\/\$\{page\}\.html`, LANG\)\}>\{introCopy\.legal\[page\]\}<\/a>/);
+  assert.match(intro, /<HomeReading copy=\{introCopy\.reading\} legal=\{introCopy\.legal\} language=\{LANG\} notes=\{__CP_RECENT_NOTES__\} \/>/);
+  assert.match(readFileSync("vite.config.js", "utf8"), /__CP_RECENT_NOTES__: JSON\.stringify\(recentNotes\(notesDay\(\)\)\)/);
+  for (const page of SITE_PAGES) assert.ok(READING_KINDS.includes(page) || ["privacy", "terms"].includes(page), page);
   for (const page of SITE_PAGES) {
     for (const language of ["ko", "en", "ja"]) assert.ok(all[legalPagePath(`/${page}.html`, language).slice(1)], `${page} in ${language} is written`);
   }
@@ -158,7 +169,8 @@ test("the start screen's foot links the five pages in the screen's language", ()
 });
 
 test("the service worker keeps every page for offline reading, and leaves the crawler's files alone", () => {
-  for (const file of Object.keys(all)) assert.match(`/${file}`, DOCUMENT_PAGE, file);
+  // A note or an article of the world's newspaper is not kept for offline reading: the worker leaves it to the network, as it leaves any address it does not name.
+  for (const file of Object.keys(all)) if (!file.startsWith("notes/") && !file.startsWith("news/")) assert.match(`/${file}`, DOCUMENT_PAGE, file);
   assert.doesNotMatch("/robots.txt", DOCUMENT_PAGE);
   assert.doesNotMatch("/sitemap.xml", DOCUMENT_PAGE);
 });
@@ -170,13 +182,15 @@ test("the sitemap names the start page in three languages and every plain page, 
   const start = { ko: "/", en: "/en/", ja: "/ja/" };
   assert.deepEqual(entries.slice(0, 3), Object.values(start).map((loc) => ({ loc, alternates: start })));
   assert.deepEqual(entries.slice(3).map((entry) => entry.loc.slice(1)).sort(), Object.keys(all).sort());
-  const xml = sitemapXml({ origin: ORIGIN, date: "2026-10-29" });
+  // The sitemap's date also decides which notes are out, so it is the day `all` was rendered for: a fixed past day lost every note since.
+  const day = notesDay();
+  const xml = sitemapXml({ origin: ORIGIN, date: day });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9" xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml">/);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   assert.equal(locs.length, count);
   assert.ok(locs.every((loc) => loc.startsWith(`${ORIGIN}/`)), "every address is absolute");
   for (const file of Object.keys(all)) assert.ok(locs.includes(`${ORIGIN}/${file}`), `${file} is in the sitemap`);
-  assert.equal((xml.match(/<lastmod>2026-10-29<\/lastmod>/g) ?? []).length, count);
+  assert.equal(xml.split(`<lastmod>${day}</lastmod>`).length - 1, count);
   for (const path of ["/", "/en/", "/ja/"]) assert.ok(locs.includes(`${ORIGIN}${path}`), `${path} is in the sitemap`);
   assert.ok(xml.includes(`<xhtml:link rel="alternate" hreflang="en" href="${ORIGIN}/en/"/>`));
   assert.doesNotMatch(xml, /\?lang=/, "the start page by its folders, not the query a crawler reads as the Korean page");

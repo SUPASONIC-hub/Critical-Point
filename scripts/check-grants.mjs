@@ -12,9 +12,11 @@ import { noteBriefing, noteRevealDetails, takeReadingTally } from "../src/state/
 import { createCaseClose, createRunSummary, normalizeCaseOpen, openCaseRun, RULES_MARK, RULES_MARK_KEY, RUN_INITIAL_STATE } from "../src/gauntlet/gauntletEngine.js";
 import { LINK_CARRY_MAX, LINK_SPAN_MAX } from "../src/gauntlet/cascadeRisk.js";
 import { RELIC_IDS } from "../src/gauntlet/relics.js";
+import { PAY_HARM_MOST, PAY_LADDER } from "../src/gauntlet/settlementPay.js";
 import { isoWeekKey, WEEK_RULE_CATALOGUE, WEEK_RULE_ID_MAX, WEEKLY_RULES } from "../src/gauntlet/weeklyRules.js";
 import { createSeasonTelemetryPayload } from "../src/viewModels/seasonViewModels.js";
 import { funnelQuery, readFunnel } from "./report-funnel.mjs";
+import { countsQuery, readCounts } from "./report-decision-t.mjs";
 import { DEFAULTS as BUDGET_DEFAULTS, QUERY as BUDGETS_QUERY, nearLimits, readBudgets } from "./report-budgets.mjs";
 import { QUERY as BOARD_QUEUE_QUERY, actionDone as boardActionDone, actionStatement as boardAction, readQueue as readBoardQueue } from "./board-reports.mjs";
 import { readTestWeek, testWeekQuery } from "./report-test-week.mjs";
@@ -105,6 +107,18 @@ await db.exec(`
   alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
+// Supabase's own `auth.role()` and `auth.jwt()`, which read the token's claims
+// PostgREST sets per request (`request.jwt.claims`). The board's admin gate
+// (20261118000000_board_admins.sql) is the first migration to call them.
+await db.exec(`
+  create schema auth;
+  create function auth.jwt() returns jsonb language sql stable as
+    $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
+  create function auth.role() returns text language sql stable as
+    $$ select auth.jwt() ->> 'role' $$;
+  grant usage on schema auth to anon, authenticated, service_role;
+  grant execute on all functions in schema auth to anon, authenticated, service_role;
+`);
 
 // The newest ranking reset (20261020010000, the day-ten table; the one of
 // 2026-10-11 before it was held to the same seed) deletes rows, and a delete is
@@ -125,9 +139,18 @@ const MARK3_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules
 // two drafts are one file, `*_ranking_reset_rules_mark4_relic_draft.sql` (promoted 11-12, the one wipe, with C9's
 // `relic-draft` checker mark): promoted, it is the RULES_MARK 4 reset.
 const MARK4_RESET = readdirSync(MIGRATIONS).find((file) => file.endsWith("_rules_mark4_ranking_reset.sql") || file.endsWith("_ranking_reset_rules_mark4_relic_draft.sql")) ?? null;
-const RANKING_RESET = MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// The resets after 11-12 are named by their day (`*_ranking_reset_<MMDD>.sql`, 11-30's
+// first, then the quarterly ones of docs/ops-mode.md): the newest of them, by name, is the one replayed here.
+const DATED_RESET = readdirSync(MIGRATIONS).filter((file) => /_ranking_reset_\d{4}\.sql$/.test(file)).sort().at(-1) ?? null;
+const RANKING_RESET = DATED_RESET ?? MARK4_RESET ?? MARK3_RESET ?? DAY_TEN_RESET;
+// A dated reset may raise the mark (11-30's to RULES_MARK 5, N26) or keep it, so its mark is read from
+// the file itself: the `>= N` its `ranking_check_run_marks` asks of `tableRules`.
+const datedMark = DATED_RESET
+  ? Number(readFileSync(path.join(MIGRATIONS, DATED_RESET), "utf8").match(/'tableRules'\)::numeric >= (\d+) end/)?.[1] ?? Number.NaN)
+  : null;
+if (DATED_RESET && !Number.isInteger(datedMark)) throw new Error(`supabase/migrations/${DATED_RESET}: no \`(dynamics->>'tableRules')::numeric >= N\` in ranking_check_run_marks to read the server's mark from.`);
 /** The table mark the replayed server asks of every case row of a ranked season. */
-const SERVER_MARK = MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2;
+const SERVER_MARK = datedMark ?? (MARK4_RESET ? 4 : MARK3_RESET ? 3 : 2);
 const RESET_SEED = "grants-check-reset";
 /** Every row of every table in `public` but the ranking rows, as text: what the reset must leave as it found it. */
 async function readEverythingButRanking() {
@@ -188,6 +211,18 @@ async function seedBeforeRankingReset() {
       await db.query(`insert into public.hall_of_fame_boards (board, kind, checked_seasons, settled_at) values ('table-1', 'table', 12, now())`);
       await db.query(`insert into public.hall_of_fame (board, place, run_tag, score, rank, style) values ('table-1', 1, 'RESETSD1', 90, 'S', 'BOARD BREAKER')`);
     }
+    // The board admins' log (20261118000000) exists before the 11-30 reset: a reset leaves it as it found it.
+    if (await boardAdminLogExists()) {
+      await db.query(`insert into public.board_admin_log (admin_email, action, post_id) values ($1, 'hide', 0)`, [`${RESET_SEED}@check.invalid`]);
+    }
+    // The weekly reminder's subscriptions (20261129000000) exist before the 11-30 reset: a reset leaves them as it found them.
+    // The makers' notice (20261202010000) once a reset replays after it: a reset leaves it as it found it.
+    if (await boardNoticeExists()) {
+      await db.query(`insert into public.board_notice (body_ko, posted_by) values ('초기화 전에 올린 공지', $1)`, [`${RESET_SEED}@check.invalid`]);
+    }
+    if (await pushSubscriptionsExist()) {
+      await db.query(`insert into public.push_subscriptions (endpoint, p256dh, auth) values ($1, $2, 'QUJDREVGR0hJSktMTU5PUA')`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`, `B${"A".repeat(86)}`]);
+    }
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
@@ -211,7 +246,19 @@ async function removeRankingResetSeed() {
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_bust_stats where case_id = $1`, [RESET_SEED]);
   if (RANKING_RESET !== DAY_TEN_RESET) await db.query(`delete from public.scene_choice_stats where case_id = $1`, [RESET_SEED]);
   if (await hallOfFameExists()) await db.query(`delete from public.hall_of_fame_boards where board = 'table-1'`);
+  if (await boardAdminLogExists()) await db.query(`delete from public.board_admin_log where admin_email = $1`, [`${RESET_SEED}@check.invalid`]);
+  if (await pushSubscriptionsExist()) await db.query(`delete from public.push_subscriptions where endpoint = $1`, [`https://fcm.googleapis.com/fcm/send/${RESET_SEED}`]);
+  if (await boardNoticeExists()) await db.query(`delete from public.board_notice where posted_by = $1`, [`${RESET_SEED}@check.invalid`]);
   return removed;
+}
+async function boardNoticeExists() {
+  return (await db.query(`select to_regclass('public.board_notice') is not null as here`)).rows[0].here;
+}
+async function pushSubscriptionsExist() {
+  return (await db.query(`select to_regclass('public.push_subscriptions') is not null as here`)).rows[0].here;
+}
+async function boardAdminLogExists() {
+  return (await db.query(`select to_regclass('public.board_admin_log') is not null as here`)).rows[0].here;
 }
 async function hallOfFameExists() {
   return (await db.query(`select to_regclass('public.hall_of_fame') is not null as here`)).rows[0].here;
@@ -278,6 +325,13 @@ const RECHECK_MARKS = files.some((file) => file.endsWith("_ranking_recheck_marks
 const RECHECK_SEEN = files.some((file) => file.endsWith("_ranking_recheck_seen.sql"));
 // The hall of fame (D2, `*_hall_of_fame.sql`): its cases run once it is among the files.
 const HALL_OF_FAME = files.some((file) => file.endsWith("_hall_of_fame.sql"));
+const BOARD_ADMINS = files.some((file) => file.endsWith("_board_admins.sql"));
+// 주 1회 알림's push subscriptions (N25, `*_push_subscriptions.sql`): its cases run once it is among the files.
+const PUSH_SUBSCRIPTIONS = files.some((file) => file.endsWith("_push_subscriptions.sql"));
+// Its queue and log views (`*_board_admin_queue.sql`): three more RPCs for the same two.
+const BOARD_ADMIN_QUEUE = files.some((file) => file.endsWith("_board_admin_queue.sql"));
+// 「만든 사람 공지」 (`*_board_notice.sql`): one notice the same two write, anon reads while it lasts.
+const BOARD_NOTICE = files.some((file) => file.endsWith("_board_notice.sql"));
 
 // What the ranking reset removed, and what it left (20261020010000).
 if (beforeReset && afterReset) {
@@ -419,8 +473,18 @@ const CLIENT_FUNCTIONS = {
     "scene_bust_rates", "scene_choice_rates",
     // The ranking policy calls it as anon: whether marked rows are hidden.
     ...(SUSPICION_MARKS ? ["ranking_hides_marked"] : []),
+    // 주 1회 알림 (N25): a device adds or removes its own push subscription, by its endpoint.
+    ...(PUSH_SUBSCRIPTIONS ? ["push_subscribe", "push_unsubscribe"] : []),
   ],
-  authenticated: [],
+  // The board's two makers, signed in (20261118000000_board_admins.sql); each
+  // refuses anyone `is_board_admin()` does not name.
+  authenticated: [
+    ...(BOARD_ADMINS ? ["admin_board_delete", "admin_board_me", "admin_board_same_writer", "admin_board_search", "admin_board_set_hidden"] : []),
+    // The queue, its count and the log (20261118010000_board_admin_queue.sql), for the same two.
+    ...(BOARD_ADMIN_QUEUE ? ["admin_board_log", "admin_board_queue", "admin_board_queue_count"] : []),
+    // The makers' notice (20261202010000_board_notice.sql), for the same two.
+    ...(BOARD_NOTICE ? ["admin_board_notice_clear", "admin_board_notice_get", "admin_board_notice_set"] : []),
+  ],
 };
 {
   const { rows } = await db.query(`
@@ -1125,6 +1189,19 @@ withHeaders(null);
   await post("send a case row with 5 KB of dynamics", "playtest_sessions", withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, note: "x".repeat(4400) } }));
   await post("send a case row from a build before the snapshot", "playtest_sessions", withDynamics({ ...createRunSummary(RUN_INITIAL_STATE), responseTimeSec: 7.4 }));
   await post("send a case row whose opening snapshot is null", "playtest_sessions", withDynamics({ ...honest.dynamics, open: null }));
+  // G34 보상금 (20261202000000): a payment the opening snapshot carries is one the ladder makes (settlementPay.js PAY_LADDER).
+  const paidOpen = (paid) => withDynamics({ ...honest.dynamics, open: { ...honest.dynamics.open, paid } });
+  for (const cost of [PAY_LADDER[0], PAY_LADDER.at(-1)]) await post(`send a case row whose opening paid the case before off at ${cost}`, "playtest_sessions", paidOpen({ caseId: "case08", cost, harm: 33 }));
+  await post("send a case row whose opening paid nothing (null)", "playtest_sessions", paidOpen(null));
+  for (const [what, paid] of [
+    ["a price off the ladder", { caseId: "case08", cost: PAY_LADDER[0] + 1, harm: 33 }],
+    ["no harm", { caseId: "case08", cost: PAY_LADDER[0], harm: 0 }],
+    ["more harm than a payment wipes", { caseId: "case08", cost: PAY_LADDER[0], harm: PAY_HARM_MOST + 1 }],
+    ["a harm that is not whole", { caseId: "case08", cost: PAY_LADDER[0], harm: 2.5 }],
+    ["a price as a string", { caseId: "case08", cost: String(PAY_LADDER[0]), harm: 33 }],
+    ["no case", { cost: PAY_LADDER[0], harm: 33 }],
+    ["an array", []],
+  ]) await postRefused(`send a case row whose opening paid ${what}`, "playtest_sessions", paidOpen(paid), /invalid settlement pay/);
   for (const [what, patch] of [
     ["an opening snapshot that is an array", { open: [] }],
     ["an opening snapshot with no case", { open: { vault: 0 } }],
@@ -1856,10 +1933,10 @@ if (!HALL_OF_FAME) {
   ]) {
     await raises(label, "service_role", settle([{ board, places }]), [], /^22023 /);
   }
-  // Below ten by the server's own count: a count in the call is not read.
+  // Below five by the server's own count: a count in the call is not read.
   // A call that says its own count, as the draft's did, is answered by the server's.
   const settleSaying = (boards) => `select public.hall_of_fame_settle('${JSON.stringify(boards)}'::jsonb) as settled;`;
-  await raises("post a place below ten checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below ten checked seasons \(it has 1\)/);
+  await raises("post a place below five checked seasons", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 1\)/);
   await raises("post four places", "service_role", settle([{ board: table, places: [place("AAAA0001", 91), place("AAAA0002", 85), place("AAAA0003", 80), place("AAAA0003", 80)] }]), [], /^22023 /);
   await raises("post a board that is not one", "service_role", settle([{ board: "table-x", places: [] }]), [], /^22023 /);
   await raises("post a style the ranking does not have", "service_role", settle([{ board: table, places: [{ ...place("AAAA0001", 91), style: "GOD MODE" }] }]), [], /23514/);
@@ -1868,30 +1945,34 @@ if (!HALL_OF_FAME) {
   check(JSON.stringify(await tags(table)) === JSON.stringify(["AAAA0001", "AAAA0002", "AAAA0003"]), `a refused call changed the table board: ${JSON.stringify(await tags(table))}.`);
   check((await view(oldWeek)).length === 0, "a refused call wrote the board beside the refused one.");
 
-  // Below ten: the board stays, with the server's count and no place (「표본 부족」).
+  // Below five: the board stays, with the server's count and no place (「표본 부족」).
   await allowed("write a week's board below the threshold", "service_role", settleSaying([{ board: thisWeek, checked: 50, places: [] }]));
   const sparse = await view(thisWeek);
-  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below ten reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
-  // Nine more seasons on this week's board, none of them replayed: it reaches ten.
-  await fill("fwk", 9, { week: thisWeek });
-  check((await counted()).get(thisWeek) === 10, "nine more seasons with no mark did not bring this week's board to ten.");
+  check(sparse.length === 1 && sparse[0].place === null && sparse[0].checked_seasons === 1 && sparse[0].kind === "week" && sparse[0].settled_on === null, `a board below five reads ${JSON.stringify(sparse)}; the count is the server's (1), not the call's (50).`);
+  // Three more seasons on this week's board, none of them replayed: at four it
+  // is still refused; one more reaches five, the threshold itself.
+  await fill("fwk", 3, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 4, "three more seasons with no mark did not bring this week's board to four.");
+  await raises("post a place at four checked seasons", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]), [], /^22023 .*below five checked seasons \(it has 4\)/);
+  await fill("fwl", 1, { week: thisWeek });
+  check((await counted()).get(thisWeek) === 5, "one more season with no mark did not bring this week's board to five.");
   await allowed("write this week's board, provisional", "service_role", settle([{ board: thisWeek, places: [place("CCCC0001", 70)] }]));
   const provisional = await view(thisWeek);
-  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 10, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 10.`);
+  check(JSON.stringify(provisional.map((row) => row.run_tag)) === JSON.stringify(["CCCC0001"]) && provisional[0].settled_on === null && provisional[0].checked_seasons === 5, `this week's board reads ${JSON.stringify(provisional)}; expected one provisional place on a count of 5.`);
 
   // A week four weeks past its Monday settles on the day's write, and is kept from then on.
   const settled = (await allowed("settle a week four weeks old", "service_role", settle([{ board: oldWeek, places: [place("CCCC0002", 60)] }])))?.rows[0]?.settled;
   check(JSON.stringify(settled?.settled) === JSON.stringify([oldWeek]), `a week four weeks old was not settled: ${JSON.stringify(settled)}.`);
   // A settled board's candidates are no longer read.
   check(!(await listedRuns(3)).some((runId) => runId === "run-hall-cccc0002" || runId === "run-hall-cccc0003"), "the checker's read still lists a settled week's seasons.");
-  // A settled board is kept even when its count fell below ten since.
+  // A settled board is kept even when its count fell below five since.
   await db.exec(`set session_replication_role = replica`);
   try {
-    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id = 'run-hall-fow00001' and case_id = 'season-final'`);
+    await db.query(`update public.playtest_sessions set suspicion = '{time-over-gap}' where run_id between 'run-hall-fow00001' and 'run-hall-fow00006' and case_id = 'season-final'`);
   } finally {
     await db.exec(`set session_replication_role = origin`);
   }
-  check((await counted()).get(oldWeek) === 9, "a season marked since did not leave the settled week's count.");
+  check((await counted()).get(oldWeek) === 4, "the seasons marked since did not leave the settled week's count.");
   const kept = (await allowed("write a settled week again", "service_role", settle([{ board: oldWeek, places: [place("CCCC0003", 65)] }])))?.rows[0]?.settled;
   check(JSON.stringify(kept?.kept) === JSON.stringify([oldWeek]), `a settled week answered ${JSON.stringify(kept)}.`);
   const old = await view(oldWeek);
@@ -2419,6 +2500,16 @@ if (!READING_AXIS) {
       `the drop-off report read ${JSON.stringify({ runs: funnel.runs, devices: funnel.devices, reach: funnel.reach.slice(0, 3), markedRuns: funnel.markedRuns, breaks: funnel.breaks, gaps: funnel.gaps, locales: funnel.locales, unnamed: funnel.unnamed, english: funnel.english.reach.slice(0, 3) })}; expected 3 runs from 2 devices reaching 프롤로그 01/02/03 as 3/2/1, one NEW GAME+ run, one break among three gaps, and one English run (through 프롤로그 02) beside two naming no language.`,
     );
     check(funnelRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "the drop-off report fetched a run or device id.");
+    // 결정 T's counts (scripts/report-decision-t.mjs, .github/workflows/decision-t.yml):
+    // its one SELECT runs as the report's role and gives one row of counts,
+    // the six case rows above among them, and no id.
+    const countRows = (await allowed("count decision T's units", "service_role", countsQuery("2030-W01", "all")))?.rows ?? [];
+    const counted = readCounts(countRows);
+    check(
+      countRows.length === 1 && counted.caseRows >= 6 && Object.values(counted).every(Number.isFinite),
+      `decision T's counts read ${JSON.stringify({ rows: countRows.length, ...counted })}; expected one row of numbers with at least the six case rows of the drop-off runs.`,
+    );
+    check(countRows.every((row) => !JSON.stringify(row).includes("grants-check-session-") && !JSON.stringify(row).includes("run-week-funnel")), "decision T's counts fetched a run or device id.");
   }
 
   withHeaders(null);
@@ -3000,6 +3091,7 @@ const UPDATE_PROBE = {
   board_posts: "hidden = true",
   board_reports: "reason = reason",
   board_blocked_terms: "term = term",
+  ...(BOARD_ADMINS ? { board_admins: "email = email", board_admin_log: "action = action" } : {}),
   cloud_saves: "payload = payload",
   telemetry_rate_limits: "request_count = 0",
   private_settings: "value = value",
@@ -3007,6 +3099,8 @@ const UPDATE_PROBE = {
   scene_choice_stats: "picks = picks",
   weekly_rules: "rule_id = rule_id",
   ...(HALL_OF_FAME ? { hall_of_fame: "score = score", hall_of_fame_boards: "checked_seasons = checked_seasons" } : {}),
+  ...(PUSH_SUBSCRIPTIONS ? { push_subscriptions: "language = language" } : {}),
+  ...(BOARD_NOTICE ? { board_notice: "body_ko = body_ko" } : {}),
 };
 // The list is typed out because each table needs an assignment of its own, and
 // the rules in part 1 only see table-wide privileges: a new table given a
@@ -3048,6 +3142,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
 // snapshot rebuilt again.
 {
   const LADDER_C4 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_c4.sql"));
+  const LADDER_N18 = readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_ladder_n18.sql"));
   const SCENE_SEED = "grants-check-scene";
   const NG_SCENE = "ngplus_scene";
   await db.exec(`set session_replication_role = replica`);
@@ -3059,6 +3154,7 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
       [4, "prologue05", { newGamePlus: true }],
       [5, "case01", { newGamePlus: true }],
       [6, "case03", { newGamePlus: true }],
+      [7, "case05", { newGamePlus: true }],
     ]) {
       await db.query(
         `insert into public.playtest_sessions (session_id, run_id, session_code, case_id, case_title, summary, decision_log)
@@ -3071,11 +3167,20 @@ await refused("rebuild the choice snapshot", "anon", `select public.refresh_scen
   }
   await db.query(`select public.refresh_scene_bust_stats()`);
   const counted = (await db.query(`select case_id, windows from public.scene_bust_stats where node_id = $1 order by case_id`, [NG_SCENE])).rows.map(({ case_id, windows }) => `${case_id}:${windows}`);
-  const expected = LADDER_C4 ? ["case03:1", "prologue01:1"] : ["case01:1", "case03:1", "prologue01:1", "prologue05:1"];
+  const expected = LADDER_N18 ? ["case05:1", "prologue01:1"] : LADDER_C4 ? ["case03:1", "case05:1", "prologue01:1"] : ["case01:1", "case03:1", "case05:1", "prologue01:1", "prologue05:1"];
   check(
     JSON.stringify(counted) === JSON.stringify(expected),
-    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
+    `the scene snapshot counted ${JSON.stringify(counted)}, expected ${JSON.stringify(expected)}; a NEW GAME+ season's ${LADDER_N18 ? "prologue 01 to case 04" : LADDER_C4 ? "prologue 01 to case 02" : "prologue 01 to 04"} are left out, its later cases and an ordinary season's prologue 01 are not.`,
   );
+  // N44 (*_scene_bust_collecting): a scene under twenty windows and runs is
+  // answered with its count and no percent, which the page prints as 「모으는 중」.
+  if (readdirSync(MIGRATIONS).some((file) => file.endsWith("_scene_bust_collecting.sql"))) {
+    const rates = (await allowed("read the scene wall rates under the floor", "anon", `select public.scene_bust_rates() as rates`))?.rows[0]?.rates ?? {};
+    check(
+      JSON.stringify(rates?.prologue01?.[NG_SCENE]) === JSON.stringify([1, null]),
+      `a scene of one window answers ${JSON.stringify(rates?.prologue01?.[NG_SCENE])}; expected [1, null] (the count, and no percent under twenty windows and runs).`,
+    );
+  }
   await db.query(`delete from public.playtest_sessions where session_code = 'SCENESEED'`);
   await db.query(`select public.refresh_scene_bust_stats()`);
 }
@@ -3524,6 +3629,291 @@ const VALIDATOR_PARTS = {
   check(/'29 18 \* \* \*'/.test(readFileSync(path.join(MIGRATIONS, "20261023020000_scene_choice_rates.sql"), "utf8")), "the choice snapshot is rebuilt once a day (free plan): the cron line changed.");
   await db.query(`delete from public.playtest_sessions where session_id = $1`, [sessionId(97)]);
   await allowed("rebuild the choice snapshot after the rows are gone", "service_role", `select public.refresh_scene_choice_stats()`);
+}
+
+// ---- the board's two makers (20261118000000_board_admins.sql)
+//
+// Signed in as one of the two (Google, the address in any case), every admin
+// RPC answers; signed in as anyone else -- another address, or one of the two
+// addresses from an e-mail/password account -- each refuses, and anon cannot
+// call them at all. A hide, a restore and a delete each leave one log row;
+// restore deletes the post's reports; the writer key never leaves.
+if (BOARD_ADMINS) {
+  const claims = (email, providers = ["google"]) => JSON.stringify({ role: "authenticated", email, app_metadata: { provider: providers[0], providers } });
+  const signIn = (value) => db.query(`select set_config('request.jwt.claims', $1, false)`, [value]);
+  const logRows = async () => (await one(`select count(*)::int as n from public.board_admin_log`))?.n ?? 0;
+  await db.exec(`set session_replication_role = replica`);
+  let seeded;
+  try {
+    seeded = (
+      await db.query(`
+        insert into public.board_posts (session_id, nickname, body, actor_key)
+        values ('admin-check-1', '관리확인', '같은 사람 첫 글', 'board:admin-check-a'),
+               ('admin-check-2', '관리확인', '같은 사람 둘째 글', 'board:admin-check-a'),
+               ('admin-check-3', '다른사람', '다른 사람 글', 'board:admin-check-b')
+        returning id`)
+    ).rows.map((row) => Number(row.id));
+    await db.query(`insert into public.board_reports (post_id, session_id, reason, actor_key) values ($1, 'admin-check-r', 'spam', 'board-report:admin-check')`, [seeded[0]]);
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  const [first, second, other] = seeded;
+
+  await refused("ask whether it is a board admin", "anon", `select public.admin_board_me()`);
+  await refused("search the board as an admin", "anon", `select * from public.admin_board_search('관리확인')`);
+  await refused("hide a post as an admin", "anon", `select public.admin_board_set_hidden(${first}, true)`);
+  await refused("read the board admins", "anon", `select * from public.board_admins`);
+  await refused("read the board admin log", "anon", `select * from public.board_admin_log`);
+
+  for (const [who, value] of [
+    ["a stranger", claims("someone@example.com")],
+    ["a maker's address from an e-mail account", claims("goeun.nam@gmail.com", ["email"])],
+  ]) {
+    await signIn(value);
+    const me = await allowed(`ask whether ${who} is a board admin`, "authenticated", `select public.admin_board_me() as me`);
+    check(me?.rows[0]?.me === false, `admin_board_me answers ${me?.rows[0]?.me} to ${who}.`);
+    await raises(`search the board as ${who}`, "authenticated", `select * from public.admin_board_search('관리확인')`, [], /^42501 .*board admin only/);
+    await raises(`hide a post as ${who}`, "authenticated", `select public.admin_board_set_hidden(${first}, true)`, [], /^42501 .*board admin only/);
+    await raises(`delete a post as ${who}`, "authenticated", `select public.admin_board_delete(${other})`, [], /^42501 .*board admin only/);
+    await raises(`read a writer's posts as ${who}`, "authenticated", `select * from public.admin_board_same_writer(${first})`, [], /^42501 .*board admin only/);
+    await refused(`read the board admins as ${who}`, "authenticated", `select * from public.board_admins`);
+  }
+
+  await signIn(claims("From.Logic.To.Magic@gmail.com", ["email", "google"]));
+  const me = await allowed("ask whether a maker is a board admin", "authenticated", `select public.admin_board_me() as me`);
+  check(me?.rows[0]?.me === true, `admin_board_me answers ${me?.rows[0]?.me} to a maker signed in with Google.`);
+  const found = await allowed("search the board as a maker", "authenticated", `select * from public.admin_board_search('관리확인')`);
+  const rows = found?.rows ?? [];
+  check(rows.length === 2 && Number(rows[0].id) === second, `the search for a nickname found ${rows.map((row) => row.id).join(", ")}; the maker's two posts, newest first.`);
+  check(rows.every((row) => !("actor_key" in row) && row.same_writer_count === 2), `a search row carries a writer key or the wrong same-writer count: ${JSON.stringify(rows[0])}`);
+  check(rows.find((row) => Number(row.id) === first)?.report_count === 1, "a search row does not count its post's report.");
+  const byBody = await allowed("search the board by words in a post", "authenticated", `select id from public.admin_board_search('사람 둘째')`);
+  check((byBody?.rows ?? []).length === 1, "a search for words in one post found another.");
+  const page = await allowed("page through the board", "authenticated", `select id from public.admin_board_search(null, true, 1, $1)`, [second]);
+  check(Number(page?.rows[0]?.id) === first, "the page before a post does not start with the post before it.");
+  const writer = await allowed("read a writer's posts", "authenticated", `select id from public.admin_board_same_writer(${second})`);
+  check((writer?.rows ?? []).map((row) => Number(row.id)).sort().join() === [first, second].sort().join(), "a writer's posts are not the two posts under one writer key.");
+
+  const before = await logRows();
+  await allowed("hide a post as a maker", "authenticated", `select public.admin_board_set_hidden(${first}, true)`);
+  check((await one(`select hidden from public.board_posts where id = $1`, [first]))?.hidden === true, "a maker's hide left the post on the board.");
+  const visibleOnly = await allowed("search without hidden posts", "authenticated", `select id from public.admin_board_search('관리확인', false)`);
+  check((visibleOnly?.rows ?? []).length === 1, "a search without hidden posts listed a hidden one.");
+  await allowed("restore a post as a maker", "authenticated", `select public.admin_board_set_hidden(${first}, false)`);
+  const restored = await one(`select hidden, kept_at is not null as kept, (select count(*)::int from public.board_reports where post_id = $1) as reports from public.board_posts where id = $1`, [first]);
+  check(restored?.hidden === false && restored?.kept === true && restored?.reports === 0, `a maker's restore left ${JSON.stringify(restored)}; visible, kept and its reports gone.`);
+  const missing = await allowed("hide a post that does not exist", "authenticated", `select public.admin_board_set_hidden(-1, true) as done`);
+  check(missing?.rows[0]?.done === false, "hiding a missing post reported success.");
+  await allowed("delete a post as a maker", "authenticated", `select public.admin_board_delete(${other})`);
+  check(!(await one(`select id from public.board_posts where id = $1`, [other])), "a maker's delete left the post.");
+  const log = (await db.query(`select admin_email, action, post_id from public.board_admin_log order by id desc limit 3`)).rows;
+  check((await logRows()) === before + 3, `three admin actions wrote ${(await logRows()) - before} log rows.`);
+  check(log.map((row) => row.action).join() === "delete,restore,hide" && log.every((row) => row.admin_email === "from.logic.to.magic@gmail.com"), `the admin log reads ${JSON.stringify(log)}.`);
+
+  await signIn("");
+  await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [[first, second]]);
+  await db.query(`delete from public.board_admin_log`);
+}
+
+// ---- 주 1회 알림's push subscriptions (N25, *_push_subscriptions.sql)
+//
+// anon adds a subscription and refreshes it by its endpoint, removes it by
+// its endpoint, and can neither read the table nor reach it any other way; a
+// push service the table does not know, or a key that is not one, is
+// refused. The weekly sender's read and its after-run write
+// (scripts/send-weekly-push.mjs) run as the service role on this schema.
+if (PUSH_SUBSCRIPTIONS) {
+  const endpoint = "https://fcm.googleapis.com/fcm/send/grants-check:APA91b-x_y";
+  const p256dh = `B${"A".repeat(86)}`;
+  const auth = "QUJDREVGR0hJSktMTU5PUA";
+  const subscribe = (point, key = p256dh, secret = auth, language = "ko") =>
+    `select public.push_subscribe('${point}', '${key}', '${secret}', '${language}') as ok`;
+  const rows = async () => (await db.query(`select id, endpoint, language from public.push_subscriptions order by id`)).rows;
+
+  await allowed("subscribe to the weekly reminder", "anon", subscribe(endpoint));
+  await allowed("subscribe again in another language", "anon", subscribe(endpoint, p256dh, auth, "ja"));
+  const kept = await rows();
+  check(kept.length === 1 && kept[0].language === "ja", `two subscribes of one endpoint left ${JSON.stringify(kept)}; one row, in the second language.`);
+  await allowed("subscribe from Apple's push service", "anon", subscribe("https://web.push.apple.com/QGrants-check"));
+  await raises("subscribe an endpoint on no known push service", "anon", subscribe("https://evil.example/push"), [], /^23514 /);
+  await raises("subscribe a plain http endpoint", "anon", subscribe("http://fcm.googleapis.com/fcm/send/x"), [], /^23514 /);
+  await raises("subscribe with a key that is not one", "anon", subscribe(endpoint, "short"), [], /^23514 /);
+  await raises("subscribe in a language the game has not", "anon", subscribe(endpoint, p256dh, auth, "fr"), [], /invalid push subscription/);
+  await refused("read the push subscriptions", "anon", `select * from public.push_subscriptions`);
+  await refused("insert a push subscription directly", "anon", `insert into public.push_subscriptions (endpoint, p256dh, auth) values ('${endpoint}x', '${p256dh}', '${auth}')`);
+
+  const { subscriptionsQuery, afterSql } = await import("./send-weekly-push.mjs");
+  const crisis = Date.parse("2026-12-01T08:00:00+09:00");
+  const due = (await allowed("read the subscriptions to send to", "service_role", subscriptionsQuery(crisis)))?.rows ?? [];
+  check(due.length === 2, `the weekly sender's read found ${due.length} rows; the two subscriptions.`);
+  const [fcm, apple] = due.map((row) => Number(row.id));
+  // One statement a line; the CLI runs them as one file, PGlite's prepared statements one at a time.
+  for (const statement of afterSql({ sent: [fcm], gone: [apple] }, crisis).split("\n").filter(Boolean)) {
+    await allowed("mark the sent rows and delete the gone ones", "service_role", statement);
+  }
+  const again = (await allowed("read the subscriptions after a run", "service_role", subscriptionsQuery(crisis)))?.rows ?? [];
+  check(again.length === 0 && (await rows()).length === 1, `after a run the read found ${again.length} rows and the table holds ${(await rows()).length}; none to send again, one left.`);
+
+  const gone = await allowed("unsubscribe from the weekly reminder", "anon", `select public.push_unsubscribe('${endpoint}') as ok`);
+  check(gone?.rows[0]?.ok === true && (await rows()).length === 0, "push_unsubscribe left the subscription.");
+  const twice = await allowed("unsubscribe twice", "anon", `select public.push_unsubscribe('${endpoint}') as ok`);
+  check(twice?.rows[0]?.ok === false, "a second push_unsubscribe reported a row.");
+  await db.query(`delete from public.telemetry_rate_limits where actor_key like 'global:push-%' or actor_key like 'push-%'`);
+}
+
+// ---- the makers' report queue and log (20261118010000_board_admin_queue.sql)
+//
+// The queue is the posts scripts/board-reports.mjs counts as waiting: on the
+// board with a report, or hidden by the reports themselves. A post a person
+// hid, and a post with no report, are not in it; hiding for good or restoring
+// takes a post out. The log reads back the newest actions. Strangers are
+// refused, anon cannot call any of the three, and no row carries a writer key.
+if (BOARD_ADMINS && BOARD_ADMIN_QUEUE) {
+  const claims = (email) => JSON.stringify({ role: "authenticated", email, app_metadata: { provider: "google", providers: ["google"] } });
+  const signIn = (value) => db.query(`select set_config('request.jwt.claims', $1, false)`, [value]);
+  await db.exec(`set session_replication_role = replica`);
+  let seeded;
+  try {
+    seeded = (
+      await db.query(`
+        insert into public.board_posts (session_id, nickname, body, actor_key, hidden, auto_hidden_at)
+        values ('queue-check-1', '대기확인', '신고 두 건 보이는 글', 'board:queue-check-a', false, null),
+               ('queue-check-2', '대기확인', '신고로 자동 숨김된 글', 'board:queue-check-a', true, now()),
+               ('queue-check-3', '끝난글', '사람이 숨긴 글', 'board:queue-check-b', true, null),
+               ('queue-check-4', '조용한글', '신고 없는 글', 'board:queue-check-c', false, null)
+        returning id`)
+    ).rows.map((row) => Number(row.id));
+    const [reported, autoHidden, personHidden] = seeded;
+    await db.query(
+      `insert into public.board_reports (post_id, session_id, reason, actor_key)
+       values ($1, 'queue-check-r1', 'spam', 'board-report:queue-check-1'),
+              ($1, 'queue-check-r2', 'abuse', 'board-report:queue-check-2'),
+              ($2, 'queue-check-r3', 'privacy', 'board-report:queue-check-3'),
+              ($3, 'queue-check-r4', 'spam', 'board-report:queue-check-4')`,
+      [reported, autoHidden, personHidden],
+    );
+  } finally {
+    await db.exec(`set session_replication_role = origin`);
+  }
+  const [reported, autoHidden, personHidden, quiet] = seeded;
+
+  await refused("read the report queue as an admin", "anon", `select * from public.admin_board_queue()`);
+  await refused("count the report queue as an admin", "anon", `select public.admin_board_queue_count()`);
+  await refused("read the admin log as an admin", "anon", `select * from public.admin_board_log()`);
+
+  await signIn(claims("someone@example.com"));
+  await raises("read the report queue as a stranger", "authenticated", `select * from public.admin_board_queue()`, [], /^42501 .*board admin only/);
+  await raises("count the report queue as a stranger", "authenticated", `select public.admin_board_queue_count()`, [], /^42501 .*board admin only/);
+  await raises("read the admin log as a stranger", "authenticated", `select * from public.admin_board_log()`, [], /^42501 .*board admin only/);
+
+  await signIn(claims("goeun.nam@gmail.com"));
+  const queue = (await allowed("read the report queue as a maker", "authenticated", `select * from public.admin_board_queue()`))?.rows ?? [];
+  const ids = queue.map((row) => Number(row.id));
+  check(ids.includes(reported) && ids.includes(autoHidden), `the queue ${ids.join(", ")} lacks a reported post or an auto-hidden one.`);
+  check(!ids.includes(personHidden) && !ids.includes(quiet), `the queue ${ids.join(", ")} lists a post a person hid or one nobody reported.`);
+  check(queue.every((row) => !("actor_key" in row)), "a queue row carries a writer key.");
+  const reportedRow = queue.find((row) => Number(row.id) === reported);
+  check(
+    reportedRow?.report_count === 2 && reportedRow?.writer_count === 2 && reportedRow?.same_writer_count === 2 && JSON.stringify(reportedRow?.reasons) === '["abuse","spam"]' && reportedRow?.first_report_at,
+    `a queue row reads ${JSON.stringify(reportedRow)}; two reports from two writers, both reasons, its first report's time.`,
+  );
+  const counted = await allowed("count the report queue as a maker", "authenticated", `select public.admin_board_queue_count() as n`);
+  const before = counted?.rows[0]?.n;
+  check(before === queue.length, `the queue's count ${before} is not the ${queue.length} rows it lists.`);
+
+  await allowed("hide an auto-hidden post for good", "authenticated", `select public.admin_board_set_hidden(${autoHidden}, true)`);
+  await allowed("keep a reported post", "authenticated", `select public.admin_board_set_hidden(${reported}, false)`);
+  const after = (await allowed("count the queue after two decisions", "authenticated", `select public.admin_board_queue_count() as n`))?.rows[0]?.n;
+  check(after === before - 2, `two decided posts left the queue at ${after}, from ${before}.`);
+  const left = ((await allowed("read the queue after two decisions", "authenticated", `select id from public.admin_board_queue()`))?.rows ?? []).map((row) => Number(row.id));
+  check(!left.includes(reported) && !left.includes(autoHidden), `decided posts are still in the queue: ${left.join(", ")}.`);
+
+  const log = (await allowed("read the admin log as a maker", "authenticated", `select * from public.admin_board_log(2)`))?.rows ?? [];
+  check(
+    log.length === 2 &&
+      log.map((row) => `${row.action}:${Number(row.post_id)}`).join() === `restore:${reported},hide:${autoHidden}` &&
+      log.every((row) => row.admin_email === "goeun.nam@gmail.com" && row.at && !("actor_key" in row)),
+    `the admin log reads ${JSON.stringify(log)}; the restore, then the hide, by the maker.`,
+  );
+
+  await signIn("");
+  await db.query(`delete from public.board_posts where id = any($1::bigint[])`, [seeded]);
+  await db.query(`delete from public.board_admin_log`);
+}
+
+// ---- 「만든 사람 공지」 (20261202010000_board_notice.sql)
+//
+// Only the two makers write the notice, and only through its RPCs: anon and a
+// signed-in stranger are refused (the stranger with `board admin only`), and
+// nobody but the service role writes the table. anon reads its words and
+// times while it lasts, never the maker's address; an ended notice reads as
+// none. One notice at most: a second set replaces the first.
+if (BOARD_ADMINS && BOARD_NOTICE) {
+  const claims = (email, providers = ["google"]) => JSON.stringify({ role: "authenticated", email, app_metadata: { provider: providers[0], providers } });
+  const signIn = (value) => db.query(`select set_config('request.jwt.claims', $1, false)`, [value]);
+  const read = async () => (await allowed("read the board notice", "anon", `select body_ko, body_en, body_ja, posted_at, expires_at from public.board_notice`))?.rows ?? [];
+  const stored = async () => (await one(`select count(*)::int as n from public.board_notice`))?.n;
+  const setSql = (ko, en = null, ja = null, ends = null) => ({
+    sql: `select public.admin_board_notice_set($1, $2, $3, $4::timestamptz) as at`,
+    params: [ko, en, ja, ends],
+  });
+  const set = (label, args) => allowed(label, "authenticated", args.sql, args.params);
+  const setRaises = (label, args, pattern) => raises(label, "authenticated", args.sql, args.params, pattern);
+  const forged = `insert into public.board_notice (body_ko, posted_by) values ('가짜 공지', 'x@example.com')`;
+
+  check((await read()).length === 0, "anon reads a board notice nobody posted.");
+  await refused("post a board notice", "anon", `select public.admin_board_notice_set('공지')`);
+  await refused("take down the board notice", "anon", `select public.admin_board_notice_clear()`);
+  await refused("read the board notice whole", "anon", `select * from public.admin_board_notice_get()`);
+  await refused("write the board notice directly", "anon", forged);
+  await refused("read who posted the board notice", "anon", `select posted_by from public.board_notice`);
+
+  for (const [who, value] of [
+    ["a stranger", claims("someone@example.com")],
+    ["a maker's address from an e-mail account", claims("goeun.nam@gmail.com", ["email"])],
+  ]) {
+    await signIn(value);
+    await setRaises(`post a board notice as ${who}`, setSql("가짜 공지"), /^42501 .*board admin only/);
+    await raises(`take down the board notice as ${who}`, "authenticated", `select public.admin_board_notice_clear()`, [], /^42501 .*board admin only/);
+    await raises(`read the board notice whole as ${who}`, "authenticated", `select * from public.admin_board_notice_get()`, [], /^42501 .*board admin only/);
+    await refused(`write the board notice directly as ${who}`, "authenticated", forged);
+  }
+  check((await stored()) === 0, "a refused notice was stored.");
+
+  await signIn(claims("goeun.nam@gmail.com"));
+  await setRaises("post a board notice with no Korean", setSql("   ", "English only"), /^22023 .*Korean/);
+  await setRaises("post a board notice over 600 characters", setSql("가".repeat(601)), /^22023 .*600/);
+  await setRaises("post an English notice over 600 characters", setSql("공지", "a".repeat(601)), /^22023 .*600/);
+  await setRaises("post a board notice that has already ended", setSql("공지", null, null, "2000-01-01T00:00:00Z"), /^22023 .*ends/);
+  check((await stored()) === 0, "a notice the server refused was stored.");
+
+  await set("post a board notice as a maker", setSql("  우리가 알립니다.  ", "  ", "私たちからのお知らせ"));
+  let shown = await read();
+  check(
+    shown.length === 1 && shown[0].body_ko === "우리가 알립니다." && shown[0].body_en === null && shown[0].body_ja === "私たちからのお知らせ" && shown[0].posted_at && shown[0].expires_at === null,
+    `anon reads the notice as ${JSON.stringify(shown)}; trimmed Korean, no English (blank), the Japanese, its time, no end.`,
+  );
+  const whole = (await allowed("read the board notice whole as a maker", "authenticated", `select * from public.admin_board_notice_get()`))?.rows ?? [];
+  check(whole.length === 1 && whole[0].posted_by === "goeun.nam@gmail.com", `the makers' read of the notice is ${JSON.stringify(whole)}.`);
+
+  await signIn(claims("from.logic.to.magic@gmail.com"));
+  await set("replace the board notice as the other maker", setSql("새 공지", "New notice", null, new Date(Date.now() + 86_400_000).toISOString()));
+  shown = await read();
+  check(shown.length === 1 && shown[0].body_ko === "새 공지" && shown[0].body_en === "New notice" && shown[0].body_ja === null && shown[0].expires_at, `a second notice left ${JSON.stringify(shown)}; one notice, the second.`);
+  check((await stored()) === 1, "two notices are stored; the second has to replace the first.");
+
+  // Ended: the row stays for the makers' form, and anon reads none.
+  await db.query(`update public.board_notice set posted_at = now() - interval '2 days', expires_at = now() - interval '1 day'`);
+  check((await read()).length === 0, "anon still reads a notice that has ended.");
+  const ended = (await allowed("read an ended notice as a maker", "authenticated", `select body_ko from public.admin_board_notice_get()`))?.rows ?? [];
+  check(ended.length === 1, "the makers cannot read back a notice that has ended.");
+
+  const cleared = await allowed("take down the board notice as a maker", "authenticated", `select public.admin_board_notice_clear() as gone`);
+  check(cleared?.rows[0]?.gone === true && (await stored()) === 0, "taking the notice down left it stored.");
+  const again = await allowed("take down a notice that is not there", "authenticated", `select public.admin_board_notice_clear() as gone`);
+  check(again?.rows[0]?.gone === false, "taking down no notice reported one.");
+
+  await signIn("");
 }
 
 // ---- retention runs as the service role and reaches every table

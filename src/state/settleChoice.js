@@ -1,13 +1,15 @@
 import { CASE_RESULT_NODES, CASE_SEQUENCE } from "../gameCases.js";
 import { getAuthorityGate, REFRAME_COGNITION, REFRAME_EFFECT } from "../gameLogic.js";
-import { getBranchDetourBypass } from "../gameData.js";
+import { getBranchDetourBypass, nodes } from "../gameData.js";
+import { countNarrows, countScouts, isMarkNineOn } from "../gauntlet/nextTableRules.js";
 import { applyGauntletEffect, countCaseBoards, isShockDue, resolveWindow } from "../gauntlet/gauntletEngine.js";
 import { countAudit } from "../gauntlet/auditRisk.js";
 import { carryLinksOut, isLinkDue } from "../gauntlet/cascadeRisk.js";
 import { listOfferedDirections } from "../gauntlet/logicStreak.js";
 import { getRelicPool, getRelicUnlocks } from "../gauntlet/relics.js";
+import { isSignNode } from "../gauntlet/storyAutoCash.js";
 import { getTableRules, STAGED } from "../gauntlet/tableUnlocks.js";
-import { getBlackoutSkip, getReframeTarget } from "./caseRoutes.js";
+import { getBlackoutSkip, getReframeTarget, keepsSceneOnBust } from "./caseRoutes.js";
 
 /**
  * The settlement of one decision, outside React (F1 phase 3, S2 in
@@ -67,6 +69,16 @@ export function getSettlementRules({ caseId, run, caseClosed }, staged = STAGED)
 }
 
 /**
+ * G6 결재 판: whether the scene `nodeId` is its case's last decision -- every
+ * card on it (the wild one aside) closes the case -- so the board dealt for it
+ * is the case's 결재 판. A scene not loaded, or with no cards, is not one.
+ * The rule is storyAutoCash.js's (`isSignNode`): G43's story table reads it too.
+ */
+export function isSignScene(caseId, nodeId) {
+  return isSignNode(caseId, nodes[nodeId]);
+}
+
+/**
  * The directions of card a scene has on the table (사람 or 자리, C-3), for the
  * logic streak: a hand that leaves its direction because no card leaning that
  * way was there keeps its streak
@@ -98,7 +110,7 @@ export function routeChoice({ caseId, nodeId, resources, caseResults = {}, run, 
   };
   const branchBypass = getBranchDetourBypass(choice, branchContext);
   const plannedNode = reframeTarget ?? branchBypass ?? choice.next;
-  const blackoutSkip = window.status === "bust" && run?.story !== true ? getBlackoutSkip(plannedNode, branchContext) : null;
+  const blackoutSkip = window.status === "bust" && run?.story !== true && !keepsSceneOnBust(caseId) ? getBlackoutSkip(plannedNode, branchContext) : null;
   const nextNode = blackoutSkip?.nodeId ?? plannedNode;
   return {
     reframe,
@@ -144,12 +156,17 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     caseClosed: route.caseClosed,
     offerRelics: caseId !== "final",
     // The case's audit so far, read off its log (auditRisk.js); the engine reads it only in a case whose rules have it.
-    audit: countAudit(log),
+    audit: countAudit(log, isMarkNineOn(settlementRules.rules)),
     ...settlementRules,
     // B2: whether a link made boards ago comes back on the next board, off the case's log (cascadeRisk.js).
     cascade: isLinkDue(run, log, runId, settlementRules.rules),
     // MARKET SHOCK, under the week that has it: whether the next board is the case's shock board, off the case's log.
     shock: isShockDue(run, countCaseBoards(log), route.caseClosed),
+    // G6: the board this decision deals is the case's last (the 결재 판); G2: the second looks the case has bought.
+    sign: !route.caseClosed && isSignScene(caseId, route.nextNode),
+    narrows: countNarrows(log),
+    // G13 (RULES_MARK 7): the first looks the case has bought.
+    scouts: countScouts(log),
   };
   const { verdict, nextRun: settledRun, unlockedRelics } = settle ? settle(settlement) : settleAgainstCodex(settlement, unlocked);
   const gauntletEffect = applyGauntletEffect(baseEffect, {
@@ -159,6 +176,9 @@ export function settleChoice(state, { choice, window = null, forced = false, set
     fractureRate: verdict.fractureRate,
     focusMultiplier: verdict.focus?.resourceMultiplier,
     scouted: verdict.scouted,
+    narrowed: verdict.narrowed === true,
+    ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
+    ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
   });
   return {
     ...route,

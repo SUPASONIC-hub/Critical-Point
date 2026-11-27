@@ -5,7 +5,7 @@
   place-items: center;
   padding: 24px;
   color: var(--ui-text);
-  background: radial-gradient(60% 50% at top, rgb(255 92 72 / 0.1), transparent 70%), var(--ui-bg);
+  background: radial-gradient(60% 50% at top, rgb(176 38 30 / 0.08), transparent 70%), var(--ui-bg);
 }
 .error-panel {
   width: min(100%, 560px);
@@ -78,7 +78,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(4 7 8 / 0.72);
+  background: rgb(247 242 230 / 0.72);
   overflow: auto;
 }
 * {
@@ -179,7 +179,7 @@ summary:focus-visible {
 .music-toggle:hover,
 .music-volume-toggle:hover {
   color: var(--ui-text);
-  border-color: rgb(255 255 255 / 0.3);
+  border-color: rgb(22 24 26 / 0.21);
 }
 /* A phone draws the pills 38x36 (34 tall on its side); the finger presses
    over 44x44 centred on each, whatever size it is drawn. A pill wider than
@@ -203,7 +203,7 @@ summary:focus-visible {
   color: var(--ui-accent-ink);
   background: var(--ui-accent);
   border-color: var(--ui-accent);
-  box-shadow: 0 6px 24px rgb(217 255 98 / 0.26);
+  box-shadow: 0 6px 24px rgb(22 96 62 / 0.16);
 }
 .music-toggle span {
   max-width: 6rem;
@@ -248,7 +248,7 @@ summary:focus-visible {
   align-items: center;
   min-height: 32px;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.34);
+  border: 1px solid rgb(22 24 26 / 0.24);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -258,11 +258,11 @@ summary:focus-visible {
      broke across two lines next to six buttons. */
   flex: none;
   background: var(--ui-surface-2);
-  color: var(--c-paper);
+  color: var(--ui-text);
   white-space: nowrap;
 }
 .case-chip {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgb(22 24 26 / 0.1);
   color: inherit;
 }
 .game-header h1:focus,
@@ -299,9 +299,9 @@ summary:focus-visible {
   gap: 8px;
   min-height: 38px;
   padding: 0 12px;
-  color: var(--c-ink-raised);
-  background: var(--c-paper-muted);
-  border: 0;
+  color: var(--ui-text);
+  background: var(--ui-surface-1);
+  border: 1px solid var(--ui-line-field);
   border-radius: 6px;
   font-weight: 800;
 }
@@ -390,9 +390,14 @@ summary:focus-visible {
 }
 .intro-visual picture,
 .intro-visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
+  object-fit: cover;
+  object-position: 72% 36%;
+  /* Printed faint in the paper, so the title reads over it. */
+  filter: grayscale(1) sepia(0.25) contrast(1.05);
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  transform-origin: 70% 40%;
+  animation: intro-art-drift 28s ease-in-out infinite alternate;
 }
 .intro-visual img {
   object-fit: cover;
@@ -408,23 +413,23 @@ summary:focus-visible {
     transform: scale(1.1) translate3d(-1.5%, 0.5%, 0);
   }
 }
-/* Graded, not framed: ink on the reading side, a floor of ink under the fold
-   and a lid of shade under the brand pills. */
+/* Graded, not framed: paper on the reading side, a floor of paper under the
+   fold and a lid of it under the brand pills. */
 .intro-hero-art::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(55% 60% at 16% 46%, rgb(217 255 98 / 0.07), transparent 70%),
+    radial-gradient(55% 60% at 16% 46%, rgb(22 96 62 / 0.04), transparent 70%),
     linear-gradient(0deg, var(--ui-bg), transparent 30%),
-    linear-gradient(rgb(18 22 24 / 0.7), transparent 20%),
+    linear-gradient(rgb(247 242 230 / 0.7), transparent 20%),
     linear-gradient(
       90deg,
       var(--ui-bg),
-      rgb(18 22 24 / 0.94) 28%,
-      rgb(18 22 24 / 0.55) 52%,
-      rgb(18 22 24 / 0.08) 78%
+      rgb(247 242 230 / 0.94) 28%,
+      rgb(247 242 230 / 0.55) 52%,
+      rgb(247 242 230 / 0.08) 78%
     );
 }
 .intro-visual figcaption {
@@ -482,10 +487,9 @@ summary:focus-visible {
   min-height: 34px;
   padding: 0 14px 0 12px;
   color: var(--ui-text);
-  background: var(--ui-glass);
-  border: 1px solid var(--ui-line-strong);
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
+  background: var(--ledger-white);
+  border: 1px solid var(--ui-text);
+  border-radius: 3px;
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -514,7 +518,7 @@ summary:focus-visible {
 /* The 3px ring; at the peak it reaches 6px and has faded out. */
 .brand-mark-dot::before {
   inset: -3px;
-  background: rgb(217 255 98 / 0.16);
+  background: rgb(22 96 62 / 0.1);
   animation-name: brand-dot-ring;
 }
 /* The wider 18px glow, faded in over the dot's own 12px one. */
@@ -552,7 +556,7 @@ summary:focus-visible {
 }
 .intro .top-actions .ghost:hover {
   background: var(--ui-surface-3);
-  border-color: rgb(255 255 255 / 0.3);
+  border-color: rgb(22 24 26 / 0.21);
 }
 /* The board is the one place players talk to each other, so it is the one
    header pill that glints: an accent rim, a slow glow and a light sweep. All
@@ -564,7 +568,7 @@ summary:focus-visible {
   overflow: hidden;
   color: var(--ui-accent);
   border-color: var(--ui-line-accent);
-  box-shadow: 0 0 14px rgb(217 255 98 / 0.22);
+  box-shadow: 0 0 14px rgb(22 96 62 / 0.13);
   animation: board-glow 2.4s ease-in-out 2;
 }
 .intro .top-actions .intro-board-button::after {
@@ -572,7 +576,7 @@ summary:focus-visible {
   position: absolute;
   inset: 0 auto 0 -60%;
   width: 45%;
-  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.6), transparent);
+  background: linear-gradient(100deg, transparent, rgb(22 24 26 / 0.42), transparent);
   transform: skewX(-18deg);
   animation: board-shine 2.8s var(--ui-ease) 2;
   pointer-events: none;
@@ -587,8 +591,8 @@ summary:focus-visible {
 @keyframes board-glow {
   50% {
     box-shadow:
-      0 0 0 3px rgb(217 255 98 / 0.12),
-      0 0 22px rgb(217 255 98 / 0.45);
+      0 0 0 3px rgb(22 96 62 / 0.07),
+      0 0 22px rgb(22 96 62 / 0.27);
   }
 }
 /* The sweep travels from left -60% to 130% of the pill, 190% of its width,
@@ -614,49 +618,34 @@ summary:focus-visible {
 }
 
 /* Title lockup ------------------------------------------------------------
-   Heavy caps set tight in Pretendard, with a thin chromatic flicker. The flicker
-   and the charge are decoration only: both stop under prefers-reduced-motion,
-   and the readable copy is the element's own text, never a transparent fill. */
+   The game's logo (GameWordmark.jsx, src/components/wordmarkLogo.js): the
+   GAUGE mark and the drawn wordmark, thin lines on one row, the point and the
+   full stop in the heat red. The heading's text is the title in .sr-only; the
+   svg is the picture of it. The font size still sets the logo's measure, so
+   the reading line under it keeps its place in the column. */
 .game-wordmark {
   display: grid;
+  /* As wide as the copy column: the logo's width is a share of it. The column
+     is a flex box that starts its children, which would shrink the heading to
+     an svg's 300px default. */
+  align-self: stretch;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: 0;
   margin: 0;
   font-size: clamp(2.5rem, 6.1vw, 6rem);
-  font-weight: 800;
   line-height: 0.92;
-  letter-spacing: -0.045em;
-  text-transform: uppercase;
 }
-.wordmark-line {
-  position: relative;
+.wordmark-logo {
   display: block;
+  width: min(100%, 8.8em);
+  height: auto;
+  aspect-ratio: 11 / 1;
   color: var(--ui-text);
-  text-shadow: 0 8px 40px rgb(0 0 0 / 0.6);
+  overflow: hidden;
 }
-.wordmark-line::before,
-.wordmark-line::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-.wordmark-line::before {
-  color: rgb(217 255 98 / 0.85);
-  transform: translate3d(-0.018em, 0.012em, 0);
-  animation: wordmark-drift-a 5.2s steps(2, end) infinite;
-}
-.wordmark-line::after {
-  color: rgb(88 214 255 / 0.72);
-  transform: translate3d(0.018em, -0.012em, 0);
-  animation: wordmark-drift-b 6.7s steps(2, end) infinite;
-}
-.wordmark-line-accent {
-  color: var(--ui-accent);
-  text-shadow:
-    0 8px 40px rgb(0 0 0 / 0.6),
-    0 0 60px rgb(217 255 98 / 0.32);
+.wordmark-point {
+  fill: var(--ui-heat);
 }
 .wordmark-rule {
   display: block;
@@ -665,7 +654,7 @@ summary:focus-visible {
   margin: 20px 0 14px;
   background: linear-gradient(90deg, var(--ui-accent), transparent);
   border-radius: 999px;
-  box-shadow: 0 0 18px rgb(217 255 98 / 0.45);
+  box-shadow: 0 0 18px rgb(22 96 62 / 0.27);
   transform-origin: left;
   animation: wordmark-charge 4.4s ease-in-out infinite;
 }
@@ -693,38 +682,6 @@ summary:focus-visible {
   letter-spacing: 0.2em;
 }
 
-@keyframes wordmark-drift-a {
-  0%,
-  88%,
-  100% {
-    opacity: 0;
-    transform: translate3d(-0.018em, 0.012em, 0);
-  }
-  90% {
-    opacity: 1;
-    transform: translate3d(-0.05em, 0.02em, 0);
-  }
-  95% {
-    opacity: 0.6;
-    transform: translate3d(-0.008em, -0.01em, 0);
-  }
-}
-@keyframes wordmark-drift-b {
-  0%,
-  84%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0.018em, -0.012em, 0);
-  }
-  87% {
-    opacity: 1;
-    transform: translate3d(0.052em, -0.024em, 0);
-  }
-  93% {
-    opacity: 0.55;
-    transform: translate3d(0.01em, 0.012em, 0);
-  }
-}
 @keyframes wordmark-charge {
   0%,
   100% {
@@ -738,10 +695,6 @@ summary:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wordmark-line::before,
-  .wordmark-line::after {
-    display: none;
-  }
   .wordmark-rule,
   .intro-visual img,
   .brand-mark-dot::before,
@@ -760,10 +713,9 @@ summary:focus-visible {
   margin: 26px 0 14px;
   padding: 7px 14px 7px 11px;
   color: var(--ui-text);
-  background: var(--ui-glass);
-  border: 1px solid var(--ui-line-strong);
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
+  background: var(--ledger-white);
+  border: 1px solid var(--ui-text);
+  border-radius: 3px;
   font-size: clamp(0.84375rem, 1.2vw, 0.96875rem);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -774,9 +726,7 @@ summary:focus-visible {
   width: 18px;
   height: 2px;
   flex: none;
-  background: var(--ui-accent);
-  border-radius: 999px;
-  box-shadow: 0 0 10px var(--ui-accent);
+  background: var(--ledger-pencil);
 }
 .intro-hero-copy > p {
   max-width: 44ch;
@@ -800,26 +750,25 @@ summary:focus-visible {
   min-height: 60px;
   padding: 0 30px 0 24px;
   gap: 10px;
+  /* The green stamp of the ledger, on a lip of ink a press takes away. */
   color: var(--ui-accent-ink);
   background: var(--ui-accent);
-  border-radius: var(--ui-radius-sm);
+  border: 2px solid var(--ledger-ink);
+  border-radius: 6px;
   font-size: 1.0625rem;
-  font-weight: 700;
+  font-weight: 900;
   letter-spacing: -0.01em;
-  box-shadow:
-    0 0 0 1px rgb(217 255 98 / 0.6),
-    0 12px 40px rgb(217 255 98 / 0.26),
-    inset 0 1px 0 rgb(255 255 255 / 0.5);
+  box-shadow: 0 5px 0 var(--ledger-ink);
   transition:
-    transform var(--ui-dur-fast) var(--ui-ease),
-    background var(--ui-dur-fast) var(--ui-ease);
+    transform 70ms var(--ui-ease),
+    box-shadow 70ms var(--ui-ease);
 }
 .intro-launch button::after {
   content: "";
   position: absolute;
   inset: 0 auto 0 -40%;
   width: 36%;
-  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  background: linear-gradient(100deg, transparent, rgb(253 251 245 / 0.35), transparent);
   transform: skewX(-18deg);
   animation: intro-cta-shine 4.2s var(--ui-ease) infinite;
   pointer-events: none;
@@ -838,18 +787,15 @@ summary:focus-visible {
   transition: transform var(--ui-dur) var(--ui-ease);
 }
 .intro-launch button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: rgb(228 255 142);
-  box-shadow:
-    0 0 0 1px rgb(217 255 98 / 0.8),
-    0 18px 50px rgb(217 255 98 / 0.36),
-    inset 0 1px 0 rgb(255 255 255 / 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 var(--ledger-ink);
 }
 .intro-launch button:hover:not(:disabled) svg {
   transform: translateX(3px);
 }
 .intro-launch button:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(5px);
+  box-shadow: none;
 }
 .intro-launch button:disabled {
   opacity: 0.6;
@@ -880,6 +826,38 @@ summary:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 3px;
   border-radius: 4px;
+}
+/* N19: the second door (스토리 모드 from the first case) reads as a quiet line
+   beside the briefing link, not a second slab: the acid button stays the only
+   primary action on the stage. */
+.intro-launch button.intro-story-start {
+  min-height: 44px;
+  padding: 0 4px;
+  gap: 8px;
+  color: var(--ui-text);
+  background: none;
+  box-shadow: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 7px;
+}
+.intro-launch button.intro-story-start::after {
+  content: none;
+}
+.intro-launch button.intro-story-start small {
+  color: var(--ui-text-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.intro-launch button.intro-story-start:hover:not(:disabled),
+.intro-launch button.intro-story-start:focus-visible {
+  transform: none;
+  color: var(--ui-accent);
+  background: none;
+  box-shadow: none;
+  text-decoration-color: var(--ui-accent);
 }
 /* 기기 간 이어하기: one folded line under the primary action. */
 .cloud-save-panel {
@@ -1001,7 +979,7 @@ summary:focus-visible {
   display: grid;
   gap: 4px;
   padding-left: 14px;
-  border-left: 1px solid var(--ui-line-strong);
+  border-left: 2px solid var(--ledger-pencil);
 }
 .intro-stats dt {
   order: 2;
@@ -1094,18 +1072,6 @@ summary:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
 }
-/* The five pages beside the build (privacyText.js SITE_PAGES). The line
-   height is what makes each link a 52px target; on a narrow screen the line
-   wraps, with no gap between its rows. */
-.intro-legal {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 20px;
-  width: min(var(--ui-page-max), 100%);
-  margin: 64px auto 0;
-  line-height: 3.25;
-  border-top: 1px solid var(--ui-line);
-}
 /* The resume card replaces the door when a save exists. */
 .resume-panel {
   display: flex;
@@ -1121,7 +1087,7 @@ summary:focus-visible {
   border-radius: var(--ui-radius-md);
   box-shadow:
     var(--ui-shadow-2),
-    0 0 48px rgb(217 255 98 / 0.08);
+    0 0 48px rgb(22 96 62 / 0.05);
   backdrop-filter: blur(16px);
 }
 .resume-panel div {
@@ -1159,7 +1125,7 @@ summary:focus-visible {
   background: var(--ui-accent);
   border: 0;
   border-radius: var(--ui-radius-sm);
-  box-shadow: 0 10px 32px rgb(217 255 98 / 0.24);
+  box-shadow: 0 10px 32px rgb(22 96 62 / 0.14);
   font-size: 1rem;
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
@@ -1260,7 +1226,7 @@ summary:focus-visible {
   margin: clamp(40px, 6vw, 80px) auto 14px;
   padding: clamp(20px, 3vw, 32px);
   color: var(--ui-text);
-  background: radial-gradient(80% 120% at 0 0, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(80% 120% at 0 0, rgb(22 96 62 / 0.05), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -1382,7 +1348,7 @@ summary:focus-visible {
   letter-spacing: 0.02em;
 }
 .intro .new-game-plus-button:hover {
-  background: rgb(217 255 98 / 0.2);
+  background: rgb(22 96 62 / 0.12);
 }
 .test-unlock {
   width: 100%;
@@ -1400,7 +1366,7 @@ summary:focus-visible {
   margin: 0 auto 14px;
   padding: 16px 20px;
   color: var(--ui-text);
-  background: linear-gradient(90deg, rgb(217 255 98 / 0.08), transparent 60%), var(--ui-surface-1);
+  background: linear-gradient(90deg, rgb(22 96 62 / 0.05), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-md);
 }
@@ -1702,11 +1668,11 @@ summary:focus-visible {
 }
 .intro .play-style.selected,
 .intro .operator-origin.selected {
-  background: linear-gradient(160deg, rgb(217 255 98 / 0.1), transparent 55%), var(--ui-surface-2);
+  background: linear-gradient(160deg, rgb(22 96 62 / 0.06), transparent 55%), var(--ui-surface-2);
   border-color: var(--ui-accent);
   box-shadow:
     0 0 0 1px var(--ui-accent),
-    0 12px 36px rgb(217 255 98 / 0.1);
+    0 12px 36px rgb(22 96 62 / 0.06);
   transform: none;
 }
 .intro .play-style::after,
@@ -1726,7 +1692,7 @@ summary:focus-visible {
   border-color: var(--ui-accent);
   box-shadow:
     inset 0 0 0 4px var(--ui-surface-2),
-    0 0 12px rgb(217 255 98 / 0.5);
+    0 0 12px rgb(22 96 62 / 0.3);
 }
 .intro .play-style > span,
 .intro .operator-origin > span {
@@ -1801,8 +1767,7 @@ summary:focus-visible {
   line-height: 1.5;
 }
 .consent-note a,
-.privacy-note a,
-.intro-legal a {
+.privacy-note a {
   color: inherit;
 }
 .consent-note.error {
@@ -1851,11 +1816,11 @@ summary:focus-visible {
 }
 .intro .data-status.ready {
   color: var(--c-green-70);
-  background: rgb(34 99 71 / 0.35);
+  background: rgb(22 96 62 / 0.1);
 }
 .intro .data-status.local {
   color: var(--c-amber);
-  background: rgb(255 206 115 / 0.12);
+  background: rgb(132 88 0 / 0.1);
 }
 .db-status-panel {
   display: grid;
@@ -1866,10 +1831,10 @@ summary:focus-visible {
   border-radius: var(--ui-radius-sm);
 }
 .db-status-panel.ready {
-  border-color: rgb(156 203 180 / 0.34);
+  border-color: rgb(22 96 62 / 0.27);
 }
 .db-status-panel.pending {
-  border-color: rgb(255 206 115 / 0.34);
+  border-color: rgb(132 88 0 / 0.27);
 }
 .db-status-panel div {
   display: flex;
@@ -1906,8 +1871,8 @@ summary:focus-visible {
 .privacy-note {
   padding: 16px;
   color: var(--ui-text);
-  background: rgb(255 206 115 / 0.06);
-  border: 1px solid rgb(255 206 115 / 0.22);
+  background: rgb(132 88 0 / 0.05);
+  border: 1px solid rgb(132 88 0 / 0.18);
   border-radius: var(--ui-radius-sm);
 }
 .privacy-note b {
@@ -2056,7 +2021,7 @@ summary:focus-visible {
   margin-bottom: 18px;
   background: var(--ui-accent);
   border-radius: 999px;
-  box-shadow: 0 0 14px rgb(217 255 98 / 0.5);
+  box-shadow: 0 0 14px rgb(22 96 62 / 0.3);
 }
 .roadmap-heading b {
   max-width: 42ch;
@@ -2247,15 +2212,16 @@ summary:focus-visible {
   border-color: var(--ui-line-strong);
   box-shadow: none;
 }
+/* A locked card is told by its dashed edge, ground and lock, not by faint words (2026-11-23). */
 .case-card.locked-case h2 {
-  color: var(--ui-text-2);
+  color: var(--ui-text);
   -webkit-text-fill-color: currentColor;
 }
 .case-card.locked-case span,
 .case-card.locked-case b,
 .case-card.locked-case p,
 .case-card.locked-case small {
-  color: var(--ui-text-3);
+  color: var(--ui-text-2);
   -webkit-text-fill-color: currentColor;
 }
 .case-card.locked-case::before {
@@ -2269,20 +2235,20 @@ summary:focus-visible {
    neutral ground (one step lighter since design-mood) 0.14 read 4.45:1; 0.1
    reads 5.61:1 (5.50 on bright, the lightest ground). */
 .case-card.active-case {
-  background: radial-gradient(120% 90% at 0 0, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
-  border-color: rgb(217 255 98 / 0.6);
+  background: radial-gradient(120% 90% at 0 0, rgb(22 96 62 / 0.06), transparent 60%), var(--ui-surface-1);
+  border-color: rgb(22 96 62 / 0.36);
   box-shadow:
-    0 0 0 1px rgb(217 255 98 / 0.25),
-    0 20px 60px rgb(217 255 98 / 0.1);
+    0 0 0 1px rgb(22 96 62 / 0.15),
+    0 20px 60px rgb(22 96 62 / 0.06);
 }
 .case-card.active-case::before {
-  color: rgb(40 50 30);
+  color: var(--ui-surface-3);
 }
 .case-card.active-case:hover {
   border-color: var(--ui-accent);
   box-shadow:
     0 0 0 1px var(--ui-accent),
-    0 24px 70px rgb(217 255 98 / 0.16);
+    0 24px 70px rgb(22 96 62 / 0.1);
 }
 .active-case .case-status-chip {
   color: var(--ui-accent-ink);
@@ -2297,12 +2263,12 @@ summary:focus-visible {
   border-radius: 50%;
 }
 .case-card.complete-case {
-  border-color: rgb(104 196 255 / 0.3);
+  border-color: rgb(20 82 160 / 0.24);
 }
 .complete-case .case-status-chip {
   color: var(--ui-chip);
   background: var(--ui-chip-soft);
-  border-color: rgb(104 196 255 / 0.3);
+  border-color: rgb(20 82 160 / 0.24);
 }
 
 /* Ranking -------------------------------------------------------------------
@@ -2369,7 +2335,7 @@ summary:focus-visible {
   margin-bottom: 14px;
   padding: 20px 20px 20px 24px;
   color: var(--ui-text);
-  background: radial-gradient(90% 140% at 0 0, rgb(217 255 98 / 0.1), transparent 60%), var(--ui-surface-1);
+  background: radial-gradient(90% 140% at 0 0, rgb(22 96 62 / 0.06), transparent 60%), var(--ui-surface-1);
   border: 1px solid var(--ui-line-accent);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-2);
@@ -2405,7 +2371,7 @@ summary:focus-visible {
   background: var(--ui-accent);
   border: 0;
   border-radius: var(--ui-radius-sm);
-  box-shadow: 0 10px 32px rgb(217 255 98 / 0.22);
+  box-shadow: 0 10px 32px rgb(22 96 62 / 0.13);
   font-size: 0.9375rem;
   font-weight: 700;
   transition: transform var(--ui-dur-fast) var(--ui-ease);
@@ -2480,8 +2446,8 @@ summary:focus-visible {
   transform: translateY(-1px);
 }
 .ranking-row.current-player {
-  background: linear-gradient(90deg, rgb(217 255 98 / 0.09), transparent 60%), var(--ui-surface-2);
-  border-color: rgb(217 255 98 / 0.55);
+  background: linear-gradient(90deg, rgb(22 96 62 / 0.05), transparent 60%), var(--ui-surface-2);
+  border-color: rgb(22 96 62 / 0.33);
   box-shadow: inset 3px 0 var(--ui-accent);
 }
 .ranking-position {
@@ -2493,13 +2459,13 @@ summary:focus-visible {
 }
 .ranking-row:nth-child(1) .ranking-position {
   color: var(--c-gx-relic);
-  text-shadow: 0 0 18px rgb(255 196 87 / 0.4);
+  text-shadow: 0 0 18px rgb(132 88 0 / 0.32);
 }
 .ranking-row:nth-child(2) .ranking-position {
-  color: rgb(214 222 228);
+  color: rgb(62 60 56);
 }
 .ranking-row:nth-child(3) .ranking-position {
-  color: rgb(226 162 116);
+  color: rgb(166 70 0);
 }
 .ranking-player b,
 .ranking-player small,
@@ -2536,11 +2502,11 @@ summary:focus-visible {
 }
 .ranking-page .ranking-player .ranking-integrity-badge.valid {
   color: var(--c-green-70);
-  border-color: rgb(156 203 180 / 0.3);
+  border-color: rgb(22 96 62 / 0.24);
 }
 .ranking-page .ranking-player .ranking-integrity-badge.invalid {
   color: var(--c-danger-81);
-  border-color: rgb(255 176 159 / 0.3);
+  border-color: rgb(176 38 30 / 0.24);
 }
 .ranking-page .ranking-player .season-complete-badge {
   color: var(--ui-accent-ink);
@@ -2562,6 +2528,17 @@ summary:focus-visible {
   font-size: 0.6875rem;
   font-weight: 700;
   vertical-align: middle;
+}
+/* N46: a board with no place yet, how far it is from its first three, one
+   line under the table's heading in the badge's accent outline. */
+.ranking-page .ranking-hall-progress {
+  margin: -8px 0 12px;
+  padding: 6px 10px;
+  color: var(--ui-text-2);
+  border-left: 2px solid var(--ui-line-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 .ranking-row.season-complete {
   border-color: var(--ui-line-accent);
@@ -2906,10 +2883,10 @@ summary:focus-visible {
   overflow: hidden;
   padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
     max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
-  color: var(--c-paper);
+  color: var(--ui-text);
   background:
-    radial-gradient(60% 60%, rgb(217 255 98 / 0.1), transparent 70%),
-    linear-gradient(90deg, rgb(6 9 10 / 0.95), rgb(6 9 10 / 0.78)),
+    radial-gradient(60% 60%, rgb(22 96 62 / 0.06), transparent 70%),
+    linear-gradient(90deg, rgb(247 242 230 / 0.95), rgb(247 242 230 / 0.78)),
     url(/triggerlab-key-visual-960.webp) center / cover;
   animation: opening-burst-in 0.18s ease-out both;
 }
@@ -2918,8 +2895,8 @@ summary:focus-visible {
   inset: 0;
   opacity: 0.4;
   background-image:
-    linear-gradient(rgb(217 255 98 / 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(217 255 98 / 0.18) 1px, transparent 1px);
+    linear-gradient(rgb(22 96 62 / 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(22 96 62 / 0.11) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: linear-gradient(90deg, var(--c-black), transparent 82%);
   animation: opening-burst-grid 0.86s steps(4, end) both;
@@ -2936,7 +2913,7 @@ summary:focus-visible {
   backdrop-filter: blur(18px);
   box-shadow:
     var(--ui-shadow-2),
-    0 0 90px rgb(217 255 98 / 0.14);
+    0 0 90px rgb(22 96 62 / 0.08);
   text-align: left;
   animation: opening-burst-panel 0.86s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -2957,7 +2934,7 @@ summary:focus-visible {
   width: min(280px, 70%);
   height: 5px;
   background: var(--ui-accent);
-  box-shadow: 0 0 24px rgb(217 255 98 / 0.7);
+  box-shadow: 0 0 24px rgb(22 96 62 / 0.42);
   animation: opening-burst-charge 0.86s ease-out both;
 }
 @keyframes opening-burst-in {
@@ -3029,8 +3006,8 @@ body {
   color: var(--ui-text);
   background-color: var(--ui-bg);
   background-image:
-    radial-gradient(90% 60% at 50% -12%, rgb(217 255 98 / 0.07), transparent 60%),
-    radial-gradient(70% 50% at 100% 100%, rgb(104 196 255 / 0.05), transparent 70%);
+    radial-gradient(90% 60% at 50% -12%, rgb(22 96 62 / 0.04), transparent 60%),
+    radial-gradient(70% 50% at 100% 100%, rgb(20 82 160 / 0.04), transparent 70%);
 }
 
 /* Intro and ranking, narrower -------------------------------------------- */
@@ -3057,13 +3034,13 @@ body {
   .intro-hero-art::after {
     background:
       linear-gradient(
-        rgb(18 22 24 / 0.72),
-        rgb(18 22 24 / 0.12) 20%,
-        rgb(18 22 24 / 0.55) 48%,
-        rgb(18 22 24 / 0.9) 72%,
+        rgb(247 242 230 / 0.72),
+        rgb(247 242 230 / 0.12) 20%,
+        rgb(247 242 230 / 0.55) 48%,
+        rgb(247 242 230 / 0.9) 72%,
         var(--ui-bg) 90%
       ),
-      radial-gradient(80% 50% at 30% 70%, rgb(217 255 98 / 0.06), transparent 70%);
+      radial-gradient(80% 50% at 30% 70%, rgb(22 96 62 / 0.04), transparent 70%);
   }
   .intro-hero-copy {
     width: 100%;

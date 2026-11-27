@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import { getWeekRule } from "./weeklyRules.js";
+import { getCaseRule, getWeekRule } from "./weeklyRules.js";
+import { caseRuleFor, isTwistMoved } from "./caseRules.js";
+import { readSignWay } from "./actTwists.js";
+import { asksOpening, asksToSign, getNameWall } from "./gauntletEngine.js";
+import { OPEN_BIG_CHIPS, OPEN_BIG_WALL, OPEN_WAYS } from "./nextTableRules.js";
+import { fill } from "../locale.js";
 import { getAccessibility } from "../state/accessibilitySettings.js";
 import edgeCopy from "../copy/edge.js";
 
@@ -14,6 +19,11 @@ import edgeCopy from "../copy/edge.js";
  * and the page draws it no later. Which page carries it is tableStaging's
  * `getBriefingWeekRuleId`; this reads the rule of the id that answered, and
  * nothing for an id the catalogue does not have.
+ *
+ * A case's own rule (「이번 사건만」, caseRules.js, N26) is the same panel
+ * under its own kicker, on the page tableStaging's `getBriefingCaseRuleCase`
+ * names. A season with a week's rule has no case rule, so the two never
+ * share a page.
  */
 
 const NO_PANEL = Object.freeze([Object.freeze([]), null]);
@@ -30,11 +40,14 @@ const NO_PANEL = Object.freeze([Object.freeze([]), null]);
  * SceneBriefing for the same reason the week's rule is: the PlayScreen chunk
  * had 4 bytes left (scripts/check-bundle-size.mjs).
  */
-export function useWeekRulePanel(id, page = null) {
+export function useWeekRulePanel(id, page = null, caseId = null, run = null) {
   const echo = page?.echo ?? null;
   const recall = page?.recall ?? null;
   return useMemo(() => {
-    const rule = getWeekRule(id);
+    const week = getWeekRule(id);
+    // G36: a NEW GAME+ season's twist may stand in another act (`run`'s twistSeed), and the kicker says so.
+    const rule = week ?? (caseId ? getCaseRule(caseId, caseRuleFor(caseId, run)) : null);
+    const moved = !week && caseId && isTwistMoved(caseId, run);
     if (!rule && !echo && !recall) return NO_PANEL;
     // The clock reads the rule's line in the story too (E-9 (b)), as the panel prints it.
     const read = rule?.world ? { ...rule, text: `${rule.world} ${rule.text}` } : rule;
@@ -48,10 +61,10 @@ export function useWeekRulePanel(id, page = null) {
           </p>
         )}
         {echo && <SeasonEchoPanel key="season-echo" echo={echo} />}
-        {rule && <WeekRulePanel key="week-rule" rules={[rule]} />}
+        {rule && <WeekRulePanel key="week-rule" rules={[rule]} kicker={week ? edgeCopy.weekRule : moved ? edgeCopy.movedTwist : edgeCopy.caseRule} />}
       </>,
     ];
-  }, [id, echo, recall]);
+  }, [id, echo, recall, caseId, run]);
 }
 
 /**
@@ -107,6 +120,60 @@ export function pastPick(picked, id, wild = 0) {
 }
 
 /**
+ * G5 8막 실명 서명 (actTwists.js): the two ways to sign the case, under its
+ * rule's panel, while the case still asks (gauntletEngine.js `asksToSign`: no
+ * board of it played yet). Not choosing is 조건을 단다, pressed from the start.
+ * In the reading-clock question's form (ReadingClockAsk.jsx), so it needs no CSS of its own.
+ */
+// The touch target's floor (44px, WCAG 2.5.5), on every height: the comic card's own was 40 to 41px here (E1g).
+const SIGN_BUTTON = { minHeight: 44 };
+
+export function SignAsk({ run, onSign }) {
+  if (onSign && asksOpening(run)) return <OpeningAsk run={run} onSign={onSign} />;
+  if (!onSign || !asksToSign(run)) return null;
+  const signed = readSignWay(run.open.signed);
+  return (
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="sign-ask" role="group" aria-labelledby="gx-sign-ask" aria-describedby="gx-sign-name-wall" style={{ gridArea: "auto" }}>
+      <p className="gx-breach-kicker">{edgeCopy.sign.kicker}</p>
+      <p id="gx-sign-ask">{edgeCopy.sign.question}</p>
+      {/* G16 (RULES_MARK 7): the wall 「이름만」 moves in this case, drawn for it, before the choice; the group and
+          「이름만」 are described by it, so a player who only tabs to the buttons hears it too. */}
+      <p id="gx-sign-name-wall" data-testid="sign-name-wall">{fill(edgeCopy.sign.nameWall, { wall: getNameWall(run) })}</p>
+      <div className="gx-comic-cards">
+        {["name", "terms"].map((way) => (
+          <button key={way} type="button" className="gx-comic-card" data-testid={`sign-${way}`} aria-pressed={signed === way}
+            aria-describedby={way === "name" ? "gx-sign-name-wall" : undefined} onClick={() => onSign(way)} style={SIGN_BUTTON}>
+            {signed === way && <span aria-hidden="true">✓ </span>}
+            {edgeCopy.sign[way]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** G23 여는 판돈 (RULES_MARK 8): the signature's frame, asking how to open a case. Not choosing is 보통. */
+function OpeningAsk({ run, onSign }) {
+  const chosen = run.open.opening === "big" ? "big" : "normal";
+  return (
+    <div className="gx-panel gx-panel-breach gx-carry" data-testid="opening-ask" role="group" aria-labelledby="gx-opening-ask" aria-describedby="gx-opening-big" style={{ gridArea: "auto" }}>
+      <p className="gx-breach-kicker">{edgeCopy.opening.kicker}</p>
+      <p id="gx-opening-ask">{edgeCopy.opening.question}</p>
+      <p id="gx-opening-big">{fill(edgeCopy.opening.bigNote, { chips: OPEN_BIG_CHIPS, wall: OPEN_BIG_WALL })}</p>
+      <div className="gx-comic-cards">
+        {OPEN_WAYS.map((way) => (
+          <button key={way} type="button" className="gx-comic-card" data-testid={`opening-${way}`} aria-pressed={chosen === way}
+            aria-describedby={way === "big" ? "gx-opening-big" : undefined} onClick={() => onSign(way)} style={SIGN_BUTTON}>
+            {chosen === way && <span aria-hidden="true">✓ </span>}
+            {edgeCopy.opening[way]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
  * The NEW GAME+ line, in the introduction's form (SceneBriefing's unlock panel), so it needs no CSS of its own.
  * Drawn after the page's grid, it is raised to just under the title strip (`order: -1`, as .gx-comic-top is in
  * briefing.css): under the case file, a phone had to scroll to it (운영화면 문제 5-2).
@@ -129,10 +196,10 @@ function SeasonEchoPanel({ echo }) {
  * that softens it, which a week's rule never has. `gridArea` undoes the
  * breach panel's named area, which the page has not.
  */
-function WeekRulePanel({ rules }) {
+function WeekRulePanel({ rules, kicker }) {
   return (
     <div className="gx-panel gx-panel-breach gx-carry" data-testid="week-rule-panel" style={{ gridArea: "auto" }}>
-      <p className="gx-breach-kicker">{edgeCopy.weekRule}</p>
+      <p className="gx-breach-kicker">{kicker}</p>
       <ul>
         {rules.map((rule) => (
           <li key={rule.id} className={`gx-mutation mut-${rule.id}`}>

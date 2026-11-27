@@ -11,10 +11,13 @@ const cascadeCopy = {
   mutation: {
     title: "그때의 결재가 돌아왔다",
     text: "몇 판 전 크게 태운 카드의 연결. 이번 판은 벽이 {wall} 가까워진다.",
+    textTop: "몇 판 전 크게 태운 카드의 연결. 이번 판은 벽 띠의 먼 끝이 {wall} 가까워진다.",
   },
   linkMade: "{min}~{max}판 안에 한 판의 벽이 {wall} 가까워진다.",
+  linkMadeTop: "{min}~{max}판 안에 한 판의 벽 띠 먼 끝이 {wall} 가까워진다.",
   range: { next: "다음 판", after: "{low}판 뒤", within: "{low}~{high}판 안" },
   links: "연결 {live}. 가장 이른 것은 {range}, 그 판의 벽이 {wall} 가까워진다",
+  linksTop: "연결 {live}. 가장 이른 것은 {range}, 그 판의 벽 띠 먼 끝이 {wall} 가까워진다",
 };
 export default cascadeCopy;
 

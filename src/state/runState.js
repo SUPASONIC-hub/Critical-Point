@@ -50,9 +50,11 @@ const emptyCognition = () => makeEmptyScores(cognitionLabels);
  * (`veteran`) and story mode (`story`, the comfort setting as it stood at the
  * start). The engine's own opening table when it has neither.
  */
-const openingTable = (veteran, story, weekRule = null) => {
+const openingTable = (veteran, story, weekRule = null, runId = null) => {
   const week = story ? null : normalizeWeekRuleId(weekRule);
-  return veteran || story || week ? { ...RUN_INITIAL_STATE, veteran, story, weekRule: week } : RUN_INITIAL_STATE;
+  // G36: a NEW GAME+ season's act twists are placed by its run id (caseRules.js `readTwistShuffle`).
+  const seed = veteran && typeof runId === "string" && runId ? { twistSeed: runId } : null;
+  return veteran || story || week ? { ...RUN_INITIAL_STATE, veteran, story, weekRule: week, ...seed } : RUN_INITIAL_STATE;
 };
 /** The route a case opened on with no case before it (F1 step 2): its scene, or the season's first. */
 const seasonRoute = (nodeId = SEASON_ENTRY_NODE) => ({ after: null, rank: null, nodeId: nodeId || SEASON_ENTRY_NODE });
@@ -293,7 +295,7 @@ export const RUN_FIELDS = {
     // season's end, across a week's end (D3).
     // The season's first case opens here, so its opening snapshot (S3) is
     // stamped here, on the hand the `resources` row deals it.
-    newGame: (event, run) => stampCaseOpen(openingTable(event.veteran === true, event.story === true, event.weekRule), { caseId: SEASON_ENTRY_CASE, resources: createOpeningResources(run.operatorOrigin), route: seasonRoute() }),
+    newGame: (event, run) => stampCaseOpen(openingTable(event.veteran === true, event.story === true, event.weekRule, event.runId), { caseId: SEASON_ENTRY_CASE, resources: createOpeningResources(run.operatorOrigin), route: seasonRoute() }),
     // A closed case keeps its REBOOT board and its relic draft; an abandoned
     // one forfeits its pot (gauntletEngine.openCaseRun, done by the caller).
     openCase: given("gauntletRun"),

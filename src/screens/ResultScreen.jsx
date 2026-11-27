@@ -5,7 +5,7 @@ import { ScenePlate } from "../components/ScenePlate.jsx";
 import * as endingCopy from "../endingCopy.js";
 import resultCopy from "../copy/result.js";
 import { fill } from "../locale.js";
-import { SIDE_CASES } from "../sideCases.js";
+import { SideOpenedPanel } from "../components/SideOpenedPanel.jsx";
 
 export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcuts }) {
   const {
@@ -130,7 +130,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 {letterKeys && <kbd className="shortcut-hint" aria-hidden="true">R</kbd>}
                 {resultCopy.replayCase}
               </button>
-              <button type="button" className="ghost" onClick={() => { setStarted(false); setShowRanking(true); }}>
+              <button type="button" className="ghost" onClick={() => setShowRanking(true)}>
                 <Trophy size={16} />
                 {resultCopy.ranking}
               </button>
@@ -187,11 +187,11 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span lang="en">YOUR CONSEQUENCE</span>
               <strong>{caseOutcome.tag}</strong>
             </div>
-            <div>
-              <h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2>
-              <p>{caseOutcome.text}</p>{caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}{seasonStanding.titleRise && <p data-testid="title-rise">{fill(resultCopy.titleRise, { title: seasonStanding.titleRise })}</p>}
+            <div><h2 ref={titleRef} tabIndex={-1}>{caseOutcome.title}</h2><p>{caseOutcome.text}</p>
+              {caseOutcome.past && <p data-testid="case-past">{caseOutcome.past}</p>}{caseOutcome.shock && <p data-testid="case-shock">{caseOutcome.shock}</p>}
+              {seasonStanding.titleRise && <p data-testid="title-rise">{fill(resultCopy.titleRise, { title: seasonStanding.titleRise })}</p>}
               <p className={`season-standing ${seasonStanding.level}`} data-testid="season-standing"><b>{seasonStanding.mark} {seasonStanding.label}</b> {seasonStanding.text}{seasonStanding.held && <> <span data-testid="standing-held">{seasonStanding.held}</span></>}</p>
-            </div>
+            {renderers.renderCaseCover?.(currentCase)}{renderers.renderActProgress?.(currentCase)}</div>
           </section>
           {/* The pause. No bet, no clock, no choice -- six cases of crisis in one
               register is a hard read, and this is the one beat where the analyst
@@ -219,12 +219,13 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 {seasonRecordNotice && <p data-testid="season-record-notice">{seasonRecordNotice}</p>}
                 <small>{resultBridge}</small>
               </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>
+              <button type="button" data-testid="next-case-button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>
                 <ChevronRight size={18} />{letterKeys && <kbd className="shortcut-hint" aria-hidden="true">N</kbd>}
                 {nextCaseSignal.button}
               </button>
             </section>
           )}
+          <SideOpenedPanel caseId={currentCase} caseResults={view.score.caseResults} setStarted={setStarted} />{/* 11-18: under the next case */}
           {currentCase === "final" && (
             <section className={`ending-variant-panel ${endingVariant.failure ? "failure" : ""}`} aria-label={resultCopy.endingVariantLabel}>
               <span>{endingVariant.label}</span>
@@ -246,7 +247,6 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
               <span lang="en">{view.logicReport.mark}</span>{view.logicReport.lines.map((line) => <p key={line}>{line}</p>)}
             </section>
           )}
-          {currentCase === "final" && SIDE_CASES.length > 0 && <section className="ending-epilogue-panel" aria-label={resultCopy.sideSlotOpened.label} data-testid="side-slot-opened"><p>{resultCopy.sideSlotOpened.text}</p></section>}
           {currentCase === "final" && view.failureRecovery && (
             <section className="failure-recovery-panel" aria-label={resultCopy.failureRecoveryLabel}>
               <strong>{view.failureRecovery.title}</strong>
@@ -334,7 +334,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
             </div>
           </section>
           {/* Act three. Everything the report used to open with. */}
-          <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />
+          <ReportArchive view={view} observerEndingRecord={observerEndingRecord} endingAxes={endingAxes} observationLabels={endingCopy.observationLabels} />{renderers.renderLeaveLine?.(currentCase, nextCaseSignal)}{/* N42 */}
           {/* ad-slot: placement="report" hidden={currentCase.startsWith("prologue") || (currentCase === "final" && endingStep < 3)} */}</section>
       </main>
 );

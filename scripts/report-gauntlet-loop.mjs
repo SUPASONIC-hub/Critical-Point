@@ -8,6 +8,8 @@ import {
   getCardChips,
   getCloseness,
   getHeartbeatBpm,
+  getNameWall,
+  getRerollCost,
   getWindowBand,
   HAND_CAP,
   normalizeRunState,
@@ -17,14 +19,17 @@ import {
   rerollRelicOffer,
   resolveWindow,
   STANCE_CHARGE,
+  stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_REROLL_COST, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
-import { SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
-import { AUDIT_HEAT, AUDIT_LIMIT } from "../src/gauntlet/auditRisk.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, isMarkNineOn, isMarkTenOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
+import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
+import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
+import { AUDIT_HEAT, AUDIT_LIMIT, getSmoothness, SMOOTH_LIMIT, SMOOTH_SPAN } from "../src/gauntlet/auditRisk.js";
 import { ALL_RULES, STORY_OFF_RULES, STORY_RULES, UNLOCK_LADDER } from "../src/gauntlet/tableUnlocks.js";
 import { CASE_RESULT_NODES, CASE_SEQUENCE, CASE_START_NODES, nodes } from "../src/gameData.js";
-import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
+import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit, LINK_VALUES, narrowDue, NEXT_ON, newSeen, RELIC_DROP_ORDER, scoutDue, spendsAt, takeIntoSlots, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
  * The gauntlet's balance, measured.
@@ -41,7 +46,9 @@ import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, createCaseBot, directCard, handUnit
  * - a bust changes what the next window is, not just what the score is;
  * - a bust skips the next scene, which shortens the case. That must never be a
  *   shortcut: busting on purpose to reach the case's end sooner has to bank far
- *   less than playing the table;
+ *   less than playing the table. 프롤로그 01 and 02 are the exception that cannot be
+ *   one (N21, 11-25): there a bust keeps the scene, so it shortens nothing and
+ *   is the pot lost alone (caseRoutes.js `keepsSceneOnBust`);
  * - the logic streak is a hand skill, not a second instrument: a hand that
  *   holds one direction (사람 or 자리; a thinking type until C-3, 2026-10-25)
  *   busts exactly as often as one whose card leans neither way, is paid more
@@ -133,10 +140,18 @@ const WINDOWS_PER_CASE = Math.round(MEASURED_WINDOWS_PER_CASE);
 // the other (`directCard`), which moves neither.
 const card = { id: "sim", label: "sim", effect: { capital: 7, trust: 11, humanCost: 4 } };
 assert.equal(getLogicDirection(card), LOGIC_EVEN, "the bare card leans neither way");
+/** How far a typed hand leans the card's 자본 (season-bot.mjs `directCard`). */
+const DIRECTION_LEAN = Math.abs(directCard(card, "position").effect.capital - card.effect.capital);
 for (const direction of LOGIC_DIRECTIONS) {
   const leaned = directCard(card, direction);
   assert.equal(getLogicDirection(leaned), direction, `the card leaned toward ${direction} reads so`);
-  assert.deepEqual([getCardChips(leaned), getCardBurn(leaned)], [getCardChips(card), getCardBurn(card)], `leaning the card toward ${direction} moves neither its chips nor its burn`);
+  assert.deepEqual(getCardBurn(leaned), getCardBurn(card), `leaning the card toward ${direction} does not move its burn`);
+  // G29 (RULES_MARK 9): 자본 weighs COIN_GAIN_WEIGHT and 믿음 ×2, so the lean toward 자리 pays more chips and toward 사람 fewer,
+  // by the coin weight's share of the shift -- the temptation it is for. Before 9 neither moved.
+  const moved = getCardChips(leaned) - getCardChips(card);
+  const shift = leaned.effect.capital - card.effect.capital;
+  if (!isMarkNineOn()) assert.equal(moved, 0, `leaning the card toward ${direction} does not move its chips`);
+  else assert.ok(Math.abs(moved - shift * (COIN_GAIN_WEIGHT - 2)) <= 1, `leaning toward ${direction} moves the chips by the coin weight only: ${moved}`);
 }
 
 /**
@@ -167,7 +182,7 @@ const { playCase: playSimCase, playHandCase } = createCaseBot({ windowsPerCase: 
 // The case player `measure` plays; B2's rows below swap in the heavy card's for a while.
 let playCase = playSimCase;
 
-function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false) {
+function measure(label, decide, hand = null, relics = [], cases = CASES, lock = null, rules = ALL_RULES, story = false, twist = null) {
   const paid = { cashed: 0, bonus: 0, capped: 0, best: 0 };
   let logic;
   let vault = 0;
@@ -176,12 +191,14 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
   let mutated = 0;
   let nextTableRules = 0;
   let played = 0;
+  let trustSpent = 0;
   const seen = newSeen();
   for (let caseIndex = 0; caseIndex < cases; caseIndex += 1) {
     // A hand that plays for the streak carries it from case to case for a
     // season's length, and starts again with the next season.
     if (caseIndex % SEASON_CASES === 0) logic = undefined;
-    const result = playCase(caseIndex, decide, hand ? { pickType: hand, logic } : undefined, relics, lock, rules, story);
+    // 	wist: G5's act twists, every case played as 	wist.caseId (and signed 	wist.sign, 8막).
+    const result = playCase(caseIndex, decide, hand || twist ? { ...(hand ? { pickType: hand, logic } : {}), ...twist } : undefined, relics, lock, rules, story);
     if (hand) logic = result.logic;
     for (const key of ["cashed", "bonus", "capped"]) paid[key] += result[key];
     paid.best = Math.max(paid.best, result.logic.best);
@@ -191,6 +208,7 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     mutated += result.mutatedAfterBust;
     nextTableRules += result.nextTableRules;
     played += result.played;
+    trustSpent += result.trustSpent ?? 0;
     addSeen(seen, result.seen);
   }
   return {
@@ -206,6 +224,8 @@ function measure(label, decide, hand = null, relics = [], cases = CASES, lock = 
     meanBonus: Number((paid.bonus / Math.max(1, paid.cashed)).toFixed(3)),
     capShare: Number((paid.capped / Math.max(1, paid.cashed)).toFixed(3)),
     best: paid.best,
+    // The 믿음 a case's looks cost (RULES_MARK 7's G13 rows).
+    meanTrust: Number((trustSpent / cases).toFixed(1)),
     // For the measurements at the end of this file; no row above reads it.
     seen,
   };
@@ -234,6 +254,17 @@ const scoutRows = [0, 3, 6, 9].map((margin) =>
 );
 /** The most a scouting hand may bank, as a share of a hand that sees the wall. */
 const SCOUT_SEES_CAP = 0.8;
+/** How far past the first band's near end the next push reaches when a narrowing hand takes its second look (the season bot's SCOUT_EDGE). */
+const NARROW_TRIGGER = 3;
+/**
+ * G2 (the next rules): the 믿음 a case's looks may cost a narrowing hand --
+ * what the old narrow-every-board hand paid (26.3 a case, measured 11-18 and
+ * again 11-19). The second look's price now climbs within a case
+ * (`narrowTrustAt`), so a hand with unlimited 믿음 would buy a closer read than
+ * the cap allows; no season holds that much (41.7 a case, 2,000 a season).
+ * Under the old rules the budget never binds.
+ */
+const NARROW_TRUST_BUDGET = 26;
 const skipper = measure("bust to skip", (win) =>
   win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true,
 );
@@ -328,7 +359,9 @@ if (AUDIT_ON) {
   console.log(`audit week       best blind ${bestOfRows(fixed).label}, best heartbeat ${bestOfRows(heartbeat).label}`);
   const reading = [20, 30, 40, 50].map((target) => {
     const blind = fixed.find((row) => row.label === `heat ${target}`);
-    const reads = measure(`reads, heat ${target}`, (win, _run, audit) => win.gauge < (audit + 1 >= AUDIT_LIMIT ? Math.max(target, AUDIT_HEAT) : target));
+    // G35 (RULES_MARK 9): the audit is a tally of heats; the hand that reads it pushes on past the band a cash here would fill.
+    const fills = (win, audit) => (Array.isArray(audit) ? getSmoothness([...audit, Math.round(win.gauge)]) >= SMOOTH_LIMIT : audit + 1 >= AUDIT_LIMIT);
+    const reads = measure(`reads, heat ${target}`, (win, _run, audit) => win.gauge < (!fills(win, audit) ? target : Array.isArray(audit) ? target + SMOOTH_SPAN * 2 + 1 : Math.max(target, AUDIT_HEAT)));
     return `heat ${target} ${blind.meanVault} (caught ${blind.seen.audits}) -> reads ${reads.meanVault} (caught ${reads.seen.audits}, bust ${(reads.bustRate * 100).toFixed(1)}%)`;
   });
   console.log(`audit week       reading the audit: ${reading.join("; ")}`);
@@ -364,7 +397,10 @@ const bestHeartbeat = heartbeat.reduce((best, row) => (row.meanVault > best.mean
 
 assert.notEqual(bestFixed.label, "heat 0", "never pushing cannot be the best blind policy, or there is no bet");
 assert.notEqual(bestFixed.label, fixed.at(-1).label, "pushing as far as possible cannot be the best blind policy either");
-assert.ok(bestFixed.bustRate >= 0.08 && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
+// G42 (RULES_MARK 10, the user's (1) of 2026-11-26): OVERCLOCK from ×32 leaves the best blind hand
+// (heat 50, ×23) on the narrow push, and it busts 6.6% (8.8% at 9, its ×4 chain overclocked most boards).
+const BLIND_BUST_FLOOR = isMarkTenOn() ? 0.06 : 0.08;
+assert.ok(bestFixed.bustRate >= BLIND_BUST_FLOOR && bestFixed.bustRate <= 0.5, `the best blind policy should bust sometimes, not constantly (got ${bestFixed.bustRate})`);
 assert.ok(bestHeartbeat.meanVault > bestFixed.meanVault, "listening to the heartbeat should be worth something");
 assert.ok(
   bestHeartbeat.meanVault < oracle.meanVault * 0.6,
@@ -374,6 +410,9 @@ const bestScout = bestOfRows(scoutRows);
 console.log(
   `scout            blind ${bestFixed.meanVault} < heartbeat ${bestHeartbeat.meanVault} < scout ${bestScout.meanVault} (${bestScout.label}, bust ${(bestScout.bustRate * 100).toFixed(1)}%) < sees ${oracle.meanVault}  (scout/sees ${(bestScout.meanVault / oracle.meanVault).toFixed(3)}, heartbeat/sees ${(bestHeartbeat.meanVault / oracle.meanVault).toFixed(3)})`,
 );
+// G42 (RULES_MARK 10): how often a cash dealt the next board OVERCLOCK (×32 twice in a row; ×4 before), measured, not asserted.
+const overclockShare = (row) => `${((row.seen.overclockDealt / Math.max(1, row.seen.windows)) * 100).toFixed(1)}%`;
+console.log(`overclock        dealt after ${overclockShare(bestFixed)} of ${bestFixed.label}'s boards, ${overclockShare(bestHeartbeat)} of ${bestHeartbeat.label}'s, ${overclockShare(oracle)} of ${oracle.label}'s (the chain from ×${getHotCashMultiplier(ALL_RULES)})`);
 assert.ok(bestScout.meanVault > bestHeartbeat.meanVault, `a look at the wall should be worth more than the heartbeat: ${bestScout.meanVault} against ${bestHeartbeat.meanVault}`);
 assert.ok(
   bestScout.meanVault < oracle.meanVault * SCOUT_SEES_CAP,
@@ -398,18 +437,39 @@ assert.ok(
       row: measure(`scout at ${timing}, margin ${bestMargin}`, Object.assign((win) => scoutOrListen(win), { scout: (win) => scoutDue(timing, win) })),
       when: timing,
     })),
+    // B1's next step (11-18): look before push 1, and take the second look
+    // (SCOUT_NARROW_TRUST more, the band 20 to 14) when the next push, three
+    // past, reaches the first band -- the moment the first band stops
+    // answering -- then push while the next step stays this margin past the
+    // narrowed band's near end; the best of three margins. Measured 11-18:
+    // 14 is the narrowest band whose best hand stays under the cap (12 made
+    // 0.817 and 10 made 0.832 against a wall seen).
+    {
+      row: bestOfRows([2, 3, 4].map((inner) => measure(`scout narrow, margin ${bestMargin} then ${inner}`, Object.assign(
+        (win) => (win.narrowed ? win.gauge + win.schema.stepMax - inner < getWindowBand(win).wallMin : scoutOrListen(win)),
+        { scout: (win) => scoutDue("narrow", win), narrow: (win) => narrowDue("narrow", win, NARROW_TRIGGER), trustBudget: NARROW_TRUST_BUDGET },
+      )))),
+      when: "narrow",
+    },
   ];
-  console.log(`scout            a look costs 믿음 ${SCOUT_TRUST} and the clock; when the heartbeat's best hand looks (never / before push 1 / before push 3 / when the next push reaches the band):`);
+  console.log(`scout            a look costs 믿음 ${SCOUT_TRUST} and the clock, the second (narrow, 20 to 14) 믿음 ${SCOUT_NARROW_TRUST} more; when the heartbeat's best hand looks (never / before push 1 / before push 3 / when the next push reaches the band / before push 1 and again when the next push reaches the first band):`);
   for (const { row, when } of timedRows) {
     const looks = row.seen.scouts / Math.max(1, CASES);
+    const narrows = row.seen.narrows / Math.max(1, CASES);
+    const narrowTrust = row.seen.narrowTrust / Math.max(1, CASES);
     console.log(
-      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case  믿음 ${(-looks * SCOUT_TRUST).toFixed(2)}/case`,
+      `scout            ${when.padEnd(8)} vault ${String(row.meanVault).padStart(7)}  bust ${(row.bustRate * 100).toFixed(1).padStart(5)}%  windows ${String(row.meanWindows).padEnd(5)} looks ${looks.toFixed(2)}/case${narrows ? ` + narrow ${narrows.toFixed(2)}` : ""}  믿음 ${(-(looks * SCOUT_TRUST + narrowTrust)).toFixed(2)}/case${narrows ? ` (narrowed ${((row.seen.narrows / Math.max(1, row.seen.pushedBoards)) * 100).toFixed(1)}% of pushed boards)` : ""}  (scout/sees ${(row.meanVault / oracle.meanVault).toFixed(3)})`,
     );
   }
   for (const { row, when } of timedRows.slice(1)) {
     assert.ok(row.meanVault > bestHeartbeat.meanVault, `a look at ${when} should still be worth more than the heartbeat: ${row.meanVault} against ${bestHeartbeat.meanVault}`);
     assert.ok(row.meanVault < oracle.meanVault * SCOUT_SEES_CAP, `a look at ${when} must not be an answer key: ${row.meanVault} against a wall-seeing ${oracle.meanVault}`);
   }
+  // The second look is information worth its 믿음: it banks more than one look before push 1 does.
+  const narrowRow = timedRows.find(({ when }) => when === "narrow").row;
+  const alwaysRow = timedRows.find(({ when }) => when === "always").row;
+  console.log(`scout            narrow best ${narrowRow.label}: ${narrowRow.meanVault} against one look ${alwaysRow.meanVault} (${((narrowRow.meanVault / alwaysRow.meanVault - 1) * 100).toFixed(1)}%)`);
+  assert.ok(narrowRow.meanVault > alwaysRow.meanVault, `the second look should be worth something: ${narrowRow.meanVault} against ${alwaysRow.meanVault}`);
 }
 assert.ok(skipper.meanWindows < WINDOWS_PER_CASE, "busting on purpose does shorten a case");
 assert.ok(
@@ -437,7 +497,8 @@ const HOLD_BAND = [1.28, 1.52];
 for (const row of [holder, logicRows.find((row) => row.label === "holds position")]) {
   assert.ok(row.meanBonus >= HOLD_BAND[0] && row.meanBonus <= HOLD_BAND[1], `a hand that ${row.label} should be paid about what the beat paid a good hand, and a little more since the cap rose past one push (${HOLD_BAND.join(" to ")}): ${row.meanBonus}`);
 }
-assert.ok(randomType.meanBonus <= 1.1, `a hand that picks a card at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
+// G1 (the next rules): a change of direction halves the streak instead of ending it, so a random hand keeps a little (measured 1.131).
+assert.ok(randomType.meanBonus <= (NEXT_ON ? 1.15 : 1.1), `a hand that picks a card at random must be paid next to nothing by the streak: ${randomType.meanBonus}`);
 assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a direction should pay");
 /**
  * LOCK, held to the hand's ratchets. Until 2026-09-28 no hand here ever locked,
@@ -451,7 +512,22 @@ assert.ok(holder.meanVault > bestHeartbeatSoFar.meanVault, "holding a direction 
  * every beat, so it has to bank about what that banked (`LOCK_ON_THE_BEAT`,
  * the last measurement of it): within LOCK_SHIFT for each stance.
  */
-const LOCK_ON_THE_BEAT = { strike: 43849, steady: 43633, expose: 36660 };
+// Under the next rules (G3, G6) the same hands, measured 11-19: STRIKE may pay to ×1.55 at heat 60 or more,
+// EXPOSE carries thicker chips, STEADY is a little weaker, and every case's last board pays ×1.5.
+// G29 (RULES_MARK 9): the simulated card's 자본 7 weighs COIN_GAIN_WEIGHT, so every pot it pays is its chips' share bigger; the beat's measure is scaled by it.
+const COIN_SCALE = getCardChips(card) / getCardChips(card, BASE_SCHEMA, withMarkNine(ALL_RULES, false));
+// G42 (RULES_MARK 10, the user's (1) of 2026-11-26): OVERCLOCK from ×32 takes the pot the ×4 chain had
+// inflated (the listening hand 30,041 -> 21,185), so the three lines are re-measured on 10's table
+// (check:pressure 11-26: strike 41,834, steady 40,204, expose 39,879 against 56,086 / 54,352 / 54,729 at 9).
+const LOCK_ON_THE_BEAT = isMarkTenOn() ? { strike: 41834, steady: 40204, expose: 39879 } : Object.fromEntries(Object.entries(NEXT_ON ? { strike: 49053, steady: 47968, expose: 46633 } : { strike: 43849, steady: 43633, expose: 36660 }).map(([mode, vault]) => [mode, Math.round(vault * COIN_SCALE)]));
+/**
+ * A LOCK hand against the bare hand that sees the wall: never more under the
+ * old rules. Under the next ones STRIKE's hot cap and EXPOSE's carry are paid
+ * on boards the bare wall-seeing hand plays without a stance, so the bound is
+ * that hand by NEXT_SEES_ROOM, and the 0.6 against a wall-seeing hand of the
+ * same stance (above) is the one that keeps LOCK from reading the wall.
+ */
+const NEXT_SEES_ROOM = NEXT_ON ? 1.08 : 1;
 const LOCK_SHIFT = 0.06;
 for (const row of lockReport) {
   assert.ok(
@@ -469,18 +545,19 @@ for (const row of lockReport) {
     `the ${row.mode} hand is paid past its cap: ${row.listen.meanVault} against ${bestHeartbeatSoFar.meanVault}`,
   );
   assert.ok(
-    row.listen.meanVault < oracle.meanVault,
+    row.listen.meanVault < oracle.meanVault * NEXT_SEES_ROOM,
     `the ${row.mode} hand must never be worth more than seeing the wall: ${row.listen.meanVault} against ${oracle.meanVault}`,
   );
 }
 // EXPOSE carries nothing into the next board that the pot can see, so it is the
 // hand's pay and nothing else: under the cap, and less than listening is worth.
 const exposeHand = lockReport.find((row) => row.mode === "expose").listen;
-assert.ok(
+// G3: under the next rules EXPOSE carries thicker chips (EXPOSED HAND) and is held to the stance cap above, as STRIKE and STEADY are.
+if (!NEXT_ON) assert.ok(
   exposeHand.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1,
   `the hand cannot pay past its cap: ${exposeHand.meanVault} against ${bestHeartbeatSoFar.meanVault}`,
 );
-assert.ok(
+if (!NEXT_ON) assert.ok(
   exposeHand.meanVault / bestHeartbeatSoFar.meanVault < listeningOverBlind,
   "the hand must pay less than listening does: LOCK is still the spice",
 );
@@ -581,6 +658,24 @@ const inert = relicReport
 assert.deepEqual(inert, [], `relics the simulation never trips: ${inert.join(", ")}`);
 
 /**
+ * G4 (2026-11-19): under the next rules (relicsNext.js) a tool is a plan. The
+ * best and the worst tool for the heartbeat hand differ by RELIC_SPREAD_MIN or
+ * more, and at least RELIC_BESTS_MIN tools are each the best for one of the
+ * measured hands (blind, heartbeat, sees, skip): no one tool for everyone.
+ */
+const RELIC_SPREAD_MIN = 1.15;
+const RELIC_BESTS_MIN = 3;
+if (isNextOn()) {
+  const singles = relicReport.filter((row) => row.relics.length === 1);
+  const byListen = [...singles].sort((left, right) => right.listen.meanVault - left.listen.meanVault);
+  const spread = byListen[0].listen.meanVault / byListen.at(-1).listen.meanVault;
+  const bests = Object.fromEntries(["blind", "listen", "sees", "skip"].map((key) => [key, singles.reduce((best, row) => (row[key].meanVault > best[key].meanVault ? row : best)).name]));
+  console.log(`relic spread     heartbeat best ${byListen[0].name} ${byListen[0].listen.meanVault} / worst ${byListen.at(-1).name} ${byListen.at(-1).listen.meanVault} = x${spread.toFixed(3)}; best by hand ${Object.entries(bests).map(([key, name]) => `${key} ${name}`).join(", ")}`);
+  assert.ok(spread >= RELIC_SPREAD_MIN, `the tools must matter: best ${byListen[0].name} against worst ${byListen.at(-1).name} is only x${spread.toFixed(3)}`);
+  assert.ok(new Set(Object.values(bests)).size >= RELIC_BESTS_MIN, `one tool is best for everyone: ${JSON.stringify(bests)}`);
+}
+
+/**
  * C9, the KD은행 계좌 at the draft (design-kd-spend-relic.md, decisions all 1):
  * a reroll for RELIC_REROLL_COST and one more relic for RELIC_EXTRA_COST, each
  * once a draft, out of the vault. The relic hand plays seasons of
@@ -607,12 +702,12 @@ function measureSpending(label, decide, spend) {
   let paid = 0;
   let rerolls = 0;
   let extras = 0;
-  let season = { vault: 0, relics: [], carried: undefined };
+  let season = { vault: 0, relics: [], carried: undefined, extraBought: false };
   for (let caseIndex = 0; caseIndex < SPEND_CASES; caseIndex += 1) {
-    if (caseIndex % SEASON_CASES === 0) season = { vault: 0, relics: [], carried: undefined };
+    if (caseIndex % SEASON_CASES === 0) season = { vault: 0, relics: [], carried: undefined, extraBought: false };
     const result = playHandCase(caseIndex, decide, season.relics, season.carried);
     season.carried = { stanceMastery: result.stanceMastery, logic: result.logic };
-    let run = normalizeRunState({ vault: season.vault + result.vault, relics: season.relics, ...openRelicDraft(`spend:${caseIndex}`, RELIC_IDS, season.relics) });
+    let run = normalizeRunState({ vault: season.vault + result.vault, relics: season.relics, extraBought: season.extraBought, ...openRelicDraft(`spend:${caseIndex}`, RELIC_IDS, season.relics) });
     if (run.relicOffer.length) {
       const pays = spendsAt(spend, run);
       if (pays.reroll) run = rerollRelicOffer(run);
@@ -624,6 +719,7 @@ function measureSpending(label, decide, spend) {
     }
     season.vault = run.vault;
     season.relics = run.relics;
+    season.extraBought = run.extraBought;
     if (caseIndex % SEASON_CASES === SEASON_CASES - 1) banked += season.vault;
   }
   const seasons = SPEND_CASES / SEASON_CASES;
@@ -639,12 +735,14 @@ const spendingRows = {
   // Pays only while the slots have room (the reroll with one free, one more
   // with two): where a relic is still worth buying, for reading 12,000.
   early: measureSpending(`${bestHeartbeatSoFar.label}, both while slots are free`, listening, "early"),
+  // G4: rerolls an offer with nothing strong in it, one more while two slots are free.
+  weak: measureSpending(`${bestHeartbeatSoFar.label}, rerolls a weak offer`, listening, "weak"),
   earlyBlind: measureSpending(`blind heat ${blindSpendTarget}, both while slots are free`, (win) => win.gauge < blindSpendTarget, "early"),
   sees: measureSpending("sees the wall, never pays", (win) => win.gauge + win.schema.stepMax < win.wall, "never"),
   skipBuys: measureSpending("bust to skip, both every draft", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "always"),
   skipNever: measureSpending("bust to skip, never pays", (win) => (win.seed.endsWith(`:${WINDOWS_PER_CASE - 1}`) ? win.gauge < 50 : true), "never"),
 };
-console.log(`draft spend      prices reroll ${RELIC_REROLL_COST}, one more ${RELIC_EXTRA_COST}; ${SPEND_CASES / SEASON_CASES} seasons of ${SEASON_CASES} cases, every relic unlocked`);
+console.log(`draft spend      prices reroll ${getRerollCost()}, one more ${RELIC_EXTRA_COST}; ${SPEND_CASES / SEASON_CASES} seasons of ${SEASON_CASES} cases, every relic unlocked`);
 for (const row of Object.values(spendingRows)) {
   console.log(`draft spend      ${row.label.padEnd(44)} vault ${String(row.meanVault).padStart(7)}  paid ${String(row.paidPerCase).padStart(5)}/case  before paying ${String(row.meanVault + row.paidPerCase).padStart(7)}  rerolls ${row.rerolls.toFixed(1)}/season  one more ${row.extras.toFixed(1)}/season`);
 }
@@ -652,7 +750,14 @@ assert.ok(
   spendingRows.skipBuys.meanVault < spendingRows.blind.meanVault * 0.25,
   `buying with what a skip saved must stay a loss: ${spendingRows.skipBuys.meanVault} against ${spendingRows.blind.meanVault} for best blind play`,
 );
-for (const key of ["reroll", "extra", "always", "early", "earlyBlind"]) {
+// G4: with the reroll at 1,500, rerolling a weak offer has to pay for itself.
+if (isNextOn()) {
+  // G29 (RULES_MARK 9, the user's 「1」 of 2026-11-25): the money cards' heavier chips leave a weak reroll 0.4% under never paying
+  // (measured with each 4차 item turned off: G29 alone moves it), so under 9 it has to come within WEAK_REROLL_ROOM of it.
+  const WEAK_REROLL_ROOM = isMarkNineOn() ? 0.99 : 1;
+  assert.ok(WEAK_REROLL_ROOM < 1 ? spendingRows.weak.meanVault >= spendingRows.listen.meanVault * WEAK_REROLL_ROOM : spendingRows.weak.meanVault > spendingRows.listen.meanVault, `rerolling a weak offer must beat never paying${WEAK_REROLL_ROOM < 1 ? ` (within ${Math.round((1 - WEAK_REROLL_ROOM) * 100)}% under RULES_MARK 9)` : ""}: ${spendingRows.weak.meanVault} against ${spendingRows.listen.meanVault}`);
+}
+for (const key of ["reroll", "extra", "always", "early", "weak", "earlyBlind"]) {
   const row = spendingRows[key];
   const bare = key === "earlyBlind" ? spendingRows.blind : spendingRows.listen;
   assert.ok(row.meanVault <= bare.meanVault * RELIC_LIFT_CAP, `paying at the draft is a win button: ${row.label} banks ${row.meanVault} against ${bare.meanVault}`);
@@ -673,7 +778,8 @@ for (const relic of ["encore", "metronome"]) {
     assert.equal(row.busts, bare.busts, `${row.label}: a relic that bends the streak must not move the wall`);
     assert.ok(row.meanVault >= bare.meanVault, `${row.label}: the relic must never cost the hand (${row.meanVault} against ${bare.meanVault})`);
     assert.ok(row.meanVault <= bare.meanVault * RELIC_LIFT_CAP, `${relic} is a win button for a hand that ${bare.label}: ${row.meanVault} against ${bare.meanVault}`);
-    assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap`);
+    // Under the next rules (G4) METRONOME's switch pays the tool's own boost, which is not the streak's.
+    if (!(isNextOn() && Object.hasOwn(RELIC_BOOSTS, relic))) assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap`);
     return `${bare.label} ${bare.meanVault} -> ${row.meanVault} (pot bonus ${bare.meanBonus.toFixed(3)} -> ${row.meanBonus.toFixed(3)})`;
   });
   console.log(`logic + ${relic.padEnd(10)} ${lifts.join("; ")}`);
@@ -769,6 +875,11 @@ const stepReport = UNLOCK_LADDER.slice(0, -1).map((step) => {
     steady: under("steady lock", stepListening, null, { mode: "steady" }, BRACKET_CASES),
   };
 });
+// G35 (RULES_MARK 9, the user's 「1」 of 2026-11-25): the audit reads a hand that always cuts at the same heat, which the
+// blind rows are, so the whole table a step is held under is the whole table less the audit; what the audit takes is printed.
+const auditFree = new Set([...ALL_RULES].filter((rule) => rule !== "audit"));
+const stepBound = isMarkNineOn() ? bestOfRows([40, 50, 60].map((target) => measure(`heat ${target}, no audit`, (win) => win.gauge < target, null, [], CASES, null, auditFree))) : bestFixed;
+if (stepBound !== bestFixed) console.log(`step bound       the whole table less the audit: ${stepBound.label} ${stepBound.meanVault}; with it ${bestFixed.label} ${bestFixed.meanVault} (the audit takes ${((100 * (stepBound.meanVault - bestFixed.meanVault)) / Math.max(1, stepBound.meanVault)).toFixed(1)}%)`);
 for (const row of stepReport) {
   const { caseId, rules, blind, listen, sees, skip, holds, wanders, unlocked, waited, strike, steady } = row;
   console.log(
@@ -781,7 +892,7 @@ for (const row of stepReport) {
   assert.ok(listen.meanVault < sees.meanVault * 0.6, `${caseId}: the heartbeat must not be an answer key: best ${listen.meanVault} against a wall-seeing ${sees.meanVault}`);
   assert.ok(skip.meanWindows < WINDOWS_PER_CASE, `${caseId}: busting on purpose does shorten a case`);
   assert.ok(skip.meanVault < blind.meanVault * 0.25, `${caseId}: the skip must not be a shortcut: busting to skip banks ${skip.meanVault} against ${blind.meanVault}`);
-  assert.ok(blind.meanVault <= bestFixed.meanVault, `${caseId}: a step must not bank more than the whole table (${blind.meanVault} against ${bestFixed.meanVault})`);
+  assert.ok(blind.meanVault <= stepBound.meanVault, `${caseId}: a step must not bank more than the whole table (${blind.meanVault} against ${stepBound.meanVault})`);
 
   // A bust: broken wherever the step can break a board, untouched where it cannot.
   const bust = [...row.blindRows, skip].filter((played) => played.midCase > 0);
@@ -797,8 +908,12 @@ for (const row of stepReport) {
     assert.ok(holds.meanVault <= Math.ceil(listen.meanVault * HAND_CAP) + 1, `${caseId}: the streak cannot pay past the hand's cap: ${holds.meanVault} against ${listen.meanVault}`);
     assert.ok(wanders.meanVault <= holds.meanVault, `${caseId}: picking a card at random must never pay better than holding a direction`);
   } else {
-    assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card that leans is paid as any card`);
-    assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever way it leans`);
+    // G29 (RULES_MARK 9): a leaned card's chips move by the coin weight's share of the lean (the lean check at the top), and no more.
+    const leanShare = isMarkNineOn() ? (DIRECTION_LEAN * (COIN_GAIN_WEIGHT - 2) + 1) / getCardChips(card) : 0;
+    if (!leanShare) assert.equal(holds.meanVault, listen.meanVault, `${caseId}: with no streak, a card that leans is paid as any card`);
+    else assert.ok(Math.abs(holds.meanVault / listen.meanVault - 1) <= leanShare, `${caseId}: with no streak, a card that leans is paid as any card but for the coin weight's share (${holds.meanVault} against ${listen.meanVault})`);
+    if (!leanShare) assert.equal(wanders.meanVault, listen.meanVault, `${caseId}: whichever way it leans`);
+    else assert.ok(Math.abs(wanders.meanVault / listen.meanVault - 1) <= leanShare, `${caseId}: whichever way it leans, but for the coin weight's share (${wanders.meanVault} against ${listen.meanVault})`);
   }
   // LOCK, where the step has it, is STRIKE until the stances open.
   if (rules.has("lock")) {
@@ -808,7 +923,7 @@ for (const row of stepReport) {
     // the stances until C-4 made 프롤로그 05 a step short of the whole table.
     const cap = HAND_CAP * (rules.has("stance") ? STANCE_LIFT_CAP : 1);
     assert.ok(strike.meanVault <= Math.ceil(waited.meanVault * cap) + 1, `${caseId}: the hand is paid past its cap: ${strike.meanVault} against ${waited.meanVault} for the same clock without a LOCK`);
-    assert.ok(strike.meanVault < sees.meanVault, `${caseId}: the hand must never be worth more than seeing the wall`);
+    assert.ok(strike.meanVault < sees.meanVault * NEXT_SEES_ROOM, `${caseId}: the hand must never be worth more than seeing the wall`);
   }
   if (!rules.has("stance")) assert.equal(steady.meanVault, strike.meanVault, `${caseId}: a hand that asks for STEADY is ${rules.has("lock") ? "locking in STRIKE" : "not locking at all"}`);
 }
@@ -1076,6 +1191,216 @@ if (CASCADE_ON) {
   console.log(`cascade          with links on: blind ${blind.meanVault} (${blind.label}) < heartbeat ${listen.meanVault} (${listen.label}) < scout ${look.meanVault} (${look.label}) < sees ${sees.meanVault}; bust to skip ${onRow("bust to skip").meanVault}`);
   assert.ok(blind.meanVault < listen.meanVault && listen.meanVault < look.meanVault && look.meanVault < sees.meanVault, "with links on, information still pays in the table's order");
   assert.ok(onRow("bust to skip").meanVault < blind.meanVault * 0.25, "with links on, busting to skip is still no shortcut");
+}
+
+/**
+ * G5's acts 1, 2, 4, 6 and 8 (src/gauntlet/actTwists.js, 2026-11-25): each
+ * twist played as one of its act's cases, every board of the case under it,
+ * beside the same hand on a plain case. Printed for the record of each act's
+ * two good answers (cp-archive 메모-20261119 G5-나머지-막-설계.md); the only
+ * assertions are what the twist itself must do -- the numbers are the user's
+ * (played only with `node scripts/report-gauntlet-loop.mjs --compare`)
+ * (「전부 1」), and a gap is reported, not tuned here.
+ */
+function reportActTwists({ pct, listening, G_CASES }) {
+  const gap = (a, b) => pct(Math.abs(a.meanVault / Math.max(1, b.meanVault) - 1));
+  const pair = (label, decide, twist, lock = null) => ({ label, off: measure(label, decide, null, [], G_CASES, lock), on: measure(`${label} as ${twist.caseId}`, decide, null, [], G_CASES, lock, ALL_RULES, false, twist) });
+  const line = (act, { label, off, on }) => console.log(`next G5 ${act} ${label.padEnd(18)} vault ${off.meanVault} -> ${on.meanVault}  bust ${pct(off.bustRate)} -> ${pct(on.bustRate)}`);
+  // 1막 떠넘겨진 손실 (사건 05): softer busts for a pushing hand, paid in 사람 피해.
+  const act1 = [["heat 50", (win) => win.gauge < 50], ["heat 60", (win) => win.gauge < 60], ["heartbeat", listening]].map(([label, decide]) => pair(label, decide, { caseId: "case05" }));
+  for (const row of act1) line("1막 떠넘김", row);
+  for (const row of act1) assert.ok(row.on.meanVault >= row.off.meanVault, `G5 1막: a kept third can only add to the vault (${row.label})`);
+  // 2막 뒤늦은 청구서 (사건 10): cash big at 60 and over and carry half, or clean at 40-59.
+  // The same listening hand, two habits (11-20): cash where the heartbeat says (often 60 and over), or stop before a push could reach 60.
+  const act2 = [["heartbeat (big)", listening], ["heartbeat (clean)", (win) => listening(win) && win.gauge + win.schema.stepMin < 60]].map(([label, decide]) => pair(label, decide, { caseId: "case10" }));
+  for (const row of act2) line("2막 청구서", row);
+  console.log(`next G5 2막 청구서 big ${act2[0].on.meanVault} against clean ${act2[1].on.meanVault} (${gap(act2[0].on, act2[1].on)} apart)`);
+  // 4막 학습된 벽 (사건 22): the band stands around the last cash; how much more a hand banks.
+  const act4 = [["heat 60", (win) => win.gauge < 60], ["heat 70", (win) => win.gauge < 70], ["heartbeat", listening]].map(([label, decide]) => pair(label, decide, { caseId: "case22" }));
+  for (const row of act4) line("4막 학습벽", row);
+  console.log(`next G5 4막 학습벽 vault up ${act4.map((row) => `${row.label} ${pct(row.on.meanVault / Math.max(1, row.off.meanVault) - 1)}`).join(", ")}`);
+  // 6막 진술 고정 (사건 33): one stance for the case, carried on every cash without a charge.
+  const act6 = FOCUS_MODES.map((mode) => pair(`${mode}, no charge`, listening, { caseId: "case33" }, { mode, idle: true }));
+  for (const row of act6) line("6막 진술", row);
+  const best6 = Math.max(...act6.map((row) => row.on.meanVault));
+  const low6 = Math.min(...act6.map((row) => row.on.meanVault));
+  console.log(`next G5 6막 진술 stances on record ${act6.map((row) => `${row.label.split(",")[0]} ${row.on.meanVault}`).join(", ")} (${pct(1 - low6 / Math.max(1, best6))} apart)`);
+  // 8막 실명 서명 (사건 48): by name or with conditions, for a hand that listens and one that does not.
+  for (const [label, decide] of [["heartbeat", listening], ["heat 50", (win) => win.gauge < 50]]) {
+    const named = measure(`${label}, name only`, decide, null, [], G_CASES, null, ALL_RULES, false, { caseId: "case48", sign: "name" });
+    const terms = measure(`${label}, conditions`, decide, null, [], G_CASES, null, ALL_RULES, false, { caseId: "case48", sign: "terms" });
+    console.log(`next G5 8막 서명 ${label.padEnd(18)} name only ${named.meanVault} (bust ${pct(named.bustRate)})  conditions ${terms.meanVault} (bust ${pct(terms.bustRate)})  best ${named.meanVault >= terms.meanVault ? "name" : "conditions"}`);
+  }
+}
+/**
+ * RULES_MARK 7 (2026-11-25, with the wipe; 게임성 개선점 2026-11-20, the
+ * user's 「1 나눠서 두 번」): each item played under the rules of 6 (`SIX`) and
+ * of 7 (`SEVEN`) on the same seeded cases. Printed for the record (the notes'
+ * targets are read off the rows); asserted is only what each rule must do.
+ * (played only with `node scripts/report-gauntlet-loop.mjs --compare`)
+ *
+ * G11b  each act's heartbeat-hand vault against the acts' mean (target ±15%;
+ *       3, 5 and 7's numbers are 11-25's, which G11b leaves as they are).
+ * G11c  tools that pay on one cash together pay RELIC_BOOST_CAP at most: a
+ *       hand holding tools banks no more than before, a hand with none the same.
+ * G13   the first look's price climbs 1, 1, 1, 2, 2, 3 in a case: for the
+ *       same 믿음 budget a case, the scouting hand looks on fewer boards.
+ * G16   8막's 「이름만」 wall drawn for each case, 1 to 3: some hand's best
+ *       answer turns on the wall its case drew (the board is the page's, so
+ *       the rows are 7's; 6 was −2, the middle row).
+ * G18   a LOCK press on 7막's hearing and SHORT CLOCK takes LOCK_DRAG of the
+ *       clock: charging there pays less against not charging than it did, and
+ *       a plain board charges as before.
+ */
+function reportMarkSeven({ pct, listening, G_CASES, bestMargin }) {
+  const SIX = withMarkSeven(ALL_RULES, false);
+  const SEVEN = withMarkSeven(ALL_RULES, true);
+  const pair = (label, decide, { relics = [], lock = null, twist = null } = {}) => ({
+    label,
+    six: measure(`${label} (6)`, decide, null, relics, G_CASES, lock, SIX, false, twist),
+    seven: measure(`${label} (7)`, decide, null, relics, G_CASES, lock, SEVEN, false, twist),
+  });
+  const change = (row) => pct(row.seven.meanVault / Math.max(1, row.six.meanVault) - 1);
+  // G11b: one case of each act, the heartbeat hand, no tools; 8막 signs with conditions (not choosing).
+  const acts = [[1, "case05"], [2, "case10"], [3, "case15"], [4, "case22"], [5, "case27"], [6, "case33"], [7, "case40"], [8, "case48"]]
+    .map(([act, caseId]) => [act, measure(`act ${act}`, listening, null, [], G_CASES, null, SEVEN, false, { caseId })]);
+  const actMean = acts.reduce((sum, [, row]) => sum + row.meanVault, 0) / acts.length;
+  console.log(`mark7 G11b 막별 heartbeat ${acts.map(([act, row]) => `${act}막 ${row.meanVault} (${pct(row.meanVault / actMean - 1)})`).join("  ")}  mean ${Math.round(actMean)}`);
+  // G11c: tool hands whose conditions can meet on one cash.
+  const tools = [["none", []], ["heatSink+frontPage", ["heatSink", "frontPage"]], ["coldBlood+heatSink+stethoscope", ["coldBlood", "heatSink", "stethoscope"]], ["auditContact+encore+testimony", ["auditContact", "encore", "testimony"]]]
+    .map(([label, relics]) => pair(label, listening, { relics }));
+  for (const row of tools) console.log(`mark7 G11c 도구 겹침 ${row.label.padEnd(30)} vault ${row.six.meanVault} -> ${row.seven.meanVault} (${change(row)})`);
+  assert.equal(tools[0].seven.meanVault, tools[0].six.meanVault, "G11c: a hand with no tool is not touched");
+  for (const row of tools) assert.ok(row.seven.meanVault <= row.six.meanVault, `G11c: the cap only ever cuts (${row.label})`);
+  // G13: the scouting hand (the best margin above), with a 믿음 budget for its first looks a case.
+  const scouting = (budget) => Object.assign((win) => (win.scouted ? win.gauge + win.schema.stepMax - bestMargin < getWindowBand(win).wallMin : listening(win)), { scout: true, ...(budget ? { scoutBudget: budget } : {}) });
+  const looks = [0, 12, 9, 7].map((budget) => pair(`budget ${budget || "none"}`, scouting(budget)));
+  const share = (row) => row.seen.scouts / Math.max(1, row.meanWindows * G_CASES);
+  for (const row of looks) console.log(`mark7 G13 첫 조회 ${row.label.padEnd(12)} looked on ${pct(share(row.six))} -> ${pct(share(row.seven))} of boards  믿음 ${row.six.meanTrust} -> ${row.seven.meanTrust}/case  vault ${row.six.meanVault} -> ${row.seven.meanVault}`);
+  assert.ok(looks[0].seven.meanTrust > looks[0].six.meanTrust, "G13: the same looks cost more 믿음 past the third");
+  assert.ok(share(looks[2].seven) < share(looks[2].six), "G13: for the same budget the hand looks on fewer boards");
+  // G16: 사건 48 opened on a window that draws each wall (getNameWall), by name and with conditions.
+  const opens = {};
+  for (let at = 0; at < 200 && Object.keys(opens).length < 3; at += 1) opens[getNameWall(stampCaseOpen(normalizeRunState({ windowIndex: at }), { caseId: "case48" }))] ??= at;
+  const flips = [];
+  for (const [label, decide] of [["heartbeat", listening], ["heat 40", (win) => win.gauge < 40], ["heat 50", (win) => win.gauge < 50], ["heat 60", (win) => win.gauge < 60]]) {
+    const terms = measure(`${label}, conditions`, decide, null, [], G_CASES, null, SEVEN, false, { caseId: "case48", sign: "terms" });
+    const named = [1, 2, 3].map((wall) => [wall, measure(`${label}, name only −${wall}`, decide, null, [], G_CASES, null, SEVEN, false, { caseId: "case48", sign: "name", openAt: opens[wall] })]);
+    const answers = named.map(([, row]) => (row.meanVault >= terms.meanVault ? "name" : "conditions"));
+    if (new Set(answers).size > 1) flips.push(label);
+    console.log(`mark7 G16 8막 서명 ${label.padEnd(10)} conditions ${terms.meanVault}  ${named.map(([wall, row], index) => `name −${wall} ${row.meanVault} (bust ${pct(row.bustRate)}) ${answers[index]}`).join("  ")}`);
+  }
+  assert.ok(flips.length > 0, "G16: some hand's best answer turns on the wall its case drew");
+  // G18: STRIKE charged before the first push against no charge, on the short clocks and a plain case.
+  for (const [label, caseId] of [["7막 청문회", "case40"], ["SHORT CLOCK 사건 09", "case09"], ["plain 사건 20", "case20"]]) {
+    const none = pair(`${label}, no charge`, listening, { twist: { caseId } });
+    const strike = pair(`${label}, STRIKE`, listening, { twist: { caseId }, lock: { mode: "strike" } });
+    const ratio = (key) => strike[key].meanVault / Math.max(1, none[key].meanVault);
+    console.log(`mark7 G18 LOCK 충전 ${label.padEnd(18)} no charge ${none.six.meanVault} -> ${none.seven.meanVault}  STRIKE ${strike.six.meanVault} -> ${strike.seven.meanVault} (bust ${pct(strike.six.bustRate)} -> ${pct(strike.seven.bustRate)})  charge pays ×${ratio("six").toFixed(2)} -> ×${ratio("seven").toFixed(2)}`);
+    if (caseId === "case20") assert.equal(strike.seven.meanVault, strike.six.meanVault, "G18: a plain board charges as before");
+    else assert.ok(ratio("seven") < ratio("six"), `G18: charging on ${label} pays less against not charging`);
+  }
+}
+
+/**
+ * G1·G2·G3·G6·G7 (the next rules, 2026-11-19 「전부 1」): every choice has
+ * more than one good answer. Played only with the next rules on (RULES_NEXT=0
+ * plays the old ones, where these do not hold: that is what they changed).
+ *
+ * G1  the best hand that holds one direction for good and the best that
+ *     changes it now and then bank within 5% of each other, and a random
+ *     card stays clearly behind both (under 90%).
+ * G2  for the 믿음 the old narrow-every-board hand paid in a case, the best
+ *     narrowing hand narrows on 50 to 85% of the boards it pushes, under the
+ *     0.8 cap against a wall seen.
+ * G3  the best vault each stance reaches over the measured hands is within
+ *     10% of the others', and each stance is the best in at least one hand.
+ *     LOCK cannot be charged on a board where it would add nothing, so a
+ *     charged cash it added nothing to is rare (under 25%).
+ * G6  every case's last board is its 결재 판, and it is played.
+ * G7  숨 고르기 lowers the bust after a bust for the heat-50 and heat-60
+ *     hands, and moves the heartbeat hand's vault by under 2%.
+ */
+if (NEXT_ON) {
+  const G_CASES = BRACKET_CASES;
+  const share = (part, whole) => part / Math.max(1, whole);
+  const pct = (value) => `${(value * 100).toFixed(1)}%`;
+  // G1
+  const other = (direction) => (direction === "people" ? "position" : "people");
+  const switchesAfter = (k) => (offers, logic) => {
+    const held = logic.type ?? "people";
+    const want = logic.held >= k ? other(held) : held;
+    return offers.some((offer) => offer.type === want) ? want : offers.some((offer) => offer.type === held) ? held : offers[0].type;
+  };
+  const holdRows = logicRows.filter((row) => ["holds people", "holds position", "holds, follows table"].includes(row.label));
+  const switchRows = [logicRows.find((row) => row.label === "switches on a rise"), ...[6, 8, 10].map((k) => measure(`switches after ${k}`, listening, switchesAfter(k)))];
+  const bestHold = bestOfRows(holdRows);
+  const bestSwitch = bestOfRows(switchRows);
+  for (const row of [...holdRows, ...switchRows, randomType]) console.log(`next G1 눈에 띔   ${row.label.padEnd(22)} vault ${String(row.meanVault).padStart(7)}  caught ${row.seen.caught} of ${row.seen.exposedCashes} exposed cashes  pot bonus ${row.meanBonus.toFixed(3)}  best streak ${row.best}`);
+  const g1Gap = Math.abs(bestHold.meanVault / bestSwitch.meanVault - 1);
+  console.log(`next G1 눈에 띔   best hold ${bestHold.label} ${bestHold.meanVault}, best switch ${bestSwitch.label} ${bestSwitch.meanVault} (${pct(g1Gap)} apart), random ${randomType.meanVault}`);
+  assert.ok(g1Gap <= 0.05, `G1: holding for good and switching now and then should both be good answers: ${bestHold.meanVault} against ${bestSwitch.meanVault}`);
+  assert.ok(randomType.meanVault < Math.min(bestHold.meanVault, bestSwitch.meanVault) * 0.9, `G1: a random card should stay clearly behind: ${randomType.meanVault}`);
+  // G2
+  const bestMarginG2 = Number(bestScout.label.split("margin ")[1]);
+  const narrowRows = [26, 22, 18, 14].map((budget) => measure(`narrow, 믿음 ${budget} a case`, Object.assign(
+    (win) => (win.narrowed ? win.gauge + win.schema.stepMax - NARROW_TRIGGER < getWindowBand(win).wallMin : win.scouted ? win.gauge + win.schema.stepMax - bestMarginG2 < getWindowBand(win).wallMin : listening(win)),
+    { scout: (win) => scoutDue("narrow", win), narrow: (win) => narrowDue("narrow", win, NARROW_TRIGGER), trustBudget: budget },
+  )));
+  for (const row of narrowRows) console.log(`next G2 둘째 조회 ${row.label.padEnd(22)} vault ${String(row.meanVault).padStart(7)}  narrowed ${pct(share(row.seen.narrows, row.seen.pushedBoards))} of pushed boards  second looks' 믿음 ${(row.seen.narrowTrust / CASES).toFixed(1)}/case  scout/sees ${(row.meanVault / oracle.meanVault).toFixed(3)}`);
+  const bestNarrow = bestOfRows(narrowRows);
+  const narrowShare = share(bestNarrow.seen.narrows, bestNarrow.seen.pushedBoards);
+  assert.ok(narrowShare >= 0.5 && narrowShare <= 0.85, `G2: the best narrowing hand should narrow on some pushed boards and not others: ${pct(narrowShare)}`);
+  assert.ok(bestNarrow.meanVault < oracle.meanVault * SCOUT_SEES_CAP, `G2: the second look must not be an answer key: ${bestNarrow.meanVault} against ${oracle.meanVault}`);
+  // G3
+  const holdsPeople = LOGIC_HANDS["holds people"];
+  const G3_HANDS = {
+    listening: [listening, null],
+    "heat 40": [(win) => win.gauge < 40, null],
+    "heat 60": [(win) => win.gauge < 60, null],
+    "holds people": [listening, holdsPeople],
+    "holds people, heat 35": [(win) => win.gauge < 35, holdsPeople],
+  };
+  const stanceBest = Object.fromEntries(FOCUS_MODES.map((mode) => [mode, 0]));
+  const winners = new Set();
+  let unpaid = 0;
+  let charged = 0;
+  for (const [name, [decide, hand]] of Object.entries(G3_HANDS)) {
+    const rowsOf = FOCUS_MODES.map((mode) => measure(`${mode} lock, ${name}`, decide, hand, [], G_CASES, { mode }));
+    const top = bestOfRows(rowsOf);
+    winners.add(top.label.split(" ")[0]);
+    for (const [index, row] of rowsOf.entries()) {
+      stanceBest[FOCUS_MODES[index]] = Math.max(stanceBest[FOCUS_MODES[index]], row.meanVault);
+      unpaid += row.seen.lockUnpaid;
+      charged += row.seen.lockCashed;
+    }
+    console.log(`next G3 stance   ${name.padEnd(22)} ${rowsOf.map((row) => `${row.label.split(" ")[0]} ${row.meanVault}`).join("  ")}  best ${top.label.split(" ")[0]}  LOCK added nothing ${rowsOf.map((row) => pct(share(row.seen.lockUnpaid, row.seen.lockCashed))).join(" / ")}`);
+  }
+  const stanceTop = Math.max(...Object.values(stanceBest));
+  const stanceLow = Math.min(...Object.values(stanceBest));
+  console.log(`next G3 stance   best of each: ${FOCUS_MODES.map((mode) => `${mode} ${stanceBest[mode]}`).join(", ")} (${pct(1 - stanceLow / stanceTop)} apart); best somewhere: ${[...winners].join(", ")}; LOCK added nothing on ${pct(share(unpaid, charged))} of charged cashes`);
+  assert.ok(stanceLow >= stanceTop * 0.9, `G3: every stance's best should be within 10% of the others': ${JSON.stringify(stanceBest)}`);
+  assert.deepEqual([...winners].sort(), [...FOCUS_MODES].sort(), `G3: every stance should be the best in at least one hand: ${[...winners].join(", ")}`);
+  assert.ok(share(unpaid, charged) < 0.25, `G3: LOCK should rarely be charged where it adds nothing: ${pct(share(unpaid, charged))}`);
+  // G6
+  const signSeen = holder.seen;
+  console.log(`next G6 결재 판   ${signSeen.signBoards} 결재 판 of ${holder.seen.windows} boards (holds people), bust ${pct(share(signSeen.signBusts, signSeen.signBoards))}, ${pct(share(signSeen.signPot, signSeen.pot))} of the pots`);
+  assert.ok(signSeen.signBoards > 0, "G6: a case's last board is its 결재 판");
+  // G7
+  const breathRows = [["heat 50", (win) => win.gauge < 50], ["heat 60", (win) => win.gauge < 60], ["heartbeat", listening]].map(([name, decide]) => ({
+    name,
+    off: measure(name, (win) => decide(win), null, [], G_CASES),
+    on: measure(`${name} + 숨 고르기`, Object.assign((win) => decide(win), { breathe: true }), null, [], G_CASES),
+  }));
+  const afterBust = (row) => share(row.seen.afterBustBusts, row.seen.afterBustBoards);
+  for (const { name, off, on } of breathRows) console.log(`next G7 숨 고르기 ${name.padEnd(22)} bust after a bust ${pct(afterBust(off))} -> ${pct(afterBust(on))} (fresh ${pct(share(off.seen.freshBusts, off.seen.freshBoards))})  vault ${off.meanVault} -> ${on.meanVault}  breaths ${on.seen.breaths}`);
+  for (const { name, off, on } of breathRows.slice(0, 2)) assert.ok(afterBust(on) < afterBust(off), `G7: 숨 고르기 should help a ${name} hand after a bust`);
+  const beat = breathRows[2];
+  assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < 0.02, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
+  // Only on `--compare`: 22 more measures of 500 cases, kept out of the default run under CI's 480-second cap.
+  if (process.argv.includes("--compare")) reportActTwists({ pct, listening, G_CASES });
+  // Only on `--compare` too: RULES_MARK 7's rows, each item under the rules of 6 and of 7.
+  if (process.argv.includes("--compare")) reportMarkSeven({ pct, listening, G_CASES, bestMargin: Number(bestScout.label.split("margin ")[1]) });
 }
 
 // WEEK_RULE (season-bot.mjs): every case above was played under that week's rule.

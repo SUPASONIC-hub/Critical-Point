@@ -1,6 +1,7 @@
 /** The ranking screen in English (src/copy/ranking.js). */
 export default {
-  back: "Back to the briefing",
+  back: "Back to the title screen",
+  backToResult: "Back to the result",
   title: "Where did thinking stretch the furthest?",
   intro: "Compare Burst Scores and Ranks. A season’s record is its average case score. A high score doesn’t mean you got the right answers. It means that under pressure, your thinking rhythm, perspective shifts, recovery and redesign all rose together.",
   retry: "Try again",
@@ -33,4 +34,5 @@ export default {
   hallBadge: "Hall of Fame · {board} #{place}",
   hallMainBoard: "main ranking",
   hallProvisional: " (provisional)",
+  hallProgress: "Hall of Fame · {board}: the first three places open once {min} seasons are in (now {count}/{min})",
 };

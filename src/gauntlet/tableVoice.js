@@ -2,13 +2,19 @@ import { useEffect, useRef, useState } from "react";
 
 import { formatMoney } from "../gameConstants.js";
 import { getClockCall } from "./tableReadout.js";
-import { dangerZoneOf } from "./tableMeters.js";
+import { CLOCK_CUT_MS, dangerZoneOf, describeClockCut } from "./tableMeters.js";
 import { findAudit } from "./auditRisk.js";
 import { formatChange } from "./moneyFeedback.js";
 import { ACT_START_CASES } from "./actCardGate.js";
-import { SCOUT_TRUST } from "./tableRules.js";
+import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "./tableRules.js";
+import { decisionWindowSeconds } from "./stakeClock.js";
+import { getBoardMark, getBreathWall, LOCK_CAP } from "./gauntletEngine.js";
+import { BREATH_GAUGE, SIGN_CHIPS, SIGN_MARK } from "./nextTableRules.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
+
+/** G15·G22: the line beside 숨 고르기: where the last BUST went, and on a hot one how far the wall moves. */
+export const readBreathBust = (board) => fill(tableCopy.stage.breathBust, { heat: board.bustHeat }) + (board.breathHot ? fill(tableCopy.stage.breathHotWall, { wall: getBreathWall(board) }) : "");
 
 /**
  * What the table says aloud, in one polite region (E3, table-voice).
@@ -38,6 +44,10 @@ import { fill } from "../locale.js";
  * - on a table that counts B2's links, the line its reading carries for the
  *   board that opens (`said`, cascadeRisk.js: a new link, or one due next);
  * - the clock at ten and at five seconds, and a table the reading clock opened;
+ * - the stake clock (B5, honest form): when the heat crosses a stake tier and
+ *   the window's clock is cut by its seconds -- or a cooling gives them back --
+ *   the heat, the seconds it moved and the seconds left, once per crossing,
+ *   so a listener hears what a sighted player sees the clock do;
  * - that a press let the held 확정 go too soon (길게 눌러야 확정된다), or that a
  *   screen reader's tap armed it and a second one seals it (useHoldConfirm);
  * - what a look (SCOUT) bought: the narrower band, once, as the button is spent;
@@ -70,7 +80,9 @@ const STANCE_CARRY_IDS = new Set(["strikeWake", "steadyLine", "exposedHand"]);
  * lapse in seconds -- then the clock's calls before the push's and the
  * stance's: a listener out of time has the least of it to lose.
  */
-const KIND_ORDER = Object.freeze({ status: -1, hold: 0, clock: 1, bank: 2, act: 3, audit: 4, links: 5, stance: 6, scout: 7, push: 8, wall: 9 });
+// G1~G7 (the next rules): `lock` is LOCK refused with its reason, `breath` what 숨 고르기 did, `sign` the 결재 판's
+// opening line, `exposure` 눈에 띔 building or clearing with the staked card.
+const KIND_ORDER = Object.freeze({ status: -1, hold: 0, lock: 0.5, clock: 1, breath: 1.2, stakeClock: 1.5, bank: 2, act: 3, sign: 3.5, audit: 4, links: 5, stance: 6, exposure: 6.5, scout: 7, push: 8, wall: 9 });
 
 // The voice's words are src/copy/table.js's `voice` (영어판 4단계), read as
 // each call is made, so another language laid over them is the one said.
@@ -89,8 +101,52 @@ export const describeWall = ({ gauge, dangerLine }) => fill(voice().wall, { gaug
 
 export const describeStanceCarry = ({ focus, carry }) => fill(voice().stance, { focus: Math.round(focus), label: carry.label, title: carry.title });
 
-/** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took. */
-export const describeScout = ({ wallMin, wallMax }) => fill(voice().scout, { min: wallMin, max: wallMax, trust: SCOUT_TRUST });
+/** What a look bought (`getWindowBand`) and cost (B1): the band it narrowed to, never the wall inside it, and the 믿음 it took (`trust`: the first look's price, G13). */
+export const describeScout = ({ wallMin, wallMax, narrowed }, trust = SCOUT_TRUST) =>
+  fill(narrowed ? voice().scoutNarrow : voice().scout, { min: wallMin, max: wallMax, trust: narrowed ? SCOUT_NARROW_TRUST : trust });
+
+/**
+ * The stake clock's move (B5): the heat that moved it, the seconds the
+ * window's clock lost (`cut` > 0) or got back (`cut` < 0), and the seconds it
+ * now shows. Only what the HUD's clock already shows, in words.
+ */
+const describeStakeClock = ({ gauge, cut, remaining }) =>
+  fill(cut > 0 ? voice().stakeClockCut : voice().stakeClockBack, { gauge: Math.round(gauge), cut: Math.abs(cut), seconds: Math.max(0, Math.ceil(remaining)) });
+
+/**
+ * The window's whole clock at its heat, on a board that has the stake clock
+ * (`stakeClock: true`, every board dealt since 2026-11-05), else null: an
+ * older board's flat clock never moves, so it has nothing to say.
+ */
+export const readWindowSeconds = (win) => (win?.schema?.stakeClock === true ? decisionWindowSeconds(win.gauge, win.schema) : null);
+
+/**
+ * B5 seen (N43 step 3, 11-18 「전부 1」): what the mark beside the HUD's clock
+ * shows, { text, key } for CLOCK_CUT_MS after the stake clock shortened, else
+ * null. Read off the same whole clock as the voice's stake-clock line, so a
+ * push across a tier and the clock's own creep across one -- which no push
+ * line had told -- are shown alike. This window only (a new seed starts over)
+ * and only while it is live (a bust's heat is not a cut). Shown, not heard:
+ * the voice says it already, and nothing is played.
+ */
+export function useClockCut(win, seed) {
+  const live = win.status === "live";
+  const seconds = readWindowSeconds(win);
+  const seenRef = useRef({ seed, seconds });
+  const timerRef = useRef(null);
+  const [cut, setCut] = useState(null);
+  useEffect(() => {
+    const seen = seenRef.current;
+    seenRef.current = { seed, seconds };
+    const text = seen.seed === seed && live ? describeClockCut(seen.seconds, seconds) : "";
+    if (!text) return;
+    setCut((last) => ({ text, key: (last?.key ?? 0) + 1 }));
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setCut(null), CLOCK_CUT_MS);
+  }, [live, seed, seconds]);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
+  return cut;
+}
 
 /**
  * The table as it stands, when asked (E3, 「지금 상황 듣기」): the heat,
@@ -115,11 +171,19 @@ export const findStanceCarry = (cashMutations = []) => cashMutations.find((mutat
  * built from. `clock` is called as if the table were running, so a pause and
  * a resume do not count as the clock reaching ten seconds again.
  */
-export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, asked = 0, runPot = 0, pulse = "" }) {
+export function readTableFacts({ win, live, dangerLine, cashMutations, clock, hold = "idle", band = null, scoutTrust = SCOUT_TRUST, asked = 0, runPot = 0, pulse = "", exposure = "", lockRefused = 0, lockReason = "", breathLine = "", leakLine = "" }) {
   const carry = findStanceCarry(cashMutations);
   return {
     asked,
-    status: describeStatus({ gauge: win.gauge, dangerLine, runPot, remaining: clock.remaining, pulse }),
+    // G1: 눈에 띔, said with the status when asked and once whenever the staked card builds or clears it.
+    status: `${describeStatus({ gauge: win.gauge, dangerLine, runPot, remaining: clock.remaining, pulse })}${exposure ? ` ${exposure}` : ""}`,
+    exposure,
+    lockRefused,
+    lockReason,
+    breathed: win.breathed === true,
+    breathLine,
+    // G27 (trial only): said once when a full charge starts to leak.
+    leakLine,
     live,
     pushes: win.pushes,
     push: describePush({ gauge: win.gauge, dangerLine }),
@@ -129,8 +193,32 @@ export function readTableFacts({ win, live, dangerLine, cashMutations, clock, ho
     stance: carry ? describeStanceCarry({ focus: win.focus, carry }) : "",
     clock: getClockCall({ ...clock, live, paused: false }),
     hold: getHoldCall(hold),
-    scout: band?.scouted ? describeScout(band) : "",
+    scout: band?.scouted ? describeScout(band, scoutTrust) : "",
+    gauge: win.gauge,
+    remaining: clock.remaining,
+    windowSeconds: readWindowSeconds(win),
   };
+}
+
+/**
+ * G1~G7 (the next rules): what the voice says of them. 눈에 띔 as the staked
+ * card leaves it, LOCK's reason when a shut LOCK is pressed (`lockRefused`
+ * counts the presses), and what 숨 고르기 did once pressed.
+ */
+function readNextLines({ win, logic = null, lockRefused = 0 }) {
+  const stage = tableCopy.stage;
+  return {
+    exposure: logic?.exposure?.spoken ?? "",
+    lockRefused,
+    lockReason: fill(stage.lockShutReason, { cap: LOCK_CAP }),
+    breathLine: win?.breathed ? fill(stage.breathDone, { gauge: BREATH_GAUGE, to: Math.round(win.gauge), wall: getBreathWall(win.schema) }) : "",
+    leakLine: win?.schema?.chargeLeak === true && win.leakFocus < win.chargedFocus ? stage.chargeLeak : "",
+  };
+}
+
+/** G6: the 결재 판's line, said once as its table opens: the stake and the cell it shows. */
+function readSignOpening(win, band) {
+  return getBoardMark(win?.schema) === SIGN_MARK && band?.shown !== undefined ? fill(tableCopy.stage.signOpen, { chips: SIGN_CHIPS, cell: band.shown }) : "";
 }
 
 /**
@@ -142,9 +230,17 @@ export function listTableCalls(before, after) {
   const calls = [];
   if (after.asked > before.asked) calls.push({ kind: "status", text: after.status });
   if (after.hold && after.hold !== before.hold) calls.push({ kind: "hold", text: after.hold });
+  // G3: a LOCK refused says why, every time it is pressed; G7: 숨 고르기 says what it did; G1: 눈에 띔 moving.
+  if (after.lockRefused > (before.lockRefused ?? 0) && after.lockReason) calls.push({ kind: "lock", text: after.lockReason });
+  if (after.breathed && !before.breathed && after.breathLine) calls.push({ kind: "breath", text: after.breathLine });
+  if (after.leakLine && !before.leakLine) calls.push({ kind: "leak", text: after.leakLine });
+  if (after.exposure && after.exposure !== before.exposure) calls.push({ kind: "exposure", text: after.exposure });
   if (after.clock && after.clock !== before.clock) calls.push({ kind: "clock", text: after.clock });
   if (after.carry && after.carry !== before.carry) calls.push({ kind: "stance", text: after.stance });
   if (after.scout && after.scout !== before.scout) calls.push({ kind: "scout", text: after.scout });
+  if (after.windowSeconds !== null && before.windowSeconds !== null && before.windowSeconds !== undefined && after.windowSeconds !== before.windowSeconds) {
+    calls.push({ kind: "stakeClock", text: describeStakeClock({ gauge: after.gauge, cut: before.windowSeconds - after.windowSeconds, remaining: after.remaining }) });
+  }
   if (after.pushes > before.pushes) calls.push({ kind: "push", text: after.push });
   // A push said the line it landed on; a crossing with no push is the clock's or a cooling press's.
   else if (after.zone && before.zone && after.zone !== before.zone) calls.push({ kind: "wall", text: after.wall });
@@ -200,8 +296,9 @@ const SILENT = Object.freeze({ text: "", n: 0 });
  * a timer, never from the effect itself, and a closed window's region is
  * empty whatever was said last.
  */
-export function useTableVoice({ speaking, run, audit = null, links, caseId = null, ...table }) {
-  const facts = readTableFacts({ ...table, runPot: run.runPot });
+export function useTableVoice({ speaking, run, audit = null, links, caseId = null, logic = null, lockRefused = 0, ...table }) {
+  const facts = readTableFacts({ ...table, runPot: run.runPot, ...readNextLines({ win: table.win, logic, lockRefused }) });
+  const opening = readSignOpening(table.win, table.band);
   // Each line is a fresh node in the region (`n` keys it, TableNotices): a line
   // the same as the last -- 상황 듣기 asked twice on a table whose clock has not
   // started -- is still a change the reader announces.
@@ -215,6 +312,9 @@ export function useTableVoice({ speaking, run, audit = null, links, caseId = nul
   const auditRef = useRef(null);
   const linksRef = useRef(null);
   const linkLine = links?.said;
+  // G6: the 결재 판's line, said once when the table first speaks (the table is mounted afresh for every window).
+  const openingRef = useRef(undefined);
+  if (openingRef.current === undefined) openingRef.current = opening || null;
 
   // Once a window: the settlement, the act, the audit and the links' line
   // since the last table, kept until they can be said. `??=` because a
@@ -259,6 +359,10 @@ export function useTableVoice({ speaking, run, audit = null, links, caseId = nul
     if (linksRef.current) {
       calls.push({ kind: "links", text: linksRef.current });
       linksRef.current = null;
+    }
+    if (openingRef.current) {
+      calls.push({ kind: "sign", text: openingRef.current });
+      openingRef.current = null;
     }
     if (!calls.length) return;
     queueRef.current = queueCalls(queueRef.current, calls);

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ACT_TALLY_CASES, buildActTallyModel, buildActTallyShareText, describeNearLine, readLargestStake, tallyCaseLabel, toResultCardModel } from "../../src/actTally.js";
+import { ACT_TALLY_CASES, MINI_TALLY_CASES, buildActTallyModel, buildActTallyShareText, describeNearLine, readLargestStake, tallyCaseLabel, toResultCardModel } from "../../src/actTally.js";
 import { ACT_START_CASES } from "../../src/gauntlet/actCardGate.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { getEndingVariant, getSeasonStrain } from "../../src/gameLogic.js";
@@ -49,9 +49,12 @@ test("the tally rides on the act cards after 프롤로그, 사건 18 and 사건 
   for (const caseId of ACT_TALLY_CASES) assert.ok(ACT_START_CASES.includes(caseId), `${caseId} opens an act`);
   assert.deepEqual(ACT_TALLY_CASES.map((caseId) => CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1]), ["prologue05", "case18", "case36"]);
   const played = season(upTo("case08"));
-  for (const caseId of ACT_START_CASES.filter((id) => !ACT_TALLY_CASES.includes(id))) assert.equal(buildActTallyModel(caseId, played), null, caseId);
-  assert.deepEqual(Object.keys(actTallyCopy.ends), [...ACT_TALLY_CASES]);
-  assert.deepEqual(Object.keys(actTallyCopy.corners), [...ACT_TALLY_CASES]);
+  // N23: 사건 07's report carries a small one, keyed by the act card that follows it (사건 08's).
+  assert.deepEqual([...MINI_TALLY_CASES], ["case08"]);
+  assert.ok(buildActTallyModel("case08", played));
+  for (const caseId of ACT_START_CASES.filter((id) => !ACT_TALLY_CASES.includes(id) && !MINI_TALLY_CASES.includes(id))) assert.equal(buildActTallyModel(caseId, played), null, caseId);
+  assert.deepEqual(Object.keys(actTallyCopy.ends), [...ACT_TALLY_CASES, ...MINI_TALLY_CASES]);
+  assert.deepEqual(Object.keys(actTallyCopy.corners), [...ACT_TALLY_CASES, ...MINI_TALLY_CASES]);
 });
 
 test("a season with no closed case, or a save that does not read, draws no tally", () => {
@@ -176,7 +179,11 @@ test("the picture is the finale's card with 가까운 결말, the act in its cor
 test("the copied line names the act, the type and the ending, and ends at the site", () => {
   const model = buildActTallyModel("case37", season(upTo("case37")));
   const text = buildActTallyShareText(model, `${ORIGIN}/`);
-  assert.equal(text, `트리거랩 시즌을 6막 끝 · 사건 36까지 왔습니다. 판단 유형은 '${model.habitTitle}', 가까운 결말은 '${model.endingName}'. ${ORIGIN}/`);
+  const mark = `?from=card${model.habitId ? `&h=${model.habitId}` : ""}`;
+  assert.equal(text, `「임계점: CRITICAL POINT」 시즌을 6막 끝 · 사건 36까지 왔습니다. 판단 유형은 '${model.habitTitle}', 가까운 결말은 '${model.endingName}'. ${ORIGIN}/${mark}`);
+  // 유입 1: an English or Japanese page shares its own start page.
+  assert.ok(buildActTallyShareText(model, ORIGIN, "en").endsWith(`${ORIGIN}/en/${mark}`));
+  assert.ok(buildActTallyShareText(model, ORIGIN, "ja").endsWith(`${ORIGIN}/ja/${mark}`));
   assert.ok(!buildActTallyShareText(model).includes("http"));
 });
 

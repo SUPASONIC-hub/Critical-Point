@@ -37,45 +37,45 @@
     U+E9, U+200B, U+200F, U+202A, U+202E, U+2060, U+2064, U+2592, U+3002, U+30A1-30A2, U+30A4, U+30A6-30A8,
     U+30AA-30AB, U+30AF-30B0, U+30B4, U+30B7-30B9, U+30BB, U+30BF-30C1, U+30C8-30CC, U+30CF, U+30D4-30D5,
     U+30D7, U+30D9-30DA, U+30DE, U+30E0, U+30E4-30E5, U+30E7-30E8, U+30EA-30EC, U+30F3-30F4, U+30FB-30FC,
-    U+54B2, U+6545, U+6C34, U+91CE, U+AC13, U+AC1B, U+AC20, U+AC2D, U+AC31, U+AC40, U+AC54, U+AC71, U+AC77,
-    U+AC84, U+AC89, U+ACAA, U+ACB8, U+ACE1, U+ACE4, U+ACE7, U+ACF6, U+ACFD, U+AD04, U+AD1C, U+AD73, U+AD75,
+    U+54B2, U+6545, U+6C34, U+70B9, U+91CE, U+AC13, U+AC1B, U+AC20, U+AC2D, U+AC31, U+AC40, U+AC54, U+AC71,
+    U+AC77, U+AC84, U+AC89, U+ACAA, U+ACB8, U+ACE1, U+ACE4, U+ACE7, U+ACF6, U+ACFD, U+AD1C, U+AD73, U+AD75,
     U+AD7D, U+ADF9, U+AE01, U+AE0B, U+AE43, U+AE4D, U+AE65, U+AE6C, U+AE79, U+AE7B, U+AEBE, U+AECD,
     U+AED0-AED1, U+AF2C, U+AF3D, U+AF42, U+AF49, U+AF64, U+AFB9, U+AFC8, U+AFD4, U+AFE8, U+AFF0, U+B010,
     U+B014, U+B01C-B01D, U+B048, U+B053, U+B055, U+B057, U+B080, U+B084, U+B08C-B08D, U+B099, U+B0A1, U+B0AB,
     U+B0AD, U+B0AF, U+B0B1, U+B0C9, U+B0D0, U+B109, U+B10C, U+B113, U+B125, U+B138, U+B154-B155, U+B17C,
-    U+B180, U+B188, U+B18D, U+B192, U+B1A8, U+B1CC, U+B1E8, U+B205, U+B208, U+B214-B215, U+B220, U+B234,
-    U+B258, U+B25C, U+B268, U+B274, U+B284, U+B299, U+B2A0, U+B2AC, U+B2D0, U+B2D8, U+B2DB, U+B2DD, U+B2E6,
-    U+B2ED, U+B2F3, U+B301, U+B304, U+B311, U+B313-B314, U+B355, U+B364-B365, U+B367, U+B36E, U+B38C, U+B3CB,
-    U+B3CE, U+B3D5, U+B3D7, U+B451, U+B460, U+B465, U+B46C, U+B480, U+B4C0, U+B4DD, U+B4E6, U+B4EC, U+B4EF,
-    U+B518, U+B51C, U+B525, U+B52A, U+B534, U+B540-B541, U+B544-B545, U+B550, U+B5B1, U+B5B3-B5B4, U+B5BC,
-    U+B5C0, U+B5C4, U+B5CC-B5CD, U+B5D0, U+B610, U+B69C-B69D, U+B6A4, U+B6AB, U+B6B1, U+B6F4, U+B6F8, U+B72C,
-    U+B730, U+B738, U+B754-B755, U+B760, U+B784, U+B790, U+B799, U+B79C, U+B7AC, U+B7F4, U+B7FD, U+B7FF-B801,
-    U+B807, U+B80C, U+B81B, U+B82C, U+B834-B835, U+B837, U+B86C-B86D, U+B86F, U+B8E9, U+B8F0, U+B8F8, U+B904,
-    U+B918, U+B93C, U+B959, U+B968, U+B96D, U+B987, U+B989, U+B98E, U+B9C1, U+B9D1, U+B9D8-B9D9, U+B9DB,
-    U+B9F5, U+B9F8-B9FA, U+BA39, U+BA49, U+BA4D-BA4E, U+BA65, U+BA67-BA68, U+BA78, U+BAAC, U+BAB8-BAB9,
-    U+BABD, U+BB45, U+BB47, U+BB49, U+BB50, U+BB54, U+BB58, U+BB61, U+BBA4, U+BBAC, U+BBC0, U+BBD0, U+BBF9,
+    U+B180, U+B188, U+B18D, U+B192, U+B1A8, U+B1CC, U+B1E8, U+B205, U+B214-B215, U+B220, U+B234, U+B258,
+    U+B25C, U+B268, U+B284, U+B299, U+B2A0, U+B2AC, U+B2D0, U+B2D8, U+B2DB, U+B2DD, U+B2E6, U+B2ED, U+B2F3,
+    U+B301, U+B304, U+B311, U+B313-B314, U+B355, U+B364-B365, U+B367, U+B36E, U+B38C, U+B3CB, U+B3CE, U+B3D5,
+    U+B3D7, U+B451, U+B460, U+B465, U+B46C, U+B480, U+B4C0, U+B4DD, U+B4E6, U+B4EC, U+B4EF, U+B518, U+B51C,
+    U+B525, U+B52A, U+B534, U+B540-B541, U+B544-B545, U+B550, U+B560, U+B5B1, U+B5B3-B5B4, U+B5BC, U+B5C0,
+    U+B5C4, U+B5CC-B5CD, U+B5D0, U+B610, U+B69C-B69D, U+B6A4, U+B6AB, U+B6B1, U+B6F4, U+B6F8, U+B72C, U+B730,
+    U+B738, U+B754-B755, U+B760, U+B784, U+B790, U+B799, U+B79C, U+B7AC, U+B7F4, U+B7FD, U+B7FF-B801, U+B807,
+    U+B80C, U+B81B, U+B82C, U+B834-B835, U+B837, U+B86C-B86D, U+B86F, U+B8E9, U+B8F0, U+B8F8, U+B904, U+B918,
+    U+B93C, U+B959, U+B968, U+B96D, U+B987, U+B989, U+B98E, U+B9C1, U+B9D1, U+B9D8-B9D9, U+B9DB, U+B9F5,
+    U+B9F8-B9FA, U+BA39, U+BA49, U+BA4D-BA4E, U+BA65, U+BA67-BA68, U+BA78, U+BAAC, U+BAB8-BAB9, U+BABD,
+    U+BB45, U+BB47, U+BB49, U+BB50, U+BB54, U+BB58, U+BB61, U+BBA4, U+BBAC, U+BBC0, U+BBD0, U+BBF9, U+BC0C,
     U+BC0F, U+BC11, U+BC1F, U+BC27, U+BC2D, U+BC34, U+BC38, U+BC43, U+BC49, U+BC85, U+BC97, U+BC9A, U+BCA0,
     U+BCA4, U+BCBC, U+BCCD, U+BCD5, U+BCF6, U+BD05, U+BD10, U+BD24, U+BD2C, U+BD48, U+BD59, U+BD81,
     U+BD90-BD91, U+BD93, U+BE4C, U+BE54-BE55, U+BE57, U+BE59-BE5B, U+BE64, U+BE75, U+BE80, U+BE84,
     U+BE8C-BE8D, U+BE8F-BE90, U+BED0, U+BED4, U+BED7-BED8, U+BF08, U+BF18, U+BF51, U+BF55, U+BFCC, U+BFD4,
     U+BFDC, U+C058, U+C060, U+C069, U+C090-C091, U+C0B6, U+C0BD, U+C0BF-C0C0, U+C0C5, U+C0CC, U+C0D8-C0D9,
     U+C0DC, U+C0F7, U+C11E, U+C123, U+C130, U+C148-C149, U+C14C, U+C154, U+C168, U+C170, U+C19C, U+C19F,
-    U+C1A5, U+C1E0, U+C1F1, U+C1FC, U+C21F, U+C22D, U+C270, U+C274, U+C27D, U+C2A8, U+C2B4, U+C2B7, U+C2E3,
-    U+C2EB, U+C2ED, U+C2FC, U+C309, U+C30C, U+C369, U+C36C, U+C370, U+C379, U+C465, U+C4F1, U+C500, U+C52C,
-    U+C539, U+C53B, U+C54E, U+C557, U+C564, U+C568, U+C587, U+C597-C598, U+C5B9, U+C5BD, U+C5C4, U+C5CC,
-    U+C5CE, U+C5D1, U+C5D8, U+C5E0, U+C5EE, U+C5FC, U+C5FF, U+C60C, U+C634, U+C637, U+C639, U+C63B, U+C655,
+    U+C1A5, U+C1E0, U+C1F1, U+C1FC, U+C21F, U+C22D, U+C274, U+C27D, U+C2A8, U+C2B4, U+C2B7, U+C2E3, U+C2EB,
+    U+C2ED, U+C2FC, U+C309, U+C30C, U+C369, U+C36C, U+C370, U+C379, U+C465, U+C4F1, U+C500, U+C52C, U+C539,
+    U+C53B, U+C54E, U+C557, U+C564, U+C568, U+C587, U+C597-C598, U+C5B9, U+C5BD, U+C5C4, U+C5CC, U+C5CE,
+    U+C5D1, U+C5D8, U+C5E0, U+C5E3, U+C5EE, U+C5FC, U+C5FF, U+C60C, U+C634, U+C637, U+C639, U+C63B, U+C655,
     U+C65C, U+C67C, U+C689, U+C6C5, U+C6E1, U+C6E8, U+C717, U+C719, U+C721, U+C73D, U+C74A, U+C74D, U+C787,
     U+C78A, U+C78E, U+C794, U+C796, U+C7A3-C7A4, U+C7A6, U+C7B0, U+C7B4, U+C7BD, U+C7E4, U+C80A, U+C813,
     U+C816, U+C820, U+C82F, U+C878, U+C880-C881, U+C8E0, U+C90C, U+C918, U+C92C, U+C958, U+C961, U+C988,
     U+C990, U+C998, U+C9CA, U+C9D3, U+C9D6, U+C9DA, U+C9DD, U+C9EC-C9ED, U+C9F0, U+CA4C, U+CA61, U+CA84,
     U+CABC, U+CB64, U+CBE4, U+CC0C, U+CC1C, U+CC22, U+CC2C, U+CC2E, U+CC3B-CC3C, U+CC48, U+CC4C, U+CC55,
     U+CC58-CC59, U+CC99, U+CCA8, U+CCE4, U+CD09, U+CD0C, U+CD2C, U+CDA4, U+CDB0, U+CDC4, U+CDE8, U+CE20-CE21,
-    U+CE69, U+CE6B, U+CE75, U+CE94, U+CE98, U+CEA0, U+CEE4, U+CEE8, U+CEF4, U+CEF7-CEF9, U+CF13, U+CF2D,
-    U+CF30, U+CF55, U+CF58, U+CF64, U+CF67, U+CF69, U+CF70, U+CF85, U+CFC4, U+CFE0, U+CFE8, U+D000, U+D018,
+    U+CE69, U+CE6B, U+CE75, U+CE94, U+CE98, U+CEA0, U+CEE8, U+CEF4, U+CEF7-CEF9, U+CF13, U+CF2D, U+CF30,
+    U+CF55, U+CF58, U+CF64, U+CF67, U+CF69, U+CF70, U+CF85, U+CFC4, U+CFE0, U+CFE8, U+D000, U+D018,
     U+D034-D035, U+D038, U+D070, U+D074, U+D07D, U+D0B4-D0B5, U+D0B7, U+D0C4, U+D0D0-D0D1, U+D0D3-D0D5,
     U+D0E0, U+D0E4, U+D0ED, U+D0F1, U+D138, U+D140-D141, U+D145, U+D14D, U+D150, U+D168, U+D17C, U+D1A1,
     U+D1A4, U+D1B1, U+D22D, U+D230, U+D234, U+D23C-D23D, U+D241, U+D248, U+D280, U+D284, U+D29C, U+D2BF-D2C0,
-    U+D2C8-D2C9, U+D2F1, U+D2F4, U+D2F8, U+D301, U+D305, U+D320-D321, U+D325, U+D329, U+D32C, U+D33B, U+D384,
+    U+D2C9, U+D2F1, U+D2F4, U+D2F8, U+D301, U+D305, U+D320-D321, U+D325, U+D329, U+D32C, U+D33B, U+D384,
     U+D3B4, U+D3C5, U+D3C8, U+D3F0, U+D3F4, U+D479, U+D47C, U+D489, U+D4CC, U+D4E8, U+D508, U+D515, U+D53D,
     U+D540, U+D54D, U+D56B, U+D575, U+D578, U+D5A5, U+D5DB, U+D5E4, U+D5EC, U+D608, U+D610, U+D61C, U+D639,
     U+D64D, U+D68D, U+D6A1, U+D6CC, U+D6D1, U+D6D4, U+D6E8, U+D6FC, U+D718, U+D759, U+D760-D761, U+D76C,
@@ -83,7 +83,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   /* palette */
   --c-ink: rgb(24 32 31);
   --c-ink-deep: rgb(16 23 22);
@@ -92,11 +92,12 @@
   --c-line: rgb(216 222 215);
   --c-ink-muted: rgb(82 96 91);
   --c-line-soft: rgb(220 229 223);
-  --c-acid: rgb(217 255 98);
-  --c-acid-deep: rgb(192 234 75);
-  --c-sky: rgb(123 211 255);
-  --c-amber: rgb(255 206 115);
-  --c-focus-ring: rgb(138 180 255);
+  --c-acid: rgb(22 96 62);
+  --c-acid-deep: rgb(14 74 46);
+  --c-sky: rgb(20 82 160);
+  --c-amber: rgb(132 88 0);
+  /* Blue ink: 6.6:1 on the paper, 3:1 asked of a focus ring. */
+  --c-focus-ring: rgb(20 82 160);
   --c-ink-raised: rgb(36 48 46);
   --c-teal-deep: rgb(44 74 70);
   --c-green-deep: rgb(29 78 63);
@@ -105,10 +106,10 @@
   --c-violet: rgb(108 101 173);
   --c-sage: rgb(117 167 121);
   --c-danger: rgb(167 67 50);
-  --c-coral: rgb(255 138 112);
+  --c-coral: rgb(176 52 36);
   --c-danger-deep: rgb(122 47 34);
   --c-blush: rgb(245 222 216);
-  --c-acid-dark: rgb(159 202 53);
+  --c-acid-dark: rgb(14 74 46);
   --c-teal: rgb(41 92 87);
   --c-black: rgb(0 0 0);
   --c-cream: rgb(247 241 227);
@@ -117,48 +118,49 @@
      family, lightness, and -aNN for the alpha when it is not opaque. A trailing
      -2 or -3 marks a near-identical neighbour that has not been merged, because
      merging it would change what renders. */
-  --c-danger-81: rgb(255 176 159);
-  --c-gray-68: rgb(169 176 170);
-  --c-green-70: rgb(156 203 180);
+  --c-danger-81: rgb(150 30 24);
+  --c-gray-68: rgb(88 84 76);
+  --c-green-70: rgb(22 96 62);
   --c-danger-14: rgb(45 30 28);
-  --c-danger-73-2: rgb(224 160 147);
-  --c-sky-77: rgb(169 161 232);
-  --c-sky-86: rgb(203 199 239);
-  --c-acid-72: rgb(184 230 138);
+  --c-danger-73-2: rgb(150 44 34);
+  --c-sky-77: rgb(70 56 150);
+  --c-sky-86: rgb(70 56 150);
+  --c-acid-72: rgb(22 96 62);
   --c-ink-08: rgb(21 21 21);
-  --c-sky-08-a94: rgb(12 18 31 / 0.9411764705882353);
-  --c-gray-61: rgb(139 152 173);
+  --c-sky-08-a94: rgb(247 242 230 / 0.96);
+  --c-gray-61: rgb(88 84 76);
   /* The gauntlet table. Felt for the ground, heat for the wall, chip blue for
      what a card pays, acid for the one control that banks it. */
-  --c-gx-felt: rgb(8 14 13);
-  --c-gx-felt-raised: rgb(17 28 25);
-  --c-gx-felt-card: rgb(24 38 34);
-  --c-gx-text-dim: rgb(163 180 174);
-  --c-gx-heat: rgb(255 56 56);
+  --c-gx-felt: rgb(253 251 245);
+  --c-gx-felt-raised: rgb(247 242 230);
+  --c-gx-felt-card: rgb(253 251 245);
+  --c-gx-text-dim: rgb(88 84 76);
+  --c-gx-heat: rgb(196 34 28);
   --c-gx-heat-deep: rgb(120 16 20);
-  --c-gx-heat-a55: rgb(255 56 56 / 0.55);
-  --c-gx-heat-a18: rgb(255 56 56 / 0.18);
-  --c-gx-ember: rgb(255 142 76);
-  --c-gx-chip: rgb(104 196 255);
-  --c-gx-band: rgb(255 56 56 / 0.28);
-  --c-gx-next: rgb(255 206 115 / 0.55);
-  --c-gx-shade: rgb(0 0 0 / 0.72);
-  --c-gx-hand: rgb(94 234 255);
-  --c-gx-hand-a45: rgb(94 234 255 / 0.45);
-  --c-gx-fever: rgb(255 92 214);
-  --c-gx-fever-a40: rgb(255 92 214 / 0.4);
-  --c-gx-relic: rgb(255 196 87);
-  --c-gx-relic-a30: rgb(255 196 87 / 0.3);
-  --c-gx-rare: rgb(190 146 255);
-  --c-gx-rare-a60: rgb(190 146 255 / 0.6);
+  --c-gx-heat-a55: rgb(196 34 28 / 0.55);
+  --c-gx-heat-a18: rgb(196 34 28 / 0.14);
+  --c-gx-ember: rgb(150 62 0);
+  --c-gx-chip: rgb(20 82 160);
+  --c-gx-band: rgb(196 34 28 / 0.26);
+  --c-gx-next: rgb(214 148 34 / 0.45);
+  --c-gx-shade: rgb(40 30 12 / 0.55);
+  --c-gx-hand: rgb(0 104 124);
+  --c-gx-hand-a45: rgb(0 104 124 / 0.4);
+  --c-gx-fever: rgb(160 30 120);
+  --c-gx-fever-a40: rgb(160 30 120 / 0.35);
+  --c-gx-relic: rgb(132 88 0);
+  --c-gx-relic-a30: rgb(132 88 0 / 0.28);
+  --c-gx-rare: rgb(100 60 170);
+  --c-gx-rare-a60: rgb(100 60 170 / 0.55);
 
   /* semantic aliases referenced by components */
-  --color-line: var(--c-line);
+  --color-line: var(--ui-line-field);
   --color-muted: var(--c-ink-muted);
   --color-accent: var(--c-acid);
-  --color-white: var(--c-paper);
-  --color-white-soft: rgba(255, 255, 255, 0.68);
-  --color-overlay-line: rgba(255, 255, 255, 0.22);
+  /* Named for the night it began in: the ledger prints it in ink. */
+  --color-white: var(--ui-text);
+  --color-white-soft: rgb(62 60 56);
+  --color-overlay-line: rgb(22 24 26 / 0.28);
   --color-focus: var(--c-focus-ring);
   --font-body: 1rem;
   --font-label: 0.75rem;
@@ -192,16 +194,16 @@
      route-atlas meta), where --ui-text-3 would read 3.88 on the neutral one.
      The acid, chip, amber and sky inks stay above 5.6:1 everywhere; --ui-heat,
      used large, above 3.5; dread's rose accent above 5.7. */
-  --ui-bg: rgb(18 22 24);
-  --ui-bg-raised: rgb(22 27 29);
-  --ui-surface-1: rgb(26 32 34);
-  --ui-surface-2: rgb(32 39 41);
-  --ui-surface-3: rgb(41 50 52);
-  --ui-surface-4: rgb(52 63 65);
-  --ui-glass: rgb(28 35 37 / 0.72);
-  --ui-glass-strong: rgb(24 30 32 / 0.88);
-  --ui-line: rgb(255 255 255 / 0.08);
-  --ui-line-strong: rgb(255 255 255 / 0.16);
+  --ui-bg: rgb(233 226 210);
+  --ui-bg-raised: rgb(238 232 218);
+  --ui-surface-1: rgb(247 242 230);
+  --ui-surface-2: rgb(242 236 222);
+  --ui-surface-3: rgb(238 231 214);
+  --ui-surface-4: rgb(226 217 196);
+  --ui-glass: rgb(247 242 230 / 0.82);
+  --ui-glass-strong: rgb(247 242 230 / 0.95);
+  --ui-line: rgb(22 24 26 / 0.16);
+  --ui-line-strong: rgb(22 24 26 / 0.34);
   /* The edge of a form control. A field's fill is one surface step from the
      panel it sits on, so the border is the only thing that says where the
      field is, and WCAG 1.4.11 asks 3:1 of that. White at 0.4 reads 3.46:1
@@ -209,29 +211,29 @@
      against the darkest (--ui-bg-raised) in neutral; across the moods 3.46 to
      3.83 (the lowest is neutral's surface-3, the next bright's 3.49).
      --ui-line-strong is 1.5 to 1.7 and is not a control's edge. */
-  --ui-line-field: rgb(255 255 255 / 0.4);
-  --ui-line-accent: rgb(217 255 98 / 0.34);
+  --ui-line-field: rgb(22 24 26 / 0.62);
+  --ui-line-accent: rgb(176 38 30 / 0.5);
   /* The briefing page's frame; a mood other than neutral tints it. */
-  --ui-frame: rgb(242 246 243);
-  --ui-text: rgb(242 246 243);
-  --ui-text-2: rgb(190 203 197);
-  --ui-text-3: rgb(142 158 152);
+  --ui-frame: rgb(22 24 26);
+  --ui-text: rgb(22 24 26);
+  --ui-text-2: rgb(62 60 56);
+  --ui-text-3: rgb(88 84 76);
   --ui-accent: var(--c-acid);
-  --ui-accent-ink: rgb(12 16 8);
-  --ui-accent-soft: rgb(217 255 98 / 0.12);
-  --ui-accent-glow: rgb(217 255 98 / 0.32);
-  --ui-heat: rgb(255 92 72);
-  --ui-heat-soft: rgb(255 92 72 / 0.14);
-  --ui-chip: rgb(104 196 255);
-  --ui-chip-soft: rgb(104 196 255 / 0.14);
+  --ui-accent-ink: rgb(253 251 245);
+  --ui-accent-soft: rgb(22 96 62 / 0.12);
+  --ui-accent-glow: rgb(22 96 62 / 0.2);
+  --ui-heat: rgb(176 38 30);
+  --ui-heat-soft: rgb(176 38 30 / 0.1);
+  --ui-chip: rgb(20 82 160);
+  --ui-chip-soft: rgb(20 82 160 / 0.1);
   --ui-radius-xs: 8px;
   --ui-radius-sm: 12px;
   --ui-radius-md: 16px;
   --ui-radius-lg: 22px;
   --ui-radius-xl: 30px;
-  --ui-shadow-1: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px rgb(0 0 0 / 0.28);
-  --ui-shadow-2: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px rgb(0 0 0 / 0.42);
-  --ui-shadow-glow: 0 0 0 1px rgb(217 255 98 / 0.5), 0 12px 40px rgb(217 255 98 / 0.22);
+  --ui-shadow-1: 0 1px 0 rgb(22 24 26 / 0.06), 0 8px 20px rgb(70 50 20 / 0.14);
+  --ui-shadow-2: 0 2px 0 rgb(22 24 26 / 0.08), 0 18px 44px rgb(70 50 20 / 0.22);
+  --ui-shadow-glow: 0 0 0 2px var(--c-acid), 6px 6px 0 rgb(22 96 62 / 0.14);
   --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ui-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* The fast settle the table's heat bar and the cashed stake land with. */
@@ -284,88 +286,115 @@ html {
    and teal lines; the accent stays acid. Lowest text ratio 5.53:1
    (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="tense"] {
-  --ui-bg: rgb(4 14 16);
-  --ui-bg-raised: rgb(7 19 21);
-  --ui-surface-1: rgb(10 24 26);
-  --ui-surface-2: rgb(15 30 32);
-  --ui-surface-3: rgb(22 39 41);
-  --ui-surface-4: rgb(32 51 53);
-  --ui-glass: rgb(12 27 29 / 0.72);
-  --ui-glass-strong: rgb(8 21 23 / 0.88);
-  --ui-line: rgb(150 230 235 / 0.1);
-  --ui-line-strong: rgb(150 230 235 / 0.2);
-  --ui-frame: rgb(150 226 232);
-  --mood-edge: rgb(30 170 190 / 0.26);
+  --ui-bg: rgb(214 225 224);
+  --ui-bg-raised: rgb(221 231 230);
+  --ui-surface-1: rgb(240 245 244);
+  --ui-surface-2: rgb(233 240 239);
+  --ui-surface-3: rgb(225 234 233);
+  --ui-surface-4: rgb(210 222 221);
+  --ui-glass: rgb(240 245 244 / 0.82);
+  --ui-glass-strong: rgb(240 245 244 / 0.95);
+  --ui-line: rgb(0 60 70 / 0.18);
+  --ui-line-strong: rgb(0 60 70 / 0.36);
+  --ui-frame: rgb(0 84 100);
+  --mood-edge: rgb(0 110 130 / 0.16);
 }
 
 /* dread: an oxblood ground, a deep red edge, and the accent turned to a rose
    the accent ink still reads on (7.3:1); the heat fill comes up. Lowest text
    ratio 5.91:1 (--ui-text-3 on --ui-surface-3). */
 :root[data-mood="dread"] {
-  --ui-bg: rgb(24 6 8);
-  --ui-bg-raised: rgb(29 9 11);
-  --ui-surface-1: rgb(34 12 14);
-  --ui-surface-2: rgb(41 16 18);
-  --ui-surface-3: rgb(51 22 24);
-  --ui-surface-4: rgb(63 30 32);
-  --ui-glass: rgb(36 13 15 / 0.72);
-  --ui-glass-strong: rgb(30 9 11 / 0.88);
-  --ui-line: rgb(255 140 130 / 0.1);
-  --ui-line-strong: rgb(255 140 130 / 0.2);
-  --ui-line-accent: rgb(255 120 100 / 0.4);
-  --ui-accent: rgb(255 120 100);
-  --ui-accent-soft: rgb(255 92 72 / 0.14);
-  --ui-accent-glow: rgb(255 92 72 / 0.36);
-  --ui-heat-soft: rgb(255 92 72 / 0.22);
-  --ui-shadow-glow: 0 0 0 1px rgb(255 120 100 / 0.5), 0 12px 40px rgb(255 92 72 / 0.24);
-  --ui-frame: rgb(255 120 104);
-  --mood-edge: rgb(190 16 28 / 0.4);
+  --ui-bg: rgb(236 214 210);
+  --ui-bg-raised: rgb(240 222 218);
+  --ui-surface-1: rgb(249 238 236);
+  --ui-surface-2: rgb(244 230 227);
+  --ui-surface-3: rgb(238 220 217);
+  --ui-surface-4: rgb(226 204 200);
+  --ui-glass: rgb(249 238 236 / 0.82);
+  --ui-glass-strong: rgb(249 238 236 / 0.95);
+  --ui-line: rgb(110 20 16 / 0.18);
+  --ui-line-strong: rgb(110 20 16 / 0.36);
+  --ui-line-accent: rgb(176 38 30 / 0.55);
+  --ui-accent: rgb(150 30 24);
+  --ui-accent-soft: rgb(176 38 30 / 0.12);
+  --ui-accent-glow: rgb(176 38 30 / 0.24);
+  --ui-heat-soft: rgb(176 38 30 / 0.16);
+  --ui-shadow-glow: 0 0 0 2px rgb(150 30 24), 6px 6px 0 rgb(176 38 30 / 0.14);
+  --ui-frame: rgb(150 30 24);
+  --mood-edge: rgb(176 38 30 / 0.2);
 }
 
 /* bright: a warm brown-amber ground, an amber edge and frame, and the accent
    turned amber (ink 12:1 on it). Lowest text ratio 4.65:1 (--ui-text-3 on
    --ui-surface-3). */
 :root[data-mood="bright"] {
-  --ui-bg: rgb(38 26 12);
-  --ui-bg-raised: rgb(43 30 15);
-  --ui-surface-1: rgb(48 34 18);
-  --ui-surface-2: rgb(54 39 22);
-  --ui-surface-3: rgb(62 46 27);
-  --ui-surface-4: rgb(74 56 35);
-  --ui-glass: rgb(50 36 19 / 0.72);
-  --ui-glass-strong: rgb(44 31 15 / 0.88);
-  --ui-line: rgb(255 210 150 / 0.1);
-  --ui-line-strong: rgb(255 210 150 / 0.2);
-  --ui-line-accent: rgb(255 196 92 / 0.4);
-  --ui-accent: rgb(255 196 92);
-  --ui-accent-soft: rgb(255 196 92 / 0.14);
-  --ui-accent-glow: rgb(255 196 92 / 0.36);
-  --ui-shadow-glow: 0 0 0 1px rgb(255 196 92 / 0.5), 0 12px 40px rgb(255 196 92 / 0.24);
-  --ui-frame: rgb(255 204 120);
-  --mood-edge: rgb(255 150 30 / 0.3);
+  --ui-bg: rgb(240 222 186);
+  --ui-bg-raised: rgb(244 229 197);
+  --ui-surface-1: rgb(251 243 224);
+  --ui-surface-2: rgb(247 236 212);
+  --ui-surface-3: rgb(242 228 199);
+  --ui-surface-4: rgb(232 214 178);
+  --ui-glass: rgb(251 243 224 / 0.82);
+  --ui-glass-strong: rgb(251 243 224 / 0.95);
+  --ui-line: rgb(110 70 0 / 0.18);
+  --ui-line-strong: rgb(110 70 0 / 0.36);
+  --ui-line-accent: rgb(132 88 0 / 0.5);
+  --ui-accent: rgb(122 80 0);
+  --ui-accent-soft: rgb(132 88 0 / 0.12);
+  --ui-accent-glow: rgb(132 88 0 / 0.24);
+  --ui-shadow-glow: 0 0 0 2px rgb(122 80 0), 6px 6px 0 rgb(132 88 0 / 0.14);
+  --ui-frame: rgb(122 80 0);
+  --mood-edge: rgb(200 130 0 / 0.2);
 }
 
 /* sorrow: a clear navy ground, a sky-blue edge and frame, and the accent
    turned sky (ink 11:1 on it). Lowest text ratio 5.12:1 (--ui-text-3 on
    --ui-surface-3). */
 :root[data-mood="sorrow"] {
-  --ui-bg: rgb(10 20 40);
-  --ui-bg-raised: rgb(13 24 45);
-  --ui-surface-1: rgb(16 28 51);
-  --ui-surface-2: rgb(21 34 58);
-  --ui-surface-3: rgb(28 42 68);
-  --ui-surface-4: rgb(38 53 80);
-  --ui-glass: rgb(18 30 54 / 0.72);
-  --ui-glass-strong: rgb(13 25 46 / 0.88);
-  --ui-line: rgb(160 200 255 / 0.1);
-  --ui-line-strong: rgb(160 200 255 / 0.2);
-  --ui-line-accent: rgb(130 200 255 / 0.4);
-  --ui-accent: rgb(130 200 255);
-  --ui-accent-soft: rgb(123 211 255 / 0.12);
-  --ui-accent-glow: rgb(123 211 255 / 0.32);
-  --ui-shadow-glow: 0 0 0 1px rgb(130 200 255 / 0.5), 0 12px 40px rgb(123 211 255 / 0.22);
-  --ui-frame: rgb(140 200 255);
-  --mood-edge: rgb(50 130 255 / 0.32);
+  --ui-bg: rgb(212 222 238);
+  --ui-bg-raised: rgb(220 229 243);
+  --ui-surface-1: rgb(240 244 250);
+  --ui-surface-2: rgb(232 238 247);
+  --ui-surface-3: rgb(222 231 243);
+  --ui-surface-4: rgb(206 218 236);
+  --ui-glass: rgb(240 244 250 / 0.82);
+  --ui-glass-strong: rgb(240 244 250 / 0.95);
+  --ui-line: rgb(20 50 110 / 0.18);
+  --ui-line-strong: rgb(20 50 110 / 0.36);
+  --ui-line-accent: rgb(20 82 160 / 0.5);
+  --ui-accent: rgb(20 82 160);
+  --ui-accent-soft: rgb(20 82 160 / 0.12);
+  --ui-accent-glow: rgb(20 82 160 / 0.24);
+  --ui-shadow-glow: 0 0 0 2px rgb(20 82 160), 6px 6px 0 rgb(20 82 160 / 0.14);
+  --ui-frame: rgb(20 82 160);
+  --mood-edge: rgb(20 82 160 / 0.18);
+}
+
+/* The ledger (2안 감사 장부, 2026-11-17): the interface is an audit ledger on
+   paper -- ink type, ruled lines, a red pencil, rubber stamps. The grounds and
+   inks above are the paper's; these are the ledger's own marks. Ink on the
+   paper reads 15:1, --ui-text-2 9:1, --ui-text-3 6:1, the pencil 6.1:1 and
+   the stamp green 7.6:1; the lowest, --ui-text-3 on a mood's --ui-surface-4,
+   is 5.4:1 (tense). */
+:root {
+  --ledger-white: rgb(253 251 245);
+  --ledger-ink: rgb(22 24 26);
+  --ledger-rule: rgb(70 100 150 / 0.16);
+  --ledger-margin: rgb(214 70 60 / 0.5);
+  --ledger-shadow: rgb(70 50 20 / 0.2);
+  --ledger-paper-a92: rgb(247 242 230 / 0.92);
+  --ledger-paper-a60: rgb(247 242 230 / 0.6);
+  --ledger-paper-a10: rgb(247 242 230 / 0.1);
+  --ledger-pencil: rgb(176 38 30);
+  --ledger-pencil-soft: rgb(176 38 30 / 0.1);
+  /* The pencil's wash laid on white, opaque: a cost chip reads on it and on
+     nothing under it (pencil on it 5.3:1). */
+  --ledger-pencil-wash: rgb(247 229 223);
+  --ledger-pencil-line: rgb(176 38 30 / 0.4);
+  --ledger-stamp-soft: rgb(22 96 62 / 0.14);
+  --ledger-tape: rgb(255 248 200 / 0.7);
+  /* The bands drawn behind ruled paper: one ruled line every 28px. */
+  --ledger-ruled: repeating-linear-gradient(180deg, transparent 0 27px, var(--ledger-rule) 27px 28px);
 }
 
 /* PC reading size (playtest 2026-11-02, "text could be bigger on a PC"): from

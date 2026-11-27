@@ -47,6 +47,10 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
+      # 주 1회 알림 (N25, docs/event-week.md section 8): the Web Push public
+      # key. Without it the weekly reminder's switch is not shown.
+      - key: VITE_VAPID_PUBLIC_KEY
+        sync: false
       # Web ads (출시 로드맵 2단계, docs/web-ads.md): only ADSENSE_CLIENT is
       # set today (since the AdSense review). The publisher ID alone is site verification (a meta tag and /ads.txt, no
       # ad code); ADSENSE_ADS=notice with ADSENSE_DATE puts the seven-day notice

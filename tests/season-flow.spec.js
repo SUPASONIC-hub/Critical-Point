@@ -1358,15 +1358,16 @@ test.describe("a phone held upright", () => {
   test("a briefing that fits its screen keeps the whole picture", async ({ page }) => {
     // The shortest story in the season, on a window one pixel wider than a
     // phone: the room is drawn whole in its panel there (a phone draws it
-    // behind the title, D-13).
-    await page.setViewportSize({ width: 701, height: 1400 });
+    // behind the title, D-13). 1500 tall since RULES_MARK 8: G23's opening
+    // stake panel (사건 08~42) made 사건 08's page 65px longer than 1400.
+    await page.setViewportSize({ width: 701, height: 1500 });
     await openHeldBriefing(page, "case08", "c8_clerks_reaction");
     const fits = await measureBriefing(page);
     expect(fits.scrolls, "the page fits the screen").toBe(false);
     expect(fits.drawingHeight, "the drawing is in its panel").toBeGreaterThan(80);
     expect(fits.pictureHeight, "the drawing is shown whole").toBeGreaterThanOrEqual(fits.drawingHeight);
     expect(fits.backdrop.height, "and not behind the title as well").toBe(0);
-    expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1400);
+    expect(fits.openBottom, "판 열기 is on screen").toBeLessThanOrEqual(1500);
   });
 
   // The band holds two things pinned in it: the room's name and clock in a

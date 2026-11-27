@@ -54,7 +54,7 @@ export function botEndings(lines = SIMULATION_LINES) {
 }
 export const BOT_ENDINGS = botEndings();
 /** The season bands the 2026-10-22 proposal (랭크기준-제안) measured on the bot: S 72+, A 66+, B 56+. Reference only. */
-export const PROPOSED_BANDS = { S: 72, A: 66, B: 56 };
+const PROPOSED_BANDS = { S: 72, A: 66, B: 56 };
 const RANKS = ["S", "A", "B", "C"];
 
 export function checkArgs(week, board) {

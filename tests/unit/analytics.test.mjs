@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
 import { CONTENT_KINDS } from "../../scripts/content-pages/pages.mjs";
+import { noteKinds, notesDay } from "../../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../../scripts/content-pages/news.mjs";
+
+// One day for the whole file: a run crossing midnight in Seoul on a note's day would otherwise compare two different sets of pages.
+process.env.CP_NOTES_DAY ||= notesDay();
+
+/** The plain pages a build writes today: the five pages, the policy, the content pages, the notes out by now and the world's newspaper. */
+const PAGE_COUNT = 15 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length;
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -46,7 +54,7 @@ test("off, index.html and the pages are the ones without it, but for the policy'
   for (const origin of ["", "https://critical-point-wn6p.onrender.com"]) {
     const off = renderStaticPages(origin, { analytics: null });
     assert.deepEqual(off, renderStaticPages(origin));
-    assert.equal(Object.keys(off).length, 15 + CONTENT_KINDS.length * 3, "the five pages, the policy and the content pages (scripts/content-pages)");
+    assert.equal(Object.keys(off).length, PAGE_COUNT, "the five pages, the policy, the content pages and the notes (scripts/content-pages)");
     for (const [file, html] of Object.entries(off)) {
       const language = POLICIES[file];
       if (!language) {
@@ -100,7 +108,7 @@ test("on, every page loads Google's tag and the file that configures it, with no
   assert.match(index, new RegExp(`${tags.replace(/[.?/]/g, "\\$&")}\\n\\s*<script src="${on.path}" defer></script>\\n\\s*</head>`));
   assert.deepEqual(inlineScriptProblems(index), []);
   const pages = renderStaticPages("", { analytics: on });
-  assert.equal(Object.keys(pages).length, 15 + CONTENT_KINDS.length * 3);
+  assert.equal(Object.keys(pages).length, PAGE_COUNT);
   for (const [file, html] of Object.entries(pages)) {
     const head = html.slice(0, html.indexOf("</head>"));
     assert.ok(head.includes(tags) && head.includes(`<script src="${on.path}" defer></script>`), file);
