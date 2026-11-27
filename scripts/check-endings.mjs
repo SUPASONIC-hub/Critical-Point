@@ -562,6 +562,8 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
  * Cashed at 70 the tables raise a season's trust (mean 71.7 -> 75.4 on 600),
  * so G37's two gates moved again: the cold gap 10 -> 9 and storyOpenTrust
  * 83 -> 87 (quiet cover 0.5% -> 3.0%, cold 2.7% -> 3.2% on the sim's 600).
+ * RULES_MARK 11 (G38 (1), 유지비 on the season's means) reads them after 유지비: 9 -> 6 (a gap over 80 counts
+ * two thirds) and 87 -> 85: on 9/87 cold 0.5% and open question 1.7% of the 600 story seasons, on 6/85 2.3% / 3.0% (11-27).
  *
  * Played after everything above, on the same seeded stream, so the seasons
  * above are the ones they always were.

@@ -62,6 +62,7 @@ test("G38 유지비 on the ending: the season's means read a third less over 80,
   assert.deepEqual(weighFinale({ trust: 100, legitimacy: 70, capital: 50 }, "burn"), { trust: 93, legitimacy: 70, capital: 50 });
   assert.equal(ENDING_THRESHOLDS.silenceCapital, 91);
   assert.equal(ENDING_THRESHOLDS.coldLegitimacy, 85);
-  assert.equal(ENDING_THRESHOLDS.storyColdGap, 9);
+  assert.equal(ENDING_THRESHOLDS.storyColdGap, 6);
+  assert.equal(ENDING_THRESHOLDS.storyOpenTrust, 85, "G43's 9/87 after 유지비");
   assert.equal(ENDING_THRESHOLDS.oversightLegitimacy, 82, "the gates not moved stay where they were");
 });
