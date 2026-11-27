@@ -1687,7 +1687,9 @@ const budgets = [
   // 69,130 / 25,783 -> 69,845 / 25,982 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 69,841 / 25,978 in the e2e build on Windows, the plus 4; CI re-measures.
   // 69,845 / 25,982 -> 70,838 / 26,324 g6b-firstpaint (over gameplay-g6b, MARK 13): nextTableRules.js and tableRules.js left the first paint (index) for this chunk, the start screen reading RULES_MARK 13 from rulesSwitch.js alone. Measured 70,834 / 26,320 in the e2e build on Windows, the plus 4; CI re-measures.
   // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): hashed names of the chunks it imports. Measured gzip 26,327 in the e2e build, the plus 4.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 70_838, maxGzip: 26_331 },
+  // 70,838 / 26,324 -> 71,108 / 26,401 gameplay-g7a (RULES_MARK 14: G50 G51) over main cf7cbf6c: measured 71,104 / 26,397 in the e2e build on Windows, the plus 4; CI re-measures.
+  // bundle-1127b: both (first-hour gzip +7 on g7a's 71,108 / 26,401), provisional; CI re-measures.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 71_108, maxGzip: 26_408 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in

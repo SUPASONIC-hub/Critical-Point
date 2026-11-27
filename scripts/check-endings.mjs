@@ -7,7 +7,7 @@ import { DEFAULT_RELIC_POOL, getRelicPool, getRelicUnlocks, RELIC_IDS, RELIC_SLO
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST } from "../src/gauntlet/tableRules.js";
 import { STAGED } from "../src/gauntlet/tableUnlocks.js";
 import { getQuietClueRate } from "../src/seasonStanding.js";
-import { isMarkNineOn, isMarkTenOn, isMarkThirteenOn } from "../src/gauntlet/nextTableRules.js";
+import { isMarkFourteenOn, isMarkNineOn, isMarkTenOn, isMarkThirteenOn } from "../src/gauntlet/nextTableRules.js";
 import { AUDIT_VALUES, AUDIT_ON, CASCADE_ON, CHIP_MARGIN, createSeasonBot, LINK_VALUES, newLinkTally, POPULATION, RELICS_HELD_AT, SCOUT_EXTRA_TIMINGS, SCOUT_TIMINGS, WEEK_RULE, WEEK_VALUES } from "./sim/season-bot.mjs";
 
 /**
@@ -420,7 +420,27 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   // 73.7 / 74.1 / 76.0%, the money hand listening / deaf 48.4 / 65.9, 51.6 / 72.7, 67.7 / 86.4 (18.7 points at 13, the gate chosen).
   const listenCollapseOf = (key) => listenCollapse[key] ? (100 * listenCollapse[key].collapse) / Math.max(1, listenCollapse[key].seasons) : NaN;
   console.log(`Collapse by listening (G47, measured): ${["money", "spend-people", "min-risk"].map((name) => `${name} ${listenCollapseOf(`${name}:listens`).toFixed(1)} / ${listenCollapseOf(`${name}:deaf`).toFixed(1)}`).join(" · ")} (listens / deaf, %)`);
-  if (isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(listenCollapseOf("money:deaf") - listenCollapseOf("money:listens") >= 18, `G47: the money hand that listens collapses ${listenCollapseOf("money:listens").toFixed(1)}% against ${listenCollapseOf("money:deaf").toFixed(1)}% deaf (gap under 18 points)`);
+  if (isMarkThirteenOn() && !isMarkFourteenOn() && !process.env.ENDING_BASELINE) assert.ok(listenCollapseOf("money:deaf") - listenCollapseOf("money:listens") >= 18, `G47: the money hand that listens collapses ${listenCollapseOf("money:listens").toFixed(1)}% against ${listenCollapseOf("money:deaf").toFixed(1)}% deaf (gap under 18 points)`);
+  // 게임성 7차 Q7 (RULES_MARK 14): the split above is the population's 75 money seasons drawn into listening and deaf at random, and it
+  // swung by more than ten points when the seed's stream moved (18.7 -> 47.9 -> -2.2 points). So the same season is played twice instead,
+  // once blind and once on the heartbeat (`board`), PAIR_SEASONS a hand, and the money hand's gap held at PAIR_GAP_LEAST points: G47's 18
+  // at 14 (paired, 11-27: 37.5 at 13 and at 14, G50·G51 moving no collapse), the notes' 40 once G48's ×64 quarter lands (48.8).
+  const PAIR_SEASONS = Number(process.env.ENDING_PAIR_SEASONS) || 80;
+  const PAIR_HANDS = ["money", "spend-people", "min-risk"];
+  const PAIR_GAP_LEAST = 18;
+  const pairBot = createSeasonBot({ seed: 20260927, staged, archetypes: { ...ARCHETYPES, ...Object.fromEntries(PAIR_HANDS.flatMap((name) => ["blind", "listens"].map((board) => [`${name}@${board}`, { ...ARCHETYPES[name], board }]))) } });
+  const pairCollapse = Object.fromEntries(PAIR_HANDS.map((name, handIndex) => {
+    const row = { blind: 0, listens: 0 };
+    for (let index = 0; index < PAIR_SEASONS; index += 1) {
+      for (const board of ["blind", "listens"]) {
+        pairBot.reseed(((20260927 ^ (index * 2654435761)) >>> 0) + handIndex);
+        if (pairBot.playSeason(`pair:${name}:${index}`, `${name}@${board}`, false).ending.id === "collapse") row[board] += 1;
+      }
+    }
+    return [name, { blind: (100 * row.blind) / PAIR_SEASONS, listens: (100 * row.listens) / PAIR_SEASONS }];
+  }));
+  console.log(`Collapse by listening, paired (Q7, measured, ${PAIR_SEASONS} seasons a hand each played blind and on the heartbeat): ${PAIR_HANDS.map((name) => `${name} ${pairCollapse[name].blind.toFixed(1)} / ${pairCollapse[name].listens.toFixed(1)} (${(pairCollapse[name].blind - pairCollapse[name].listens).toFixed(1)} points)`).join(" · ")} (blind / listens, %)`);
+  if (isMarkFourteenOn() && !process.env.ENDING_BASELINE) assert.ok(pairCollapse.money.blind - pairCollapse.money.listens >= PAIR_GAP_LEAST, `Q7: the money hand collapses ${pairCollapse.money.listens.toFixed(1)}% listening against ${pairCollapse.money.blind.toFixed(1)}% blind on the same seasons (gap under ${PAIR_GAP_LEAST} points)`);
   // G42 OVERCLOCK 문턱 (RULES_MARK 10): the population's boards played OVERCLOCKed, and the share of the pot they paid.
   const watched = addSeen(populationSeen);
   console.log(`OVERCLOCK (G42, measured): ${watched.overclocked} of ${watched.windows} boards (${((watched.overclocked / Math.max(1, watched.windows)) * 100).toFixed(1)}%), paying ${((watched.overclockPot / Math.max(1, watched.pot)) * 100).toFixed(1)}% of the pot`);

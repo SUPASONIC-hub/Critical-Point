@@ -28,7 +28,7 @@ import {
   withMarkSeven,
   withNextRules,
 } from "../../src/gauntlet/nextTableRules.js";
-import { RELIC_BOOST_CAP, RELIC_BOOSTS, readRelicBoost } from "../../src/gauntlet/relicsNext.js";
+import { getRelicBoost, readRelicBoost, RELIC_BOOST_CAP, RELIC_BOOSTS } from "../../src/gauntlet/relicsNext.js";
 import { SIGN_LAST_CASE, SIGN_NAME_CHIPS, SIGN_NAME_WALL, SIGN_NAME_WALL_HIGH, SIGN_NAME_WALL_LOW } from "../../src/gauntlet/actTwists.js";
 import { LOCK_DRAG, LOCK_PRESS_SECONDS, SCOUT_TRUST } from "../../src/gauntlet/tableRules.js";
 import { readTableMeters } from "../../src/gauntlet/tableMeters.js";
@@ -82,7 +82,7 @@ test("G11c: tools that pay on one cash pay RELIC_BOOST_CAP at most together, nev
   // HEAT SINK ×1.6 and FRONT PAGE ×1.15: ×1.84 before, the cap now.
   const pair = readRelicBoost(["heatSink", "frontPage"], hotOverclock, RELIC_BOOST_CAP);
   assert.deepEqual(pair, { fired: ["heatSink", "frontPage"], factor: RELIC_BOOST_CAP, capped: true });
-  assert.equal(readRelicBoost(["heatSink", "frontPage"], hotOverclock).factor, RELIC_BOOSTS.heatSink.boost * RELIC_BOOSTS.frontPage.boost, "no cap: the product");
+  assert.equal(readRelicBoost(["heatSink", "frontPage"], hotOverclock).factor, RELIC_BOOSTS.heatSink.boost * getRelicBoost("frontPage"), "no cap: the product (FRONT PAGE ×1.12 from 14, G51)");
   // COLD BLOOD ×2 with HEAT SINK: no less than COLD BLOOD alone.
   assert.equal(readRelicBoost(["coldBlood", "heatSink"], hotOverclock, RELIC_BOOST_CAP).factor, RELIC_BOOSTS.coldBlood.boost);
   assert.deepEqual(readRelicBoost(["coldBlood"], hotOverclock, RELIC_BOOST_CAP), { fired: ["coldBlood"], factor: RELIC_BOOSTS.coldBlood.boost }, "one tool alone is never cut");

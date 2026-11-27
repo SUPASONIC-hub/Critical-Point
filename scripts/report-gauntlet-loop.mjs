@@ -22,7 +22,7 @@ import {
   stampCaseOpen,
 } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, getLogicType, LOGIC_DIRECTIONS, LOGIC_EVEN } from "../src/gauntlet/logicStreak.js";
-import { COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isMarkNineOn, isMarkTenOn, isMarkTwelveOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
+import { COIN_GAIN_WEIGHT, getHotCashMultiplier, HOT_CASH_BPM, isMarkFourteenOn, isMarkNineOn, isMarkTenOn, isMarkTwelveOn, isNextOn, withMarkNine, withMarkSeven } from "../src/gauntlet/nextTableRules.js";
 import { RELIC_BOOSTS } from "../src/gauntlet/relicsNext.js";
 import { DEFAULT_RELIC_POOL, RELIC_EXTRA_COST, RELIC_IDS, RELIC_SLOTS, RELICS } from "../src/gauntlet/relics.js";
 import { SCOUT_NARROW_TRUST, SCOUT_TRUST, SEAL_BREAK_GAUGE } from "../src/gauntlet/tableRules.js";
@@ -105,6 +105,12 @@ const RELIC_LIFT_CAP = 1.35;
  */
 const RELIC_LIFT_CAP_TWELVE = 1.4;
 const RELIC_ONE_CAP = isMarkTwelveOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
+/**
+ * G51 (RULES_MARK 14): FRONT PAGE ×1.2 -> ×1.12 lifts the listening hand 31.2% (spread ×1.290, check:pressure 11-27), so
+ * from 14 the listening hand's single tool is held at RELIC_LIFT_CAP again. The streak hands' ENCORE stays at RELIC_ONE_CAP:
+ * it lifts the hand that switches on a rise ×1.357 at 14 as at 12 (G46's chain, not FRONT PAGE).
+ */
+const RELIC_LISTEN_CAP = isMarkFourteenOn() ? RELIC_LIFT_CAP : RELIC_ONE_CAP;
 /** What a charged stance carries into the next board is a rule too, and is held to the same. */
 const STANCE_LIFT_CAP = RELIC_LIFT_CAP;
 /**
@@ -654,7 +660,7 @@ for (const row of relicReport) {
   assert.ok(row.skip.meanVault < row.blind.meanVault * 0.25, `with ${row.name}, busting to skip must stay a loss: ${row.skip.meanVault} against ${row.blind.meanVault}`);
   if (row.relics.length === 1) {
     assert.ok(
-      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_ONE_CAP,
+      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_LISTEN_CAP,
       `${row.name} is a win button: best play banks ${row.listen.meanVault} against ${relicBaseline.listen.meanVault} without it`,
     );
   }

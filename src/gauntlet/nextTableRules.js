@@ -659,3 +659,69 @@ export function halveSkilledHarm(effect, multiplier) {
 
 /** G45 (RULES_MARK 13): a burned season that paid this many covers (the whole ladder, settlementPay.js PAY_MOST) closes on QUIET COVER, not PROFITABLE SILENCE. */
 export const BURN_COVER_QUIET = 10;
+
+/* ------------------------------------------ RULES_MARK 14 (게임성 7차 A) */
+
+/**
+ * G50 and G51 (게임성 개선점 7차, the user's 「전부 1」 of 2026-11-27): rules
+ * that ship as RULES_MARK 14. A row is rechecked under them only when its mark
+ * is `RULES_FOURTEEN_MARK` or later (rankingRecheck.js `getRowRules`), so a row
+ * of 5 to 13 is played again as it was. They ride on the marks before: a set
+ * that plays those off plays none of these. `FOURTEEN_RULE` in a set plays
+ * them, `BEFORE_FOURTEEN_RULE` the rules before, and a set with neither what
+ * this page plays. `RULES_MARK14=0` turns them off in a script.
+ */
+export const RULES_FOURTEEN_MARK = 14;
+export const FOURTEEN_RULE = "mark14";
+export const BEFORE_FOURTEEN_RULE = "before14";
+
+/** Whether this page (or this script) plays RULES_MARK 14's rules: `RULES_MARK14=0` turns them off in a script. */
+export function wantsMarkFourteen(scope = globalThis) {
+  return scope.process?.env?.RULES_MARK14 !== "0";
+}
+
+/** What a rule set that names neither plays: this page's (or script's) choice, read once. */
+let fourteenChoice;
+export const fourteenByDefault = () => (fourteenChoice ??= wantsMarkFourteen());
+
+/** The mark RULES_MARK 14 rides on (whether `rules` plays the rules before it). */
+const isMarkBeforeFourteenOn = (rules) => isMarkThirteenOn(rules);
+
+/** Whether `rules` plays RULES_MARK 14's rules (and so those before it too). */
+export function isMarkFourteenOn(rules) {
+  if (!isMarkBeforeFourteenOn(rules)) return false;
+  if (rules?.has?.(BEFORE_FOURTEEN_RULE)) return false;
+  if (rules?.has?.(FOURTEEN_RULE)) return true;
+  return fourteenByDefault();
+}
+
+const fourteenSets = new WeakMap();
+const beforeFourteenSets = new WeakMap();
+/** `rules` playing RULES_MARK 14's rules (`on`) or those before; the same set back when it already does. */
+export function withMarkFourteen(rules, on = fourteenByDefault()) {
+  if (!rules || typeof rules.has !== "function") return rules;
+  if (isMarkFourteenOn(rules) === Boolean(on) || (on && !isMarkBeforeFourteenOn(rules))) return rules;
+  const mark = on ? FOURTEEN_RULE : BEFORE_FOURTEEN_RULE;
+  const drop = on ? BEFORE_FOURTEEN_RULE : FOURTEEN_RULE;
+  if (!(rules instanceof Set)) return { has: (id) => id === mark || (id !== drop && rules.has(id)) };
+  const cache = on ? fourteenSets : beforeFourteenSets;
+  if (!cache.has(rules)) cache.set(rules, Object.freeze(new Set([...[...rules].filter((id) => id !== drop), mark])));
+  return cache.get(rules);
+}
+
+/**
+ * G50 마지막 답의 무게 (RULES_MARK 14): the finale's answer weighs this on the
+ * season's mean (seasonStanding.js `getFinaleWeight`), not FINALE_WEIGHT's 5.
+ * 5 moved the ending in 76.0% of standing seasons, one point over check:endings'
+ * 75%; 6 moves 79.2% (7: 81.0%, COLD JUSTICE 10.0%), 600 seasons, 게임성 7차 G50.
+ */
+export const FINALE_WEIGHT_FOURTEEN = 6;
+
+/**
+ * G51 FRONT PAGE (RULES_MARK 14): the tool pays ×1.12 on an OVERCLOCK board, not
+ * ×1.2 (relicsNext.js `getRelicBoost`). Since G46 OVERCLOCK lights 32.3% of the
+ * boards and they pay 61.3% of the pot, and ×1.2 lifted the listening hand 38.0%,
+ * two points under check:pressure's ×1.40; ×1.12 lifts it 31.2% and the tools'
+ * spread is ×1.290 (게임성 7차 G51), so the single tool's cap is back at ×1.35.
+ */
+export const FRONT_PAGE_BOOST_FOURTEEN = 1.12;

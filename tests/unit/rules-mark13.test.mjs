@@ -22,7 +22,7 @@ const BEFORE = withMarkThirteen(ALL_RULES, false);
 
 test("RULES_MARK 13: on by default, off in a script with RULES_MARK13=0, and a row of 5 to 12 played without it", () => {
   assert.equal(RULES_THIRTEEN_MARK, 13);
-  assert.equal(RULES_MARK, 13);
+  assert.ok(RULES_MARK >= 13, "RULES_MARK 14 keeps 13's rules");
   assert.equal(wantsMarkThirteen({}), true);
   assert.equal(wantsMarkThirteen({ process: { env: { RULES_MARK13: "0" } } }), false);
   assert.equal(isMarkThirteenOn(ALL_RULES), true);
