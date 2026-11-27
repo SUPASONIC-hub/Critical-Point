@@ -245,7 +245,8 @@ const budgets = [
   // 169,456 / 63,251 -> 169,832 / 63,399 gameplay-g5b (MARK 11) over main 5d2a7431: measured 169,828 / 63,395 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,832 / 63,399 -> 169,974 / 63,457 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 169,970 / 63,453 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,974 -> 169,981 raw g6b-firstpaint: applySceneEffect is sceneEffect.js's now (out of riskLogic.js and the first paint). Measured 169,977 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 169_981, maxGzip: 63_457 },
+  // 169,981 / 63,457 -> 170,182 / 63,530 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 170,178 / 63,526, the plus 4; CI re-measures.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 170_182, maxGzip: 63_530 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -828,7 +829,8 @@ const budgets = [
   // make it smaller), the plus 8. Raw 225,769, inside.
   // 225,779 / 82,479 -> 230,284 / 84,263 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 230,280 / 84,259 in the e2e build on Windows, the plus 4; CI re-measures. The case-open 운영비, the softer gains and the collapse gate read RULES_MARK 13 from nextTableRules.js, which gameConstants.js and riskLogic.js now import into the first paint.
   // 230,284 / 84,263 -> 225,758 / 82,494 g6b-firstpaint: the MARK 13 switch out of the first paint again (gameConstants.js reads it from rulesSwitch.js, applySceneEffect moved to sceneEffect.js), nextTableRules.js and tableRules.js back in the game's chunks. Measured 225,754 / 82,490 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^index-.*\.js$/, maxBytes: 225_758, maxGzip: 82_494 },
+  // gzip 82,494 -> 82,502 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows gzip 82,498, the plus 4; CI re-measures.
+  { pattern: /^index-.*\.js$/, maxBytes: 225_758, maxGzip: 82_502 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -3003,7 +3005,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> en 454,291, ja 462,795 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured en 454,287, ja 462,791 in the e2e build on Windows, the plus 4; CI re-measures.
 // -> ko 388,895, en 456,232, ja 464,718 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured ko 388,891, en 456,228, ja 464,714 in the e2e build on Windows, the plus 4; CI re-measures. The index chunk above carries the MARK 13 switch.
 // -> ko 387,125, en 454,466, ja 462,952 g6b-firstpaint: the MARK 13 switch out of the index chunk (see index above). Measured ko 387,121, en 454,462, ja 462,948 in the e2e build on Windows, the plus 4; CI re-measures.
-const FIRST_PAINT_BUDGETS = { ko: 387_125, en: 454_466, ja: 462_952 };
+// -> 387,136 / 454,476 / 462,962 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 387,132 / 454,472 / 462,958, the plus 4; CI re-measures.
+const FIRST_PAINT_BUDGETS = { ko: 387_136, en: 454_476, ja: 462_962 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
