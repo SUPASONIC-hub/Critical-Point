@@ -10,6 +10,7 @@ import { fill } from "../locale.js";
 import revealCopy from "../copy/reveal.js";
 import { SceneMinutes } from "./SceneMinutes.jsx";
 import { BetweenHandsPulse } from "./BetweenHandsPulse.jsx";
+import { FirstHourAsk } from "./FirstHourAsk.jsx";
 import { noteRevealDetails } from "../state/readingTally.js";
 import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
@@ -335,6 +336,8 @@ export function DecisionReveal({ view }) {
 
         {/* N22: once a season, between two hands of 프롤로그 01·02 (state/betweenHandsPulse.js). */}
         <BetweenHandsPulse key={decisionReveal.nextNode} pulse={decisionReveal.pulse ?? null} onAnswer={answerPulse} />
+        {/* 첫 30분 자동 기록: 「무엇을 잃었나요?」 once, on a first BUST's sheet; never beside N22's question. */}
+        {busted && !decisionReveal.pulse && <FirstHourAsk key={decisionReveal.nextNode} kind="lost" />}
 
         <div className="decision-reveal-footer">
           <span>{fill(revealCopy.next, { title: decisionReveal.nextTitle })}</span>

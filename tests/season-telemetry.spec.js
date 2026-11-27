@@ -7,7 +7,9 @@
 // that an untagged test does not press on the phone on the same screen. A test
 // that is the only one to press a control stays in both projects.
 import { expect, test } from "./helpers/network.js";
-import { cashStakedCard, completeCurrentCase, dismissProtocolBreach, openIntroDrawer } from "./helpers/gameFlow.js";
+import { bustStakedCard, cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, openIntroDrawer, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
+import { FIRST_HOUR_KEY } from "../src/appConfig.js";
+import { FIRST_HOUR_FIELDS } from "../src/firstHourLog.js";
 import { startDebugNode } from "./helpers/seasonFlow.js";
 import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
 import { recheckCaseGap, recheckCaseLinks } from "../src/chainRecheck.js";
@@ -367,4 +369,63 @@ test("the between-hands question is asked once in 프롤로그 01 and sends one 
   await decisionNext.click();
   await settleOneHand();
   await expect(pulse, "once a season").toHaveCount(0);
+});
+
+// 첫 30분 자동 기록 (2026-11-27): a device with none of the game's data is a
+// first visit. After its first BUST the verdict sheet asks 「무엇을 잃었나요?」,
+// and 프롤로그 01's report asks 0 to 10; each is a tap, each once, neither
+// takes the focus from the way on, and the record goes to its own RPC with
+// only the listed fields -- no session id, no address.
+test.describe("a first visit", () => {
+  test.use({ coldOpeningSeen: false });
+
+  test("is asked what it lost after its first BUST and whether it will come back on 프롤로그 01's report", async ({ page }) => {
+    test.setTimeout(150_000);
+    const records = [];
+    await page.route("https://e2e.supabase.co/**", async (route) => {
+      const request = route.request();
+      if (request.method() === "POST" && request.url().endsWith("/rpc/first_hour_record")) records.push(request.postDataJSON());
+      await route.fulfill({ status: 201, contentType: "application/json", body: "{}" });
+    });
+    await page.addInitScript(() => {
+      localStorage.setItem("critical-point-telemetry-url", "https://e2e.supabase.co");
+      localStorage.setItem("critical-point-telemetry-key", "anon");
+    });
+    await page.goto("/");
+    await clickElement(page.getByTestId("start-first-case"), "start first case");
+    const skip = page.getByTestId("cold-opening-skip");
+    await expect(skip.or(page.locator(".game-shell")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    if (await skip.isVisible()) await skip.click();
+    await expect(page.locator(".game-shell")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await dismissProtocolBreach(page);
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await bustStakedCard(page);
+
+    const lost = page.getByTestId("first-hour-lost");
+    const decisionNext = page.getByTestId("decision-next");
+    await expect(lost).toBeVisible();
+    await expect(lost.getByRole("button")).toHaveText(["판돈", "다음 장면", "모르겠다", "건너뛰기"]);
+    await expect(decisionNext, "the way on keeps the focus").toBeFocused();
+    await lost.getByTestId("first-hour-lost-stake").click();
+    await expect(lost.getByRole("status")).toBeFocused();
+    await expect.poll(() => records.at(-1)?.p_record?.lost).toBe("stake");
+    const sent = records.at(-1);
+    expect(Object.keys(sent).sort()).toEqual(["p_id", "p_record"]);
+    expect(Object.keys(sent.p_record).filter((key) => !FIRST_HOUR_FIELDS.includes(key))).toEqual([]);
+    expect(sent.p_record).toMatchObject({ first: true, btn: "prologue", t1: expect.any(String), bustNode: expect.any(String) });
+    expect(sent.p_record.t1Push).toBeGreaterThan(0);
+    expect(JSON.stringify(sent)).not.toMatch(/session/i);
+
+    await decisionNext.click();
+    await completeCurrentCase(page);
+    const again = page.getByTestId("first-hour-again");
+    await expect(again).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(again.getByRole("button")).toHaveCount(12);
+    await again.getByTestId("first-hour-again-7").click();
+    await expect.poll(() => records.at(-1)?.p_record?.again).toBe(7);
+    expect(records.every((record) => record.p_id === sent.p_id), "one record, sent whole each time").toBe(true);
+    const kept = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)), FIRST_HOUR_KEY);
+    expect([kept.lost, kept.again]).toEqual(["stake", 7]);
+    await expect(page.getByTestId("first-hour-lost")).toHaveCount(0);
+  });
 });

@@ -121,6 +121,8 @@ export const WEEKLY_REMINDER_SYNC_KEY = "critical-point-weekly-reminder-sync-v1"
 // N24: when this device last opened the start screen and which side cases it listed then
 // (`{ at, sides }`, src/state/sinceLastVisit.js), for the 「지난번 이후」 card. Kept on the device only.
 export const LAST_VISIT_KEY = "critical-point-last-visit-v1";
+/** 첫 30분 자동 기록 (src/firstHourLog.js): a first-visit device's one record of its first half hour. */
+export const FIRST_HOUR_KEY = "critical-point-first-hour-v1";
 
 /**
  * Debug tooling is on in a build that asks for it, and in a dev server visited

@@ -1227,13 +1227,14 @@ test.describe("the big decisions' 확정 is held", () => {
     const styles = await page.locator(".gx-actions button").evaluateAll((buttons) =>
       buttons.map((button) => {
         const style = getComputedStyle(button);
-        return { id: button.dataset.testid ?? button.className, select: style.userSelect || style.webkitUserSelect, touch: style.touchAction };
+        return { id: button.dataset.testid ?? button.className, held: "hold" in button.dataset, select: style.userSelect || style.webkitUserSelect, touch: style.touchAction };
       }),
     );
     expect(styles.length).toBeGreaterThan(1);
     for (const style of styles) {
       expect(style.select, `${style.id}: no text selection`).toBe("none");
-      expect(style.touch, `${style.id}: no double-tap zoom`).toBe("manipulation");
+      // The held 확정 takes no pan either (#699, Galaxy A32): a drifting finger must not cancel the hold.
+      expect(style.touch, `${style.id}: ${style.held ? "no pan or zoom under a hold" : "no double-tap zoom"}`).toBe(style.held ? "none" : "manipulation");
     }
   });
 

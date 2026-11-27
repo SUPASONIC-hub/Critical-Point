@@ -68,4 +68,13 @@ export default {
     answers: { fun: "楽しい", hard: "難しい", long: "長い" },
     thanks: "ありがとうございます。次の勝負へどうぞ。",
   },
+  firstHour: {
+    lost: "何を失いましたか？",
+    lostAnswers: { stake: "賭け金", next: "次の場面", unknown: "わからない" },
+    again: "また開くと思いますか？",
+    againEnds: "0 まったく · 10 きっと",
+    againScore: "{n}点",
+    skip: "スキップ",
+    thanks: "ありがとうございます。",
+  },
 };
