@@ -148,8 +148,8 @@ export function weekHasNews(ms, calendar = WEEKLY_RULES, days = 7) {
  * the end of that day, read off the weekly clock, so a test build (held on a
  * January week) never shows it.
  */
-export const RANKING_RESET_MS = Date.parse("2026-11-25T00:00:00+09:00");
-export const RANKING_RESET_NOTICE_DAYS = 14;
+const RANKING_RESET_MS = Date.parse("2026-11-25T00:00:00+09:00");
+const RANKING_RESET_NOTICE_DAYS = 14;
 
 /** Whether the start screen tells of the 11-25 ranking wipe at `ms`. */
 export function rankingResetNoticeAt(ms) {

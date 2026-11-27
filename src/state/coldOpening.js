@@ -29,7 +29,7 @@ export { COLD_OPENING_ENABLED };
  * is off. A release build never reads it (IntroScreen puts the build constant
  * in front of the call).
  */
-export const COLD_OPENING_QUERY = "coldOpening";
+const COLD_OPENING_QUERY = "coldOpening";
 
 export function coldOpeningForced(search = globalThis.location?.search ?? "") {
   return new URLSearchParams(search).get(COLD_OPENING_QUERY) === "1";
@@ -64,7 +64,7 @@ export function playsColdOpening({ enabled, hasResumableSave }) {
  * 60~90 second budget (tests/unit/cold-opening.test.mjs, the timed walk in
  * tests/cold-opening.spec.js); the page itself has no clock.
  */
-export const COLD_OPENING_PRESS_SECONDS = 1.5;
+const COLD_OPENING_PRESS_SECONDS = 1.5;
 export function panelReadingSeconds(panel) {
   const words = [panel?.caption, panel?.text].filter(Boolean).join("");
   return words.length / 10 + COLD_OPENING_PRESS_SECONDS;
