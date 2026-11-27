@@ -33,7 +33,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /** The events whose runs count as evidence for a head commit. */
-export const EVIDENCE_EVENTS = new Set(["pull_request", "workflow_dispatch"]);
+const EVIDENCE_EVENTS = new Set(["pull_request", "workflow_dispatch"]);
 
 /**
  * The job names a complete Verify run reports, read from verify.yml. A matrix
@@ -163,7 +163,7 @@ function defaultWait(attempt) {
 }
 
 /** `api` for the command line: the REST API with the job's token. */
-export function githubApi({ repo, token, fetchImpl = fetch }) {
+function githubApi({ repo, token, fetchImpl = fetch }) {
   return async (resource) => {
     const response = await fetchImpl(`https://api.github.com/repos/${repo}/${resource}`, {
       headers: { accept: "application/vnd.github+json", authorization: `Bearer ${token}`, "x-github-api-version": "2022-11-28" },

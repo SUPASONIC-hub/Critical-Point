@@ -55,8 +55,8 @@ test.beforeEach(async ({ page }) => {
  */
 function closedCase(caseId, logicRecord, extra = {}) {
   const summary = createCaseSummary({}, {}, [{ caseId }], { resources: { time: 72, capital: 100, trust: 50, legitimacy: 50, humanCost: 0, fatigue: 10 }, schemaVersion: 2 });
-  // RULES_MARK 4 (C-3 and C-4): a case closed at 3 is from the table before and keeps the season off the ranking.
-  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 4 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
+  // RULES_MARK 7 (G11b·c, G13, G16, G18 with the 11-25 wipe): a case closed at 6 is from the table before and keeps the season off the ranking.
+  const atLogicTable = { gauntlet: { logicStreak: 0, tableRules: 10 }, logicRecord: { windows: 6, heat: 3, peak: 1, top: ["position", 2], grows: 0, switches: 0, breaks: 0, busts: 0, keeps: 0, best: 0, ...logicRecord } };
   return { ...summary, ...(logicRecord ? atLogicTable : {}), ...extra };
 }
 
@@ -173,12 +173,12 @@ test("the closing report names the hottest case, the score and the rank still to
   // Asked once, and with nothing of the season in the question.
   expect(asked).toEqual(["{}"]);
 
-  // It is the panel after the epilogue, in the epilogue's own frame. The line
-  // that the side slot opened (E-11, shown while a side case is listed) comes
-  // after it.
-  await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(3);
+  // It is the panel after the epilogue, in the epilogue's own frame. The
+  // finale says nothing about side cases since 11-18: each opened at its own
+  // place in the story, and all are open by now.
+  await expect(page.locator(".result-page > section.ending-epilogue-panel")).toHaveCount(2);
   await expect(page.locator(".result-page > section.ending-epilogue-panel").nth(1)).toHaveAttribute("data-testid", "logic-report");
-  await expect(page.locator("section[data-testid='logic-report'] + section")).toHaveAttribute("data-testid", "side-slot-opened");
+  await expect(page.locator("[data-testid='side-opened'], [data-testid='side-slot-opened']")).toHaveCount(0);
   await expect(page.locator("section[aria-label='엔딩 에필로그'] + section")).toHaveAttribute("data-testid", "logic-report");
   const overflow = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
   expect(overflow.scrollWidth, "the panel does not widen the page").toBeLessThanOrEqual(overflow.clientWidth + 1);

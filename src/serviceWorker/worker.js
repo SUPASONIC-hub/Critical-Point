@@ -66,11 +66,37 @@ export const NAVIGATION_TIMEOUT_MS = 3000;
 const WARM_CONCURRENCY = 3;
 
 const ROOT_STATIC = /^\/(?:icons\/)?[A-Za-z0-9._-]+\.(?:webp|jpe?g|png|webmanifest)$/;
-export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|cases\/[a-z0-9]+)\.html$/;
+export const DOCUMENT_PAGE = /^\/(?:(?:en|ja)\/)?(?:privacy|terms|about|faq|contact|guide|characters|making|weekly|cases\/[a-z0-9]+)\.html$/;
 // The start page in English and Japanese (scripts/site-pages.mjs, since
 // 11-03): the network's copy while there is one, and offline the kept page,
 // which opens in the folder's language (src/locale.js `folderLanguage`).
 export const LANGUAGE_START = /^\/(?:en|ja)\/(?:index\.html)?$/;
+
+/**
+ * 주 1회 알림 (N25, state/weeklyReminder.js): a Web Push message from the
+ * weekly sender (scripts/send-weekly-push.mjs), `{title, body, url}` already
+ * in the player's language. A push is always shown -- iOS takes the
+ * subscription back from a site whose pushes show nothing -- so a message
+ * without a usable title still shows the game's name. A tap opens the game:
+ * the open window if there is one, else the start page the message names.
+ */
+export const REMINDER_TAG = "cp-weekly-rule";
+const START_PAGE = /^\/(?:(?:en|ja)\/)?$/;
+
+/** What a push's data becomes on screen. Pure: the unit tests hand it data. */
+export function pushNotice(data) {
+  const title = typeof data?.title === "string" && data.title.trim() ? data.title.slice(0, 120) : "CRITICAL POINT";
+  return {
+    title,
+    options: {
+      body: typeof data?.body === "string" ? data.body.slice(0, 400) : "",
+      tag: REMINDER_TAG,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/favicon-32.png",
+      data: { url: typeof data?.url === "string" && START_PAGE.test(data.url) ? data.url : "/" },
+    },
+  };
+}
 
 export function cacheNameFor(release) {
   return `${CACHE_PREFIX}${release}`;
@@ -276,6 +302,29 @@ export function installWorker(scope, config) {
     else if (strategy === "document") event.respondWith(answerPage(event.request, new URL(event.request.url).pathname, keep));
     else if (strategy === "immutable") event.respondWith(answerImmutable(event.request, keep));
     else event.respondWith(answerRevalidated(event.request, keep));
+  });
+  /** A tap on the reminder: the open app if there is one, a new window on the start page if not. */
+  async function openApp(url) {
+    const windows = await scope.clients.matchAll({ type: "window", includeUncontrolled: true });
+    const open = windows.find((client) => new URL(client.url).origin === scope.location.origin);
+    if (open?.focus) return open.focus();
+    return scope.clients.openWindow?.(url);
+  }
+
+  scope.addEventListener("push", (event) => {
+    let data;
+    try {
+      data = event.data?.json() ?? null;
+    } catch {
+      data = { body: event.data?.text?.() ?? "" };
+    }
+    const { title, options } = pushNotice(data);
+    event.waitUntil(scope.registration.showNotification(title, options));
+  });
+  scope.addEventListener("notificationclick", (event) => {
+    if (event.notification?.tag !== REMINDER_TAG) return;
+    event.notification.close();
+    event.waitUntil(openApp(event.notification.data?.url ?? "/").catch(() => {}));
   });
   scope.addEventListener("message", (event) => {
     if (event.data?.type !== "warm") return;

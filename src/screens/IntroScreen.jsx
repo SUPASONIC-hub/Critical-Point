@@ -6,30 +6,34 @@ import { AccessibilityPanel } from "../components/AccessibilityPanel.jsx";
 import { CloudSavePanel } from "../components/CloudSavePanel.jsx";
 import { InstallHintSlot } from "../components/InstallHintSlot.jsx";
 import { GameWordmark } from "../components/GameWordmark.jsx";
+import { HomeReading } from "../components/HomeReading.jsx";
 import { LanguagePicker } from "../components/LanguagePicker.jsx";
 import { StudioCredit } from "../components/StudioCredit.jsx";
 import { WeeklyRuleNotice } from "../components/WeeklyRuleNotice.jsx";
+import { SinceLastSlot } from "../components/SinceLastSlot.jsx";
 import { rankingResetNoticeAt } from "../gauntlet/weeklyCalendar.js";
 import { castAliasLine, castNoticeAt } from "../castAliases.js";
 import { weeklyRuleNow } from "../state/weeklyClock.js";
 import { getArtSources, PHONE_ART_MEDIA } from "../responsiveArt.js";
 import { getAnalystTitle } from "../analystTitle.js";
 import { caseDisplayCode } from "../gameCases.js";
-import { getSideSlot } from "../sideCases.js";
+import { getSideSlot, peekRequestedSideCase, requestSideCase } from "../sideCases.js";
 import { LazyScreen } from "../components/LazyScreen.jsx";
 import { loadedChunk } from "../state/chunkReload.js";
 import { retryableLazy } from "../state/retryableLazy.js";
 import { confirmAction } from "../state/confirmAction.js";
 import { useConsentToggle } from "../state/useConsentToggle.js";
+import { setAccessibility } from "../state/accessibilitySettings.js";
 import { DEFAULT_PLAYER_NAME, getDeletionRequestText } from "../appConfig.js";
 import introPanelsCopy from "../copy/introPanels.js";
 import { decideCaseCardPress } from "../viewModels/seasonViewModels.js";
-import { legalPagePath, PRIVACY_PAGE_PATH, SITE_PAGES, TERMS_PAGE_PATH } from "../privacyText.js";
+import { legalPagePath, PRIVACY_PAGE_PATH, TERMS_PAGE_PATH } from "../privacyText.js";
 import { fill, LANG } from "../locale.js";
 import introCopy, { newGamePlusLabel } from "../copy/intro.js";
 import { coldOpeningForced, playsColdOpening } from "../state/coldOpening.js";
 import { GAME_EVENTS, sendGameEventOnce } from "../gameEvents.js";
-import { readSharedHabitId, sharedHabitTitle } from "../shareLink.js";
+import { readSharedHabitId, readSharedScore, sharedHabitTitle } from "../shareLink.js";
+import { FRIEND_TARGET_KEY, readStoredValue } from "../appConfig.js";
 
 // E-11: the side screen, fetched the first time a side case is opened (sideCases.js).
 const SideCaseScreen = retryableLazy(() => import("./SideCaseScreen.jsx").then(loadedChunk).then(({ SideCaseScreen }) => ({ default: SideCaseScreen })));
@@ -141,31 +145,47 @@ function DeletionRequest() {
  * table, which the first paint does not carry: it is fetched only for such a
  * visit, and the line is the name that table has under the id, in the page's
  * language, or nothing.
+ *
+ * N32: with the friend's best burst on the address (`&s=<score>`), or kept
+ * from such a visit (friendTarget.js, this device only), a goal line under
+ * it: 「친구 기록 넘기기」. Both modules are fetched only when there is one.
  */
 function FriendResultLine() {
   const [line, setLine] = useState("");
+  const [goal, setGoal] = useState("");
   useEffect(() => {
-    const id = readSharedHabitId(globalThis.location?.search);
-    if (!id) return undefined;
+    const search = globalThis.location?.search;
+    const id = readSharedHabitId(search);
+    const target = readSharedScore(search) > 0 || readStoredValue(FRIEND_TARGET_KEY, null) !== null;
+    if (!id && !target) return undefined;
     let live = true;
-    import("../copy/habits.js")
-      .then(({ default: habits }) => {
+    Promise.all([import("../copy/habits.js"), target ? import("../friendTarget.js") : null])
+      .then(([{ default: habits }, friend]) => {
         const title = sharedHabitTitle(habits, id);
         if (live && title) setLine(fill(habits.friendLine, { habit: title }));
+        const kept = friend?.takeFriendTarget(search);
+        if (live && kept) setGoal(fill(habits.friendTarget, { score: kept.score }));
       })
       .catch(() => {});
     return () => {
       live = false;
     };
   }, []);
-  return line ? <p className="intro-friend-line" data-testid="friend-result-line">{line}</p> : null;
+  return (
+    <>
+      {line && <p className="intro-friend-line" data-testid="friend-result-line">{line}</p>}
+      {goal && <p className="intro-friend-line" data-testid="friend-target-line">{goal}</p>}
+    </>
+  );
 }
 
 export function IntroScreen({ view, renderers = {} }) {
   // The case the burst is opening, or null when there is none.
   const [openingBurst, setOpeningBurst] = useState(null);
   // E-11: the side case open in this screen's place, or null.
-  const [sideCaseId, setSideCaseId] = useState(null);
+  // A side case asked for from a case report opens as the start screen mounts (sideCases.requestSideCase).
+  const [sideCaseId, setSideCaseId] = useState(peekRequestedSideCase);
+  useEffect(() => requestSideCase(null), []);
   const openingBurstRef = useRef(false);
   const openingTimerRef = useRef(null);
   const heroArt = getArtSources("/triggerlab-key-visual.webp");  const {
@@ -257,6 +277,18 @@ export function IntroScreen({ view, renderers = {} }) {
       beginOpeningBurst(startGame);
     }
   };
+  // N19 (owner's answer Q4 (1), 2026-11-16): the start screen's second door.
+  // It turns the comfort panel's 스토리 모드 on and starts as 「프롤로그 시작」
+  // does; the season's first case reads the setting at this press
+  // (runLifecycle.startGame, or the shell's save as runState loads it), so the
+  // first case is already played in story mode. Shown only with no run to
+  // lose, so it never asks to throw one away. The setting stays on afterwards,
+  // as it would from the panel, where it can be turned off.
+  const startStoryRun = () => {
+    if (openingBurst) return;
+    setAccessibility({ storyMode: true });
+    startNewRun();
+  };
   const startNewGamePlusRun = async () => {
     if (!hasResumableSave || (await confirmAction(CONFIRM.newGamePlus))) beginOpeningBurst(startNewGamePlus);
   };
@@ -343,8 +375,8 @@ export function IntroScreen({ view, renderers = {} }) {
       </button>
     </div>
   );
-  // E-11 번외 사건: hidden until a finale is closed on this device and a side
-  // case is written (sideCases.getSideSlot). Read on each draw, so a case
+  // E-11 번외 사건: hidden until a side case is open on this device (11-18: at
+  // its place in the story) and written (sideCases.getSideSlot). Read on each draw, so a case
   // closed in the side screen is counted when the start screen comes back.
   const sideSlot = getSideSlot({ newGamePlusUnlocked, caseResults });
   if (sideCaseId) {
@@ -431,11 +463,24 @@ export function IntroScreen({ view, renderers = {} }) {
                   <a className="intro-briefing-link" href={`#${BRIEFING_DRAWER_ID}`} onClick={openBriefingDrawer}>
                     {introCopy.briefingLink}
                   </a>
+                  <button
+                    type="button"
+                    className="intro-story-start"
+                    data-testid="start-story-mode"
+                    onClick={startStoryRun}
+                    onPointerEnter={prefetchGameRuntime}
+                    onFocus={prefetchGameRuntime}
+                    disabled={Boolean(openingBurst)}
+                  >
+                    {introCopy.storyStart.label}
+                    <small>{introCopy.storyStart.hint}</small>
+                  </button>
                   {consentLine}
                 </div>
               )}
               <FriendResultLine />
               <CloudSavePanel />
+              <SinceLastSlot view={view} />
               {/* The resume card has no row for it, so with a save it reads
                   under the fold that follows the card. */}
               {hasResumableSave && consentLine}
@@ -968,15 +1013,13 @@ export function IntroScreen({ view, renderers = {} }) {
             })}
           </div>
         </section>
-        {/* Plain links to the five pages beside the build (privacyText.js,
-            scripts/legal-pages.mjs and site-pages.mjs) in the page's
-            language: the addresses a store listing names, and the site's
-            text a crawler follows from the start page. */}
-        <footer className="intro-legal">
-          {SITE_PAGES.map((page) => (
-            <a key={page} href={legalPagePath(`/${page}.html`, LANG)}>{introCopy.legal[page]}</a>
-          ))}
-        </footer>
+        {/* 읽을거리: what the game is, the site's nine kinds of page in the
+            page's language (the privacy policy and the terms among them, the
+            addresses a store listing names), the newest notes and 오늘의 1면,
+            the world newspaper's article for today in Seoul (loaded as its own
+            chunk, HomeReading.jsx) -- text a reader
+            and a crawler find on the start page (src/homeReading.js). */}
+        <HomeReading copy={introCopy.reading} legal={introCopy.legal} language={LANG} notes={__CP_RECENT_NOTES__} />
         {/* What the burst says to a screen reader. The region is on the page
             before the burst is, so the sentence is news when it lands; the
             burst itself is a picture of the same thing. */}

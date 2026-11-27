@@ -325,6 +325,122 @@ test("a deployment with no server says the board is not connected", async ({ pag
   await expectBlockedAndExplained(page, "연결된 뒤에");
 });
 
+/**
+ * N33: 「이번 주 질문」 is pinned over the composer in a week that has one
+ * (src/boardQuestions.js), on the week's rule's clock; the pinned test week
+ * (January) has none, which every other test here already plays.
+ */
+test("a week with a question pins ours over the composer, and the test week has none", async ({ page }) => {
+  await openBoard(page);
+  await expect(page.locator(".board-composer")).toBeVisible();
+  await expect(page.getByTestId("board-week-question")).toHaveCount(0);
+
+  await page.addInitScript((ms) => {
+    globalThis.__weeklyRuleClock = ms;
+  }, Date.parse("2026-11-24T12:00:00+09:00"));
+  await openBoard(page);
+  const question = page.getByTestId("board-week-question");
+  await expect(question).toBeVisible();
+  await expect(question).toContainText("이번 주 질문 · 우리가 묻습니다");
+  await expect(question).toContainText("벽 바로 앞에서 손을 멈춘 적이 있나요?");
+  const order = await page.evaluate(() => {
+    const pinned = document.querySelector("[data-testid=board-week-question]");
+    const composer = document.querySelector(".board-composer");
+    return Boolean(pinned.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(order, "the question sits above the composer").toBe(true);
+});
+
+/**
+ * 「만든 사람 공지」: the makers' one notice (board_notice, written only by
+ * the two makers' admin RPCs; check:grants holds that a stranger is refused).
+ * It is pinned over the week's question and the composer, outside the posts,
+ * in the page's language or else Korean, and no notice draws nothing.
+ */
+const NOTICE = {
+  body_ko: "우리가 알립니다.\n이번 주에는 새 사건이 열립니다.",
+  body_en: "A word from us: a new case opens this week.",
+  body_ja: null,
+  posted_at: "2026-11-26T01:00:00Z",
+  expires_at: null,
+};
+
+async function openBoardIn(page, lang) {
+  await page.goto(lang === "ko" ? "/" : `/?lang=${lang}`);
+  await page.locator(".intro-board-button").first().click();
+  await expect(page.locator(".board-page")).toBeVisible();
+}
+
+test("the makers' notice is pinned over the board in the page's language, Korean where it has none", async ({ page }) => {
+  // Three page loads, two of them with a language's dictionary: a cold dev server needs the time.
+  test.setTimeout(120_000);
+  // A 360px phone: the notice wraps and the page never scrolls sideways.
+  await page.setViewportSize({ width: 360, height: 740 });
+  const asked = [];
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/board_posts**`, (route) =>
+    route.fulfill(json([{ id: 1, nickname: "만든 사람 공지", body: "공지처럼 보이고 싶은 글", created_at: "2026-11-25T09:00:00Z" }])),
+  );
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => {
+    asked.push(new URL(route.request().url()).searchParams.get("select"));
+    return route.fulfill(json([NOTICE]));
+  });
+  await useMockSupabase(page);
+
+  for (const [lang, label, text, textLang] of [
+    ["ko", "만든 사람 공지", "이번 주에는 새 사건이 열립니다.", "ko"],
+    ["en", "From the makers", "A word from us: a new case opens this week.", "en"],
+    ["ja", "制作者からのお知らせ", "이번 주에는 새 사건이 열립니다.", "ko"],
+  ]) {
+    await openBoardIn(page, lang);
+    const notice = page.getByRole("region", { name: label });
+    await expect(notice, `${lang}: the notice is a named region`).toBeVisible();
+    await expect(notice).toHaveAttribute("data-testid", "board-makers-notice");
+    await expect(notice).toContainText("FROM THE MAKERS");
+    await expect(page.getByTestId("board-makers-notice-text")).toContainText(text);
+    await expect(page.getByTestId("board-makers-notice-text")).toHaveAttribute("lang", textLang);
+    // Pinned: over the composer and the posts, and not one of them.
+    const placed = await page.evaluate(() => {
+      const pinned = document.querySelector("[data-testid=board-makers-notice]");
+      const composer = document.querySelector(".board-composer");
+      return {
+        above: Boolean(pinned.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING),
+        inList: Boolean(pinned.closest(".board-list-panel")),
+        reportable: pinned.querySelectorAll("[data-testid=board-report-toggle]").length,
+        wide: document.documentElement.scrollWidth <= window.innerWidth,
+      };
+    });
+    expect(placed, `${lang}: pinned above the composer, outside the posts, no report button, no sideways scroll`).toEqual({ above: true, inList: false, reportable: 0, wide: true });
+    // The post that calls itself 「만든 사람 공지」 stays a post.
+    await expect(page.locator(".board-post").first()).toContainText("공지처럼 보이고 싶은 글");
+  }
+  expect(asked.every((select) => select === "body_ko,body_en,body_ja,posted_at,expires_at"), `the board asks for the words and times only: ${asked.join(" | ")}`).toBe(true);
+});
+
+test("no notice, or one the board cannot reach, draws nothing", async ({ page }) => {
+  // Three page loads.
+  test.setTimeout(120_000);
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  // Each time, the answer has come and been read before "nothing" is believed.
+  const openAndAnswer = async () => {
+    const answered = page.waitForResponse((response) => response.url().includes("/rest/v1/board_notice"));
+    await openBoard(page);
+    await answered;
+    await expect(page.locator(".board-composer")).toBeVisible();
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await expect(page.getByTestId("board-makers-notice")).toHaveCount(0);
+  };
+  await openAndAnswer();
+
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => route.fulfill(json({ message: "boom" }, 500)));
+  await openAndAnswer();
+
+  // An ended notice the page still receives is none as well.
+  await page.route(`${SUPABASE}/rest/v1/board_notice**`, (route) => route.fulfill(json([{ ...NOTICE, expires_at: "2000-01-01T00:00:00Z" }])));
+  await openAndAnswer();
+});
+
 test("no ranking row can take the ranking screen down", async ({ page }) => {
   const honest = {
     run_tag: "HONEST01",
@@ -432,16 +548,43 @@ test("a season in the hall of fame carries its place on the ranking, by run tag"
   await expect(row("HALLRUN1").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 1위 (잠정)", "명예의 전당 · 2026-W47 2위"]);
   await expect(row("HALLRUN2").locator(".ranking-hall-badge")).toHaveText(["명예의 전당 · 본 판 2위 (잠정)"]);
   await expect(row("PLAINRUN").locator(".ranking-hall-badge")).toHaveCount(0);
-  // The read asks for the places only, and their four columns.
+  // The read asks for every board, with its count (N46), and no progress line
+  // while every board here has its places.
   expect(asked.length).toBeGreaterThan(0);
-  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on");
-  expect(decodeURIComponent(asked[0])).toContain("place=not.is.null");
+  expect(decodeURIComponent(asked[0])).toContain("select=board,place,run_tag,settled_on,checked_seasons");
+  expect(decodeURIComponent(asked[0])).not.toContain("place=");
+  await expect(page.getByTestId("ranking-hall-progress")).toHaveCount(0);
   // The badge sits inside its row, on a phone too.
   await page.setViewportSize({ width: 360, height: 780 });
   const badge = row("HALLRUN1").locator(".ranking-hall-badge").first();
   const [badgeBox, rowBox] = [await badge.boundingBox(), await row("HALLRUN1").boundingBox()];
   expect(badgeBox.x).toBeGreaterThanOrEqual(rowBox.x);
   expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+});
+
+// N46: while a board keeps no place yet, the ranking says how far it is from
+// its first three, one line a board: the table's own and this week's (the
+// e2e build's weekly clock is pinned to 2026-W02); a past week's says nothing.
+test("a board with no place yet says how far it is from its first three (N46)", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await page.route(`${SUPABASE}/rest/v1/public_hall_of_fame**`, (route) => route.fulfill(json([
+    { board: "table-4", place: null, run_tag: null, settled_on: null, checked_seasons: 3 },
+    { board: "2026-W02", place: null, run_tag: null, settled_on: null, checked_seasons: 4 },
+    { board: "2026-W01", place: null, run_tag: null, settled_on: null, checked_seasons: 2 },
+  ])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "랭킹" }).first().click();
+  const lines = page.getByTestId("ranking-hall-progress");
+  await expect(lines).toHaveText([
+    "명예의 전당 · 본 판: 첫 세 자리는 5시즌이 모이면 열립니다 (지금 3/5)",
+    "명예의 전당 · 2026-W02: 첫 세 자리는 5시즌이 모이면 열립니다 (지금 4/5)",
+  ]);
+  // On a phone the line wraps inside the panel.
+  await page.setViewportSize({ width: 360, height: 740 });
+  const [lineBox, panelBox] = [await lines.first().boundingBox(), await page.locator(".ranking-table-panel").boundingBox()];
+  expect(lineBox.x).toBeGreaterThanOrEqual(panelBox.x);
+  expect(lineBox.x + lineBox.width).toBeLessThanOrEqual(panelBox.x + panelBox.width + 0.5);
 });
 
 /* ------------------------------------------------------------- story mode */
@@ -539,4 +682,41 @@ test("a season with a story case is not sent to the public ranking, and this dev
   expect(season.summary.assistTime).toBe(2);
   // (How that row is drawn is the test of the seeded ranking above: a page
   // loaded on this save opens on its ending, not on the intro's 랭킹 button.)
+});
+
+// n37 (11-19): the button said 「브리핑으로 돌아가기」 on every way in, and the
+// result page's 랭킹 ended the run first, so it closed onto the first screen.
+// Each screen now names the place it goes back to, and goes there.
+test("랭킹 and 게시판 opened from the first screen go back to it, and say so", async ({ page }) => {
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await page.goto("/");
+  await page.waitForSelector(".intro");
+  for (const [opener, screen] of [["랭킹", ".ranking-page"], ["게시판", ".board-page"]]) {
+    await page.getByRole("button", { name: opener }).first().click();
+    await expect(page.locator(screen)).toBeVisible();
+    await expect(page.getByRole("button", { name: "브리핑으로 돌아가기" })).toHaveCount(0);
+    await page.getByRole("button", { name: "첫 화면으로 돌아가기" }).click();
+    await expect(page.locator(".intro")).toBeVisible();
+    await expect(page.locator(screen)).toHaveCount(0);
+  }
+});
+
+test("랭킹 opened from a case's result page goes back to that page", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.route(`${SUPABASE}/**`, (route) => route.fulfill(json([])));
+  await useMockSupabase(page);
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await completeCurrentCase(page);
+  const result = page.locator(".result-page");
+  await expect(result).toBeVisible();
+  await result.locator(".top-actions").getByRole("button", { name: "랭킹" }).click();
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await expect(page.getByRole("button", { name: "첫 화면으로 돌아가기" })).toHaveCount(0);
+  // R is the result page's retry; it is hidden, so the key is not its.
+  await page.keyboard.press("r");
+  await expect(page.locator(".ranking-page")).toBeVisible();
+  await page.getByRole("button", { name: "결과로 돌아가기" }).click();
+  await expect(result).toBeVisible();
+  await expect(page.locator(".intro")).toHaveCount(0);
 });

@@ -1,11 +1,13 @@
 import { expect, test } from "./helpers/network.js";
 import { ACCESSIBILITY_SETTINGS_KEY } from "../src/appConfig.js";
-import { CASE_RESULT_NODES } from "../src/gameCases.js";
+import { CASE_RESULT_NODES, CASE_START_NODES } from "../src/gameCases.js";
 import { isResourceGain } from "../src/gameConstants.js";
 import { nodeOrders, nodes } from "../src/gameData.js";
 import { FRACTURE_MIN_BURN } from "../src/gauntlet/gauntletEngine.js";
 import { getLogicDirection, LOGIC_DIRECTIONS } from "../src/gauntlet/logicStreak.js";
 import { getDirectionName } from "../src/gauntlet/tableReadout.js";
+import { isSignNode, STORY_AUTO_HEAT } from "../src/gauntlet/storyAutoCash.js";
+import { isClosingScene } from "../src/gauntlet/holdConfirm.js";
 import { bustStakedCard, cashStakedCard, clickElement, dismissProtocolBreach, expectSceneMinutes, findSkippedSceneWalk, openRevealDetails, startDebugNode, TRANSITION_TIMEOUT_MS, waitForEntrance } from "./helpers/gameFlow.js";
 import { readJsonStorage, TEST_STORAGE_KEYS } from "./helpers/storage.js";
 import { FIVE_RELICS, LAYOUT_VIEWPORTS, measureTable, OVERCLOCKED_BOARD, openBrokenBoard, SEALED_BOARD } from "./helpers/layout.js";
@@ -197,6 +199,9 @@ async function closeCaseOneIntoDraft(page) {
  */
 async function pressAt(page, locator) {
   await expect(locator).toBeVisible();
+  // A finger scrolls to what is below the fold first: the draft's cards say
+  // their condition too (G4), and at 1280x720 the pass button sits under them.
+  await locator.scrollIntoViewIfNeeded();
   const box = await locator.boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 }
@@ -238,6 +243,22 @@ test("an act's last case is 「고점 판」: the briefing says it and the board
   await startDebugNode(page, "case06", "c6_start");
   await expect(page.getByTestId("gauntlet-board-mark")).toHaveText("이번 판");
 });
+// G23 (RULES_MARK 8): 사건 08 to 42 ask how to open, in the signature's frame, and 크게 연다 deals the nearer wall.
+test("a case from 사건 08 asks how to open, inside a 360px phone, and opening big stands the wall from 48 @once", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await startDebugNode(page, "case12", CASE_START_NODES.case12, { openTable: false });
+  const ask = page.getByTestId("opening-ask");
+  await expect(ask).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(page.getByTestId("opening-normal")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("opening-big")).toHaveAccessibleDescription(/48/);
+  // Polled: the briefing's entrance scales the page for a moment (43.65px mid-way).
+  await expect.poll(async () => (await page.getByTestId("opening-big").boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByTestId("opening-big").click();
+  await expect(page.getByTestId("opening-big")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("open-table").click();
+  await expect(page.locator(".gx-band-label").first()).toContainText("48");
+});
 // C9 (11-30): the KD은행 계좌 pays at the draft. The vault a fresh case01
 // close leaves is too small for either buy, so the save is given one and
 // reloaded on the draft, which a reload keeps.
@@ -246,11 +267,10 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await page.setViewportSize(viewport);
     await closeCaseOneIntoDraft(page);
     const draft = page.getByTestId("relic-draft");
-    // With what the close banked, neither buy can pay: both stay, off, with the reason.
-    for (const id of ["relic-reroll", "relic-extra"]) {
-      await expect(draft.getByTestId(id)).toHaveAttribute("aria-disabled", "true");
-      await expect(draft.getByTestId(id)).toHaveAccessibleDescription("잔액 부족");
-    }
+    // With what the close banked, one more (12,000) cannot pay: it stays, off, with the reason.
+    // (The reroll is 1,500 under the next rules (G4), which a case01 close may already hold.)
+    await expect(draft.getByTestId("relic-extra")).toHaveAttribute("aria-disabled", "true");
+    await expect(draft.getByTestId("relic-extra")).toHaveAccessibleDescription("잔액 부족");
     const saved = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
     // Seeded on the reload itself, before the app reads the save: the page going
     // away writes the run it holds (useWindowSuspension's pagehide save), and a
@@ -267,10 +287,10 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await draft.getByTestId("relic-reroll").click();
     await expect(draft.getByTestId("relic-reroll")).toHaveAccessibleDescription("이번 사건에 사용함");
     const rerolled = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-    expect(rerolled.dynamics.vault).toBe(26000);
+    expect(rerolled.dynamics.vault).toBe(28500);
     expect(rerolled.dynamics.relicDraft.reroll.offer).toEqual(rerolled.dynamics.relicOffer);
     expect(rerolled.dynamics.relicOffer).not.toEqual(first);
-    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −$4,000");
+    await expect(page.getByTestId("gauntlet-purse-change").locator('[aria-hidden="true"]')).toHaveText("▼ −$1,500");
 
     await page.keyboard.press("b");
     await expect(draft.getByTestId("relic-spend")).toBeVisible();
@@ -282,8 +302,8 @@ for (const viewport of [{ width: 360, height: 740 }, { width: 1280, height: 720 
     await draft.getByTestId("relic-option").first().click();
     await expect(draft).toHaveCount(0);
     const done = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
-    expect(done.dynamics.vault).toBe(30000 - 4000 - 12000);
-    expect(done.dynamics.seasonSpent).toBe(16000);
+    expect(done.dynamics.vault).toBe(30000 - 1500 - 12000);
+    expect(done.dynamics.seasonSpent).toBe(13500);
     expect(done.dynamics.relics).toHaveLength(2);
     expect(done.dynamics.relicDraft.picked).toEqual(done.dynamics.relics);
     // Nothing on the page is wider than the screen while the draft was up (360px: the two buys side by side).
@@ -547,12 +567,49 @@ test("every push visibly compounds the pot, and the odds are never printed", asy
     await expect.poll(() => readNumber(pot)).toBeGreaterThanOrEqual(Math.floor(previous * 1.5));
     previous = await readNumber(pot);
   }
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
+  // G42 (RULES_MARK 10): three pushes (45 heat at most) stay under ×32, so the chain is not lit yet.
+  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("꺼짐");
   await expect(page.getByTestId("gauntlet-stage")).not.toContainText(/%/);
 });
 
-test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
+// B5 seen (N43 ③, 11-18 「전부 1」): the clock's own creep across a stake
+// tier cuts the clock as a push does, and no push line had told it. The cut
+// is marked beside the clock, 「−5초」, for 0.8 seconds, then goes.
+test("the creep across a stake tier marks the clock's cut beside it for a moment", async ({ page }) => {
+  // Up to sixty quarter seconds of the page's clock, each drawn: 30 to 43 seconds here.
+  test.setTimeout(120_000);
+  await page.clock.install();
   await openTable(page, "case01", "start");
+  const stage = page.getByTestId("gauntlet-stage");
+  const heat = async () => Number(await stage.getAttribute("data-gauge"));
+  const mark = page.getByTestId("gauntlet-clock-cut");
+  await page.locator(".choices .choice").first().click();
+  // Pushes that cannot reach the second tier (45) themselves: a step is 15 at most.
+  while ((await heat()) < 30) {
+    const before = await heat();
+    await page.getByTestId("commit-push").click();
+    await expect.poll(heat).toBeGreaterThan(before);
+  }
+  expect(await heat()).toBeLessThan(45);
+  await expect(mark).toHaveCount(0);
+  // The page's clock held still from here, so the 0.8 seconds pass only when
+  // this test moves them: a flowing clock let the mark come and go between
+  // two polls of a busy machine. The creep alone carries the heat across, a
+  // tenth of a second at a time, until the mark is up.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1_000));
+  for (let step = 0; step < 600 && !(await mark.count()) && (await heat()) < 50; step += 1) await page.clock.runFor(100);
+  expect(await heat()).toBeGreaterThanOrEqual(45);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(mark).toHaveText("−5초");
+  await expect(mark).toHaveAttribute("aria-hidden", "true");
+  await page.clock.runFor(1_000);
+  await expect(mark).toHaveCount(0);
+});
+
+test("a bust takes the pot, says BUST, and deals a broken board", async ({ page }) => {
+  // AFTERSHOCK is open from 사건 04 (N18), and the gauge below is its start.
+  // 사건 07, because the first BUST of 사건 04~06 keeps a third of the pot (G5).
+  await openTable(page, "case07", CASE_START_NODES.case07);
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 0");
   // Bank something first, so there is a pot for the wall to take.
   await page.locator(".choices .choice").first().click();
@@ -592,6 +649,28 @@ test("a bust takes the pot, says BUST, and deals a broken board", async ({ page 
   await expect(page.getByTestId("gauntlet-run-signal")).toContainText("BUST 1");
   await expect(page.getByTestId("gauntlet-gauge")).toHaveText("22");
   await expect(page.locator(".gx-card-chips").first()).toHaveText("▒▒");
+});
+
+// 11-24: the first BUST of 사건 04~06 keeps a third of the pot (G5), and the table said $0.
+test("a passed-down bust shows the third of the pot it keeps", async ({ page }) => {
+  await openTable(page, "case05", CASE_START_NODES.case05);
+  await page.locator(".choices .choice").first().click();
+  await page.getByTestId("commit-push").click();
+  await page.getByTestId("commit-confirm").click();
+  await page.getByTestId("decision-next").click();
+  const banked = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
+  const kept = Math.floor(banked.dynamics.runPot / 3);
+  expect(kept).toBeGreaterThan(0);
+
+  await dismissProtocolBreach(page);
+  await page.locator(".choices .choice").first().click();
+  await pushUntilBust(page);
+  await expect(page.locator(".gx-slam-bust")).toContainText(`→ $${kept.toLocaleString("en-US")}`);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
+  // The settle keeps what the table said, and the next table opens on it.
+  await expect(page.locator(".decision-reveal h2")).toHaveText("BUST");
+  await expect.poll(async () => (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).dynamics.runPot).toBe(kept);
+  await expect(page.getByTestId("gauntlet-run-pot")).toHaveText(`$${kept.toLocaleString("en-US")}`);
 });
 
 // money-feedback (2026-11-02): the hand's amount is thrown large at the middle
@@ -777,7 +856,8 @@ test("안전선 pushes to the safe line at once, the reveal says what one more p
   await expect.poll(async () => Number(await stage.getAttribute("data-gauge"))).toBeGreaterThanOrEqual(Number(heat));
   await expect(safe, "the button is for the first press only").toHaveCount(0);
   await page.getByTestId("commit-confirm").click();
-  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
+  // G30 (RULES_MARK 9): a cash 3 or less under the wall says so first.
+  await expect(page.getByTestId("reveal-afterword")).toHaveText(/^(아슬아슬 ×1\.25 · 벽까지 \d\. )?한 번 더 밀었다면 \+\d+ → \d+, 벽 \d+: (갈 수 있었다|BUST였다)\.$/);
   await page.getByTestId("decision-next").click();
   await expect(page.getByTestId("table-reaction")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
 });
@@ -819,7 +899,8 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   expect(atTheTable.log.at(-1).assistStory).toBeUndefined();
   await expect(page.getByTestId("next-mutations")).toContainText("BLACKOUT");
 
-  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true }) });
+  // 판 모두 직접 치기 (G43): this table is not the case's 결재 판, and is played by hand only with it.
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify({ storyMode: true, playAllTables: true }) });
   const inStoryMode = await bustTheFirstCard();
   const entry = inStoryMode.log.at(-1);
   expect(entry.threshold.busted).toBe(true);
@@ -843,6 +924,121 @@ test("a bust in story mode plays the next scene, where the table's bust skips it
   // The band label is SCOUT's button here, its text followed by " · 조회".
   await expect(page.locator(".gx-band-label")).toHaveText(/^벽 88–98(?: · |$)/);
   expect((await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId).toBe(skipped);
+});
+
+// G43 (2026-11-26, Q7 (1)): in story mode a case is played by hand on its
+// 결재 판 alone. Every other table is cashed at heat 70 the moment its card is
+// picked -- on the briefing page or on the table -- and the reveal says so in
+// one line, which fits a 360px phone. The entry it logs is a hand's: the
+// replay record, the pushes and a gauge the far wall never reached.
+const withStory = (page, settings) => page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: ACCESSIBILITY_SETTINGS_KEY, value: JSON.stringify(settings) });
+const autoLine = (page) => page.locator(".decision-reveal").getByTestId("reveal-auto");
+
+test("story mode cashes every table but the case's 결재 판 and its held last decision at heat 70, and says so", async ({ page }) => {
+  test.setTimeout(120_000);
+  expect(isSignNode("case01", nodes.start), "사건 01's first scene is not its 결재 판").toBe(false);
+  expect(isSignNode("case01", nodes.c1_aftershock), "c1_aftershock is").toBe(true);
+  await page.setViewportSize({ width: 360, height: 740 });
+  await withStory(page, { storyMode: true });
+
+  // Picked on the briefing page: the table never asks for a push.
+  await startDebugNode(page, "case01", "start", { openTable: false });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  const card = page.locator("[data-testid='briefing-card']:not([disabled]):not([aria-disabled='true'])").first();
+  const actCard = page.getByTestId("act-card-continue");
+  await expect(card.or(actCard).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  if (await actCard.isVisible()) await actCard.click();
+  await card.click();
+  await expect(autoLine(page)).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveText(/^자동 확정 · 열기 \d+\. 결재 판만 직접 칩니다\.$/);
+  const first = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  expect(first.nodeId).toBe("start");
+  expect(first.assistStory).toBe(true);
+  expect(first.threshold.busted).toBe(false);
+  expect(first.threshold.cause).toBe("cash");
+  expect(first.threshold.pushes).toBeGreaterThan(0);
+  expect(first.threshold.gauge).toBeGreaterThanOrEqual(STORY_AUTO_HEAT);
+  expect(first.threshold.gauge).toBeLessThan(first.threshold.wall);
+  expect(first.replay?.events?.at(-1)?.[1], "the replay record ends on its cash, as a hand's").toBe("C");
+  // One line, inside the sheet, and the page no wider for it.
+  const fit = await autoLine(page).evaluate((line) => ({
+    clipped: line.scrollWidth - line.clientWidth,
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  }));
+  expect(fit.clipped).toBeLessThanOrEqual(0);
+  expect(fit.overflow).toBeLessThanOrEqual(1);
+
+  // Picked on the table, with the briefing opened first: cashed the same way.
+  await page.getByTestId("decision-next").click();
+  await dismissProtocolBreach(page);
+  const stage = page.getByTestId("gauntlet-stage");
+  await expect(stage).toHaveAttribute("data-status", "live");
+  const before = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).nodeId;
+  expect(isSignNode("case01", nodes[before])).toBe(false);
+  expect(isClosingScene(nodes[before])).toBe(false);
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(autoLine(page)).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  const second = (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  expect(second.nodeId).toBe(before);
+  expect(second.threshold.gauge).toBeGreaterThanOrEqual(STORY_AUTO_HEAT);
+
+  // The case's last decision, whose 확정 is held, keeps its long press (#686, the user's (1)): one tap commits nothing.
+  expect(isClosingScene(nodes.c1_final_sale) && !isSignNode("case01", nodes.c1_final_sale)).toBe(true);
+  await startDebugNode(page, "case01", "c1_final_sale");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await expect(page.getByTestId("commit-confirm")).toHaveAttribute("data-hold", /.+/);
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next").or(page.locator(".result-page")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveCount(0);
+
+  // The case's 결재 판 is played by hand: the card is staked, the table stays live.
+  await startDebugNode(page, "case01", "c1_aftershock");
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+  await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+  await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+  await expect(stage).toHaveAttribute("data-status", "live");
+  await cashStakedCard(page);
+  await expect(page.getByTestId("decision-next").or(page.locator(".result-page")).first()).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+  await expect(autoLine(page)).toHaveCount(0);
+});
+
+test("판 모두 직접 치기 plays every story table by hand, set from the play header by keyboard; board mode is untouched", async ({ page }) => {
+  test.setTimeout(120_000);
+  const stage = page.getByTestId("gauntlet-stage");
+  const playByHand = async () => {
+    await page.locator(".choices .choice:not([aria-disabled='true'])").first().click();
+    await expect(page.locator(".gx-card.selected")).toHaveCount(1);
+    await expect(stage).toHaveAttribute("data-status", "live");
+    await cashStakedCard(page);
+    await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
+    await expect(autoLine(page)).toHaveCount(0);
+    return (await readJsonStorage(page, TEST_STORAGE_KEYS.save)).log.at(-1);
+  };
+
+  // Board mode: the first scene is played by hand, as before G43.
+  await openTable(page, "case01", "start");
+  const board = await playByHand();
+  expect(board.assistStory).toBeUndefined();
+
+  // Story mode with the switch turned on in the play header's comfort settings, by keyboard.
+  await withStory(page, { storyMode: true });
+  await openTable(page, "case01", "start");
+  await page.getByTestId("open-comfort-settings").click();
+  const dialog = page.getByTestId("comfort-dialog");
+  const toggle = dialog.getByRole("checkbox", { name: /판 모두 직접 치기/ });
+  await expect(toggle).not.toBeChecked();
+  await toggle.focus();
+  await page.keyboard.press("Space");
+  await expect(toggle).toBeChecked();
+  expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).playAllTables, ACCESSIBILITY_SETTINGS_KEY)).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  const story = await playByHand();
+  expect(story.assistStory).toBe(true);
+  expect(story.nodeId).toBe("start");
 });
 
 /**
@@ -1005,16 +1201,17 @@ test("cashing without a single push seals the best card on the next board", asyn
 });
 
 test("two hot cashouts trigger an overclock payout banner", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  test.setTimeout(150_000);
+  // G42 (RULES_MARK 10): a hot cash is ×32 (heat 55); the wall is set past any push from there.
+  await openFarWall(page, "case01", "start");
   await page.locator(".choices .choice").first().click();
-  for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
+  await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
-  await page.getByTestId("commit-confirm").click();
-  await page.getByTestId("decision-next").click();
 
-  await dismissProtocolBreach(page);
+  // The first hot cash taken: the chain stands at one when the next board opens.
+  await openFarWall(page, "case01", "start", 1);
   await page.locator(".choices .choice").first().click();
-  for (let press = 0; press < 3; press += 1) await page.getByTestId("commit-push").click();
+  await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
   await page.getByTestId("commit-confirm").click();
   await expect(page.locator(".decision-reveal")).toHaveClass(/is-overdrive/);
@@ -1125,17 +1322,32 @@ function findCoolWalk(caseId = "case01") {
 async function pushToHotCash(page) {
   const stage = page.getByTestId("gauntlet-stage");
   const heat = async () => Number(await stage.getAttribute("data-gauge"));
-  for (let press = 0; press < 6 && (await heat()) < 24; press += 1) {
-    const before = await heat();
-    await page.getByTestId("commit-push").click();
-    await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
-  }
-  expect(await heat(), "the card is hot enough to cash at x4").toBeGreaterThanOrEqual(24);
+  // One push (a cash with none deals COLD FEET) from FAR_WALL's 40 lands at 55 at most; the clock's creep
+  // carries it on to ×32, and the cash is taken before 60, where it would deal HEAT DEBT.
+  const before = await heat();
+  await page.getByTestId("commit-push").click();
+  await expect.poll(heat, { timeout: 5_000 }).toBeGreaterThan(before);
+  await expect.poll(heat, { timeout: 30_000, intervals: [100] }).toBeGreaterThanOrEqual(HOT_HEAT);
+  expect(await heat(), "the card is hot enough to cash at x32, and under HEAT DEBT").toBeLessThan(60);
   await expect(stage).toHaveAttribute("data-status", "live");
 }
 
+/**
+ * G42 (RULES_MARK 10): the OVERCLOCK chain asks for ×32, heat 55 (the multiplier
+ * doubles every 11); 56 read on the gauge, which rounds. A board opened at heat
+ * 40 under a wall of 86 or more: one push and the creep never reach it.
+ * `streak` is the chain the run already holds.
+ */
+const HOT_HEAT = 56;
+const FAR_WALL = Object.freeze({ wallMin: 86, wallMax: 94, startGauge: 40 });
+async function openFarWall(page, caseId, nodeId, streak = 0) {
+  await openBrokenBoard(page, caseId, nodeId, { schema: FAR_WALL, streak });
+  await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
+}
+
 test("a bust's next rules are headed as a broken board, and no row is drawn as a carried rule", async ({ page }) => {
-  await openTable(page, "case01", "start");
+  // 사건 04 is where AFTERSHOCK opens (N18).
+  await openTable(page, "case04", CASE_START_NODES.case04);
   await page.locator(".choices .choice").first().click();
   await pushUntilBust(page);
   await expect(page.locator(".decision-reveal h2")).toHaveText("BUST", { timeout: TRANSITION_TIMEOUT_MS });
@@ -1151,14 +1363,8 @@ test("an earned OVERCLOCK's next rules are not headed as a broken board, and its
   test.setTimeout(120_000);
   const walk = findCoolWalk();
   expect(walk, "사건 01 still has two scenes in a row with a card that fractures nothing").not.toBeNull();
-  await openTable(page, walk.caseId, walk.firstId);
-  await cardOf(page, walk.first).click();
-  await pushToHotCash(page);
-  await expect(page.getByTestId("gauntlet-overdrive")).toContainText("점화");
-  await page.getByTestId("commit-confirm").click();
-  await expect(page.getByTestId("decision-next")).toBeVisible({ timeout: TRANSITION_TIMEOUT_MS });
-  await nextScene(page, walk.secondId);
-
+  // The first hot cash already taken (the chain at one), on a board whose wall no push to ×32 meets (G42).
+  await openFarWall(page, walk.caseId, walk.secondId, 1);
   await cardOf(page, walk.second).click();
   await pushToHotCash(page);
   await expect(page.getByTestId("gauntlet-overdrive")).toContainText("오버클럭 준비");
@@ -1267,14 +1473,17 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(briefing.getByRole("dialog")).toBeVisible();
   await expect(briefing.locator(".gx-balloon")).not.toBeEmpty();
   await expect(briefing.getByTestId("briefing-question")).toContainText("당신의 판단");
-  await expect(briefing.locator(".gx-panel-file li")).toHaveCount(4);
+  // The case file's facts and trace, and G31's line: a season's first case opens rested and unhurried.
+  await expect(briefing.locator(".gx-panel-file li")).toHaveCount(5);
+  await expect(briefing.getByTestId("briefing-tilt")).toContainText("피로 10");
   const timer = page.getByTestId("reading-timer");
   const first = Number(await timer.locator("b").textContent());
   expect(first).toBeGreaterThanOrEqual(12);
   await page.clock.runFor(3_000);
   expect(Number(await timer.locator("b").textContent())).toBeLessThan(first);
-  // The table's own clock has not moved while the page was up.
-  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  // The table's own clock has not moved while the page was up: 45, and G31 (RULES_MARK 9,
+  // storyTilt.js) gives a case opened on 남은 시간 72 (the season's start) TILT_CLOCK more.
+  await expect(page.locator(".gx-clock b")).toHaveText("47");
 
   // A card picked on the page opens the table with that card on it.
   const label = await briefing.getByTestId("briefing-card").nth(1).locator("span").first().textContent();
@@ -1297,8 +1506,8 @@ test("the briefing page holds the clock, stakes a card from the page, and opens 
   await expect(ask).toContainText("다 읽고 직접 열기로 바꿀까요?");
   await expect(page.getByTestId("reading-timer")).toHaveAttribute("aria-checked", "true");
   await expect(page.getByTestId("reading-clock-hold")).toBeFocused();
-  // The table's clock has not moved while the page asked.
-  await expect(page.locator(".gx-clock b")).toHaveText("45");
+  // The table's clock has not moved while the page asked (45, and G31's TILT_CLOCK on a season's first case).
+  await expect(page.locator(".gx-clock b")).toHaveText("47");
   await page.getByTestId("reading-clock-keep").click();
   await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
   await expect(page.getByTestId("commit-push")).toBeEnabled();

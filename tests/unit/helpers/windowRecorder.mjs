@@ -43,5 +43,5 @@ export function thresholdOf(window) {
 
 /** The same, from a verdict (resolveWindow), as useChoiceCommit writes it. */
 export function thresholdOfVerdict(verdict) {
-  return { busted: verdict.outcome === "bust", cause: verdict.cause, gauge: verdict.gauge, wall: verdict.wall, pushes: verdict.pushes, focus: verdict.focus };
+  return { busted: verdict.outcome === "bust", cause: verdict.cause, gauge: verdict.gauge, wall: verdict.wall, pushes: verdict.pushes, focus: verdict.focus, ...(verdict.passedDown ? { passedDown: true } : {}) };
 }

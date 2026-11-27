@@ -1,11 +1,19 @@
+import { lazy, Suspense } from "react";
 import { fill } from "../locale.js";
 import comfortCopy from "../copy/comfort.js";
 import { setAccessibility, STORY_SCALES, TABLE_TIME_SCALES, TEXT_SCALES, useAccessibility } from "../state/accessibilitySettings.js";
+import { reminderAvailability } from "../state/weeklyReminder.js";
+
+// 주 1회 알림 (N25): fetched only where it can be offered -- a copy opened from
+// the home screen with notifications and a service worker.
+const WeeklyReminderToggle = lazy(() => import("./WeeklyReminderToggle.jsx"));
+const reminderOffered = () => ["ok", "denied"].includes(reminderAvailability());
 
 // 스토리 모드 is first: it is the one that changes what the table asks. This
 // is the only place it is chosen; the play-style drawer's note points here.
+// 판 모두 직접 치기 (G43) is beside it: it only changes what story mode does.
 // Each switch's words are src/copy/comfort.js's, under its key.
-const TOGGLES = ["storyMode", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"];
+const TOGGLES = ["storyMode", "playAllTables", "holdReadingClock", "foldReadScenes", "calmEffects", "edgeNotices", "crisisEdge", "letterKeys", "stillIntro"];
 
 /**
  * The comfort settings: in the intro's setup console, and in the dialog the
@@ -82,6 +90,11 @@ export function AccessibilityPanel() {
           ))}
         </div>
       </fieldset>
+      {reminderOffered() && (
+        <Suspense fallback={null}>
+          <WeeklyReminderToggle />
+        </Suspense>
+      )}
     </section>
   );
 }

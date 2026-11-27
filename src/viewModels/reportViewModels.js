@@ -20,7 +20,7 @@ export { HELD_LINE_CAPITAL_SHARE, readHeldLine } from "../seasonStanding.js";
 /**
  * What src/nearestEnding.js answers, written out here so the type check does
  * not follow that module into the ruling's.
- * @typedef {{ id?: string, label?: string, gaps?: Array<{ key: string, value: number }>, burn?: boolean } | null} NearestEnding
+ * @typedef {{ id?: string, label?: string, gaps?: Array<{ key: string, value: number }>, burn?: boolean, door?: boolean } | null} NearestEnding
  */
 
 /**
@@ -102,7 +102,8 @@ export function describeNearestEnding(nearest) {
     legitimacy,
     particle: subjectParticle(key === "pactGap" ? trust : legitimacy),
   }));
-  return fill(NEAREST.line, { ending: nearest.label, gaps: gaps.join(" · ") });
+  const line = fill(NEAREST.line, { ending: nearest.label, gaps: gaps.join(" · ") });
+  return nearest.door ? `${line} ${NEAREST.door}` : line;
 }
 
 export function createEndingProfile({ finalEndingEntry }) {

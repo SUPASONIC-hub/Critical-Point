@@ -1,0 +1,121 @@
+/* 읽을거리 (HomeReading.jsx): the start screen's last section, a column of
+   text a reader reads -- what the game is, the site's nine kinds of page, the
+   newest notes. Plain lines on the intro's ground: no cards, nothing tilted,
+   body text at 16px / 1.75 under a 40em measure. It replaced .intro-legal, the
+   five policy links that were the foot (AdSense 2차 분석, 2026-11-20). */
+.home-reading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  width: min(var(--ui-page-max), 100%);
+  margin: 64px auto 0;
+  padding: 28px 0 8px;
+  border-top: 1px solid var(--ui-line-strong);
+  color: var(--ui-text);
+}
+.home-reading-head {
+  display: grid;
+  gap: 4px;
+}
+.home-reading-eyebrow {
+  color: var(--ui-text-3);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.home-reading h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+.home-reading h3 {
+  margin: 0 0 10px;
+  font-size: 1.0625rem;
+}
+.home-reading-about {
+  max-width: 40em;
+}
+.home-reading-about p {
+  margin: 0 0 12px;
+  color: var(--ui-text-2);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.home-reading-menu ul,
+.home-reading-notes ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-reading-menu ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  column-gap: 28px;
+}
+.home-reading-menu li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-top: 1px solid var(--ui-line);
+}
+.home-reading-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 14px;
+}
+.home-reading a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ui-text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 4px;
+}
+.home-reading a:hover {
+  text-decoration-color: currentColor;
+}
+.home-reading-menu small {
+  color: var(--ui-text-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.home-reading-notes li,
+.home-reading-story {
+  padding: 12px 0;
+  border-top: 1px solid var(--ui-line);
+}
+.home-reading-notes time,
+.home-reading-paper {
+  display: block;
+  margin: 0;
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+}
+.home-reading-notes p,
+.home-reading-story p:last-child {
+  margin: 4px 0 0;
+  color: var(--ui-text-2);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.home-reading-all {
+  margin-top: 8px;
+}
+/* 오늘의 1면 beside the newest notes (it shares their rules above): two
+   plain columns where there is room, one under the other on a phone. No
+   card, no tilt; the line that says it is made up stays in view under it. */
+.home-reading-press {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 28px;
+  align-items: start;
+}
+.home-reading-fiction {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--ui-line);
+  color: var(--ui-text-3);
+  font-size: 0.8125rem;
+}

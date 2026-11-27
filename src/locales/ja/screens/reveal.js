@@ -21,6 +21,7 @@ export default {
     bust: "熱 {gauge} — 壁は {wall} にあった。",
     cashed: "熱 {gauge} で確定。壁は {wall} にあった。",
   },
+  autoCash: "熱 {gauge} で自動確定。決裁の勝負だけ自分で打ちます。",
   details: "詳しく",
   ledgerLabel: "判定の余波",
   pot: {
@@ -30,6 +31,8 @@ export default {
     auditCaught: " 監査で発覚: 金庫へ行くはずの ",
     auditOf: " のうち",
     auditTaken: " を回収 · 金庫 ",
+    auditWhy: "なぜ: 監査ラインの下で確定した勝負が、監査の欄を上限まで埋めた。もう一度押してラインの上で確定すると欄は減る。",
+    auditWhySmooth: "なぜ: 同じ位置(熱±1)で切った確定が上限まで集まり、帳簿がなめらかすぎた。切る位置を変えれば避けられる。",
     toVault: " 金庫へ移動 ",
     vault: " · 金庫",
     staked: "懸かっている賭け金 ",
@@ -60,4 +63,9 @@ export default {
   next: "次へ · {title}",
   caseResult: "事件の結果",
   nextHand: "次の勝負",
+  pulse: {
+    question: "ここまでどうでしたか？",
+    answers: { fun: "楽しい", hard: "難しい", long: "長い" },
+    thanks: "ありがとうございます。次の勝負へどうぞ。",
+  },
 };

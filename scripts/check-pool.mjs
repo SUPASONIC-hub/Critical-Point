@@ -23,8 +23,11 @@ export function poolOptions(argv, count) {
   // The slowest check takes about half a minute on a quiet machine. One that
   // has not finished in five has hung, and without a limit it held the whole
   // run until the job's own timeout, with nothing in the log to say which.
+  // Eight minutes since 2026-11-18: check:endings (600 replayed seasons) took
+  // 277.7 s beside the other checks on CI and went over five on two PRs that
+  // changed no game logic. A hung check is still stopped well before the job's.
   const timeoutArg = argv.find((arg) => arg.startsWith("--timeout="));
-  const timeoutMs = Math.max(1, Number(timeoutArg?.slice(10)) || 300) * 1000;
+  const timeoutMs = Math.max(1, Number(timeoutArg?.slice(10)) || 480) * 1000;
   return { jobs, timeoutMs };
 }
 

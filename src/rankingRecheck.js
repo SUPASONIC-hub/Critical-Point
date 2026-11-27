@@ -48,6 +48,7 @@ import { getGameplayStats, getRiskPressure } from "./gameLogic.js";
 import { drawRelicOffer, drawStep, getMultiplier, getRelicDraftCost, getRerollSeed, getSealedCardId, normalizeRelicDraft, normalizeSchema, RULES_MARK, RULES_MARK_KEY } from "./gauntlet/gauntletEngine.js";
 import { RELIC_IDS } from "./gauntlet/relics.js";
 import { getTableRules } from "./gauntlet/tableUnlocks.js";
+import { isMarkNineOn, isNextOn, RULES_EIGHT_MARK, RULES_NEXT_MARK, RULES_NINE_MARK, RULES_SEVEN_MARK, RULES_TEN_MARK, withMarkEight, withMarkNine, withMarkSeven, withMarkTen, withNextRules } from "./gauntlet/nextTableRules.js";
 import { recheckWindow } from "./gauntlet/windowReplay.js";
 import { getSeasonScore } from "./seasonScore.js";
 
@@ -86,9 +87,21 @@ export function recheckCaseScore(row) {
   return { status: differs.length ? "mismatch" : "match", differs, expected: stats };
 }
 
-/** The rules a stored case was played under, from what its summary says of the run. */
-export function getRowRules(caseId, summary) {
-  return getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+/**
+ * The rules a stored case was played under, from what its summary says of the
+ * run and the RULES_MARK its row carries (`mark`): a row marked
+ * RULES_NEXT_MARK or later was played under the next rules (G1~G7,
+ * nextTableRules.js), an earlier one under the rules before them; one marked
+ * RULES_SEVEN_MARK or later under RULES_MARK 7's too (G11b·c, G13, G16, G18),
+ * an earlier one without them. With no mark, the rules this engine plays now.
+ */
+export function getRowRules(caseId, summary, mark = undefined) {
+  const rules = getTableRules(caseId, { veteran: summary?.newGamePlus === true, story: summary?.assistStory === true });
+  if (mark === undefined || mark === null) return rules;
+  // RULES_MARK 8 (G19~G26): a row of 5 to 7 is played again without them (`before8`); RULES_MARK 9 (G29~G37) likewise for a row of 8 (`before9`),
+  // and RULES_MARK 10 (G40~G42) for a row of 9 (`before10`).
+  const eight = withMarkEight(withMarkSeven(withNextRules(rules, Number(mark) >= RULES_NEXT_MARK), Number(mark) >= RULES_SEVEN_MARK), Number(mark) >= RULES_EIGHT_MARK);
+  return withMarkTen(withMarkNine(eight, Number(mark) >= RULES_NINE_MARK), Number(mark) >= RULES_TEN_MARK);
 }
 
 /**
@@ -177,7 +190,7 @@ export function readSeed(seed, { runId, windowIndex, nodeId }) {
  */
 export function recheckCaseWindows(row, { recordKey = WINDOW_RECORD_KEY, rules = null } = {}) {
   const log = Array.isArray(row?.decision_log) ? row.decision_log : [];
-  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary);
+  const caseRules = rules ?? getRowRules(row?.case_id, row?.summary, row?.dynamics?.[RULES_MARK_KEY]);
   const counts = { match: 0, mismatch: 0, unreplayable: 0, abandoned: 0, unrecorded: 0 };
   const findings = [];
   const windows = log.filter((entry) => entry?.threshold);
@@ -258,11 +271,17 @@ export function recheckRelicDraft(row, before = null) {
     else {
       const known = (list) => Array.isArray(list) && list.every((id) => RELIC_IDS.includes(id));
       if (!known(raw.pool) || !known(raw.owned) || !known(raw.offer) || !known(raw.picked) || (raw.reroll && !known(raw.reroll.offer))) differs.push("ids");
-      if (!sameIds(draft.offer, drawRelicOffer(draft.seed, draft.pool, draft.owned))) differs.push("offer");
-      if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned))) differs.push("reroll");
+      // G33 (RULES_MARK 9): the side that handed a card over draws the offer with it; a row of 8 or less has none.
+      const side = draft.side ?? null;
+      const nine = Number(row?.dynamics?.[RULES_MARK_KEY]) >= RULES_NINE_MARK;
+      if (side !== null ? !isMarkNineOn(rowRules(row)) : nine) differs.push("side");
+      if (!sameIds(draft.offer, drawRelicOffer(draft.seed, draft.pool, draft.owned, side))) differs.push("offer");
+      if (draft.reroll && !sameIds(draft.reroll.offer, drawRelicOffer(getRerollSeed(draft.seed), draft.pool, draft.owned, side))) differs.push("reroll");
       const last = draft.reroll?.offer ?? draft.offer;
       if (draft.picked.some((id) => !last.includes(id)) || draft.picked.length > (draft.extra ? 2 : 1)) differs.push("picked");
-      if (numberOf(raw.cost) !== getRelicDraftCost(draft)) differs.push("cost");
+      // G25: a refined tool is one the draft held.
+      if (draft.refine && !draft.owned.includes(draft.refine)) differs.push("refine");
+      if (numberOf(raw.cost) !== getRelicDraftCost(draft, rowRules(row))) differs.push("cost");
       if (draft.cost > 0 && (open?.story === true || open?.practice === true || entry.assistStory)) differs.push("spent");
       if (draft.cost > 0 && numberOf(open?.vault) !== null && draft.cost > open.vault) differs.push("vault");
       if (Array.isArray(open?.relics) && !sameIds(draft.owned, open.relics)) differs.push("owned");
@@ -273,6 +292,9 @@ export function recheckRelicDraft(row, before = null) {
   });
   return { drafts, findings };
 }
+
+/** The rules a case row was played under (`getRowRules`, by its RULES_MARK): what prices its draft (G4). */
+export const rowRules = (row) => getRowRules(row?.case_id, row?.summary, row?.dynamics?.[RULES_MARK_KEY]);
 
 /** What a case row's drafts cost in all: the vault may be down by this much from the close before (chainRecheck.js). */
 export function getRowDraftCost(row) {
@@ -345,6 +367,9 @@ export function recheckRun(rows = []) {
   if (cases.some((row) => !isCurrentTable(row))) return { status: "unverified", marks: [], cases: [] };
   const marks = new Set();
   let recorded = false;
+  // G4: under the next rules a season buys 「하나 더」 once (gauntletEngine.js `buyExtraRelic`).
+  const extras = cases.reduce((sum, row) => sum + (Array.isArray(row.decision_log) ? row.decision_log : []).filter((entry) => entry?.relicDraft?.extra === true).length, 0);
+  if (cases.length && isNextOn(rowRules(cases[0])) && extras > 1) marks.add(RELIC_DRAFT_MARK);
   const report = cases.map((row, at) => {
     const score = recheckCaseScore(row);
     const windows = recheckCaseWindows(row);

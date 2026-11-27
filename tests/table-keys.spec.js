@@ -97,10 +97,11 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await page.keyboard.press("1");
   const focus = page.getByTestId("gauntlet-focus");
   await expect(focus).toContainText("STRIKE 0");
-  // The button says what a press costs, to the eye and to a screen reader.
+  // The button says what a press costs, to the eye and to a screen reader
+  // (from RULES_MARK 5 the stance's hot line, G3, may follow it).
   const lock = page.getByTestId("commit-focus");
   await expect(lock.locator("small")).toHaveText("0 · −1.5초");
-  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 LOCK으로 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
+  await expect(lock).toHaveAccessibleDescription(/누를 때마다 자원 배율이 오르고 시간이 1\.5초 줄어든다\. 칩 배율은 LOCK으로 1\.5배까지만 오른다\. 70 이상 충전해 확정하면 다음 판에서 치른다\.(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
   await expect(page.locator(".gx-focus-reticle, .gx-beat-ring"), "no ring to time a press against").toHaveCount(0);
 
   // Any moment is as good as another: the press is not timed.
@@ -116,7 +117,7 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
   await page.keyboard.press("e");
   await expect(focus).toContainText("STRIKE 59");
   await expect(focus.locator("small")).toHaveText(/^상한 ×1\.5 · 자원 ×/);
-  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다$/);
+  await expect(lock).toHaveAccessibleDescription(/칩 배율이 1\.5배에 닿아 이번 판에는 더하지 않는다\. 70 이상 충전해 확정하면 다음 판에서 치른다\.(?: STRIKE로 열기 \d+ 이상에서 확정하면 상한이 ×[\d.]+\.)?$/);
   await expect(page.locator(".gx-grade"), "and nothing grades them").toHaveCount(0);
   await expect(stageOf(page)).toHaveAttribute("data-status", "live");
 
@@ -134,28 +135,40 @@ test("E locks: a press charges and costs the clock, Q changes the stance and the
  * and the spent button stays where it was, aria-disabled, so the focus is not
  * dropped to the page (decision 11).
  */
-test("R scouts the wall once: the band narrows to 20, the clock pays 3 seconds (and 믿음 1 at the settle), and the spent button keeps the focus", async ({ page }) => {
+test("R scouts the wall: the band narrows to 20, then to 14, the clock pays 3 seconds a look (and 믿음 1 then 2 at the settle), and the spent button keeps the focus", async ({ page }) => {
   await openTable(page);
   await page.keyboard.press("1");
   const scout = page.getByTestId("commit-scout");
   // The name starts with what the pill shows (axe 4.14 label-in-name) and adds the price (B1: 믿음 1 and the clock).
-  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1과 시간 3초$/);
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 조회, 믿음 1 · 시간 3초$/);
   await expect(scout).toHaveAttribute("aria-disabled", "false");
   const bandOf = async () => (await scout.textContent()).match(/벽 (\d+)–(\d+)/).slice(1).map(Number);
   const [low, high] = await bandOf();
   await scout.focus();
   const before = await clockOf(page);
   await page.keyboard.press("r");
+  // B1's next step (11-18): with the 믿음 for it, the same button now offers the second look.
+  await expect(scout).toContainText("좁히기");
+  await expect(scout).toHaveAttribute("aria-disabled", "false");
+  await expect(scout).toHaveAccessibleName(/^벽 \d+–\d+ · 좁히기, 14칸으로 · 믿음 2 · 시간 3초$/);
+  await expect(scout, "the button keeps the focus it had").toBeFocused();
+  const [first, last] = await bandOf();
+  expect(last - first, "the look narrows the band to 2 x SCOUT_REACH").toBeLessThanOrEqual(20);
+  expect(first).toBeGreaterThanOrEqual(low);
+  expect(last).toBeLessThanOrEqual(high);
+  expect(await clockOf(page), "the look costs three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  const once = await clockOf(page);
+  await page.keyboard.press("r");
   await expect(scout).toContainText("조회함");
   await expect(scout).toHaveAttribute("aria-disabled", "true");
   await expect(scout, "the spent button keeps the focus it had").toBeFocused();
   const [min, max] = await bandOf();
-  expect(max - min, "the look narrows the band to 2 x SCOUT_REACH").toBeLessThanOrEqual(20);
-  expect(min).toBeGreaterThanOrEqual(low);
-  expect(max).toBeLessThanOrEqual(high);
-  expect(await clockOf(page), "the look costs three seconds of the table's clock").toBeLessThanOrEqual(before - 3);
+  expect(max - min, "the second look narrows it to 2 x SCOUT_NARROW_REACH").toBeLessThanOrEqual(14);
+  expect(min).toBeGreaterThanOrEqual(first);
+  expect(max).toBeLessThanOrEqual(last);
+  expect(await clockOf(page), "the second look costs three seconds too").toBeLessThanOrEqual(once - 3);
 
-  // Once a window: neither R nor the button spends it again.
+  // Twice a window at most: neither R nor the button spends a third.
   const after = await clockOf(page);
   await page.keyboard.press("r");
   // force: Playwright counts aria-disabled as not enabled, and the click is the point here.
@@ -427,8 +440,9 @@ test("a save that holds a locked card as its bet still settles", { tag: "@once" 
 
 test("an untouched window that runs out cannot be replayed by reloading under the slam", { tag: "@once" }, async ({ page }) => {
   test.setTimeout(120_000);
-  // The shortest clock a board can carry, so the test waits twelve seconds, not forty-five.
-  await openBrokenBoard(page, "case01", "start", { schema: { seconds: 12 } });
+  // The shortest clock a board can carry, so the test waits twelve seconds, not
+  // forty-five. 사건 05 is where SILENCE opens (N18), which the end reads.
+  await openBrokenBoard(page, "case05", CASE_START_NODES.case05, { schema: { seconds: 12 } });
   const fresh = await readJsonStorage(page, TEST_STORAGE_KEYS.save);
   expect(fresh.dynamics?.openSeed ?? null, "reading alone is not a touch").toBeNull();
 
@@ -625,7 +639,10 @@ const STAGED_STEPS = [
   { caseId: "case01", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case02", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
   { caseId: "case03", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
-  { caseId: "case04", on: WHOLE, lines: 0 },
+  // AFTERSHOCK and SILENCE (N18), a line each; 사건 06 is the first with nothing new.
+  { caseId: "case04", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case05", on: WHOLE, lines: 1, kicker: NEW_PROTOCOL },
+  { caseId: "case06", on: WHOLE, lines: 0 },
 ];
 
 /** A scene's briefing page, with the table behind it still shut. */
@@ -879,9 +896,9 @@ test("staged: the introduction is drawn as a carried rule, with a border that is
   expect(intro.border, "every introduction is drawn alike").toBe(first.border);
 });
 
-test("staged: 판 열기 stays docked and pressable over the introduction on a small phone, a short one, a phone on its side and at a large type size", async ({ page }) => {
-  test.setTimeout(420_000);
-  await holdReadingClock(page);
+// One test a screen since 2026-11-18: the four in one test ran 4.2 minutes on
+// main and over its 7-minute limit on the 11-17 bundle's slower shards.
+{
   const SCREENS = [
     // Every phone docks 판 열기 alone since 2026-10-22 (D-3), so a 740px one
     // has the panel and the question on its first screen too.
@@ -896,6 +913,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
     { name: "390x844, 20px type", size: { width: 390, height: 844 }, rootFontSize: "20px" },
   ];
   for (const screen of SCREENS) {
+  test(`staged: 판 열기 stays docked and pressable over the introduction at ${screen.name}`, async ({ page }) => {
+    test.setTimeout(240_000);
+    await holdReadingClock(page);
     for (const step of STAGED_STEPS.filter((rung) => rung.lines > 0)) {
       await openIntroPage(page, step.caseId, screen.size, { broken: step.caseId === "prologue02", rootFontSize: screen.rootFontSize });
       const where = `${step.caseId} @ ${screen.name}`;
@@ -920,8 +940,9 @@ test("staged: 판 열기 stays docked and pressable over the introduction on a s
     // And it opens the table.
     await clickThroughMotion(page.getByTestId("open-table"), `판 열기 @ ${screen.name}`);
     await expect(page.getByTestId("scene-briefing")).toHaveCount(0);
+  });
   }
-});
+}
 
 // The draft a case shows was offered as the case before it closed, so the
 // first one a plain run meets is the offer made at the close of 프롤로그 04.
@@ -1195,6 +1216,25 @@ test.describe("the big decisions' 확정 is held", () => {
     await expectHolding(page);
     await expect(stageOf(page)).toHaveAttribute("data-status", "cashed", { timeout: 3_000 });
     await page.mouse.up();
+  });
+
+  // 2026-11-26 (Galaxy A32): a held label was selected as text, the copy menu
+  // and the assistant opened, the browser cancelled the press and the clock
+  // ran out. Every button of the action row refuses selection and the
+  // long-press callout, so a hold stays a hold.
+  test("the held buttons cannot be selected as text or open the long-press menu", async ({ page }) => {
+    await stakeClosing(page);
+    const styles = await page.locator(".gx-actions button").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const style = getComputedStyle(button);
+        return { id: button.dataset.testid ?? button.className, select: style.userSelect || style.webkitUserSelect, touch: style.touchAction };
+      }),
+    );
+    expect(styles.length).toBeGreaterThan(1);
+    for (const style of styles) {
+      expect(style.select, `${style.id}: no text selection`).toBe("none");
+      expect(style.touch, `${style.id}: no double-tap zoom`).toBe("manipulation");
+    }
   });
 
   test("a hold confirms before it is let go; one slid off confirms nothing", async ({ page }) => {

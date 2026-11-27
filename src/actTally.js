@@ -6,6 +6,7 @@ import { getJudgementHabit, habitCardLine } from "./judgementHabit.js";
 import { nearestEnding } from "./nearestEnding.js";
 import { easyResourceLabels, subjectParticle } from "./playerLanguage.js";
 import { buildResultCardModel } from "./resultCardModel.js";
+import { shareAddress } from "./shareLink.js";
 import { readClosedCases } from "./seasonStanding.js";
 import actTallyCopy from "./copy/actTally.js";
 import reportLinesCopy from "./copy/reportLines.js";
@@ -28,6 +29,13 @@ import { fill } from "./locale.js";
 
 /** The act cards that carry the tally (actCardCopy.js). */
 export { ACT_TALLY_CASES };
+
+/**
+ * N23 (2026-11-16): the small tally on 사건 07's report, at the end of 1막
+ * (actProgress.js, ActProgress.jsx), keyed like the act cards' by the case
+ * the act it closes leads into.
+ */
+export const MINI_TALLY_CASES = Object.freeze(["case08"]);
 
 const toCount = (value) => (Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) : 0);
 
@@ -78,7 +86,7 @@ export function describeNearLine(nearest) {
  * @param {{ caseResults?: object, discoveredClues?: any[], log?: any[], resources?: object }} [season]
  */
 export function buildActTallyModel(caseId, season = {}) {
-  if (!ACT_TALLY_CASES.includes(caseId)) return null;
+  if (!ACT_TALLY_CASES.includes(caseId) && !MINI_TALLY_CASES.includes(caseId)) return null;
   const caseResults = season?.caseResults && typeof season.caseResults === "object" ? season.caseResults : {};
   if (!readClosedCases(caseResults).length) return null;
   const input = {
@@ -99,6 +107,8 @@ export function buildActTallyModel(caseId, season = {}) {
     habitTitle: habit?.title ?? actTallyCopy.habitPending,
     habitLine: habit?.line ?? "",
     habitCard: habit ? habitCardLine(habit) : "",
+    // The habit's id, for the shared address (shareLink.js); never printed.
+    habitId: habit?.id ?? "",
     stakeLine: stake
       ? fill(stake.kept ? actTallyCopy.stakeKept : actTallyCopy.stakeLost, { pot: formatNumber(stake.pot), where: tallyCaseLabel(stake.caseId) })
       : actTallyCopy.stakeNone,
@@ -113,12 +123,16 @@ export function buildActTallyModel(caseId, season = {}) {
   };
 }
 
-/** The line copied with the picture, ending at the site's address when there is one. */
-export function buildActTallyShareText(model, origin = "") {
+/**
+ * The line copied with the picture, ending at the site's address when there
+ * is one: the start page in the page's language, marked as a shared card's
+ * the way the finale's is (shareLink.js `shareAddress`).
+ */
+export function buildActTallyShareText(model, origin = "", language) {
   if (!model) return "";
-  const address = String(origin ?? "").trim().replace(/\/+$/, "");
+  const address = shareAddress(origin, model.habitId, language);
   const line = fill(actTallyCopy.shareLine, { end: model.end, habit: model.habitTitle, ending: model.endingName });
-  return [line, address && `${address}/`].filter(Boolean).join(" ");
+  return [line, address].filter(Boolean).join(" ");
 }
 
 /**

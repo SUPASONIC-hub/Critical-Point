@@ -1,5 +1,6 @@
 import { CASE_SEQUENCE } from "./gameCases.js";
 import { ENDING_GATES, initialResources } from "./gameConstants.js";
+import { isMarkEightOn, isMarkTenOn } from "./gauntlet/nextTableRules.js";
 
 /**
  * Where a season stands against SYSTEM COLLAPSE, read the one way the ending
@@ -12,6 +13,13 @@ import { ENDING_GATES, initialResources } from "./gameConstants.js";
 
 const { collapseHarmPerCase: HARM_PER_CASE, collapseBustRate: BUST_RATE, collapseOverreachHarm: OVERREACH_HARM } = ENDING_GATES;
 
+// G26 (RULES_MARK 8): the slack door opens further: the record bar 0.5, and OPEN OVERSIGHT's legitimacy and trust this much lower (6.1% of open doors change the ending).
+const CLUE_RATE_SLACK_EIGHT = 0.5;
+const OVERSIGHT_SLACK_EIGHT = 9;
+const OVERSIGHT_TRUST_SLACK_EIGHT = 8;
+/** What an open slack door lowers, for the ruling (gameLogic.js) and the finale's line (nearestEnding.js); `bar` is the record bar before 8. */
+export const getSlackGates = (bar) => (isMarkEightOn() ? { clueRate: CLUE_RATE_SLACK_EIGHT, oversight: OVERSIGHT_SLACK_EIGHT, trust: OVERSIGHT_TRUST_SLACK_EIGHT } : { clueRate: bar, oversight: 0, trust: 0 });
+
 /**
  * How much of a gate counts as close to it. The one number the readout's
  * warning state hangs on; where it sits is the owner's call.
@@ -21,6 +29,43 @@ export const SEASON_STANDING_NEAR = 0.8;
 // in 100 windows is at the line, not under it.
 const NEAR_TOLERANCE = 1e-9;
 const HARM_CASES_LISTED = 3;
+
+/**
+ * G34 (RULES_MARK 9, 보상금): a case whose harm was paid off at its close
+ * (`covered`, src/gauntlet/settlementPay.js) counts what is left of it, and
+ * the cover is kept: each one takes COVER_LEGITIMACY off the season's mean
+ * 공정함 (gameLogic.js `getSeasonStrain`), and the ruling leans to the endings
+ * made of silence -- PROFITABLE SILENCE's trust bar COVER_SILENCE_TRUST
+ * higher a cover, QUIET COVER from COVER_QUIET covers on.
+ */
+export const caseHarm = (summary) => Math.max(0, (Number(summary?.finalHumanCost) || 0) - (Number(summary?.covered?.harm) || 0));
+export const COVER_LEGITIMACY = 1;
+export const COVER_SILENCE_TRUST = 3;
+export const COVER_QUIET = 6;
+
+/**
+ * G40 (RULES_MARK 10, 마지막 답의 무게): the finale's answer weighs once more on
+ * the season's mean standing the ruling reads -- 증언 (witness) the people's
+ * 믿음, 개혁 (control) the system's 공정함, FINALE_WEIGHT each, up to 100; 소각
+ * (burn) nothing. Only the mean (`getSeasonStrain().seasonResources`): a caller
+ * that hands the last case's resources alone is read as it was. Measured
+ * (게임성 5차 G40, with G41): the answer moves the ending in 75.8% of standing
+ * seasons (63.3% before); +8 took COLD JUSTICE under 3%.
+ */
+export const FINALE_WEIGHT = 5;
+const FINALE_KEYS = Object.freeze({ witness: "trust", control: "legitimacy" });
+/** The season's mean standing with the finale's answer on it, as the ruling (gameLogic.js) and the finale's line (nearestEnding.js) read it. */
+export function weighFinale(seasonResources, finale) {
+  const key = FINALE_KEYS[finale];
+  if (!seasonResources || !key || !isMarkTenOn()) return seasonResources;
+  return { ...seasonResources, [key]: Math.min(100, (Number(seasonResources[key]) || 0) + FINALE_WEIGHT) };
+}
+/**
+ * G41 (RULES_MARK 10): a season that paid COVER_QUIET cases off or more and did
+ * not burn its records closes on QUIET COVER where it would have closed on
+ * PROFITABLE SILENCE: it kept the records and bought the quiet (게임성 5차 G41).
+ */
+export const coversBeforeSilence = (seasonCovers) => isMarkTenOn() && seasonCovers >= COVER_QUIET;
 
 /**
  * The season's closed cases as `[caseId, summary]`, the case that is closing
@@ -37,7 +82,8 @@ export function readCollapseTally(summaries = []) {
   return {
     casesPlayed: summaries.length,
     seasonWindows: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0) + (Number(summary.pushRecord?.cashes) || 0), 0),
-    seasonHumanCost: summaries.reduce((sum, summary) => sum + (Number(summary.finalHumanCost) || 0), 0),
+    seasonHumanCost: summaries.reduce((sum, summary) => sum + caseHarm(summary), 0),
+    seasonCovers: summaries.filter((summary) => summary?.covered).length,
     seasonBusts: summaries.reduce((sum, summary) => sum + (Number(summary.pushRecord?.busts) || 0), 0),
   };
 }
@@ -132,7 +178,7 @@ export function getSeasonStanding({ caseResults = {}, pending = null, resources 
       level: overreachLevel,
     },
     harmCases: closed
-      .map(([caseId, summary]) => ({ caseId: caseId ?? null, harm: Number(summary.finalHumanCost) || 0 }))
+      .map(([caseId, summary]) => ({ caseId: caseId ?? null, harm: caseHarm(summary) }))
       .filter((entry) => entry.harm > 0)
       .sort((a, b) => b.harm - a.harm || seasonOrder(a.caseId) - seasonOrder(b.caseId))
       .slice(0, HARM_CASES_LISTED),

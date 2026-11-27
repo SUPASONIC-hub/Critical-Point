@@ -1,6 +1,7 @@
 /** src/copy/ranking.js in Japanese: the ranking screen. */
 export default {
-  back: "ブリーフィングに戻る",
+  back: "タイトル画面に戻る",
+  backToResult: "結果に戻る",
   title: "どこで思考がいちばん大きく広がったか",
   intro: "バーストスコアとランクを比べます。シーズンの記録は事件の平均スコアです。スコアが高いのは正解を当てたという意味ではなく、圧力の中で思考のリズム、視点の転換、回復の判断、構造の再設計がいっしょに跳ね上がったという意味です。",
   retry: "もう一度読み込む",
@@ -33,4 +34,5 @@ export default {
   hallBadge: "名誉の殿堂 · {board} {place}位",
   hallMainBoard: "通常ランキング",
   hallProvisional: "（暫定）",
+  hallProgress: "名誉の殿堂 · {board}：最初の3席は{min}シーズン集まると開きます（現在 {count}/{min}）",
 };

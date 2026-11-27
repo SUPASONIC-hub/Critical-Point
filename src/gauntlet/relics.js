@@ -32,7 +32,9 @@ import { subjectParticle } from "../playerLanguage.js";
 import { formatMoney } from "../gameConstants.js";
 import relicsCopy from "../copy/relics.js";
 import { fill } from "../locale.js";
-import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT } from "./auditRisk.js";
+import { AUDIT_CONTACT_SLACK, AUDIT_LIMIT, SMOOTH_LIMIT } from "./auditRisk.js";
+import { isMarkNineOn, isNextOn } from "./nextTableRules.js";
+import { boostPercent, COLD_BLOOD_WALL, HOT_CASH_HEAT, LONG_STREAK, LOW_CASH_HEAT, RELIC_BOOSTS, SIDE_STREAK } from "./relicsNext.js";
 import {
   AFTERSHOCK_START,
   BLACKOUT_WALL_SHIFT,
@@ -70,6 +72,7 @@ export const RELIC_SLOTS = 5;
  * reads what is left. Neither moves the pot, the wall or the gauge.
  */
 export const RELIC_REROLL_COST = 4000;
+// Under the next rules (G4) the reroll is relicsNext.js `NEXT_REROLL_COST` and one more is once a season.
 export const RELIC_EXTRA_COST = 12000;
 /** The logic streak that unlocks ENCORE: the streak at which the pot's bonus is full. */
 const ENCORE_UNLOCK_COMBO = 8;
@@ -87,14 +90,19 @@ const relicWords = relicsCopy.relics;
  */
 function relic(id, { label, icon, softens = null, unlock = null }, values = {}) {
   const words = relicWords[id];
-  const say = (line) => fill(line, values);
+  // G4: under the next rules a tool says the condition that pays (relicsNext.js);
+  // COLD BLOOD says what it does instead, since it does something else.
+  const next = isNextOn();
+  const boost = Object.hasOwn(RELIC_BOOSTS, id) ? { pct: boostPercent(id), low: LOW_CASH_HEAT, hot: HOT_CASH_HEAT, side: SIDE_STREAK, long: LONG_STREAK, wall: COLD_BLOOD_WALL } : {};
+  const say = (line) => fill(line, { ...values, ...boost });
+  const text = next && words.nextText ? say(words.nextText) : next && words.next ? `${say(words.text)} ${say(words.next)}` : say(words.text);
   return {
     label,
     name: words.name,
     icon,
-    text: say(words.text),
+    text,
     proc: say(words.proc),
-    ...(softens ? { softens: { mutation: softens, text: say(words.softens) } } : {}),
+    ...(softens ? { softens: { mutation: softens, text: say(next && words.nextSoftens ? words.nextSoftens : words.softens) } } : {}),
     unlock: unlock ? { id: unlock, text: say(words.unlock) } : null,
   };
 }
@@ -106,7 +114,7 @@ export const RELICS = Object.freeze({
   }),
   heatSink: relic("heatSink", { label: "HEAT SINK", icon: "fan", softens: "heatDebt" }, { share: HEAT_SINK_SHARE, seconds: HEAT_SINK_SECONDS }),
   // C-7's five, each a person of the season (2026-10-25).
-  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: AUDIT_LIMIT + AUDIT_CONTACT_SLACK }),
+  auditContact: relic("auditContact", { label: "AUDIT CONTACT", icon: "clipboard" }, { limit: (isMarkNineOn() ? SMOOTH_LIMIT : AUDIT_LIMIT) + AUDIT_CONTACT_SLACK }),
   carbonCopy: relic("carbonCopy", { label: "CARBON COPY", icon: "files", softens: "blackout" }, {
     shift: BLACKOUT_WALL_SHIFT, particle: subjectParticle(String(BLACKOUT_WALL_SHIFT)), pull: BLACKOUT_WALL_SHIFT - CARBON_COPY_HOLD,
   }),
@@ -135,6 +143,21 @@ export const BREATHER = Object.freeze({
 });
 
 export const RELIC_IDS = Object.freeze(Object.keys(RELICS));
+/**
+ * G33 (게임성 개선점 4차, 「전부 1」 of 2026-11-25; RULES_MARK 9): one card of
+ * a draft is handed over by the side the case closed on -- the direction its
+ * logic hold kept (logicStreak.js), or the record when it kept none -- from
+ * that side's tools, by that side's person (a speaker's name, said in the
+ * page's language). The other two are drawn as before.
+ */
+export const HANDED_RELICS = Object.freeze({
+  people: Object.freeze(["testimony", "fieldNote", "insurance"]),
+  position: Object.freeze(["frontPage", "heatSink", "encore"]),
+  record: Object.freeze(["auditContact", "carbonCopy", "stethoscope"]),
+});
+export const HANDED_BY = Object.freeze({ people: "도윤하", position: "오진우", record: "이민서" });
+/** The side a case closed on, from its logic hold's direction (null: none held). */
+export const handedSideOf = (direction) => (Object.hasOwn(HANDED_RELICS, direction) && direction !== "record" ? direction : "record");
 /** Relics every season can draft without unlocking anything. */
 export const DEFAULT_RELIC_POOL = Object.freeze(RELIC_IDS.filter((id) => !RELICS[id].unlock));
 

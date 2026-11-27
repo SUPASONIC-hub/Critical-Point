@@ -1,6 +1,6 @@
 # 초상화 출처
 
-`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호), 11월 13일에 번외 5를 위해 더한 세 장(육성빈, 추영복, 마리사 탄), 11월 13일에 번외 6을 위해 더한 한 장(레 티 호아), 11월 13일에 번외 7을 위해 더한 두 장(그레이스 웡, 모지현)의 출처입니다.
+`public/portrait-*.webp` 가운데 2026년 10월 15일에 더한 열한 장, 10월 20일에 더한 다섯 장, 10월 21일에 더한 예순여섯 장, 10월 23일에 바꾼 한 장(도윤하), 11월 12일에 번외 4를 위해 더한 세 장(오민정, 문정택, 한기호), 11월 13일에 번외 5를 위해 더한 세 장(육성빈, 추영복, 마리사 탄), 11월 13일에 번외 6을 위해 더한 한 장(레 티 호아), 11월 13일에 번외 7을 위해 더한 두 장(그레이스 웡, 모지현), 11월 14일에 번외 8을 위해 더한 한 장(비노드 타파), 11월 16일에 번외 9를 위해 더한 한 장(아이굴 세리코바), 11월 20일에 번외 10·11을 위해 더한 두 장(변정순, 염봉수)의 출처입니다.
 처음 다섯 장 가운데 넷(한서윤, 반재욱, 오진우, 에코)은 그전에 찾아 둔 무료 라이선스 이미지인데, 그때 출처를 적어 두지 않아 여기 적지 못합니다.
 도윤하는 처음 다섯 장의 여성 초상이 본문(남자: 「은행 총각」, 「누나 결혼식」)과 맞지 않아 2026년 10월 23일 아래 표의 사진으로 바꿨습니다.
 
@@ -18,7 +18,7 @@
 은재하 → 뤼카 베르나르(리옹 출신 셰프)는 Kampus Production의 사진으로, 이 사진가는 연하진과 두 장째이고 모델은 다른 사람입니다.
 배수경은 이름은 그대로 두고 베트남 출신 결혼이민자(귀화 16년)라는 배경을 더하면서, 40대 여성의 사진(yun zhu)으로 초상만 바꿨습니다. 옛 사진(Esma Yıkılmaz İpek)은 더 쓰지 않습니다.
 
-## 사진에서 만든 일흔두 장
+## 사진에서 만든 일흔여섯 장
 
 사진은 모두 Unsplash 또는 Pexels의 무료 사진이고, 2026년 10월 15일에 내려받았습니다(나은호와 권도현은 10월 20일, 선우진부터 신영란까지, 고은비부터 남지형까지, 공병만부터 권태호까지는 10월 21일).
 두 라이선스 모두 출처 표시 없이 상업적으로 쓰고 고칠 수 있지만, 사진가를 밝혀 둡니다.
@@ -106,6 +106,10 @@
 | 문정택 | `portrait-moon-jeongtaek.webp` | https://unsplash.com/photos/man-sitting-on-chair-d77tidmCJqI | Raychan (https://unsplash.com/@wx1993) | [Unsplash License](https://unsplash.com/license) |
 | 그레이스 웡 | `portrait-grace-wong.webp` | https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-wearing-eyeglasses-sitting-on-gray-chair-8278977/ | ANTONI SHKRABA production (https://www.pexels.com/@anthonyshkraba-production/) | [Pexels License](https://www.pexels.com/license/) |
 | 모지현 | `portrait-mo-jihyun.webp` | https://www.pexels.com/photo/young-brunette-portrait-14255519/ | Oktavianus Mulyadi (https://www.pexels.com/@zacks1981/) | [Pexels License](https://www.pexels.com/license/) |
+| 비노드 타파 | `portrait-binod-thapa.webp` | https://www.pexels.com/photo/focused-factory-worker-operating-machine-35669949/ | Mushfiqur Rahman (https://www.pexels.com/@mushfiqur-rahman-2158530446/) | [Pexels License](https://www.pexels.com/license/) |
+| 아이굴 세리코바 | `portrait-aigul-serikova.webp` | https://www.pexels.com/photo/mature-asian-woman-with-wrinkles-leaning-on-sofa-6888679/ | Meruyert Gonullu (https://www.pexels.com/@meruyert-gonullu/) | [Pexels License](https://www.pexels.com/license/) |
+| 변정순 | `portrait-byeon-jeongsun.webp` | https://www.pexels.com/photo/happy-asian-lady-using-netbook-on-couch-in-living-room-6798765/ | Michelle Leman (https://www.pexels.com/@michelle-leman/) | [Pexels License](https://www.pexels.com/license/) |
+| 염봉수 | `portrait-yeom-bongsu.webp` | https://www.pexels.com/photo/mature-man-in-grey-striped-jacket-and-eyeglasses-posing-in-a-park-16726865/ | daejeung (https://www.pexels.com/@daejeung/) | [Pexels License](https://www.pexels.com/license/) |
 
 같은 사진가의 사진이 여러 장 있지만(cottonbro studio 세 장, Vitaly Gariev·Mikhail Nilov·Kindel Media 두 장씩, 11-13 기준) 모델은 서로 다른 사람입니다.
 10월 21일의 스무 장은 얼굴을 가운데 두고, 사진에 함께 찍힌 손과 물건, 글자는 잘라 냈습니다(채이안의 엄지, 지강현의 손가락, 유하온이 잡은 의자, 신영란 앞으로 뻗은 손님의 팔 등).
@@ -142,6 +146,25 @@ ANTONI SHKRABA production은 최서진(Antoni Shkraba)과 같은 작업실이지
 세 장까지라는 기준에 걸리고, Ramon Karolan의 사진은 이미 주은채에 써서 쓰지 않았습니다.
 
 
+비노드 타파는 2026년 11월 14일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 번외 8(src/nodes/side08.js)에서 9년 8개월 일한 공장을
+떠나는 네팔 출신 사출기 담당이라 악역이 아니고, 기계 앞에서 일하는 평범한 얼굴의 사진을 골랐습니다(사진 속 사람은 게임의 인물이 아님). 얼굴을 가운데 두고
+기계와 손은 잘라 냈습니다. 번외 6처럼 생성 사진을 먼저 찾았지만 Pixabay의 남아시아 남성 생성 사진은 의상·전신 사진뿐이었습니다. 후보와 보정 전 원본은
+cp-archive/메모-20261114/side08-portraits/에 있습니다.
+
+아이굴 세리코바는 2026년 11월 16일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 번외 9(src/nodes/side09.js)에서 남편의 빚을 처음 알게 되는
+카자흐스탄 출신 57세 아내라 악역이 아니고, 집 소파에 기대 앉은 평범한 얼굴의 사진을 골랐습니다(사진 속 사람은 게임의 인물이 아님). 얼굴을 가운데 두고
+턱을 괸 팔과 소파는 잘라 냈습니다. Meruyert Gonullu의 사진은 처음이고, 같은 모델이 책을 내려다보는 사진(6888678)은 눈이 보이지 않아 쓰지 않았습니다. Pexels의 몽골·카자흐
+여성 사진은 대부분 전통 의상 촬영이라 고르지 않았습니다. 후보와 보정 전 원본은 cp-archive/메모-20261114/side09/portraits/에 있습니다.
+
+변정순은 2026년 11월 20일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 번외 10(src/nodes/side10.js)에서 사고 뒤 밤마다 밀린 집을 도는
+온새 돌봄의 58세 요양보호사라 악역이 아니고, 집 소파에 앉아 카메라를 보는 평범한 얼굴의 사진을 골랐습니다(사진 속 사람은 게임의 인물이 아님). 얼굴을 가운데 두고
+노트북과 발, 화분은 잘라 냈습니다. Michelle Leman의 사진은 처음이고, 같은 모델이 노트북을 내려다보는 사진(6798774)은 눈이 보이지 않아 쓰지 않았습니다.
+후보와 보정 전 원본은 cp-archive/메모-20261120/side10-portraits/에 있습니다.
+
+염봉수는 2026년 11월 20일에 내려받아 같은 보정을 했고, 라이선스 문구는 위와 같습니다. 번외 11(src/nodes/side11.js)에서 경포 해변을 지키는 66세 수상안전요원이라
+악역이 아니고, 공원에서 안경을 쓰고 웃는 평범한 얼굴의 사진을 골랐습니다(사진 속 사람은 게임의 인물이 아님). 얼굴을 가운데 두고 무릎에 짚은 손과 나무는 잘라 냈습니다.
+daejeung의 사진은 처음이고, 같은 사진가의 밀짚모자 사진(38201780)은 선글라스로 눈이 가려져, 부산 부두의 노인 사진(40207125, 다른 사진가)은 뒷모습이라 쓰지 않았습니다.
+후보와 보정 전 원본은 cp-archive/메모-20261120/side11-portraits/에 있습니다.
 
 ## 실존하지 않는 사람의 생성 사진 열아홉 장
 
@@ -193,6 +216,11 @@ TheDigitalArtist는 서로 확연히 다른 세 장(진세라, 석재우, 편종
 
 ## 초상이 없는 인물
 
-2026년 10월 21일부터 없습니다. 장면에서 말하는 아흔여섯 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 72 + 생성 19 + 그린 1; 번외 4의 세 명은 11월 12일, 번외 5의 세 명·번외 6의 한 명·번외 7의 두 명은 11월 13일).
+2026년 10월 21일부터 없습니다. 장면에서 말하는 백 명이 모두 위 표의 초상을 가집니다(처음 넷 + 사진 76 + 생성 19 + 그린 1; 번외 4의 세 명은 11월 12일, 번외 5의 세 명·번외 6의 한 명·번외 7의 두 명은 11월 13일, 번외 8의 한 명은 11월 14일, 번외 9의 한 명은 11월 16일, 번외 10·11의 한 명씩은 11월 20일).
 번외 6의 관리 대리인 기성철은 장면의 화자가 아니라 서술 속에서만 말하므로 초상이 없습니다. 평범한 얼굴의 동아시아 남성 생성 사진을 업로더 상한(한 사람에 세 장) 안에서 찾지 못해(kalsstockmedia 8644546은 연서준과 같은 모델로 보이고, Joshgmit의 태권도복 시리즈는 표정이 험악함) 화자로 두지 않았습니다(우리, 11월 13일).
+번외 8의 채권관리팀 차장 설경민(악역 쪽)과 도담사출 대표 심재만도 기성철처럼 서술 속에서만 말합니다(간접 화법과 「」). 악역 쪽인 설경민은 생성 사진이어야 하는데,
+11월 14일에 Pixabay에서 평범한 얼굴의 40대·60대 동아시아 남성 생성 사진을 찾지 못했습니다. 의상 시리즈(AiArtista 8743314)는 추영복과 너무 닮았고,
+Pexels의 중년 남성 후보 둘(Wasin Pirom 31465733, Ketut Subiyanto 4584068)은 채이안·지강현과 같은 모델이라 쓰지 않았습니다(우리, 11월 14일).
+번외 9의 상속채권파트장 위성규(악역 쪽)도 같은 방식으로 서술 속에서만 말합니다. 11월 16일 Pixabay의 생성 사진에서 평범한 얼굴의 40대 동아시아 남성을 다시
+찾았지만, 사무실 장면은 서양인이거나 근육질·애니메이션풍이었고 TheDigitalArtist는 이미 세 장이라 쓰지 않았습니다(우리, 11월 16일).
 새 인물에게도 실루엣을 남기지 않고 초상을 줍니다(우리, 10월 21일). 실루엣은 파일을 받지 못했을 때만 그려집니다(`src/components/SpeakerPortrait.jsx`).

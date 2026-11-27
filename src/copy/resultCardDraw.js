@@ -9,7 +9,7 @@ import { localizeTables } from "../locale.js";
 const resultCardDrawCopy = {
   // The words the card prints that are the same for every season.
   labels: {
-    game: "TRIGGERLAB: CRITICAL POINT",
+    game: "CRITICAL POINT",
     season: "SEASON 01 · FINAL RECORD",
     dna: "판단 DNA",
     ending: "결말",
@@ -28,7 +28,7 @@ const resultCardDrawCopy = {
   // people under the collapse line (readHeldLine), so a shared card does not
   // read as a lost one.
   held: "현금은 잃었어도 사람 피해는 붕괴선 아래",
-  shareLine: "트리거랩에서 한 시즌을 끝냈습니다. 판단 DNA는 '{mode}', 결말은 '{ending}'. 최고 버스트 {burst}{points}, {rank} 랭크.{share}",
+  shareLine: "「임계점: CRITICAL POINT」에서 한 시즌을 끝냈습니다. 판단 DNA는 '{mode}', 결말은 '{ending}'. 최고 버스트 {burst}{points}, {rank} 랭크.{share}",
 };
 export default resultCardDrawCopy;
 

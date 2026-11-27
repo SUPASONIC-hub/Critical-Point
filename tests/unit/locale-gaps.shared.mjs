@@ -138,7 +138,7 @@ export function collectLines(tables) {
   add("logicRank", [LOGIC_RANK_COPY.pending, LOGIC_RANK_COPY.band(25), LOGIC_REPORT_COPY.label, LOGIC_REPORT_COPY.caption]);
 
   // The other players' lines on a scene.
-  add("sceneRates", [SCENE_CHOICE_COPY.line(47, false), SCENE_CHOICE_COPY.line(12, true), SCENE_TRACE_COPY.line(31)]);
+  add("sceneRates", [SCENE_CHOICE_COPY.line(47, false), SCENE_CHOICE_COPY.line(12, true), SCENE_TRACE_COPY.line(31, 64), SCENE_TRACE_COPY.collecting(7)]);
 
   // NEW GAME+ and the 결말 도감.
   add("endingBook.first", getEndingBook({ seasons: 1 }));

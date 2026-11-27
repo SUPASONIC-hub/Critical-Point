@@ -1,4 +1,5 @@
 import { drawStep, GAUGE_MAX, getMultiplier } from "./gauntletEngine.js";
+import { EDGE_CASH_BONUS, isMarkNineOn, readEdgeCash } from "./nextTableRules.js";
 import { tableReactions } from "../caseCopy.js";
 import { formatMoney } from "../gameConstants.js";
 import { getCaseRead } from "../seasonScore.js";
@@ -53,7 +54,10 @@ export function describeAfterword(win) {
   // nothing to weigh "one more" against: no line (user, 2026-10-23 Q34 (1)).
   if (win?.status === "cashed" && !(Number(win.pushes) > 0)) return null;
   const next = readNextPush(win);
-  if (next) return fill(words().nextPush, { step: next.step, gauge: next.gauge, wall: next.wall, outcome: next.safe ? words().nextSafe : words().nextBust });
+  // G30 (RULES_MARK 9): a cash close under the wall was paid more, and the line says so first.
+  const gap = isMarkNineOn() ? readEdgeCash(win) : null;
+  const edge = gap === null ? "" : fill(words().edge, { bonus: EDGE_CASH_BONUS, gap });
+  if (next) return edge + fill(words().nextPush, { step: next.step, gauge: next.gauge, wall: next.wall, outcome: next.safe ? words().nextSafe : words().nextBust });
   const tell = readTellWall(win);
   return tell ? fill(words().tell, { heard: tell.heard, wall: tell.wall }) : null;
 }

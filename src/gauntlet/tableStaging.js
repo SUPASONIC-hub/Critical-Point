@@ -1,5 +1,6 @@
 import { CASE_START_NODES } from "../gameCases.js";
 import { getUnlockIntro, STAGED } from "./tableUnlocks.js";
+import { caseRuleFor } from "./caseRules.js";
 
 /**
  * What the briefing asks of the unlock ladder (`tableUnlocks`). The stage asks
@@ -54,4 +55,14 @@ const OPENING_VOICE = /^[가-힣A-Za-z0-9 ]{1,16}: \S/u;
  */
 export function getBriefingWeekRuleId(node, nodeId, run) {
   return (opensCase(node, nodeId) && run?.story !== true && run?.weekRule) || null;
+}
+
+/**
+ * The case whose own rule (caseRules.js, N26) its opening page prints, in
+ * the week's panel under its own kicker (WeekRulePanel.jsx); null on the
+ * case's later pages, in a case with none, in a story case and in a season
+ * that carries a week's rule (`caseRuleFor`), whose panel is the week's.
+ */
+export function getBriefingCaseRuleCase(node, nodeId, run) {
+  return (opensCase(node, nodeId) && caseRuleFor(node.caseId, run) && node.caseId) || null;
 }

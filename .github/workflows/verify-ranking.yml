@@ -59,11 +59,11 @@ name: Verify Ranking
 # --per-board; a candidate is read every night, read before or not, within
 # the same `cap`). Right after the marks, one read-only SELECT counts each
 # board's seasons with no mark over the whole board (hall_of_fame_counts: the
-# threshold of ten is not counted within the rows read), and from the same
+# threshold of five is not counted within the rows read), and from the same
 # check of the same rows (src/hallOfFame.js, verify-ranking-rows
 # --hall-of-fame-sql) one statement calls hall_of_fame_settle
 # (*_hall_of_fame.sql) with each board's first three clean, checked seasons;
-# it counts again itself and refuses a place below ten. The check is not run
+# it counts again itself and refuses a place below five. The check is not run
 # twice, so what was checked and what is posted cannot differ. Then a job of
 # its own, the only one with `contents: write`, reads the public view and
 # force-pushes one commit with the page to the `hall-of-fame` branch, an
@@ -112,6 +112,11 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # `actions: read` for N45's count only: the step lists this workflow's
+    # earlier runs and downloads their summary artifacts.
+    permissions:
+      contents: read
+      actions: read
     outputs:
       settled: ${{ steps.hall.outputs.settled }}
     env:
@@ -254,6 +259,40 @@ jobs:
         run: |
           rm -f rows/*.json runs.json runs.sql run.sql query.err marks.sql marked.json write.err counts.sql counts.json hall.sql hall.json hall.err
           if [ -d rows ]; then rmdir rows; fi
+      # N45 (F1's hide switch, 2026-11-19): how many days in a row the nightly
+      # report would have hidden no season, out of the 14 the switch waits for
+      # (supabase/migrations/20261117000000_ranking_hide_switch.sql), and how
+      # many seasons those nights judged. Counted again each night from the
+      # earlier runs' summary artifacts (scripts/hide-switch-days.mjs): no
+      # state file, no write, no new secret. At 14 days with seasons judged it
+      # shows the one SQL line to turn the switch on. A failure here fails
+      # nothing.
+      - name: Count the days for the hide switch
+        if: always() && steps.token.outputs.configured == 'true'
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ranking-report hide-days
+          # This run is still in progress, so --status completed leaves it out.
+          gh run list --repo "$GITHUB_REPOSITORY" --workflow verify-ranking.yml --status completed --limit 40 --json databaseId,createdAt > hide-days/runs.json || echo "[]" > hide-days/runs.json
+          for id in $(node -e 'for (const r of JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))) console.log(r.databaseId)' hide-days/runs.json); do
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" -n verify-ranking-summary -D "hide-days/$id" > /dev/null 2>&1 || true
+          done
+          node scripts/hide-switch-days.mjs hide-days/runs.json hide-days ranking-report/verify-ranking-summary.md > hide-days/line.md
+          cat hide-days/line.md | tee -a "$GITHUB_STEP_SUMMARY" >> ranking-report/verify-ranking-summary.md
+          rm -rf hide-days
+      # F7: where the event weeks stand today (docs/event-week.md), at the
+      # end of the summary. It reads the calendar in the repository only: no
+      # secret, no query, no write. A failure here never fails the run.
+      - name: Add the event week line
+        if: always() && steps.token.outputs.configured == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p ranking-report
+          npm run --silent report:event-week | tee -a "$GITHUB_STEP_SUMMARY" ranking-report/verify-ranking-summary.md || true
       # What the Job Summary says, as the run's artifact too (2026-11-03): the
       # summary cannot be read from the CLI or the API, and the W47 verdict
       # (11-23) reads it. Only the lines above (the redacted report) are in it.

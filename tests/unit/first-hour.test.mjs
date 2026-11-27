@@ -10,10 +10,12 @@ import {
   sendGameEvent,
   sendGameEventOnce,
   startVitalsSample,
+  VITALS_FULL_SAMPLE_UNTIL,
   VITALS_SAMPLE_RATE,
+  vitalsSampleRate,
 } from "../../src/gameEvents.js";
 import { readInteractionToNextPaint, watchVitals } from "../../src/webVitals.js";
-import { readSharedHabitId, shareAddress, sharedHabitTitle, SHARE_SOURCE } from "../../src/shareLink.js";
+import { readSharedHabitId, shareAddress, sharedHabitTitle, SHARE_SOURCE, startPath } from "../../src/shareLink.js";
 import { CASE_SEQUENCE } from "../../src/gameCases.js";
 import { JUDGEMENT_HABITS } from "../../src/judgementHabit.js";
 import { fill } from "../../src/locale.js";
@@ -51,7 +53,7 @@ test("every event name is one GA4 accepts and none says who played", () => {
   for (const name of Object.values(GAME_EVENTS)) {
     assert.match(name, /^cp_[a-z0-9_]{1,37}$/);
   }
-  assert.deepEqual(Object.keys(GAME_EVENTS).sort(), ["firstTable", "inp", "lcp", "prologueDone", "start"]);
+  assert.deepEqual(Object.keys(GAME_EVENTS).sort(), ["firstTable", "inp", "lcp", "prologueDone", "scene", "start"]);
 });
 
 test("start, the first table and the prologue's end are each counted once per page", () => {
@@ -84,22 +86,43 @@ test("an event sent before the tag was there is still sent once it is", () => {
 
 // ------------------------------------------------------------ N12 speed
 
-test("one page in twenty with Google's tag fetches the speed watcher; the rest never do", async () => {
+// N40: every page while visits are few, then one in twenty.
+const BEFORE_LINE = Date.parse(`${VITALS_FULL_SAMPLE_UNTIL}T00:00:00+09:00`) - 1;
+const AFTER_LINE = BEFORE_LINE + 1;
+
+test("one page in twenty with Google's tag fetches the speed watcher after the date; the rest never do", async () => {
   assert.ok(VITALS_SAMPLE_RATE >= 0.01 && VITALS_SAMPLE_RATE <= 0.05, "the owner's 1 to 5%");
   let loads = 0;
   const load = async () => {
     loads += 1;
     return { watchVitals: () => true };
   };
-  assert.equal(startVitalsSample({ scope: {}, random: () => 0, load }), false, "no tag, no sample");
-  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => VITALS_SAMPLE_RATE, load }), false);
-  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0.99, load }), false);
-  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0.01, load }), true);
+  const now = AFTER_LINE;
+  assert.equal(startVitalsSample({ scope: {}, random: () => 0, now, load }), false, "no tag, no sample");
+  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => VITALS_SAMPLE_RATE, now, load }), false);
+  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0.99, now, load }), false);
+  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0.01, now, load }), true);
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(loads, 1);
   // A watcher that cannot be fetched is not an error on the page.
-  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0, load: () => Promise.reject(new Error("offline")) }), true);
+  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0, now, load: () => Promise.reject(new Error("offline")) }), true);
   await new Promise((resolve) => setTimeout(resolve, 0));
+});
+
+test("N40: while visits are few every page with the tag is measured, and still none without it", async () => {
+  assert.match(VITALS_FULL_SAMPLE_UNTIL, /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(vitalsSampleRate(BEFORE_LINE), 1);
+  assert.equal(vitalsSampleRate(AFTER_LINE), VITALS_SAMPLE_RATE, "from KST midnight of the date");
+  assert.equal(vitalsSampleRate(Date.parse("2026-11-18T12:00:00+09:00")), 1, "the day it shipped");
+  let loads = 0;
+  const load = async () => {
+    loads += 1;
+    return { watchVitals: () => true };
+  };
+  assert.equal(startVitalsSample({ scope: { gtag() {} }, random: () => 0.99, now: BEFORE_LINE, load }), true);
+  assert.equal(startVitalsSample({ scope: {}, random: () => 0, now: BEFORE_LINE, load }), false, "no tag, no sample");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(loads, 1);
 });
 
 test("INP is the longest interaction, past one outlier in fifty", () => {
@@ -206,6 +229,15 @@ test("the shared address marks the card and names the habit by its id", () => {
   assert.equal(shareAddress("https://a.example", "<b>x</b>"), "https://a.example/?from=card", "only an id's shape is ever written");
   assert.equal(shareAddress("", "moth"), "");
   assert.equal(shareAddress(undefined), "");
+});
+
+test("an English or Japanese card shares that language's own start page (유입 1)", () => {
+  assert.equal(shareAddress("https://a.example", "moth", "en"), "https://a.example/en/?from=card&h=moth");
+  assert.equal(shareAddress("https://a.example/", "", "ja"), "https://a.example/ja/?from=card");
+  assert.equal(shareAddress("https://a.example", "moth", "ko"), "https://a.example/?from=card&h=moth");
+  assert.equal(shareAddress("https://a.example", "moth", "xx"), "https://a.example/?from=card&h=moth", "a language that is not one of ours is the Korean page");
+  assert.equal(startPath("en"), "/en/");
+  assert.equal(startPath(), "/");
 });
 
 test("the start page reads back only an id-shaped habit from a card's address", () => {

@@ -14,6 +14,16 @@
 6. 끝난 뒤 적는 것
 7. 참고: 파일 위치
 
+**오늘 어느 칸인지**는 `npm run report:event-week`가 달력만 읽어 한 번에 보여 줍니다(이번 주·다음 주 규칙, 지난주 판
+탭이 닫히는 날, 달력의 마지막 줄과 남은 이벤트 주). 달력이 28일 안에 끝나면 다음 격주 자리와 고르기(D-14)·
+병합(D-7) 마감을 `주의:` 줄로 알립니다. `-- --at=2026-11-30`처럼 날짜(KST)를 주면 그날로 미리 봅니다. DB와
+네트워크는 쓰지 않고 판의 숫자·점수도 건드리지 않습니다. 매일 밤 Verify Ranking 요약(과 그 artifact)의 끝에도 같은
+줄이 붙습니다(`.github/workflows/verify-ranking.yml`의 「Add the event week line」, 실패해도 실행은 실패하지 않음).
+**알람 메일**(N48, 2026-11-19): 그 `주의:` 줄은 28일 동안 매일 뜨므로, 메일은 세 날에만 갑니다 -- 달력이 28일 안에
+처음 들어온 날, 다음 격주 자리의 고르기 마감(D-14), 병합 마감(D-7). 그날 Funnel(22:10 KST) 예약 실행이 「Fail on an
+event week deadline」으로 실패해 예산 80% 알람과 같은 실패 메일이 옵니다. `npm run report:event-week -- --alarm
+--at=2027-06-21`로 그날 울릴지 미리 봅니다(아무것도 안 찍히면 안 울림).
+
 ---
 
 ## 1. 지금 돌아가는 것
@@ -29,15 +39,20 @@
 | --- | --- | --- |
 | `near-wall` | NEAR WALL | 벽 띠를 열기 4만큼 앞당김(`wallShift`) |
 | `heavy-fracture` | HEAVY FRACTURE | FRACTURE 청구 1.75배(`fractureRate`) |
-| `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`) |
+| `short-clock` | SHORT CLOCK | 판마다 8초 짧고 칩 1.25배(`secondsShift`, `chipsFactor`). 판 규칙 7부터 LOCK 한 번이 시계 1.15배(`LOCK_DRAG`, 판의 `lockDrag`) |
 | `crisis-week` | CRISIS WEEK | 벽 띠 열기 3 앞당김 + 칩 1.2배(`wallShift`, `chipsFactor`). B10 위기 주간, 첫 주 2026-W49(마이그레이션 20261116000000, 11-13 사용자 「전부 1」) |
-| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 카탈로그에만, 달력·마이그레이션 없음(초안) |
-| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 카탈로그에만, 달력·마이그레이션 없음(초안) |
-| `audit` / `cascade` / `audit-cascade` | AUDIT WEEK / CASCADE WEEK / AUDIT & CASCADE | 숫자는 그대로, 장치(`WEEK_RULE_DEVICES`의 `audit`·`cascade`)를 켬. W47 시험 주용 |
+| `audit-cascade` | AUDIT & CASCADE | W47 시험 주의 줄. 감사·연쇄는 RULES_MARK 3부터 판의 규칙(`tableUnlocks.js`)이라 이 규칙이 켜는 장치는 이제 없습니다. 달력과 서버 `weekly_rules`가 이 id를 들고 있고 그 주에 시작한 시즌이 도장을 지니므로 카탈로그에 남깁니다 |
+| `idle-erosion` | IDLE MONEY | 장치 `erosion`: 사건이 닫힐 때마다 그 사건 내내 금고에 있던 돈의 2%가 사라짐(`IDLE_EROSION_PERCENT`, 판의 숫자는 그대로). B4 「가만히 있으면 돈의 가치가 줄어듦」. 2027-W19 한 주(마이그레이션 20261121000000, 11-16 병합) |
+| `market-shock` | MARKET SHOCK | 장치 `shock`: 사건마다 한 번, 4번째 판(`MARKET_SHOCK_BOARD` 3, 0부터)에 벽 띠 열기 4 앞당김(`MARKET_SHOCK_WALL`) + 그때까지 쌓은 판돈이 판의 시드로 최대 ±20%(`MARKET_SHOCK_WOBBLE`) 흔들림. 판 규칙 SHOCK으로 미리 알림. 금융 소재 기획 c2. 2027-W25 한 주(마이그레이션 20261121000000, 11-16 병합) |
 
 - 숫자는 `normalizeSchema`가 가두는 값(벽, FRACTURE, 봉인, 시계, 칩)만 움직이고, 판 위에 덮어 쓸 뿐 판의 표를
-  고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`) 말고는 켤 수 없습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다
-  지킵니다.
+  고치지 않습니다(D4). 장치는 허용 목록(`WEEK_RULE_DEVICES`, 지금은 `erosion`·`shock`)에 있는 것만 켤 수 있습니다.
+  감사·연쇄는 판의 규칙이 되어 목록에서 빠졌습니다. `tests/unit/weekly-rules.test.mjs`가 둘 다 지킵니다.
+- 판 규칙 7(2026-11-25)의 LOCK 시계 1.15배(G18)는 카탈로그의 숫자가 아니라 판에 붙는 표시(`lockDrag`)입니다.
+  `getWeekBoard`가 `LOCK_DRAG_RULES`(`short-clock`, `hearing`)의 판에 붙이므로, SHORT CLOCK 주의 시즌과 사건 09,
+  7막 청문회에서 섭니다. 같은 판 규칙 7의 첫 조회 사다리(G13)와 도구 겹침 상한 ×1.6(G11c)은 주간 규칙 시즌에도
+  그대로 서고, 8막 서명란의 값(G16)은 막 비틀기라 주간 규칙 시즌에는 없습니다. 주간 안내 페이지의 SHORT CLOCK
+  문장은 `{lockDrag}` 빈칸으로 같은 상수를 읽습니다(`scripts/content-pages/weekly-text.mjs`).
 - 규칙의 말(제목·본문·이야기 속 한 줄 `world`)은 `src/copy/weekRules.js`, 시작 화면·순위 화면의 줄과 상자 문구는
   `src/copy/weekRule.js`이고, 영어·일본어는 `src/locales/<lang>/screens/weekRules.js`·`weekRule.js`에 같은
   키로 있습니다. 숫자는 `{shift}` 같은 빈칸으로 들어가 상수 하나를 고치면 세 언어가 따라옵니다.
@@ -52,6 +67,19 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 규칙 없이** 시작하고 「이번 주의 규칙으로 시작(이번 주 순위로)」 상자를 체크해야 켜집니다(E-8). 시즌을 하나라도
 끝낸 기기는 켜진 채 시작하고 「이번 주의 규칙 없이 시작(평소 순위로)」 상자로 끕니다(결정 27). 두 상자는
 기기 설정으로 남습니다(`src/state/weeklyRuleChoice.js`).
+
+**사건 규칙과 막 비틀기** (N26, G5, 2026-11-20 판 규칙 5) -- 주간 규칙과 같은 카탈로그를 사건 하나에만 쓰는 「이번
+사건만」 규칙이 있습니다(`gauntlet/caseRules.js`, 11-20 묶음): 사건 09 SHORT CLOCK, 11 NEAR WALL, 14 HEAVY FRACTURE, 16 CRISIS
+WEEK. 판 규칙 5부터는 3·5·7막의 막 비틀기(`gauntlet/actTwists.js`: 합병, 흩어진 자리, 청문회)도 같은 틀로 섭니다.
+사건 14·16은 사건 규칙이 막 비틀기보다 먼저입니다. **주간 규칙이 도장 찍힌 시즌과 이야기 모드에는 둘 다 없습니다**
+(`caseRuleFor`). 그래서 이벤트 주 순위는 주간 규칙만으로 겨루고, 이벤트 주를 고를 때 막 비틀기와 겹칠 걱정은 하지
+않아도 됩니다. 패널은 주간 규칙과 같은 `WeekRulePanel`에 「이번 사건만 · 이 사건이 닫힐 때까지」 머리로 나옵니다.
+
+판 규칙 6(2026-11-23)부터는 1·2·4·6·8막도 막 비틀기가 섭니다: 사건 04~06 떠넘겨진 손실, 10 뒤늦은 청구서, 20·22·23
+학습된 벽, 32~35 진술 고정, 44·46·48·49 실명 서명. 이 다섯은 판의 숫자만이 아니라 판이 닫힐 때 무언가를 읽는
+「장치」라(`actTwistFor`, `twistHasDevice`), 엔진은 판의 rules로 막 비틀기를 읽고(`getCaseTwist`) 다시보기와 서버
+재검사도 같은 값을 봅니다. 주간 규칙과의 관계는 위와 같습니다: 주간 규칙 시즌과 이야기 모드에는 없고, 8막의 서명란
+(`SignAsk`)도 나오지 않습니다.
 
 **화면** --
 
@@ -88,19 +116,35 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 
 ## 2. 달력
 
-`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-05 기준).
+`MERGED_WEEKS`와 `weekly_rules`가 같은 줄을 듭니다(2026-11-16 기준). 이 표는 `tests/unit/event-week-doc.test.mjs`가
+`MERGED_WEEKS`와 한 줄씩 대조하므로, 달력 줄을 더하는 PR은 이 표도 같이 고쳐야 `npm test`를 통과합니다.
 
 | 주 | 날짜 | 규칙 | 병합일 |
 | --- | --- | --- | --- |
 | 2026-W46 | 11-09 ~ 11-15 | `near-wall` | 10-16 |
 | 2026-W47 | 11-16 ~ 11-22 | `audit-cascade` (시험 주) | 10-22 |
 | 2026-W48 | 11-23 ~ 11-29 | `heavy-fracture` | 10-23 |
+| 2026-W49 | 11-30 ~ 12-06 | `crisis-week` (B10 위기 주간) | 11-13 |
 | 2026-W50 | 12-07 ~ 12-13 | `short-clock` | 10-23 |
 | 2026-W52 | 12-21 ~ 12-27 | `near-wall` | 10-23 |
 | 2027-W01 | 01-04 ~ 01-10 | `heavy-fracture` | 10-23 |
 | 2027-W03 | 01-18 ~ 01-24 | `short-clock` | 10-23 |
+| 2027-W05 | 02-01 ~ 02-07 | `near-wall` | 11-12 |
+| 2027-W07 | 02-15 ~ 02-21 | `heavy-fracture` | 11-12 |
+| 2027-W09 | 03-01 ~ 03-07 | `short-clock` | 11-12 |
+| 2027-W11 | 03-15 ~ 03-21 | `near-wall` | 11-12 |
+| 2027-W13 | 03-29 ~ 04-04 | `heavy-fracture` | 11-12 |
+| 2027-W15 | 04-12 ~ 04-18 | `short-clock` | 11-12 |
+| 2027-W17 | 04-26 ~ 05-02 | `near-wall` | 11-16 |
+| 2027-W19 | 05-10 ~ 05-16 | `idle-erosion` (B4 IDLE MONEY) | 11-16 |
+| 2027-W21 | 05-24 ~ 05-30 | `heavy-fracture` | 11-16 |
+| 2027-W23 | 06-07 ~ 06-13 | `short-clock` | 11-16 |
+| 2027-W25 | 06-21 ~ 06-27 | `market-shock` (c2 MARKET SHOCK) | 11-16 |
 
-둘 중 하나가 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). 사이의 주는 규칙 없는 평범한 주이고,
+대체로 격주입니다(2026년은 W53이 있어 2027-W01은 12-28 주 다음). W49의 위기 주간은 W48·W50 사이에 끼운 주라
+W48~W50이 세 주 이어집니다. W17~W25는 세 규칙의 차례를 이어 가되, 장치 규칙 둘(IDLE MONEY, MARKET SHOCK)이
+그 격주 자리를 하나씩 받아 다른 규칙 주와 붙지 않습니다(W19·W25, 6주 간격). W26은 평범한 주입니다.
+사이의 주는 규칙 없는 평범한 주이고,
 그 주의 시작 화면은 다음 주 예고만 보입니다.
 
 ---
@@ -120,7 +164,7 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 
 한 PR에 둘을 같이 넣습니다.
 
-1. `src/gauntlet/weeklyCalendar.js`의 `MERGED_WEEKS`에 `{ week: "2027-W05", id: "near-wall", added: "<병합일>" }`.
+1. `src/gauntlet/weeklyCalendar.js`의 `MERGED_WEEKS`에 `{ week: "2027-W17", id: "near-wall", added: "<병합일>" }`.
    `added`는 **실제로 병합하는 날**로 씁니다. 날짜가 밀리면 줄을 고쳐서 다시 올립니다. 유닛 테스트가 7일을
    재므로 늦은 줄은 `npm test`에서 떨어집니다.
 2. `supabase/migrations/<main의 마지막 마이그레이션 뒤 날짜>_weekly_rule_calendar_<주>.sql`:
@@ -128,8 +172,8 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
    (20261023010000 파일의 꼴). 마이그레이션이 든 PR은 병합하면 1분 안에 운영 DB에 적용되므로 **병합 직전에
    우리에게 따로 묻습니다.** 아직 시작하지 않은 주의 줄이라 적용 순간에 판정받는 런은 없습니다.
 3. `npm run check:grants`(두 달력 비교), `npm test`(`weekly-rules.test.mjs`), `npm run check:changed`.
-4. README 「이번 주의 규칙」 문단의 주 목록과 이 문서 2장의 표를 맞춥니다(`check:doc-numbers`는 이 표를 세지
-   않으니 손으로).
+4. README 「이번 주의 규칙」 문단의 주 목록과 이 문서 2장의 표를 맞춥니다. 2장의 표는 `event-week-doc.test.mjs`가
+   달력과 대조하고, README 문단은 손으로 봅니다.
 
 ### 3-3. 알리기
 
@@ -197,7 +241,8 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
    (`gh run download … -n verify-ranking-summary`), 다음 이벤트 주의 병합 마감(D-7), 지난주 판 탭이 닫히는 날.
 4. **README** 「이번 주의 규칙」 문단: 지난 주의 서술을 지우고 다음 주들만 남깁니다(문단은 날짜를 그대로 두는
    기록이 아니라 지금 참인 것만 적는 곳입니다).
-5. 다음 달력 줄이 D-7 안에 있는지 봅니다. 비어 있으면 3-2로 돌아갑니다.
+5. 다음 달력 줄이 D-7 안에 있는지 봅니다(`npm run report:event-week`의 「남은 이벤트 주」·`주의:` 줄). 비어 있으면
+   3-2로 돌아갑니다.
 
 ---
 
@@ -213,7 +258,47 @@ PGlite로 마이그레이션을 다시 돌려 두 달력이 같은지 봅니다.
 | 기기의 상자 둘, 시즌의 도장 | `src/state/weeklyRuleChoice.js`, `src/state/runState.js` |
 | 테스트 시계 | `src/state/weeklyClock.js`, `.env.e2e` |
 | 순위 판 고르기 | `src/state/useLeaderboard.js`, `src/screens/RankingScreen.jsx` |
-| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql` |
+| 서버 달력·주 판정·`public_rankings.week` | `supabase/migrations/20261021000000_weekly_rule_event.sql`, `20261021010000_weekly_rule_w44_test_week.sql`, `20261022010000_test_week_to_w47.sql`, `20261023010000_weekly_rule_calendar_w48_w03.sql`, `20261115000000_weekly_rule_calendar_w05_w15.sql`, `20261116000000_weekly_rule_crisis_week.sql`, `20261121000000_weekly_rule_calendar_w17_w26.sql` |
 | 달력 비교, 주 판 재계산 | `scripts/check-grants.mjs` (`check:grants`), `scripts/verify-ranking-rows.mjs` (`verify:ranking`) |
+| 오늘의 이벤트 주 칸(달력만 읽음) | `scripts/report-event-week.mjs` (`report:event-week`) |
 | 시험 주 보고 | `.github/workflows/test-week.yml`, `scripts/report-test-week.mjs`, 저장소 변수 `TEST_WEEK_SIM_LINES` |
-| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
+| 테스트 | `tests/unit/weekly-rules.test.mjs`, `tests/unit/event-week-doc.test.mjs`, `tests/unit/report-event-week.test.mjs`, `tests/unit/report-test-week.test.mjs`, `tests/unit/verify-ranking-weekly.test.mjs`, `tests/weekly-rule.spec.js` |
+
+---
+
+## 8. 주 1회 알림 (Web Push, N25)
+
+규칙이 있는 주의 **월요일 08:00 KST**(12:00에 한 번 더, 못 보낸 것만)에 알림을 켠 기기로 그 주의 규칙을 한 번
+보냅니다. 규칙 없는 주는 보내지 않습니다. 기본은 꺼짐이고, 홈 화면에 추가한 앱의 편의 설정 맨 아래에서 켭니다
+(iOS 16.4 이상 포함). 서버에 남는 것은 브라우저의 구독 주소(endpoint)와 키 둘, 언어뿐이고, 끄면 지웁니다.
+달력은 2장의 `MERGED_WEEKS` 그대로라, 달력에 주를 올리면 알림도 따라옵니다.
+
+**VAPID 키 만들기** (한 번, 아무 PC에서):
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+나온 Public Key와 Private Key를 아래 네 곳에 넣습니다. **Private Key는 GitHub Secrets에만** 둡니다.
+
+| 어디 | 이름 | 값 |
+| --- | --- | --- |
+| Render 대시보드 → 서비스 → Environment | `VITE_VAPID_PUBLIC_KEY` | Public Key (넣은 뒤 다시 배포해야 빌드에 들어감) |
+| GitHub → Settings → Secrets → Actions | `VAPID_PUBLIC_KEY` | Public Key (Render와 같은 값) |
+| 〃 | `VAPID_PRIVATE_KEY` | Private Key |
+| 〃 | `VAPID_SUBJECT` | `mailto:` + 지원 메일 주소 |
+
+`VITE_VAPID_PUBLIC_KEY`가 없는 빌드에서는 스위치가 보이지 않습니다. 키를 바꾸면 이미 켠 기기의 구독은 모두
+무효가 되므로(410으로 지워짐) 바꾸지 않습니다. DB 접근은 Funnel·Board Reports와 같은 `SUPABASE_ACCESS_TOKEN`을
+씁니다(새 키 없음).
+
+**확인**: Actions → Weekly Push → Run workflow(기본 dry run: 대상 수만 세고 보내지 않음). 실제로 보내려면
+`dry_run`을 끄고 실행합니다(이미 이번 주에 받은 기기에는 다시 보내지 않음). 로그와 Job Summary에는 수만 남습니다.
+
+| 무엇 | 파일 |
+| --- | --- |
+| 스위치, 구독 | `src/state/weeklyReminder.js`, `src/state/weeklyReminderPush.js`, `src/components/WeeklyReminderToggle.jsx`, `src/copy/reminder.js` |
+| 알림 표시·탭 | `src/serviceWorker/worker.js` (`push`, `notificationclick`, `pushNotice`) |
+| 서버 표·함수 | `supabase/migrations/20261129000000_push_subscriptions.sql` (`push_subscribe`, `push_unsubscribe`) |
+| 보내기 | `.github/workflows/weekly-push.yml`, `scripts/send-weekly-push.mjs` |
+| 테스트 | `tests/unit/weekly-reminder.test.mjs`, `scripts/check-grants.mjs` (`check:grants`) |

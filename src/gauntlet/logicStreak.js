@@ -138,7 +138,7 @@ export function getLogicBonus(streak) {
  * every window whatever the move: they are the table's, not the hand's, and
  * the next window reads them under any rules.
  */
-export function advanceLogic(logic, { type, tier, offered, bustHolds, reach, hold = LOGIC_HOLD }) {
+export function advanceLogic(logic, { type, tier, offered, bustHolds, reach, hold = LOGIC_HOLD, halve = false }) {
   const rose = tier > logic.heat;
   const next = { ...logic, heat: tier, rose, reach: rose ? METRONOME_REACH : Math.max(0, (logic.reach || 0) - 1) };
   const bust = tier === 3;
@@ -156,7 +156,9 @@ export function advanceLogic(logic, { type, tier, offered, bustHolds, reach, hol
   const left = logic.rose || (reach && logic.reach > 0) ? "switch" : offered && !offered.includes(logic.type) ? "keep" : "break";
   const move = bust ? "bust" : held ?? left;
   if (move === "grow" || move === "switch") next.streak += 1;
-  if (move === "break" || (move === "bust" && !bustHolds)) next.streak = 0;
+  // G1 (the next rules, `halve`): a change of direction halves the streak instead of ending it.
+  if (move === "break") next.streak = halve ? Math.floor(logic.streak / 2) : 0;
+  if (move === "bust" && !bustHolds) next.streak = 0;
   next.best = Math.max(next.best, next.streak);
   return { logic: next, move };
 }

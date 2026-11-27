@@ -13,4 +13,5 @@ export default {
   steady: { title: "無難なバランス型", line: "目立たず、それでも最後まで勝負を閉じました。" },
   cardLine: "あなたの審査タイプは、{habit}です。",
   friendLine: "友だちの結果：{habit}",
+  friendTarget: "友だちの記録を超えよう：最高バースト{score}点より上へ。",
 };

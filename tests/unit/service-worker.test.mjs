@@ -569,6 +569,9 @@ test("the warm list is every other build file, the portraits and the art at one 
   const config = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file)]) });
   assert.deepEqual(config.warm, ["/assets/RankingScreen-BHGTYjZL.js", "/assets/case02-CN_k66fr.js", "/portrait-echo.webp", "/profile.jpg", "/scene-case01-960.webp"]);
   assert.equal(config.warm.includes("/triggerlab-key-visual-960.webp"), false, "already in the precache");
+  // The makers' admin chunk is fetched only by a page that asks for it.
+  const withAdmin = workerConfigFor({ html: PAGE, files: shipped([...FILES.map(([file]) => file), "/assets/BoardAdmin-Ab12Cd34.js", "/assets/BoardAdmin-Ef56Gh78.css"]) });
+  assert.deepEqual(withAdmin.warm, config.warm);
   // Only the five portraits that shipped first are warmed; a later one is
   // fetched when its speaker first appears, and sw.js does not grow with it.
   const withNew = workerConfigFor({ html: PAGE, files: shipped(["/index.html", "/sw.js", ...FILES.map(([file]) => file), "/portrait-lee-minseo.webp"]) });
@@ -608,7 +611,8 @@ test("the built worker is the source without its exports, and says what it was b
   // It runs as a classic script against a scope, and registers its listeners.
   const heard = [];
   new Function("self", source)({ addEventListener: (type) => heard.push(type), location: { origin: ORIGIN } });
-  assert.deepEqual(heard, ["install", "activate", "fetch", "message"]);
+  // `push` and `notificationclick` are 주 1회 알림's (N25, Web Push).
+  assert.deepEqual(heard, ["install", "activate", "fetch", "push", "notificationclick", "message"]);
   assert.throws(() => buildWorkerSource('import x from "./y.js";\n', config), /classic worker/);
 });
 

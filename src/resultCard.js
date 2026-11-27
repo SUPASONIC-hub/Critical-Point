@@ -52,9 +52,10 @@ export function readResultCardTheme(documentRef) {
   const style = documentRef?.defaultView?.getComputedStyle?.(documentRef.documentElement);
   const read = (token, fallback) => style?.getPropertyValue?.(token)?.replace(/\s+/g, " ").trim() || fallback;
   return {
-    ground: read("--c-gx-felt", "black"),
-    panel: read("--c-gx-felt-raised", "black"),
-    text: read("--c-paper", "white"),
+    // The ledger's page (2안, 2026-11-17): ink on paper, a white panel.
+    ground: read("--ui-surface-1", "black"),
+    panel: read("--ledger-white", "black"),
+    text: read("--ui-text", "white"),
     dim: read("--c-gx-text-dim", "white"),
     accent: read("--c-acid", "white"),
     heat: read("--c-gx-heat", "white"),
