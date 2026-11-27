@@ -632,11 +632,13 @@ export function readSoft(value) {
 /**
  * G47 (RULES_MARK 13): a scene whose table cashed at SKILL_HARM_MULTIPLIER or
  * more takes half its 사람 피해 (rounded down); the collapse gate moves from 20
- * to COLLAPSE_HARM_THIRTEEN a case to keep the season's collapses (with G44:
- * 18.5% of 600, the money hand's listening and deaf collapses 37.0 / 66.7).
+ * to COLLAPSE_HARM_THIRTEEN a case to keep the season's collapses. The notes
+ * measured 15 with G44 alone (18.5% of 600); with G45's paying bot and G46's
+ * chain on it, 15 collapsed 15.8% and 14 17.0% (check:endings 11-27), so 14,
+ * the user's (1) of 2026-11-27 (Q4 (2)).
  */
 export const SKILL_HARM_MULTIPLIER = 32;
-export const COLLAPSE_HARM_THIRTEEN = 15;
+export const COLLAPSE_HARM_THIRTEEN = 14;
 /** `effect` with G47's half harm when its table cashed at `multiplier` (null: no table, as before). */
 export function halveSkilledHarm(effect, multiplier) {
   const harm = Number(effect?.humanCost) || 0;

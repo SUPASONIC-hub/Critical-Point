@@ -109,7 +109,7 @@ export const cognitionLabels = {
 export const ENDING_GATES = Object.freeze({
   // Collapse is harm: the mean human cost a case closed on (season p50 about 6;
   // spending people for position closes near 25, putting them first at 0) --
-  // G47 (RULES_MARK 13): 15 a case, with a table cashed at ×32 or more taking half its scene's harm.
+  // G47 (RULES_MARK 13): 14 a case, with a table cashed at ×32 or more taking half its scene's harm.
   collapseHarmPerCase: isMarkThirteenOn() ? COLLAPSE_HARM_THIRTEEN : 20,
   // -- or overreach people paid for: a fifth of the windows busted (about the
   // season's p85) while cases still closed on half that harm.

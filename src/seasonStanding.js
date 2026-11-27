@@ -105,7 +105,7 @@ export function weighUpkeep(seasonResources) {
  */
 export function readSoftMeans(seasonResources) {
   if (!seasonResources || !isMarkThirteenOn()) return seasonResources;
-  return { ...seasonResources, ...Object.fromEntries(SOFT_KEYS.map((key) => [key, Math.round(readSoft(Number(seasonResources[key]) || 0))])) };
+  return { ...seasonResources, ...Object.fromEntries(SOFT_KEYS.filter((key) => key in seasonResources).map((key) => [key, Math.round(readSoft(Number(seasonResources[key]) || 0))])) };
 }
 /**
  * G44 (RULES_MARK 13): what an entry moved, as the ledger sums it -- 돈·믿음·

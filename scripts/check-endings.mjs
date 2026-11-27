@@ -405,7 +405,10 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
   const apart = answered.filter((row) => row.endings[0] !== row.endings[1]).length;
   const answerShare = moves / Math.max(1, answered.length);
   console.log(`Last answer (G40, measured): of ${answered.length} standing seasons the ending moves with the answer in ${moves} (${(answerShare * 100).toFixed(1)}%), all three the same ${answered.length - moves} (${(((answered.length - moves) / Math.max(1, answered.length)) * 100).toFixed(1)}%), witness and control apart ${apart} (${((apart / Math.max(1, answered.length)) * 100).toFixed(1)}%)`);
-  if (isMarkTenOn() && !process.env.ENDING_BASELINE) assert.ok(answerShare >= 0.75, `G40: the finale's answer moves only ${(answerShare * 100).toFixed(1)}% of standing seasons' endings (target 75%)`);
+  // G44·G45·G47 (RULES_MARK 13, the user's (1) of 2026-11-27): 73% from 13. Measured 11-27 on 600 seasons, gate 15 / 14:
+  // the answer moves 73.7% / 74.1%, collapse 15.8% / 17.0%. The notes' parts: G45's paying bot about -4 points, G46's chain about -1.7.
+  const ANSWER_SHARE = isMarkThirteenOn() ? 0.73 : 0.75;
+  if (isMarkTenOn() && !process.env.ENDING_BASELINE) assert.ok(answerShare >= ANSWER_SHARE, `G40: the finale's answer moves only ${(answerShare * 100).toFixed(1)}% of standing seasons' endings (target ${ANSWER_SHARE * 100}%)`);
   // G41 (RULES_MARK 10): the endings the money paths reach, and the second one's share of their standing seasons.
   for (const name of ["money", "spend-people"]) {
     const map = byArchetype[name] ?? new Map();
@@ -415,10 +418,11 @@ if (AUDIT_ON) console.log(`Audit (measured, values ${AUDIT_VALUES}): ${auditTall
     if (name === "spend-people" && isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(map.size >= 3, `G45: spend-people reaches ${map.size} endings (target 3)`);
     console.log(`Money path (G41, measured) ${name}: ${map.size} endings (${[...map.entries()].sort((a, b) => b[1] - a[1]).map(([id, count]) => `${id} ${count}`).join(", ")}); second of the standing ${standing[1] ? `${standing[1][0]} ${((standing[1][1] / Math.max(1, total)) * 100).toFixed(1)}%` : "none"}`);
   }
-  // G47 (RULES_MARK 13): the collapse of the hands that listen and of those that do not, by archetype; the money hand's gap at least 25 points.
+  // G47 (RULES_MARK 13): the collapse of the hands that listen and of those that do not, by archetype; the money hand's gap at least 20 points
+  // (the notes' 25 without G45 and G46; measured 11-27, gate 15 / 14: 48.4 / 65.9 (17.5) and 51.6 / 72.7 (21.1), the user's (1)).
   const listenCollapseOf = (key) => listenCollapse[key] ? (100 * listenCollapse[key].collapse) / Math.max(1, listenCollapse[key].seasons) : NaN;
   console.log(`Collapse by listening (G47, measured): ${["money", "spend-people", "min-risk"].map((name) => `${name} ${listenCollapseOf(`${name}:listens`).toFixed(1)} / ${listenCollapseOf(`${name}:deaf`).toFixed(1)}`).join(" · ")} (listens / deaf, %)`);
-  if (isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(listenCollapseOf("money:deaf") - listenCollapseOf("money:listens") >= 25, `G47: the money hand that listens collapses ${listenCollapseOf("money:listens").toFixed(1)}% against ${listenCollapseOf("money:deaf").toFixed(1)}% deaf (gap under 25 points)`);
+  if (isMarkThirteenOn() && !process.env.ENDING_BASELINE) assert.ok(listenCollapseOf("money:deaf") - listenCollapseOf("money:listens") >= 20, `G47: the money hand that listens collapses ${listenCollapseOf("money:listens").toFixed(1)}% against ${listenCollapseOf("money:deaf").toFixed(1)}% deaf (gap under 20 points)`);
   // G42 OVERCLOCK 문턱 (RULES_MARK 10): the population's boards played OVERCLOCKed, and the share of the pot they paid.
   const watched = addSeen(populationSeen);
   console.log(`OVERCLOCK (G42, measured): ${watched.overclocked} of ${watched.windows} boards (${((watched.overclocked / Math.max(1, watched.windows)) * 100).toFixed(1)}%), paying ${((watched.overclockPot / Math.max(1, watched.pot)) * 100).toFixed(1)}% of the pot`);
