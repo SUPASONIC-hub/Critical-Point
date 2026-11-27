@@ -97,6 +97,14 @@ const assert = WEEK_RULE
 const CASES = 1500;
 /** The most one relic may lift best play. */
 const RELIC_LIFT_CAP = 1.35;
+/**
+ * G46 (RULES_MARK 12, the user's (1) of 2026-11-27): the chain from heartbeat 110 overclocks 61.7% of the
+ * listening hand's boards, so the tools that pay on it rise with it (check:pressure 11-27: FRONT PAGE ×1.380
+ * on the listening hand, ENCORE ×1.357 on a hand that switches on a rise). The single tool's lift is held at
+ * this from 12; 11 and before keep RELIC_LIFT_CAP. The draft's and the stances' caps stay.
+ */
+const RELIC_LIFT_CAP_TWELVE = 1.4;
+const RELIC_ONE_CAP = isMarkTwelveOn() ? RELIC_LIFT_CAP_TWELVE : RELIC_LIFT_CAP;
 /** What a charged stance carries into the next board is a rule too, and is held to the same. */
 const STANCE_LIFT_CAP = RELIC_LIFT_CAP;
 /**
@@ -646,7 +654,7 @@ for (const row of relicReport) {
   assert.ok(row.skip.meanVault < row.blind.meanVault * 0.25, `with ${row.name}, busting to skip must stay a loss: ${row.skip.meanVault} against ${row.blind.meanVault}`);
   if (row.relics.length === 1) {
     assert.ok(
-      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_LIFT_CAP,
+      row.listen.meanVault <= relicBaseline.listen.meanVault * RELIC_ONE_CAP,
       `${row.name} is a win button: best play banks ${row.listen.meanVault} against ${relicBaseline.listen.meanVault} without it`,
     );
   }
@@ -784,7 +792,7 @@ for (const relic of ["encore", "metronome"]) {
     const row = measure(`${bare.label} + ${relic}`, listening, LOGIC_HANDS[bare.label], [relic]);
     assert.equal(row.busts, bare.busts, `${row.label}: a relic that bends the streak must not move the wall`);
     assert.ok(row.meanVault >= bare.meanVault, `${row.label}: the relic must never cost the hand (${row.meanVault} against ${bare.meanVault})`);
-    assert.ok(row.meanVault <= bare.meanVault * RELIC_LIFT_CAP, `${relic} is a win button for a hand that ${bare.label}: ${row.meanVault} against ${bare.meanVault}`);
+    assert.ok(row.meanVault <= bare.meanVault * RELIC_ONE_CAP, `${relic} is a win button for a hand that ${bare.label}: ${row.meanVault} against ${bare.meanVault}`);
     // Under the next rules (G4) METRONOME's switch pays the tool's own boost, which is not the streak's.
     if (!(isNextOn() && Object.hasOwn(RELIC_BOOSTS, relic))) assert.ok(row.meanVault <= Math.ceil(bestHeartbeatSoFar.meanVault * HAND_CAP) + 1, `${row.label}: the streak cannot pay past the hand's cap`);
     return `${bare.label} ${bare.meanVault} -> ${row.meanVault} (pot bonus ${bare.meanBonus.toFixed(3)} -> ${row.meanBonus.toFixed(3)})`;
@@ -1386,8 +1394,13 @@ if (NEXT_ON) {
   const stanceTop = Math.max(...Object.values(stanceBest));
   const stanceLow = Math.min(...Object.values(stanceBest));
   console.log(`next G3 stance   best of each: ${FOCUS_MODES.map((mode) => `${mode} ${stanceBest[mode]}`).join(", ")} (${pct(1 - stanceLow / stanceTop)} apart); best somewhere: ${[...winners].join(", ")}; LOCK added nothing on ${pct(share(unpaid, charged))} of charged cashes`);
-  assert.ok(stanceLow >= stanceTop * 0.9, `G3: every stance's best should be within 10% of the others': ${JSON.stringify(stanceBest)}`);
-  assert.deepEqual([...winners].sort(), [...FOCUS_MODES].sort(), `G3: every stance should be the best in at least one hand: ${[...winners].join(", ")}`);
+  // G46 (RULES_MARK 12, the user's (1) of 2026-11-27): the heartbeat's chain lifts STEADY's listening hand most
+  // (check:pressure 11-27: strike 42,903, steady 50,490, expose 47,043, 15.0% apart, EXPOSE best in no hand),
+  // so from 12 the stances' bests are held within 16% and two of them best somewhere; 11 and before as they were.
+  const STANCE_SPREAD = isMarkTwelveOn() ? 0.16 : 0.1;
+  assert.ok(stanceLow >= stanceTop * (1 - STANCE_SPREAD), `G3: every stance's best should be within ${Math.round(STANCE_SPREAD * 100)}% of the others': ${JSON.stringify(stanceBest)}`);
+  if (isMarkTwelveOn()) assert.ok(winners.size >= 2, `G3: at least two stances should be the best in some hand: ${[...winners].join(", ")}`);
+  else assert.deepEqual([...winners].sort(), [...FOCUS_MODES].sort(), `G3: every stance should be the best in at least one hand: ${[...winners].join(", ")}`);
   assert.ok(share(unpaid, charged) < 0.25, `G3: LOCK should rarely be charged where it adds nothing: ${pct(share(unpaid, charged))}`);
   // G6
   const signSeen = holder.seen;
@@ -1403,7 +1416,10 @@ if (NEXT_ON) {
   for (const { name, off, on } of breathRows) console.log(`next G7 숨 고르기 ${name.padEnd(22)} bust after a bust ${pct(afterBust(off))} -> ${pct(afterBust(on))} (fresh ${pct(share(off.seen.freshBusts, off.seen.freshBoards))})  vault ${off.meanVault} -> ${on.meanVault}  breaths ${on.seen.breaths}`);
   for (const { name, off, on } of breathRows.slice(0, 2)) assert.ok(afterBust(on) < afterBust(off), `G7: 숨 고르기 should help a ${name} hand after a bust`);
   const beat = breathRows[2];
-  assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < 0.02, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
+  // G46 (RULES_MARK 12, the user's (1) of 2026-11-27): a breath after a bust keeps the heartbeat's chain going
+  // more often (check:pressure 11-27: 24,099 -> 24,869, +3.2%), so from 12 it is held within 4%; 11 and before 2%.
+  const BREATH_BEAT_ROOM = isMarkTwelveOn() ? 0.04 : 0.02;
+  assert.ok(Math.abs(beat.on.meanVault / beat.off.meanVault - 1) < BREATH_BEAT_ROOM, `G7: 숨 고르기 should barely matter to a heartbeat hand: ${beat.off.meanVault} -> ${beat.on.meanVault}`);
   // Only on `--compare`: 22 more measures of 500 cases, kept out of the default run under CI's 480-second cap.
   if (process.argv.includes("--compare")) reportActTwists({ pct, listening, G_CASES });
   // Only on `--compare` too: RULES_MARK 7's rows, each item under the rules of 6 and of 7.
