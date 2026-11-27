@@ -245,7 +245,7 @@ async function request(fetchImpl, url, options) {
   }
 }
 
-export async function refreshSession({ target, fetch: fetchImpl }, session, now = Date.now()) {
+async function refreshSession({ target, fetch: fetchImpl }, session, now = Date.now()) {
   const body = await request(fetchImpl, `${target.url}/auth/v1/token?grant_type=refresh_token`, {
     method: "POST",
     headers: { apikey: target.key, "Content-Type": "application/json" },
@@ -254,7 +254,7 @@ export async function refreshSession({ target, fetch: fetchImpl }, session, now 
   return toSession(body, now);
 }
 
-export function callAdminRpc({ target, fetch: fetchImpl }, session, name, args = {}) {
+function callAdminRpc({ target, fetch: fetchImpl }, session, name, args = {}) {
   return request(fetchImpl, `${target.url}/rest/v1/rpc/${name}`, {
     method: "POST",
     headers: { apikey: target.key, Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
@@ -262,7 +262,7 @@ export function callAdminRpc({ target, fetch: fetchImpl }, session, name, args =
   });
 }
 
-export function signOutRemote({ target, fetch: fetchImpl }, session) {
+function signOutRemote({ target, fetch: fetchImpl }, session) {
   return request(fetchImpl, `${target.url}/auth/v1/logout?scope=local`, {
     method: "POST",
     headers: { apikey: target.key, Authorization: `Bearer ${session.access_token}` },

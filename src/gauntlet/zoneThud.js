@@ -29,7 +29,7 @@ export const THUD_GLIDE = 0.22;
 /** In fast enough to land as a hit, slow enough not to click. */
 export const THUD_ATTACK = 0.012;
 /** Where the body has settled to 45% before the tail. */
-export const THUD_SETTLE = 0.18;
+const THUD_SETTLE = 0.18;
 export const THUD_TAIL = 1.1;
 export const THUD_LEVEL = 0.55;
 /** The octave above, for earbuds; shorter, so the low body is what lingers. */

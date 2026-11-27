@@ -259,7 +259,7 @@ function revealMode(track, mixVolume) {
   };
 }
 
-export function hashMusicKey(value = "") {
+function hashMusicKey(value = "") {
   return String(value).split("").reduce((hash, character) => ((hash << 5) - hash + character.charCodeAt(0)) | 0, 0);
 }
 
