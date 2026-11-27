@@ -65,11 +65,18 @@ what the copy actually says today.
 | 막 비틀기: 떠넘겨진 손실 / 뒤늦은 청구서 / 학습된 벽 / 진술 고정 / 실명 서명 | Passed Down / The Late Bill / The Trained Wall / On the Record / Signed by Name | 押しつけられた損失 / 遅れてきた請求書 / 学習された壁 / 供述の固定 / 実名の署名 | 판 규칙 6 (G5). 1·2·4·6·8막 |
 | 서명란: 이름만 쓴다 / 조건을 단다 | The signature line: Name only / With conditions | 署名欄: 名前だけ書く / 条件をつける | 판 규칙 6 (G5 8막). 고르지 않으면 조건을 단다 |
 | 조서에 남은 자세 | On record until the Case ends | 調書に残った構え | 판 규칙 6 (G5 6막). 자세 줄의 고정 표시 |
-| 지난 판 N에서 터짐 | Last BUST at N | 前回NでBUST | 판 규칙 6 (G15). 숨 고르기 옆, 60 이상이면 열기 −14 |
+| 지난 판 N에서 터짐 | Last BUST at N | 前回NでBUST | 판 규칙 6 (G15). 숨 고르기 옆, 60 이상이면 열기 −14(판 규칙 8부터 벽 +5, G22) |
 | 낮게 끊으면 감사 / 왜 | Low cash = audit / Why | 低く確定で監査 / なぜ | G17. 감사 한도 한 칸 앞에서 지금 확정하면 칸이 찰 때의 경고, 감사로 잃은 결과의 이유 줄 |
 | 다시 뽑기 / 하나 더 | Reroll / One more | 引き直し / もう一つ | 도구 드래프트 |
 | 판돈 배수는 합쳐 ×1.6까지 (도구 겹침) | pay ×1.6 at most together | 合わせて1.6倍まで | 판 규칙 7 (G11c). 드래프트 안내 줄. 혼자 더 큰 도구는 그 값 |
 | 이번 서명란 (「이름만」의 벽 값) | this signature line | 今回の署名欄 | 판 규칙 7 (G16). 사건마다 1~3, 사건 49는 3 |
+| 여는 판돈: 보통으로 연다 / 크게 연다 | Opening stake: Open normally / Open big | 開く賭け金: 普通に開く / 大きく開く | 판 규칙 8 (G23). 사건 08~42의 첫 판 전, 고르지 않으면 보통 |
+| 판에서 연 문 | The door you opened at the table | 勝負で開いた扉 | 판 규칙 8 (G26). 시즌 결말 리포트의 한 줄 |
+| 아슬아슬 | Close call | ギリギリ | 판 규칙 9 (G30). 벽까지 3 이하 확정, 판돈 ×1.25 |
+| 장부 매끈함 / 같은 자리면 감사 | Ledger too smooth / Same spot = audit | 帳簿のなめらかさ / 同じ位置で監査 | 판 규칙 9 (G35). 열기 ±1 안 확정 5번이면 감사 |
+| ○○가 건넨 것 | Handed over by … | …が渡したもの | 판 규칙 9 (G33). 드래프트 첫 칸 |
+| 보상금 / 덮은 기록 | Compensation / Covered record | 補償金 / 隠した記録 | 판 규칙 9 (G34). 결과 화면, 6개 이상이면 판 규칙 10 (G41)에서 결말이 기움 |
+| NEW GAME+ · 이번 시즌은 이 막에 선 규칙 | NEW GAME+ · this act’s rule this season | NEW GAME+ · 今シーズンこの幕に立つ規則 | 판 규칙 9 (G36). 자리를 옮겨 선 막 비틀기 |
 
 ## People (prologue 01 to case 07)
 

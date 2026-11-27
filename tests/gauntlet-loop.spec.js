@@ -1342,8 +1342,10 @@ async function pushToHotCash(page) {
  */
 const HOT_HEAT = 56;
 const HOT_WALL = Object.freeze({ wallMin: 72, wallMax: 74, startGauge: 40, tellError: 1 });
+// The case opened in the middle third of 피로, 시간 and 정당성: no story tilt (G31) lays its own heartbeat error over HOT_WALL's.
+const UNTILTED_OPEN = Object.freeze({ resources: Object.freeze({ fatigue: 18, time: 68, legitimacy: 52 }) });
 async function openHotWall(page, caseId, nodeId, streak = 0) {
-  await openBrokenBoard(page, caseId, nodeId, { schema: HOT_WALL, streak });
+  await openBrokenBoard(page, caseId, nodeId, { schema: HOT_WALL, streak, open: UNTILTED_OPEN });
   await page.addStyleTag({ content: ".debug-overlay { display: none !important; }" });
 }
 
