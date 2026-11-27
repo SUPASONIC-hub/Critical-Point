@@ -8,7 +8,8 @@
 // that is the only one to press a control stays in both projects.
 import { expect, test } from "./helpers/network.js";
 import { bustStakedCard, cashStakedCard, clickElement, completeCurrentCase, dismissProtocolBreach, openIntroDrawer, TRANSITION_TIMEOUT_MS } from "./helpers/gameFlow.js";
-import { FIRST_HOUR_FIELDS, FIRST_HOUR_KEY } from "../src/firstHourLog.js";
+import { FIRST_HOUR_KEY } from "../src/appConfig.js";
+import { FIRST_HOUR_FIELDS } from "../src/firstHourLog.js";
 import { startDebugNode } from "./helpers/seasonFlow.js";
 import { collectPostedRows, jsonbBytes, SERVER_DYNAMICS_BYTES } from "./helpers/caseRows.js";
 import { recheckCaseGap, recheckCaseLinks } from "../src/chainRecheck.js";

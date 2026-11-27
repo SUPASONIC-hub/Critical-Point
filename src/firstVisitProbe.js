@@ -26,5 +26,20 @@ export function readHadSavedData(storage = globalThis.localStorage) {
   }
 }
 
-/** What the page saw as it loaded. */
+/** What the page saw as it loaded, and when. */
 export const hadSavedDataOnLoad = readHadSavedData();
+export const loadedAt = Date.now();
+
+/**
+ * The presses before firstHourLog.js has loaded (main.jsx fetches it after
+ * the first paint): kept with their time on a first visit, handed over once.
+ */
+const early = [];
+const keep = (event) => early.push({ target: event.target, at: Date.now() });
+if (!hadSavedDataOnLoad) globalThis.document?.addEventListener?.("click", keep, true);
+
+/** The presses kept so far; no more are kept after this. */
+export function takeEarlyClicks() {
+  globalThis.document?.removeEventListener?.("click", keep, true);
+  return early.splice(0);
+}

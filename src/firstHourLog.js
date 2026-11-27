@@ -1,6 +1,7 @@
-import { readStoredValue, STORAGE_KEY, writeStoredValue } from "./appConfig.js";
+import { FIRST_HOUR_KEY, readStoredValue, STORAGE_KEY, writeStoredValue } from "./appConfig.js";
 import { CASE_SEQUENCE } from "./gameCases.js";
-import { hadSavedDataOnLoad } from "./firstVisitProbe.js";
+import { hadSavedDataOnLoad, loadedAt, takeEarlyClicks } from "./firstVisitProbe.js";
+import { attachFirstHourLog } from "./gameEvents.js";
 import { createTelemetryEventId } from "./state/telemetryEventId.js";
 import { saveFirstHourRecord, telemetryEnabled } from "./telemetry.js";
 
@@ -34,7 +35,7 @@ import { saveFirstHourRecord, telemetryEnabled } from "./telemetry.js";
  *   far, farCase    the furthest scene by 30 minutes, and its case's place in the season
  *   lost, again     the two questions: "stake" | "next" | "unknown" | "skip" | "shown"; 0..10 | "skip" | "shown"
  */
-export const FIRST_HOUR_KEY = "critical-point-first-hour-v1";
+export { FIRST_HOUR_KEY };
 export const FIRST_HOUR_WINDOW_MS = 30 * 60 * 1000;
 export const PHONE_MAX_WIDTH = 767;
 export const LOST_ANSWERS = Object.freeze(["stake", "next", "unknown"]);
@@ -60,6 +61,8 @@ const CLICKS = [
 const defaults = () => ({
   telemetryOn: telemetryEnabled,
   hadSavedData: hadSavedDataOnLoad,
+  loadedAt,
+  earlyClicks: takeEarlyClicks,
   read: () => readStoredValue(FIRST_HOUR_KEY, ""),
   write: (text) => writeStoredValue(FIRST_HOUR_KEY, text),
   consent: () => {
@@ -79,7 +82,7 @@ let record = null;
 let lastSent = "";
 let listening = null;
 
-const seconds = () => Math.max(0, Math.round((deps.now() - record.t0) / 1000));
+const seconds = (at = deps.now()) => Math.max(0, Math.round((at - record.t0) / 1000));
 const save = () => deps.write(JSON.stringify(record));
 
 /** Whether a note may still be taken: a record, not closed, inside the half hour. The first note after it closes the record. */
@@ -117,11 +120,11 @@ export function flush({ keepalive = false } = {}) {
   return true;
 }
 
-function onClick(event) {
+function onClick(event, at = deps.now()) {
   const target = event.target;
   if (!target || typeof target.closest !== "function") return;
   const hit = CLICKS.find(([selector]) => target.closest(selector));
-  if (hit) noteControl(hit[1]);
+  if (hit) noteControl(hit[1], at);
 }
 
 function onHidden(event) {
@@ -154,7 +157,7 @@ export function startFirstHour(overrides = {}) {
     const width = Number(deps.scope.innerWidth) || 0;
     const candidate = {
       id: createTelemetryEventId(),
-      t0: deps.now(),
+      t0: deps.loadedAt ?? deps.now(),
       v: 1,
       first: true,
       dev: width > 0 && width <= PHONE_MAX_WIDTH ? "phone" : "pc",
@@ -169,11 +172,16 @@ export function startFirstHour(overrides = {}) {
     deps.scope.document?.addEventListener?.("visibilitychange", onHidden);
     deps.scope.addEventListener("pagehide", onHidden);
   }
+  const early = deps.earlyClicks?.() ?? [];
+  if (record) {
+    for (const { target, at } of early) onClick({ target }, at);
+    attachFirstHourLog({ noteTable, noteScene, noteCaseDone });
+  }
   return record;
 }
 
 /** A press the start screen or the cold opening counts (CLICKS). */
-export function noteControl(kind) {
+export function noteControl(kind, at = deps.now()) {
   if (!open()) return;
   if (kind === "file") {
     record.file = true;
@@ -185,9 +193,9 @@ export function noteControl(kind) {
   } else {
     if (!record.btn) {
       record.btn = kind;
-      record.btnS = seconds();
+      record.btnS = seconds(at);
     }
-    if ((kind === "prologue" || kind === "story") && record.startS == null) record.startS = seconds();
+    if ((kind === "prologue" || kind === "story") && record.startS == null) record.startS = seconds(at);
   }
   save();
 }

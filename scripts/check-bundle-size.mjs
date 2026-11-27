@@ -246,7 +246,8 @@ const budgets = [
   // 169,832 / 63,399 -> 169,974 / 63,457 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 169,970 / 63,453 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,974 -> 169,981 raw g6b-firstpaint: applySceneEffect is sceneEffect.js's now (out of riskLogic.js and the first paint). Measured 169,977 in the e2e build on Windows, the plus 4; CI re-measures.
   // 169,981 / 63,457 -> 170,182 / 63,530 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 170,178 / 63,526, the plus 4; CI re-measures.
-  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 170_182, maxGzip: 63_530 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the two questions (FirstHourAsk.jsx) on the verdict sheet and the report, the hand-close and hint notes. Measured 171,789 / 64,040 in the e2e build, the plus 4.
+  { pattern: /^GameRuntime-.*\.js$/, maxBytes: 171_793, maxGzip: 64_044 },
   // src/gameLogic.js and the code it brings, shared by the runtime's chunk and
   // the table's settlement (settleChoice.js, #233), split out by Rolldown on
   // 2026-10-24 (see GameRuntime above). It loads with whichever of the two
@@ -831,7 +832,10 @@ const budgets = [
   // 230,284 / 84,263 -> 225,758 / 82,494 g6b-firstpaint: the MARK 13 switch out of the first paint again (gameConstants.js reads it from rulesSwitch.js, applySceneEffect moved to sceneEffect.js), nextTableRules.js and tableRules.js back in the game's chunks. Measured 225,754 / 82,490 in the e2e build on Windows, the plus 4; CI re-measures.
   // gzip 82,494 -> 82,502 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows gzip 82,498, the plus 4; CI re-measures.
   // 225,758 / 82,502 -> 225,833 / 82,543 bundle 11-27 (#697, the note late-choices-count on the start screen list) over main e052534f: CI verify-quick measured 225,829 / 82,539, the plus 4.
-  { pattern: /^index-.*\.js$/, maxBytes: 225_833, maxGzip: 82_543 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the first-visit probe (firstVisitProbe.js, read before any other module) and the lazy fetch of firstHourLog.js in main.jsx, gameEvents' three hand-over notes, saveFirstHourRecord in telemetry.js. Measured 227,075 / 83,031 in the e2e build, the plus 4.
+  { pattern: /^index-.*\.js$/, maxBytes: 227_079, maxGzip: 83_035 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the record itself, fetched after the first paint only on a first-visit device (or one holding its record). Measured 4,001 / 1,917 in the e2e build, the plus 4.
+  { pattern: /^firstHourLog-.*\.js$/, maxBytes: 4_005, maxGzip: 1_921 },
   // The 홈 화면에 추가 hint (components/InstallHint.jsx), fetched only on a
   // browser that offers an install. Measured 559 / 319 on 2026-10-26, the
   // gzip plus 4.
@@ -1681,7 +1685,8 @@ const budgets = [
   // 68,697 / 25,702 -> 69,130 / 25,783 gameplay-g5b (MARK 11) over main 5d2a7431: measured 69,126 / 25,779 in the e2e build on Windows, the plus 4; CI re-measures.
   // 69,130 / 25,783 -> 69,845 / 25,982 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 69,841 / 25,978 in the e2e build on Windows, the plus 4; CI re-measures.
   // 69,845 / 25,982 -> 70,838 / 26,324 g6b-firstpaint (over gameplay-g6b, MARK 13): nextTableRules.js and tableRules.js left the first paint (index) for this chunk, the start screen reading RULES_MARK 13 from rulesSwitch.js alone. Measured 70,834 / 26,320 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 70_838, maxGzip: 26_324 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): hashed names of the chunks it imports. Measured gzip 26,327 in the e2e build, the plus 4.
+  { pattern: /^gauntletEngine-.*\.js$/, maxBytes: 70_838, maxGzip: 26_331 },
   // The season's result card: the two buttons at the ending, the card's
   // model and the canvas code that draws it, in one chunk the ending asks for
   // when it opens. 8,271 / 3,996 on 2026-10-09, plus 5%. The buttons are in
@@ -2337,7 +2342,8 @@ const budgets = [
   // 213,381 / 71,163 -> 213,498 / 71,223 gameplay-g5b (MARK 11) over main 5d2a7431: measured 213,494 / 71,219 in the e2e build on Windows, the plus 4; CI re-measures.
   // 213,498 / 71,223 -> 214,165 / 71,313 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 214,161 / 71,309 in the e2e build on Windows, the plus 4; CI re-measures.
   // 214,165 / 71,313 -> 214,274 / 71,343 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 214,270 / 71,339 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 214_274, maxGzip: 71_343 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the two questions' words. Measured 214,563 / 71,431 in the e2e build, the plus 4.
+  { pattern: /^locale-ja-index-.*\.js$/, maxBytes: 214_567, maxGzip: 71_435 },
   // index 91,605 / 33,973 -> 93,179 / 34,900 and overlay 2,894 / 1,183 -> 6,589 / 2,026 on 2026-10-26, en-speakers
   // (사건 11~최종 화자 63명의 영어 이름과 시범 범위 previewThrough: 범위 밖 사건은 영어 파일이 있어도 한국어로).
   // Both load on the English page only. Measured in the e2e build, the gzip plus 4.
@@ -2476,7 +2482,8 @@ const budgets = [
   // 178,649 / 63,643 -> 178,758 / 63,704 gameplay-g5b (MARK 11) over main 5d2a7431: measured 178,754 / 63,700 in the e2e build on Windows, the plus 4; CI re-measures.
   // 178,758 / 63,704 -> 179,291 / 63,807 gameplay-g6a (G46, MARK 12) over gameplay-g5b 79c0d5d6: measured 179,287 / 63,803 in the e2e build on Windows, the plus 4; CI re-measures.
   // 179,291 / 63,807 -> 179,396 / 63,854 gameplay-g6b (G44 G45 G47, MARK 13) over gameplay-g6a: measured 179,392 / 63,850 in the e2e build on Windows, the plus 4; CI re-measures.
-  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 179_396, maxGzip: 63_854 },
+  // 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the two questions' words. Measured 179,636 / 63,956 in the e2e build, the plus 4.
+  { pattern: /^locale-en-index-.*\.js$/, maxBytes: 179_640, maxGzip: 63_960 },
   // The board's blocked words and how far each is matched (src/boardBlockedTerms.js, 2026-11-03; the scopes and guards
   // 2026-11-04, board-auto-hide over main 2bd9a8ba; 시발점 passed 11-04): fetched only when 글 남기기 is pressed, so nothing at first paint carries them. Measured 3,093 / 1,717, the plus 4.
   // 128,593 / 46,483 -> 128,682 / 46,495 on 2026-10-30, E-11 번외 사건 틀 (draft) over main 430dda1e (#373 #374 #375 #376 #378): the side slot's, the finale line's and the side screen's words in English. Measured 128,678 / 46,491, the plus 4.
@@ -3008,7 +3015,8 @@ const FIRST_PAINT_IMAGE = "triggerlab-key-visual-960.webp";
 // -> ko 387,125, en 454,466, ja 462,952 g6b-firstpaint: the MARK 13 switch out of the index chunk (see index above). Measured ko 387,121, en 454,462, ja 462,948 in the e2e build on Windows, the plus 4; CI re-measures.
 // -> 387,136 / 454,476 / 462,962 a850ad86 (#696, withOpeningCosts in sceneViewModels, applySceneEffect imported straight): measured on Windows 387,132 / 454,472 / 462,958, the plus 4; CI re-measures.
 // -> 387,214 / 454,569 / 463,052 bundle 11-27 (#697, the note late-choices-count on the start screen list) over main e052534f: CI verify-quick measured 387,210 / 454,565 / 463,048, the plus 4.
-const FIRST_PAINT_BUDGETS = { ko: 387_214, en: 454_569, ja: 463_052 };
+// 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): the entry's probe and lazy fetch. Measured 387,706 / 455,161 / 463,630 in the e2e build, the plus 4.
+const FIRST_PAINT_BUDGETS = { ko: 387_710, en: 455_165, ja: 463_634 };
 const LOCALE_FIRST_PAINT = {
   en: [/^locale-overlay-.*\.js$/, /^locale-en-index-.*\.js$/],
   ja: [/^locale-overlay-.*\.js$/, /^locale-ja-index-.*\.js$/],
@@ -3231,7 +3239,8 @@ function checkBudget(file, budget) {
 // +58 / +18: season-1214 over main 7b45eff7: main's budget (its largest-note-day room kept) plus the Season's own growth, measured main vs season in the same e2e build.
 // 12,874 / 4,584 -> 12,874 / 4,589 on 2026-11-23, deps-1123 after merging main bc74cd3c (Season #642 #654): measured 12,870 / 4,573, raw plus 4, gzip plus the largest note day's room (16).
 // 12,874 -> 12,908 raw board-notice over main d5d79552 (만든 사람 공지: boardNotice.js, fetchBoardNotice, 관리 막대 공지 보기). Measured locally (Windows e2e build); provisional until CI verify-quick, then CI plus 4. 12,904 (one more hashed file named).
-const WORKER_BUDGET = { maxBytes: 12_908, maxGzip: 4_589 };
+// 첫 30분 자동 기록 (first-hour-1127, 2026-11-27): one more chunk name in the worker's list. Measured 12,939 / 4,599 in the e2e build, the plus 4.
+const WORKER_BUDGET = { maxBytes: 12_943, maxGzip: 4_603 };
 try {
   const worker = readFileSync(path.join(distDir, "sw.js"));
   const gzipBytes = gzipSync(worker).length;

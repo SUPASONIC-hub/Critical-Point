@@ -1,16 +1,15 @@
 // First: whether the device had the game's data, read before any other module writes (firstVisitProbe.js).
-import "./firstVisitProbe.js";
+import { hadSavedDataOnLoad } from "./firstVisitProbe.js";
 import { createRoot } from "react-dom/client";
 import { App, AppErrorBoundary, logCaughtRenderError } from "./App.jsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.jsx";
-import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue, WEEKLY_REMINDER_KEY } from "./appConfig.js";
+import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, FIRST_HOUR_KEY, readStoredValue, WEEKLY_REMINDER_KEY } from "./appConfig.js";
 import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installServiceWorker } from "./serviceWorker/register.js";
 import { installChunkReload } from "./state/chunkReload.js";
 import { loadLocale } from "./locale.js";
 import { installInstallPrompt } from "./state/installPrompt.js";
 import { startVitalsSample } from "./gameEvents.js";
-import { startFirstHour } from "./firstHourLog.js";
 
 // Cloud sync is opt-in: a device that never turned it on sends nothing, and
 // does not download the code that would. Turning it on in CloudSavePanel
@@ -28,8 +27,11 @@ if (readStoredValue(WEEKLY_REMINDER_KEY, "0") === "1") {
 }
 
 installChunkReload();
-// 첫 30분 자동 기록 (firstHourLog.js): a first-visit device keeps one small record; with no backend, nothing.
-startFirstHour();
+// 첫 30분 자동 기록 (firstHourLog.js): a first-visit device, or one with its record, fetches the code that
+// keeps one small record (with no backend it keeps nothing); every other device never downloads it.
+if (!hadSavedDataOnLoad || readStoredValue(FIRST_HOUR_KEY, "")) {
+  import("./firstHourLog.js").then(({ startFirstHour }) => startFirstHour()).catch(() => {});
+}
 // Before the first paint: a still intro must not start moving and then stop.
 applyAccessibilityToDocument();
 // Started here so the answer is usually in before the runtime chunk is.

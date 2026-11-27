@@ -22,6 +22,7 @@ function page({ hadSavedData = false, consent = true, telemetryOn = true, width 
   const on = (type, fn) => (listeners[type] = fn);
   const scope = { innerWidth: width, addEventListener: on, document: { documentElement: { lang: "ko" }, visibilityState: "visible", addEventListener: on } };
   const record = log.startFirstHour({
+    loadedAt: null,
     telemetryOn,
     hadSavedData,
     read: () => kept,
@@ -210,7 +211,7 @@ test("hidden by a switch of tab is a leave too; consent is read from the save wh
   const sent = [];
   const listeners = {};
   const scope = { innerWidth: 0, addEventListener: (type, fn) => (listeners[type] = fn), document: { visibilityState: "hidden", addEventListener: (type, fn) => (listeners[type] = fn) } };
-  log.startFirstHour({ telemetryOn: true, hadSavedData: false, read: () => kept, write: (text) => ((kept = text), true), send: async (id, payload) => sent.push(payload), scope });
+  log.startFirstHour({ loadedAt: null, telemetryOn: true, hadSavedData: false, read: () => kept, write: (text) => ((kept = text), true), send: async (id, payload) => sent.push(payload), scope });
   listeners.visibilitychange({ type: "visibilitychange" });
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(sent.length, 1);
@@ -219,4 +220,26 @@ test("hidden by a switch of tab is a leave too; consent is read from the save wh
   log.answer("again", 3);
   assert.equal(sent.length, 1, "a save that cannot be read is no consent");
   globalThis.localStorage.removeItem(STORAGE_KEY);
+});
+
+test("presses before the module loaded count at their own time, and the entry's notes reach the record", async () => {
+  const events = await import("../../src/gameEvents.js");
+  let kept = "";
+  const target = { closest: (query) => (query === '[data-testid="start-first-case"]' ? {} : null) };
+  log.startFirstHour({
+    loadedAt: 1_000,
+    now: () => 60_000,
+    telemetryOn: true,
+    hadSavedData: false,
+    consent: () => false,
+    read: () => kept,
+    write: (text) => ((kept = text), true),
+    earlyClicks: () => [{ target, at: 6_000 }],
+    scope: {},
+  });
+  events.noteTableOpened("prologue01", {}, "p1_start");
+  events.noteSceneShown("prologue01", "p1_start", { consent: false, scope: {} });
+  events.noteCaseClosed("prologue01", true, {});
+  const record = JSON.parse(kept);
+  assert.deepEqual([record.btn, record.btnS, record.startS, record.t1, record.far, record.lastAt], ["prologue", 5, 5, "p1_start", "p1_start", "result:prologue01"]);
 });
