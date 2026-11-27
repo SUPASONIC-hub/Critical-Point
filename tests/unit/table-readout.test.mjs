@@ -6,12 +6,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { resourceMeta } from "../../src/appCopy.js";
 import {
-  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, reduceWindow, RUN_INITIAL_STATE,
+  BASE_SCHEMA, buildNextSchema, FRACTURE_MIN_BURN, getClockHeatRate, getHeartbeatBpm, reduceWindow, RUN_INITIAL_STATE,
 } from "../../src/gauntlet/gauntletEngine.js";
 import { describeCaseChange, describeClockHeat, describeEffect, describeStakedDetail, describeStanding, formatMultiplier, joinRules, useTableForecast } from "../../src/gauntlet/tableReadout.js";
 import { getAuthorityGate } from "../../src/gameLogic.js";
 // G42 (RULES_MARK 10): the chain asks for ×32 on this page's table (×4 before).
-import { HOT_CASH_TEN as HOT_CASH_MULTIPLIER } from "../../src/gauntlet/nextTableRules.js";
+import { HOT_CASH_BPM, HOT_CASH_TEN as HOT_CASH_MULTIPLIER } from "../../src/gauntlet/nextTableRules.js";
 import observerCopy from "../../src/copy/observer.js";
 import { initialResources } from "../../src/gameConstants.js";
 import { easyResourceLabels } from "../../src/playerLanguage.js";
@@ -279,17 +279,26 @@ test("the heat of the rules never passes the end of its bar", () => {
   assert.equal(forecast({ schema: everything }).ruleHeat, 100);
 });
 
+/**
+ * G46 (RULES_MARK 12): the chain counts a cash at heartbeat HOT_CASH_BPM or over,
+ * so hot and cold are windows: heat 45 under a wall at 60 races the heart (131)
+ * at ×17, heat 60 under a wall at 90 pays ×44 with a calm one (94).
+ */
+const HOT = { win: { ...QUIET_WINDOW, gauge: 45, wall: 60, tellOffset: 0 }, multiplier: 17 };
+const COLD = { win: { ...QUIET_WINDOW, gauge: 59, wall: 90, tellOffset: 0 }, multiplier: 40 };
+
 test("the chain climbs from dormant to ready as the cashes stay hot", () => {
-  const hot = HOT_CASH_MULTIPLIER;
-  const cold = HOT_CASH_MULTIPLIER - 0.1;
+  assert.ok(getHeartbeatBpm(45, 60) >= HOT_CASH_BPM && getHeartbeatBpm(59, 90) < HOT_CASH_BPM);
+  assert.ok(COLD.multiplier >= HOT_CASH_MULTIPLIER, "the cold window pays ×32 or more: the multiplier no longer builds the chain");
   const ladder = [
-    forecast({ multiplier: cold }),
-    forecast({ multiplier: hot }),
-    forecast({ multiplier: cold, run: run({ streak: 1 }) }),
-    forecast({ multiplier: hot, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK }),
-    forecast({ multiplier: hot, run: run({ streak: 1 }) }),
+    forecast({ ...COLD }),
+    forecast({ ...HOT }),
+    forecast({ ...COLD, run: run({ streak: 1 }) }),
+    forecast({ ...HOT, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK }),
+    forecast({ ...HOT, run: run({ streak: 1 }) }),
   ].map((read) => read.overdrive);
   assert.deepEqual(ladder.map((step) => step.label), ["꺼짐", "점화", "유지", "이어짐", "오버클럭 준비"]);
+  assert.match(ladder[0].text, new RegExp(`심박 ${HOT_CASH_BPM}`), "the line names the heartbeat");
   const progress = ladder.map((step) => step.progress);
   assert.deepEqual(progress, [...progress].sort((a, b) => a - b), "each step fills more of the bar than the one before");
   assert.equal(new Set(progress).size, progress.length);
@@ -297,13 +306,13 @@ test("the chain climbs from dormant to ready as the cashes stay hot", () => {
 });
 
 test("OVERCLOCK is promised only where the cash forecast really carries it", () => {
-  const ready = forecast({ multiplier: HOT_CASH_MULTIPLIER, run: run({ streak: 1 }) });
+  const ready = forecast({ ...HOT, run: run({ streak: 1 }) });
   assert.ok(ids(ready.cashMutations).includes("overclock"));
-  const early = forecast({ multiplier: HOT_CASH_MULTIPLIER, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK });
+  const early = forecast({ ...HOT, run: run({ streak: 1 }), caseId: BEFORE_OVERCLOCK });
   assert.ok(!early.rules.has("overclock"), `${BEFORE_OVERCLOCK} has no OVERCLOCK yet`);
   assert.ok(!ids(early.cashMutations).includes("overclock"), "so its cash forecast names none");
   assert.notEqual(early.overdrive.label, "오버클럭 준비", "and the chain does not say it is ready");
-  const under = forecast({ multiplier: HOT_CASH_MULTIPLIER - 0.1, run: run({ streak: 1 }) });
+  const under = forecast({ ...COLD, run: run({ streak: 1 }) });
   assert.ok(!ids(under.cashMutations).includes("overclock"), "a cash under the hot line breaks the chain instead");
 });
 

@@ -230,6 +230,11 @@ export default {
       ignition: { label: "Ignition", text: "Commit for Overclock streak step 1" },
       dormant: { label: "Off", text: "The streak starts with a ×{multiplier}+ Commit" },
     },
+    overdriveBpm: {
+      live: { label: "Live", text: "One more Commit at Heartbeat {bpm}+ for Overclock" },
+      held: { label: "Held", text: "Commit at Heartbeat {bpm} or more this hand to keep it going" },
+      dormant: { label: "Off", text: "Commit twice at Heartbeat {bpm}+ for Overclock" },
+    },
     rulesOn: "{rules} in effect",
     rulesHidden: "Hidden rules in effect",
     rulesQuiet: "Rules stable",
