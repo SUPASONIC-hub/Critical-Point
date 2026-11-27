@@ -13,6 +13,8 @@ const relicsCopy = {
   draft: {
     full: "도구 칸 가득",
     closed: "사건 종료",
+    // G33 (RULES_MARK 9): on the card the side the case closed on handed over (relics.js HANDED_BY).
+    handedBy: "{name}{particle} 건넨 것",
     swapTitle: "내려놓을 도구 하나",
     title: "다음 사건에 가져갈 도구 하나",
     swapLede: "{name}{particle} 들려면 가진 도구 하나를 내려놓는다. 내려놓은 도구는 이 테이블부터 규칙을 바꾸지 않는다.",
@@ -38,9 +40,14 @@ const relicsCopy = {
     // price, filled formatted; a button that is off says why in `off`.
     reroll: "다시 뽑기 · {cost}",
     extra: "하나 더 · {cost}",
+    refine: "도구 다듬기 · {cost}",
+    refineGroup: "다듬을 도구",
+    refineOption: "{name} 다듬기, 조건 배수 {boost}배로",
     spendNote: "누르면 KD은행 계좌에서 바로 빠지고, 되돌릴 수 없다.",
     // Under the note (user decision 2026-11-05, (1)): buying every time dries the vault the ending reads (check:pressure, 11-05: -52% a case against never; only when a slot is open, -3.3%).
     spendHint: "하나 더는 칸이 빌 때만. 매번 사면 결말에 쓸 금고가 마른다.",
+    // G4 (relicsNext.js): under the next rules one more is once a season and the reroll is cheap.
+    spendHintNext: "하나 더는 시즌에 한 번. 다시 뽑기는 싸다: 셋이 약하면 다시 뽑아라. 한 판에 도구가 겹쳐도 판돈 배수는 합쳐 {cap}배까지다(혼자 더 큰 도구는 그 값).",
     secondTitle: "하나 더 고르기",
     secondLede: "산 도구 하나를 남은 두 개 중에서 고른다.",
     off: {
@@ -51,6 +58,8 @@ const relicsCopy = {
       picked: "이미 골랐음",
       few: "남은 도구가 하나뿐",
       short: "잔액 부족",
+      season: "이번 시즌에 이미 샀음",
+      none: "다듬을 도구가 없음",
     },
   },
   // By the tool's id: its name, what it does, what it says when it fires, the
@@ -60,50 +69,69 @@ const relicsCopy = {
       name: "메트로놈",
       text: "열기가 오른 다음 장면까지, 방향을 바꿔도 전환으로 인정된다.",
       proc: "전환을 붙잡았다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "방향을 바꾼 판(전환), 또는 같은 방향 6연속 뒤 첫 판에서 확정하면 판돈 +{pct}%.",
     },
     coldBlood: {
       name: "냉혈",
       text: "벽에 닿은 뒤의 AFTERSHOCK가 열기 {start}{particle} 아니라 {cold}에서 시작한다.",
       proc: "여진을 절반으로 식혔다",
+      // G4: what it does under the next rules, in place of the line above.
+      nextText: "BUST 다음 판은 AFTERSHOCK 없이 열기 0에서 시작하고 벽이 {wall} 물러서며, 그 판에서 확정하면 판돈 +{pct}%.",
+      nextSoftens: "냉혈: AFTERSHOCK 면제",
       softens: "냉혈: 열기 {cold}에서 시작",
     },
     heatSink: {
       name: "방열판",
       text: "HEAT DEBT가 열기의 {share}분의 1만 남기고, 시간은 {seconds}초만 가져간다.",
       proc: "열 빚을 절반으로 줄였다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "열기 {hot} 이상에서 확정하면 판돈 +{pct}%.",
       softens: "방열판: 열기 {share}분의 1, {seconds}초",
     },
     auditContact: {
       name: "감사실 연줄",
       text: "감사팀 반재욱이 한 칸은 눈감아 준다. 감사는 {limit}칸이 차야 적발된다.",
       proc: "반재욱이 한 칸을 눈감았다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "한 번 이상 밀고 열기 {low} 밑에서 확정하면 판돈 +{pct}%, 눈에 띔에도 잡히지 않는다.",
     },
     carbonCopy: {
       name: "임경수의 사본",
       text: "임경수가 태우지 않은 사본이 있다. BLACKOUT이 벽을 {shift}{particle} 아니라 {pull}만 당긴다.",
       proc: "사본이 벽을 붙잡았다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "BLACKOUT 판에서 확정하면 판돈 +{pct}%.",
       softens: "사본: 벽 {pull}만 당김",
     },
     testimony: {
       name: "오진우의 진술",
       text: "결정 제한시간은 설정값이었다. 시간이 다 돼 BUST해도 판돈의 {share}분의 1은 남는다.",
       proc: "시간이 다 돼도 판돈 {share}분의 1을 지켰다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "시간이 절반 넘게 남았을 때 확정하면 판돈 +{pct}%.",
     },
     frontPage: {
       name: "차지원의 1면",
       text: "특종이 이어져도 손이 떨리지 않는다. OVERCLOCK 판에서 밀 때 늘어나는 열기가 절반이다.",
       proc: "1면 마감 앞에서도 손이 고요했다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "OVERCLOCK 판에서 확정하면 판돈 +{pct}%.",
       softens: "1면: 밀기 폭 절반만 커짐",
     },
     fieldNote: {
       name: "도윤하의 현장 메모",
       text: "현장에선 두 번이면 흐름이 선다. 같은 유형 {hold}번째부터 논리 콤보가 오른다.",
       proc: "현장 메모로 콤보를 일찍 세웠다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "같은 쪽 논리 콤보 {side} 이상에서 확정하면 판돈 +{pct}%.",
     },
     encore: {
       name: "앙코르",
       text: "벽에 닿아 판돈을 잃어도 논리 콤보는 남는다.",
       proc: "벽에 닿고도 콤보가 살아남았다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "논리 콤보 {long} 이상에서 확정하면 판돈 +{pct}%.",
       unlock: "논리 콤보 {combo} 달성",
     },
     insurance: {
@@ -116,6 +144,8 @@ const relicsCopy = {
       name: "청진기",
       text: "SILENCE가 와도 심박이 계속 벽을 가리킨다. 시간은 여전히 {seconds}초다.",
       proc: "침묵 속에서 심장을 들었다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "SILENCE 판에서 확정하면 판돈 +{pct}%.",
       softens: "청진기: 심박 유지",
       unlock: "SILENCE를 한 번 겪기",
     },
@@ -123,6 +153,8 @@ const relicsCopy = {
       name: "악력",
       text: "STRIKE MASTERY가 밀 때마다 얹던 열기 1을 걷어 내고, STRIKE WAKE로 깨어난 판의 칩이 {chips}배 더 두꺼워진다.",
       proc: "STRIKE 숙련이 손에 붙었다",
+      // G4: the condition that pays under the next rules (relicsNext.js).
+      next: "STRIKE를 끝까지 충전하고 확정하면 판돈 +{pct}%.",
       softens: "악력: 밀 때 오르는 열기 그대로",
       unlock: "STRIKE 숙련 {count}회",
     },

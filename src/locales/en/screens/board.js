@@ -1,6 +1,6 @@
 /** The participant board in English (src/copy/board.js). */
 export default {
-  back: "Back to the briefing",
+  back: "Back to the title screen",
   title: "Words left behind",
   intro: "A name and a few lines are enough. The name and words you write here are shown to other participants as they are. No score, no ranking. This is where people who have been through the cases leave something for the next.",
   posts: "Posts: {count}",
@@ -29,6 +29,22 @@ export default {
     error: "Couldn’t load the posts.",
     local: "The board isn’t connected right now.",
     ready: "No posts yet. Leave the first one.",
+  },
+  weekQuestion: {
+    label: "This week’s question",
+    from: "From us",
+    note: "Answer with a post below. The question changes every Monday.",
+    questions: {
+      "first-stake": "In the first case, the first time you pressed LOCK, what made you press it? We care more about the reason than the score.",
+      "stopped-at-wall": "Have you ever pulled back right before the Wall? Tell us what stopped your hand.",
+      "numbers-or-people": "Was there a scene where you could save only the numbers or the people? We hesitated a long time writing scenes like that. Which did you choose?",
+      "short-clock": "When the clock is short, do you get faster or more careful? Tell us what changed for you under this week’s short clock.",
+    },
+  },
+  makersNotice: {
+    label: "From the makers",
+    note: "Not a participant post: we posted this ourselves.",
+    posted: "Posted {date}",
   },
   noTime: "No timestamp",
   reportedLabel: "You reported {name}’s post",

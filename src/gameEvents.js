@@ -1,4 +1,5 @@
-import { CASE_SEQUENCE } from "./gameCases.js";
+import { readStoredValue, STORAGE_KEY } from "./appConfig.js";
+import { authoredNodeOrders, CASE_SEQUENCE } from "./gameCases.js";
 
 /**
  * The first hour as Google Analytics counts it (N2, 2026-11-12), and the
@@ -18,6 +19,8 @@ export const GAME_EVENTS = Object.freeze({
   firstTable: "cp_first_table_open",
   /** The season's first case closed for the first time. */
   prologueDone: "cp_prologue01_done",
+  /** N16·N39: a written scene of 프롤로그 01 to 사건 07 shown, as two whole numbers (case_no, scene_no). */
+  scene: "cp_scene",
   /** Largest Contentful Paint of the start page, in ms (N12). */
   lcp: "cp_lcp",
   /** Interaction to Next Paint over the page's life, in ms (N12). */
@@ -27,8 +30,32 @@ export const GAME_EVENTS = Object.freeze({
 /** The case the first-hour events are about: the season's first, 프롤로그 01. */
 export const FIRST_CASE = CASE_SEQUENCE[0];
 
-/** One in twenty page loads measures its speed (N12: 1 to 5%). */
+/**
+ * N16 (owner's answer Q2 (1), 2026-11-16) and N39 (Q4 (1), 2026-11-18): the
+ * cases whose scenes are counted one by one -- the season's first twelve,
+ * 프롤로그 01 to 05 and 사건 01 to 07, where most first players leave -- each
+ * with the number it goes as, its place in the season (1 to 12; 프롤로그 01
+ * and 02 keep 1 and 2). Nothing later in the season sends a scene.
+ */
+export const SCENE_EVENT_CASES = Object.freeze(Object.fromEntries(CASE_SEQUENCE.slice(0, 12).map((caseId, index) => [caseId, index + 1])));
+
+/**
+ * N12 and N40 (Q5 (1), 2026-11-18): the share of page loads that measure
+ * their speed. While visits are few every load does -- at one or two devices
+ * a week, one in twenty left the weekly phone-speed table empty -- and from
+ * VITALS_FULL_SAMPLE_UNTIL (KST midnight) on, one in twenty (N12: 1 to 5%).
+ * The build cannot know the week's visitors, so the line between the two is
+ * a date: the one constant to move, or to bring forward once a week passes
+ * about 500 visitors.
+ */
 export const VITALS_SAMPLE_RATE = 0.05;
+export const VITALS_FULL_SAMPLE_UNTIL = "2027-01-04";
+const FULL_SAMPLE_END = Date.parse(`${VITALS_FULL_SAMPLE_UNTIL}T00:00:00+09:00`);
+
+/** The rate on a given moment (ms since the epoch): 1 before the date, VITALS_SAMPLE_RATE from it. */
+export function vitalsSampleRate(now = Date.now()) {
+  return now < FULL_SAMPLE_END ? 1 : VITALS_SAMPLE_RATE;
+}
 
 const NAMES = new Set(Object.values(GAME_EVENTS));
 const sentOnce = new Set();
@@ -74,12 +101,46 @@ export function noteCaseClosed(caseId, closedBefore, scope = globalThis) {
 }
 
 /**
- * N12: on one page load in twenty, and only with Google's tag on the page,
- * fetches the small speed watcher (webVitals.js) and starts it. The other
- * nineteen never download it. Returns whether this load was sampled.
+ * N16·N39: a written scene of 프롤로그 01 to 사건 07 came on screen. It goes
+ * as `cp_scene` with two whole numbers -- `case_no` (SCENE_EVENT_CASES, 1 to
+ * 12) and `scene_no`, the scene's place in the case as written (gameCases.js
+ * `authoredNodeOrders`, 1 to 5) -- once per scene per page. The scenes the graph adds between
+ * them (aftermath, reaction, route) send nothing: a number for those would
+ * shift whenever the graph grows. Only on a device that left 「기록 보내기」
+ * on (`consent`, the start page's checkbox, read from the save when the
+ * caller does not say): a player who said no to the play record is not
+ * counted scene by scene either. Returns whether it went. Called as each
+ * table stage mounts (GauntletStage.jsx); a scene's later windows are the
+ * same scene and go nowhere.
  */
-export function startVitalsSample({ scope = globalThis, random = Math.random, load = () => import("./webVitals.js") } = {}) {
-  if (typeof scope?.gtag !== "function" || !(random() < VITALS_SAMPLE_RATE)) return false;
+export function noteSceneShown(caseId, nodeId, { consent = readSavedConsent(), scope = globalThis } = {}) {
+  if (consent !== true || !Object.hasOwn(SCENE_EVENT_CASES, caseId)) return false;
+  const sceneNo = (authoredNodeOrders[caseId] ?? []).indexOf(nodeId) + 1;
+  if (sceneNo < 1) return false;
+  const key = `${GAME_EVENTS.scene}:${caseId}:${sceneNo}`;
+  if (sentOnce.has(key)) return false;
+  const sent = sendGameEvent(GAME_EVENTS.scene, { case_no: SCENE_EVENT_CASES[caseId], scene_no: sceneNo }, scope);
+  if (sent) sentOnce.add(key);
+  return sent;
+}
+
+/** The save's 「기록 보내기」: true only when the save says so in as many words. */
+export function readSavedConsent() {
+  try {
+    return JSON.parse(readStoredValue(STORAGE_KEY, "null"))?.dataConsent === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * N12·N40: on a sampled page load (`vitalsSampleRate`: every load until
+ * VITALS_FULL_SAMPLE_UNTIL, one in twenty after), and only with Google's tag
+ * on the page, fetches the small speed watcher (webVitals.js) and starts it.
+ * A load not sampled never downloads it. Returns whether this load was sampled.
+ */
+export function startVitalsSample({ scope = globalThis, random = Math.random, now = Date.now(), load = () => import("./webVitals.js") } = {}) {
+  if (typeof scope?.gtag !== "function" || !(random() < vitalsSampleRate(now))) return false;
   Promise.resolve()
     .then(load)
     .then((module) => module.watchVitals({ scope }))

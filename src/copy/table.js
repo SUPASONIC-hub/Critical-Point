@@ -21,6 +21,26 @@ const tableCopy = {
     // A marked board's label in pot's place (GauntletStage `getBoardMark`): C-10's act end, C-7's pass.
     markPeak: "고점 판",
     markBreather: "숨 고른 판",
+    // G1·G2·G3·G6·G7 (the next rules, nextTableRules.js): 눈에 띔, LOCK 닫힘, 결재 판, 숨 고르기.
+    markSign: "결재 판",
+    exposure: "눈에 띔 {points}",
+    exposureChance: "열기 {heat} 밑 확정은 적발 위험 {risk}/{most}",
+    exposureSpoken: "눈에 띔 {points}/{most}: 열기 {heat} 밑에서 확정하면 적발될 수 있고, 적발되면 이번 판돈을 잃고 연속이 반으로 준다. 쌓일수록 잘 걸린다. 방향을 바꾸면 풀린다.",
+    exposureCleared: "이 카드로 방향을 바꾸면 눈에 띔이 풀리고, 연속은 반으로 준다.",
+    exposureShield: "EXPOSE 충전으로 이번 확정은 적발되지 않는다.",
+    caught: "눈에 띄어 적발: 이번 판돈 없음, 연속이 반으로.",
+    lockShut: "LOCK 닫힘",
+    lockShutReason: "지금은 못 누름 — 들고 온 연속이 이미 LOCK 상한 ×{cap}을 채워 더할 것이 없다.",
+    lockStrikeHot: " STRIKE로 열기 {heat} 이상에서 확정하면 상한이 ×{cap}.",
+    signOpen: "결재 판, 판돈 {chips}배, 벽 한 칸 보임: 벽은 {cell} 이상.",
+    signCell: "벽 {cell}부터",
+    breath: "숨 고르기",
+    // G15: beside 숨 고르기, where the BUST before this board went.
+    breathBust: "지난 판 {heat}에서 터짐",
+    breathHotWall: " · 이번 판 벽 +{wall}",
+    chargeLeak: "충전이 새기 시작했다. 지금 확정하거나 다시 눌러라.",
+    breathLabel: "숨 고르기: 시계 {seconds}초를 쓰고 열기를 {gauge} 내리고 벽을 {wall} 뒤로. 첫 밀기 전 한 번.",
+    breathDone: "숨을 골랐다. 열기 {gauge} 내려 {to}, 벽이 {wall} 뒤로 갔다.",
     combo: "콤보",
     runPot: "판돈",
     vault: "금고",
@@ -36,6 +56,8 @@ const tableCopy = {
     streak: "연속",
     best: "최고",
     audit: "감사",
+    // G17: beside the count, one cash under the line from its limit.
+    auditWarn: "낮게 끊으면 감사",
     links: "연결",
     lockCap: "상한",
     lockMultiplier: "배율",
@@ -56,7 +78,11 @@ const tableCopy = {
     briefChallenge: "이 장면의 챌린지: {challenge}.",
     briefPot: "현재 판돈: {pot}. 벽에 닿으면 금고 밖 판돈은 사라진다.",
     briefRules: "이번 판 규칙: {rules}.",
-    briefNext: "다음 밀기 예고: 열기 {gauge} → {low}–{high}.",
+    briefNext: "다음 밀기 예고: 열기 {gauge} → {low}–{high}{clock}.",
+    // B5 (11-18): what the stake clock takes if the next push crosses a tier, said before the push (stakeClock.js).
+    nextClock: " · 시계 최대 −{cut}초",
+    // B5 seen (N43, 3rd step): the seconds the stake clock just took, beside the clock for a moment, a push's cut or the creep's.
+    clockCut: "−{cut}초",
     situationLabel: "현재 상황판",
     risk: "현재 위험",
     wallRange: "벽 {min}–{max}",
@@ -68,14 +94,14 @@ const tableCopy = {
     fail: "실패",
     handCount: "카드 {count}장",
     push: "밀어붙인다",
-    pushDetail: "열기 {gauge}, 다음 열기 {low}에서 {high}",
+    pushDetail: "열기 {gauge}, 다음 열기 {low}에서 {high}{clock}",
     lockCapped: "상한 도달",
     lockPrice: "−{seconds}초",
     steadyCold: "열기가 없어 지금은 식힐 것이 없다. 한 번 민 뒤에 충전하라",
     lockDetail: "지금 충전 {charge}. 누를 때마다 자원 배율이 오르고 시간이 {seconds}초 줄어든다.",
-    lockAtCap: "칩 배율이 {cap}배에 닿아 이번 판에는 더하지 않는다",
-    lockUnderCap: "칩 배율은 LOCK으로 {cap}배까지만 오른다",
-    lockStance: ". {charge} 이상 충전해 확정하면 다음 판에서 치른다",
+    lockAtCap: "칩 배율이 {cap}배에 닿아 이번 판에는 더하지 않는다.",
+    lockUnderCap: "칩 배율은 LOCK으로 {cap}배까지만 오른다.",
+    lockStance: " {charge} 이상 충전해 확정하면 다음 판에서 치른다.",
     sealed: "봉인됨",
     pickCard: "카드를 고른다",
     commit: "확정",
@@ -109,6 +135,8 @@ const tableCopy = {
     slamPot: "판돈",
     slamStill: "심장이 멈춘 자리에서 벽이 드러났다.",
     slamCombo: " · 논리 콤보 {streak}",
+    // G30 (RULES_MARK 9): a cash this close under the real wall, paid ×{bonus}.
+    slamEdge: "아슬아슬 ×{bonus} · 벽까지 {gap}",
     equipped: "장착",
     dropped: "· {name} 내려놓음",
     logicWord: "논리 ",
@@ -117,7 +145,10 @@ const tableCopy = {
     relicsLabel: "장착한 도구",
     scout: "조회",
     scouted: "조회함",
-    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust}과 시간 {seconds}초",
+    // G13: {trust} climbs within a case (2, 3, ...), so no particle rides on the number.
+    scoutLabel: "벽 {min}–{max} · 조회, 믿음 {trust} · 시간 {seconds}초",
+    narrow: "좁히기",
+    narrowLabel: "벽 {min}–{max} · 좁히기, {width}칸으로 · 믿음 {trust} · 시간 {seconds}초",
     glossaryCard: "카드 {number}: {label} ({type})",
     glossaryMastery: "시즌 숙련: LOCK을 충전한 채로 확정한 판의 수. 자세마다 {goal}판을 채우면 새 판의 규칙이 바뀐다 (STRIKE {strike} · STEADY {steady} · EXPOSE {expose}).",
   },
@@ -147,6 +178,9 @@ const tableCopy = {
     mastery: "시즌 숙련 ",
     mastered: "완성",
     blocked: "판이 열려 있을 때만 자세를 바꿀 수 있다.",
+    // G5 6막 진술 고정: the recorded stance's line, and why the row is shut.
+    fixed: "조서에 남은 자세 · 사건 끝까지",
+    fixedBlocked: "이번 사건은 첫 확정의 자세가 조서에 남아, 사건이 끝날 때까지 바꿀 수 없다.",
     detail: "시즌 숙련: 충전한 채로 확정한 판",
   },
   ledger: {
@@ -167,10 +201,17 @@ const tableCopy = {
     potLost: "잃은 판돈",
     potBanked: "번 판돈 {pot}",
     relics: "장착한 도구",
+    // G6 결재 판 (the next rules): the case's last board, drawn larger than the rest.
+    sign: "결재 판",
+    signCash: "{multiplier}에 확정 · +{pot}",
+    signBust: "BUST · 판돈 {pot} 잃음",
+    signNote: "사건의 마지막 판, 판돈 {chips}배",
   },
   // tableReadout.js: the readouts the table, the reveal and the archive print.
   readout: {
     clockHeat: "시계가 올리는 열기 {value}배",
+    // MARKET SHOCK (weeklyRules.js), on the case's result: what the shock did to the case's stacked pot, signed.
+    caseShock: "시장 충격 {change}",
     nextBusted: "다음 판은 벽에 닿은 대가로 바뀐 규칙으로 시작한다.",
     nextColdFeet: "한 번도 밀지 않고 멈춘 대가로 다음 판의 가장 비싼 카드가 봉인된다.",
     nextRecalculated: "이번 열기와 소모가 다음 판의 환경을 다시 계산한다.",
@@ -218,10 +259,10 @@ const tableCopy = {
     rulesLift: "{rules} 해제 조건: 사건 결과까지 살아남아 판돈을 금고로 넘겨라.",
     overdrive: {
       ready: { label: "오버클럭 준비", text: "지금 확정하면 다음 판은 칩 2배, 밀기 폭 증가" },
-      live: { label: "이어짐", text: "한 번 더 ×4+ 확정하면 오버클럭" },
-      held: { label: "유지", text: "이번 판도 ×4 이상으로 확정해야 이어진다" },
+      live: { label: "이어짐", text: "한 번 더 ×{multiplier}+ 확정하면 오버클럭" },
+      held: { label: "유지", text: "이번 판도 ×{multiplier} 이상으로 확정해야 이어진다" },
       ignition: { label: "점화", text: "확정하면 오버클럭 연속 1단계" },
-      dormant: { label: "꺼짐", text: "×4 이상 확정부터 연속이 켜진다" },
+      dormant: { label: "꺼짐", text: "×{multiplier} 이상 확정부터 연속이 켜진다" },
     },
     rulesOn: "{rules} 적용 중",
     rulesHidden: "숨은 규칙 적용 중",
@@ -234,16 +275,22 @@ const tableCopy = {
     push: "열기 {gauge} · {danger}",
     wall: "지금 열기 {gauge} · {danger}",
     stance: "충전 {focus} · 확정하면 다음 판 {label} · {title}",
-    scout: "조회했다. 믿음 {trust}을 썼다. 벽은 {min}에서 {max} 사이 어딘가",
+    scout: "조회했다(믿음 −{trust}). 벽은 {min}에서 {max} 사이 어딘가",
+    scoutNarrow: "더 좁혔다(믿음 −{trust}). 벽은 {min}에서 {max} 사이 어딘가",
     // {hand} is the last hand's ±N, signed by the code (formatChange).
     bank: "이번 판 {hand} · 판돈 {pot} · 금고 {vault}",
     act: "{act}막 시작 · 사건 {case}",
+    // The stake clock (B5): the heat crossed a tier and the clock moved by {cut} seconds.
+    stakeClockCut: "열기 {gauge} · 시계 {cut}초 줄었다 · 남은 {seconds}초",
+    stakeClockBack: "열기 {gauge} · 시계 {cut}초 돌아왔다 · 남은 {seconds}초",
     // Asked for by key I or the heart's button (describeStatus): what the screen shows, never the wall.
     status: "열기 {gauge} · {danger} · 판돈 {pot} · 남은 {seconds}초 · 심박 {bpm}",
   },
   // tableAfterword.js: what a closed window still says about itself, and the
   // recap over the next scene's reaction.
   afterword: {
+    // G30: put before nextPush on a cash close under the wall.
+    edge: "아슬아슬 ×{bonus} · 벽까지 {gap}. ",
     nextPush: "한 번 더 밀었다면 +{step} → {gauge}, 벽 {wall}: {outcome}.",
     nextSafe: "갈 수 있었다",
     nextBust: "BUST였다",

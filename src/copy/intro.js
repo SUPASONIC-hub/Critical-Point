@@ -19,11 +19,13 @@ const introCopy = {
   pageTitle: "임계점: CRITICAL POINT - 판단이 깊어지는 순간",
   subtitle: "45초마다 당신의 판단 기준이 기록된다",
   // appCopy's GAME_TITLE_READING, for the same reason: the reading under the wordmark and on the case chip (2026-11-04: the English and Japanese pages printed the Korean).
-  titleReading: "트리거랩",
+  titleReading: "임계점",
   premise:
     "3년 전 당신은 대출 승인 문서에 혼자 반대 의견을 올렸습니다. 대출은 그대로 나갔고, 당신은 미국계 자본이 최대주주인 KD금융그룹 지하의 트리거랩으로 내려왔습니다. 오늘 케이스데스크에 올라온 첫 파일에, 그때 그 대출번호가 그대로 남아 있습니다. 오래 붙잡은 조건은 다음 사건의 압력이 되어 돌아옵니다. 이야기는 그보다 조금 앞, 수습 마지막 과제에서 시작합니다.",
   startButton: "프롤로그 시작",
   briefingLink: "브리핑 먼저 보기",
+  // N19: the second door, with 스토리 모드 on from the first case (편의 설정's own words: easier, not ranked).
+  storyStart: { label: "이야기로 시작", hint: "쉬움 · 랭킹 밖" },
   ranking: "랭킹",
   board: "게시판",
   heroAlt: "해 질 녘 고층 옥상에서 도시를 내려다보는 두 분석관의 뒷모습",
@@ -52,8 +54,8 @@ const introCopy = {
   round: " · {round}회차",
   stats: { cases: "사건", oneCase: "한 사건", minutes: "분 안팎", answers: "정답" },
   previousMessage: "이전 참가자가 남긴 말: “{message}”",
-  // N10: from 11-16 to the end of 11-30 (rankingResetNoticeAt).
-  rankingReset: "랭킹 안내: 11월 30일(월) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남습니다.",
+  // N10: from 11-16 (11-11 by rankingResetNoticeAt since the move) to the end of 11-25.
+  rankingReset: "랭킹 안내: 11월 25일(수) 규칙 개편과 함께 공개 랭킹을 한 번 비웁니다. 명예의 전당 표는 그대로 남습니다.",
   // From 11-13 to the end of 12-13 (castNoticeAt); {names} is castAliasLine.
   castRenamed: "등장인물 안내: 몇몇 인물이 새 이름과 얼굴로 바뀌었습니다. 이전 기록의 옛 이름은 새 이름으로 보입니다({names}).",
   setup: {
@@ -146,6 +148,37 @@ const introCopy = {
   },
   // A case card's status chip (introViewModel.js, getCaseStatusText).
   status: { playing: "진행 중", open: "시작 가능", complete: "완료됨", locked: "이전 사건 필요" },
+  // The reading section under the start screen (HomeReading.jsx, scripts/static-shell.mjs):
+  // what the game is, every kind of page on the site, and the newest notes. AdSense
+  // 2차 분석 (2026-11-20): the start page showed nothing a reader could read.
+  reading: {
+    title: "읽을거리",
+    intro: [
+      "임계점은 브라우저에서 바로 하는 무료 금융 미스터리 게임입니다. 당신은 3년 전 대출 한 건에 혼자 반대 의견을 썼다가 지하 분석실로 밀려난 분석관이 되어, 그 대출에서 시작된 쉰다섯 개의 사건을 차례로 맡습니다.",
+      "사건마다 장면을 읽고, 시간이 줄어드는 테이블에서 얼마나 걸지 정합니다. 걸수록 보상이 커지지만 보이지 않는 선을 넘으면 그 판을 잃고, 오래 붙든 조건은 다음 사건의 압박으로 돌아옵니다. 어려운 금융 용어는 처음 나올 때마다 괄호로 풀었고, 출퇴근길 같은 짧은 틈에 끊어서 하다가 다른 기기에서 이어 할 수 있습니다.",
+      "아래에서 게임 방법과 사건 파일, 인물 소개, 그리고 우리 두 사람이 직접 쓰는 노트를 읽을 수 있습니다.",
+    ],
+    menuLabel: "사이트 메뉴",
+    menuTitle: "사이트 안내",
+    items: {
+      guide: { label: "게임 방법", text: "테이블 규칙과 자원, 판돈과 BUST까지 한 쪽에" },
+      "cases/index": { label: "사건 파일", text: "프롤로그부터 최종 사건까지, 사건마다 첫 장면과 질문" },
+      characters: { label: "인물", text: "각자 처음 등장할 때의 모습으로 만나는 사람들" },
+      making: { label: "만든 이야기", text: "질문 하나가 쉰다섯 사건의 게임이 되기까지" },
+      "notes/index": { label: "노트", text: "금융 이야기와 설계 기록, 우리가 직접 쓰는 글" },
+      about: { label: "게임 소개", text: "어떤 게임인지 한눈에" },
+      faq: { label: "자주 묻는 질문", text: "저장, 랭킹, 언어, 데이터에 대한 질문" },
+      contact: { label: "문의", text: "버그 제보와 의견 보내기" },
+      policies: { label: "방침·약관", text: "개인정보 처리와 이용 조건" },
+    },
+    notesTitle: "최근 노트",
+    notesAll: "노트 전체 보기",
+    notesEmpty: "첫 노트를 준비하고 있습니다.",
+    // 오늘의 1면: one article of the world's newspaper, fixed by the day in Seoul (src/news/newsIndex.js).
+    frontTitle: "오늘의 1면",
+    frontNote: "게임 속 가상 기사입니다 — 실제 사건·인물·회사와 관계없습니다",
+    frontAll: "세계관 신문 전체 보기",
+  },
   legal: { about: "게임 소개", faq: "자주 묻는 질문", contact: "문의", privacy: "개인정보처리방침", terms: "이용약관" },
   opening: {
     firstCase: "첫 사건",
@@ -154,7 +187,7 @@ const introCopy = {
     syncing: "{case} 판단 조건 동기화 중",
   },
   // E-11 번외 사건: the start screen's side slot (sideCases.getSideSlot), hidden
-  // until a finale is closed and a side case is written.
+  // until a side case is open on this device (11-18: at its place in the story).
   sideSlot: {
     label: "번외 사건",
     heading: "번외 사건 · 랭킹 밖 · {book}",

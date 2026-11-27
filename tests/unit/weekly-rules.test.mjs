@@ -271,7 +271,7 @@ test("CRISIS WEEK moves the wall and the chips at once, on top of the board, cla
   assert.deepEqual([...draft.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)].map(([, week, id]) => [week, id]), [["2026-W49", "crisis-week"]]);
 });
 
-test("the calendar books W48 to 2027-W15 one week in two, the three event rules in turn, each with its line in the story (E-9)", () => {
+test("the calendar books W48 to 2027-W25 one week in two, the three event rules in turn and the two devices once each, each with its line in the story (E-9)", () => {
   // The crisis week (B10, 2026-W49) sits between them and is checked on its own above.
   const booked = WEEKLY_RULES.filter((entry) => entry.week >= "2026-W48" && entry.id !== "crisis-week");
   assert.deepEqual(booked.map(({ week, id }) => [week, id]), [
@@ -286,7 +286,22 @@ test("the calendar books W48 to 2027-W15 one week in two, the three event rules 
     ["2027-W11", "near-wall"],
     ["2027-W13", "heavy-fracture"],
     ["2027-W15", "short-clock"],
+    // 2027-W17 ~ W26 (초안 11-16): the rotation goes on, and IDLE MONEY and
+    // MARKET SHOCK (#555) take one of its slots each, six weeks apart.
+    ["2027-W17", "near-wall"],
+    ["2027-W19", "idle-erosion"],
+    ["2027-W21", "heavy-fracture"],
+    ["2027-W23", "short-clock"],
+    ["2027-W25", "market-shock"],
   ]);
+  // The two devices' weeks: once each, and neither beside another rule's week.
+  for (const id of ["idle-erosion", "market-shock"]) {
+    const weeks = WEEKLY_RULES.filter((entry) => entry.id === id);
+    assert.equal(weeks.length, 1, `${id} has one week`);
+    const start = weekStartMs(weeks[0].week);
+    for (const side of [-7, 7]) assert.equal(weekRuleAt(start + side * DAY + 60_000), null, `${id}'s week has no rule beside it`);
+  }
+  assert.equal(weekRuleAt(weekStartMs("2027-W26")), null, "W26 is an ordinary week");
   // One week in two: two weeks from one start to the next, across 2026's W53.
   for (let i = 1; i < booked.length; i += 1) assert.equal(weekStartMs(booked[i].week) - weekStartMs(booked[i - 1].week), 14 * DAY, booked[i].week);
   assert.equal(weekRuleAt(weekStartMs("2026-W47"))?.id, "audit-cascade", "W47 is the audit and links' test week, before the booked weeks");
@@ -444,7 +459,7 @@ test("the server's week table says what the calendar says", () => {
   // check:grants holds the table PGlite builds from them to the same.
   const byWeek = (a, b) => a.week.localeCompare(b.week);
   const table = new Map();
-  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql", "20261115000000_weekly_rule_calendar_w05_w15.sql", "20261116000000_weekly_rule_crisis_week.sql"]) {
+  for (const name of ["20261021000000_weekly_rule_event.sql", "20261021010000_weekly_rule_w44_test_week.sql", "20261022010000_test_week_to_w47.sql", "20261023010000_weekly_rule_calendar_w48_w03.sql", "20261115000000_weekly_rule_calendar_w05_w15.sql", "20261116000000_weekly_rule_crisis_week.sql", "20261121000000_weekly_rule_calendar_w17_w26.sql"]) {
     const sql = read(`supabase/migrations/${name}`).replace(/^--.*$/gm, "");
     for (const [, week] of sql.matchAll(/delete from public\.weekly_rules where week = '(\d{4}-W\d{2})'/g)) table.delete(week);
     for (const [, week, id] of sql.matchAll(/\('(\d{4}-W\d{2})',\s*'([a-z0-9-]+)'\)/g)) table.set(week, id);
@@ -583,11 +598,13 @@ test("the ranking keeps last week's board for the week after it: W47 on 11-23, b
   assert.deepEqual(weekBoardsAt(Number.NaN), []);
 });
 
-test("the start screen tells of the 11-30 ranking wipe from 11-16 to the end of 11-30 (N10)", () => {
-  assert.equal(rankingResetNoticeAt(kst("2026-11-15T23:59:59")), false);
+test("the start screen tells of the 11-25 ranking wipe from 11-11 to the end of 11-25 (N10, moved up from 11-30 on 11-25)", () => {
+  assert.equal(rankingResetNoticeAt(kst("2026-11-10T23:59:59")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-11T00:00:00")), true);
   assert.equal(rankingResetNoticeAt(kst("2026-11-16T00:00:00")), true);
-  assert.equal(rankingResetNoticeAt(kst("2026-11-30T23:59:59")), true);
-  assert.equal(rankingResetNoticeAt(kst("2026-12-01T00:00:00")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-25T23:59:59")), true);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-26T00:00:00")), false);
+  assert.equal(rankingResetNoticeAt(kst("2026-11-30T12:00:00")), false);
   assert.equal(rankingResetNoticeAt(Date.parse(E2E_WEEKLY_RULE_CLOCK)), false, "a test build never shows it");
   assert.equal(rankingResetNoticeAt(Number.NaN), false);
 });

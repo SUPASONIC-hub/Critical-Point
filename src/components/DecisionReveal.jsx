@@ -9,6 +9,7 @@ import { Prose } from "./Prose.jsx";
 import { fill } from "../locale.js";
 import revealCopy from "../copy/reveal.js";
 import { SceneMinutes } from "./SceneMinutes.jsx";
+import { BetweenHandsPulse } from "./BetweenHandsPulse.jsx";
 import { noteRevealDetails } from "../state/readingTally.js";
 import { useSceneChoiceLine } from "../state/useSceneChoiceRates.js";
 // formatMultiplier is the table's: this file had a copy that rounded to nearest,
@@ -101,7 +102,7 @@ function afterwordParts(text) {
 }
 
 export function DecisionReveal({ view }) {
-  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta } = view;
+  const { decisionReveal, decisionRevealRef, trapDecisionRevealFocus, renderSceneLines, setDecisionReveal, resourceMeta, answerPulse } = view;
   const verdict = decisionReveal?.verdict ?? null;
   const busted = verdict?.outcome === "bust";
   // Where the lost scene went on: its place up to the first " · " (B-13), the
@@ -172,6 +173,7 @@ export function DecisionReveal({ view }) {
               case against a hand that sees the wall (tableAfterword.js). Plain
               text in the sheet, nothing that moves and no voice of its own:
               the slam is the one announcement. */}
+          {decisionReveal.auto && <p data-testid="reveal-auto">{fill(revealCopy.autoCash, { gauge: Math.round(verdict?.gauge ?? 0) })}</p>}
           {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
           {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>
@@ -218,6 +220,8 @@ export function DecisionReveal({ view }) {
                 <>
                   <Vault size={14} aria-hidden="true" />{revealCopy.pot.auditCaught}<b>{formatMoney(verdict.secured + verdict.audit.lost)}</b>{revealCopy.pot.auditOf}{" "}
                   <b>{formatMoney(verdict.audit.lost)}</b>{revealCopy.pot.auditTaken}<b>{formatMoney(decisionReveal.vault)}</b>
+                  {/* G17: why the case lost it, in a line of its own. */}
+                  <small className="gx-reveal-why" data-testid="audit-why" style={{ display: "block" }}>{verdict.audit.level === undefined ? revealCopy.pot.auditWhy : revealCopy.pot.auditWhySmooth}</small>
                 </>
               ) : decisionReveal.caseClosed ? (
                 <>
@@ -328,6 +332,9 @@ export function DecisionReveal({ view }) {
             {choiceShare}
           </p>
         )}
+
+        {/* N22: once a season, between two hands of 프롤로그 01·02 (state/betweenHandsPulse.js). */}
+        <BetweenHandsPulse key={decisionReveal.nextNode} pulse={decisionReveal.pulse ?? null} onAnswer={answerPulse} />
 
         <div className="decision-reveal-footer">
           <span>{fill(revealCopy.next, { title: decisionReveal.nextTitle })}</span>

@@ -919,7 +919,9 @@ test("a replay link restores the captured scene in a fresh context", async ({ pa
   try {
     const fresh = await viewer.newPage();
     await fresh.goto(replayUrl);
-    await expect(fresh.locator(".game-shell")).toBeVisible();
+    // A new context has an empty cache: the whole runtime is fetched cold, as
+    // the other first boots of the suite wait for it (30 s, not the 8 s default).
+    await expect(fresh.locator(".game-shell")).toBeVisible({ timeout: 30_000 });
 
     // What is on screen is the scene the link names, with the resources it carries.
     await expect(fresh.locator(".game-header h1")).toHaveText(nodes[before.nodeId].title);

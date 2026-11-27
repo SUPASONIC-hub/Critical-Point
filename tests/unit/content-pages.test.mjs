@@ -14,7 +14,7 @@ import { CASE_PAGES, CASE_TEXT } from "../../scripts/content-pages/cases.mjs";
 import { CHARACTER_GROUPS } from "../../scripts/content-pages/characters-text.mjs";
 import { MAKING_BODY } from "../../scripts/content-pages/making-text.mjs";
 import { CONTENT_KINDS, renderContentPages } from "../../scripts/content-pages/pages.mjs";
-import { MENU_KINDS } from "../../scripts/content-pages/site-nav.mjs";
+import { MENU_KINDS, menuPath } from "../../scripts/content-pages/site-nav.mjs";
 import { renderStaticPages } from "../../scripts/site-pages.mjs";
 
 /**
@@ -36,7 +36,7 @@ const languageOf = (file) => /^(en|ja)\//.exec(file)?.[1] ?? "ko";
 
 test("every content page is written in Korean, English and Japanese, and every case of the season has one", () => {
   assert.deepEqual(CASE_PAGES, CASE_SEQUENCE, "a page for each of the season's cases, in its order");
-  assert.equal(CONTENT_KINDS.length, CASE_SEQUENCE.length + 4);
+  assert.equal(CONTENT_KINDS.length, CASE_SEQUENCE.length + 5, "the guide, the case files, the cast, the making-of and the weekly calendar");
   for (const kind of CONTENT_KINDS) {
     for (const language of LANGUAGES) {
       const file = `${FOLDER[language]}${kind}.html`;
@@ -59,7 +59,8 @@ test("every plain page carries the site menu at its head and its foot, and every
     const navs = [...html.matchAll(/<nav\b[^>]*>([\s\S]*?)<\/nav>/g)].map((match) => match[1]);
     assert.equal(navs.length, 2, `${file}: a menu at the head and one at the foot`);
     for (const links of navs) {
-      for (const kind of MENU_KINDS) assert.ok(links.includes(`href="/${FOLDER[language]}${kind}.html"`), `${file} links ${kind} in ${language}`);
+      // The notes are Korean only: every language links the one list (site-nav.mjs `isKoreanOnly`).
+      for (const kind of MENU_KINDS) assert.ok(links.includes(`href="${menuPath(kind, language)}"`), `${file} links ${kind} in ${language}`);
     }
     for (const [, href] of decode(html).matchAll(/<(?:a|img)\b[^>]*?(?:href|src)="([^"]+)"/g)) {
       if (href.startsWith("mailto:") || /^https:\/\//.test(href)) continue;

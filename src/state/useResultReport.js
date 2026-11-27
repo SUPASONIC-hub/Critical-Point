@@ -22,7 +22,7 @@ import { createLogicReport, getRankedLogicHold, hasBeatTableCase } from "../logi
 import { easyResourceLabels } from "../playerLanguage.js";
 import { createAchievementBadges, createEndingProfile, createScoreBreakdown, createSeasonStandingReadout, describeDecisionPace, getDecisionPace } from "../viewModels/reportViewModels.js";
 import { createCompletedCaseResultList } from "../viewModels/introViewModel.js";
-import { describeCaseChange } from "../gauntlet/tableReadout.js";
+import { describeCaseChange, describeCaseShock } from "../gauntlet/tableReadout.js";
 import { getRouteMarker } from "./savedState.js";
 import { getCaseComparison, getSeasonCard } from "./secondSeason.js";
 import { getWeekRule } from "../gauntlet/weeklyRules.js";
@@ -209,7 +209,9 @@ export function useResultReport({
       tone: getOutcomeTone(getOutcomeCarryover({ caseId: currentCase, choiceId: outcomeChoiceId }), { failure: currentCase === "final" && endingVariant.failure }),
     }
     : null;
-  const caseOutcome = { ...closedOutcome, ...(pastLine ? { past: pastLine } : {}), scene };
+  // MARKET SHOCK's line (c2 follow-up) rides on the outcome too: no new field in the view's bag.
+  const shockLine = describeCaseShock(log);
+  const caseOutcome = { ...closedOutcome, ...(pastLine ? { past: pastLine } : {}), ...(shockLine ? { shock: shockLine } : {}), scene };
   // The tab on a result (resultTabTitle.js, 개선 포인트 A3): the season's ending
   // by its name in the page's language, a case by the ending it closed on.
   const resultTabTitle = readResultTabTitle({ currentCase, endingVariant, caseTag: caseOutcome.tag });

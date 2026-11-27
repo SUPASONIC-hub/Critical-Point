@@ -53,6 +53,10 @@ export default {
       title: "The season learned to hold on",
       text: "The result of charging STEADY LOCK again and again. Every new hand starts cooler, with a little more time.",
     },
+    sign: {
+      title: "Sign-off hand",
+      text: "The case’s last hand. The stake is ×{chips}, and the nearest cell the Wall can be on is shown.",
+    },
     shock: {
       title: "The market shook",
       text: "This week’s market shock. This hand’s Wall is {wall} closer, and your stacked stake just moved by up to {swing}%.",
@@ -61,6 +65,9 @@ export default {
       title: "The season learned to read the table",
       text: "The result of charging EXPOSE LOCK again and again. Seals open earlier, and with more, even a face-down hand can’t hide.",
     },
+  },
+  lateBill: {
+    text: "The price of committing at a high multiplier. You start carrying 3/4 of this Heat, and lose {seconds} seconds.",
   },
   lifted: {
     blackout: {

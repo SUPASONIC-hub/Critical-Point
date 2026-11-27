@@ -1,6 +1,7 @@
 /**
  * The site's menu, at the head and the foot of every plain page: the game,
- * the pages about it (the guide, the case files, the cast, how we made it)
+ * the pages about it (the guide, the case files, the cast, how we made it,
+ * the notes, the world's newspaper)
  * and the five that were there before them (about, FAQ, contact and the two
  * policies), in the page's language, and at the head the page in the other
  * two languages. `renderDocumentPage` (scripts/legal-pages.mjs) prints it;
@@ -16,10 +17,18 @@
  * nothing of it.
  */
 
-export const MENU_LANGUAGES = ["ko", "en", "ja"];
+const MENU_LANGUAGES = ["ko", "en", "ja"];
 
 /** The pages the menu lists after the game, in its order. Each is `/<kind>.html`, `/en/<kind>.html`, `/ja/<kind>.html`. */
-export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "faq", "contact", "privacy", "terms"];
+export const MENU_KINDS = ["about", "guide", "cases/index", "characters", "making", "notes/index", "news/index", "faq", "contact", "privacy", "terms"];
+
+/**
+ * The notes (/notes/, scripts/content-pages/notes.mjs) are written in Korean
+ * only (owner's decision 2026-11-20, Q3 「1」): every language's menu links the
+ * one Korean list, and says so in its own words. So is the world's newspaper,
+ * 석간 원장 (/news/, scripts/content-pages/news.mjs).
+ */
+export const isKoreanOnly = (kind) => /^(notes|news)\//.test(String(kind));
 
 /** The menu's words. `game` opens the game in the page's language. */
 export const MENU_LABELS = {
@@ -32,6 +41,8 @@ export const MENU_LABELS = {
     "cases/index": "사건 파일",
     characters: "인물",
     making: "만든 이야기",
+    "notes/index": "노트",
+    "news/index": "세계관 신문",
     faq: "FAQ",
     contact: "문의",
     privacy: "개인정보",
@@ -47,6 +58,8 @@ export const MENU_LABELS = {
     "cases/index": "Case Files",
     characters: "Characters",
     making: "How We Made It",
+    "notes/index": "Notes (in Korean)",
+    "news/index": "In-World Paper (in Korean)",
     faq: "FAQ",
     contact: "Contact",
     privacy: "Privacy",
@@ -62,6 +75,8 @@ export const MENU_LABELS = {
     "cases/index": "事件ファイル",
     characters: "登場人物",
     making: "制作の話",
+    "notes/index": "ノート(韓国語)",
+    "news/index": "作中の新聞(韓国語)",
     faq: "よくある質問",
     contact: "お問い合わせ",
     privacy: "プライバシー",
@@ -72,26 +87,28 @@ export const MENU_LABELS = {
 
 const folderOf = (language) => (language === "ko" ? "" : `/${language}`);
 /** A page's address from the root, as legal-pages.mjs's `pagePath` writes it. */
-export const menuPath = (kind, language) => `${folderOf(language)}/${kind}.html`;
+export const menuPath = (kind, language) => `${isKoreanOnly(kind) ? "" : folderOf(language)}/${kind}.html`;
 /** The game in a language: `/`, `/en/`, `/ja/` (legal-pages.mjs `gamePath`). */
-export const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
+const menuGamePath = (language) => (language === "ko" ? "/" : `/${language}/`);
 
-/** The section a page belongs to: a case's page is under the case files. */
-const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : kind);
+/** The section a page belongs to: a case's page is under the case files, the weekly calendar under the guide. */
+const sectionOf = (kind) => (String(kind).startsWith("cases/") ? "cases/index" : isKoreanOnly(kind) ? `${String(kind).split("/")[0]}/index` : kind === "weekly" ? "guide" : kind);
 
 function menuLinks(kind, language) {
   const words = MENU_LABELS[language];
   const section = sectionOf(kind);
   return MENU_KINDS.map((item) => {
     const current = item === kind ? ' aria-current="page"' : item === section ? ' aria-current="true"' : "";
-    return `<a href="${menuPath(item, language)}"${current}>${words[item]}</a>\n`;
+    const korean = isKoreanOnly(item) && language !== "ko" ? ' hreflang="ko"' : "";
+    return `<a href="${menuPath(item, language)}"${korean}${current}>${words[item]}</a>\n`;
   }).join("");
 }
 
 /** The head's menu: the game, every page in the page's language, and this page in the other two. */
 export function siteHeaderNav({ kind, language }) {
   const words = MENU_LABELS[language];
-  const switches = MENU_LANGUAGES.filter((code) => code !== language)
+  // A Korean-only page has no other language to switch to.
+  const switches = MENU_LANGUAGES.filter((code) => code !== language && !isKoreanOnly(kind))
     .map((other) => `<a href="${menuPath(kind, other)}" hreflang="${other}" lang="${other}">${MENU_LABELS[other].name}</a>\n`)
     .join("");
   return `<nav aria-label="${words.label}">
@@ -115,24 +132,25 @@ ${menuLinks(kind, language).replace(/ aria-current="(?:page|true)"/g, "")}</nav>
  */
 export const MENU_STYLE = `
 nav a[aria-current=true]{color:var(--text)}
-.site-foot{padding:12px 0 0;border-top:1px solid var(--line);border-bottom:0}
+.site-foot{padding:12px 0 0;border-top:4px double var(--text);border-bottom:0}
 .site-foot+p{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
 .lede{font-size:1.0625rem;color:var(--text)}
 .meta{margin:4px 0 0;color:var(--text-2);font-size:.875rem}
 .case-list{list-style:none;padding:0}
-.case-list li{margin:0;padding:14px 0;border-top:1px solid var(--line)}
+.case-list li{margin:0;padding:14px 0;border-top:1px solid var(--line-strong)}
 .case-list a{font-weight:700}
 .case-list p{margin:4px 0 0}
 .cast{display:grid;gap:20px;padding:0;list-style:none}
 .cast li{display:flex;gap:14px;margin:0;align-items:flex-start}
-.cast img{flex:none;width:72px;height:72px;object-fit:cover;border-radius:12px;background:var(--surface)}
+.cast img{flex:none;width:80px;height:80px;object-fit:cover;border:4px solid var(--surface);border-radius:2px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 6px 14px var(--shadow-2);transform:rotate(-2deg)}
+.cast li:nth-child(even) img{transform:rotate(2deg)}
 .cast p{margin:4px 0 0}
 .cast .line{color:var(--text);font-style:italic}
 @media (max-width:599px){.cast li{display:flow-root}.cast img{float:left;margin:4px 14px 4px 0}.cast h3{margin-top:8px}.cast p:not(.meta){clear:left}}
 .pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:36px;padding-top:12px;border-top:1px solid var(--line)}
 .pager a{display:inline-flex;align-items:center;min-height:44px}
 .note{font-size:.875rem}
-.spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.9375rem}
+.spoiler-note{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line-strong);border-left:3px solid var(--pencil);border-radius:3px;background:var(--surface);font-size:.9375rem}
 details{margin-top:4px}
 summary{cursor:pointer;color:var(--text-2);font-size:.875rem;padding:10px 0}
 `;

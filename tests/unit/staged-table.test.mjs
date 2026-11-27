@@ -1,3 +1,4 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -206,7 +207,9 @@ test("a feat is only counted toward the codex in a case that has relics", () => 
     const { unlockedRelics: _none, ...settled } = settle(step(caseId));
     assert.deepEqual(settled, resolveWindow({ run: RUN_INITIAL_STATE, window: feat, card: staked, rules: step(caseId) }), "the settlement itself is untouched");
   }
-  assert.deepEqual(settle(step("prologue05")).unlockedRelics, everywhere);
+  // SILENCE is dealt from 사건 05 (N18): 프롤로그 05 to 사건 04 have relics but no way to prove this feat.
+  for (const caseId of ["prologue05", "case01", "case02", "case03", "case04"]) assert.deepEqual(settle(step(caseId)).unlockedRelics, [], caseId);
+  assert.deepEqual(settle(step("case05")).unlockedRelics, everywhere);
   assert.deepEqual(settle(ALL_RULES).unlockedRelics, everywhere);
 });
 
@@ -287,10 +290,10 @@ test("with the switch off, every case is settled under everything, exactly as be
 
 test("as shipped, a plain run's prologues are settled under their steps and a NEW GAME+ run's under everything", () => {
   const veteran = normalizeRunState({ veteran: true });
-  for (const caseId of CASE_SEQUENCE.slice(0, 8)) {
+  for (const caseId of CASE_SEQUENCE.slice(0, 10)) {
     assert.equal(getSettlementRules({ caseId, run: RUN_INITIAL_STATE, caseClosed: false }).rules, step(caseId), caseId);
     assert.deepEqual(getSettlementRules({ caseId, run: veteran, caseClosed: true }), { rules: ALL_RULES, nextRules: ALL_RULES }, caseId);
   }
   assert.equal(getSettlementRules({ caseId: "prologue05", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, step("case01"), "사건 01 is its own step (C-4)");
-  assert.equal(getSettlementRules({ caseId: "case02", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, ALL_RULES, "사건 03 is the whole table");
+  assert.equal(getSettlementRules({ caseId: "case04", run: RUN_INITIAL_STATE, caseClosed: true }).nextRules, ALL_RULES, "사건 05 is the whole table (N18)");
 });

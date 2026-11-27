@@ -45,6 +45,16 @@ export const STAKE_CLOCK_FLOOR = 12;
 export const HOT_CASH_MULTIPLIER = 4;
 export const OVERCLOCK_STREAK = 2;
 export const OVERCLOCK_CHIPS = 2;
+/**
+ * How much wider an OVERCLOCK board's push is (`stepMin`, `stepMax`): 7~15
+ * becomes 11~21. N18 tried +4/+5 (11~20, 2026-11-17) to keep a bet in 사건
+ * 01 to 03 once AFTERSHOCK moved to 사건 04. Merged with RULES_MARK 7 that
+ * failed check:pressure (a pressed EXPOSE +8.3% against its 6%, the tools'
+ * spread x1.142 under x1.15), while +4/+6 holds every line there with heat 50
+ * still the best blind policy in 사건 01 to 03, so the owner chose +4/+6 on
+ * 2026-11-23. FRONT PAGE takes back about half of it (FRONT_PAGE_STEP).
+ */
+export const OVERCLOCK_STEP = Object.freeze([4, 6]);
 export const COLD_FEET_CHIPS = 0.6;
 /** What a charged stance carries into the next board. */
 export const STRIKE_WAKE_CHIPS = 1.25;
@@ -64,6 +74,16 @@ export const LOGIC_HOLD = 3;
 /** The table clock one LOCK press costs. */
 export const LOCK_PRESS_SECONDS = 1.5;
 /**
+ * G18 LOCK 충전 비용 (RULES_MARK 7, nextTableRules.js `isMarkSevenOn`): on a
+ * board with a short clock (SHORT CLOCK, a week's or 사건 09's, and 7막 청문회:
+ * the schema's `lockDrag`) a LOCK press takes LOCK_DRAG times LOCK_PRESS_SECONDS.
+ * Only there, for now: LOCK is the table's centre (게임성 개선점 G18's risk), so
+ * the rest of the season charges as before.
+ */
+export const LOCK_DRAG = 1.15;
+/** The rules whose boards carry the drag (gauntletEngine.js `getWeekBoard`): a week's or 사건 09's SHORT CLOCK, and 7막's hearing. */
+export const LOCK_DRAG_RULES = Object.freeze(["short-clock", "hearing"]);
+/**
  * SCOUT (B1, 11일차 초안): what one look at the wall costs on the table clock,
  * once a window, and how far the band it draws reaches -- a band
  * `2 * SCOUT_REACH` wide that holds the wall at a seeded place inside it, cut
@@ -78,6 +98,16 @@ export const SCOUT_REACH = 10;
  * other cost. The stage and the bots do not look with less than this.
  */
 export const SCOUT_TRUST = 1;
+/**
+ * B1's next step (2026-11-18): a second look on the same window narrows the
+ * band it drew to `2 * SCOUT_NARROW_REACH` (20 to 14), still holding the wall
+ * at a seeded place inside it and inside the first band. It costs this much
+ * more 믿음 and the same clock (SCOUT_SECONDS): the closer the read, the
+ * dearer. Once a window, after the first look. Measured in check:pressure
+ * ("scout narrow") and check:endings ("Scout spend", `narrow`).
+ */
+export const SCOUT_NARROW_REACH = 7;
+export const SCOUT_NARROW_TRUST = 2;
 
 /** METRONOME: how many windows after the pressure rose a change of type still counts as a switch. */
 export const METRONOME_REACH = 2;

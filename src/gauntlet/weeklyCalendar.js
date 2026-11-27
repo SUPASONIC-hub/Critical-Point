@@ -35,6 +35,15 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
  * on for twelve more weeks, one week in two, the three event rules in turn
  * after W03's short-clock. `added` is the day the draft was written; the PR
  * is merged at least seven days before W05 (2027-02-01), so the notice holds.
+ *
+ * 2027-W17 to 2027-W26 (초안, 2026-11-16, 사용자 확인 전): the same one week in
+ * two, five event weeks. The three event rules go on in turn after W15's
+ * short-clock (W17, W21, W23), and the two catalogue devices of #555 come in
+ * once each, in the rotation's slots and so never beside another rule's week:
+ * IDLE MONEY at W19, MARKET SHOCK at W25, six weeks apart, after the
+ * crisis week and the plain rules have had their turns. W26 is an ordinary
+ * week. `added` is the day the draft was written; merged at least seven days
+ * before W17 (2027-04-26).
  */
 const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2026-W46", id: "near-wall", added: "2026-10-16" }),
@@ -52,6 +61,11 @@ const MERGED_WEEKS = Object.freeze([
   Object.freeze({ week: "2027-W11", id: "near-wall", added: "2026-11-12" }),
   Object.freeze({ week: "2027-W13", id: "heavy-fracture", added: "2026-11-12" }),
   Object.freeze({ week: "2027-W15", id: "short-clock", added: "2026-11-12" }),
+  Object.freeze({ week: "2027-W17", id: "near-wall", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W19", id: "idle-erosion", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W21", id: "heavy-fracture", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W23", id: "short-clock", added: "2026-11-16" }),
+  Object.freeze({ week: "2027-W25", id: "market-shock", added: "2026-11-16" }),
 ]);
 
 /**
@@ -126,15 +140,18 @@ export function weekHasNews(ms, calendar = WEEKLY_RULES, days = 7) {
 }
 
 /**
- * The last unscheduled ranking wipe (결정 T, N10): 2026-11-30, Monday 00:00
- * KST. The start screen says so from two weeks before (11-16 00:00 KST) to
+ * The last unscheduled ranking wipe (결정 T, N10): 2026-11-25, Wednesday 00:00
+ * KST (moved up from Monday 11-30 on 11-25, the owner's answers 2 and then 1:
+ * bundle R merges on 11-25, as soon as CI is green; the wipe itself happens
+ * when the migration applies at the merge, this day only drives the notice).
+ * The start screen says so from two weeks before (11-11 00:00 KST; it first showed on 11-16 with the 11-30 day) to
  * the end of that day, read off the weekly clock, so a test build (held on a
  * January week) never shows it.
  */
-export const RANKING_RESET_MS = Date.parse("2026-11-30T00:00:00+09:00");
+export const RANKING_RESET_MS = Date.parse("2026-11-25T00:00:00+09:00");
 export const RANKING_RESET_NOTICE_DAYS = 14;
 
-/** Whether the start screen tells of the 11-30 ranking wipe at `ms`. */
+/** Whether the start screen tells of the 11-25 ranking wipe at `ms`. */
 export function rankingResetNoticeAt(ms) {
   const at = Number(ms);
   return Number.isFinite(at) && at >= RANKING_RESET_MS - RANKING_RESET_NOTICE_DAYS * DAY_MS && at < RANKING_RESET_MS + DAY_MS;

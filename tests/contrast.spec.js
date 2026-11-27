@@ -415,12 +415,12 @@ test("a long question on a phone stands on a fainter picture and stays readable"
   await startAt(page, "case05", "c5_final_redesign_route");
   // Polled: the table has only just taken the briefing's place.
   await expect.poll(lines, "the shortest question is one or two lines").toBeLessThanOrEqual(2);
-  await expect.poll(opacity, "a short question keeps the room as drawn").toBeCloseTo(0.78, 2);
+  await expect.poll(opacity, "a short question keeps the room as drawn").toBeCloseTo(0.35, 2);
 
   await startAt(page, "case02", "c2_trace");
   await expect.poll(lines, "the longest question is more than two lines").toBeGreaterThan(2);
-  await expect.poll(opacity, "the room behind a long question is fainter").toBeLessThanOrEqual(0.5);
-  expect(await opacity(), "and is still a room").toBeGreaterThanOrEqual(0.4);
+  await expect.poll(opacity, "the room behind a long question is fainter").toBeLessThan(0.35);
+  expect(await opacity(), "and is still a room").toBeGreaterThanOrEqual(0.2);
   // Read with the table's fold closed, as a player meets it. `expectReadable`
   // opens every drawer, and the open fold takes the question's row: the
   // question drops below the plate, and nothing of it is over the picture.
@@ -437,7 +437,7 @@ test("a long question on a phone stands on a fainter picture and stays readable"
   expect(painted.measured, "the lines over the plate were measured").toBeGreaterThan(0);
 
   await page.setViewportSize({ width: 1366, height: 768 });
-  await expect.poll(opacity, "a wide screen keeps the room as drawn").toBeCloseTo(0.78, 2);
+  await expect.poll(opacity, "a wide screen keeps the room as drawn").toBeCloseTo(0.35, 2);
 });
 
 test("the report and ending sequence stay readable", async ({ page }) => {
@@ -612,5 +612,70 @@ test("each card in the hand stands apart from the felt by its edge, at 3:1", asy
   for (const { card, low, where, samples } of cards) {
     expect(samples, `${card}: edge samples`).toBeGreaterThan(4);
     expect(low, `${card}: its edge against the felt (${where})`).toBeGreaterThanOrEqual(3);
+  }
+});
+
+/**
+ * The screens around the game, read since the ledger (2안 감사 장부,
+ * 2026-11-17) turned every ground to paper: a colour picked for the night
+ * shift's ink could go unread on any of them, and none was read before. The
+ * ranking and the board as a deployment with no server shows them, the error
+ * log with its recovery slots, and the settings over a table.
+ */
+test("the ranking, the board, the error log and the settings stay readable", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto("/?debug=1");
+  await page.waitForSelector(".intro-shell");
+  for (const [opener, label] of [
+    [".intro-ranking-button:not(.intro-board-button):not([data-testid])", "ranking"],
+    [".intro-board-button", "board"],
+  ]) {
+    await page.locator(opener).click();
+    await expect(page.locator(".intro")).toHaveCount(0);
+    await expectReadable(page, label);
+    await page.keyboard.press("Escape");
+    await page.waitForSelector(".intro");
+  }
+  await page.getByTestId("open-error-log-from-header").click();
+  await page.getByTestId("error-log-panel").waitFor();
+  await expectReadable(page, "error log");
+
+  await startAt(page, "case01", "start");
+  await page.getByTestId("open-comfort-settings").click();
+  await page.locator(".comfort-dialog").waitFor();
+  await expectReadable(page, "settings");
+});
+
+/**
+ * States a walk through the game rarely or never lands on: a clue on the reveal,
+ * a broken streak and every route tone in the report, a relic in the bank, a
+ * carried rule's badge, a locked and a running case card. Their real classes on
+ * the real stylesheet, read in each mood (2026-11-23: all of these had shipped
+ * unreadable, or were one colour rule away from it, with this file green).
+ */
+const RARE_STATES = `
+  <div class="cinematic-clue-card"><div><span>단서</span><strong>지워진 결재선</strong><p>사라진 줄을 찾았다.</p></div></div>
+  <div style="background:var(--ui-surface-2)">
+    <div class="route-atlas-meta"><b class="route-break">연속 끊김</b></div>
+    ${["branch", "system", "evidence", "memory", "turnaround", "reaction", "aftermath"].map((tone) => `<article class="route-atlas-node ${tone}"><div class="route-atlas-dot">01</div></article>`).join("")}
+  </div>
+  <main class="shell"><div class="gx-bank"><b class="gx-relic-chip"><span class="gx-relic-name">유물</span></b></div></main>
+  <div class="gx-panel gx-carry"><ul><li class="gx-mutation"><b>OVERCLOCK</b><strong>규칙</strong></li><li class="gx-mutation mut-reboot"><b>REBOOT</b><strong>규칙</strong></li></ul></div>
+  <div class="case-card locked-case"><h2>잠긴 사건</h2><p>설명</p><small>조건</small></div>
+  <div class="case-card active-case"><h2>진행 중</h2><p>설명</p></div>`;
+
+test("the rarely reached badges and cards stay readable in every mood", async ({ page }) => {
+  await page.goto("/?debug=1");
+  await page.waitForSelector(".intro-shell");
+  await page.evaluate((html) => {
+    document.getElementById("root").style.display = "none";
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    document.body.append(host);
+  }, RARE_STATES);
+  for (const mood of MOODS) {
+    await putMood(page, mood);
+    await settle(page, { drawers: false });
+    expect(await page.evaluate(COLLECT), `rare states (${mood})`).toEqual([]);
   }
 });

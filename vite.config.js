@@ -7,8 +7,9 @@ import { parse as parseYaml } from "yaml";
 import react from "@vitejs/plugin-react";
 import { criticalFreshnessProblem, readGeneratedCritical } from "./scripts/critical-css-rules.mjs";
 import { buildKillSource, buildWorkerSource, shippedFiles, workerBody, workerConfigFor, WORKER_FILE } from "./scripts/service-worker-build.mjs";
-import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks } from "./scripts/site-pages.mjs";
+import { crawlerFiles, localizedStartPage, renderStartPages, renderStaticPages, siteOrigin, withAbsoluteSiteLinks, withoutHtmlComments } from "./scripts/site-pages.mjs";
 import { withStaticShell } from "./scripts/static-shell.mjs";
+import { PAGE_FONT_SOURCES, withShippedFonts } from "./scripts/legal-pages.mjs";
 import { adsTxt, insertAdSlots, readAdsenseEnv, withVerificationMeta } from "./scripts/adsense-config.mjs";
 import { readSearchConsoleEnv, withSiteVerificationMeta } from "./scripts/search-console.mjs";
 import { analyticsFor, readAnalyticsEnv, withAnalyticsTags } from "./scripts/analytics-config.mjs";
@@ -16,6 +17,8 @@ import { seasonData } from "./scripts/vite-season-data.mjs";
 import { localePreloadFileName, localePreloadMap, localePreloadSource, readLocaleKey, withLocalePreloadTag } from "./scripts/locale-preload.mjs";
 import { CACHE_PREFIX } from "./src/serviceWorker/worker.js";
 import { COLD_OPENING_ENABLED } from "./src/coldOpeningSwitch.js";
+import { notesDay } from "./scripts/content-pages/notes.mjs";
+import { recentNotes } from "./src/notes/noteIndex.js";
 
 const WINDOWS_SEPARATOR = /\\/g;
 
@@ -405,9 +408,10 @@ function serviceWorker() {
  * the same addresses from the same source.
  *
  * Their canonical and hreflang links and the sitemap's addresses are absolute
- * on the build's origin (`siteOrigin`), relative without one. The sitemap is
- * dated the day of the build, so it is the one file a rebuild of the same
- * commit can change; the service worker leaves it and robots.txt out of the
+ * on the build's origin (`siteOrigin`), relative without one. The sitemap
+ * dates each page by scripts/sitemap-dates.json, and a page changed since by
+ * the day of the build, so it is the one file a rebuild of the same commit
+ * can change; the service worker leaves it and robots.txt out of the
  * release's name (`shippedFiles`, scripts/service-worker-build.mjs), which
  * a device would otherwise download everything again for. Before
  * `serviceWorker()` in the list, which reads every file on disk. With Google
@@ -426,7 +430,10 @@ function serviceWorker() {
 function staticPages({ analytics, ads, app = false }) {
   const files = () => {
     const origin = siteOrigin();
-    return { ...renderStaticPages(origin, { analytics, ads, app }), ...crawlerFiles({ origin, date: new Date().toISOString().slice(0, 10) }) };
+    const dates = JSON.parse(readFileSync("scripts/sitemap-dates.json", "utf8")).pages;
+    // One day for the notes the pages, the sitemap and the start screen list (__CP_RECENT_NOTES__): today in Seoul.
+    const day = notesDay();
+    return { ...renderStaticPages(origin, { analytics, ads, app, day }), ...crawlerFiles({ origin, date: day, dates }) };
   };
   const TYPES = { html: "text/html; charset=utf-8", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8" };
   return {
@@ -434,14 +441,29 @@ function staticPages({ analytics, ads, app = false }) {
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = new URL(request.url ?? "/", "http://dev.invalid").pathname;
+        // Every page is drawn (and hashed for the sitemap) to answer one, so only the
+        // names they can have are: not each module and image the game asks for. The
+        // whole set per request made the 11-17 bundle's e2e run ~1.5x main's.
+        if (!Object.hasOwn(TYPES, pathname.split(".").pop())) return next();
         const file = files()[pathname.slice(1)];
         if (!file) return next();
         response.setHeader("Content-Type", TYPES[pathname.split(".").pop()]);
         response.end(file);
       });
     },
-    generateBundle() {
-      for (const [fileName, source] of Object.entries(files())) this.emitFile({ type: "asset", fileName, source });
+    generateBundle(_options, bundle) {
+      // The pages' two font files (PAGE_FONT_SOURCES, legal-pages.mjs) by the names the build gave them.
+      const shipped = {};
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset") continue;
+        for (const original of asset.originalFileNames ?? []) {
+          const source = `/${original.replace(/\\/g, "/")}`;
+          if (PAGE_FONT_SOURCES.includes(source)) shipped[source] = `/${asset.fileName}`;
+        }
+      }
+      for (const [fileName, source] of Object.entries(files())) {
+        this.emitFile({ type: "asset", fileName, source: fileName.endsWith(".html") ? withShippedFonts(source, shipped) : source });
+      }
     },
   };
 }
@@ -492,7 +514,9 @@ function startPages() {
       handler(_options, bundle) {
         const page = bundle["index.html"];
         if (!page || page.type !== "asset") throw new Error("start-pages: the bundle has no index.html to write the English and Japanese start pages from.");
-        const html = typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8");
+        // index.html's notes to developers stay in the source, not in what ships (withoutHtmlComments).
+        const html = withoutHtmlComments(typeof page.source === "string" ? page.source : Buffer.from(page.source).toString("utf8"));
+        page.source = html;
         for (const [fileName, source] of Object.entries(renderStartPages(html, siteOrigin()))) this.emitFile({ type: "asset", fileName, source });
       },
     },
@@ -810,6 +834,9 @@ export default defineConfig(({ command, mode }) => {
       // B-3(1) 냉정한 오프닝 (src/coldOpeningSwitch.js): a constant, so a build
       // with the switch off has none of the page in it.
       __CP_COLD_OPENING__: JSON.stringify(COLD_OPENING_ENABLED),
+      // The newest notes out on the day the build ran (in Seoul): the ones this build
+      // wrote pages for, as the start screen's 읽을거리 lists them (HomeReading.jsx).
+      __CP_RECENT_NOTES__: JSON.stringify(recentNotes(notesDay())),
     },
     // The dev server compiles a module the first time it is asked for. Fifty
     // cases are fifty large data modules, and compiling them on the first scene

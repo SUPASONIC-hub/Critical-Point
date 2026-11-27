@@ -168,6 +168,9 @@ jobs:
     # (tests/e2e-shards.json, scripts/e2e-shards.mjs): about ten minutes each.
     # The count here and the file's `shardCount` move together
     # (`npm run e2e:rebalance -- --shards=N`; a unit test holds them equal).
+    # Back to 30 on 2026-11-18: the 11-17 bundle's ~1.5x slower shards were the
+    # dev server drawing every static page per request (vite.config.js
+    # staticPages); with that fixed the longest shard took 17 minutes.
     timeout-minutes: 30
     strategy:
       fail-fast: false

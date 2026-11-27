@@ -57,7 +57,7 @@ import { createChoiceReaders } from "./state/useDecision.js";
 import { useChoiceCommit } from "./state/useChoiceCommit.js";
 import { useRunReadout } from "./state/useRunReadout.js";
 import { clearRunStorage, logStorageResetFailure } from "./state/runStorageReset.js";
-import { normalizeRunState } from "./gauntlet/gauntletEngine.js";
+import { normalizeRunState, signCase } from "./gauntlet/gauntletEngine.js";
 import { useRelicTable } from "./gauntlet/useRelicTable.js";
 import { useTelemetryQueue } from "./state/useTelemetryQueue.js";
 import { useAppPersistence } from "./state/useAppPersistence.js";
@@ -452,7 +452,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     setSaveStatus,
     setLastSavedAt,
   });
-  const { choose, isAdvancing, releaseAdvance } = useChoiceCommit({
+  const { choose, isAdvancing, releaseAdvance, answerPulse } = useChoiceCommit({
     currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
     caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
     sceneChallenge, nodeEnteredAt, currentCaseReframeCount, runId, sessionId, sessionCode,
@@ -551,7 +551,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     decisionReveal,
     isAdvancing,
     isResult,
-    nextCaseSignal,
+    nextCaseSignal, screenOpen: showRanking || showBoard,
     saveCurrentGame: saveCurrentGameEvent,
     startCase: openCaseEvent,
     started,
@@ -656,9 +656,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    * that prices the card. There are no side bonuses stacked on top: what the
    * player sees on the table is what the resources receive.
    */
-  function resolveGauntlet({ card, window: closedWindow, forced = false }) {
+  function resolveGauntlet({ card, window: closedWindow, forced = false, auto = false }) {
     if (!card) return;
-    choose(card, closedWindow, forced);
+    choose(card, closedWindow, forced, auto); // `auto`: G43's story table cashed for the player (storyAutoCash.js).
   }
 
   /** Another tab moved the run on: this tab stops writing and reloads what storage holds. */
@@ -671,9 +671,14 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   function pickRelic(relicId = null, dropId = null) {
     if (!staleSave) applyRun({ gauntletRun: relicTable.equip(gauntletRun, relicId, dropId) });
   }
-  function spendAtDraft(kind) {
-    const paid = relicTable.spend(gauntletRun, kind);
+  function spendAtDraft(kind, id = null) {
+    const paid = relicTable.spend(gauntletRun, kind, id);
     if (!staleSave && paid !== gauntletRun) applyRun({ gauntletRun: paid });
+  }
+  /** G5 8막 실명 서명: the case's way to sign, on its open snapshot before its first board (gauntletEngine's signCase). */
+  function signRun(way) {
+    const signed = signCase(gauntletRun, way);
+    if (!staleSave && signed !== gauntletRun) applyRun({ gauntletRun: signed });
   }
 
   /**
@@ -866,20 +871,19 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
 
   const {
     renderSceneLines, renderSceneMinutes,
-    renderDecisionReveal,
-    renderRecoveryNotice,
-    renderSaveStatus,
-    renderErrorLogPanel,
+    renderDecisionReveal, renderRecoveryNotice, renderSaveStatus,
+    renderErrorLogPanel, renderActProgress, renderLeaveLine, renderCaseCover,
   } = useRuntimeRenderers({
     decisionReveal, decisionRevealRef, trapDecisionRevealFocus, simplifyPlayerText, setDecisionReveal, resourceMeta,
     lastRecoveredError, started, pauseAfterRecovery: lifecycle.pauseAfterRecovery, startFreshAfterRecovery, showRecoveryCenter, showErrorLog,
     setShowRecoveryCenter, setShowErrorLog, dismissRecoveryNotice, saveStatus, retryStorageCleanup: retryStorageCleanupEvent,
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
-    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup,
+    startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
+    cover: { caseResults, run: gauntletRun, log, onApply: applyRun, locked: staleSave },
   });
 
-  if (showRanking && !started) {
+  if (showRanking && (!started || isResult)) { // over a result page too, closing back onto it (RankingScreen returnTo)
     return (
       <LazyScreen quiet>
       <RankingScreen
@@ -892,7 +896,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
         runId={runId}
         sessionCode={sessionCode}
         triggerLabels={triggerLabels}
-        onClose={() => setShowRanking(false)}
+        onClose={() => setShowRanking(false)} returnTo={started ? "result" : "intro"}
       />
       </LazyScreen>
     );
@@ -940,7 +944,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     seasonGoals, delayedConsequences, showErrorLog, setShowErrorLog, operationsSnapshot,
   });
   if (isResult) {
-    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel };
+    const renderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderActProgress, renderLeaveLine, renderCaseCover };
     return (
       <LazyScreen quiet>
         <ResultScreen view={resultView} renderers={renderers} sceneTitleRef={sceneTitleRef} shortcuts={shortcutHints} />
@@ -958,7 +962,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
   }, {}, caseResults);
   const playRenderers = { renderDecisionReveal, renderRecoveryNotice, renderErrorLogPanel, renderSaveStatus };
   const playActions = {
-    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, spendAtDraft,
+    saveCurrentGame, resolveGauntlet: resolveGauntletEvent, markWindowTouched, pickRelic, spendAtDraft, signCase: signRun,
     onSuspendable: suspension.recordSuspendable, reloadFromStorage, reset: resetEvent, copyReplayLink, copyDiagnosticTrace,
   };
   return (

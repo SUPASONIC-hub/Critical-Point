@@ -245,7 +245,8 @@ test("a commit that throws half way releases the table", () => {
 });
 
 test("a bust costs the bust, and the room plays the next scene without the analyst", () => {
-  const { context, did } = sceneContext("p1_start");
+  // From 프롤로그 03: in 01 and 02 a bust keeps the scene (N21, below).
+  const { context, did } = sceneContext("p3_start");
   const card = context.node.choices[0];
   const window = closedWindow("bust");
   assert.equal(window.status, "bust");
@@ -262,7 +263,7 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   for (const [key, value] of Object.entries(BUST_EFFECT)) {
     assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `the bust's own ${key} is on top of what the card cost`);
   }
-  // The card led to p1_counter; the room went on past it.
+  // The card led to p3_committee; the room went on past it.
   assert.equal(entry.skippedNodeId, card.next);
   assert.equal(entry.routeChangeKind, "blackout-skip");
   assert.notEqual(patch.nodeId, card.next);
@@ -270,6 +271,24 @@ test("a bust costs the bust, and the room plays the next scene without the analy
   assert.equal(patch.decisionReveal.skippedTitle, nodes[card.next].title);
   assert.equal(patch.decisionReveal.skippedNodeId, card.next, "the reveal can open the scene's minutes");
   assert.equal(patch.gauntletRun.busts, 1);
+});
+
+test("in 프롤로그 01 and 02 a bust costs the bust and the pot, and the run plays the next scene (N21)", () => {
+  for (const nodeId of ["p1_start", "p2_start"]) {
+    const { context, did } = sceneContext(nodeId);
+    const card = context.node.choices[0];
+    mount(context).choose(card, closedWindow("bust", `unit-bust-${nodeId}`));
+    const [patch] = did.patches;
+    const [entry] = patch.log;
+    assert.equal(entry.threshold.state, "bust", nodeId);
+    for (const [key, value] of Object.entries(BUST_EFFECT)) {
+      assert.equal(entry.effect[key] - (entry.riskRewardEffect[key] ?? 0), value, `${nodeId}: the bust's own ${key} is still charged`);
+    }
+    assert.equal(patch.nodeId, card.next, `${nodeId}: the run goes where the card led`);
+    assert.equal(entry.skippedNodeId, undefined, nodeId);
+    assert.equal(entry.routeChangeKind, undefined, nodeId);
+    assert.equal(patch.decisionReveal.skippedTitle, null, nodeId);
+  }
 });
 
 test("a bust on the card that closes the case still closes it: a bust never skips onto, or past, a result", () => {
@@ -387,7 +406,7 @@ test("a decision the save refused sends nothing and unlocks nothing", () => {
 test("the finale closes the season: NEW GAME+ is told, and a ranking row waits behind the last case row", () => {
   const finaleId = Object.keys(nodes).find((id) => nodes[id].caseId === "final" && nodes[id].choices?.some((choice) => choice.next === CASE_RESULT_NODES.final));
   const earlier = CASE_SEQUENCE.filter((caseId) => caseId !== "final");
-  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1, gauntlet: { logicStreak: 0, tableRules: 4 } }]));
+  const caseResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", assistTime: caseId === earlier[3] ? 2 : 1, gauntlet: { logicStreak: 0, tableRules: 10 } }]));
   const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
   const card = context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final);
   mount(context).choose(card, closedWindow("cash"));
@@ -414,7 +433,7 @@ test("the season row is ranked on the mean of its cases' scores, and the finale'
   // A season far from its finale: the first half closed on 95, the rest on 30,
   // and one case played again after closing on 95, whose replay scored 10.
   const scoreOf = (index) => (index < earlier.length / 2 ? 95 : 30);
-  const caseResults = Object.fromEntries(earlier.map((caseId, index) => [caseId, { burstScore: scoreOf(index), rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
+  const caseResults = Object.fromEntries(earlier.map((caseId, index) => [caseId, { burstScore: scoreOf(index), rank: "B", gauntlet: { logicStreak: 0, tableRules: 10 } }]));
   caseResults[earlier[0]] = { ...caseResults[earlier[0]], burstScore: 10, firstBurstScore: 95 };
   const { context, did } = sceneContext(finaleId, { completedCases: earlier, caseResults });
   mount(context).choose(context.node.choices.find((choice) => choice.next === CASE_RESULT_NODES.final), closedWindow("cash"));
@@ -509,9 +528,10 @@ test("in a story run a bust costs the bust and the pot, and no scene is played w
   assert.equal(entry.environmentMode, "stable");
   assert.deepEqual(patch.gauntletRun.schema.mutations, []);
   assert.equal(patch.gauntletRun.story, true);
-  // The same bust at the table, for the difference.
-  const table = sceneContext("p1_start");
-  mount(table.context).choose(card, closedWindow("bust", "unit-bust-table"));
+  // The same bust at the table, for the difference: from 프롤로그 03, where a
+  // table run's bust skips the scene (in 01 and 02 it keeps it too, N21).
+  const table = sceneContext("p3_start");
+  mount(table.context).choose(table.context.node.choices[0], closedWindow("bust", "unit-bust-table"));
   assert.equal(table.did.patches[0].log[0].routeChangeKind, "blackout-skip");
 
   // 프롤로그 01 has no way to break a board in any run. In 사건 01, which has
@@ -568,7 +588,7 @@ test("a season with any story case is not sent to the public ranking, and this d
   const { buildLeaderboard } = await import("../../src/ranking.js");
   const { finaleId, earlier } = finaleScene();
   // Every case closed at the logic table: its run summary has the table's mark (`hasBeatTableCase`).
-  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
+  const plainResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 10 } }]));
   const seasons = {
     "the finale itself": { caseResults: plainResults, story: true },
     "one case long before it": { caseResults: { ...plainResults, [earlier[7]]: { ...plainResults[earlier[7]], assistStory: true } }, story: false },
@@ -606,7 +626,7 @@ test("a season with any story case is not sent to the public ranking, and this d
 
 test("a season with a case from before the logic table is not sent to the public ranking, and this device still ranks it", () => {
   const { finaleId, earlier } = finaleScene();
-  const logicResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 4 } }]));
+  const logicResults = Object.fromEntries(earlier.map((caseId) => [caseId, { burstScore: 60, rank: "B", gauntlet: { logicStreak: 0, tableRules: 10 } }]));
   const seasons = {
     "a case with the beat table's summary": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B", gauntlet: { beatCombo: 4, bestCombo: 11, grooveVault: 520 } } },
     "a case from before the table": { ...logicResults, [earlier[3]]: { burstScore: 60, rank: "B" } },
@@ -763,4 +783,12 @@ test("the season before's picks change nothing the commit writes", async (t) => 
   assert.deepEqual(withPicks, without);
   assert.equal(JSON.stringify(withPicks), JSON.stringify(without));
   for (const entry of withPicks.log) assert.equal(Object.keys(entry).some((key) => /pick|past/i.test(key)), false);
+});
+
+test("the between-hands answer the table hands back drops an answer it does not know, and queues nothing", async () => {
+  const { context, did } = sceneContext("p1_start");
+  const { answerPulse } = mount(context);
+  assert.equal(await answerPulse({ caseId: context.currentCase, sceneNo: 2 }, "not-an-answer"), "dropped");
+  assert.equal(await answerPulse(null, "not-an-answer"), "dropped");
+  assert.equal(did.queued.length, 0);
 });

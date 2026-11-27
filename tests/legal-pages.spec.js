@@ -1,11 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./helpers/network.js";
 import { CONTENT_KINDS } from "../scripts/content-pages/pages.mjs";
+import { noteKinds, notesDay } from "../scripts/content-pages/notes.mjs";
+import { NEWS_KINDS } from "../scripts/content-pages/news.mjs";
 
 /**
  * The plain pages beside the build -- the privacy policy and the terms of use
  * (scripts/legal-pages.mjs), the about, FAQ and contact pages
- * (scripts/site-pages.mjs) -- open from the start screen, its foot and the
+ * (scripts/site-pages.mjs) -- open from the start screen, its reading section
+ * (읽을거리, HomeReading.jsx; the five-link foot until 2026-11-20) and the
  * data drawer's note, in the screen's language, and lead to each other, to
  * the other languages and back to the game. The dev server answers them from
  * the same source the build writes them from (`staticPages()` in
@@ -30,7 +33,7 @@ test("the policy pages open from the start screen and lead to each other and bac
   await page.goto("/");
   await expect(page.locator(".intro")).toBeVisible();
 
-  await page.locator(".intro-legal").getByRole("link", { name: "개인정보처리방침" }).click();
+  await page.locator(".home-reading-menu").getByRole("link", { name: "개인정보처리방침" }).click();
   await expect(page).toHaveURL(/\/privacy\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "개인정보처리방침" })).toBeVisible();
   await expect(page.getByRole("link", { name: "from.logic.to.magic@gmail.com" }).first()).toBeVisible();
@@ -57,12 +60,13 @@ test("the policy pages open from the start screen and lead to each other and bac
   await expect(page.getByRole("heading", { level: 1, name: "이용약관" })).toBeVisible();
 });
 
-test("the start screen's foot opens the five pages in the screen's language, and each leads back", async ({ page }) => {
+test("the start screen's reading section opens the five pages in the screen's language, and each leads back", async ({ page }) => {
   for (const language of ["ko", "en", "ja"]) {
     await page.goto(language === "ko" ? "/" : `/?lang=${language}`);
     await expect(page.locator("html")).toHaveAttribute("lang", language);
-    const foot = page.locator(".intro-legal");
-    await expect(foot.getByRole("link")).toHaveCount(5);
+    // Nine kinds of page, 방침·약관 one row of two links (src/homeReading.js).
+    const foot = page.locator(".home-reading-menu");
+    await expect(foot.getByRole("link")).toHaveCount(10);
     for (const [kind, heading] of Object.entries(HEADINGS[language])) {
       await expect(foot.getByRole("link", { name: heading, exact: true })).toHaveAttribute("href", `${FOLDER[language]}/${kind}.html`);
     }
@@ -71,7 +75,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
   // Korean: the three pages about the game open from the foot, one after another.
   await page.goto("/");
   for (const kind of ["about", "faq", "contact"]) {
-    await page.locator(".intro-legal").getByRole("link", { name: HEADINGS.ko[kind], exact: true }).click();
+    await page.locator(".home-reading-menu").getByRole("link", { name: HEADINGS.ko[kind], exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${kind}\\.html$`));
     await expect(page.getByRole("heading", { level: 1, name: HEADINGS.ko[kind] })).toBeVisible();
     // exact: the credit under it names each creator's address for its owner ("SUPASONIC: from.logic...").
@@ -82,7 +86,7 @@ test("the start screen's foot opens the five pages in the screen's language, and
 
   // English: the FAQ, its header to the contact page, the Japanese contact page, and back to the game in Japanese.
   await page.goto("/?lang=en");
-  await page.locator(".intro-legal").getByRole("link", { name: "FAQ", exact: true }).click();
+  await page.locator(".home-reading-menu").getByRole("link", { name: "FAQ", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/faq\.html$/);
   await expect(page.getByRole("heading", { level: 1, name: "FAQ" })).toBeVisible();
   await menu(page, "en").getByRole("link", { name: "Contact", exact: true }).click();
@@ -147,8 +151,8 @@ test("the build writes the fifteen pages, robots.txt and the sitemap as plain fi
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const xml = await sitemap.text();
-  // The fifteen, the start page in three languages and the content pages (scripts/content-pages).
-  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3 + CONTENT_KINDS.length * 3);
+  // The fifteen, the start page in three languages, the content pages, the notes out on the build's day and the world's newspaper (scripts/content-pages).
+  expect(xml.match(/<url>/g)).toHaveLength(PAGES.length + 3 + CONTENT_KINDS.length * 3 + noteKinds(notesDay()).length + NEWS_KINDS.length);
   for (const [path] of PAGES) expect(xml, path).toContain(`<loc>${path}</loc>`);
   for (const path of ["/", "/en/", "/ja/"]) expect(xml, path).toContain(`<loc>${path}</loc>`);
   // The content pages are plain files too, at their own addresses, and in the sitemap.
@@ -223,7 +227,7 @@ for (const language of ["ko", "en", "ja"]) {
 // read with no script as a crawler reads it, and the game in that language
 // once the script runs.
 for (const [language, start, title] of [
-  ["en", "Start the prologue", "Critical Point - Every 45 seconds, your judgment goes on the record"],
+  ["en", "Start the prologue", "Critical Point — Free Browser Mystery Game"],
   ["ja", "プロローグを始める", "臨界点: CRITICAL POINT - 45秒ごとに、あなたの判断基準が記録される"],
 ]) {
   test(`/${language}/ is the start page in its language, to a crawler and to a player`, async ({ page, request }) => {
@@ -236,6 +240,6 @@ for (const [language, start, title] of [
     await page.goto(`/${language}/`);
     await expect(page.locator("html")).toHaveAttribute("lang", language);
     await expect(page.getByTestId("start-first-case")).toContainText(start);
-    await expect(page.locator(".intro-legal").getByRole("link").first()).toHaveAttribute("href", `/${language}/about.html`);
+    await expect(page.locator(".home-reading-menu").getByRole("link").first()).toHaveAttribute("href", `/${language}/guide.html`);
   });
 }

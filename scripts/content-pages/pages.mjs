@@ -1,5 +1,6 @@
+import { readFileSync } from "node:fs";
 import { CREATOR_LINE, studioName } from "../../src/credits.js";
-import { escapeHtml, gamePath, PAGE_LANGUAGES, pagePath, renderDocumentPage } from "../legal-pages.mjs";
+import { adsEffectiveDate, escapeHtml, gamePath, PAGE_LANGUAGES, pagePath, renderDocumentPage } from "../legal-pages.mjs";
 import {
   CASE_INDEX_DESCRIPTION,
   CASE_INDEX_INTRO,
@@ -15,6 +16,10 @@ import {
 import { CHARACTER_GROUPS, CHARACTERS_DESCRIPTION, CHARACTERS_INTRO } from "./characters-text.mjs";
 import { GUIDE_BODY, GUIDE_DESCRIPTION } from "./guide-text.mjs";
 import { MAKING_BODY, MAKING_DESCRIPTION } from "./making-text.mjs";
+import { WEEKLY_DESCRIPTION, weeklyBody } from "./weekly-text.mjs";
+import CASE_BACKGROUND from "./cases/background-ko.mjs";
+import { notesDay } from "./notes.mjs";
+import { notePath, publishedNotes } from "../../src/notes/noteIndex.js";
 import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../structured-data.mjs";
 
 /**
@@ -27,6 +32,7 @@ import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../struc
  *   /cases/index.html    the case files, and a page per case (./cases.mjs)
  *   /characters.html     the recurring cast as each is introduced (./characters-text.mjs)
  *   /making.html         how we made it, in our own plural voice (./making-text.mjs)
+ *   /weekly.html         the weekly rule calendar, every booked week and its rule (./weekly-text.mjs)
  *
  * Why: AdSense turned the site down on 2026-11-08 for low-value content.
  * These are the site's own words, readable with no script, and none of them
@@ -34,14 +40,15 @@ import { breadcrumbStructuredData, pageTrail, structuredDataTag } from "../struc
  * (tests/unit/content-pages.test.mjs).
  */
 
-/** The page kinds this module writes, in the menu's order: the guide, the case files, every case, the cast, the making-of. */
-export const CONTENT_KINDS = ["guide", "cases/index", ...CASE_PAGES.map(caseKind), "characters", "making"];
+/** The page kinds this module writes, in the menu's order: the guide, the case files, every case, the cast, the making-of; then the weekly calendar, linked from the guide rather than the menu. */
+export const CONTENT_KINDS = ["guide", "cases/index", ...CASE_PAGES.map(caseKind), "characters", "making", "weekly"];
 
 const HEADINGS = {
   guide: { ko: "게임 방법", en: "How to Play", ja: "遊び方" },
   "cases/index": { ko: CASE_WORDS.ko.index, en: CASE_WORDS.en.index, ja: CASE_WORDS.ja.index },
   characters: { ko: "등장인물", en: "Characters", ja: "登場人物" },
   making: { ko: "우리가 만든 이야기", en: "How We Made It", ja: "私たちの制作の話" },
+  weekly: { ko: "주간 규칙 달력", en: "Rule of the Week Calendar", ja: "今週のルール カレンダー" },
 };
 
 const paragraphs = (lines) => lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("\n");
@@ -75,7 +82,45 @@ ${groups.join("\n")}
 <p class="note">${escapeHtml(words.fiction)}</p>`;
 }
 
-function caseBody(caseId, language) {
+/* ------------------------------------------------------- 배경 지식 (Korean) */
+
+const BACKGROUND_WORDS = {
+  heading: "배경 지식",
+  note: "배경 지식은 사건이 기대고 있는 금융·회사 개념을 우리가 일반적인 구조로 풀어 쓴 글입니다. 개별 상황에 대한 법률·투자 조언이 아닙니다.",
+};
+
+/** The box's own sheet: a ruled card under the case's question. */
+export const BACKGROUND_STYLE = ".background{margin:28px 0;padding:6px 18px 4px;border:1px solid var(--line-strong);border-left:4px solid var(--accent);border-radius:4px;background:var(--surface)}.background h2{margin-top:14px}";
+
+/**
+ * A Korean case page's 「배경 지식」 box (./cases/background-ko.mjs), or "" for
+ * a case or language without one. The term its note names is a link once the
+ * note is out by `day` and plain text before: a `<span>` in place of the
+ * `<a>`, so the page's words, and with them its sitemap date, stay the same
+ * the day the link appears.
+ */
+export function backgroundBox(caseId, language, day) {
+  const box = language === "ko" ? CASE_BACKGROUND[caseId] : null;
+  if (!box) return "";
+  const [slug, term] = box.note ?? [];
+  const out = slug ? publishedNotes(day).some((note) => note.slug === slug) : false;
+  let linked = false;
+  const lines = box.text.map((line) => {
+    const html = escapeHtml(line);
+    const word = term ? escapeHtml(term) : "";
+    if (!word || linked || !html.includes(word)) return `<p>${html}</p>`;
+    linked = true;
+    return `<p>${html.replace(word, () => (out ? link(notePath(slug), term) : `<span>${word}</span>`))}</p>`;
+  });
+  return `<section class="background" aria-labelledby="background">
+<h2 id="background">${escapeHtml(BACKGROUND_WORDS.heading)}: ${escapeHtml(box.title)}</h2>
+${lines.join("\n")}
+<p class="note">${escapeHtml(BACKGROUND_WORDS.note)}</p>
+</section>
+`;
+}
+
+function caseBody(caseId, language, day = notesDay()) {
   const words = CASE_WORDS[language];
   const text = CASE_TEXT[caseId][language];
   const rule = caseRule(caseId, language);
@@ -103,7 +148,7 @@ ${cast}
 </ul>
 <h2>${escapeHtml(words.question)}</h2>
 <p class="lede">${escapeHtml(text.question)}</p>
-<p>${link(gamePath(language), words.play)}</p>
+${backgroundBox(caseId, language, day)}<p>${link(gamePath(language), words.play)}</p>
 <p class="note">${escapeHtml(words.fiction)}</p>
 <div class="pager">
 ${pager}
@@ -159,13 +204,15 @@ const makingBody = (language) => `${MAKING_BODY[language].trim()}
 
 /* ----------------------------------------------------------------- the pages */
 
-function pageOf(kind, language) {
+function pageOf(kind, language, day) {
   if (kind === "guide") return { body: GUIDE_BODY[language], description: GUIDE_DESCRIPTION[language], heading: HEADINGS.guide[language] };
   if (kind === "cases/index") return { body: caseIndexBody(language), description: CASE_INDEX_DESCRIPTION[language], heading: HEADINGS[kind][language] };
   if (kind === "characters") return { body: charactersBody(language), description: CHARACTERS_DESCRIPTION[language], heading: HEADINGS.characters[language] };
+  if (kind === "weekly") return { body: weeklyBody(language, undefined, gamePath(language)), description: WEEKLY_DESCRIPTION[language], heading: HEADINGS.weekly[language] };
   if (kind === "making") return { body: makingBody(language), description: MAKING_DESCRIPTION[language], heading: HEADINGS.making[language] };
   const caseId = kind.slice("cases/".length);
-  return { body: caseBody(caseId, language), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language) };
+  const style = CASE_BACKGROUND[caseId] && language === "ko" ? BACKGROUND_STYLE : "";
+  return { body: caseBody(caseId, language, day), description: CASE_TEXT[caseId][language].question, heading: caseHeading(caseId, language), style };
 }
 
 /**
@@ -184,13 +231,68 @@ function trailOf(kind, language, heading) {
   return structuredDataTag(breadcrumbStructuredData(trail));
 }
 
-/** Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash. */
-export function renderContentPages({ analytics = null } = {}) {
+/* ----------------------------------------------------------------- the dates */
+
+/**
+ * The day the content pages went up: all but the weekly calendar with #478,
+ * merged to main on 2026-11-09. A case page added later is not that old, so
+ * tests/unit/page-dates.test.mjs fails until it has a day of its own.
+ */
+export const CONTENT_PUBLISHED = "2026-11-09";
+
+/** The weekly calendar came a week later (9129fbf1). */
+export const WEEKLY_PUBLISHED = "2026-11-16";
+
+/** The about page, the FAQ and the contact page went up with #376, merged to main on 2026-10-30 (Seoul). */
+export const SITE_PUBLISHED = "2026-10-30";
+
+const SITE_KINDS = new Set(["about", "faq", "contact"]);
+
+/** The day each page's words last changed, the same record the sitemap's lastmod reads. */
+export const recordedDates = () =>JSON.parse(readFileSync(new URL("../sitemap-dates.json", import.meta.url), "utf8")).pages;
+
+const UPDATED_WORD = { ko: "고친 날", en: "Updated", ja: "更新日" };
+
+/** Who wrote the page: the studio's name alone, in the page's language (src/credits.js). */
+const WRITTEN_BY = {
+  ko: (studio) => `글: ${studio}`,
+  en: (studio) => `Written by ${studio}`,
+  ja: (studio) => `文: ${studio}`,
+};
+
+const dateTag = (day, language) => `<time datetime="${day}">${adsEffectiveDate(day)[language]}</time>`;
+
+/**
+ * The notes' date line (`bylineOf`, ./notes.mjs) in the page's language: when
+ * it went up, when its words last changed if they have since, and who wrote
+ * it. The making-of leaves the last out: its foot already signs it (MAKERS_LINE).
+ * So does the about page, whose text says who made the game.
+ */
+export function pageDateLine(language, changed, { published = CONTENT_PUBLISHED, signed = true } = {}) {
+  const update = changed && changed !== published ? ` · ${UPDATED_WORD[language]} ${dateTag(changed, language)}` : "";
+  const author = signed ? ` · ${escapeHtml(WRITTEN_BY[language](studioName(language)))}` : "";
+  return `<p class="effective">${dateTag(published, language)}${update}${author}</p>\n`;
+}
+
+/** The date line's facts for a page kind. */
+export const dateLineOptions = (kind) => ({
+  published: SITE_KINDS.has(kind) ? SITE_PUBLISHED : kind === "weekly" ? WEEKLY_PUBLISHED : CONTENT_PUBLISHED,
+  signed: kind !== "making" && kind !== "about",
+});
+
+/**
+ * Every content page: `{ "guide.html": "<!doctype html>...", "en/cases/case01.html": ..., ... }`, keyed by path from the root without its slash.
+ * `pageDates` (`{ loc: { date } }`, scripts/sitemap-dates.json by default) dates each of them; `null` writes them with no date
+ * line, which is how `pageFingerprints` reads them: a page's hash must not depend on the date that hash decides.
+ */
+export function renderContentPages({ analytics = null, day = notesDay(), pageDates = recordedDates() } = {}) {
   const pages = {};
   for (const kind of CONTENT_KINDS) {
     for (const language of PAGE_LANGUAGES) {
-      const page = pageOf(kind, language);
-      pages[pagePath(kind, language).slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, structuredData: trailOf(kind, language, page.heading) });
+      const page = pageOf(kind, language, day);
+      const loc = pagePath(kind, language);
+      const line = pageDates ? pageDateLine(language, pageDates[loc]?.date, dateLineOptions(kind)) : "";
+      pages[loc.slice(1)] = renderDocumentPage({ kind, language, analytics, ...page, body: `${line}${page.body}`, structuredData: trailOf(kind, language, page.heading) });
     }
   }
   return pages;

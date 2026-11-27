@@ -1,0 +1,120 @@
+name: Weekly Push
+
+# 주 1회 알림 (N25): on the Monday morning (KST) of a week the calendar gives a
+# rule, one Web Push notification to every device that turned the reminder on
+# (scripts/send-weekly-push.mjs; the table is
+# supabase/migrations/20261129000000_push_subscriptions.sql). A week without a
+# rule sends nothing. Subscriptions the push service answers 404/410 for are
+# deleted; a row is marked when it was sent, so the second morning run (and a
+# hand run) sends only to the rows the first one missed.
+#
+# Secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT (docs/event-week.md
+# section 8), and the SUPABASE_ACCESS_TOKEN / SUPABASE_DB_PASSWORD Funnel and
+# Board Reports already use. Without them the run says so in a warning and
+# sends nothing. A hand run is a dry run unless `dry_run` is unticked: it reads
+# the rows and counts them, and sends nothing.
+#
+# This repository is public, and so is the log: counts only, never an
+# endpoint or a key.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "dry run: 대상만 세고 보내지 않음"
+        type: boolean
+        default: true
+  schedule:
+    # 08:00 KST Monday, and 12:00 KST for the rows the first run could not reach.
+    - cron: "0 23 * * 0"
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Not a secret: it is the host name in the site's own connect-src.
+      SUPABASE_PROJECT_REF: kiazzdbpkazwqhhimdib
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: See whether the secrets are configured
+        id: secrets
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ] && { [ "$DRY_RUN" = "true" ] || [ -n "$VAPID_PRIVATE_KEY" ]; }; then echo "configured=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Explain the skipped run
+        if: steps.secrets.outputs.configured != 'true'
+        run: |
+          echo "::warning title=Nothing was sent::SUPABASE_ACCESS_TOKEN or the VAPID secrets are not configured (docs/event-week.md section 8)."
+      - uses: ./.github/actions/setup
+        if: steps.secrets.outputs.configured == 'true'
+        with:
+          browser: none
+      - name: Is this a week with a rule
+        id: due
+        if: steps.secrets.outputs.configured == 'true'
+        run: echo "due=$(node scripts/send-weekly-push.mjs --due)" >> "$GITHUB_OUTPUT"
+      - name: Say there is nothing to send
+        if: steps.secrets.outputs.configured == 'true' && steps.due.outputs.due != 'yes'
+        run: echo "이번 주는 규칙이 없어 알림을 보내지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+      - name: Read the subscriptions
+        if: steps.due.outputs.due == 'yes'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          node scripts/send-weekly-push.mjs --sql > subs.sql || exit 1
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f subs.sql > subs.json 2> subs.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure subs.json subs.err
+            exit 1
+          fi
+      - name: Send
+        if: steps.due.outputs.due == 'yes'
+        shell: bash
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN" = "true" ]; then
+            node scripts/send-weekly-push.mjs --send subs.json --dry-run >> "$GITHUB_STEP_SUMMARY"
+          else
+            node scripts/send-weekly-push.mjs --send subs.json --out after.sql >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Mark the sent rows and delete the gone ones
+        if: steps.due.outputs.due == 'yes' && env.DRY_RUN != 'true'
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set +e -uo pipefail
+          [ -f after.sql ] || exit 0
+          npx supabase db query --linked --project-ref "$SUPABASE_PROJECT_REF" --output-format json -f after.sql > after.json 2> after.err
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "supabase db query exited $code:"
+            node scripts/check-migration-drift.mjs --say-failure after.json after.err
+            exit 1
+          fi
+      - name: Remove the rows
+        if: always()
+        run: rm -f subs.sql subs.json subs.err after.sql after.json after.err

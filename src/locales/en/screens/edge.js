@@ -1,6 +1,8 @@
 /** src/copy/edge.js in English: the week's panel, the reading clock's question and the comfort settings. */
 export default {
   weekRule: "Rule of the Week · until this season ends",
+  caseRule: "This case only · until this case closes",
+  movedTwist: "NEW GAME+ · this act’s rule this season",
   unfold: "Read last season · Show",
   pastPick: {
     wildPicked: "Reframed last season too",
@@ -17,6 +19,15 @@ export default {
     hold: "I’ll open it myself",
     keep: "Leave it to the clock",
   },
+  sign: {
+    kicker: "The signature line",
+    question: "How will you sign this Case? If you don’t choose, you sign with conditions.",
+    name: "Name only",
+    terms: "With conditions",
+    nameWall: "On this signature line, Name only stands the Wall band {wall} closer.",
+  },
+  // G23 여는 판돈 (WeekRulePanel.jsx OpeningAsk).
+  opening: { kicker: "Opening stake", question: "How do you open this Case? If you don't choose, it opens normally.", normal: "Open normally", big: "Open big", bigNote: "Open big and every card's chips are ×{chips} this Case, but the Wall can stand as low as {wall} Heat." },
   comfort: {
     title: "Comfort settings",
     close: "Close",

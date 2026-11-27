@@ -11,7 +11,7 @@
 
 가장 빠른 시작은 **가장 최근 사건 파일(사건 49)을 복사해서 고치는 것**입니다. 그 파일은 지금 검사가 요구하는
 모양을 모두 갖추고 있습니다. 사건 01~11과 마지막 사건은 옛 표에서 옮겨 와 모양이 느슨하니 견본으로 쓰지
-마십시오.
+마십시오. 시즌 밖의 짧은 번외 사건이라면 복사 대신 `npm run new:case -- "제목"`이 뼈대를 만들어 줍니다(6-1).
 
 새 사건을 견본으로 게임에 넣어 두지는 않았습니다. 들어간 사건은 모두 시즌의 이야기이고, 이야기 없는 견본
 사건은 검사(결말 퍼널, 시즌 완주)를 함께 바꾸게 하기 때문입니다. 대신 견본은 셋입니다. 1장의 **뼈대 견본**은
@@ -38,9 +38,10 @@
 12. 언어 셋: 한국어 원문과 영어·일본어 파일
 13. 초상과 장면 그림
 14. 사건 하나가 조각 하나: 예산
-15. 장면 분위기 태그 (준비 중)
+15. 장면 분위기 태그
 16. PR 전 열 줄 점검
 17. 말투: 블랙 코미디 한 줄
+18. 바깥 나라 인물, 이름 바꾸기, 돈 표시
 
 ---
 
@@ -465,19 +466,66 @@ id로 키를 쓰고, `outcomes`와 `carryovers`는 **이번 사건**의 여파 �
 번외 사건은 시즌 밖의 짧은 사건(장면 8~12개, 판 한 번, 결말 셋)입니다. 위 1~7을 하나도 하지 않습니다.
 `CASE_SEQUENCE`·사건 목록·서버의 사건 목록이 그대로라 점수 상한, 목표, 칭호, 랭킹이 바뀌지 않습니다.
 
+**가장 빠른 시작은 `npm run new:case -- "제목"`입니다**(N29). 아래 1·2와 그 둘레를 한 번에 만듭니다.
+
+- 번호는 이 브랜치의 마지막 번외 다음입니다. 열린 번외 PR의 번호는 보지 못하니, 그때는
+  `npm run new:case -- side09 "제목"`처럼 id를 붙입니다. 같은 id의 파일이 있으면 아무것도 쓰지 않고 멈춥니다.
+- `--en=Title`, `--ja=タイトル`로 두 언어 제목을 같이 넣고, `--dry-run`으로 쓸 파일만 먼저 봅니다.
+- 쓰는 곳: `src/nodes/sideNN.js`, 영어·일본어 `src/locales/{en,ja}/nodes/sideNN.js`, `SIDE_CASES` 한 줄, 두 사전
+  (`src/locales/en/index.js`, `src/locales/ja/index.js`)의 라벨·제목, `docs/canon.md`의 「번외 N」 절,
+  `docs/portrait-credits.md`의 사진 표 한 줄.
+- 글은 모두 `TODO`로 들어갑니다. 뼈대는 검사를 통과하지 않는 것이 정상이고, 남은 일은 아래 5의
+  `npm run check:case -- sideNN`이 보여 줍니다.
+- 시즌 사건(`caseNN`)은 만들지 않습니다. 시즌 사건은 위 1~7대로 씁니다.
+
 1. **파일**: `src/nodes/sideNN.js`(예: `side01.js`)에 `export const side01 = { ... }`. 모양은 견본
    `src/nodes/side00.js`(틀 확인용, 출시 빌드에 없음)를 따릅니다. id는 `sideNN`이고 `caseNN`은 쓰지 않습니다
    (서버는 `^case[0-9]{2}$`만 시즌 사건으로 받습니다). 장면은 `s1_`로 시작하고, 마지막 장면 `s1_aftershock`의
    카드 셋이 `s1_result`로 가며, 그 카드 id마다 `outcomes`에 결말 하나(`title`, `text`)를 씁니다. 시작 자원은
    `startState.resources`에 직접 씁니다(시즌 자원을 읽지 않습니다).
 2. **목록**: `src/nodes/sidePacks.js`의 `SIDE_CASES`에 `{ id, label: "번외 1", title, load }` 한 줄. 목록이 비어
-   있으면 시작 화면의 칸이 보이지 않습니다.
+   있으면 시작 화면의 칸이 보이지 않습니다. 이야기 속 자리는 `unlockAfter`(그 날짜 바로 앞 시즌 사건)로 적습니다.
+   공개 날짜나 예고 줄은 없습니다(11-25 「준비되면 불시에 오픈」, `docs/ops-mode.md`): 목록에 넣어 배포한 번외는 그 배포부터 열립니다.
+   그래서 목록에는 다 쓴 번외만 넣고, e2e는 `tests/side-case.spec.js`의 `RELEASE_CASES`에 한 줄을 더합니다.
 3. **검사**: `check:graph`가 `src/nodes/side*.js`를 모두 걸어 봅니다(`checkSidePack`, `src/state/sidePackCheck.js`).
    `check:canon`·`check:plain-language`·`check:card-labels`·`check:text`는 `src/nodes`의 모든 파일을 이미 읽습니다.
 4. **기록**: 이 기기의 `critical-point-side-cases-v1`에 끝낸 표시와 진행 중인 판만 남습니다. 서버 행, 랭킹,
    시즌 저장, NEW GAME+에는 아무것도 가지 않습니다(`tests/unit/side-cases.test.mjs`). 온라인 저장은 끝낸
    표시(`closedAt`, `outcomeChoiceId`)만 시즌의 기기 기록 옆 `save.deviceRecords.sideCases`에 싣고, 진행 중인
    판은 싣지 않습니다. 다른 기기에서 불러오면 끝낸 사건은 끝낸 채로 합쳐집니다(둘 다 끝냈으면 늦게 끝낸 쪽의 결말).
+5. **남은 일 보기**: `npm run check:case -- sideNN`은 16장 점검표 가운데 손으로 보던 것을 경고로 보여 줍니다.
+   경고만 하고 실패하지 않습니다(종료 코드 0). id 없이 돌리면 `SIDE_CASES`의 번외를 모두 읽고, 시즌 사건
+   id(`case12`)도 받습니다. push 전 `npm run check:changed`가 이 브랜치가 고친 사건 파일에 대해 같이 돌립니다.
+
+   | 경고 칸 | 무엇 | 고치는 곳 |
+   | --- | --- | --- |
+   | `[파일]` | 사건 파일이 없거나 `export const sideNN`이 없음 | 1 |
+   | `[초상]` | 화자가 `SPEAKER_PORTRAITS`에 없거나 그 파일이 `public/`에 없음(실루엣) | 13장 |
+   | `[$]` | 장면 글(한국어·영어·일본어)에 `$`가 있음. 판의 `$`는 게임이 붙이고 이야기 속 금액은 원 | 18장 |
+   | `[길이]` | 본문이 420자를 넘음 | 7장 check:card-labels |
+   | `[TODO]` | 뼈대가 남긴 `TODO`, `docs/portrait-credits.md`의 `TODO` 줄 | 각 칸 |
+   | `[en 키]` `[ja 키]` | 영어·일본어 파일이 없거나, 빠진 문구·원문에 없는 문구 | 12장 |
+   | `[en 이름]` `[ja 이름]` | 화자 이름이 그 언어 사전의 `speakers`에 없음(한국어 이름이 그대로 나감) | 12장·18장 |
+   | `[canon]` | `docs/canon.md`의 「번외 N, 제목 (sideNN)」 절이 없거나 제목·label이 다름, 절에 `TODO`, When 줄의 첫 날짜(「M월 D일」)가 본문에 없음 | `docs/canon.md` |
+   | `[읽기]` | 사건 파일을 불러오다 멈춤(문법 오류 같은 것). 오류의 첫 줄만 보여 줍니다 | 그 파일 |
+   | `[중복]` | 이 문서·`docs/canon.md`·`docs/portrait-credits.md`에 여덟 줄 이상 두 번 붙은 덩어리나 같은 제목 | 그 문서 |
+
+6. **PR에서 경고 요약**(N47, 11-18): `src/nodes/side*.js`나 `src/locales/*/nodes/side*.js`를 고친 PR에는
+   **Case Check** 작업(`.github/workflows/case-check.yml`)이 `check:case --summary`를 돌려 사건마다 한 줄
+   (「side03: 경고 2개 (초상 1, en 키 1)」)을 PR 경고와 작업 요약에 남깁니다. 목록은 싣지 않고 요약만(긴 목록은
+   지나쳐 읽힘), 실패하지 않으며 병합을 막지 않습니다. 자세히는 위 5의 `npm run check:case -- sideNN`.
+7. **다음 Season 준비표**(N47): `npm run report:season-ready`는 읽기만 하는 표입니다. `src/nodes`의 번외
+   파일마다 공개 목록(`SIDE_CASES`)에 있는지(공개됨/대기), `check:case` 경고 수(초상 · en/ja · 기타), e2e
+   spec이 그 id를 부르는지, 준비(경고 0 + e2e 있음)를 한 줄씩 보여 주고, 표 아래에 판정 한 줄을 씁니다.
+
+   | 판정 | 뜻 |
+   | --- | --- |
+   | 「공개 가능 — sideNN 준비됨.」 | 대기 중인 번외가 모두 초록. 목록에 넣어 바로 열 수 있음 |
+   | 「아직 — sideNN에 경고나 e2e 빠짐.」 | 대기 중인 번외 가운데 빨강이 있음 |
+   | 「새로 준비된 번외 없음」 | 모든 번외 파일이 이미 공개 목록에 있음 |
+
+   `CASE_SEQUENCE` 밖의 시즌 사건 파일(`caseNN.js`, `prologueNN.js`)이 있으면 그 이름도 마지막 줄에 나옵니다.
+   준비된 번외는 예고 없이 바로 엽니다(11-25), 이 표가 그 근거입니다. 종료 코드는 늘 0입니다.
 
 ---
 
@@ -618,6 +666,9 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
     `npm run check:changed`가 바뀐 파일에 필요한 검사만 골라 돌립니다(사건 파일을 바꾸면 빌드와 `check:bundle`도
     들어가니 14장의 예산을 봅니다).
 
+번외 사건이라면 1 앞에 `npm run check:case -- sideNN`으로 `TODO`·초상·영어·일본어 키를 먼저 비웁니다(6-1의 5).
+경고만 하므로 이 목록이 비어도 위 순서는 그대로 돌립니다.
+
 브라우저 테스트는 main에 병합된 뒤에 돕니다. 그 전에 위 순서를 모두 통과시켜 둡니다.
 
 ---
@@ -741,6 +792,8 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 | 자원의 화면 이름 | `src/playerLanguage.js` (`easyResourceLabels`) |
 | 샛길 조건 | `src/seasonRules.js` (`branchConditions`) |
 | 인물 프로필 합치기 | `src/gameDialogue.js` |
+| 이름을 바꾼 인물의 옛 이름 → 새 이름(저장·기록 읽기) | `src/castAliases.js` (`CAST_ALIASES`, `renameCast`), `check:canon`의 `cast-old-names` |
+| 판 위의 돈 표시($) | `src/gameConstants.js` (`formatMoney`, `MONEY_SIGN`, `MONEY_READ_AS`) |
 | 시즌 사실 문서 | `docs/canon.md` |
 | 서버 사건 목록 | `supabase/migrations/` 의 `season_case_ids()` |
 | 브라우저 빌드의 시즌 데이터 | `scripts/vite-season-data.mjs`, `scripts/season-split.mjs` |
@@ -898,3 +951,44 @@ Pretendard에 없는 글자(한자 같은 것)는 검사 안의 예외 목록에
 - 영어·일본어 파일에도 같은 자리에 한 줄씩 둡니다(12장). 이모티콘 `^^`는 세 언어 모두 그대로 씁니다.
 - 한 장면에 이런 줄은 하나만 둡니다. 본문 420자 한도 안에서, 장면의 대가(이 장면은 미달 창구에 남은 이름)를
   가리지 않게 끝에 둡니다.
+
+---
+
+## 18. 바깥 나라 인물, 이름 바꾸기, 돈 표시 (2026-11-13)
+
+11-13에 KD의 싱가포르 법인·도쿄 지점과 바깥에서 뽑은 사람들이 인물표에 들어왔고(#539), 판의 돈은 $로 찍히게
+됐습니다(#547). 새 사건을 쓸 때 걸리는 것은 셋입니다.
+
+**바깥 나라 인물** -- 누가 어디 사람인지, 어떻게 부르는지는 `docs/canon.md`의 「The people from abroad」 표가
+정합니다. 그 표에 없는 사람을 새로 넣을 때도 같은 규칙을 지킵니다.
+
+- 따옴표 안의 말은 자연스러운 한국어입니다(영어·일본어를 섞지 않고, 서툰 한국어로 흉내 내지 않습니다). 한국어로
+  말하는지 통역을 거치는지는 처음 나오는 서술에서 한 번만 말합니다.
+- 서술과 `speaker` 키는 언제나 **성과 이름 전부**입니다. 줄인 이름(「남 씨」, 「프리야 씨」)은 따옴표 안에서만 씁니다.
+  `speaker`가 초상 표(13장)의 열쇠라, 키가 줄면 실루엣이 됩니다.
+- 영어 파일은 이름을 ASCII로 씁니다(`Nguyen Van Nam`). 일본어는 표의 가타카나 그대로입니다.
+- 국적은 누가 옳고 그른 일을 하는 이유가 되지 않습니다(10장의 「웃음의 과녁은 제도와 권력」과 같은 규칙).
+- 초상은 13장대로, 그 사람의 배경에 맞는 평범한 얼굴로 고릅니다.
+
+**이름 바꾸기** -- 이미 운영에 나간 인물의 이름을 바꾸면, 그 전에 저장된 판과 기록(`speaker`, `title`, 고른 카드의
+글)은 옛 이름을 들고 있습니다. 그래서 이름은 한 곳에서만 바꿉니다.
+
+1. `src/castAliases.js`의 `CAST_ALIASES`에 세 언어 모두 `[옛 이름, 새 이름]` 한 줄씩. 저장을 읽을 때
+   `renameCast`가 옛 이름을 새 이름으로 바꾸고, 시작 화면이 한 달 동안 바뀐 이름을 알립니다(`castNoticeAt`).
+2. 사건 파일·사건 사이 문구·초상 표·`docs/canon.md`에서 옛 이름을 모두 새 이름으로. 초상 파일 이름(slug)도
+   새 이름으로 바꾸고 `docs/portrait-credits.md` 줄을 고칩니다.
+3. `scripts/check-canon.mjs`의 `cast-old-names` 규칙의 `find`에 옛 한국어 이름을 더합니다. 이 규칙이
+   `castAliases.js` 밖의 시즌 파일에서 옛 이름을 찾으면 멈춥니다.
+4. 이름이 길어지면 카드 라벨 30자(`check:card-labels`)를 넘기 쉽습니다(11-13에 12장을 줄였습니다). 새 음절은
+   `build:fonts`(7장 check:fonts).
+
+**돈 표시** -- 판돈·금고·계좌·장부 줄은 세 언어 모두 `formatMoney`가 `$12,345`로 찍습니다(숫자는 그대로, 기호만).
+사건 글은 이것과 따로입니다.
+
+- 장면 본문·메모·결말의 금액은 지금처럼 원으로 씁니다(「300억」, 「1,700만 원」). 이야기 안의 은행 돈이고,
+  `docs/canon.md`의 금액과 맞아야 합니다. 사건 파일에 `$`를 쓰지 않습니다.
+- 판의 말(10장 끝, 해라체 줄)에 돈 숫자를 넣을 때는 `$`를 직접 붙이지 말고 `formatMoney`를 거칩니다.
+  한국어 조사는 숫자의 끝자리가 아니라 「달러」를 따라갑니다: `objectParticle(MONEY_READ_AS)`가 「를」을
+  고릅니다(`src/components/DecisionReveal.jsx`, `src/gauntlet/GauntletLedger.jsx`의 꼴).
+- 같은 곳에 간 송금 둘을 가를 때 동그라미 숫자(①②) 대신 금액으로 가리킵니다(번외 7, 11-13: 「홍콩 ①」 →
+  「31억 송금」). 새 기호는 글꼴 조각을 키우므로, 꼭 필요하면 `build:fonts`와 `check:fonts`를 함께 돌립니다.

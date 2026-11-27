@@ -1,3 +1,5 @@
+// RULES_MARK 8's audit, links and chips (G35, G32, G29 are rules-mark9.test.mjs's).
+import "./helpers/markEight.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
@@ -154,7 +156,7 @@ test("the table reads where the audit stands and what a cash now would make it, 
   assert.equal(readTableMeters({ win, schema, selectedCard: null, run: normalizeRunState({}) }).audit, null, "no count, no audit");
   assert.equal(readAudit(auditRun(), 0, { ...win, gauge: 70 }).afterCash, 0);
   const runtime = readFileSync("src/state/useRunReadout.js", "utf8");
-  assert.match(runtime, /isAuditOn\(gauntletRun, caseRules\) \? countAudit\(log\) : null/, "the runtime counts it only in a case whose rules have it");
+  assert.match(runtime, /isAuditOn\(gauntletRun, caseRules\) \? countAudit\(log, isMarkNineOn\(caseRules\)\) : null/, "the runtime counts it only in a case whose rules have it");
 });
 
 test("the voice says the audit once, as the next table opens on a count that moved", () => {

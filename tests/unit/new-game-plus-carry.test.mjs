@@ -138,8 +138,8 @@ test("every case of a NEW GAME+ run is marked, and no case of any other run", ()
 });
 
 test("the cases a NEW GAME+ run plays under a different table are the steps short of everything", () => {
-  // 프롤로그 01 to 사건 02 since C-4 (2026-10-25): the ladder reaches 사건 03.
-  assert.deepEqual(VETERAN_TABLE_CASES, ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02"]);
+  // 프롤로그 01 to 사건 04 since N18 (11-25): the ladder reaches 사건 05 (사건 03 from C-4, 2026-10-25).
+  assert.deepEqual(VETERAN_TABLE_CASES, ["prologue01", "prologue02", "prologue03", "prologue04", "prologue05", "case01", "case02", "case03", "case04"]);
   // The server's list is the same one (the scene wall rate's NEW GAME+ line):
   // the newest migration, or draft, that writes `refresh_scene_bust_stats`.
   const dir = new URL("../../supabase/migrations/", import.meta.url);

@@ -22,7 +22,7 @@ import {
 } from "../gameLogic.js";
 import { nodes } from "../gameData.js";
 import { chapterRules } from "../caseCopy.js";
-import { BUST_EFFECT, createCaseClose, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
+import { createCaseClose, getBustEffect, createRunSummary, getTableClockScale } from "../gauntlet/gauntletEngine.js";
 import { describeLogicLog } from "../gauntlet/tableReadout.js";
 import { describeAfterword, describeCaseRead, readWindowAgainstSeer } from "../gauntlet/tableAfterword.js";
 import { isTableTaught } from "../gauntlet/tableUnlocks.js";
@@ -45,6 +45,7 @@ import { appendTraceEvent } from "./trace.js";
 import { createTelemetryEventId } from "./telemetryEventId.js";
 import { fitCaseDynamics, validateTelemetryItem } from "./payloadSchemas.js";
 import { takeBriefingRead, takeReadingTally } from "./readingTally.js";
+import { markPulseAsked, pulseSceneNo, sendPulseAnswer, shouldAskPulse } from "./betweenHandsPulse.js";
 
 // Uploads stop on a conflict, and the panel that explains it is on the intro.
 // A player in the middle of a case is told here, where the save speaks: once a
@@ -246,7 +247,7 @@ export function useChoiceCommit(context) {
     }
   }
 
-  function commit(choice, closedWindow, forced) {
+  function commit(choice, closedWindow, forced, auto = false) {
     const {
       currentCase, fallbackCaseId, resolvedNodeId, node, resources, triggers, cognition, log,
       caseResults, completedCases, discoveredClues, gauntletRun, relicTable, riskPressure,
@@ -276,7 +277,7 @@ export function useChoiceCommit(context) {
     const clueReward = clue
       ? { label: "EVIDENCE BONUS", text: runLines.commit.evidenceBonus, effect: { legitimacy: 2, fatigue: -1 } }
       : null;
-    const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? BUST_EFFECT : {});
+    const finalEffect = readers.mergeEffects(gauntletEffect, clueReward?.effect ?? {}, busted ? getBustEffect(verdict) : {});
     const finalResources = applyEffect(resources, finalEffect);
     const nextDiscoveredClues = clue ? [...discoveredClues, clue] : discoveredClues;
     const suspenseEvent = getSuspenseEvent({
@@ -343,10 +344,25 @@ export function useChoiceCommit(context) {
         pushes: verdict.pushes,
         // B1: the look was spent (its 믿음 is in `effect`); the replay checker holds the record to it.
         scouted: verdict.scouted,
+        // The second look (B1, 11-18), only when spent: an entry without it had none.
+        ...(verdict.narrowed ? { narrowed: true } : {}),
+        // G1~G7 (the next rules), each only when it happened: the second look's price, a charged EXPOSE cash
+        // (no audit mark), 숨 고르기, the 결재 판 and 눈에 띔.
+        ...(verdict.narrowTrust !== undefined ? { narrowTrust: verdict.narrowTrust } : {}),
+        // G13 (RULES_MARK 7): the first look's price, the case's nth.
+        ...(verdict.scoutTrust !== undefined ? { scoutTrust: verdict.scoutTrust } : {}),
+        ...(verdict.auditShield ? { auditShield: true } : {}),
+        // G5 1막 떠넘겨진 손실: the case's twist kept part of this BUST's pot, and 사람 피해 paid (getBustEffect).
+        ...(verdict.passedDown ? { passedDown: true } : {}),
+        ...(verdict.breathed ? { breathed: true } : {}),
+        ...(verdict.sign ? { sign: true } : {}),
+        ...(verdict.exposure ? { exposure: verdict.exposure } : {}),
         rewardMultiplier: busted ? 1 : verdict.resourceMultiplier * (verdict.focus?.resourceMultiplier ?? 1),
         potMultiplier: verdict.multiplier,
         pot: verdict.pot,
         lostPot: verdict.lostPot,
+        // MARKET SHOCK, on the window that dealt it: what the shock did to the stacked pot, signed (the case's result sums it).
+        ...(verdict.shock ? { shock: verdict.shock.pot } : {}),
         // Only on the entry that closes a replayed case (`createTableRecord`).
         ...(verdict.firstRecord ? { firstRecord: verdict.firstRecord } : {}),
         focus: verdict.focus,
@@ -456,6 +472,11 @@ export function useChoiceCommit(context) {
       closedCase = { caseSummary, finalResources, nextTriggers, nextCognition, nextLog, nextRun, nextCompletedCases, responseTimeSec };
     }
 
+    // N22: once a season, a sheet between two hands of 프롤로그 01·02 asks how it is going (betweenHandsPulse.js).
+    const askPulse = shouldAskPulse({
+      caseId: currentCase, caseClosed, consent: context.dataConsent, telemetryOn: telemetryEnabled,
+      veteran: gauntletRun?.veteran === true, replay: Boolean(caseResults[currentCase]), hands: nextLog.length, runId,
+    });
     const enteredAt = Date.now();
     // One patch: the run in memory and the save are both made from it.
     const written = applyRun({
@@ -503,11 +524,15 @@ export function useChoiceCommit(context) {
         // heartbeat heard (C-11), and on the close the case against a hand that
         // sees the wall (C-12).
         afterword: describeAfterword(windowState),
+        // G43: a story table cashed at heat 70 for the player (storyAutoCash.js), said under the verdict. Display only: the log entry is a hand's.
+        ...(auto ? { auto: true } : {}),
         caseRead: caseClosed ? describeCaseRead(nextLog) : null,
         // E-6: the card the player chose here, for the share of others who chose it; none for the room's.
         scene: forced ? null : { caseId: currentCase, nodeId: resolvedNodeId, choiceId: choice.id },
+        pulse: askPulse ? { caseId: currentCase, sceneNo: pulseSceneNo(currentCase, resolvedNodeId) } : null,
       },
     });
+    if (askPulse && !written?.stale && !written?.replay) markPulseAsked(runId);
     // Everything that leaves this tab's own state waits for the save to say
     // whose run this is. A tab another tab has moved past is refused by
     // `persist` and locks its table -- and it used to have sent the case row,
@@ -523,7 +548,7 @@ export function useChoiceCommit(context) {
     }
   }
 
-  function choose(choice, closedWindow = null, forced = false) {
+  function choose(choice, closedWindow = null, forced = false, auto = false) {
     const { staleSave, clueCount, casesOpened, resources, resolvedNodeId, setSaveStatus } = context;
     if (committingRef.current || isAdvancing || staleSave) return;
     const authorityGate = getAuthorityGate(choice, {
@@ -543,12 +568,21 @@ export function useChoiceCommit(context) {
     committingRef.current = true;
     setIsAdvancing(true);
     try {
-      commit(choice, closedWindow, forced);
+      commit(choice, closedWindow, forced, auto);
     } catch (error) {
       releaseAdvance();
       throw error;
     }
   }
 
-  return { choose, isAdvancing, releaseAdvance };
+  /** N22: the reveal's three buttons. Resolves to "sent", "queued" or "dropped". */
+  function answerPulse(pulse, answer) {
+    const { sessionId, sessionCode, activeCaseMeta, queueTelemetry } = context;
+    return sendPulseAnswer(
+      { sessionId, sessionCode, caseId: pulse?.caseId, caseLabel: activeCaseMeta?.label ?? pulse?.caseId, sceneNo: pulse?.sceneNo, answer },
+      { queueTelemetry },
+    );
+  }
+
+  return { choose, isAdvancing, releaseAdvance, answerPulse };
 }

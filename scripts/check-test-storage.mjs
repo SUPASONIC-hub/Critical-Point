@@ -2,6 +2,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "espree";
 
+import { authStorageKey } from "../src/boardAdminEntry.js";
+
 /**
  * Test storage key guardrail.
  *
@@ -147,6 +149,15 @@ for (const [name, value] of testKeys) {
 const declared = new Set(testKeys.values());
 for (const exported of sourceExports.values()) {
   for (const [name, value] of exported) if (/KEY$/.test(name)) declared.add(value);
+}
+// The board's admin session (src/boardAdminEntry.js): supabase-js's key,
+// `sb-<project ref>-auth-token`, which the app derives from the backend's
+// address and so never writes as a literal. The specs' stub backend
+// (BACKEND_ORIGIN, tests/helpers/network.js) is the one project a test may name.
+{
+  const backend = /export const BACKEND_ORIGIN = "([^"]+)"/.exec(readFileSync(path.join(root, "tests", "helpers", "network.js"), "utf8"))?.[1];
+  if (backend) declared.add(authStorageKey(backend));
+  else failures.push("tests/helpers/network.js names no BACKEND_ORIGIN; the admin session key cannot be declared.");
 }
 
 // --- Resolving a key expression ----------------------------------------------

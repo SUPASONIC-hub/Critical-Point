@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 
 import { formatMoney, isResourceGain } from "../gameConstants.js";
-import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getClockHeatRate, getEscalationWindow, HOT_CASH_MULTIPLIER, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
+import { BASE_SCHEMA, buildNextSchema, describeMutations, FRACTURE_MIN_BURN, getCardBurn, getCaseTwist, getClockHeatRate, getEscalationWindow, isPenaltyMutation, STANCE_CHARGE } from "./gauntletEngine.js";
 import { advanceLogic, getLogicBonus, getLogicDirection, LOGIC_EVEN } from "./logicStreak.js";
+import { EXPOSURE_HEAT, EXPOSURE_STEPS, getExposure, getHotCashMultiplier, isNextOn } from "./nextTableRules.js";
 import { hasRelic } from "./relics.js";
-import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD } from "./tableRules.js";
+import { twistHasDevice } from "./actTwists.js";
+import { HEAT_DEBT_GAUGE, INSURANCE_SHARE, LOGIC_HOLD, TESTIMONY_SHARE } from "./tableRules.js";
 import { directionParticle, easyCognitionLabels, objectParticle, topicParticle } from "../playerLanguage.js";
 import { getTableRules } from "./tableUnlocks.js";
 import tableCopy from "../copy/table.js";
@@ -80,7 +82,7 @@ export const getTypeName = (type) => easyCognitionLabels[type] ?? "";
  * leans neither way is called. A verdict logged before C-3 holds a thinking
  * type where the direction now is, and is read by the type's name.
  */
-export const DIRECTION_NAMES = say.directions;
+const DIRECTION_NAMES = say.directions;
 export const getDirectionName = (direction) => DIRECTION_NAMES[direction] ?? getTypeName(direction);
 
 /**
@@ -149,10 +151,10 @@ const MOVE_COPY = say.moves;
  * wide screen reads whole -- and `spoken` the sentence the push and confirm
  * buttons are described by.
  */
-export function readLogic({ logic, card, offered, relics = [] }) {
+export function readLogic({ logic, card, offered, relics = [], next = false, watched = true }) {
   const reach = hasRelic(relics, "metronome");
   const holdAt = hasRelic(relics, "fieldNote") ? LOGIC_HOLD - 1 : LOGIC_HOLD;
-  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt });
+  const play = (type) => advanceLogic(logic, { type, tier: 0, offered, reach, hold: holdAt, halve: next });
   const moveOf = (candidate) => play(getLogicDirection(candidate)).move;
   const staked = card ? play(getLogicDirection(card)) : null;
   const now = staked?.logic ?? logic;
@@ -162,7 +164,10 @@ export function readLogic({ logic, card, offered, relics = [] }) {
   const bonus = getLogicBonus(now.streak);
   const did = staked ? MOVE_COPY[staked.move] : null;
   const note = did ?? (open && !staked ? say.canSwitch : "");
+  // G1 눈에 띔 (the next rules): the points the hand holds now and after the staked card, and what they risk.
+  const exposure = next && watched ? readExposure(getExposure(logic.held), getExposure(now.held)) : null;
   return {
+    exposure,
     after: now.streak,
     bonus,
     move: staked?.move ?? null,
@@ -171,8 +176,21 @@ export function readLogic({ logic, card, offered, relics = [] }) {
     held,
     note,
     line: [fill(say.combo, { streak: now.streak }), hold, note].filter(Boolean).join(" · "),
-    spoken: `${fill(say.spoken, { streak: now.streak, bonus: bonus.toFixed(2), hold })}${did ? fill(say.spokenMove, { move: did }) : open && !staked ? say.spokenOpen : ""}`,
+    spoken: `${fill(say.spoken, { streak: now.streak, bonus: bonus.toFixed(2), hold })}${did ? fill(say.spokenMove, { move: did }) : open && !staked ? say.spokenOpen : ""}${exposure?.spoken ? ` ${exposure.spoken}` : ""}`,
   };
+}
+
+/**
+ * G1 눈에 띔 as the table says it: the points after the staked card (`after`)
+ * and before it (`before`), out of EXPOSURE_STEPS (past which the chance a
+ * cash under EXPOSURE_HEAT is caught stops growing), and the sentence. Null when there is nothing to say: no points either side.
+ */
+export function readExposure(before, after) {
+  if (!before && !after) return null;
+  // The step, never a percentage: the table prints no odds. `most` is where the chance stops growing.
+  const most = EXPOSURE_STEPS;
+  const spoken = after > 0 ? fill(say.exposureSpoken, { points: Math.min(after, most), most, heat: EXPOSURE_HEAT }) : say.exposureCleared;
+  return { before, points: Math.min(after, most), most, heat: EXPOSURE_HEAT, cleared: before > 0 && after === 0, spoken };
 }
 
 /** What a card's tag adds for a screen reader: what picking it would do to the streak. */
@@ -294,6 +312,19 @@ export function describeCaseChange(log = [], labels = {}) {
     }));
 }
 
+/**
+ * MARKET SHOCK (weeklyRules.js, c2 follow-up), on the case's result: the
+ * swings the case's shock boards dealt its stacked pot (`threshold.shock`,
+ * written by the commit from the verdict), summed and signed --
+ * 「시장 충격 +$1,200」 or 「시장 충격 −$800」. Empty when no shock moved
+ * anything: a week without it, a log from before it, or a swing of 0.
+ */
+export function describeCaseShock(log = []) {
+  const total = log.reduce((sum, entry) => sum + (Number(entry?.threshold?.shock) || 0), 0);
+  // Signed as the bank rail signs (moneyFeedback.js `formatChange`, not imported: its chunk is not this one), U+2212 for minus.
+  return total ? fill(say.caseShock, { change: `${total > 0 ? "+" : "−"}${formatMoney(Math.abs(total))}` }) : "";
+}
+
 export function joinRules(items) {
   if (!items.length) return say.baseRules;
   return items.map((item) => item.label).join(" / ");
@@ -317,14 +348,16 @@ function getRuleObjective(mutations) {
   return fill(say.rulesLift, { rules: labels });
 }
 
-function getOverdriveCopy({ streak, hot, cashMutations }) {
+function getOverdriveCopy({ streak, hot, cashMutations, hotCash }) {
   const willOverdrive = cashMutations.some((mutation) => mutation.id === "overclock");
   const { overdrive } = say;
-  if (willOverdrive) return { id: "ready", ...overdrive.ready, progress: 100 };
-  if (streak > 0 && hot) return { id: "live", ...overdrive.live, progress: 75 };
-  if (streak > 0) return { id: "held", ...overdrive.held, progress: 50 };
-  if (hot) return { id: "ignition", ...overdrive.ignition, progress: 35 };
-  return { id: "dormant", ...overdrive.dormant, progress: 12 };
+  // G42 (RULES_MARK 10): the chain's multiplier is the rules' (×32, ×4 before).
+  const line = (id, progress) => ({ id, label: overdrive[id].label, text: fill(overdrive[id].text, { multiplier: hotCash }), progress });
+  if (willOverdrive) return line("ready", 100);
+  if (streak > 0 && hot) return line("live", 75);
+  if (streak > 0) return line("held", 50);
+  if (hot) return line("ignition", 35);
+  return line("dormant", 12);
 }
 
 /**
@@ -349,16 +382,19 @@ function getOverdriveCopy({ streak, hot, cashMutations }) {
 export function useTableForecast({ schema, run, win, selectedCard, multiplier, caseId, offered }) {
   // The same frozen Set for a case from one render to the next, so it can key a memo.
   const rules = getTableRules(caseId, run);
+  const next = isNextOn(rules);
+  const watched = run?.story !== true && !run?.practice;
   const mutations = useMemo(() => describeMutations(schema), [schema]);
   const relics = run?.relics;
   const streakState = run?.logic;
   const logic = useMemo(
-    () => (rules.has("logic") && streakState ? readLogic({ logic: streakState, card: selectedCard, offered, relics }) : null),
-    [offered, relics, rules, selectedCard, streakState],
+    () => (rules.has("logic") && streakState ? readLogic({ logic: streakState, card: selectedCard, offered, relics, next, watched }) : null),
+    [next, offered, relics, rules, selectedCard, streakState, watched],
   );
   const selectedBurn = useMemo(() => (selectedCard ? getCardBurn(selectedCard, schema) : null), [schema, selectedCard]);
   const fractureAxis = selectedBurn && Math.abs(selectedBurn.value) >= FRACTURE_MIN_BURN ? selectedBurn.key : null;
-  const hot = multiplier >= HOT_CASH_MULTIPLIER;
+  const hotCash = getHotCashMultiplier(rules);
+  const hot = multiplier >= hotCash;
   const streak = run?.streak ?? 0;
   const { focusMode } = win;
   const indebted = win.gauge >= HEAT_DEBT_GAUGE;
@@ -370,6 +406,8 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
   // the schedule `resolveWindow` applies (`getSeasonEscalation`), which a
   // practice window does not move along (`getEscalationWindow`).
   const windowIndex = getEscalationWindow(run) + (run?.practice ? 0 : 1);
+  // G5 (actTwists.js): the case's twist, which 2막's bills more of the debt.
+  const twist = getCaseTwist(run, rules);
 
   const cashMutations = useMemo(
     () =>
@@ -388,8 +426,9 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
         stanceMastery,
         windowIndex,
         rules,
+        twist,
       })),
-    [focusMode, fractureAxis, hot, indebted, pushed, relics, rules, stanceEarned, stanceMastery, streak, windowIndex],
+    [focusMode, fractureAxis, hot, indebted, pushed, relics, rules, stanceEarned, stanceMastery, streak, twist, windowIndex],
   );
   const bustMutations = useMemo(
     () =>
@@ -431,11 +470,17 @@ export function useTableForecast({ schema, run, win, selectedCard, multiplier, c
       fractureAxis,
       cashMutations,
       bustMutations,
-      overdrive: getOverdriveCopy({ streak, hot, cashMutations }),
-      // What a bust would leave of the case pot: nothing, or a third with INSURANCE unspent.
-      bustKeeps: hasRelic(relics ?? [], "insurance") && !run?.insuranceSpent ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE) : 0,
+      overdrive: getOverdriveCopy({ streak, hot, cashMutations, hotCash }),
+      // What a bust leaves of the case pot, as `resolveWindow` settles it: half
+      // on a clock bust with TESTIMONY; a third with INSURANCE or 1막's
+      // 떠넘겨진 손실 while the case's one keep is unspent; otherwise nothing.
+      bustKeeps: win.status === "bust" && win.cause === "timeout" && hasRelic(relics ?? [], "testimony")
+        ? Math.floor((run?.runPot ?? 0) / TESTIMONY_SHARE)
+        : !run?.insuranceSpent && (hasRelic(relics ?? [], "insurance") || twistHasDevice(twist, "passedDown"))
+          ? Math.floor((run?.runPot ?? 0) / INSURANCE_SHARE)
+          : 0,
       clockHeat: describeClockHeat(pushes),
       runTension: Math.min(100, (run?.busts ?? 0) * 24 + streak * 16 + Math.min(40, Math.log10(Math.max(1, run?.runPot ?? 0)) * 11)),
     };
-  }, [bustMutations, cashMutations, fractureAxis, hot, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak]);
+  }, [bustMutations, cashMutations, fractureAxis, hot, hotCash, logic, mutations, pushes, relics, rules, run?.busts, run?.insuranceSpent, run?.runPot, schema, streak, twist, win.cause, win.status]);
 }

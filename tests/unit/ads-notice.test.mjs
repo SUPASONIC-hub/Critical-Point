@@ -45,6 +45,8 @@ test("the stage: off, on with the dates as they were, or what the build reads; a
   assert.throws(() => adStage({ stage: "soon", date: DAY }), /"off", "notice" or "on"/);
 });
 
+const withoutRestRange = (html) => html.replace(/@font-face\{[^}]*unicode-range:[^}]*\}/, "");
+
 for (const [name, analytics] of [
   ["Google Analytics off", null],
   ["Google Analytics on", ga],
@@ -65,7 +67,8 @@ for (const [name, analytics] of [
       ]) {
         // The page without its notice is the page without ads, byte for byte; the notice comes right after the date line.
         assert.equal(notice[file].split(text).length, 2, `${file} has the notice once`);
-        assert.equal(notice[file].replace(`${text}\n`, ""), off[file], `${file} is otherwise the page without ads`);
+        // Less the second font file's range, which is the page's own characters (legal-pages.mjs `withPageFont`): the notice's syllables are in it.
+        assert.equal(withoutRestRange(notice[file].replace(`${text}\n`, "")), withoutRestRange(off[file]), `${file} is otherwise the page without ads`);
         assert.ok(notice[file].includes(`${effective(off[file])}\n${text}`), `${file}: the notice under the date line`);
         assert.equal(effective(notice[file]), effective(off[file]), `${file} keeps its date`);
       }

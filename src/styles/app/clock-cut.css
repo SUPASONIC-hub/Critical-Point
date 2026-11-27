@@ -1,0 +1,41 @@
+/* B5 seen (N43 (3), 11-18): the seconds the stake clock just took, an ink
+   mark at the ring's left for 0.8 seconds (CLOCK_CUT_MS, useClockCut in
+   tableVoice.js) -- not above it, where the HUD's edge clipped it on a phone.
+   A push's cut and the clock's creep across a tier alike. Out of the flow, so
+   the HUD and the hand under it do not move; it fades, never jumps, and
+   stands still under reduced motion or calm effects (comfort.css), where the
+   timer still takes it away. A file of its own so play.css's budget is not
+   touched. */
+.gx-clock .gx-clock-cut {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 4px);
+  translate: 0 -50%;
+  padding: 1px 4px;
+  color: var(--c-danger-81);
+  background: var(--ui-surface);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 800 0.6875rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: gx-clock-cut 0.8s ease-out both;
+}
+@keyframes gx-clock-cut {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx-clock .gx-clock-cut {
+    animation: none;
+  }
+}

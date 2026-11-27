@@ -177,10 +177,12 @@ const BUDGETS = {
   // language is written again in the page's (AppContent, isStaleBook); the
   // export and its line of why. Measured 970 / 96.
   // 969 (E-11) and 970 (memory-line-i18n) -> 971 on 2026-11-11, bundle 1111 (#350 #301 #501): both exports.
+  // 971 -> 976 lines, 96 -> 97 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the case's way
+  // to sign written on the run (signRun, gauntletEngine's signCase), beside the draft's two answers.
   "src/GameRuntime.jsx": {
-    lines: 971,
+    lines: 976,
     longestLine: 190,
-    importedNames: 96,
+    importedNames: 97,
     hooks: { useState: 10, useMemo: 7, useEffect: 5, useRef: 7 },
   },
   // 105 / 3 -> 111 / 4 on 2026-09-23: the header stamp reads the case's own
@@ -256,10 +258,19 @@ const BUDGETS = {
   // KD은행 계좌, with a line saying why it sits there.
   // 863 -> 865 lines on 2026-11-13, measured (n2n3-firsthour): the import and the call that
   // count 프롤로그 01's first table opened for Google Analytics (N2, gameEvents.js).
+  // 865 -> 869 lines, 73 -> 74 names on 2026-11-19 (b5-open-clock-cue, measured locally): the stake
+  // clock's cut beside the clock (useClockCut, tableVoice.js), its call and its mark.
+  // 869 -> 876 lines, 74 -> 76 names on 2026-11-20 (gameplay-g5-rest, measured): G5 8막 실명 서명, the briefing's
+  // signature line (WeekRulePanel.jsx SignAsk) and the board dealt again under the way chosen (signCase).
+  // 876 -> 886 on 2026-11-20 (G15, G17, G10): the scout band's line broken in two for the board 숨 고르기 reads (ScoutBand `board`) and the line under the row
+  // saying where the BUST before went,
+  // the HUD's audit warning in words (`auditWarn`), and G10's mark where a rule pulled the band from (`gauge-pulled`).
+  // 886 -> 898 lines, 76 -> 79 names on 2026-11-26 (story-g43, measured): G43, a story table other than the case's
+  // 결재 판 cashed at heat 70 once its card is picked (storyAutoCash.js `stake`), and the setting that plays them all.
   "src/gauntlet/GauntletStage.jsx": {
-    lines: 865,
+    lines: 898,
     longestLine: 250,
-    importedNames: 73,
+    importedNames: 79,
     hooks: {},
   },
 };

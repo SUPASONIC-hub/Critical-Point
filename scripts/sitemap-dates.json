@@ -1,0 +1,1041 @@
+{
+  "//": "lastmod per sitemap address: the page hash and the day it last changed. npm run sitemap:dates lists changed pages; -- --write dates them today (scripts/sitemap-dates.mjs).",
+  "pages": {
+    "/": {
+      "hash": "118f828e0efee8fa",
+      "date": "2026-11-11"
+    },
+    "/en/": {
+      "hash": "48543a005309a139",
+      "date": "2026-11-18"
+    },
+    "/ja/": {
+      "hash": "80558cd6a5d28c90",
+      "date": "2026-11-11"
+    },
+    "/about.html": {
+      "hash": "c0abc4237ff0f543",
+      "date": "2026-11-23"
+    },
+    "/en/about.html": {
+      "hash": "565bfdf8f7dc7e68",
+      "date": "2026-11-23"
+    },
+    "/ja/about.html": {
+      "hash": "8078f2f3b395dbd0",
+      "date": "2026-11-23"
+    },
+    "/faq.html": {
+      "hash": "43a625c190cb880c",
+      "date": "2026-11-16"
+    },
+    "/en/faq.html": {
+      "hash": "43cf0b5a476cb09e",
+      "date": "2026-11-16"
+    },
+    "/ja/faq.html": {
+      "hash": "78ff39044f7ac049",
+      "date": "2026-11-16"
+    },
+    "/contact.html": {
+      "hash": "fecd885c2fd00d39",
+      "date": "2026-11-16"
+    },
+    "/en/contact.html": {
+      "hash": "00172daceca0fd3e",
+      "date": "2026-11-16"
+    },
+    "/ja/contact.html": {
+      "hash": "9c6371ce213f3517",
+      "date": "2026-11-16"
+    },
+    "/privacy.html": {
+      "hash": "8809fd6089683ff8",
+      "date": "2026-11-19"
+    },
+    "/en/privacy.html": {
+      "hash": "60a184f5cf503722",
+      "date": "2026-11-19"
+    },
+    "/ja/privacy.html": {
+      "hash": "d96f9c4a5a4f2f3d",
+      "date": "2026-11-19"
+    },
+    "/terms.html": {
+      "hash": "293ec289476665c6",
+      "date": "2026-11-16"
+    },
+    "/en/terms.html": {
+      "hash": "000645e64cbc7630",
+      "date": "2026-11-16"
+    },
+    "/ja/terms.html": {
+      "hash": "5c0779c4371ee08f",
+      "date": "2026-11-16"
+    },
+    "/guide.html": {
+      "hash": "873fe31a1cd71ebc",
+      "date": "2026-11-26"
+    },
+    "/en/guide.html": {
+      "hash": "6fd9d898183cb1ca",
+      "date": "2026-11-26"
+    },
+    "/ja/guide.html": {
+      "hash": "252a534c2a9e5df7",
+      "date": "2026-11-26"
+    },
+    "/cases/index.html": {
+      "hash": "c2b26802cb1d2339",
+      "date": "2026-11-16"
+    },
+    "/en/cases/index.html": {
+      "hash": "302814aebd979bff",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/index.html": {
+      "hash": "c12c3e9bd07e99c0",
+      "date": "2026-11-16"
+    },
+    "/cases/prologue01.html": {
+      "hash": "2ad47c5d39b47f6a",
+      "date": "2026-11-20"
+    },
+    "/en/cases/prologue01.html": {
+      "hash": "dfc8cee5a6b20929",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/prologue01.html": {
+      "hash": "ec26f96c9960c2c1",
+      "date": "2026-11-16"
+    },
+    "/cases/prologue02.html": {
+      "hash": "b9c332af7709f0fa",
+      "date": "2026-11-20"
+    },
+    "/en/cases/prologue02.html": {
+      "hash": "98e3770ec5ba2c28",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/prologue02.html": {
+      "hash": "b87da8caff5a87d0",
+      "date": "2026-11-16"
+    },
+    "/cases/prologue03.html": {
+      "hash": "1a7bc6c342ff559b",
+      "date": "2026-11-20"
+    },
+    "/en/cases/prologue03.html": {
+      "hash": "f9c6eef44b7bfe27",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/prologue03.html": {
+      "hash": "bc38b4ff700ff736",
+      "date": "2026-11-16"
+    },
+    "/cases/prologue04.html": {
+      "hash": "ab0f2936d0b51735",
+      "date": "2026-11-20"
+    },
+    "/en/cases/prologue04.html": {
+      "hash": "d5e16df941b90496",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/prologue04.html": {
+      "hash": "22f41ca960159c2c",
+      "date": "2026-11-16"
+    },
+    "/cases/prologue05.html": {
+      "hash": "c77df3333d850033",
+      "date": "2026-11-20"
+    },
+    "/en/cases/prologue05.html": {
+      "hash": "63ce93f4b5a9e9be",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/prologue05.html": {
+      "hash": "01849f2acecb0702",
+      "date": "2026-11-16"
+    },
+    "/cases/case01.html": {
+      "hash": "e2ffa2765e210006",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case01.html": {
+      "hash": "611d84e2be530448",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case01.html": {
+      "hash": "c1d42da37cb63ff3",
+      "date": "2026-11-16"
+    },
+    "/cases/case02.html": {
+      "hash": "ed4c1ae6240e5e48",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case02.html": {
+      "hash": "45b9440bebdcf7cc",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case02.html": {
+      "hash": "0f570fb3a50e7ef1",
+      "date": "2026-11-16"
+    },
+    "/cases/case03.html": {
+      "hash": "f4f51930dfdab21e",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case03.html": {
+      "hash": "9943bb3c92b71d3b",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case03.html": {
+      "hash": "27c6ebc38499db8f",
+      "date": "2026-11-16"
+    },
+    "/cases/case04.html": {
+      "hash": "44aaf06e337d18ad",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case04.html": {
+      "hash": "5723290bbce1eb2e",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case04.html": {
+      "hash": "044d8e3dba1b4345",
+      "date": "2026-11-16"
+    },
+    "/cases/case05.html": {
+      "hash": "4b33e7a03d045a47",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case05.html": {
+      "hash": "40d526abe8e06e18",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case05.html": {
+      "hash": "4a5fa1c0d7ed772e",
+      "date": "2026-11-16"
+    },
+    "/cases/case06.html": {
+      "hash": "18af415467c992ab",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case06.html": {
+      "hash": "d666c6b703cadf5d",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case06.html": {
+      "hash": "37e6a20c35fe1b06",
+      "date": "2026-11-16"
+    },
+    "/cases/case07.html": {
+      "hash": "78bc7c56890891d9",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case07.html": {
+      "hash": "45bc6a5fa6e8079b",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case07.html": {
+      "hash": "24da62ce76d3cf46",
+      "date": "2026-11-16"
+    },
+    "/cases/case08.html": {
+      "hash": "330cae6b9ba7c383",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case08.html": {
+      "hash": "a5a76e07f784084a",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case08.html": {
+      "hash": "edbf175226fd7645",
+      "date": "2026-11-16"
+    },
+    "/cases/case09.html": {
+      "hash": "d0d8d4f2d576f952",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case09.html": {
+      "hash": "f7833d887bf5b7fc",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case09.html": {
+      "hash": "d4e4a7f665ff7725",
+      "date": "2026-11-16"
+    },
+    "/cases/case10.html": {
+      "hash": "63a2cca91f50ef09",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case10.html": {
+      "hash": "6dc1d66304f2dd67",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case10.html": {
+      "hash": "3f0b5bda5e194cf7",
+      "date": "2026-11-16"
+    },
+    "/cases/case11.html": {
+      "hash": "0c04af4ae4dba16c",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case11.html": {
+      "hash": "37552f37ddba9dec",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case11.html": {
+      "hash": "1d6ad5fb72da5ebb",
+      "date": "2026-11-16"
+    },
+    "/cases/case12.html": {
+      "hash": "03b757d8ecd2a5e9",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case12.html": {
+      "hash": "e60c4d8c3a8af3c9",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case12.html": {
+      "hash": "529e24cf167ae39e",
+      "date": "2026-11-16"
+    },
+    "/cases/case13.html": {
+      "hash": "07f11f002e394a2f",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case13.html": {
+      "hash": "4b7f02b69f65d744",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case13.html": {
+      "hash": "7ec6036dc505aa1e",
+      "date": "2026-11-16"
+    },
+    "/cases/case14.html": {
+      "hash": "5069380699c7e7d3",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case14.html": {
+      "hash": "6384d24fa7ed0c92",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case14.html": {
+      "hash": "8b804af5c71b0abd",
+      "date": "2026-11-16"
+    },
+    "/cases/case15.html": {
+      "hash": "de4c33d2c3bea29c",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case15.html": {
+      "hash": "95998344d9cee8ce",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case15.html": {
+      "hash": "f5ccf3ba61556587",
+      "date": "2026-11-16"
+    },
+    "/cases/case16.html": {
+      "hash": "3b846f08589fe26d",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case16.html": {
+      "hash": "9c3ff40a8ae9f200",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case16.html": {
+      "hash": "58855b142817d748",
+      "date": "2026-11-16"
+    },
+    "/cases/case17.html": {
+      "hash": "fd76264c1eb9f0c5",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case17.html": {
+      "hash": "3d865b2f06a74a33",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case17.html": {
+      "hash": "011c77ce17342218",
+      "date": "2026-11-16"
+    },
+    "/cases/case18.html": {
+      "hash": "1d713590998b2e21",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case18.html": {
+      "hash": "8f7c02d326516152",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case18.html": {
+      "hash": "64a4dd00d3a87cea",
+      "date": "2026-11-16"
+    },
+    "/cases/case19.html": {
+      "hash": "95deac06174eb514",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case19.html": {
+      "hash": "668bf53433d6af00",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case19.html": {
+      "hash": "0c9f3a8f87ab4298",
+      "date": "2026-11-16"
+    },
+    "/cases/case20.html": {
+      "hash": "df662d977844de8e",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case20.html": {
+      "hash": "aa3c47c9475c004c",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case20.html": {
+      "hash": "fab7ecf75b33b906",
+      "date": "2026-11-16"
+    },
+    "/cases/case21.html": {
+      "hash": "a69366ff20edd3d3",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case21.html": {
+      "hash": "52ee12ebc6833ad2",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case21.html": {
+      "hash": "14f732a7411d7957",
+      "date": "2026-11-16"
+    },
+    "/cases/case22.html": {
+      "hash": "1fb6f4c8c785715c",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case22.html": {
+      "hash": "0b76f49da7cfa05d",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case22.html": {
+      "hash": "d0528a809353d139",
+      "date": "2026-11-16"
+    },
+    "/cases/case23.html": {
+      "hash": "d3ca1be8a136c8be",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case23.html": {
+      "hash": "2950d11011c5967a",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case23.html": {
+      "hash": "d6e0ef7ee6dc3d61",
+      "date": "2026-11-16"
+    },
+    "/cases/case24.html": {
+      "hash": "57d77382b01a410e",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case24.html": {
+      "hash": "b61362630a894840",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case24.html": {
+      "hash": "03ce4bec53fbfd97",
+      "date": "2026-11-16"
+    },
+    "/cases/case25.html": {
+      "hash": "68fb8882882eb992",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case25.html": {
+      "hash": "2c529a6ab09ad3fc",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case25.html": {
+      "hash": "5ffefd2f2c219d59",
+      "date": "2026-11-16"
+    },
+    "/cases/case26.html": {
+      "hash": "43a4115b1a2f67a1",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case26.html": {
+      "hash": "1fa288a26996b93b",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case26.html": {
+      "hash": "b478dda9e7c6aaf4",
+      "date": "2026-11-16"
+    },
+    "/cases/case27.html": {
+      "hash": "d104e05bcc4c1537",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case27.html": {
+      "hash": "f412db5e256e616b",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case27.html": {
+      "hash": "0bd447a15fc07048",
+      "date": "2026-11-16"
+    },
+    "/cases/case28.html": {
+      "hash": "063dc4de6daa2a01",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case28.html": {
+      "hash": "070080e8ba3acefa",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case28.html": {
+      "hash": "789c778deadcf33e",
+      "date": "2026-11-16"
+    },
+    "/cases/case29.html": {
+      "hash": "80ceaf7230b50378",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case29.html": {
+      "hash": "1694567de3343738",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case29.html": {
+      "hash": "35e290aea830fa61",
+      "date": "2026-11-16"
+    },
+    "/cases/case30.html": {
+      "hash": "451e7e79a5481ff1",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case30.html": {
+      "hash": "1f4b6d273d73653d",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case30.html": {
+      "hash": "3a7a655dbac0ed39",
+      "date": "2026-11-16"
+    },
+    "/cases/case31.html": {
+      "hash": "6780baa5f44d3418",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case31.html": {
+      "hash": "ac1e65bbbe9a3283",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case31.html": {
+      "hash": "0d68e81f66df0a17",
+      "date": "2026-11-16"
+    },
+    "/cases/case32.html": {
+      "hash": "aa72c1b52c96674b",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case32.html": {
+      "hash": "edbba18ee29e46fe",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case32.html": {
+      "hash": "1c5f683b2937e1c7",
+      "date": "2026-11-16"
+    },
+    "/cases/case33.html": {
+      "hash": "7961ad86e3e24377",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case33.html": {
+      "hash": "f1a7e5f0704a9f2d",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case33.html": {
+      "hash": "7fb9f001e3c6749f",
+      "date": "2026-11-16"
+    },
+    "/cases/case34.html": {
+      "hash": "5fae6dd598e95e85",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case34.html": {
+      "hash": "53c6ad952306546a",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case34.html": {
+      "hash": "717daca91a4c41ad",
+      "date": "2026-11-16"
+    },
+    "/cases/case35.html": {
+      "hash": "5ac6dd0936449ade",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case35.html": {
+      "hash": "5cd9df0fc32b8186",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case35.html": {
+      "hash": "ab94c3de59e1f551",
+      "date": "2026-11-16"
+    },
+    "/cases/case36.html": {
+      "hash": "0af763f9be729858",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case36.html": {
+      "hash": "a938503f2d7ac35c",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case36.html": {
+      "hash": "846b6672cc774335",
+      "date": "2026-11-16"
+    },
+    "/cases/case37.html": {
+      "hash": "c9a9fc712d1b317b",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case37.html": {
+      "hash": "d08ada2cd071093b",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case37.html": {
+      "hash": "b8f236a8ef05c65e",
+      "date": "2026-11-16"
+    },
+    "/cases/case38.html": {
+      "hash": "daa1dc477f6efe28",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case38.html": {
+      "hash": "389d2184daa2f546",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case38.html": {
+      "hash": "93b8b8716fda2e7d",
+      "date": "2026-11-16"
+    },
+    "/cases/case39.html": {
+      "hash": "85b9521b9478b640",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case39.html": {
+      "hash": "f06583f344d1fde5",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case39.html": {
+      "hash": "5b2bf1ce6003298d",
+      "date": "2026-11-16"
+    },
+    "/cases/case40.html": {
+      "hash": "a78ec76be9c8749a",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case40.html": {
+      "hash": "c4f56cbb87bf1ffb",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case40.html": {
+      "hash": "c1b3e56652a46c34",
+      "date": "2026-11-16"
+    },
+    "/cases/case41.html": {
+      "hash": "c5c660e672a337dd",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case41.html": {
+      "hash": "9ed15c3fcdf8c5a6",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case41.html": {
+      "hash": "fbbb242472b51420",
+      "date": "2026-11-16"
+    },
+    "/cases/case42.html": {
+      "hash": "4bdddd76de6f23ba",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case42.html": {
+      "hash": "d8f3df9e8581ea3f",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case42.html": {
+      "hash": "a7249b5a4be72039",
+      "date": "2026-11-16"
+    },
+    "/cases/case43.html": {
+      "hash": "31e5845c7a95bf36",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case43.html": {
+      "hash": "67126362b8c94a9e",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case43.html": {
+      "hash": "3ecae7ef6d39208e",
+      "date": "2026-11-16"
+    },
+    "/cases/case44.html": {
+      "hash": "e92ba1c1007da8bd",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case44.html": {
+      "hash": "6797d5bd65a0f11a",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case44.html": {
+      "hash": "57d4bf57e81bd124",
+      "date": "2026-11-16"
+    },
+    "/cases/case45.html": {
+      "hash": "15fe3b2b66f3e524",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case45.html": {
+      "hash": "d0af4c8699be1b6d",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case45.html": {
+      "hash": "756c13b1c0c42f95",
+      "date": "2026-11-16"
+    },
+    "/cases/case46.html": {
+      "hash": "a751ec9009ff6355",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case46.html": {
+      "hash": "bc62a3c48b211d49",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case46.html": {
+      "hash": "61b27f817c1887f0",
+      "date": "2026-11-16"
+    },
+    "/cases/case47.html": {
+      "hash": "b02261eb4816cb5c",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case47.html": {
+      "hash": "86cd456049d50a56",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case47.html": {
+      "hash": "b18e79e4af77b76f",
+      "date": "2026-11-16"
+    },
+    "/cases/case48.html": {
+      "hash": "1ed5b847983401aa",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case48.html": {
+      "hash": "60d7e66e5376eacc",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case48.html": {
+      "hash": "c6847f8f291c708e",
+      "date": "2026-11-16"
+    },
+    "/cases/case49.html": {
+      "hash": "1f9d5e0403896e54",
+      "date": "2026-11-20"
+    },
+    "/en/cases/case49.html": {
+      "hash": "163ba5db62b0595e",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/case49.html": {
+      "hash": "27938fe16486448a",
+      "date": "2026-11-16"
+    },
+    "/cases/final.html": {
+      "hash": "93b065143226a0ce",
+      "date": "2026-11-20"
+    },
+    "/en/cases/final.html": {
+      "hash": "2d951be1487e352e",
+      "date": "2026-11-16"
+    },
+    "/ja/cases/final.html": {
+      "hash": "0695f5d0a2499609",
+      "date": "2026-11-16"
+    },
+    "/characters.html": {
+      "hash": "28abf6ce5a4c8821",
+      "date": "2026-11-16"
+    },
+    "/en/characters.html": {
+      "hash": "03580d16ed87fead",
+      "date": "2026-11-16"
+    },
+    "/ja/characters.html": {
+      "hash": "2e2934dd3788faad",
+      "date": "2026-11-16"
+    },
+    "/making.html": {
+      "hash": "61ba9db541d5baaf",
+      "date": "2026-11-16"
+    },
+    "/en/making.html": {
+      "hash": "3befa991add3857b",
+      "date": "2026-11-16"
+    },
+    "/ja/making.html": {
+      "hash": "27f23bc195b71160",
+      "date": "2026-11-16"
+    },
+    "/weekly.html": {
+      "hash": "0e0e12889d6a2d92",
+      "date": "2026-11-23"
+    },
+    "/en/weekly.html": {
+      "hash": "bcb8c625f2881a0e",
+      "date": "2026-11-23"
+    },
+    "/ja/weekly.html": {
+      "hash": "52ed482b857d464f",
+      "date": "2026-11-23"
+    },
+    "/news/index.html": {
+      "hash": "3d5b1fd0a4a646cc",
+      "date": "2026-11-20"
+    },
+    "/news/chuseok-market-steamers.html": {
+      "hash": "f9cec0450df1a7d5",
+      "date": "2026-11-20"
+    },
+    "/news/loopnow-investment.html": {
+      "hash": "44ba840196f8e153",
+      "date": "2026-11-20"
+    },
+    "/news/verdict-eve-haeon-fees.html": {
+      "hash": "9bb410112470f808",
+      "date": "2026-11-20"
+    },
+    "/news/board-dismissal-agenda.html": {
+      "hash": "620e2efc36d54005",
+      "date": "2026-11-20"
+    },
+    "/news/gyeongpo-fireworks.html": {
+      "hash": "e037a95bf119c44e",
+      "date": "2026-11-20"
+    },
+    "/news/hearing-witness-will-attend.html": {
+      "hash": "5c6a3e980dc8a0f0",
+      "date": "2026-11-20"
+    },
+    "/news/fit-score-41-points.html": {
+      "hash": "f36588aefbb2aebb",
+      "date": "2026-11-20"
+    },
+    "/news/reader-courtroom-hallway.html": {
+      "hash": "1a84581c4ba36cf8",
+      "date": "2026-11-20"
+    },
+    "/news/documentary-ads-pulled.html": {
+      "hash": "8d4828383041299c",
+      "date": "2026-11-20"
+    },
+    "/news/class-action-first-hearing.html": {
+      "hash": "b5a142ef215bef47",
+      "date": "2026-11-20"
+    },
+    "/news/reaction-log-leak.html": {
+      "hash": "6448b5ba797fd012",
+      "date": "2026-11-20"
+    },
+    "/news/monsoon-flood-loans.html": {
+      "hash": "57b633e343cd3d7b",
+      "date": "2026-11-20"
+    },
+    "/news/whistleblower-three-lines.html": {
+      "hash": "53fff32b23af9c6f",
+      "date": "2026-11-20"
+    },
+    "/news/prosecutors-raid.html": {
+      "hash": "794ba9ad9294e7ae",
+      "date": "2026-11-20"
+    },
+    "/news/bulk-sale-singapore.html": {
+      "hash": "c48c441c15b7b55a",
+      "date": "2026-11-20"
+    },
+    "/news/fine-print-6-5-points.html": {
+      "hash": "eda3c081715303d7",
+      "date": "2026-11-20"
+    },
+    "/news/column-every-decade.html": {
+      "hash": "b537c262217ce55f",
+      "date": "2026-11-20"
+    },
+    "/news/gunsan-credit-union-line.html": {
+      "hash": "e3607ae3542bf55c",
+      "date": "2026-11-20"
+    },
+    "/news/pyeongtaek-crane.html": {
+      "hash": "336c2e9e46b82dae",
+      "date": "2026-11-20"
+    },
+    "/news/yeouido-cherry-blossoms.html": {
+      "hash": "68e19030af27557c",
+      "date": "2026-11-20"
+    },
+    "/news/personnel-notice-april.html": {
+      "hash": "b5abf8feddfe0fa4",
+      "date": "2026-11-20"
+    },
+    "/news/reporters-note-no-results.html": {
+      "hash": "e542a0e5d8c1d9a6",
+      "date": "2026-11-20"
+    },
+    "/news/one-share-shareholders.html": {
+      "hash": "ddefbe7e0acdeae0",
+      "date": "2026-11-20"
+    },
+    "/news/rejected-in-0-8-seconds.html": {
+      "hash": "453d5b626fc0c364",
+      "date": "2026-11-20"
+    },
+    "/news/consent-forms-registered-mail.html": {
+      "hash": "482c3f5190ff5e16",
+      "date": "2026-11-20"
+    },
+    "/news/noah-replaces-echo.html": {
+      "hash": "d2a3abe16f6ee2f2",
+      "date": "2026-11-20"
+    },
+    "/news/hoegi-bookshop-72-hours.html": {
+      "hash": "cba1b519755624c6",
+      "date": "2026-11-20"
+    },
+    "/news/editorial-new-year-blank-boxes.html": {
+      "hash": "fb233cb207582d26",
+      "date": "2026-11-20"
+    },
+    "/news/year-in-numbers-2025.html": {
+      "hash": "06e73b1319006350",
+      "date": "2026-11-20"
+    },
+    "/news/kd-bank-npl-sale-1860.html": {
+      "hash": "f583f6304bc34e15",
+      "date": "2026-11-20"
+    },
+    "/news/robots-night-shift.html": {
+      "hash": "fd368d2241d60217",
+      "date": "2026-11-20"
+    },
+    "/news/reader-contract-worker.html": {
+      "hash": "c4bd7e68a2cf0b9d",
+      "date": "2026-11-20"
+    },
+    "/news/senior-finance-class.html": {
+      "hash": "ea2b5d4f1d6341a4",
+      "date": "2026-11-20"
+    },
+    "/news/sangsaeng-esg-fund.html": {
+      "hash": "25b63f698e21ab7b",
+      "date": "2026-11-20"
+    },
+    "/news/innovation-committee-launch.html": {
+      "hash": "26d756796adf365c",
+      "date": "2026-11-20"
+    },
+    "/news/gaeul-tteokbang-interview.html": {
+      "hash": "d27696f38bafe10e",
+      "date": "2026-11-20"
+    },
+    "/news/money-clinic-no-suit-agreement.html": {
+      "hash": "26ff5dc5a256f457",
+      "date": "2026-11-20"
+    },
+    "/news/voluntary-compensation.html": {
+      "hash": "a01fd73d150352a0",
+      "date": "2026-11-20"
+    },
+    "/news/missing-dissent-hearing.html": {
+      "hash": "c666649845ec2b97",
+      "date": "2026-11-20"
+    },
+    "/news/flowon-creditors-liquidation-vote.html": {
+      "hash": "f466ef2e4fde3518",
+      "date": "2026-11-20"
+    },
+    "/news/haeon-partners-liquidation.html": {
+      "hash": "927cb8f3d2924be8",
+      "date": "2026-11-20"
+    },
+    "/news/editorial-no-name-at-the-top.html": {
+      "hash": "6a4312de4e82a3bf",
+      "date": "2026-11-20"
+    },
+    "/news/onsae-312-homes.html": {
+      "hash": "6772389ebf6f3c26",
+      "date": "2026-11-20"
+    },
+    "/news/novaworks-tender-2025.html": {
+      "hash": "10b6336a5c19ff53",
+      "date": "2026-11-20"
+    },
+    "/news/flowon-72-hours.html": {
+      "hash": "06a6dab5c79489d4",
+      "date": "2026-11-20"
+    },
+    "/news/onsae-care-selected-2024.html": {
+      "hash": "87f2ad6f2952e9e5",
+      "date": "2026-11-20"
+    },
+    "/news/explainer-ai-lending-2024.html": {
+      "hash": "f74625fb701ddf22",
+      "date": "2026-11-20"
+    },
+    "/news/editorial-sales-stickers.html": {
+      "hash": "3aff8705e31b35b3",
+      "date": "2026-11-20"
+    },
+    "/news/briefs-2023-08.html": {
+      "hash": "76d76d223e2b902d",
+      "date": "2026-11-20"
+    },
+    "/news/smart-logistics-3.html": {
+      "hash": "da406871e2be8481",
+      "date": "2026-11-20"
+    },
+    "/news/flowon-loan-secured-2023.html": {
+      "hash": "3f47d21aa78c82ee",
+      "date": "2026-11-20"
+    },
+    "/news/flowon-founder-interview.html": {
+      "hash": "34191a884e1280ed",
+      "date": "2026-11-20"
+    },
+    "/news/debt-ratio-clauses.html": {
+      "hash": "2fd4a827d6e8dcff",
+      "date": "2026-11-20"
+    },
+    "/news/small-factories-rates-2022.html": {
+      "hash": "329b7e1c67830fb1",
+      "date": "2026-11-20"
+    },
+    "/news/flowon-series-funding-2021.html": {
+      "hash": "9d68a8997ae8c6a6",
+      "date": "2026-11-20"
+    },
+    "/news/kingsdale-stake-sale-2014.html": {
+      "hash": "0294dc7e4629b627",
+      "date": "2026-11-20"
+    },
+    "/news/kd-group-launch.html": {
+      "hash": "68cdd2cd8f764c62",
+      "date": "2026-11-20"
+    },
+    "/news/small-loans-cleared-1998.html": {
+      "hash": "3ac3f541eaca8edf",
+      "date": "2026-11-20"
+    },
+    "/news/kyungdong-bank-sold.html": {
+      "hash": "2efa53cbbf74b5a0",
+      "date": "2026-11-20"
+    },
+    "/news/lending-doors-narrow-1997.html": {
+      "hash": "5320bbb3d2c8558a",
+      "date": "2026-11-20"
+    }
+  }
+}

@@ -99,7 +99,7 @@ export default {
       "lead": "Only two desks on the whole floor are lit, and two convenience-store coffees are set down on the desk."
     },
     "p1_review": {
-      "title": "The empty signature field",
+      "title": "The Empty Signature Field",
       "text": "The trainee review is booked for 10 minutes. Team Head Yoon Sanghyuk wears a plain navy suit and smiles only when he shakes your hand. Of the five items on the form, he enters a 5 in the speed field and nowhere else. 'I’ll fill in the rest later. Good catch on the 40 million won.' He closes the tablet. The speed of it is his answer. 'But write that number down, and 11 people won’t make it through November. I never said your judgment was wrong. I just decide where it gets to stand.' The evaluator’s signature line is blank.",
       "memo": [
         "Trainee review, 10 minutes -- 1 question",

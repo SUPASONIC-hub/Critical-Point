@@ -33,10 +33,35 @@ export function isSideCaseId(caseId) {
 
 /**
  * Whether this device has closed a finale: the condition NEW GAME+ opens on
- * (useNewGamePlus), and the one the side slot opens on (설계안 질문 2 (1)).
+ * (useNewGamePlus). A device that has opens every side case, as it always did.
  */
 export function isSideSlotOpen({ newGamePlusUnlocked = false, caseResults = null } = {}) {
   return newGamePlusUnlocked === true || Boolean(caseResults?.final);
+}
+
+/**
+ * Whether one side case is open (2026-11-18 「현재 준비된 번외 스토리 전부
+ * 공개, 스토리 흐름 순서에 맞게」): once the season case it follows in the
+ * story (`unlockAfter`, src/nodes/sidePacks.js) is closed in this run, once a
+ * finale is closed on this device (NEW GAME+), or once the side case itself is
+ * in this device's side record (played in an earlier run).
+ */
+export function isSideCaseOpen(sideCase, { newGamePlusUnlocked = false, caseResults = null, record = {} } = {}) {
+  if (!sideCase) return false;
+  if (isSideSlotOpen({ newGamePlusUnlocked, caseResults })) return true;
+  if (record?.[sideCase.id]) return true;
+  return Boolean(sideCase.unlockAfter) && Boolean(caseResults?.[sideCase.unlockAfter]);
+}
+
+// A side case asked for from a case report: the start screen opens it when it
+// mounts (IntroScreen reads it with peekRequestedSideCase, a pure read for its
+// state's first value, and clears it with requestSideCase(null) after mounting).
+let requestedSideCase = null;
+export function requestSideCase(caseId) {
+  requestedSideCase = isSideCaseId(caseId) ? caseId : null;
+}
+export function peekRequestedSideCase() {
+  return requestedSideCase;
 }
 
 const isRecord = (value) => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -67,20 +92,25 @@ export function readSideRecord() {
 }
 
 /**
- * The start screen's slot, or null when there is none to show: the device has
- * not closed a finale, or no side case is written yet. Each case says whether
- * it was closed and whether a run of it is under way, and `book` is the line
- * the 결말 도감 keeps for side cases apart from the season's (설계안 질문 5 (1)).
+ * The start screen's slot, or null when there is none to show: no side case
+ * is open on this device yet (isSideCaseOpen), or none is written. Each open
+ * case says whether it was closed and whether a run of it is under way, and
+ * `book` is the line the 결말 도감 keeps for side cases apart from the
+ * season's (설계안 질문 5 (1)): the cases closed, of all those written.
  */
 export function getSideSlot({ newGamePlusUnlocked = false, caseResults = null, cases = SIDE_CASES, record = null } = {}) {
-  if (!cases.length || !isSideSlotOpen({ newGamePlusUnlocked, caseResults })) return null;
+  if (!cases.length) return null;
   const marks = record ?? readSideRecord();
-  const rows = cases.map(({ id, label, title }) => ({
-    id,
-    label,
-    title,
-    closed: Boolean(marks[id]?.closedAt),
-    resumable: Boolean(marks[id]?.inProgress),
-  }));
-  return { cases: rows, book: fill(introCopy.sideSlot.book, { closed: rows.filter((row) => row.closed).length, total: rows.length }) };
+  const rows = cases
+    .filter((sideCase) => isSideCaseOpen(sideCase, { newGamePlusUnlocked, caseResults, record: marks }))
+    .map(({ id, label, title }) => ({
+      id,
+      label,
+      title,
+      closed: Boolean(marks[id]?.closedAt),
+      resumable: Boolean(marks[id]?.inProgress),
+    }));
+  if (!rows.length) return null;
+  const closed = cases.filter(({ id }) => marks[id]?.closedAt).length;
+  return { cases: rows, book: fill(introCopy.sideSlot.book, { closed, total: cases.length }) };
 }

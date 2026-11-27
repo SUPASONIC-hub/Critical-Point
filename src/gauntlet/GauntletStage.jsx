@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Crosshair, Flame, HeartPulse, Vault } from "lucide-react";
 import { STORAGE_KEY, takeTabToken } from "../appConfig.js";
-import { noteTableOpened } from "../gameEvents.js";
+import * as firstHour from "../gameEvents.js";
 import { getAuthorityGate } from "../gameLogic.js";
 import {
   createOpenSeed,
@@ -19,17 +19,19 @@ import {
   STANCE_CHARGE,
   getStanceMasteryProfile,
   getTableSchema,
+  signCase,
 } from "./gauntletEngine.js";
 import { useGauntletWindow } from "./useGauntletWindow.js";
 import { HoldGauge } from "./HoldGauge.jsx";
 import { useHoldConfirm } from "./useHoldConfirm.js";
 import { describeStakedDetail, formatMultiplier, formatMoney, joinRules, useTableForecast } from "./tableReadout.js";
 import { dangerZoneOf, readTableMeters } from "./tableMeters.js";
+import { readBreathBust, useClockCut } from "./tableVoice.js";
 import { BankPurse } from "./MoneyBurst.jsx";
 import { useTableKeys } from "./useTableKeys.js";
 import { useTableTabTitle } from "./tableTabTitle.js";
 import { listOfferedDirections } from "./logicStreak.js";
-import { GAUGE_MARKS, LOCK_PRESS_SECONDS } from "./tableRules.js";
+import { GAUGE_MARKS } from "./tableRules.js";
 import { GauntletFx } from "./GauntletFx.jsx";
 import { GauntletHand } from "./GauntletHand.jsx";
 import { LogicLine, RelicChips, ScoutBand, TableGlossary, TableNotices } from "./TableNotices.jsx";
@@ -55,15 +57,17 @@ import { prefetchScreenWhenIdle } from "../state/retryableLazy.js";
 import { noteBriefing } from "../state/readingTally.js";
 import tableCopy from "../copy/table.js";
 import { fill } from "../locale.js";
-
+import { SignAsk } from "./WeekRulePanel.jsx";
+import { isAutoCashTable, planAutoCash } from "./storyAutoCash.js";
+import { getAccessibility } from "../state/accessibilitySettings.js";
 
 const RESOLVE_DELAY_MS = { cashed: 760, bust: 1350 };
 // C-9: the audit's 40 to HEAT DEBT's 60, where the audit counts: the wall band's box in green (no sheet had room for a rule).
-const AUDIT_BAND_LOOK = { background: "rgb(156 203 180 / 0.14)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
+const AUDIT_BAND_LOOK = { background: "rgb(22 96 62 / 0.1)", borderLeftColor: "var(--c-green-70)", boxShadow: "none" };
 // The table's words (src/copy/table.js); the tab's are in src/copy/tabTitles.js (tableTabTitle.js).
 const { stage: say, keys: keyWords } = tableCopy;
 /** The label over the pot on a marked board (`getBoardMark`): 「고점 판」, C-10, and 「숨 고르기」, C-7. */
-const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
+const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather, sign: say.markSign };
 
 /**
  * The table. One hand, one gauge, two verbs.
@@ -76,7 +80,7 @@ const BOARD_MARK_LABELS = { peak: say.markPeak, breather: say.markBreather };
 export function GauntletStage({
   seed,
   run,
-  auditCount = 0,
+  auditCount = 0, narrowCount = 0, scoutCount = 0,
   links = null,
   cards,
   reframeChoice,
@@ -89,7 +93,7 @@ export function GauntletStage({
   onResolve,
   onTouch,
   onPickRelic,
-  onSpendAtDraft = null,
+  onSpendAtDraft = null, onSign = null,
   onSuspendable = null,
   staleSave = false,
   onReload,
@@ -170,6 +174,7 @@ export function GauntletStage({
   const resolvedRef = useRef(false);
   const touchedRef = useRef(undefined);
   const closedRef = useRef(false);
+  const autoRef = useRef(false); // G43: this window was cashed for the player (`stake`).
 
   const { sealedId, forcedCard } = useMemo(() => readRoomCards(cards, schema), [cards, schema]);
   const sealBroken = win.gauge >= schema.sealBreak;
@@ -181,18 +186,23 @@ export function GauntletStage({
   // with it selected.
   const heldCard = cards.find((card) => card.id === win.selectedId) ?? null;
   const selectedCard = reframeSelected ? reframeChoice : heldCard && isCardOpen(heldCard) ? heldCard : null;
-  const {
-    selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand, canPayScout,
-  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources });
+  const { selectedChips, multiplier, focusBonus, remaining, bpm, nextLow, nextHigh, nextMultiplierLow, nextMultiplierHigh, dangerLine, belowRelief, band, audit, safe, auditBand,
+    canPayScout, canPayNarrow, nextClock, next, narrowPrice, scoutPrice, lockSeconds, lockShut, breathable,
+  } = readTableMeters({ win, schema, selectedCard, run, audit: auditCount, resources, caseId: scene.node.caseId, narrowCount, scoutCount }); // G1~G7, MARK 7 (tableMeters.js).
   const stanceMastery = useMemo(() => getStanceMasteryProfile(run?.stanceMastery), [run?.stanceMastery]);
   const live = win.status === "live";
+  // G17: one cash under the audit's line from its limit, the token's label says so in words (in place of 감사: E1g, a phrase beside it overflowed).
+  const auditWarned = audit?.atRisk && audit.ifCash > 0;
+  const auditLabel = auditWarned ? <small data-testid="audit-warn" style={{ whiteSpace: "nowrap" }}>{audit.warn || say.auditWarn}</small> : <small>{say.audit}</small>;
+  // B5 seen (N43): the stake clock's cut, a push's or the creep's, beside the clock for a moment.
+  const clockCut = useClockCut(win, seed);
   const settleImpact = useMemo(
     () => (!live && claimed ? { amount: win.status === "bust" ? 1 : 0.35 } : null),
     [claimed, live, win.status],
   );
   const sealedLock = selectedCard && selectedCard.id === sealedId && !sealBroken;
   const canCash = live && !paused && Boolean(selectedCard) && !sealedLock;
-  const canFocus = canCash && win.focus < FOCUS_MAX;
+  const canFocus = canCash && win.focus < FOCUS_MAX && !lockShut, [lockRefused, setLockRefused] = useState(0); // G3: a shut LOCK refuses, and says why each press (the voice).
   const canPush = live && !paused && win.gauge < GAUGE_MAX;
   // A stance cannot be changed on a closed or stopped table, and says so.
   const stanceBlocked = !live || locked;
@@ -208,8 +218,8 @@ export function GauntletStage({
   // What the hand adds to the pot: the logic streak as the staked card would
   // leave it (`logic`, nothing before the case has the rule), then LOCK on top
   // under the cap they share. The settlement pays the same two numbers.
-  const earnedBonus = logic ? getHandBonus(win.groove, 0, win.focusMode, logic.after) : 1;
-  const handBonus = getHandBonus(logic ? win.groove : 0, win.focus, win.focusMode, logic?.after);
+  const earnedBonus = logic ? getHandBonus(win.groove, 0, win.focusMode, logic.after, { next, gauge: win.gauge }) : 1;
+  const handBonus = getHandBonus(logic ? win.groove : 0, win.focus, win.focusMode, logic?.after, { next, gauge: win.gauge });
   const lockPot = handBonus / earnedBonus;
   // At the cap a press adds nothing more to this hand's multiplier; what a
   // charge still pays is the resources and, with a stance, the next board.
@@ -225,7 +235,7 @@ export function GauntletStage({
   const stanceOn = rules.has("stance");
   const chainOn = rules.has("overclock");
   const scoutOn = rules.has("scout");
-  const canScout = scoutOn && live && !paused && !locked && !win.scouted && canPayScout;
+  const canScout = scoutOn && live && !paused && !locked && (win.scouted ? !win.narrowed && win.schema?.trained !== true && canPayNarrow : canPayScout);
   // A press of STEADY on a cold board cools nothing (`belowRelief`); the LOCK button says so.
   const steadyCold = lockOn && win.focusMode === "steady" && belowRelief;
   const handSize = cards.length + (reframeChoice ? 1 : 0);
@@ -234,9 +244,9 @@ export function GauntletStage({
   // is drawn into it until the player opens it.
   const [briefOpen, setBriefOpen] = useState(false);
 
-  // The report's chunk, asked for while a table is up and the browser is idle,
-  // so the case does not end on an empty page (state/retryableLazy.js).
-  useEffect(() => prefetchScreenWhenIdle("result"), []);
+  // The report's chunk, asked for while a table is up and the browser is idle, so the case does not end on
+  // an empty page (state/retryableLazy.js); and N16·N39, 프롤로그 01 ~ 사건 07's written scene as it comes on screen (gameEvents.js).
+  useEffect(() => (firstHour.noteSceneShown(scene.node.caseId, scene.nodeId), prefetchScreenWhenIdle("result")), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (draftOpen) playRelicDealCue(relicOffer.length);
@@ -332,7 +342,7 @@ export function GauntletStage({
       if (resolvedRef.current) return;
       resolvedRef.current = true;
       onSuspendable?.(null);
-      onResolve({ card, window: win, forced: !staked });
+      onResolve({ card, window: win, forced: !staked, auto: autoRef.current });
     }, RESOLVE_DELAY_MS[win.status] ?? 900);
     return () => globalThis.clearTimeout(timer);
     // The window closing (or being claimed from another tab) is the only trigger;
@@ -365,6 +375,12 @@ export function GauntletStage({
     onPickRelic(relicId, dropId);
   }
 
+  /** G5 8막 실명 서명: the case signed before its first board, which is dealt again under the way chosen (signCase). */
+  function signWay(way) {
+    dispatch({ type: "REDEAL", schema: getTableSchema(signCase(run, way)) });
+    onSign(way);
+  }
+
   /** Closes the briefing and starts the clock, with a card already staked if one was picked there. */
   function openTable(cardId = null, byClock = false) {
     if (!briefingOpen) return;
@@ -375,11 +391,20 @@ export function GauntletStage({
     readingRef.current = null;
     setOpenedSeed(seed);
     if (byClock) setClockOpenedSeed(seed);
-    noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
+    firstHour.noteTableOpened(scene.node.caseId); // N2: 프롤로그 01's first table, once per page (gameEvents.js).
     if (card || (cardId === REFRAME_CARD_ID && reframeChoice)) {
       playTargetLockCue();
-      dispatch({ type: "SELECT", id: cardId });
+      stake(cardId);
     }
+  }
+
+  // G43: a story table other than the case's 결재 판 is cashed at heat 70 once its card is picked, through the reducer (storyAutoCash.js).
+  function stake(id) {
+    const auto = id && live && !abandoned && isAutoCashTable({ run, caseId: scene.node.caseId, node: scene.node, playAll: getAccessibility().playAllTables });
+    const plan = auto ? planAutoCash(win, id, { rules, sealedId }) : null;
+    if (plan?.window.status !== "cashed") return dispatch({ type: "SELECT", id });
+    autoRef.current = true;
+    plan.events.forEach(dispatch);
   }
 
   // One gate for the click and the key. The card's button checked the run's
@@ -390,7 +415,7 @@ export function GauntletStage({
     const card = cards.find((item) => item.id === id);
     if (card ? !isCardOpen(card) : !(id === REFRAME_CARD_ID && reframeChoice)) return;
     playTargetLockCue();
-    dispatch({ type: "SELECT", id: win.selectedId === id ? null : id });
+    stake(win.selectedId === id ? null : id);
   }
 
   function setFocusMode(mode) {
@@ -420,7 +445,7 @@ export function GauntletStage({
   }
 
   function focus() {
-    if (!canFocus) return;
+    if (!canFocus) return lockShut && canCash && setLockRefused((count) => count + 1);
     dispatch({ type: "FOCUS" });
     playFocusCue(scoreFocus(win).focus / FOCUS_MAX);
     setImpact({ amount: 0.16 });
@@ -524,8 +549,8 @@ export function GauntletStage({
               <b>{formatMoney(run.vault)}</b>
             </span>
             <span className="gx-stat gx-run-signal" data-testid="gauntlet-run-signal">
-              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> <small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b>
-              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit"><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span></>}
+              {chainOn && <><small>{say.streak}</small> <b>{run.streak}</b> </>}<small lang="en">BUST</small> <b>{run.busts}</b> {!auditWarned && <><small>{say.best}</small> <b>{formatMultiplier(run.bestMultiplier || 1)}</b></>}
+              {audit && <> <span className={`gx-audit-wide${audit.atRisk ? " gx-at-risk" : ""}`} data-testid="gauntlet-audit">{auditLabel} <b>{audit.count}/{audit.limit}</b></span></>}
               {links?.live > 0 && <> <span className={links.atRisk ? "gx-at-risk" : undefined} data-testid="gauntlet-links"><small>{say.links}</small> <b>{links.live}</b></span></>}
               <i aria-hidden="true"><em style={{ width: `${runTension}%` }} /></i>
             </span>
@@ -552,7 +577,7 @@ export function GauntletStage({
             {logic && <LogicLine logic={logic} />}
           </div>
           )}
-          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}><small>{say.audit}</small> <b>{audit.count}/{audit.limit}</b></span>}
+          {audit && <span className={`gx-stat gx-hud-audit${audit.atRisk ? " gx-at-risk" : ""}`}>{auditLabel} <b>{audit.count}/{audit.limit}</b></span>}
           <div
             className={`gx-clock${remaining <= 10 ? " is-late" : ""}`}
             role="timer"
@@ -560,6 +585,7 @@ export function GauntletStage({
             style={{ "--gx-clock": Math.max(0, Math.min(1, remaining / schema.seconds)) }}
           >
             <b>{Math.ceil(remaining)}</b>
+            {clockCut && <span className="gx-clock-cut" data-testid="gauntlet-clock-cut" aria-hidden="true" key={clockCut.key}>{clockCut.text}</span>}
           </div>
         </div>
 
@@ -609,6 +635,8 @@ export function GauntletStage({
               <span key={at} className="gx-gauge-mark" data-testid="gauge-mark" style={{ left: `${at}%` }} />
             ))}
             {auditBand && <span className="gx-gauge-band" data-testid="gauge-audit" style={{ left: `${auditBand[0]}%`, width: `${auditBand[1] - auditBand[0]}%`, ...AUDIT_BAND_LOOK }} />}
+            {/* G10: where the band stood before the case's rule pulled it closer (합병 and the like): the rule seen on the bar, not only in the panel. */}
+            {schema.wallMin < (run?.schema?.wallMin ?? 0) && <span className="gx-gauge-mark" data-testid="gauge-pulled" style={{ left: `${run.schema.wallMin}%` }} />}
             {win.status === "bust" && win.cause !== "abandon" && (
               <span className="gx-gauge-wall" style={{ left: `${win.wall}%` }} />
             )}
@@ -619,7 +647,12 @@ export function GauntletStage({
             <span aria-hidden="true">
               {say.heat} <b data-testid="gauntlet-gauge">{Math.round(win.gauge)}</b>
             </span>
-            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} />
+            <ScoutBand band={band} canScout={canScout} onScout={scout} shortcut={canScout ? keys("R") : undefined} narrowTrust={narrowPrice} scoutTrust={scoutPrice}
+              board={win.schema} onBreathe={!paused && !locked && breathable ? () => dispatch({ type: "BREATHE" }) : null} />
+            {/* G15: where the BUST before this board went, an item of the row (it wraps with the row, #644): under it, it pushed the hand under the action bar (E1g, en 390x844). */}
+            {breathable && win.schema.bustHeat > 0 && (
+              <span className="gx-breath-bust" data-testid="breath-bust" style={{ color: "var(--c-danger-81)", whiteSpace: "nowrap" }}>{readBreathBust(win.schema)}</span>
+            )}
             {canPush && !win.pushes && safe.pushes > 0 && <button type="button" className="gx-scout" data-testid="commit-safe" onClick={pushToSafe} aria-keyshortcuts={keys("S")}
               aria-label={fill(say.safeLabel, { count: safe.pushes, gauge: Math.round(safe.gauge) })}>{fill(say.safe, { count: safe.pushes })}</button>}
             {/* Each push makes the clock heat the gauge faster; said once it is.
@@ -674,7 +707,7 @@ export function GauntletStage({
                 {scene.challenge && <li data-testid="brief-challenge">{fill(say.briefChallenge, { challenge: scene.challenge })}</li>}
                 <li>{fill(say.briefPot, { pot: formatMoney(run.runPot) })}</li>
                 <li>{fill(say.briefRules, { rules: currentRules })}</li>
-                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</li>
+                <li>{fill(say.briefNext, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</li>
                 {briefOpen && <TableGlossary question={scene.question} cards={reframeChoice ? [...cards, reframeChoice] : cards} mutations={tableRules} relics={relics} stanceMastery={stanceOn ? stanceMastery : null} />}
               </ul>
             </details>
@@ -702,7 +735,7 @@ export function GauntletStage({
             </small>
           </article>
         </section>
-        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} onPick={setFocusMode} />}
+        {stanceOn && <StanceRow mode={win.focusMode} mastery={stanceMastery} blocked={stanceBlocked} fixed={Boolean(win.schema?.stanceLocked)} onPick={setFocusMode} />}
         </div>
 
         <div className="gx-hand-head" aria-hidden="true">
@@ -759,7 +792,7 @@ export function GauntletStage({
           <Flame size={18} aria-hidden="true" />
           <span>{say.push}</span>
           <small>+{schema.stepMin}~{schema.stepMax}</small>
-          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh) })}</span>
+          <span id="gx-push-detail" className="sr-only">{fill(say.pushDetail, { gauge: Math.round(win.gauge), low: Math.round(nextLow), high: Math.round(nextHigh), clock: nextClock })}</span>
           {/* What the streak stands at, for the two buttons that act on it. */}
           {logic && <span id="gx-logic-detail" className="sr-only">{logic.spoken}</span>}
         </button>
@@ -769,11 +802,11 @@ export function GauntletStage({
           className={`gx-focus focus-${focusBonus.tier}`}
           data-testid="commit-focus"
           onClick={focus}
-          disabled={!canFocus}
+          disabled={!canFocus && !(lockShut && canCash)} aria-disabled={lockShut || undefined} data-shut={lockShut || undefined}
           aria-keyshortcuts={keys("E")}
           // The name is what the button shows, charge and price included (WCAG
           // 2.5.3): it changes when a press changes the charge, not on a clock.
-          aria-label={`LOCK ${lockCapped ? say.lockCapped : Math.round(win.focus)} · ${fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}`}
+          aria-label={lockShut ? `LOCK · ${say.lockShut}` : `LOCK ${lockCapped ? say.lockCapped : Math.round(win.focus)} · ${fill(say.lockPrice, { seconds: lockSeconds })}`}
           aria-describedby={steadyCold ? "gx-focus-detail gx-steady-cold" : "gx-focus-detail"}
         >
           {steadyCold && <span id="gx-steady-cold" className="sr-only">{say.steadyCold}</span>}
@@ -786,10 +819,10 @@ export function GauntletStage({
               prints it with the same charge, and with it the line was 94 to
               112px in a button with 82px of room at 390px (74px at 360px). */}
           {/* At the cap the press still charges the resources, the stance and STEADY's cooling, so it still costs the clock (C-6): the price stays in the name. */}
-          <small>{lockCapped ? say.lockCapped : <>{Math.round(win.focus)} · {fill(say.lockPrice, { seconds: LOCK_PRESS_SECONDS })}</>}</small>
+          <small>{lockShut ? say.lockShut : lockCapped ? say.lockCapped : <>{Math.round(win.focus)} · {fill(say.lockPrice, { seconds: lockSeconds })}</>}</small>
           <span id="gx-focus-detail" className="sr-only">
-            {fill(say.lockDetail, { charge: Math.round(win.focus), seconds: LOCK_PRESS_SECONDS })} {fill(lockCapped ? say.lockAtCap : say.lockUnderCap, { cap: LOCK_CAP })}
-            {stanceOn && fill(say.lockStance, { charge: STANCE_CHARGE })}
+            {fill(say.lockDetail, { charge: Math.round(win.focus), seconds: lockSeconds })} {fill(lockCapped ? say.lockAtCap : say.lockUnderCap, { cap: LOCK_CAP })}
+            {stanceOn && fill(say.lockStance, { charge: STANCE_CHARGE })}{focusBonus.note}
           </span>
         </button>
         )}
@@ -835,7 +868,7 @@ export function GauntletStage({
           resourceMeta={resourceMeta}
           moveOf={logic?.moveOf}
           onOpen={openTable}
-          reading={trackReading}
+          reading={trackReading} signAsk={<SignAsk run={run} onSign={onSign && signWay} />}
         />
       )}
 
@@ -849,7 +882,7 @@ export function GauntletStage({
         tab={{ locked, awaitingClaim, live }}
         caseId={scene.node.caseId}
         // What the table says aloud, in one polite region (tableVoice.js), the held 확정's hint included.
-        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, audit, links,
+        voice={{ win, live, speaking: live && !paused, asked, pulse: schema.sedated ? say.sedated : bpm, dangerLine, cashMutations, run, band, scoutTrust: scoutPrice, audit, links, logic, lockRefused,
           hold: holdsCash ? cashHold.phase : "idle", clock: { remaining, elapsed: win.elapsed, openedByClock: clockOpenedSeed === seed } }}
         slam={win.status !== "live" && claimed ? { window: win, multiplier, livePot, streak: earnedBonus > 1 ? logic.after : 0, runPot: run.runPot, bustKeeps, target: purseRef } : null}
         onReload={onReload}

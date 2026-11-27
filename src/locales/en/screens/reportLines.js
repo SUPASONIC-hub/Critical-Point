@@ -40,6 +40,7 @@ export default {
   witnessHeld: "At the end you chose to blow the whistle. Cash fell and the score will not show it, but you brought the hidden record out while keeping human cost below the line. What this season won lies outside the numbers.",
   nearest: {
     line: "Closest other ending: {ending}. Short of it: {gaps}",
+    door: "The door you opened at the table: strong play lowered the bar for the record endings.",
     gaps: {
       trust: "{label} by {value}",
       legitimacy: "{label} by {value}",

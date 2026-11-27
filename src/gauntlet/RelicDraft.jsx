@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { ClipboardCheck, Crosshair, Fan, Files, Hourglass, Lock, Newspaper, NotebookPen, Repeat, ShieldCheck, Snowflake, Stethoscope, Timer } from "lucide-react";
-import { BREATHER, RELIC_IDS, RELIC_SLOTS, RELICS } from "./relics.js";
-import { objectParticle } from "../playerLanguage.js";
+import { BREATHER, HANDED_BY, RELIC_IDS, RELIC_SLOTS, RELICS } from "./relics.js";
+import { objectParticle, subjectParticle } from "../playerLanguage.js";
 import { readRelicCodex } from "./useRelicTable.js";
 import { useDialogFocus } from "./useDialogFocus.js";
 import { useShortcutHints } from "../state/accessibilitySettings.js";
 import relicsCopy from "../copy/relics.js";
-import { fill } from "../locale.js";
+import { fill, speakerName } from "../locale.js";
 import { formatMoney } from "./tableReadout.js";
 import { readDraftSpend } from "./draftSpend.js";
+import { isNextOn } from "./nextTableRules.js";
+import { getRefinedBoost, RELIC_BOOST_CAP } from "./relicsNext.js";
 
 // The draft's words (src/copy/relics.js).
 const say = relicsCopy.draft;
@@ -75,6 +77,9 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
   const codexCount = fill(say.codexCount, { count: unlockedCount, total: RELIC_IDS.length });
   const full = owned.length >= RELIC_SLOTS;
   const hand = swapFor ? owned : offer;
+  // G33: the first card, when the side the case closed on handed it over (`drawRelicOffer`).
+  const side = swapFor ? null : run?.relicDraft?.side;
+  const giver = side ? speakerName(HANDED_BY[side]) : null;
   // The hand changed under the keyboard: focus goes to its first card.
   useEffect(() => {
     if (swapFor !== null) firstOption.current?.focus({ preventScroll: true });
@@ -115,8 +120,10 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
                     <b lang="en">{relic.label}</b>
                     <strong>{relic.name}</strong>
                     <small>{relic.text}</small>
+                    {giver && index === 0 && <em data-testid="relic-handed" style={{ color: "var(--c-gx-relic)", fontStyle: "normal", fontSize: "0.6875rem", fontWeight: 700 }}>{fill(say.handedBy, { name: giver, particle: subjectParticle(giver) })}</em>}
                   </span>
                   {swapFor ? <em className="gx-relic-tier">{say.drop}</em> : relic.unlock && <em className="gx-relic-tier">{say.rare}</em>}
+
                 </button>
               </li>
             );
@@ -126,8 +133,9 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
           <div className="gx-draft-spend" data-testid="relic-spend">
             <DraftBuy id="reroll" state={spend.reroll} label={say.reroll} shortcut="R" onPress={() => onSpend("reroll")} />
             <DraftBuy id="extra" state={spend.extra} label={say.extra} shortcut="B" onPress={() => onSpend("extra")} />
+            {spend.refine && <DraftRefine state={spend.refine} onPress={(id) => onSpend("refine", id)} />}
             <small className="gx-draft-note">{say.spendNote}</small>
-            <small className="gx-draft-note">{say.spendHint}</small>
+            <small className="gx-draft-note">{isNextOn() ? fill(say.spendHintNext, { cap: RELIC_BOOST_CAP }) : say.spendHint}</small>
           </div>
         )}
         <div className="gx-draft-foot">
@@ -175,6 +183,29 @@ export function RelicDraft({ offer = [], owned = [], swapFor = null, run = null,
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * G25 도구 다듬기: the buy, and once pressed the held tools it can take, each a button that says what it buys.
+ * They wrap inside the spend row, so a 360px phone keeps its width.
+ */
+function DraftRefine({ state, onPress }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <DraftBuy id="refine" state={state} label={say.refine} onPress={() => setOpen((was) => !was)} />
+      {open && state.open && (
+        <span role="group" aria-label={say.refineGroup} data-testid="relic-refine-list" style={{ display: "flex", flexWrap: "wrap", gap: 6, gridColumn: "1 / -1", minWidth: 0 }}>
+          {state.targets.map((id) => (
+            <button key={id} type="button" className="ghost gx-draft-buy" data-testid="relic-refine-option" data-relic={id}
+              aria-label={fill(say.refineOption, { name: RELICS[id].name, boost: getRefinedBoost(id) })} onClick={() => onPress(id)}>
+              {RELICS[id].name} ×{getRefinedBoost(id)}
+            </button>
+          ))}
+        </span>
+      )}
+    </>
   );
 }
 

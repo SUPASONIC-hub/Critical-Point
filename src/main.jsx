@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { App, AppErrorBoundary, logCaughtRenderError } from "./App.jsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.jsx";
-import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue } from "./appConfig.js";
+import { claimTabToken, CLOUD_SAVE_ENABLED_KEY, readStoredValue, WEEKLY_REMINDER_KEY } from "./appConfig.js";
 import { applyAccessibilityToDocument } from "./state/accessibilitySettings.js";
 import { installServiceWorker } from "./serviceWorker/register.js";
 import { installChunkReload } from "./state/chunkReload.js";
@@ -16,6 +16,14 @@ if (readStoredValue(CLOUD_SAVE_ENABLED_KEY, "0") === "1") {
   import("./cloudSave.js").then(({ installCloudSync }) => installCloudSync()).catch(() => {});
 }
 
+// 주 1회 알림 (N25) is opt-in too: only a device that turned it on fetches the
+// code that hands its push subscription to the server again, after `load`.
+if (readStoredValue(WEEKLY_REMINDER_KEY, "0") === "1") {
+  const syncReminder = () => import("./state/weeklyReminderPush.js").then(({ refreshReminderOnOpen }) => refreshReminderOnOpen()).catch(() => {});
+  if (document.readyState === "complete") syncReminder();
+  else window.addEventListener("load", syncReminder, { once: true });
+}
+
 installChunkReload();
 // Before the first paint: a still intro must not start moving and then stop.
 applyAccessibilityToDocument();
@@ -26,8 +34,9 @@ claimTabToken();
 installServiceWorker();
 // Before the intro renders: the browser's install offer can arrive first (state/installPrompt.js).
 installInstallPrompt();
-// N12: after `load`, one page in twenty with Google's tag fetches the speed
-// watcher (gameEvents.js startVitalsSample); the rest never download it.
+// N12·N40: after `load`, a sampled page with Google's tag (every page while
+// visits are few, then one in twenty) fetches the speed watcher
+// (gameEvents.js startVitalsSample); the rest never download it.
 if (document.readyState === "complete") startVitalsSample();
 else window.addEventListener("load", () => startVitalsSample(), { once: true });
 

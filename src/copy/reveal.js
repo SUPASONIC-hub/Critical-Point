@@ -29,6 +29,8 @@ const revealCopy = {
     bust: "열기 {gauge} — 벽은 {wall}에 있었다.",
     cashed: "열기 {gauge}에서 확정. 벽은 {wall}에 있었다.",
   },
+  // G43: a story table cashed for the player at heat 70 (storyAutoCash.js), said under the verdict.
+  autoCash: "자동 확정 · 열기 {gauge}. 결재 판만 직접 칩니다.",
   details: "자세히",
   ledgerLabel: "판정 후폭풍",
   pot: {
@@ -39,6 +41,10 @@ const revealCopy = {
     auditCaught: " 감사 적발: 금고로 갈 ",
     auditOf: " 중",
     auditTaken: " 환수 · 금고 ",
+    // G17: why, under the line above.
+    auditWhy: "왜: 감사 선 아래에서 끊은 확정이 감사 칸을 한도까지 채웠다. 한 번 더 밀어 선 위에서 끊으면 칸이 줄어든다.",
+    // G35 (RULES_MARK 9).
+    auditWhySmooth: "왜: 같은 자리(열기 ±1)에서 끊은 확정이 한도까지 모여 장부가 너무 매끈했다. 끊는 자리를 바꾸면 피한다.",
     toVault: " 금고로 이동 ",
     vault: " · 금고",
     staked: "걸려 있는 판돈 ",
@@ -70,6 +76,12 @@ const revealCopy = {
   next: "다음 · {title}",
   caseResult: "사건 결과",
   nextHand: "다음 판",
+  // N22: once a season, between two hands of 프롤로그 01·02.
+  pulse: {
+    question: "여기까지 어땠나요?",
+    answers: { fun: "재밌음", hard: "어려움", long: "길다" },
+    thanks: "고맙습니다. 다음 판으로 가세요.",
+  },
 };
 export default revealCopy;
 

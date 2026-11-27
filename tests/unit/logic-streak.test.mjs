@@ -1,4 +1,10 @@
+import "./helpers/oldTable.mjs";
 import assert from "node:assert/strict";
+
+// The streak's arithmetic as it was before G1 (a change of direction ends it): this file plays the old
+// rules (nextTableRules.js reads RULES_NEXT once, at its first call). tests/unit/rules-next.test.mjs
+// holds the next rules: the halving, 눈에 띔 and the rest.
+process.env.RULES_NEXT = "0";
 import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
@@ -468,10 +474,12 @@ test("the mark of a case closed at the logic table is the streak in its run summ
   const { logicStreak: _streak, bestLogic: _best, ...beatSummary } = paid.caseResults.prologue02.gauntlet;
   const between = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: beatSummary } } };
   // The first build that paid the streak is itself an older table since 2026-10-20 (the day-ten table): it has no `tableRules`.
-  const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 4 } } } };
+  const marked = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 10 } } } };
+  // RULES_MARK 4 (C-3 and C-4) is an older table since N26 (2026-11-25).
+  const markFour = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 4 } } } };
   // RULES_MARK 3 (the audit and the links from 프롤로그 04) is an older table since C-3 and C-4 (2026-10-25).
   const markThree = { ...paid, caseResults: { prologue02: { ...paid.caseResults.prologue02, gauntlet: { ...paid.caseResults.prologue02.gauntlet, tableRules: 3 } } } };
-  for (const [save, expected] of [[board, true], [paid, true], [between, true], [markThree, true], [marked, false]]) {
+  for (const [save, expected] of [[board, true], [paid, true], [between, true], [markThree, true], [markFour, true], [marked, false]]) {
     assert.equal(hasBeatTableCase(save.caseResults), expected);
     const { state, valid } = load(save);
     assert.equal(valid, true);
