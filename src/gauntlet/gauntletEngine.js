@@ -2670,9 +2670,11 @@ export function createTableRecord(log = []) {
 }
 
 /**
- * The mark of a case closed at the table of RULES_MARK 10 (G40 to G42 of the
+ * The mark of a case closed at the table of RULES_MARK 11 (G38 and G39 of the
  * fifth gameplay notes, the user's 「전부 1」 of 2026-11-26; nextTableRules.js
- * `isMarkTenOn` plays them for a row marked 10 or later only). 9 was G29 to
+ * `isMarkElevenOn` plays them for a row marked 11 or later only). 10 was G40
+ * to G42 of the same notes and the same day; nextTableRules.js
+ * `isMarkTenOn` plays them for a row marked 10 or later only. 9 was G29 to
  * G37 of the fourth gameplay notes, the user's 「전부 1」 of 2026-11-25;
  * nextTableRules.js `isMarkNineOn` plays them for a row marked 9 or later
  * only. 8 was the
@@ -2706,7 +2708,7 @@ export function createTableRecord(log = []) {
  * ranking only (src/state/useLocalRanking.js).
  */
 export const RULES_MARK_KEY = "tableRules";
-export const RULES_MARK = 10;
+export const RULES_MARK = 11;
 
 export function createRunSummary(run) {
   const state = normalizeRunState(run);

@@ -47,7 +47,8 @@ import { applyEffect, REFRAME_EFFECT } from "./gameLogic.js";
 import { applyGauntletEffect, getBustEffect, normalizeSchema } from "./gauntlet/gauntletEngine.js";
 import { describeCaseOpening } from "./state/caseRoutes.js";
 import { routeChoice } from "./state/settleChoice.js";
-import { WINDOW_RECORD_KEY } from "./rankingRecheck.js";
+import { rowRules, WINDOW_RECORD_KEY } from "./rankingRecheck.js";
+import { isMarkElevenOn } from "./gauntlet/nextTableRules.js";
 
 /** The six resources a decision moves (resourcesBefore / resourcesAfter). */
 const RESOURCE_KEYS = ["time", "capital", "trust", "legitimacy", "humanCost", "fatigue"];
@@ -207,7 +208,8 @@ export function recheckOpeningRoute(row, before = null) {
   const readable = before?.case_id === previousCaseId && typeof result?.outcomeChoiceId === "string" && before?.dynamics?.open?.practice !== true;
   if (!readable || found.after === null) return { breaks, unchecked: ["openingRoute"] };
   const rank = typeof result.rank === "string" ? result.rank : null;
-  const expected = describeCaseOpening(caseId, { caseResults: { [previousCaseId]: { outcomeChoiceId: result.outcomeChoiceId, rank } }, operatorOrigin: null });
+  // G38 유지비 (RULES_MARK 11) on the hand as the row's mark played it.
+  const expected = describeCaseOpening(caseId, { caseResults: { [previousCaseId]: { outcomeChoiceId: result.outcomeChoiceId, rank } }, operatorOrigin: null }, isMarkElevenOn(rowRules(row)));
   if (found.after !== expected.route.after || found.rank !== expected.route.rank || found.nodeId !== expected.route.nodeId) {
     breaks.push({ field: "open.openingRoute", expected: expected.route, found });
   }
