@@ -372,7 +372,8 @@ const fileBudgets = {
   // -> 3270 lines / 62596 bytes on 2026-11-20, hotfix #644 (E1g): the gauge read row wraps whole items, each nowrap. Measured.
   // -> 3275 lines / 62710 bytes on 2026-11-23: a rule's badge keeps its own ink inside a carried board (OVERCLOCK). Measured.
   // -> 3277 lines / 62807 bytes on 2026-11-23: the clue card's marked words stay in their line, in colours that read on its green. Measured.
-  "play.css": { lines: 3277, bytes: 62807 },
+  // -> 3281 lines / 62918 bytes on 2026-11-26: the action row's buttons refuse text selection and the long-press callout (Galaxy A32, #687). Measured.
+  "play.css": { lines: 3281, bytes: 62918 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
@@ -519,7 +520,9 @@ const fileBudgets = {
   // 2523 -> 2545 lines on 2026-11-18, N42 떠나는 순간 한 줄 (draft): the quiet
   // line at the foot of 프롤로그 05, 사건 03 and 사건 07 and its install
   // button, four rules, measured 2545 / 56815. The bytes still fit.
-  "result.css": { lines: 2545, bytes: 57089 },
+  // 2545 -> 2546 lines on 2026-11-26, g34-cover-e2e (measured): G34's 보상금
+  // button joins the leave line's 44px rule (a `.ghost` is 38px). The bytes still fit.
+  "result.css": { lines: 2546, bytes: 57089 },
   // New on 2026-09-29 for the comfort settings. Measured 131 / 3,633.
   // 140 / 3800 -> 124 / 2691 on 2026-10-13: comments no longer counted
   // (16 lines and 1109 bytes of them that day), the room unchanged.

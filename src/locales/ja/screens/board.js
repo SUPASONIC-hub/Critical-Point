@@ -41,6 +41,11 @@ export default {
       "short-clock": "時間が短いと、速くなりますか、それとも慎重になりますか？今週の短い時計で変わったことを残してください。",
     },
   },
+  makersNotice: {
+    label: "制作者からのお知らせ",
+    note: "参加者の投稿ではなく、私たちが直接掲載したお知らせです。",
+    posted: "{date} 掲載",
+  },
   noTime: "記録時刻なし",
   reportedLabel: "{name}さんの投稿を通報しました",
   reportLabel: "{name}さんの投稿を通報",

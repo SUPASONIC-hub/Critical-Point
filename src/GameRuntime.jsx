@@ -656,9 +656,9 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
    * that prices the card. There are no side bonuses stacked on top: what the
    * player sees on the table is what the resources receive.
    */
-  function resolveGauntlet({ card, window: closedWindow, forced = false }) {
+  function resolveGauntlet({ card, window: closedWindow, forced = false, auto = false }) {
     if (!card) return;
-    choose(card, closedWindow, forced);
+    choose(card, closedWindow, forced, auto); // `auto`: G43's story table cashed for the player (storyAutoCash.js).
   }
 
   /** Another tab moved the run on: this tab stops writing and reloads what storage holds. */
@@ -880,7 +880,7 @@ export function GameRuntime({ onSuppressSaves, saveControls, initialStartState =
     debugToolsEnabled, copyDiagnosticTrace, exportPlaytestLog: exportPlaytestLogEvent, refreshLocalErrorLog, clearLocalErrorLog,
     closeRecoveryCenter, telemetryHealth, pendingTelemetry, telemetryRetryInfo, formatSaveTime, localErrorEntries,
     startAtNode: startAtNodeEvent, saveSlots, refreshSaveSlots, restoreSaveSlot, deleteSaveSlot, restoreSaveBackup, answerPulse,
-    cover: { caseResults, run: gauntletRun, onApply: applyRun, locked: staleSave },
+    cover: { caseResults, run: gauntletRun, log, onApply: applyRun, locked: staleSave },
   });
 
   if (showRanking && (!started || isResult)) { // over a result page too, closing back onto it (RankingScreen returnTo)

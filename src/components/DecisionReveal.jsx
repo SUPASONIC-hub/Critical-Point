@@ -173,6 +173,7 @@ export function DecisionReveal({ view }) {
               case against a hand that sees the wall (tableAfterword.js). Plain
               text in the sheet, nothing that moves and no voice of its own:
               the slam is the one announcement. */}
+          {decisionReveal.auto && <p data-testid="reveal-auto">{fill(revealCopy.autoCash, { gauge: Math.round(verdict?.gauge ?? 0) })}</p>}
           {decisionReveal.afterword && <p data-testid="reveal-afterword">{afterwordParts(decisionReveal.afterword)}</p>}
           {decisionReveal.caseRead && <p data-testid="reveal-case-read">{decisionReveal.caseRead}</p>}
         </div>

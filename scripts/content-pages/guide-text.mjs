@@ -1,4 +1,4 @@
-/** How-to-play guide body, Korean/English/Japanese (scripts/content-pages/pages.mjs renders it). Every rule and number read from src/gauntlet and src/copy on 2026-11-09; the table rules of RULES_MARK 5 (G1~G7, N26) added 2026-11-20, and G5's acts 1, 2, 4, 6 and 8 (RULES_MARK 6, src/gauntlet/actTwists.js) on 2026-11-23. */
+/** How-to-play guide body, Korean/English/Japanese (scripts/content-pages/pages.mjs renders it). Every rule and number read from src/gauntlet and src/copy on 2026-11-09; the table rules of RULES_MARK 5 (G1~G7, N26) added 2026-11-20, G5's acts 1, 2, 4, 6 and 8 (RULES_MARK 6, src/gauntlet/actTwists.js) on 2026-11-23, and RULES_MARK 9's G29 weight, G31 tilt, G33 handed tool and G34 compensation on 2026-11-26. */
 
 export const GUIDE_DESCRIPTION = {
   ko: "임계점의 테이블 규칙을 실제 수치로 풀어 쓴 안내서입니다. 열기와 벽, 심박, 다음 판을 바꾸는 규칙, 논리 콤보, 도구, 버스트 점수와 리그를 설명합니다.",
@@ -18,7 +18,7 @@ export const GUIDE_BODY = {
 
 <h2>테이블 해부</h2>
 <h3>카드와 칩</h3>
-<p>선택지 하나가 카드 한 장입니다. 카드에는 칩, 가장 크게 태우는 자원, 그리고 꼬리표 두 개가 붙습니다. 하나는 사람 쪽인지 자리 쪽인지를 나타내는 방향이고, 다른 하나는 위험 다루기, 꼼꼼히 확인하기, 끝까지 버티기, 판 바꾸기 가운데 하나인 생각 유형입니다. 이득이 큰 카드일수록 칩이 많고, 현금과 남은 시간 이득은 다른 이득보다 칩에 크게 셉니다(2.5배 대 2배). 한 자원을 8 이상 태우는 카드에는 「균열 후보」 표시가 붙습니다.</p>
+<p>선택지 하나가 카드 한 장입니다. 카드에는 칩, 가장 크게 태우는 자원, 그리고 꼬리표 두 개가 붙습니다. 하나는 사람 쪽인지 자리 쪽인지를 나타내는 방향이고, 다른 하나는 위험 다루기, 꼼꼼히 확인하기, 끝까지 버티기, 판 바꾸기 가운데 하나인 생각 유형입니다. 이득이 큰 카드일수록 칩이 많고, 현금과 남은 시간 이득은 다른 이득보다 칩에 크게 셉니다(2.75배 대 2배). 한 자원을 8 이상 태우는 카드에는 「균열 후보」 표시가 붙습니다.</p>
 <h3>와일드 카드 「판을 다시 짠다」</h3>
 <p>판을 바꿀 길이 있는 장면에는 이 카드가 끼어 있습니다. 기본 칩은 24이고, 남은 시간 6과 피로 5를 쓰는 대신 믿음과 공정함을 3씩 줍니다. 방향은 사람 쪽으로 칩니다. 이 카드로 벽에 닿지 않고 확정하면 그 사건의 숨은 경로가 열리고, BUST로 끝나면 열리지 않습니다.</p>
 <h3>열기와 벽 구간</h3>
@@ -62,11 +62,13 @@ export const GUIDE_BODY = {
 <p>콤보는 벽을 움직이지 않으니, 콤보가 길다고 한 번 더 밀 이유가 되지는 않습니다. 리포트의 「관점 전환」은 생각 유형을 고르게 쓸수록 오르므로, 방향은 지키고 유형은 바꾸십시오.</p>
 
 <h2>도구</h2>
-<p>프롤로그 05부터 사건이 닫히면 다음 사건의 첫 테이블에서 드래프트가 열립니다. 시계가 멈춘 동안 도구 세 개 가운데 하나를 고릅니다. 도구는 다섯 개까지 들고, 다 차면 하나를 내려놓습니다. 아무것도 고르지 않으면 「숨 고르기」가 되어 첫 판의 시간이 10초 늘고 벽이 3 멀어집니다. 고르기 전에 금고에서 1,500을 내면 「다시 뽑기」를 드래프트마다 한 번, 12,000을 내면 「하나 더」를 시즌에 한 번 할 수 있습니다. 다시 뽑기는 싸니 셋이 약하면 다시 뽑으십시오.</p>
+<p>프롤로그 05부터 사건이 닫히면 다음 사건의 첫 테이블에서 드래프트가 열립니다. 시계가 멈춘 동안 도구 세 개 가운데 하나를 고릅니다. 도구는 다섯 개까지 들고, 다 차면 하나를 내려놓습니다. 아무것도 고르지 않으면 「숨 고르기」가 되어 첫 판의 시간이 10초 늘고 벽이 3 멀어집니다. 고르기 전에 금고에서 1,500을 내면 「다시 뽑기」를 드래프트마다 한 번, 12,000을 내면 「하나 더」를 시즌에 한 번 할 수 있습니다. 다시 뽑기는 싸니 셋이 약하면 다시 뽑으십시오. 셋 가운데 첫 칸은 지난 사건을 닫은 쪽(사람 쪽이나 자리 쪽, 어느 쪽도 이어 가지 않았으면 기록 쪽)의 도구에서 나오고, 「○○가 건넨 것」으로 표시됩니다.</p>
 <p>도구마다 조건이 있고, 조건이 맞은 확정은 판돈이 크게 오릅니다. 「방열판」은 열기 75 이상에서 확정하면 +60%, 「감사실 연줄」은 한 번 이상 밀고 열기 50 밑에서 확정하면 +80%(눈에 띔에도 적발되지 않음), 「냉혈」은 BUST 다음 판을 AFTERSHOCK 없이 열기 0에서 시작하게 하고 벽을 2 물리며 그 판의 확정을 +100%로 만듭니다. 「도윤하의 현장 메모」는 같은 쪽 콤보 5 이상에서 +25%, 「메트로놈」은 방향을 바꾼 판에서 +70%, 「임경수의 사본」은 BLACKOUT 판에서 +70%, 「차지원의 1면」은 OVERCLOCK 판에서 +20%입니다. 그러니 내 플레이에 맞는 조건을 고르십시오. 조건을 채워야 풀리는 도구도 있습니다. 논리 콤보 8을 달성하면 BUST해도 콤보가 남는 「앙코르」(콤보 8 이상 확정 +15%)가, 판돈 5,000 이상을 벽에 잃으면 사건마다 한 번 판돈의 3분의 1을 지키는 「보험」이 풀립니다. 조건이 맞은 도구가 한 판에 둘 이상 겹치면 배수는 합쳐 1.6배에서 멈춥니다. 혼자서 그보다 큰 도구(감사실 연줄 1.8배, 냉혈 2배)는 그 값까지 받으니, 두 번째 도구가 첫 도구의 몫을 깎지는 않습니다.</p>
 
 <h2>여섯 가지 자원</h2>
 <p>남은 시간, 현금, 믿음, 공정함은 높을수록 좋고, 사람 피해와 피로는 오를수록 손해입니다. 사건은 남은 시간 72, 현금 100, 믿음 50, 공정함 50, 사람 피해 0, 피로 10에서 출발하되 앞 사건의 결과만큼 달라집니다. S 랭크 뒤에는 믿음 +4와 공정함 +3, C 랭크 뒤에는 공정함 −2와 피로 +4를 안고 시작하고, 시즌 후반의 사건일수록 더 지친 채 열립니다. 카드의 이득은 열기에 따라 커져 열기 60에서 1.9배, 100에서 2.5배가 되지만, 비용은 커지지 않습니다.</p>
+<p><strong>사건을 연 자원이 판을 기울입니다.</strong> 피로 21 이상으로 열린 사건은 그 사건 동안 심박 오차가 18에서 20으로 커지고, 14 이하면 16으로 줍니다. 남은 시간 66 이하면 판 시계가 2초 짧고 70 이상이면 2초 길며, 공정함 49 이하면 감사 한도가 1 낮고 55 이상이면 1 높습니다. 사건을 여는 장면의 브리핑에 한 줄로 나옵니다. 스토리 모드에는 없습니다.</p>
+<p><strong>보상금.</strong> 사람 피해가 난 사건의 결과 화면에서 금고의 돈으로 그 사건의 사람 피해를 지울 수 있습니다. 보상금은 9,000에서 시작해 낼 때마다 1.5배가 되고, 시즌에 열 번까지입니다. 대신 덮은 기록이 남아, 하나마다 공정함이 1 내려갑니다. 많이 덮으면 시즌이 끝나는 모습이 달라질 수 있습니다.</p>
 
 <h2>이번 주의 규칙</h2>
 <p>대체로 두 주에 한 번, 그 주에만 서는 규칙이 있습니다. 주는 한국 시간 월요일 0시에 바뀌고, 시즌을 시작할 때 이번 주의 규칙으로 할지(이번 주 순위), 하지 않을지(평소 순위) 고릅니다.</p>
@@ -149,7 +151,7 @@ export const GUIDE_BODY = {
 
 <h2>Anatomy of the table</h2>
 <h3>Cards and chips</h3>
-<p>Each choice is a card. It shows its chips, the resource it burns most, and two tags: its side, People or Position, and its way of thinking: Handle Risk, Double-Check, Hold Out or Change the Game. Bigger gains mean more chips, and Cash and Time-left gains count for more of them than the rest (×2.5 against ×2). A card that burns 8 or more of one resource is marked “Fracture candidate”.</p>
+<p>Each choice is a card. It shows its chips, the resource it burns most, and two tags: its side, People or Position, and its way of thinking: Handle Risk, Double-Check, Hold Out or Change the Game. Bigger gains mean more chips, and Cash and Time-left gains count for more of them than the rest (×2.75 against ×2). A card that burns 8 or more of one resource is marked “Fracture candidate”.</p>
 <h3>The wild card, “Reframe the Table”</h3>
 <p>Scenes with a way to change the game hold this card. It pays 24 chips before Heat, costs 6 Time left and 5 Fatigue, and gives 3 Trust and 3 Fairness. It counts as the People side. Commit it without hitting the Wall and the case’s hidden route opens; a BUST leaves the route shut.</p>
 <h3>Heat and the Wall band</h3>
@@ -193,11 +195,13 @@ export const GUIDE_BODY = {
 <p>The combo never moves the Wall, so a long combo is no reason for one more push. The report’s “Perspective shifts” score rewards spreading your ways of thinking, so hold your side and vary your thinking.</p>
 
 <h2>Tools</h2>
-<p>From Prologue 05, each closed case is followed by a draft at the next case’s first table: pick one of three tools while the clock waits. You carry up to five, and when you are full you put one down. Pick nothing to “catch your breath”: the first hand gets 10 more seconds and the Wall moves 3 farther. Before you pick, “Reroll” costs 1,500 from the Vault, once per draft, and “One more” costs 12,000, once a Season. Rerolls are cheap: reroll a weak three.</p>
+<p>From Prologue 05, each closed case is followed by a draft at the next case’s first table: pick one of three tools while the clock waits. You carry up to five, and when you are full you put one down. Pick nothing to “catch your breath”: the first hand gets 10 more seconds and the Wall moves 3 farther. Before you pick, “Reroll” costs 1,500 from the Vault, once per draft, and “One more” costs 12,000, once a Season. Rerolls are cheap: reroll a weak three. The first of the three comes from the tools of the side your last case closed on (People or Position, or the record when you kept neither), shown as “Handed over by …”.</p>
 <p>Each tool has a condition, and a commit that meets it raises the stake a lot. “Heat Sink” pays +60% on a commit at Heat 75 or more; “Audit Contact” +80% when you push at least once and commit under Heat 50 (and Noticed never gets you caught); “Cold Blood” starts the hand after a BUST at Heat 0 with no AFTERSHOCK and the Wall 2 further, and pays +100% on that hand. “Do Yoonha’s Field Notes” pays +25% at a same-side combo of 5 or more, “Metronome” +70% on a hand where you switched sides, “Lim Kyungsoo’s Copy” +70% on a BLACKOUT hand and “Cha Jiwon’s Front Page” +20% on an OVERCLOCK hand. So pick the condition that fits how you play. Some tools unlock through feats: a Logic Combo of 8 opens “Encore”, which keeps your combo through a BUST (+15% on a commit at combo 8 or more), and losing a stake of 5,000 or more to the Wall opens “Insurance”, which saves a third of the stake once per case. When two or more tools meet their conditions on the same hand, their boosts together stop at ×1.6. A single tool worth more than that (Audit Contact ×1.8, Cold Blood ×2) keeps its own, so a second tool never takes from the first.</p>
 
 <h2>The six resources</h2>
 <p>Time left, Cash, Trust and Fairness are better high; Human cost and Fatigue hurt as they rise. A case starts from Time left 72, Cash 100, Trust 50, Fairness 50, Human cost 0 and Fatigue 10, shifted by your last case: after an S rank you start with Trust +4 and Fairness +3, after a C with Fairness −2 and Fatigue +4, and cases late in the season open more worn down. A card’s gains grow with Heat, ×1.9 at 60 and ×2.5 at 100, but its costs never do.</p>
+<p><strong>What a case opens on tilts its table.</strong> A case that opens at Fatigue 21 or more has the heartbeat off by up to 20 instead of 18 for the whole case, and at 14 or less by up to 16. At Time left 66 or less every table clock is 2 seconds shorter, at 70 or more 2 seconds longer; at Fairness 49 or less the audit limit is 1 lower, at 55 or more 1 higher. The briefing of the scene that opens the case says so in one line. Story Mode has none of this.</p>
+<p><strong>Compensation.</strong> On the result page of a case that closed with human cost, you can pay from the Vault to wipe that case’s human cost. It starts at 9,000, costs 1.5× more each time, and can be paid ten times a Season. Each one leaves a covered record that takes 1 Fairness, and covering many can change how the Season ends.</p>
 
 <h2>Rule of the Week</h2>
 <p>About one week in two brings an extra rule. Weeks turn at midnight on Monday, Korea time, and when you start a season you choose to play with the Rule of the Week (this week’s ranking) or without it (usual ranking).</p>
@@ -280,7 +284,7 @@ export const GUIDE_BODY = {
 
 <h2>テーブルの解剖</h2>
 <h3>カードとチップ</h3>
-<p>選択肢一つがカード一枚です。カードにはチップ、いちばん大きく燃やすリソース、そして二つのタグが付きます。一つは人の側か立場の側かを示す方向、もう一つはリスクを扱う、念入りに確かめる、最後まで粘る、卓を変える、のどれかにあたる思考タイプです。利益の大きいカードほどチップが多く、現金と残り時間の利益はほかの利益より大きく数えます(2.5倍対2倍)。一つのリソースを8以上燃やすカードには「ひびの候補」の印が付きます。</p>
+<p>選択肢一つがカード一枚です。カードにはチップ、いちばん大きく燃やすリソース、そして二つのタグが付きます。一つは人の側か立場の側かを示す方向、もう一つはリスクを扱う、念入りに確かめる、最後まで粘る、卓を変える、のどれかにあたる思考タイプです。利益の大きいカードほどチップが多く、現金と残り時間の利益はほかの利益より大きく数えます(2.75倍対2倍)。一つのリソースを8以上燃やすカードには「ひびの候補」の印が付きます。</p>
 <h3>ワイルドカード「卓を組み替える」</h3>
 <p>勝負を変える道があるシーンには、このカードが混ざっています。基本のチップは24で、残り時間6と疲労5を使う代わりに、信頼と公正さを3ずつくれます。方向は人の側として数えます。このカードで壁に触れずに確定するとその事件の隠れたルートが開き、BUSTで終わると開きません。</p>
 <h3>熱と壁の区間</h3>
@@ -324,11 +328,13 @@ export const GUIDE_BODY = {
 <p>コンボは壁を動かさないので、コンボが長いことはもう一押しの理由になりません。レポートの「視点の転換」は思考タイプをまんべんなく使うほど上がるので、方向は守り、タイプは変えましょう。</p>
 
 <h2>ツール</h2>
-<p>プロローグ05から、事件が閉じると次の事件の最初のテーブルでドラフトが開きます。時計が止まっているあいだに、ツール三つのうち一つを選びます。ツールは五つまで持て、いっぱいになったら一つを置きます。何も選ばなければ「ひと息つく」になり、最初の勝負の時間が10秒延び、壁が3遠ざかります。選ぶ前に、金庫から1,500を払えば「引き直し」がドラフトごとに一回、12,000を払えば「もう一つ」がシーズンに一度できます。引き直しは安いので、三つが弱ければ引き直しましょう。</p>
+<p>プロローグ05から、事件が閉じると次の事件の最初のテーブルでドラフトが開きます。時計が止まっているあいだに、ツール三つのうち一つを選びます。ツールは五つまで持て、いっぱいになったら一つを置きます。何も選ばなければ「ひと息つく」になり、最初の勝負の時間が10秒延び、壁が3遠ざかります。選ぶ前に、金庫から1,500を払えば「引き直し」がドラフトごとに一回、12,000を払えば「もう一つ」がシーズンに一度できます。引き直しは安いので、三つが弱ければ引き直しましょう。三つのうち最初の一つは、前の事件を閉じた側(人の側か立場の側、どちらも続けなかったら記録の側)のツールから出て、「○○が渡したもの」と表示されます。</p>
 <p>ツールにはそれぞれ条件があり、条件を満たした確定は賭け金が大きく上がります。「放熱板」は熱75以上で確定すると+60%、「監査室のつて」は一度以上押して熱50未満で確定すると+80%（目立ちがあっても見逃される）、「冷血」はBUSTの次の勝負をAFTERSHOCKなしに熱0から始めさせて壁を2遠ざけ、その勝負の確定を+100%にします。「ト・ユナの現場メモ」は同じ側のコンボ5以上で+25%、「メトロノーム」は向きを変えた勝負で+70%、「イム・ギョンスの写し」はBLACKOUTの勝負で+70%、「チャ・ジウォンの1面」はOVERCLOCKの勝負で+20%です。自分の遊び方に合う条件を選びましょう。条件を満たしてはじめて解放されるツールもあります。ロジックコンボ8を達成するとBUSTしてもコンボが残る「アンコール」（コンボ8以上の確定で+15%）が、賭け金5,000以上を壁に失うと事件ごとに一回賭け金の3分の1を守る「保険」が解放されます。条件を満たしたツールが一つの勝負で二つ以上重なると、倍率は合わせて1.6倍で止まります。一つでそれより大きいツール（監査室のつて1.8倍、冷血2倍）はその値まで受け取れるので、二つ目のツールが一つ目の分を削ることはありません。</p>
 
 <h2>六つのリソース</h2>
 <p>残り時間、現金、信頼、公正さは高いほど良く、人的被害と疲労は上がるほど損です。事件は残り時間72、現金100、信頼50、公正さ50、人的被害0、疲労10から出発し、前の事件の結果の分だけ変わります。Sランクのあとは信頼+4と公正さ+3、Cランクのあとは公正さ−2と疲労+4を抱えて始まり、シーズンの後半の事件ほど疲れた状態で開きます。カードの利益は熱に応じて大きくなり、熱60で1.9倍、100で2.5倍になりますが、コストは大きくなりません。</p>
+<p><strong>事件を開いたときのリソースが卓を傾けます。</strong>疲労21以上で開いた事件は、その事件のあいだ鼓動の誤差が18から20に広がり、14以下なら16に縮みます。残り時間66以下なら時計が2秒短く、70以上なら2秒長くなり、公正さ49以下なら監査上限が1下がり、55以上なら1上がります。事件を開く場面のブリーフィングに一行で出ます。ストーリーモードにはありません。</p>
+<p><strong>補償金。</strong>人的被害が出た事件の結果画面で、金庫のお金でその事件の人的被害を消せます。補償金は9,000から始まり、払うたびに1.5倍になり、シーズンに十回までです。そのかわり隠した記録が残り、一つごとに公正さが1下がります。多く隠すと、シーズンの終わり方が変わることがあります。</p>
 
 <h2>今週のルール</h2>
 <p>おおむね二週に一回、その週だけ立つルールがあります。週は韓国時間の月曜0時に切り替わり、シーズンを始めるときに、今週のルールで遊ぶか（今週のランキング）、遊ばないか（通常のランキング）を選びます。</p>

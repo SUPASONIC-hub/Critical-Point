@@ -29,6 +29,8 @@ const revealCopy = {
     bust: "열기 {gauge} — 벽은 {wall}에 있었다.",
     cashed: "열기 {gauge}에서 확정. 벽은 {wall}에 있었다.",
   },
+  // G43: a story table cashed for the player at heat 70 (storyAutoCash.js), said under the verdict.
+  autoCash: "자동 확정 · 열기 {gauge}. 결재 판만 직접 칩니다.",
   details: "자세히",
   ledgerLabel: "판정 후폭풍",
   pot: {

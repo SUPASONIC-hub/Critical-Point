@@ -23,9 +23,10 @@ const season = ({ trust = 80, legitimacy = 91, capital = 90, answer = null, ...r
   ...rest,
 });
 
-test("story mode: the cold gap is 10 (9 from RULES_MARK 11, G38), the table's stays 12", () => {
+test("story mode: the cold gap is 9 (G43; 10 under G37), the table's stays 12", () => {
   assert.equal(ENDING_THRESHOLDS.coldGap, 12);
   assert.equal(ENDING_THRESHOLDS.storyColdGap, 9);
+  assert.equal(ENDING_THRESHOLDS.storyOpenTrust, 87);
   const eleven = season({ trust: 80, legitimacy: 91, answer: "burn" });
   assert.equal(getEndingVariant(eleven).id, "quiet-cover");
   assert.equal(getEndingVariant({ ...eleven, storySeason: true }).id, "cold-justice");
@@ -46,13 +47,12 @@ test("the season strain says whether a case was played in story mode", () => {
 });
 
 test("the finale's nearest line reads story mode's cold gap", () => {
-  // 공정함 one under the story gap ahead of 믿음 (88 - 80 = 8: one short of 9 in story mode, four of 12 at the table).
-  const input = { ...season({ trust: 80, legitimacy: 80 + ENDING_THRESHOLDS.storyColdGap - 1, answer: "witness" }), endingId: "evidence-reform" };
+  const input = { ...season({ trust: 80, legitimacy: 88, answer: "witness" }), endingId: "evidence-reform" };
   const gapOf = (result) => result?.gaps.find((gap) => gap.key === "coldGap")?.value ?? 0;
   const table = nearestEnding(input);
   const story = nearestEnding({ ...input, storySeason: true });
   assert.equal(table?.id, "cold-justice");
-  assert.equal(gapOf(table), ENDING_THRESHOLDS.coldGap - ENDING_THRESHOLDS.storyColdGap + 1);
+  assert.equal(gapOf(table), 4);
   assert.equal(story?.id, "cold-justice");
   assert.equal(gapOf(story), 1);
 });

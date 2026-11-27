@@ -21,6 +21,7 @@ export default {
     bust: "Heat {gauge} — the Wall was at {wall}.",
     cashed: "Committed at Heat {gauge}. The Wall was at {wall}.",
   },
+  autoCash: "Auto-cashed at Heat {gauge}. You play only the Sign-off hand.",
   details: "Details",
   ledgerLabel: "Fallout",
   pot: {

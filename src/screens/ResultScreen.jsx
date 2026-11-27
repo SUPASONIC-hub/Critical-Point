@@ -219,7 +219,7 @@ export function ResultScreen({ view, renderers, sceneTitleRef: titleRef, shortcu
                 {seasonRecordNotice && <p data-testid="season-record-notice">{seasonRecordNotice}</p>}
                 <small>{resultBridge}</small>
               </div>
-              <button type="button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>
+              <button type="button" data-testid="next-case-button" onClick={() => startCase(nextCaseSignal.caseId)} aria-keyshortcuts={keys("N")}>
                 <ChevronRight size={18} />{letterKeys && <kbd className="shortcut-hint" aria-hidden="true">N</kbd>}
                 {nextCaseSignal.button}
               </button>
