@@ -373,7 +373,8 @@ const fileBudgets = {
   // -> 3275 lines / 62710 bytes on 2026-11-23: a rule's badge keeps its own ink inside a carried board (OVERCLOCK). Measured.
   // -> 3277 lines / 62807 bytes on 2026-11-23: the clue card's marked words stay in their line, in colours that read on its green. Measured.
   // -> 3281 lines / 62918 bytes on 2026-11-26: the action row's buttons refuse text selection and the long-press callout (Galaxy A32, #687). Measured.
-  "play.css": { lines: 3281, bytes: 62918 },
+  // -> 3285 lines / 62977 bytes on 2026-11-27: the held 확정 takes no pan (touch-action: none), so a drifting finger no longer cancels the hold (Galaxy A32). Measured.
+  "play.css": { lines: 3285, bytes: 62977 },
   // plate.css arrived on 2026-09-22: the drawn room's palette, its two layers
   // of effects (flash, rays, steam, lightning; snow, stage light, LEDs, bokeh,
   // the price board, the near-plane sway, the mood grade, the light leak).
