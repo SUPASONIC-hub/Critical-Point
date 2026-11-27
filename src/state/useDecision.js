@@ -85,13 +85,14 @@ export function createChoiceReaders({
     }, {});
   }
 
-  function getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute = false) {
+  function getClueReveal(challengeMatch, riskDelta, responseTimeSec, reframeOpenedRoute = false, cashMultiplier = null) {
     const clue = getDiscoveryClue({
       currentCase,
       challengeMatch,
       riskDelta,
       responseTimeSec,
       reframeOpenedRoute,
+      cashMultiplier,
       logLength: log.length,
       discoveredClueIds: discoveredClues.map((item) => item.id),
     });

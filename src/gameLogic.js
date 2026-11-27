@@ -425,10 +425,10 @@ export function getDiscoveryClue({
   responseTimeSec = 45,
   logLength = 0,
   reframeOpenedRoute = false,
-  discoveredClueIds = [],
+  discoveredClueIds = [], cashMultiplier = null, // G39 (RULES_MARK 11): the table's cash, ×32 or more; none given (a preview) reads as before
 } = {}) {
   const qualifies =
-    logLength >= 1 &&
+    logLength >= 1 && seasonStanding.clueCashed(cashMultiplier) &&
     ((challengeMatch && (riskDelta >= 2 || responseTimeSec <= 12 || riskDelta <= -2)) ||
       (reframeOpenedRoute && challengeMatch) ||
       (reframeOpenedRoute && riskDelta <= -2));
@@ -538,10 +538,10 @@ const HUMAN_RECORD_REFRAME_RATE = 0.7; // a reframed route in seven cases of ten
 // harm and people-first decisions could not tell them from a balanced season.
 // With it (2026-10-15) that hand closes 67.5% as HUMAN RECORD, all 13.7% (14.0%).
 const HUMAN_RECORD_CLUE_RATE = 1;
-const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = [82, 86, 75, 97, 45, 88];
+const [OVERSIGHT_LEGITIMACY, REFORM_LEGITIMACY, RECORD_TRUST, SILENCE_CAPITAL, SILENCE_TRUST, COLD_LEGITIMACY] = seasonStanding.withUpkeepGates([82, 86, 75, 97, 45, 88], { 3: 91, 5: 85 });
 const COLD_GAP = 12; // legitimacy this far ahead of trust left its people behind;
-// G37 (11-25): a story season (off the ranking) has no bust, so COLD JUSTICE and OPEN QUESTION were thin; check:endings' story rows.
-const [STORY_COLD_GAP, STORY_OPEN_TRUST] = [9, 87]; // and a burned story season this trusted leaves the question open (G37; G43 11-26: 10/83 -> 9/87)
+// G37: a story season has no bust, so COLD JUSTICE and OPEN QUESTION were thin (check:endings); G43 10/83 -> 9/87; RULES_MARK 11 after 유지비: 6/85.
+const [STORY_COLD_GAP, STORY_OPEN_TRUST] = seasonStanding.withUpkeepGates([9, 87], { 0: 6, 1: 85 }); // and a burned story season this trusted leaves the question open (G37)
 const PACT_GAP = 15; // trust this far ahead of legitimacy made a pact outside it
 const [HELD_LINE_MULTIPLIER, VAULT_SLACK_PER_CASE] = [16, 19500];
 // Read by check:endings' draft rows (C9): what a season that pays at its drafts has left of the slack.
@@ -553,8 +553,8 @@ export { VAULT_SLACK_PER_CASE };
 export const LOGIC_SLACK_STREAK = 24;
 // The gates above as numbers, read by nearestEnding.js for the finale's 「가장 가까웠던 다른 결말」 line (C2, display only).
 export const ENDING_THRESHOLDS = Object.freeze({
-  clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY,
-  reformLegitimacy: REFORM_LEGITIMACY, recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, recordClueRate: HUMAN_RECORD_CLUE_RATE,
+  clueRate: CLUE_RATE_BAR, clueRateSlack: CLUE_RATE_SLACK_BAR, oversightTrust: OVERSIGHT_TRUST, oversightLegitimacy: OVERSIGHT_LEGITIMACY, reformLegitimacy: REFORM_LEGITIMACY,
+  recordTrust: RECORD_TRUST, recordReframeRate: HUMAN_RECORD_REFRAME_RATE, get recordClueRate() { return seasonStanding.getRecordClueRate(HUMAN_RECORD_CLUE_RATE); }, // G39
   silenceCapital: SILENCE_CAPITAL, silenceTrust: SILENCE_TRUST, coldLegitimacy: COLD_LEGITIMACY, coldGap: COLD_GAP, storyColdGap: STORY_COLD_GAP, pactGap: PACT_GAP,
   heldLineMultiplier: HELD_LINE_MULTIPLIER, vaultSlackPerCase: VAULT_SLACK_PER_CASE, logicSlackStreak: LOGIC_SLACK_STREAK, storyOpenTrust: STORY_OPEN_TRUST,
 });
@@ -705,7 +705,7 @@ export function getEndingVariant({
   const slackGates = seasonStanding.getSlackGates(CLUE_RATE_SLACK_BAR);
   const recordsOpen = clueRate >= (slack ? slackGates.clueRate : CLUE_RATE_BAR);
   const reform = recordsOpen && legitimacy >= REFORM_LEGITIMACY;
-  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= HUMAN_RECORD_CLUE_RATE && trust >= RECORD_TRUST) return ENDINGS["human-record"];
+  if (reframeRate >= HUMAN_RECORD_REFRAME_RATE && clueRate >= seasonStanding.getRecordClueRate(HUMAN_RECORD_CLUE_RATE) && trust >= RECORD_TRUST) return ENDINGS["human-record"];
   // As burning closes the record endings, answering 개혁 opens the one named for it: EVIDENCE REFORM before
   // OPEN OVERSIGHT, which took nearly every reform season (5.3% of 600, 2026-11-05, note C2). The gates are the same.
   if (finale === "control" && reform) return ENDINGS["evidence-reform"];
@@ -714,7 +714,7 @@ export function getEndingVariant({
   if (reform) return ENDINGS["evidence-reform"];
   if (silent) return ENDINGS[seasonStanding.coversBeforeSilence(seasonCovers) ? "quiet-cover" : "profitable-silence"]; // G41
   if (pact) return ENDINGS["field-pact"];
-  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < QUIET_CLUE_RATE || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
+  if (sustained <= QUIET_SUSTAINED_PRESSURE || clueRate < seasonStanding.getQuietClueRate(QUIET_CLUE_RATE) || seasonCovers >= seasonStanding.COVER_QUIET) return ENDINGS["quiet-cover"];
   return getOpenQuestionEnding({ trust, legitimacy, capital, humanCost: Math.round(harm) });
 }
 

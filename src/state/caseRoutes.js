@@ -14,6 +14,7 @@ import {
 } from "../gameData.js";
 import { applyEffect, getCaseOutcome, getContinuityChallenge, getOutcomeCarryover, getSeasonWear, getUnattendedNext } from "../gameLogic.js";
 import { runsInto } from "../seasonRules.js";
+import { getUpkeep, isMarkElevenOn } from "../gauntlet/nextTableRules.js";
 import { createOpeningResources } from "./openingState.js";
 
 /**
@@ -34,8 +35,14 @@ import { createOpeningResources } from "./openingState.js";
  * `route` is what the opening was picked by, for the case-open snapshot (F1
  * step 2, gauntletEngine `normalizeOpeningRoute`): the case before's outcome
  * and rank, and the scene they led to.
+ *
+ * G38 유지비 (RULES_MARK 11; `upkeep`, the page's rules unless the caller
+ * says, as the recheck does for a row's mark): a case after the first opens
+ * with a third of 믿음·공정함·돈 over 80 taken off (nextTableRules.js
+ * `getUpkeep`), and its legacy says what was taken (`openingLegacy.upkeep`:
+ * [key, from, to] rows) for the case file's line.
  */
-export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
+export function describeCaseOpening(caseId, { caseResults, operatorOrigin }, upkeepOn = isMarkElevenOn()) {
   const baseStartNode = CASE_START_NODES[caseId];
   const introEcho = caseIntroEchoes[caseId] ?? caseIntroEchoes[SEASON_ENTRY_CASE];
   const previousCaseId = CASE_SEQUENCE[CASE_SEQUENCE.indexOf(caseId) - 1];
@@ -60,8 +67,12 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
   [carryoverEffect, getSeasonWear(caseId)].forEach((effect) => Object.entries(effect).forEach(([key, value]) => {
     openingEffect[key] = (openingEffect[key] ?? 0) + value;
   }));
+  const held = previousResult ? applyEffect(initialResources, openingEffect) : null;
+  const upkeep = held && upkeepOn ? getUpkeep(held) : {};
+  const upkeepRows = Object.entries(upkeep).map(([key, cut]) => [key, held[key], held[key] + cut]);
   const openingLegacy = previousResult
     ? {
+        ...(upkeepRows.length ? { upkeep: upkeepRows } : {}),
         ...baseLegacy,
         effect: openingEffect,
         continuity: previousOutcome,
@@ -81,7 +92,7 @@ export function describeCaseOpening(caseId, { caseResults, operatorOrigin }) {
   const seasonOpening = caseId === SEASON_ENTRY_CASE && !previousResult;
   const resources = seasonOpening
     ? createOpeningResources(operatorOrigin)
-    : previousResult ? applyEffect(initialResources, openingEffect) : initialResources;
+    : held ? { ...held, ...Object.fromEntries(upkeepRows.map(([key, , to]) => [key, to])) } : initialResources;
   const route = { after: previousResult?.outcomeChoiceId ?? null, rank: previousResult?.rank ?? null, nodeId };
   return { nodeId, resources, openingLegacy, echo, note: previousResult?.outcomeChoiceId ?? "season-start", route };
 }

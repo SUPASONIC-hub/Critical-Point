@@ -17,6 +17,7 @@ import {
   getRiskPressure,
   getSuspenseState,
 } from "../gameLogic.js";
+import { getRecordCashBar } from "../seasonStanding.js";
 import { getJudgementHabit, habitCardLine } from "../judgementHabit.js";
 import { countAudit, isAuditOn } from "../gauntlet/auditRisk.js";
 import { readLinks } from "../gauntlet/cascadeRisk.js";
@@ -49,6 +50,17 @@ function dealGauntletSeed(baseSeed, settledSeeds = readSettledWindowSeeds()) {
  * ones a live table causes -- while the log they read had not moved. The table
  * seed parsed up to 400 settled seeds out of storage on each of those renders.
  */
+/**
+ * G39 (RULES_MARK 11): the cash the case's record opens at while it is still
+ * shut, from the case's second scene (the first opens none); null once open,
+ * and before 11.
+ */
+function readRecordCashBar(currentCase, discoveredClues, log) {
+  if (!log.length) return null;
+  const own = getDiscoveryClue({ currentCase, challengeMatch: true, riskDelta: 2, logLength: 1 });
+  return own && !discoveredClues.some((found) => (found?.id ?? found) === own.id) ? getRecordCashBar() : null;
+}
+
 export function useRunReadout({ log, resources, triggers, cognition, caseResults, node, currentCase, clueCount, discoveredClues = [], gauntletRun, runId, seedBase, debugTools, echo = "", secondSeason = null, nodeId = null }) {
   // A case's report counts the doors of that case (D-10); the finale's, the season's.
   const caseScoped = currentCase !== "final";
@@ -93,8 +105,10 @@ export function useRunReadout({ log, resources, triggers, cognition, caseResults
       reaction: getTableReaction(log, node?.title),
       opening: echo,
       seasonOpening,
+      // G39 (RULES_MARK 11): the cash this case's record opens at, while it is still shut (the case file's line).
+      recordAt: readRecordCashBar(currentCase, discoveredClues, log),
     };
-  }, [caseResults, currentCase, echo, log, node, riskPressure, riskTier, seasonOpening]);
+  }, [caseResults, currentCase, discoveredClues, echo, log, node, riskPressure, riskTier, seasonOpening]);
   const logReadout = useMemo(() => {
     const visitedNodeIds = new Set(log.map((entry) => entry.nodeId));
     const unopenedBranchCount = getCaseBranchNodes().filter((branch) => !caseScoped || branch.caseId === currentCase).reduce(

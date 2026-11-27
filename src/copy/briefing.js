@@ -31,6 +31,10 @@ const briefingCopy = {
     legitimacyLow: "공정함 {value} — 감사 한도 −{limit}",
     legitimacyHigh: "공정함 {value} — 감사 한도 +{limit}",
   },
+  // G38 (RULES_MARK 11): 유지비 as the case opened, one line in the case file.
+  upkeep: "{name} {from} → {to}(유지비)",
+  // G39 (RULES_MARK 11): while the case's record is still shut.
+  recordAt: "이 장면의 기록: ×{at} 이상 확정하면 열림",
   // After the English PROTOCOL BREACH.
   breach: " · 이번 판의 규칙이 바뀌었다",
   hint: "카드를 고르면 그 카드를 건 채로 판이 열린다",
