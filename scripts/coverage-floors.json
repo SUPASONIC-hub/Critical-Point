@@ -93,6 +93,7 @@
     "src/notes/noteIndex.js": 100,
     "src/personalBests.js": 97,
     "src/plateStory.js": 100,
+    "src/platform/appShell.js": 100,
     "src/playerLanguage.js": 100,
     "src/privacyText.js": 100,
     "src/ranking.js": 100,

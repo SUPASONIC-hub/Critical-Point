@@ -1,0 +1,3 @@
+/* The home screen name, in English: GAME_NAME.en (scripts/legal-pages.mjs). */
+"CFBundleDisplayName" = "Critical Point";
+"CFBundleName" = "Critical Point";

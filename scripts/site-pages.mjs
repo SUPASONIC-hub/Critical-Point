@@ -876,11 +876,12 @@ export function withAbsoluteSiteLinks(html, origin) {
  * (scripts/content-pages/notes.mjs; `notesDay`, today in Seoul, by default), keyed by path from the root without its slash.
  * `analytics` (GA_MEASUREMENT_ID) and `ads` (ADSENSE_ADS, `adStage` in legal-pages.mjs) are the build's two switches: ANALYTICS_POLICY,
  * ANALYTICS_FAQ, AD_EDITS, SITE_AD_EDITS and, with both, ANALYTICS_AD_EDITS and ANALYTICS_SITE_AD_EDITS. The content pages say nothing of ads.
+ * `app` is the app build's policy, without the web's notice of Google Analytics (renderLegalPages).
  */
-export function renderStaticPages(origin = "", { analytics = null, ads = false, day = notesDay(), pageDates } = {}) {
+export function renderStaticPages(origin = "", { analytics = null, ads = false, app = false, day = notesDay(), pageDates } = {}) {
   // The FAQ says nothing of the ads until they are on: during the notice there are none yet.
   const pages = {
-    ...renderLegalPages({ analytics, ads }),
+    ...renderLegalPages({ analytics, ads, app }),
     ...renderSitePages({ analytics, ads: adStage(ads).stage === "on", pageDates }),
     ...renderContentPages({ analytics, day, pageDates }),
     ...renderNotePages({ analytics, day }),
