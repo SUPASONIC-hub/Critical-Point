@@ -251,15 +251,18 @@ export async function checkTelemetryHealth() {
 }
 
 /** One call to a Postgres function exposed through PostgREST. */
-export async function callSupabaseRpc(name, body = {}) {
+export async function callSupabaseRpc(name, body = {}, { keepalive = false } = {}) {
   if (!telemetryEnabled) return { skipped: true, data: null };
   const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
     method: "POST",
+    keepalive,
     headers: restHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(body),
   });
   if (!response.ok) throw await createTelemetryError(response, `${name} failed`);
-  return { data: await response.json() };
+  // A function that returns nothing answers 204 with no body.
+  const text = await response.text();
+  return { data: text ? JSON.parse(text) : null };
 }
 
 /**
@@ -270,15 +273,8 @@ export async function callSupabaseRpc(name, body = {}) {
  * carried by the next one, and the player is never told either way.
  */
 export async function saveFirstHourRecord(id, record, { keepalive = false } = {}) {
-  if (!telemetryEnabled) return { skipped: true };
-  const response = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/first_hour_record`, {
-    method: "POST",
-    keepalive,
-    headers: restHeaders({ "Content-Type": "application/json" }),
-    body: JSON.stringify({ p_id: id, p_record: record }),
-  });
-  if (!response.ok) throw await createTelemetryError(response, "First hour record failed");
-  return { saved: true };
+  const sent = await callSupabaseRpc("first_hour_record", { p_id: id, p_record: record }, { keepalive });
+  return sent.skipped ? { skipped: true } : { saved: true };
 }
 
 /**
