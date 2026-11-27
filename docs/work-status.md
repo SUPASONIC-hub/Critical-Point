@@ -1,6 +1,6 @@
 # Critical Point Work Status
 
-Last updated: 2026-11-27 (after #696 RULES_MARK 13 (G44 G47 G45) with marks 12~13 docs and the note `late-choices-count`, #695 RULES_MARK 12 (G46), #694, #693 docs for marks 8~11, #683 RULES_MARK 11 (G38 G39), #691, #690 CI budgets, #689; before that 2026-11-26 at `7449dcaa`, after #688 (#687 #686 G43 #684 RULES_MARK 10), #685 makers' notice, #682, #681, #680, #679, #678, #673 gameplay round 4 B (G31 G33 G34, migration); before that 2026-11-25 at `aa53c792`, after #671 no ops mode, #670 and #667 every written note out now, #669 side cases 10 and 11 open now, #668 bundle R (#582 #590 #586 #640 #646 #655 #648) with the ranking wipe and RULES_MARK 7, #674 the wipe time, #662 RULES_MARK 8, #672 G37 story-mode ending gates and #660 unused exports; before that 2026-11-24 at `d418828d`, after #664 the quarter-Monday calendar window and #665 the BUST display hotfix; before that 2026-11-23, the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
+Last updated: 2026-11-27 (after bundle #703 at `[병합 sha]` (#700 first-hour in-game record with migration `first_hour_runs`, #702, #701 RULES_MARK 14 (G50 G51)), #699 the Galaxy A32 hold fix, the E1h layout sweep, #697; before that #696 RULES_MARK 13 (G44 G47 G45) with marks 12~13 docs and the note `late-choices-count`, #695 RULES_MARK 12 (G46), #694, #693 docs for marks 8~11, #683 RULES_MARK 11 (G38 G39), #691, #690 CI budgets, #689; before that 2026-11-26 at `7449dcaa`, after #688 (#687 #686 G43 #684 RULES_MARK 10), #685 makers' notice, #682, #681, #680, #679, #678, #673 gameplay round 4 B (G31 G33 G34, migration); before that 2026-11-25 at `aa53c792`, after #671 no ops mode, #670 and #667 every written note out now, #669 side cases 10 and 11 open now, #668 bundle R (#582 #590 #586 #640 #646 #655 #648) with the ranking wipe and RULES_MARK 7, #674 the wipe time, #662 RULES_MARK 8, #672 G37 story-mode ending gates and #660 unused exports; before that 2026-11-24 at `d418828d`, after #664 the quarter-Monday calendar window and #665 the BUST display hotfix; before that 2026-11-23, the state of `main` at `981a2404`, after #635 G5's other acts, G8~G17 and RULES_MARK 6, with #637 the outside guide; #650 (#647 #649 #653) page dates, notes 18 and 20 and text contrast; #642 (#654) the first Season's two side cases, locked until 2026-12-14; #656 (#651 #652) dependencies; #657 day-varying bundle budgets; #659 (#661) dates and bylines on every content page and the note retry; before that 2026-11-20 at `78be3bd4`, after #641 background boxes on the 55 Korean case pages, #645 the 11-20 cleanup, #643 six notes and the November log draft, #644 the gauge-row hotfix, #639 the world-news paper; before that 2026-11-20 at `0d83f9fb`, after #628 bundle 11-20 (G1~G7, N26, RULES_MARK 5), #633, #634, #636 the rule-chip hotfix, #632 the home reading list and notes, #638 fifteen notes; before that 2026-11-17 at `705a809f`, after #553 dev tooling and #580 bundle 11-16b (#572 #571 #563 #559 #560 #564 #568 #567 #570 #569 #565 #574 #573 #575 #576 #578): decision T sheet, ops-mode calendar, the weekly rules page, calendar 2027-W17~W26, stake clock read aloud, share links in the player's language, page heroes, side case 8, board report queue, README showcase, UI quick wins, finish count, link preview pictures per language, the GAUGE logo; before that 2026-11-16 at `60dc8551`, after #566 (#557 #558 #562 #561) board admin tool, market shock result line, case-writing chapter 18, event-week doc test; #551 crisis edge alert, #555 (#550 #552) two weekly rules in the catalogue only, #556 the hall of fame threshold line; before that 2026-11-13 at `bd2bd589`, after #535 #537 #547 (#534 #538 #540 #541 #542 #543 #544 #545 #546) #539 #548 #549; before that 2026-11-11 at `5202715`, after #503 #426 #504 (#350 #301 #501) #477 #314 #317 #321 #333 #509 (#505 #506 #507 #508) #512 (#510 #511); before that 2026-11-10, after #492 #493 #495 #491 #496 #497 #498 #499 #500 #484; before that 2026-11-09, after #476 360px five card hand, #481 studio names and the makers as we, #478 content pages (177 plain pages), #485 about page accuracy, #488 bundle 1109b (#482 #483 #487), #489 page accessibility and #490 judgment tool bot line).
 
 This file holds what is true now: the shape of the project, the rules a change
 has to keep, and the commands that prove it. What changed and why is in `git
@@ -1048,8 +1048,38 @@ Still open, on purpose:
   ×32+ cash halves the scene's human cost, collapse gate 20 → 13 (collapse
   20.0%, final answer 76.0%); G45 ten compensation payments close a burn
   season as QUIET COVER (three endings on the spend-people path);
-  `before13`. Risk noted: money-style collapse 78.7%. This bundle adds
-  marks 12~13 to README and terminology and the note `late-choices-count`.
+  `before13`. Risk noted: money-style collapse 78.7%. #697 (`4ff896f3`,
+  14:30) adds marks 12~13 to README and terminology and the note
+  `late-choices-count`. The E1h layout sweep on `e052534f` read 25,097 rows
+  over 54 of 55 cases with no hand overflow and no horizontal overflow; 13
+  of its 16 jobs hit the 120-minute limit before measuring every scene.
+  #699 (`cf7cbf6c`, 15:23) hotfix: on a Galaxy A32 (Android Chrome) the
+  held 꾹 눌러 확정 still broke mid-hold or needed a second press after
+  #687 — `touch-action: manipulation` let a few pixels of finger drift read
+  as a pan and Chrome sent `pointercancel`; the held cash
+  (`.gx-cash[data-hold]`) alone is now `touch-action: none`, other buttons
+  still scroll. Bundle #703 (`[병합 sha]`, [병합 시각]) with #700, #702 and
+  #701: #700 replaces the three-person first-hour watch with an in-game
+  record — first-visit devices only (no game data stored when the page
+  first loaded), the first 30 minutes, sent only with data sharing on, no
+  IP, UA, name or session number, no free text; two skippable tap
+  questions, 「무엇을 잃었나요?」 (stake / next scene / not sure) on the
+  first BUST's verdict sheet and 「다음에 또 켤 것 같나요?」 (0~10) on
+  프롤로그 01's report; migration `20261202020000_first_hour_runs.sql`
+  (table `first_hour_runs`, RPC `first_hour_record`, 25 fixed keys,
+  purged after 180 days) applies on merge; the Funnel job summary gains a
+  grouped table (`scripts/report-first-hour.mjs`), and reading it waits
+  for a date. #702 makes e2e expect #699's `touch-action: none` (main
+  Verify on `cf7cbf6c` was red). #701 gameplay round 7 A, RULES_MARK 14:
+  G50 the final answer weighs 6 (was 5 since mark 10; it moves the ending
+  in 79.2% of standing seasons, was 76.0%), G51 FRONT PAGE ×1.2 → ×1.12
+  (refined ×1.3 → ×1.18, the guide's +20% → +12%, tool spread ×1.290);
+  check:pressure's one-tool bound is ×1.35 again on the listening hand's
+  one-tool line (the streak hand's ENCORE and METRONOME lines keep ×1.40);
+  the judge-skill collapse assertion is a paired measure (the same season
+  played blind and listening) at 18%p for mark 14 (money pair 37.5%p; 40%p
+  comes with G48 at mark 15). Rows marked 13 or less recheck as
+  `before14`. This docs PR adds mark 14 to README and records the afternoon.
 - Side cases in the story (2026-11-18, 「현재 준비된 번외 스토리 전부
   공개해줘. 스토리 흐름 순서에 맞게 곳곳에.」): the written side cases
   (nine then, eleven since 11-25) no longer wait for a closed finale. Each entry of `SIDE_CASES`
