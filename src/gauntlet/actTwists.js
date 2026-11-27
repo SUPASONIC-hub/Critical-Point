@@ -43,7 +43,7 @@ export const MERGER_TOP_SHIFT = 6;
 export const MERGER_EIGHT = Object.freeze({ wallTopShift: -MERGER_TOP_SHIFT, chipsFactor: MERGER_CHIPS });
 
 /** The twist's numbers, in the catalogue's schema terms (weeklyRules.js `weekRuleOverlay`). */
-export const ACT_TWIST_RULES = Object.freeze({
+const ACT_TWIST_RULES = Object.freeze({
   merger: Object.freeze({ label: "MERGER", act: 3, schema: Object.freeze({ wallShift: -MERGER_SHIFT, chipsFactor: MERGER_CHIPS }) }),
   scattered: Object.freeze({ label: "SCATTERED", act: 5, schema: Object.freeze({ wallSpread: SCATTER_SPREAD, chipsFactor: SCATTER_CHIPS }) }),
   hearing: Object.freeze({ label: "HEARING", act: 7, schema: Object.freeze({ secondsFactor: HEARING_CLOCK, chipsFactor: HEARING_CHIPS }) }),
