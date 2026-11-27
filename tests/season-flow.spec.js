@@ -1726,7 +1726,8 @@ async function readClosedSave(page, caseId) {
 }
 
 for (const band of [
-  { level: "clear", low: 12, high: HARM_GATE * SEASON_STANDING_NEAR },
+  // 12 under the old gate of 20; it follows the gate (13 from RULES_MARK 13, G47) so the band is never empty.
+  { level: "clear", low: HARM_GATE * SEASON_STANDING_NEAR - 4, high: HARM_GATE * SEASON_STANDING_NEAR },
   { level: "near", low: HARM_GATE * SEASON_STANDING_NEAR + 1, high: HARM_GATE },
   { level: "over", low: HARM_GATE + 1, high: HARM_GATE + 10 },
 ]) {
